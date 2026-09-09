@@ -1,0 +1,106 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/lobby.gd" id="1"]
+[ext_resource type="Script" path="res://addons/kenyoni/qr_code/qr_code_rect.gd" id="2"]
+
+[node name="LobbyPlayground" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.055, 0.075, 0.12, 1)
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Center" type="CenterContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Billboard" type="VBoxContainer" parent="Scroll/Center"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Scroll/Center/Billboard"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.9, 0.75, 1)
+theme_override_font_sizes/font_size = 32
+text = "PLAY SHAPES"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Scroll/Center/Billboard"]
+layout_mode = 2
+text = "Lobby playground · Phase 1"
+horizontal_alignment = 1
+
+[node name="JoinTitle" type="Label" parent="Scroll/Center/Billboard"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Join session"
+horizontal_alignment = 1
+
+[node name="QRCenter" type="CenterContainer" parent="Scroll/Center/Billboard"]
+layout_mode = 2
+
+[node name="JoinQR" type="TextureRect" parent="Scroll/Center/Billboard/QRCenter"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 280)
+layout_mode = 2
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+script = ExtResource("2")
+mode = 4
+auto_module_size = false
+module_size = 8
+quiet_zone_size = 4
+
+[node name="Instructions" type="Label" parent="Scroll/Center/Billboard"]
+layout_mode = 2
+text = "Connect your phone to the same network, then scan."
+horizontal_alignment = 1
+
+[node name="JoinAddress" type="Label" parent="Scroll/Center/Billboard"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+
+[node name="Network" type="HBoxContainer" parent="Scroll/Center/Billboard"]
+layout_mode = 2
+alignment = 1
+
+[node name="AddressPicker" type="OptionButton" parent="Scroll/Center/Billboard/Network"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Choose the PC address on your phone's network. VPN addresses may not work."
+
+[node name="Refresh" type="Button" parent="Scroll/Center/Billboard/Network"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Refresh"
+
+[node name="Copy" type="Button" parent="Scroll/Center/Billboard/Network"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Copy link"
+
+[node name="Connections" type="Label" parent="Scroll/Center/Billboard"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 browser connections"
+horizontal_alignment = 1

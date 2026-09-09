@@ -1,0 +1,10 @@
+:root { color-scheme: dark; font-family: system-ui, sans-serif; background: #0e131f; color: #f0f3f8; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100svh; display: grid; place-items: center; padding: 24px; }
+main { width: min(100%, 440px); text-align: center; padding: 40px 20px; }
+.brand { letter-spacing: .2em; font-size: 14px; font-weight: 750; color: #a6e6bf; }
+.shapes { color: #a6e6bf; font-size: 48px; letter-spacing: .15em; margin-top: 40px; }
+h1 { font-size: clamp(36px, 10vw, 52px); margin: 20px 0; }
+p { line-height: 1.6; }
+#status { padding: 18px; border: 1px solid #3b544b; border-radius: 12px; background: #172820; }
+.footnote { margin-top: 40px; color: #a0abbd; font-size: 13px; }
