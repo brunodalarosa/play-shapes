@@ -1,0 +1,18 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "godot": {
+      "type": "local",
+      "command": [
+        "C:\\Users\\backup pc\\.local\\bin\\godot-editor-mcp.exe"
+      ],
+      "cwd": "C:\\Users\\backup pc\\Documents\\Codex\\Play Shapes\\play-shapes",
+      "environment": {
+        "GODOT_MCP_GODOT_BIN": "C:\\Users\\backup pc\\Documents\\Godot\\Godot_v4.7.2-stable_win64.exe",
+        "GODOT_MCP_PROJECT_DIR": "C:\\Users\\backup pc\\Documents\\Codex\\Play Shapes\\play-shapes"
+      },
+      "enabled": true,
+      "timeout": 15000
+    }
+  }
+}
