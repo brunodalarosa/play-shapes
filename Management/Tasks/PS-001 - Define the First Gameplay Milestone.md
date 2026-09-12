@@ -2,7 +2,7 @@
 id: PS-001
 title: Define the first gameplay milestone
 type: design
-status: backlog
+status: in progress
 release:
 owner: shared
 priority:

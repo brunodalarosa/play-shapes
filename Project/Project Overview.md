@@ -57,7 +57,7 @@ Prefer designer-facing Godot resources, inspector properties, data/configuration
 
 - Start work: [[Workflow]]
 - Understand task records: [[Task System]]
-- See current work: [[Task Index]] or [[Task Board]]
+- See current work: [[Task Index]] or [[Task board]]
 - See milestones: [[Releases]]
 - Review durable choices: [[Decision Log]]
 - Capture a new idea: [[Human Drafts]]

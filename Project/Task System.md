@@ -82,4 +82,4 @@ Every implementation task's draft prompt tells the coding agent to:
 4. The executor moves it to `in-progress` and records findings in the same file.
 5. If blocked, record the precise blocker and required resolution.
 6. When acceptance criteria are met, fill `Outcome`, capture durable decisions in [[Decision Log]], create only necessary follow-ups, and move the task to `done`.
-7. Keep [[Task Index]] synchronized. [[Task Board]] reads the same frontmatter automatically.
+7. Keep [[Task Index]] synchronized. [[Task board]] reads the same frontmatter automatically.

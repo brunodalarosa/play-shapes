@@ -2,7 +2,7 @@
 id: PS-002
 title: Validate Phase 1 on a physical phone
 type: validation
-status: backlog
+status: done
 release: Local Connection Proof
 owner: shared
 priority:

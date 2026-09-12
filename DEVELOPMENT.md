@@ -5,9 +5,9 @@
 The canonical planning layer is Markdown under `Project/`, `Drafts/`, `Roadmap/`,
 `Tasks/`, and `Decisions/`. Future agents should begin with
 [Project Overview](Project/Project%20Overview.md), then read
-[Task Index](Tasks/Task%20Index.md), the selected task, and its linked decisions
+[Task Index](Task%20Index.md), the selected task, and its linked decisions
 before proposing or implementing work. The interactive Obsidian view is
-[Task Board](Tasks/Task%20Board.md); its manual-index fallback requires no plugin.
+[Task board](Task%20board.md); its manual-index fallback requires no plugin.
 
 Implementation work must happen in a separate execution session from planning.
 An implementation task is not ready until its scope, acceptance criteria,

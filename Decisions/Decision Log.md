@@ -62,5 +62,5 @@ Record durable architectural, production, and game-design choices here so future
 - **Decision:** Use one Markdown note per substantial task, small YAML frontmatter, stable sequential IDs, wikilinks, a manual index, and an embedded Obsidian Base for Kanban. Use only exploration, design, implementation, and validation task types until a demonstrated need arises.
 - **Reason:** The system must remain Git-friendly, human-readable, AI-readable, and usable without heavy process or a required query plugin.
 - **Alternatives:** Jira-like workflow replication and Dataview-dependent indexing were rejected.
-- **Related tasks:** [[Task System]], [[Task Index]], [[Task Board]]
+- **Related tasks:** [[Task System]], [[Task Index]], [[Task board]]
 - **Revisit:** When repeated friction provides evidence for a small process change.

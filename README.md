@@ -13,5 +13,5 @@ network troubleshooting, and remaining phone/export checks.
 ## Planning
 
 Open [Project Overview](Project/Project%20Overview.md) for the product principles
-and planning map. Current work is listed in [Task Index](Tasks/Task%20Index.md),
-with an Obsidian Kanban view in [Task Board](Tasks/Task%20Board.md).
+and planning map. Current work is listed in [Task Index](Task%20Index.md),
+with an Obsidian Kanban view in [Task board](Task%20board.md).
