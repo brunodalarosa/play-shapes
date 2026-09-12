@@ -64,3 +64,12 @@ Record durable architectural, production, and game-design choices here so future
 - **Alternatives:** Jira-like workflow replication and Dataview-dependent indexing were rejected.
 - **Related tasks:** [[Task System]], [[Task Index]], [[Task board]]
 - **Revisit:** When repeated friction provides evidence for a small process change.
+
+## DEC-008 — First gameplay proof is one Simon Says dance minigame
+
+- **Date:** 2026-09-12
+- **Decision:** Milestone 1 proves one complete 2–10 player loop from the lobby through a Simon Says-style dance minigame, a two-tier results scene, and back to the lobby. One-player start is debug-only. The scoreboard, multi-minigame sequencing, and fake music stops are excluded.
+- **Reason:** The milestone should prove a coherent shared-screen and phone-controller experience without expanding into the broader party-game session architecture.
+- **Alternatives:** Implementing the scoreboard, sequencing multiple minigames, or adding fake stops in the first gameplay milestone were deferred.
+- **Related tasks:** [[PS-001 - Define the First Gameplay Milestone]], [[PS-007 - Define the Gameplay Debug Suite]], [[PS-008 - Design Fake Music Stops]]
+- **Revisit:** After Milestone 1 playtesting or when defining the next gameplay iteration.

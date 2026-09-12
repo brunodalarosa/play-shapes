@@ -22,6 +22,31 @@ A release is a meaningful playable proof, not a sprint. The human project owner 
 
 - [[PS-002 - Validate Phase 1 on a Physical Phone]]
 
-## Next milestone
+## Milestone 1 — Simon Says Gameplay Proof
 
-Not yet named or scoped. [[PS-001 - Define the First Gameplay Milestone]] exists so the human can choose what the first actual gameplay release should prove before related tasks are assigned to it.
+**State:** Scoped and approved; implementation tasks have not been assigned.
+
+**What this release proves:** A group can move from the local lobby through one complete, readable, phone-controlled minigame and return to the lobby, demonstrating the first coherent Play Shapes gameplay loop.
+
+**What should be playable:** A host starts the minigame after 2–10 players join, a tunable countdown transitions to a Simon Says-style dance game, phones provide press-and-hold pose choices across two to four color-and-icon regions, lives and elimination produce a final ranking, and a simple celebratory/moody results scene appears before returning to the lobby. A one-player start is available only through the debug suite.
+
+**Explicit exclusions:**
+
+- Cross-minigame scoreboard and session sequencing.
+- Fake music stops, which are deferred to [[PS-008 - Design Fake Music Stops]].
+- Final numeric tuning values before playtesting.
+- Additional tie-breaking behavior beyond the deliberately limited rules in [[PS-001 - Define the First Gameplay Milestone]].
+
+**Completion evidence:**
+
+- Automated rules and protocol checks.
+- Godot editor/runtime validation of the complete scene loop.
+- Browser/controller validation, including simulated connections up to 10 players.
+- A working one-player debug path that does not alter the normal 2-player minimum.
+- At least one full-session LAN check with two physical phones.
+- Human playtesting of phone attention, shared-screen readability, cue clarity, fairness, pacing, and results presentation.
+- Evidence reported separately by automated, editor/runtime, browser, physical-device/LAN, and human categories.
+
+**Source design:** [[PS-001 - Define the First Gameplay Milestone]]
+
+**Included managed tasks:** None yet. The human project owner will assign implementation and validation tasks separately.
