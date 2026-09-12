@@ -1,5 +1,18 @@
 # Play Shapes development
 
+## Planning and task context
+
+The canonical planning layer is Markdown under `Project/`, `Drafts/`, `Roadmap/`,
+`Tasks/`, and `Decisions/`. Future agents should begin with
+[Project Overview](Project/Project%20Overview.md), then read
+[Task Index](Tasks/Task%20Index.md), the selected task, and its linked decisions
+before proposing or implementing work. The interactive Obsidian view is
+[Task Board](Tasks/Task%20Board.md); its manual-index fallback requires no plugin.
+
+Implementation work must happen in a separate execution session from planning.
+An implementation task is not ready until its scope, acceptance criteria,
+dependencies, and draft execution prompt reflect approved design decisions.
+
 ## Phase 1 — LAN hello world (2026-09-09)
 
 Implemented: boot starts HTTP and WebSocket services, then opens the lobby
