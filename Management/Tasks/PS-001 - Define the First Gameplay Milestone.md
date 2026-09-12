@@ -70,7 +70,7 @@ The first gameplay milestone proves that a group of 2–10 players can join a lo
 
 ## Confirmed candidate minigame
 
-The first gameplay milestone will be scoped around a Simon Says-style dance minigame:
+The canonical minigame design is [[001 - Dancer simon says]]. The first gameplay milestone will be scoped around this Simon Says-style dance minigame:
 
 - A playful lead dancer appears in the center of the shared screen, with each player's character arranged along the bottom.
 - While music plays, all characters dance automatically.
