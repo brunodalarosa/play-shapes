@@ -1,3 +1,7 @@
 # Normalize EOL for all files that Git considers text files.
 * text=auto eol=lf
 addons/kenyoni/** linguist-vendored
+# Preserve supplied source bytes used by the PS-009 provenance checks.
+assets/Kenney_Shape_Characters/License.txt -text
+assets/Kenney_Shape_Characters/Vector/overview.svg -text
+assets/Kenney_Shape_Characters/Vector/overview.swf -text

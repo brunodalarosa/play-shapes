@@ -1,0 +1,1670 @@
+{
+  "Default": {
+    "blue_body_circle.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "57c452ba4d745de4e7bc1df6c3bf34e3a8542d28a4e548c278ddf8e64fd525e3",
+      "atlas": "57ad5e93ee27c1e005a6ecc0ed6930a89dffa8c03aea1a91ec9bc2aabbbbb643"
+    },
+    "blue_body_rhombus.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "8be2a2cf1f904c79f7a76212c3cb4a4f1e99a4e7b2e853c88a2181e5ceaed9af",
+      "atlas": "72ca2d2d525a3ba2c4299aec426f24ca1a0d483caa09d7eb401b04ff98d109c6"
+    },
+    "blue_body_square.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "68500851b3de11fc489af9fa193f7cd0f43ae6e89c779202340be5984a92b55e",
+      "atlas": "cfb7d7feaf976106faa11dfe6f7de9ed22300b18c61ad8baa4188cdb5fa5e1dc"
+    },
+    "blue_body_squircle.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "0cf2b8e0ef265add1f76412fcac199baa55473431ca37043f2dbf2cb4eb3067f",
+      "atlas": "ce9086a758a06402ac109b253fe43126fdfec4d540d43283524ef8e08759d8cc"
+    },
+    "blue_hand_closed.png": {
+      "size": [
+        35,
+        34
+      ],
+      "standalone": "caa39af0174c7e22c0ba7aedae1b00907b74d421d832b36b69ce6f04e3e53062",
+      "atlas": "f93f3ef1bf37a9e6a83f32c3ae4e3d92a481b7ba399634817f738e436613d06f"
+    },
+    "blue_hand_open.png": {
+      "size": [
+        34,
+        38
+      ],
+      "standalone": "23e147dbdf4f9cdae203f01a0b1d456f354b7581ed240e69a7bde2e5d97a5890",
+      "atlas": "6e981735884b0a1bbfe386591f986d224224b65ef5eb9a47f5be768c4907338c"
+    },
+    "blue_hand_peace.png": {
+      "size": [
+        28,
+        40
+      ],
+      "standalone": "260ba9c200ae533808dcd645a754feba710d37fa7193f21e90aae025aba84863",
+      "atlas": "89877849901155768d08a4df7c32b20e08f8da0af4b0f38cc9846f5e97738817"
+    },
+    "blue_hand_point.png": {
+      "size": [
+        34,
+        36
+      ],
+      "standalone": "367fa3be8c433f67d7343cfb5e8f47999c499c9e3b5eb1d1e98bd9140ddcce32",
+      "atlas": "3accac45c999f6f1c7b58016bc1416a37a6709140d8a2005614963879cd2f6c9"
+    },
+    "blue_hand_rock.png": {
+      "size": [
+        36,
+        38
+      ],
+      "standalone": "f765ab5eaa162741abfd757202de363ad95a03441e0efddb819e4d1e01e027ba",
+      "atlas": "85b1becb658f191731b678b2fee1dd9387c93d1f168f63a226c3230193c7dc1a"
+    },
+    "blue_hand_thumb.png": {
+      "size": [
+        32,
+        38
+      ],
+      "standalone": "fb4cf4348f98eafd5c377ae8cae4afca07660abcc1eb1bfbf1650968bf41f012",
+      "atlas": "35579c04d8bfe364303c722a45712998efd8b835b46891df821abdfa7ed318ab"
+    },
+    "face_a.png": {
+      "size": [
+        50,
+        29
+      ],
+      "standalone": "05b377a667520bd549cfaad9e2641a11a85e0f06d66ea56fe5f3a14f1b9001fb",
+      "atlas": "9c178266fc5e9e54b988381b7efe96fa997c16564bb6d50904a54264efc783f3"
+    },
+    "face_b.png": {
+      "size": [
+        50,
+        24
+      ],
+      "standalone": "47a906cad73351eaa5cac408e836970111592e5b2be980e1b191841ab2ff846a",
+      "atlas": "0289f7c001f476aa3ef3251c9375913ab38e03c8796ad8d0ee4a92242732bb8e"
+    },
+    "face_c.png": {
+      "size": [
+        59,
+        30
+      ],
+      "standalone": "6ddcdc4c6a9112b50fdb0d8e13075f324136f72edcca6aebbef0de85bdc29e47",
+      "atlas": "2300b01b39c46a88e1db7aa0f2a488575538cd99ee8b4a9b207d4022b150eeee"
+    },
+    "face_d.png": {
+      "size": [
+        53,
+        33
+      ],
+      "standalone": "ac5ec1db5403e68e0b98049c4eadabae7ebaaa6b2142f78ff0ff8e84656e8080",
+      "atlas": "c0b545314fd2a2356c92649cb181c44f5f55084e5204ae3e8e0b56e3cfb47ea8"
+    },
+    "face_e.png": {
+      "size": [
+        55,
+        40
+      ],
+      "standalone": "c12a01677a3c4871224becab820b57f03d135e18fc95a3bf97077aae03948def",
+      "atlas": "6600bf30e1b2a3c5592e7bb0dee8d8482a5f3cae9470b816cbde92d01f77e73c"
+    },
+    "face_f.png": {
+      "size": [
+        55,
+        33
+      ],
+      "standalone": "e9d26d5dfff81867664f48b205a0b819bfdd4de262289de5d04c99fb781d1fc1",
+      "atlas": "69015d3296ae2198a798f31d4640f072053dbb152f1c104c13ca61ff86e4ce8e"
+    },
+    "face_g.png": {
+      "size": [
+        55,
+        32
+      ],
+      "standalone": "a4c35a778d5cc8f34f4c052853c28166108b9d52b0f0079ef4e0277a44623d28",
+      "atlas": "6ce3c97cc15981a6d89ae91296e6c3e439e5cb5966c1a77415885b979612966c"
+    },
+    "face_h.png": {
+      "size": [
+        55,
+        36
+      ],
+      "standalone": "f10d3822cdd274b112df63831a5265ba64d4f4c6c9bd245110b6bf0229069ea4",
+      "atlas": "a50e22bdfb0bc035f3df888d424aa4e9065c3b50116b12d1cfe71ad71fc9d0fa"
+    },
+    "face_i.png": {
+      "size": [
+        59,
+        42
+      ],
+      "standalone": "8b4fed8a8752c17595b8387c010e52ee6cb682ba9c668be38cdf2cab7f008d43",
+      "atlas": "6d86cbfed2b5ebd0c6371bb78e9b0e2de8b34079b03b0c53acde77eb00ed3ec1"
+    },
+    "face_j.png": {
+      "size": [
+        50,
+        39
+      ],
+      "standalone": "3b00bc8b92d1e285417175669e0eba45964703adb7a578b7a865bdbe4f365f13",
+      "atlas": "8f61605489ba0166ddbf359a088d31369a254e42f51f8cde0cb0c635be44dab7"
+    },
+    "face_k.png": {
+      "size": [
+        55,
+        40
+      ],
+      "standalone": "f124d72f1ea16a73057c495069b7890cd5013fff46f19785930b65133e332ce9",
+      "atlas": "7e6a4331412821e0d3c906b24551877058ff8a717d2d76c7ebb14943a6aba3e7"
+    },
+    "face_l.png": {
+      "size": [
+        53,
+        37
+      ],
+      "standalone": "f60a01e5ce11e282a27af230be8616cc9b62fd0f64e20aa959c1caa390c102dc",
+      "atlas": "0acde068819dc9b61d6664b7e2a5a04c4d7ee8f2f7bb438c159935643154260b"
+    },
+    "facial_part_eye_closed_down.png": {
+      "size": [
+        23,
+        11
+      ],
+      "standalone": "e8dd46fabf4a29f5126610cbf4c696bf0e02a9d3a916eb17c2478d0cf0becc36",
+      "atlas": "8e57d10c2cfe1705c31d5ec341eb671816114ac547b24f0d2cf7fbb5a1136a17"
+    },
+    "facial_part_eye_closed_up.png": {
+      "size": [
+        23,
+        11
+      ],
+      "standalone": "83a914b0b329fc5b8767c33852172bb8391d7b1b80f738df49cf44a32a661144",
+      "atlas": "7e08607dc2b6d682c9a43de348c1908729f7f361d9891a674f1fde5b940bf793"
+    },
+    "facial_part_eye_half_bottom.png": {
+      "size": [
+        20,
+        10
+      ],
+      "standalone": "53c8d38f8cae589ff52595afe98972de3eb391842c59598d03899c37540ffce3",
+      "atlas": "408d94288d0077fc467a790821a58f3045355043a163e096528e604efd980b09"
+    },
+    "facial_part_eye_half_top.png": {
+      "size": [
+        20,
+        10
+      ],
+      "standalone": "0370f084291a7130d4e16822d3d244ba927af653bb57cf9c390b5dab91667a69",
+      "atlas": "7e52220c76daf2d71eacf3cf037fffc62453bc2db2d04680d67155339a1eac80"
+    },
+    "facial_part_eye_half_top_wing.png": {
+      "size": [
+        25,
+        10
+      ],
+      "standalone": "dbc112b9d643b3a6d0100c5402e5c1cc587f9603813ec69ca9c5f043b384a068",
+      "atlas": "a308d01207f81ae3a97944715e776bbb8a778aac03eae8debc0b9c3816baa219"
+    },
+    "facial_part_eye_open.png": {
+      "size": [
+        20,
+        20
+      ],
+      "standalone": "f34c141154bff7d2a522f71e279a1695781db6593caa88dc0e722c8155b7c210",
+      "atlas": "313fe987076b0f9862b6ac45f5af679bc2fae0f1b7948908ddc77e34f8520ef9"
+    },
+    "facial_part_eyebrow_a.png": {
+      "size": [
+        20,
+        5
+      ],
+      "standalone": "8d04fdded10c21cb89a1268818cfc883886bbeced2832cf510921f2da07b259f",
+      "atlas": "e758bf245533845e83159c58b293a667329d5377e091ac97ec9cffcd218e6be0"
+    },
+    "facial_part_eyebrow_b.png": {
+      "size": [
+        20,
+        7
+      ],
+      "standalone": "06d3c55e7d8eebafb0c18ad821a429fe0a9abc610ade7ee8ee37028e5d9de541",
+      "atlas": "08f894b8db6e55af33a741d08f264fa8a3ff50a5f40198ac48e624cfea1295cc"
+    },
+    "facial_part_eyebrow_c.png": {
+      "size": [
+        15,
+        5
+      ],
+      "standalone": "84bfe6430477cccbb9e0c775ea8eb23a5fde1782dd1314483a33c72484a7e1d9",
+      "atlas": "ad0c11482bfaf0fe58239cc16b714a19bbdad674eb2828ae2dfa6ad9d162903f"
+    },
+    "facial_part_eyebrow_d.png": {
+      "size": [
+        20,
+        8
+      ],
+      "standalone": "d66ae2a8e4af563bc387a9ed80a55864bd983f1141108bc245446e2144446f82",
+      "atlas": "11d52e83d9a0195884e0961a343a2dd9987b4de0e618a14386df87b380d9c31f"
+    },
+    "facial_part_mouth_angry.png": {
+      "size": [
+        40,
+        10
+      ],
+      "standalone": "1c69812938fa7a16badb88ad77f4aafd9159175bcc71e3419b15e952c1c87dc0",
+      "atlas": "fc9351b3c8c9f31954565d13ae907e5a9a7884c2b462a389d6a2a18960c08378"
+    },
+    "facial_part_mouth_happy.png": {
+      "size": [
+        20,
+        7
+      ],
+      "standalone": "60e03c73729b54396af274eaf5afb99e2ccf187a9744bc48c3cf5de5900fa9ce",
+      "atlas": "9d626e99f0731bb9cf12e8e3af518d0472671807ab7e7cbded958c2a98722f65"
+    },
+    "facial_part_mouth_sad.png": {
+      "size": [
+        20,
+        7
+      ],
+      "standalone": "0ad4a577d5d562ecdd9c95421bb497d109f0c630cb55ded9ee6df2d5adfce11e",
+      "atlas": "268ed05e894aa03fc14561cffb3bc7a6bfdfd60018c0691b2a2b0792c1df2415"
+    },
+    "facial_part_mouth_smirk.png": {
+      "size": [
+        14,
+        7
+      ],
+      "standalone": "024928dc0b2046bc6c4afeadeac0527ffe3fd3d0b32abc41c60de05ba5b9ab71",
+      "atlas": "d241f0ab758aafaccc5a8556de1c675f18013720a10a9680f01019121a96d871"
+    },
+    "green_body_circle.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "2ef55bb668cb60f3446e5327752415b91b57c8aab01986b26200dcb71fb48c46",
+      "atlas": "54565dfa8d34cf60e2e92fab6a26c12bb1ae4021f881045bee9be7010ee26195"
+    },
+    "green_body_rhombus.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "7f4d598356af575d40b1cf28cae6971fac9d239586143a6c1b895e182dc5b9c8",
+      "atlas": "e4f1f8f7c41ba495e9d48029ed0c9fef3be62e6bcf9c60da81ede004dc46fa6e"
+    },
+    "green_body_square.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "db855c9946bd90b29dbd0950330ce7283ccb1ddcebafa9703efc7d7925f023fd",
+      "atlas": "234a4cdaa85dd58ed9358fa42c9ecb37c343ab3940a9e8c507fee005d04abb45"
+    },
+    "green_body_squircle.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "a31712fa9579b9bc9e3ef37c1c5609414c43e6a7eaf7d99a84f86aa028617f7a",
+      "atlas": "8850c5cf455e695fd23fc290152c72dce7d8c03238324ec86249ec1d74e19eb5"
+    },
+    "green_hand_closed.png": {
+      "size": [
+        35,
+        34
+      ],
+      "standalone": "4aba7dad364086b6d89f54b40bd3030863fea7fa4a40d8b7af66d20221b5c8a8",
+      "atlas": "81365d6f912fa90b98f748b4b0e6e940e94c0372286d161a546a4e326ead24b9"
+    },
+    "green_hand_open.png": {
+      "size": [
+        34,
+        38
+      ],
+      "standalone": "eee576fdd58c7302a4cada856d5ed58ffad2d3e8657f9b2985f35f5cb2b31b61",
+      "atlas": "985158dea8ff913268d2a1901b5cfcd86351a6e4e3faa8fc99a62a2308abe0ad"
+    },
+    "green_hand_peace.png": {
+      "size": [
+        28,
+        40
+      ],
+      "standalone": "8aaf19119590a4c2cbab8d0245ca772c6b33b8530cd36ee408551fb155527c91",
+      "atlas": "ef947e01847f8acf3f076c01d4c755ed9c47aababb5813249f301fb0c1ee2524"
+    },
+    "green_hand_point.png": {
+      "size": [
+        34,
+        36
+      ],
+      "standalone": "ffcaff9d80b0ec42a4b40cc7d395fc087062594257b7ff151e4fdef8e90cde9a",
+      "atlas": "497643af9f947cd633a71e5fccf2a0bbfdec3fc286ccc86b4a89056a8a7dc648"
+    },
+    "green_hand_rock.png": {
+      "size": [
+        36,
+        38
+      ],
+      "standalone": "26c01a1997b1165c4336ff966f0edf66de33ea6f35b45d63e5d972c91f1d01db",
+      "atlas": "e9aea6e5623a8a1d5ee5ef796f00be75ee179275fa1192071d6118a73cce3e96"
+    },
+    "green_hand_thumb.png": {
+      "size": [
+        32,
+        38
+      ],
+      "standalone": "41b7b4d63715e9b4a4124b928390aadf9a0fd67fd5dba767dc5f771a5e33bff5",
+      "atlas": "1176f648512702f73b831bb35ad18a58e40a734c3ed1b61af85b5f1f22f0a108"
+    },
+    "hand_yellow_closed.png": {
+      "size": [
+        35,
+        34
+      ],
+      "standalone": "7a6ce5e08939a1391349e02c06135de200e42b990b0851fd94a0b74d21bab002",
+      "atlas": "2211536e9a925827ac570dc336a301f2008bab4769b5debd86cdc52e510d5188"
+    },
+    "hand_yellow_open.png": {
+      "size": [
+        34,
+        38
+      ],
+      "standalone": "b961e1e4b7fc52fadde5a04e60f63e56ad426784f62f6b3070274b346d226d11",
+      "atlas": "c9cad29fcbaafdfeb8c9ea3f693ba1e3a3e70616e99517a493236460356c5fe9"
+    },
+    "hand_yellow_peace.png": {
+      "size": [
+        28,
+        40
+      ],
+      "standalone": "db3048ed10841be4c236d0b0273b74970ed39fd4826e9e958a7914647d2e3c22",
+      "atlas": "0336d67f16b0fe04081ba8124055931a2064814293aef80fb91ab9167617dd15"
+    },
+    "hand_yellow_point.png": {
+      "size": [
+        34,
+        36
+      ],
+      "standalone": "1014c7cab9688842d63d408563323eac3193369409393bfc9c23e8361002480d",
+      "atlas": "81806697e6711cb36282469bedaf723289da3866d86a3bace1360658b10ec372"
+    },
+    "hand_yellow_rock.png": {
+      "size": [
+        36,
+        38
+      ],
+      "standalone": "f7919213ecfad5cd4b650518e3af1562be4626659ac569f6448af51b0edc5a2d",
+      "atlas": "dbc76b777c22bd6b222874d79358495565cfde2fc38ceddba7dcbc934b25e4a6"
+    },
+    "hand_yellow_thumb.png": {
+      "size": [
+        32,
+        38
+      ],
+      "standalone": "10bd0eb302e890b9b95f3683c9db7bde092a3b496a9996b3f5063ccf6b555098",
+      "atlas": "524e5372b99b9308f10ba8e8d4f3aabd5d8ac49e0fafc5cce7c19e3cfb5bb9fa"
+    },
+    "pink_body_circle.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "81f2a597d60181a1a314c09d53f00c48532c0a15f3e3fb5d93e97a33e53fb362",
+      "atlas": "140a25172939625b7af08cd29539d2b7b2c082fb8ddb1c6661dfdaef38ebb60a"
+    },
+    "pink_body_rhombus.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "a38f2e73587b15ba3802928c32011edce3efa9b31cc082894409b839b8d3daec",
+      "atlas": "b3c72b24ae36b1f4a11b0ab13d196fa370e9b2de9118738cfcab468bc8739c31"
+    },
+    "pink_body_square.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "305992e955af412ae2238958a7a6f6ee5d9180c4480f66af36ca663708a10f98",
+      "atlas": "24646897da90f1f94e1f38ddbbdf492b84ae7f0da373367e2257826ec3b9b777"
+    },
+    "pink_body_squircle.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "9c3ebb7e607cff75fdc18beabe59d85a31524a58953e3f21f24279dd4266b203",
+      "atlas": "39d1cd0c9c50613b1979d7599e6d1a2bea1ea8b3ce85cb5d400ba0b90ea624bf"
+    },
+    "pink_hand_closed.png": {
+      "size": [
+        35,
+        34
+      ],
+      "standalone": "80ef99552b7b5fd243d077f3f90689214d3f42e887c102c92d9de03f32918a44",
+      "atlas": "1409b7fc03ad452c5ef967c4bd8ecda1a18331d48a0d28a68d62317031672103"
+    },
+    "pink_hand_open.png": {
+      "size": [
+        34,
+        38
+      ],
+      "standalone": "510f8288f00d7fbed85a8409a5924eb8880f4a835c0cbf18b555b38308987d76",
+      "atlas": "f1be2713503bcf76f845518a5468cbf411c0f257074f41f0e8afcc55bff1fb25"
+    },
+    "pink_hand_peace.png": {
+      "size": [
+        28,
+        40
+      ],
+      "standalone": "cd0240fcd6e5a36670ab10dcb4d767397dfac834413e2e8b55c207f174a4a24e",
+      "atlas": "56cbb3470e9707e6597798e6af8e0db4863cdd6655a8edba6ad2f785c76f1a35"
+    },
+    "pink_hand_point.png": {
+      "size": [
+        34,
+        36
+      ],
+      "standalone": "b3e74a089b91e40c194b988c0b5597c4d5007a71b0e3c5aa37db90f54220424d",
+      "atlas": "2e9b0d8d3ff2d05e182977b24bf32ad356ec694a8f8a547243930bba0c4ca1d1"
+    },
+    "pink_hand_rock.png": {
+      "size": [
+        36,
+        38
+      ],
+      "standalone": "88b510907baab1bd0ca8b8d0da1aa37b0853cdc1fe3c04ded82b861198c46a3c",
+      "atlas": "f714d37aaf8d4dc999229d3a572587074d4594c85d7c33ada1061a2154f30152"
+    },
+    "pink_hand_thumb.png": {
+      "size": [
+        32,
+        38
+      ],
+      "standalone": "6b400658a085da95659bb45df1d861f6f504ccd140874c5a9d397c9bb2aea066",
+      "atlas": "e27c9d352ed9366de06430729536567891b697dbbb2fed829a6592dfcf635dbf"
+    },
+    "purple_body_circle.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "7d79a9ac3074ea15dd1fbb7508af2c79e649239ff90b81f64988c3c27051eb1b",
+      "atlas": "df96f8d188fc10074cb68eb78313fa7bc3c5ffc82cdd31f99e498def5205c691"
+    },
+    "purple_body_rhombus.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "9f12a0f4a0471840e5489ea208808dad6c05c208de534d20b3e6c7038ce0ed15",
+      "atlas": "81299a6aed5c487735b97db4f4a8cfe236e3d351102cff5112dd70e3f15632e1"
+    },
+    "purple_body_square.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "9788cbdb0a20fec63785fd553bb059a2475607b0602ee1147c74d4e954af5fda",
+      "atlas": "0ab93a96c8f41a387ed05c2e592ac8c7dbfcffbb916c08cc0db20d7f9bdd825d"
+    },
+    "purple_body_squircle.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "60ab7f27fe1a4e8db7f13532a94116a833c1156c77b47903f68c53a18e923115",
+      "atlas": "2551a95bf11a5008d87e4a83f08ff25d38abd3473180e82ce52a9676f543d8bc"
+    },
+    "purple_hand_closed.png": {
+      "size": [
+        35,
+        34
+      ],
+      "standalone": "960f354f93a7720f6ba407e2cfdf515828cb79f53d2ef9336f4b547841395062",
+      "atlas": "d795fc49bac9580b2f357907b1b547f23c23deb248ec9a2465a4264f5a63e039"
+    },
+    "purple_hand_open.png": {
+      "size": [
+        34,
+        38
+      ],
+      "standalone": "4bb7dc19e5d9cc03b650f0ae869ff3fb17355c73f3fceee0631bd844d30cb1f3",
+      "atlas": "f55604d1c20cd04b5fc059dcfee83c0a22db53f6cb75a8c3a65829b40d8182c1"
+    },
+    "purple_hand_peace.png": {
+      "size": [
+        28,
+        40
+      ],
+      "standalone": "ce7af3fe905c405ae7ad0e9f2829385ec4654ba892173cdaf36b26e885051af9",
+      "atlas": "0d60094f34bb6330388b207775e2dc957f918cece8084190b74ca7cdf7fe33bf"
+    },
+    "purple_hand_point.png": {
+      "size": [
+        34,
+        36
+      ],
+      "standalone": "2fb474b53d5357a09e20e7ab2e6801af584871558b8a25df3d3e698f0653f100",
+      "atlas": "4090aab129fe2745264243d9b135780ab70a7d7bb362112695edfdc6797f71ac"
+    },
+    "purple_hand_rock.png": {
+      "size": [
+        36,
+        38
+      ],
+      "standalone": "887fe9441a7153de010fd2b0abf318a3cfa04ba49559e04b458a1936d824f9df",
+      "atlas": "667c97e004932d4d804db108072cc876348f202a7a2fef247523f3949b98111d"
+    },
+    "purple_hand_thumb.png": {
+      "size": [
+        32,
+        38
+      ],
+      "standalone": "5ba1890e55cad7a0ef344e6159b8d8799e5b32aaa98d01fa01657e6ce27d71b6",
+      "atlas": "941ecd1dd7523e3fa1c693f832da96f3158f8b7667c3d74192360c67d5892a4c"
+    },
+    "red_body_circle.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "44d268a94ea187d4edf8333e465013aebe6c1ae69c4331971094706d9f8eafb8",
+      "atlas": "ede2553dd500b6feff73aa770e4e5a68147daad0eb55749e6d4adc0cd3f4c04d"
+    },
+    "red_body_rhombus.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "c5cc8c8daf8dcead8ebcb8481301dc77e29966dbdedf20d60112843172335574",
+      "atlas": "de6b5d723c8cdcb8b62d91a618de1a8cef615fbba1d432bb2e8b4210a802c8b1"
+    },
+    "red_body_square.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "facdeef104a3c6d8321ac9d129e585b61aeda372a1847023a95d7a55f92414b1",
+      "atlas": "dac5fcd3e1c894b708bd281cf24619dbf6848b3e5f1259138ca1f1d3daaa54ba"
+    },
+    "red_body_squircle.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "b1ab52f6dcca55bef63e3c4722b0e8b59c0e6bc0e6325671bbb012c305a47189",
+      "atlas": "b5da95f033a6edbabc083b89ffc813bb296d3ecb6154bfcfaa12bf75213ac0a3"
+    },
+    "red_hand_closed.png": {
+      "size": [
+        35,
+        34
+      ],
+      "standalone": "3eaccd2b44da4c686d8fb88238235ae96ef3284b22e81772435e5348b818bb57",
+      "atlas": "0b2b0231c6074d90035fe532bddfdf384fb84f4c4bd64c4ff474196b4351bf30"
+    },
+    "red_hand_open.png": {
+      "size": [
+        34,
+        38
+      ],
+      "standalone": "1f69947badd519700e1eb7b32c5f3cfa249f813f2e05e53ddbcacf46083d95b3",
+      "atlas": "824bd4cfc243eb0706305e1e34c7de6639447e98e4f715c8cd88f2261dd4e7c1"
+    },
+    "red_hand_peace.png": {
+      "size": [
+        28,
+        40
+      ],
+      "standalone": "8bd94381609b69897ecfcd2db155fdc5bc228301577847ac0a3dca766b9ae4b5",
+      "atlas": "473679405bddecb9d54f31f6d7f7273eec45222b9f0a9d4d63abda8b3faae34e"
+    },
+    "red_hand_point.png": {
+      "size": [
+        34,
+        36
+      ],
+      "standalone": "9a18e47cf4ef5c8ea5b06594ca8fd2e87a2334c030fb6fcac83808b691ace1cc",
+      "atlas": "e17582a585b0e81073fb4ea8ef69c25846606f4859452c51ebfc5fe82f7c4dbc"
+    },
+    "red_hand_rock.png": {
+      "size": [
+        36,
+        38
+      ],
+      "standalone": "3ce42c43827d693dd0e67d2d40bee6b40f27ed9a180cf877766b9728f146c24a",
+      "atlas": "4f2c43782a03394153cd06e0174804bf4cb5b3f07d4e263f1cb3c72417b659db"
+    },
+    "red_hand_thumb.png": {
+      "size": [
+        32,
+        38
+      ],
+      "standalone": "6b6cdc8b43ee6ee752fc88b9c0eac84a9214f09e56e4f07666ad893e9c37b8fe",
+      "atlas": "a8c35c5b314285fc69483029470b9c42fa4ea95a402114cdad227a237c4eae49"
+    },
+    "shadow.png": {
+      "size": [
+        48,
+        20
+      ],
+      "standalone": "eb05579a0ff520717423337f64591fda1105ae56fa01cd971c8872056f0f4c64",
+      "atlas": "99757949b00453dab463387bcd1ee1d655f277cd0287d5dda572559d36f7d0a8"
+    },
+    "tile.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "dcc0ca426542567098ad429ff771bd9cc3586ebecf6810f292028e9efa52ace9",
+      "atlas": "b80aa923a7bf7a1f4eef0c24167df7e3e5bef58fe2bfda75c3399035d40344cf"
+    },
+    "tile_background_grass.png": {
+      "size": [
+        32,
+        18
+      ],
+      "standalone": "7fbee0a0ef6694ff962532fc12a1dfdab0816f66d738246dcc18e7b6f297cfdb",
+      "atlas": "5790dc5b2747fd80ea1dd9a3e06ecc85f478f35ed55c7c54629828224bf70d9c"
+    },
+    "tile_background_tree_large.png": {
+      "size": [
+        96,
+        147
+      ],
+      "standalone": "f1cc6586adcad9e32176617714b6f6cbbbd1a97e1d654ba5b469663a603007be",
+      "atlas": "e1adf1a5918530213b8e9c38a815ccf918aeeb480b35f609e6f665d3c3e2bc0d"
+    },
+    "tile_background_tree_small.png": {
+      "size": [
+        72,
+        110
+      ],
+      "standalone": "a01f96d951b04821b912450d45996c44e453452d04f3fb702f60a0f14f03588f",
+      "atlas": "84d6e82d1b6bc0d89c4b5c4885598953b490b0e5da11814356a8eaf70e4db245"
+    },
+    "tile_center.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "18e83e8e3ba797ab35526b043af3e633644d469079f3d5c8a99b2f06c472a6f3",
+      "atlas": "899f3e74135aae0d70a3d5f3b1ade88bcb86e0104a6016dca3371c10e5a3f738"
+    },
+    "tile_cloud.png": {
+      "size": [
+        40,
+        40
+      ],
+      "standalone": "8030f9ba5abd0932483ee489a5d4f00b2b64ea25c9a068dbc32c76acd7845cde",
+      "atlas": "fe141ab867eb18d6f7c13a650f3a3774e09a9a80c948d06be44fba816e56bac1"
+    },
+    "tile_coin.png": {
+      "size": [
+        40,
+        40
+      ],
+      "standalone": "d52b6cababa1942c3c48393d1412f17e0e133fd7dbda2248a2babca7e74f352a",
+      "atlas": "e89f5d3784125615cf1f9109ce6c5e6c2e681e9791bcac22d8c1911b3f8c7155"
+    },
+    "tile_exclamation.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "fac3671279c48ddb3c9b4084eadc52d1a4a7b26dc31253f1e4d05951597bc942",
+      "atlas": "1a0f10dfa25381293748d7fee8ed856b747f25871623980b6918b3ef73105d69"
+    },
+    "tile_grey.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "b8f1c6ac0a484526e5940f08bd5c005641ae9281679d0d9e024072cc0d00ab91",
+      "atlas": "2c48acc9ee45f94f92b47c8f43749e4a5673f649d821e051dc02188a27b48f48"
+    },
+    "tile_half.png": {
+      "size": [
+        80,
+        40
+      ],
+      "standalone": "01ce6bcd622847e632d070c736f7c68b69d0b8c4569ef082c771c3af579205a8",
+      "atlas": "476473ed85e90d02bf87f536ed2a013c864c6c5d5461ecef2f5e7ecd4d2e24b4"
+    },
+    "tile_half_center.png": {
+      "size": [
+        80,
+        40
+      ],
+      "standalone": "31693b0304a3a874e4f3570db13f68da250cb13d9cf6009516c93f1105b84e7c",
+      "atlas": "2be78d5e355184ff82a89f02303a2fd563ef1d04513ad4879292babd5cb93e4a"
+    },
+    "tile_half_left.png": {
+      "size": [
+        80,
+        40
+      ],
+      "standalone": "cdc35c3ed19c9ae8db311029cceab6858796c573ff5e9ab0dd77cbdf61093690",
+      "atlas": "7d999aed2c80b08b430e344de6c3f9b4acb9c7a9cdcc7f38c011e86f1367da9f"
+    },
+    "tile_half_right.png": {
+      "size": [
+        80,
+        40
+      ],
+      "standalone": "8be6b0ca3592a6bdd9418e9a5ffa783b4e9622901df593e0a4f2005ef9723cf0",
+      "atlas": "9e68ea32e7c5025423b7c0eac553ea2665b8c0a4ec3a5cfa48d66bf103bb143e"
+    },
+    "tile_left.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "8c02e9d7f1a7007f373d3f456e2ec47af7284adceb66af788d59b6e24bfc1303",
+      "atlas": "e1c88139c9de7699ce31f1952c408dd41af3e3cc960ddce6a6c8bbdba4ded1df"
+    },
+    "tile_ramp_left.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "6714563c95021400434b62bdaa8800e4d80d4d79e0c65d080da82143621eb795",
+      "atlas": "a46bc1e9799f97b9aa6ca9a64337076271c4f5b6c487e07b875dec76330ddbc0"
+    },
+    "tile_ramp_right.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "ab8bd39a6d75d63c9b91af4336a4dfc59b29766f33f6cf78a2e5d3336973d222",
+      "atlas": "d88db4e92b91214dc9a63d7f7b8dfef4df01935f09dc2348abc75b192b1119c0"
+    },
+    "tile_right.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "32af32dd3097474597a8d61755e40cbcff66a35362592cd2f9a7c71b8a8898c2",
+      "atlas": "aaa7067f71744c64a3bb68c347cdeee65705ca87f39f081687f279f012639d92"
+    },
+    "yellow_body_circle.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "61e504e5019a41b6ba304e93954aeb9fb8e2e592dbb597bf93cfa5a7a10dc432",
+      "atlas": "7eedb5b5ae20acc28e359a03cf6cc1d9cef55a7129a2395fdf9dfe621a04884e"
+    },
+    "yellow_body_rhombus.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "1fb3a05ab028f0ed90b6c438781011cb770a61b83bb79ff33bcc3d6cd3f10bbf",
+      "atlas": "eb240c452c850951f32d5236d12df3a84bc448c3cd666f487416eec64f977570"
+    },
+    "yellow_body_square.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "15607133b4651826c6e7db17e44aa9b4046eb6302a60dc28d42e193b9daef893",
+      "atlas": "6dfcbfc3cdd1bede7205dda48e9f36ad0f8c94e58f6ec4e638ab4967ae9c12da"
+    },
+    "yellow_body_squircle.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "603387e5bde427cde5f2953073a3839b6a5a49d1cf359facb9822721774dd8bd",
+      "atlas": "9e4439681765694cdacaa441e73657bca7db9f81bdb9982593ed77f148260cde"
+    }
+  },
+  "Double": {
+    "blue_body_circle.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "8947e9b6ec4ee1fe9c9c3fa632939db43742b5004dd1cc42e8500f7bb96abf3c",
+      "atlas": "94f01321934a8b4c34fc93a73ba61db31acd7bac9bf5f51bf39ddda69080efdf"
+    },
+    "blue_body_rhombus.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "c45f26125da6f308df80f46d3447958e6bbfbc3a3954e7d6cb9d332f6d20b80f",
+      "atlas": "22571eda73b4cd9c8cd22ddc01e2c103bd1eaaf2e5b0f4e13c0b3020cd5148ab"
+    },
+    "blue_body_square.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "5f65b4f2ee8c70a4c7b6b90924ddf3a3505baa0b6bf06a978f7b2d44a678ebf7",
+      "atlas": "131875c7f15b9c5908b5f7a922ae7564d0762513725d544431c9bc0905e6ad8d"
+    },
+    "blue_body_squircle.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "8090dd42aadd4a666ae6176034d656c80d2d2aec24758b4ece88a6433df3b606",
+      "atlas": "14e6fe73a63d9ae89d8c8e41a90f224b003fe06240db98edbeb2d859d62f2fe6"
+    },
+    "blue_hand_closed.png": {
+      "size": [
+        70,
+        68
+      ],
+      "standalone": "b9a808427a0544060da8cbdd0497aebb5564f3272c6a27055f746afdd7fad973",
+      "atlas": "4257ef175b6a0dcb499a4eedba806d526849934788cd0ad39460f1ad8935c27d"
+    },
+    "blue_hand_open.png": {
+      "size": [
+        68,
+        76
+      ],
+      "standalone": "8c3af31366d3d977b8e5723799bb4be0f963b2855fb470aeb644cdf72eb5ff2c",
+      "atlas": "c0bf03b1c2f8f888d3d36cb35f5b18883f3836cfadc1b6458b092e7f70185555"
+    },
+    "blue_hand_peace.png": {
+      "size": [
+        56,
+        80
+      ],
+      "standalone": "0b1390ac09b736b28463e1d2d0ed5e3245db871a02bc640e232eb07930c610fa",
+      "atlas": "65ba213dde1dd85066e1532020e02d5dcc21553a48a13eb633d2e9a199e244aa"
+    },
+    "blue_hand_point.png": {
+      "size": [
+        68,
+        72
+      ],
+      "standalone": "fc389d7f6dca393eed3210b67dc5f5577bee6614b6043639b554f4e75015a8f5",
+      "atlas": "349217c2e9b2d60344dab0576d6758bea0dc8f612e0d0cbdc55216e3e9fc344b"
+    },
+    "blue_hand_rock.png": {
+      "size": [
+        72,
+        76
+      ],
+      "standalone": "31b56660ecd6f50ff287dc98104de69c996abe50e4dbb22165b2677ed8861cfe",
+      "atlas": "98df1fff2ea3c8d73e49fe8035a10e78b65fead20d70d75897d5231c2da6ad0f"
+    },
+    "blue_hand_thumb.png": {
+      "size": [
+        64,
+        76
+      ],
+      "standalone": "24eb6f04bb277e8266892d6e696fd4c31bafbc4a4414bd3f696171b3c5333c22",
+      "atlas": "6554f9f0b2a37c1fb6864829b0bbd0c6cb64dfb9dc0ae4620278df6be26b810d"
+    },
+    "face_a.png": {
+      "size": [
+        100,
+        58
+      ],
+      "standalone": "ce0f526452cb900f7baa3ecbc5473096f228369dfcc843fae2ad409757990ba2",
+      "atlas": "c89276ccd7ac68d57899ea841c3b102f7a351086546ac2d282c950f8097df55c"
+    },
+    "face_b.png": {
+      "size": [
+        100,
+        48
+      ],
+      "standalone": "48255a1df00db84e7443472aae8adfe223f54a9750db3604fd6945fcebc4dc5c",
+      "atlas": "8c20e81e9e306207f8e5ffa0ee739a657325f453bfa3e32a3dff1c6a97e01240"
+    },
+    "face_c.png": {
+      "size": [
+        118,
+        60
+      ],
+      "standalone": "d319818a79339ad08b5b6698048ecafb491dd0fd38a94fd5dbd821db825bde36",
+      "atlas": "f494f0e1fe2f8611152bcd8db2ef0bebc5f5971c794adbdfeb816a7911195074"
+    },
+    "face_d.png": {
+      "size": [
+        106,
+        66
+      ],
+      "standalone": "8a002d6c4fc89e39f86499f63a34da91861b62fac7645d4ff6c6d5c89ed1ab0f",
+      "atlas": "59aacacb15a493d92551af8e89364dcfbe3c9bcc0b493097f17566bceb5ac556"
+    },
+    "face_e.png": {
+      "size": [
+        110,
+        80
+      ],
+      "standalone": "754671e37773290d149ec6985fc2101325d284902c7a1d3b3f22a42e0b69029a",
+      "atlas": "ab51ca8a91c52dc3f3ea3c821c2f2e8ecc4abda43124d4123a44f50038b364a9"
+    },
+    "face_f.png": {
+      "size": [
+        110,
+        66
+      ],
+      "standalone": "a39d5367b7b7de8e8e2b39b1f55ca57d2e3bd19f4c74fa01028d077077d567aa",
+      "atlas": "eaf096346db3aee14414d0c5e81f2ab42a9dcc4aed601c393283cc50880ea83e"
+    },
+    "face_g.png": {
+      "size": [
+        110,
+        64
+      ],
+      "standalone": "6ca77c21f68c89ae613f463310e9ff93e407e8ff7a1d72a146d5d18b42c8ed49",
+      "atlas": "451029d22ffce25894720a8f080afe1ba7be52bc53bdb00679de4d2e5bad7052"
+    },
+    "face_h.png": {
+      "size": [
+        110,
+        72
+      ],
+      "standalone": "6445c48eae64c6c6c2ff799e4a76da6a7aef3362f7acc984ae9458bccd175c6f",
+      "atlas": "07a678323f501f283ac95ad932690e16a5e53f271e5eb1929c0de319f141248e"
+    },
+    "face_i.png": {
+      "size": [
+        118,
+        84
+      ],
+      "standalone": "c9883e9e4292ec5e944e7c62278e03024e2b22e33ca40718e88409e63b25e6e1",
+      "atlas": "d5babe50038a433d3363cdf66abc8488e4c3419ea7352fbd090f97563d885f4a"
+    },
+    "face_j.png": {
+      "size": [
+        100,
+        78
+      ],
+      "standalone": "eb7f74dbc13c4a7d6533632442c586fdfcb8fd21162d9ab70b445e0459869204",
+      "atlas": "74594f6d787e036a6a31e800f18904cb03aa309c5d854c0d72de031a30e751d1"
+    },
+    "face_k.png": {
+      "size": [
+        110,
+        80
+      ],
+      "standalone": "a1578bccf52112bcfe28d7df0b87f5fdd36f6aea18869f3ece3c11fafeb14094",
+      "atlas": "1b1a7d137362565824b2d80509e76634862d4c20872e35e302fd5cfb7a9279b7"
+    },
+    "face_l.png": {
+      "size": [
+        106,
+        74
+      ],
+      "standalone": "6248d595197083bfcdc94365257759b7627ae501052bdbf36a17f5998f65c65d",
+      "atlas": "5fddf801486f7395b71e50afa424e81121ee05ca2fe4be16149cb80b245a10ce"
+    },
+    "facial_part_eye_closed_down.png": {
+      "size": [
+        46,
+        22
+      ],
+      "standalone": "2376fb6d077c652ff3d2e5133f13a2c879c261f9354f3e4cce7b4aa1ebc93d69",
+      "atlas": "c259cbea904483a093badca2d800abc630c378a97816657f0c9565eee4253c8c"
+    },
+    "facial_part_eye_closed_up.png": {
+      "size": [
+        46,
+        22
+      ],
+      "standalone": "977b04f0ad6348336db21743de19bc87161af6cfb8cb69b7e7038f3ab4afd9a4",
+      "atlas": "3eea83c5ed232a85857f1209f722df6f639d7105a07cdf795fcd4fd4cd48b6af"
+    },
+    "facial_part_eye_half_bottom.png": {
+      "size": [
+        40,
+        20
+      ],
+      "standalone": "5af55ede9818233d3570103ec20b00f7fe018b4c82e609f13d4b934e6b5a3533",
+      "atlas": "6d669d43cc6464164ce80a65b2e9e08d88b329b6cfba54de1109ae9871837e1d"
+    },
+    "facial_part_eye_half_top.png": {
+      "size": [
+        40,
+        20
+      ],
+      "standalone": "a31bd8ed161932a3809438bf219804db5dde60a2de896e46e3eb8f65c9489f46",
+      "atlas": "1c5b14bdc3887ef8bd9cb39c387a5b3678094c8486b4636c35f5f0d710ebb0b3"
+    },
+    "facial_part_eye_half_top_wing.png": {
+      "size": [
+        50,
+        20
+      ],
+      "standalone": "d19ebb6f46c9609648603344f4408fdae565c32ff416c3cd19e78d778cbf5c18",
+      "atlas": "4ad27351fdf2df98a05f55c87921232d2467fb42aa5a7e6f43a039fe8d0bb6d2"
+    },
+    "facial_part_eye_open.png": {
+      "size": [
+        40,
+        40
+      ],
+      "standalone": "f5576094415c6727f0c90e08dcdcf0c6efd4633efa5b35afb5f56cba61e75953",
+      "atlas": "4a2fcc0c412fba7addb626d73a38e88a2deae556efdca503e20d71eea147a3b6"
+    },
+    "facial_part_eyebrow_a.png": {
+      "size": [
+        40,
+        10
+      ],
+      "standalone": "31120d8ba1d050bbdb40673dba388017592fd6e802bc4ae1bda205dc71087945",
+      "atlas": "951c3fd2d998efd0c26c95429b2ea4480066572cd8869c3345e05bb5aa9b3875"
+    },
+    "facial_part_eyebrow_b.png": {
+      "size": [
+        40,
+        14
+      ],
+      "standalone": "278d2a7a4734464c30bef8a836b7fc14ce7cada8128ed76e5c936e59d05af89d",
+      "atlas": "9d9f5b8722f1b5a6a4a4ca0be3bb369e5a8a5d74a51a33e098b188dd4263f0be"
+    },
+    "facial_part_eyebrow_c.png": {
+      "size": [
+        30,
+        10
+      ],
+      "standalone": "7f5661b7a56f6909e688c900a2499ddef1a7646a1306b38837ac37392dfb213b",
+      "atlas": "31a7ec6d3997a9b562bfea6d0e89996823f74f9a8e96a913aa5638df495dc77a"
+    },
+    "facial_part_eyebrow_d.png": {
+      "size": [
+        40,
+        16
+      ],
+      "standalone": "f8f638dd53010e96b4082a16cd9164be18973a168845ab7e939b6360d0d220a7",
+      "atlas": "66ae83246773924a91f72cc753c6e94d6be6e2961ccd4297919b42a69d08a64b"
+    },
+    "facial_part_mouth_angry.png": {
+      "size": [
+        80,
+        20
+      ],
+      "standalone": "9f5f931152ebf40c5e22ea43b3b0b483c6757750d649c9b6cf30aca1d9c6ae9d",
+      "atlas": "729b43a0ea616cdfe93d3b6dbb52abdde6b5b0234103377edcb018da856630e8"
+    },
+    "facial_part_mouth_happy.png": {
+      "size": [
+        40,
+        14
+      ],
+      "standalone": "7385ed4054428dc67fd7854cde78019c9626e74a36f3b406b83749f58696f0df",
+      "atlas": "73ccd65c83de629db2507f877f95893c998e71c0d3259a3f9f3b27ec38da09be"
+    },
+    "facial_part_mouth_sad.png": {
+      "size": [
+        40,
+        14
+      ],
+      "standalone": "21df67da6f5dfb30d83472287ba779411021a4399e0b67087dd2c58d61e1e269",
+      "atlas": "3aaf481df651ac5f9d7626fc14454c59b5582165004d2835efe6914a22cac92f"
+    },
+    "facial_part_mouth_smirk.png": {
+      "size": [
+        28,
+        14
+      ],
+      "standalone": "ddbe3bcc258d61fd3d941ed92838611cc2bd56e582fcaf3b7c254c1061f4ef9f",
+      "atlas": "561fc5b4d5c6611ed855a11265c2f6749c631516cd7c16f0fab2525ca6e486d4"
+    },
+    "green_body_circle.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "3046dadbc814c12bd76cb7d0f03175accc3eb1002accb45625a33ed6363f1672",
+      "atlas": "cdae1eec2668ebf38748201cb8053a4232b2fdaa4f3139f2d78530e9bef870fd"
+    },
+    "green_body_rhombus.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "1bb231192b50b22e451b6cd7558888eb3f3cf58c480ab15e6bcdb8f5e7de0f06",
+      "atlas": "e28453e00aac41efc633583b909abe4a8114ab5d07ed84f8c56476d903ac65f6"
+    },
+    "green_body_square.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "a8fd95d493f80395e9125c6d55b23335802e92d28c5ce71b4ecf6f116f48101b",
+      "atlas": "86960aaeac13e2a3787407688396b71d313a863da5502f00a6c07c52178cc709"
+    },
+    "green_body_squircle.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "b0c72b3c046cb3a3ae27b298e65a59209574d6b4349030d92e24bec137b9a3a4",
+      "atlas": "fa13bf0815a9e83c654f9d0f698f9bd15c5157ec2679fc1cfb1a7b3134dcfaf6"
+    },
+    "green_hand_closed.png": {
+      "size": [
+        70,
+        68
+      ],
+      "standalone": "35efb770da46942f3b2b9831aa1e205f2a08a07bf809dce9ed545200fe7b0a07",
+      "atlas": "79453a941d021bd92d81396d85e333fe33fa58cce70f22503c36216ea4eb3d5f"
+    },
+    "green_hand_open.png": {
+      "size": [
+        68,
+        76
+      ],
+      "standalone": "08be013fc7442689d9be98d1cd2d85776bc8c53f4a6fe63f851abd1a691b3eca",
+      "atlas": "8ee75cf0ddbe2f7d567d5b41ccf5fe2724c7810f84d70b1b4bb33bcf6cae7137"
+    },
+    "green_hand_peace.png": {
+      "size": [
+        56,
+        80
+      ],
+      "standalone": "3622599bbd8fa92c82fc9392895bacc151b94e2067e9de5fe86a002904bf7778",
+      "atlas": "31ca84c54dca4498c6181b7dfe49586eeb5f856592d8741efc145e0e87fad5de"
+    },
+    "green_hand_point.png": {
+      "size": [
+        68,
+        72
+      ],
+      "standalone": "fe9b53ad15739a6087fcaa0d2f9b4145ac33397171057308013f0e7e3f22a65c",
+      "atlas": "97ec6a1a5ba6de9519b219603f3c31ec28a2991fbb1da42d84b2a0d55a3142a4"
+    },
+    "green_hand_rock.png": {
+      "size": [
+        72,
+        76
+      ],
+      "standalone": "5d05435301fbe0e73e4a447657fd0517532e47188b5c45ba13143155aa2c9fdb",
+      "atlas": "e77858d6256ee96169817f820074898964b3a87fe4bde1a77c763ba7abf90f1f"
+    },
+    "green_hand_thumb.png": {
+      "size": [
+        64,
+        76
+      ],
+      "standalone": "c6325110a738b598a56a2deccfd9aac520c143a0d44bf515736a4be4871fa4b0",
+      "atlas": "f43dd588f250d2cc9536399c9b1fca5742f651c27c5ca04bba2dee8f7b981f13"
+    },
+    "hand_yellow_closed.png": {
+      "size": [
+        70,
+        68
+      ],
+      "standalone": "cc9d7b42092dc40f94f6c161b5b21873fa6f0e412f02313de2c736af962ba182",
+      "atlas": "077bf2f161ebd3524e5f52fdd6d1e6093429c60b7db0340b8055326aa1f44414"
+    },
+    "hand_yellow_open.png": {
+      "size": [
+        68,
+        76
+      ],
+      "standalone": "a7bc7e029dd6ead8369d42c0629f3d7d59f2e12d4a5e438972652aaa82b30ead",
+      "atlas": "c857febe6536a40429242d2343c3fd207da6076e4b3bd804fa4a63915e029ee5"
+    },
+    "hand_yellow_peace.png": {
+      "size": [
+        56,
+        80
+      ],
+      "standalone": "c1583ada074dba2b8ac63c55842f65a5946113c64b8d08ccf5f8eb67c6933794",
+      "atlas": "e3582a8d5ac0fa15a50b61cc81cc0b1f2cc8869fd616356ac8834ec8d8b3f9d6"
+    },
+    "hand_yellow_point.png": {
+      "size": [
+        68,
+        72
+      ],
+      "standalone": "f870220e2e8695fda2f4422611f06644a2fc836b8a2d23bcb0a8990ba61a3256",
+      "atlas": "a4cbd42bc0c52ae68cd66963293d4998210e4e3fab4ab38fa7186c28615f6a31"
+    },
+    "hand_yellow_rock.png": {
+      "size": [
+        72,
+        76
+      ],
+      "standalone": "6746dc35dcf1372251a2757b6395135f1bced7d795065a12098c063ed39380c9",
+      "atlas": "0edd02492db68bcb51f249d3ec392e67d4e8ad142c6517f379efd1a889f4745f"
+    },
+    "hand_yellow_thumb.png": {
+      "size": [
+        64,
+        76
+      ],
+      "standalone": "48346bc77766f6371a4b333b8339e8c327012f81b75b2fb305ce903adc5f9e13",
+      "atlas": "4a80c5c63f0b7e41a5e868cf070bd458afaa05918c609c1c40cd2ec9fc6e05fe"
+    },
+    "pink_body_circle.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "6bad9ae20aa361a51e9f861b10aa84c79c9ef649d10158d5a2077e53ee13b9e5",
+      "atlas": "dfe1c82c45ac277ac3050f487875480976331ecd61b924ea2f97df8ed2002d3f"
+    },
+    "pink_body_rhombus.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "a66ce82f34a0f890c7bdcb5b370eb21cdb5402dd5b3c74c0ff447e5805b38a12",
+      "atlas": "bcb222cde9aa4aefaba9485e0b8bbb92fdc837ca5ec853dbdf6ec355b4397dd3"
+    },
+    "pink_body_square.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "1b156ddda9dc6564e6b9c4a90faffe151ce612689801d88b44d5eb57d0d22931",
+      "atlas": "cc6fa5038278c67bf207b80fc1de79dd0293780448be2b95191d37f1607a9ce7"
+    },
+    "pink_body_squircle.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "c3b6aaa0e55c1c293ad3dd7c85635021bf78fafe75ce1ff71385739071bb8681",
+      "atlas": "cc8aa840e7818580643503724f89774f5b347ba7fde86bc2cd814e4d0ff38575"
+    },
+    "pink_hand_closed.png": {
+      "size": [
+        70,
+        68
+      ],
+      "standalone": "1d0c4cfc961fa2abc5d826d86ac8f878b0f0742f7ec6dcd10f5d942bb85e9744",
+      "atlas": "d94a1b5f2297d5d5a959acdd7f7e13f541c086b41cc78828bfd6fb4bd7ce79bd"
+    },
+    "pink_hand_open.png": {
+      "size": [
+        68,
+        76
+      ],
+      "standalone": "a8c1ce6871da1757fed8c95d3f6e094dd713833f1d31f63021252413fd147e21",
+      "atlas": "eaa42ddd44713030041750157d155650ea1f2c98f581bcee3bef630ae113c7fe"
+    },
+    "pink_hand_peace.png": {
+      "size": [
+        56,
+        80
+      ],
+      "standalone": "07918e5f2815766006767b56b4571ebb67ddd526b248accf463b97646de95bd7",
+      "atlas": "49c3c299132ab789d7163a8682b12105a5ec3e114aeb269e3f0a863c5e90af4f"
+    },
+    "pink_hand_point.png": {
+      "size": [
+        68,
+        72
+      ],
+      "standalone": "ed9bab01e7b5c99543b13cf5c5162c2fe23967a5856fa3c8871a56c66a31eeed",
+      "atlas": "9baec167293299fdf4983598b162d16f639212482e9a2a9bfdd02810264fd0ef"
+    },
+    "pink_hand_rock.png": {
+      "size": [
+        72,
+        76
+      ],
+      "standalone": "db07723a94c4b276474054a51e7e54793fe8981b57c5f99b3493cbbb879bece9",
+      "atlas": "69a31aa666d508b1a954a89bc615606bc5a0aae08aa45beea6096f9af95a56b0"
+    },
+    "pink_hand_thumb.png": {
+      "size": [
+        64,
+        76
+      ],
+      "standalone": "0eb7239be9995c2569023229f9062f9d28fe998ab289f880b4b50fa2b7043919",
+      "atlas": "7244f4d73e0cc54eef0f4fe74c71e38d4550647f4670a2cef55d3f25b1441980"
+    },
+    "purple_body_circle.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "da246c021bd91ad80362889f0b01949b4a071c71a45c722aa87cb1c526506805",
+      "atlas": "322f44d062d9f20349800d13370deb6580d3860a8f42ca6c336c9ce4df589101"
+    },
+    "purple_body_rhombus.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "a1a996df3c2674288841f07c7503be1037fed06e32097a1fd5dac17399adf37b",
+      "atlas": "61ce9ee402c97bcf0801ecf7d3b11b2ba8d3c5d0f955e00133bcc8edf883e86c"
+    },
+    "purple_body_square.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "c4e5e4bcf024891c239b1bdf250703e7450c62cf9cac626ccbd77654833a6cb8",
+      "atlas": "b5f5e9f7661dc702573fba269273018960afa1ba23e0fa73ab29d8339776ce71"
+    },
+    "purple_body_squircle.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "97f21699b7bb47a4940f38bdf17d314d07e2fb0856f37845a8771f383fbc6575",
+      "atlas": "ef668604e17c0b385ebd4295261650c0f2b227258233dd0b0acd5f9511e5a528"
+    },
+    "purple_hand_closed.png": {
+      "size": [
+        70,
+        68
+      ],
+      "standalone": "88767ca60b2fa75abe3f33167cf79812d6acc3ff66f07ea2f526dfb1d5700b43",
+      "atlas": "b1e751f7ef76fb7e7f13ffbe02ca5a7a19d5c4f3cd458acd2adc620d6332919c"
+    },
+    "purple_hand_open.png": {
+      "size": [
+        68,
+        76
+      ],
+      "standalone": "2d1b4bb0ba85ae1392b7aa0c517f4f365f425bfd2fc665c600496cbbba09d575",
+      "atlas": "5556dcf8ed2987cffc6484b53ff47583cb43f4207f07558df515ab2aea4487b2"
+    },
+    "purple_hand_peace.png": {
+      "size": [
+        56,
+        80
+      ],
+      "standalone": "9ade89f9afb142d723bfad08706ddac9733c4908e64f999ff0472c78519b5bce",
+      "atlas": "f9af8595f3019af311ffb94900e5f00393d6630947a3f42466b75db167059b17"
+    },
+    "purple_hand_point.png": {
+      "size": [
+        68,
+        72
+      ],
+      "standalone": "02a2ed0b45463d20a20d3f0cf2e19919796883c152680f37bddee7baae9e7ffc",
+      "atlas": "d4955aeb84fe13ee1c5d04f69c28cdf816c584fed09993ca46ace0d6e8b08472"
+    },
+    "purple_hand_rock.png": {
+      "size": [
+        72,
+        76
+      ],
+      "standalone": "db686e1fd75e5c5416b156489e0a73f347f635f17ff7b140461341be9f4a1654",
+      "atlas": "9913f017440f0cbf42a09a3644d56ea520d35031968e46abfb54e3227e12cd7b"
+    },
+    "purple_hand_thumb.png": {
+      "size": [
+        64,
+        76
+      ],
+      "standalone": "b24bca12c83218b9865184abab1eb4e5ee95e417466bc0540df9eddfde56313d",
+      "atlas": "443d7169389f069cf1da6ddfe92d7640c859a74e520e5cb9059318f509a9ad5f"
+    },
+    "red_body_circle.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "9f1e63137cb7fd40040114b4c77afdc7438d3420299fb872759442b63bfe1ce8",
+      "atlas": "c29e8ac4eb58fc5a4921a3142da3a50d82f9e8ef334ca5f0de52b4d39e6cd6b0"
+    },
+    "red_body_rhombus.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "984e2f9ca9202d7a51db6b3c6c33b695f72655eb891983a62552d56360776e4b",
+      "atlas": "09bf12e5533843c8c695d45b27000db6da89a09576ae764710bdbad0fda38dde"
+    },
+    "red_body_square.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "c0ac9802a36f0568ad962fcdb6b844a6dc986e98fbd4af81feb0347815e9ecbf",
+      "atlas": "d5376284525cc807c4c3b690510dda860a659240faede7380a4c2cd63c7d6305"
+    },
+    "red_body_squircle.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "301ccf1917890809f3ca31c9f07e1e6b20071eb5b8b5ccb3fd89007791427f15",
+      "atlas": "3c2d2f15476e746024f814cfe3dd72ba2e918a76cb06c34bced345bca92fda5a"
+    },
+    "red_hand_closed.png": {
+      "size": [
+        70,
+        68
+      ],
+      "standalone": "264de18031cddee37e99a980bd96c4ffef2c5ee698f3a7c0a3df762a9c598550",
+      "atlas": "10edcb528017d0a46c9a687f582b5ce78967e9c5bf82d1f91d12d84a07c5fa16"
+    },
+    "red_hand_open.png": {
+      "size": [
+        68,
+        76
+      ],
+      "standalone": "6b6f878ed43abf8be20f58816619a22a8aadc960f6757cf5ec0e0c612edaa962",
+      "atlas": "220a9be69483f899eb8b82cf5998ad5ea71eadc09019f4bd56155db09cc4bec9"
+    },
+    "red_hand_peace.png": {
+      "size": [
+        56,
+        80
+      ],
+      "standalone": "b470bfc237387ab72fd40e26ede6fb8a2c672068166be9f24a5b6deae350d7c8",
+      "atlas": "9aa311a1ac1956722d34dec191bf3c64560847e12d9dc8faacfadde263abed64"
+    },
+    "red_hand_point.png": {
+      "size": [
+        68,
+        72
+      ],
+      "standalone": "4da4457809c200bfd9f282e6c7e8418635df7625b5b34a2a8e64e0597d1f6aa4",
+      "atlas": "fc28dd367528eb31ae8c738ebe337b0ae1be9fed795f2787591b87f22527b7cf"
+    },
+    "red_hand_rock.png": {
+      "size": [
+        72,
+        76
+      ],
+      "standalone": "b2ff95238c4e2585d3fa89806d51036157862e3d54c636094c946bea992b93a8",
+      "atlas": "d12578b7e9948fe55849111d50b5cf5ae660bf24072feb67b493c9babf7f8ac7"
+    },
+    "red_hand_thumb.png": {
+      "size": [
+        64,
+        76
+      ],
+      "standalone": "84e494e2d5047156051b2d68bd6a3c252e5c959171a2cfcfabd50fbf3f787605",
+      "atlas": "1f06ce0aa1854ab7408b69f85afff640d8fc5d4b93be3003e2c5b8ec3660eb51"
+    },
+    "shadow.png": {
+      "size": [
+        96,
+        40
+      ],
+      "standalone": "fb4e83ec26a87972ecd55b3ae8f10c2eb7e9f4677354fff42b7190c534f5a633",
+      "atlas": "e32ded28620b059842db4757f5b0dbb8870f4df1c15f9adce63762a116ca6131"
+    },
+    "tile.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "a1559aa6140b2d9fa7f07cdd8f8f80e1b9b9a3794d411891317766ad68632f47",
+      "atlas": "c4cc02817014889dafcb6e83f26276ee552b6898edb79cef6e28c01fc188fb6f"
+    },
+    "tile_background_grass.png": {
+      "size": [
+        64,
+        36
+      ],
+      "standalone": "e67b66173eca3fb897ecce9637af1a408d4dc823d2f467de2fa833f5e8a6cb0c",
+      "atlas": "e128932c8792c45ed9c0ca6491301ad05e4f6df0cd065f5e6ebd360d025a2903"
+    },
+    "tile_background_tree_large.png": {
+      "size": [
+        192,
+        294
+      ],
+      "standalone": "6f0b61601365be71be92a05c4979cbf069deb37513b920d3645695b4c8eb0352",
+      "atlas": "40c84094ec8a76e1d3c17a1906684fe203a78144ffdbf4b80e7ca1dcd82bfee4"
+    },
+    "tile_background_tree_small.png": {
+      "size": [
+        144,
+        220
+      ],
+      "standalone": "611e5bee5f5c82ccc8acc6303a42fdd099f6bc70367493f0d1dd386ae49afb14",
+      "atlas": "3ebaf05c663c548ca724d0719bb5e80edd513589e09b5bd143ed7fa4b76e1ae9"
+    },
+    "tile_center.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "ba204716396a8006fbd05fe8bd4947250246f3587fe583c35e9f51a7d3cc461e",
+      "atlas": "62c57ac06f58bd5afbb7ab8ac89e7dc67ff7ef8ef302eb80639eaa472e0dfde4"
+    },
+    "tile_cloud.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "c8ab70c89d9e0c8288fbc0262ba207d71d2a5e5420c4773ca3406b19238ad017",
+      "atlas": "80308e22742502f432bfeb5d7e258e5104d2176090f045b5d948a1dcdfe8b886"
+    },
+    "tile_coin.png": {
+      "size": [
+        80,
+        80
+      ],
+      "standalone": "da97eda7f634a3b3af215f500b8438956f8338d09a481eb5c3139019f0c88fc5",
+      "atlas": "fca233e5168b86dc56aadc16c483f5b5eb8ec40d22789110509db1eb97878e57"
+    },
+    "tile_exclamation.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "ac03c2f58a53781761ab15165bda967977b260a172dcb40ecdc6cbc8281a825e",
+      "atlas": "06818094b06a7dc40b172fad39655a6540af689a97a5dfd1786e57e41aa325b9"
+    },
+    "tile_grey.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "492c3e9f6f5b74a18a7bdd216f4072c1f88eb483afd8c1562a018960e31dc157",
+      "atlas": "0db5edb3bbb954ee0fedf514543a44bce1665f1f306cf463e0fc0f8275c8f277"
+    },
+    "tile_half.png": {
+      "size": [
+        160,
+        80
+      ],
+      "standalone": "d1262e6ec9828fefc7a7dc22a5bba66abdba8f19bc8edc1191b080269040f314",
+      "atlas": "9f50f016a9fbd02169b8c3d7ca314ef795ba028b78285579a567e0ad54545a63"
+    },
+    "tile_half_center.png": {
+      "size": [
+        160,
+        80
+      ],
+      "standalone": "f4c87ee146a55b9b37b823a03b9d42c4a268759d0b28c62f9a9c04f9f7501f2b",
+      "atlas": "eab77dd1b762610c0dbc7d3c49c6f2db431b96efda281e89a50d31399fd2ba5b"
+    },
+    "tile_half_left.png": {
+      "size": [
+        160,
+        80
+      ],
+      "standalone": "ab92d5d2baec1ea7d04aa6f68ef9270b57941e371862f176004c63661abed22c",
+      "atlas": "13b1f1b62b066a44aaabe0de4164cd66d7e135fcf33f6e800007a05d13305814"
+    },
+    "tile_half_right.png": {
+      "size": [
+        160,
+        80
+      ],
+      "standalone": "d6ffd61865931efb47b4e3ee74937d9c1f7a5677a22b12a4352a762654e53287",
+      "atlas": "c722efa095993f696e91981ee8f066fa9999d49e6e066dba114cf5426ba7f0f4"
+    },
+    "tile_left.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "71b20a2a6c6948749b4f13d70c8213070d451d3b0bdc744d7f31378afc05d776",
+      "atlas": "d6a416bee96c4953e64a56a4ec12d6e143db85edd65a9df4b1ac5043893a9ad0"
+    },
+    "tile_ramp_left.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "759ca8b1bea8c2c99b7ec9f06f54b59c1769f857aebe1c9286b5e908c1810119",
+      "atlas": "24baf06ef2437d60f656ce7e1c9a935550981f3a91845b5b4a211c01b857d646"
+    },
+    "tile_ramp_right.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "3fe3b742da0e64aecd88660935a6d0addbb2fe7c9ce48f851ff7625ec2868d7e",
+      "atlas": "651e460bd9c509932b13377934a69c8714efcb90a22b3dd61fd50af5dfb1177d"
+    },
+    "tile_right.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "725dae1bf535358e8999e0ec990ca67e76c90add1c810e9af045d7322c14234b",
+      "atlas": "f6a241678738f598845284b186a682c4e891cf25f5a8f51920a47ce220bf988e"
+    },
+    "yellow_body_circle.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "374a933a4cb06f2727259ffd4721d6ff8dc47db2ca83e73d9de66cb19437b4fd",
+      "atlas": "b6eb3bfdf4688c006c545c4806f7797c111ec25f4a5ac86db7cb523c26234b4c"
+    },
+    "yellow_body_rhombus.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "d3df9f2332693b67527d55e5bd172eba61d3afd7b9e729eb8d23ac313385cf61",
+      "atlas": "8a45c0f6a4bf034968722ca6b64929596ecf74487f1a182492c76478b50bbea1"
+    },
+    "yellow_body_square.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "27a7f46799fa09446ba60776f6cf8cd3a0958e491d7ebcc3d7725ae9c3e42c55",
+      "atlas": "3c2998f1bca44f026d913900a3222ab6b7d8a8e668dd1a60ec3e2c248e672891"
+    },
+    "yellow_body_squircle.png": {
+      "size": [
+        160,
+        160
+      ],
+      "standalone": "a6ee9de9e5fbb31298971fae6b8665b473ee91dbdabfdaa2dcad8be561257e19",
+      "atlas": "c6b97aa9d1488f691216f3bbf57d5b253944074a88b497dafbd84721fdd5cc27"
+    }
+  }
+}

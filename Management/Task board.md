@@ -41,6 +41,8 @@ views:
           - play-shapes/Management/Tasks/PS-004 - Define the Game-Feel Tuning Strategy.md
           - play-shapes/Management/Tasks/PS-005 - Define Multi-Phone and Agent Validation Strategy.md
           - play-shapes/Management/Tasks/PS-006 - Implement Player Join and Host-Owned Registry.md
+        done:
+          - play-shapes/Management/Tasks/PS-009 - Create and Import Character Feet Assets.md
     columnColors:
       note.status:
         done: green
