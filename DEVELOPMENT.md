@@ -2,8 +2,8 @@
 
 ## PS-009 — character feet and reusable asset setup (2026-09-13)
 
-Implementation is ready for review; **human foot-art approval is pending**.
-The task stays in progress until that creative acceptance is recorded.
+**PS-009 is done.** The project owner explicitly approved the foot art on
+2026-09-13 and requested completion. Pull-request merging remains an owner action.
 This branch includes the preceding PS-009/PS-010 task-definition commit because
 it is not yet on `main`. Unrelated local draft and task-board edits are excluded.
 
@@ -130,8 +130,10 @@ godot --path . --resolution 1152x800 --script res://tests/character_assets_test.
 - **Visual inspection: performed.** Both source-resolution sheets, the vector
   overview, live Godot window through Computer Use, and final renderer capture
   were inspected. Very dark tints were lifted after the first runtime comparison.
-- **Human art approval: pending.** The comparison was presented in this task.
-  Do not mark the feet approved or PS-009 done without the owner's response.
+- **Human art approval: approved on 2026-09-13.** The owner explicitly approved
+  the foot art and requested PS-009 be marked done. The comparison images retain
+  their original review-time "art approval pending" captions as historical evidence;
+  this approval record supersedes those captions.
   Physical-phone checks, game-feel playtesting, final dance readability, and
   exported-build verification are outside this asset task's technical evidence.
 

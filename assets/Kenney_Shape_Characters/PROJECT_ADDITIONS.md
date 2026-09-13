@@ -8,8 +8,9 @@ or endorse the additional feet.
 `PNG/Default/blue_foot_round.png` (40 x 24) and
 `PNG/Double/blue_foot_round.png` (80 x 48) are **Play Shapes project-created
 additions**, authored for this task in GIMP 3.2.6 using Bezier paths, a blue
-gradient, and a separate translucent top highlight. Human art approval is
-pending. One silhouette is mirrored for the two feet; no pose library is implied.
+gradient, and a separate translucent top highlight. The project owner explicitly
+approved the foot art on 2026-09-13. One silhouette is mirrored for the two feet;
+no pose library is implied.
 The layered source is `art/character-feet/blue_foot_round.xcf` at repository root.
 
 The spritesheets are expanded with a bottom shelf. All original rectangles

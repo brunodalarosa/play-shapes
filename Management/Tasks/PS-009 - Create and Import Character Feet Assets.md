@@ -2,7 +2,7 @@
 id: PS-009
 title: Create and import character feet assets
 type: implementation
-status: in progress
+status: done
 release: Milestone 1
 owner: ai
 priority:
@@ -72,8 +72,9 @@ Read this task first and treat it as the source of truth. Then read [[Project Ov
 
 # Outcome
 
-2026-09-13: implementation prepared for review; status remains **in progress**
-pending human foot-art approval.
+2026-09-13: **done**. The project owner explicitly approved the foot art and
+requested task completion. Technical validation and human art approval are
+complete; pull-request merging remains a separate owner action.
 
 - Created one rounded detached foot in GIMP, with a layered XCF source, transparent
   40 x 24 Default / 80 x 48 Double exports, and mirrored left/right use.
@@ -87,8 +88,8 @@ pending human foot-art approval.
   at `characters/asset_showcase.tscn` (F6). No animation strategy was selected.
 - Image/atlas checks and real-renderer tests passed. Editor load passed separately
   from existing MCP early-shutdown cleanup warnings. Visual source comparisons
-  and runtime screenshots were inspected; human art approval remains a distinct,
-  pending acceptance step.
+  and runtime screenshots were inspected; the owner explicitly approved the foot
+  art on 2026-09-13, completing the separate human acceptance step.
 - Comparison sheets, XCF, preservation manifests, and runtime capture are in
   `art/character-feet/`. See [[DEVELOPMENT]] for exact usage, test commands,
   import settings, pivots, provenance, and the GIMP indexed-PNG working-copy workaround.
