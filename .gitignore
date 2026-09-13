@@ -2,4 +2,6 @@
 .godot/
 /android/
 web/node_modules/
-test-results/
+test-results/*
+!test-results/.gdignore
+__pycache__/

@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/Kenney_Shape_Characters/PNG/Double/tile_background_tree_small.png" id="1"]
+[ext_resource type="Texture2D" path="res://assets/Kenney_Shape_Characters/PNG/Double/tile_left.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/Kenney_Shape_Characters/PNG/Double/tile_center.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/Kenney_Shape_Characters/PNG/Double/tile_right.png" id="4"]
+
+[node name="BackgroundSample" type="Node2D"]
+texture_filter = 4
+texture_repeat = 1
+
+[node name="Tree" type="Sprite2D" parent="."]
+position = Vector2(80, -45)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1")
+
+[node name="LeftTile" type="Sprite2D" parent="."]
+position = Vector2(-80, 105)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2")
+
+[node name="CenterTile" type="Sprite2D" parent="."]
+position = Vector2(0, 105)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("3")
+
+[node name="RightTile" type="Sprite2D" parent="."]
+position = Vector2(80, 105)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("4")

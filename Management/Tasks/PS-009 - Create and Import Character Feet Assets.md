@@ -2,7 +2,7 @@
 id: PS-009
 title: Create and import character feet assets
 type: implementation
-status: backlog
+status: in progress
 release: Milestone 1
 owner: ai
 priority:
@@ -71,3 +71,24 @@ The inspected pack contains 104 standalone PNGs in each of `PNG/Default` and `PN
 Read this task first and treat it as the source of truth. Then read [[Project Overview]], [[Workflow]], [[Decision Log]], [[DEVELOPMENT]], [[PS-001 - Define the First Gameplay Milestone]], and [[PS-010 - Explore Character Animation Strategy]] if it has been completed. Inspect the complete `assets/Kenney_Shape_Characters` pack and the current Godot project before changing anything. Use computer-based image creation/editing tools and visual inspection to create the smallest coherent foot set, preserving the pack's style, resolution conventions, existing files, and attribution. Present a compact visual comparison for human art approval before treating the feet as final. Update the Default and Double standalone PNG collections and both spritesheet PNG/XML pairs, then validate atlas completeness, coordinates, transparency, and 2x consistency. Import and configure the character and relevant background assets in Godot, create a minimal reusable assembly with independently transformable body/face/hands/feet, and demonstrate robust runtime tint variation. Do not implement gameplay, final dance animations, rigging, or collisions. Run relevant asset checks and Godot editor/runtime checks, visually inspect the result, and report automated, editor/runtime, visual, and human-approval evidence separately. Update relevant Markdown with provenance, tuning/configuration details, caveats, and exact usage guidance. Follow the repository's GitHub Flow instructions and open a pull request for human review.
 
 # Outcome
+
+2026-09-13: implementation prepared for review; status remains **in progress**
+pending human foot-art approval.
+
+- Created one rounded detached foot in GIMP, with a layered XCF source, transparent
+  40 x 24 Default / 80 x 48 Double exports, and mirrored left/right use.
+- Expanded both atlases to 105 entries. Original standalone files remain
+  byte-identical; original atlas rectangles retain their appearance and coordinates.
+- Added `characters/shape_character.tscn` with six independent sprite parts and
+  per-instance runtime tinting; neutral face details are excluded from the shader.
+  Double-resolution blue parts are canonical, rendered at half scale. Very dark
+  tint requests are lifted toward slate for facial readability.
+- Added a collision-free background composition and static six-color review scene
+  at `characters/asset_showcase.tscn` (F6). No animation strategy was selected.
+- Image/atlas checks and real-renderer tests passed. Editor load passed separately
+  from existing MCP early-shutdown cleanup warnings. Visual source comparisons
+  and runtime screenshots were inspected; human art approval remains a distinct,
+  pending acceptance step.
+- Comparison sheets, XCF, preservation manifests, and runtime capture are in
+  `art/character-feet/`. See [[DEVELOPMENT]] for exact usage, test commands,
+  import settings, pivots, provenance, and the GIMP indexed-PNG working-copy workaround.
