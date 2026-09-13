@@ -22,6 +22,8 @@ This is the lightweight human-readable view of active work. The interactive stat
 - [[PS-006 - Implement Player Join and Host-Owned Registry]] — AI implementation; depends on [[PS-003 - Define Join Identity and Reconnection UX]]
 - [[PS-007 - Define the Gameplay Debug Suite]] — shared design
 - [[PS-008 - Design Fake Music Stops]] — shared design
+- [[PS-009 - Create and Import Character Feet Assets]] — AI asset creation and Godot import for [[Releases#Milestone 1 — Simon Says Gameplay Proof|Milestone 1]]
+- [[PS-010 - Explore Character Animation Strategy]] — shared design; depends on [[PS-009 - Create and Import Character Feet Assets]]
 
 ## Recently completed
 
