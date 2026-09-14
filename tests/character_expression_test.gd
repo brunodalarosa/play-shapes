@@ -1,6 +1,10 @@
 extends SceneTree
 
 func _initialize() -> void:
+	if not _check(is_equal_approx(CharacterExpression.BLINK_SECONDS_MIN, 0.117), "Minimum blink is 30% slower"):
+		return
+	if not _check(is_equal_approx(CharacterExpression.BLINK_SECONDS_MAX, 0.195), "Maximum blink is 30% slower"):
+		return
 	var expression := CharacterExpression.new(11011)
 	var seen: Dictionary = {}
 	for unused: int in 2400:

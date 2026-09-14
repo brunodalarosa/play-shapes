@@ -13,6 +13,8 @@ const FACES: Dictionary = {
 const EXPRESSION_DECK: Array[StringName] = [
 	&"delighted", &"cheeky", &"delighted", &"cheeky", &"sad", &"delighted", &"worried"
 ]
+const BLINK_SECONDS_MIN := 0.09 * 1.3
+const BLINK_SECONDS_MAX := 0.15 * 1.3
 
 var _random := RandomNumberGenerator.new()
 var _tag: StringName = &"neutral"
@@ -44,7 +46,8 @@ func advance(delta: float, allow_emotion: bool = true) -> Texture2D:
 	_expression_in -= delta
 	if _blink_in <= 0.0:
 		_tag = &"blink"
-		_state_left = _random.randf_range(0.09, 0.15)
+		# The source face needs enough screen time to read as a blink, not a flicker.
+		_state_left = _random.randf_range(BLINK_SECONDS_MIN, BLINK_SECONDS_MAX)
 		_blink_in = _random.randf_range(2.0, 5.5)
 	elif allow_emotion and _expression_in <= 0.0:
 		_tag = EXPRESSION_DECK[_random.randi_range(0, EXPRESSION_DECK.size() - 1)]

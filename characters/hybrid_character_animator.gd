@@ -5,6 +5,7 @@ extends Node
 @export_range(0.1, 3.0, 0.05) var dance_beats_per_second: float = 1.7
 @export_range(0.0, 16.0, 0.5) var body_bounce: float = 6.0
 @export_range(0.0, 12.0, 0.5) var body_jiggle_degrees: float = 4.0
+@export_range(0.0, 16.0, 0.5) var body_sway: float = 7.0
 @export_range(1.0, 30.0, 0.5) var visual_follow_speed: float = 12.0
 
 const HANDS: Dictionary = {
@@ -15,7 +16,11 @@ const HANDS: Dictionary = {
 	&"rock": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_rock.png"),
 	&"thumb": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_thumb.png"),
 }
-const DANCE_HANDS: Array[StringName] = [&"closed", &"open", &"peace", &"point", &"open", &"thumb"]
+# Open and closed dominate; accent silhouettes remain occasional punctuation.
+const DANCE_HANDS: Array[StringName] = [
+	&"closed", &"open", &"closed", &"open", &"peace", &"open", &"closed",
+	&"point", &"open", &"closed", &"rock", &"open", &"closed", &"thumb"
+]
 
 var charge_state: PoseCharge
 var _character: ShapeCharacter
@@ -24,6 +29,11 @@ var _visual_charge: float = 0.0
 var _parts: Dictionary = {}
 var _base: Dictionary = {}
 var _expression := CharacterExpression.new()
+var _jiggle_random := RandomNumberGenerator.new()
+var _jiggle_clock: float = 0.0
+var _jiggle_speed: float = 1.0
+var _jiggle_mode_left: float = 0.0
+var _slow_jiggle: bool = false
 
 func setup(character: ShapeCharacter, state: PoseCharge) -> void:
 	_character = character
@@ -32,12 +42,14 @@ func setup(character: ShapeCharacter, state: PoseCharge) -> void:
 		var part := _character.get_node(NodePath(part_name)) as Sprite2D
 		_parts[part_name] = part
 		_base[part_name] = _transform(part.position, part.rotation_degrees, part.scale)
+	set_jiggle_seed(-1)
 
 func _process(delta: float) -> void:
 	if _character == null or charge_state == null:
 		return
 	if not charge_state.is_committed():
 		_dance_time += delta
+		_update_jiggle_pattern(delta)
 	var target_charge := charge_state.charge
 	_visual_charge = move_toward(_visual_charge, target_charge, visual_follow_speed * delta)
 	var dance := _dance_targets(_dance_time)
@@ -61,8 +73,9 @@ func _update_living_details(delta: float) -> void:
 
 	var hand_shape := _pose_hand_shape(charge_state.direction) if charge_state.charge > 0.15 else &""
 	if hand_shape.is_empty():
-		var beat := floori(_dance_time * dance_beats_per_second)
-		_set_hands(DANCE_HANDS[posmod(beat, DANCE_HANDS.size())], DANCE_HANDS[posmod(beat + 2, DANCE_HANDS.size())])
+		# One change every five beats is an 80% reduction from the first prototype.
+		var shapes := dance_hand_shapes_at(_dance_time)
+		_set_hands(shapes[0], shapes[1])
 	elif charge_state.direction == &"left":
 		_set_hands(&"open", &"peace")
 	elif charge_state.direction == &"down":
@@ -102,6 +115,31 @@ func set_expression_seed(seed: int) -> void:
 func expression_tag() -> StringName:
 	return _expression.current_tag()
 
+func dance_hand_shapes_at(time: float) -> Array[StringName]:
+	var beat := floori(time * dance_beats_per_second / 5.0)
+	return [DANCE_HANDS[posmod(beat, DANCE_HANDS.size())], DANCE_HANDS[posmod(beat + 2, DANCE_HANDS.size())]]
+
+func set_jiggle_seed(seed: int) -> void:
+	if seed < 0:
+		_jiggle_random.randomize()
+	else:
+		_jiggle_random.seed = seed
+	_slow_jiggle = false
+	_jiggle_speed = 1.0
+	_jiggle_mode_left = _jiggle_random.randf_range(6.0, 11.0)
+
+func jiggle_is_slow() -> bool:
+	return _slow_jiggle
+
+func _update_jiggle_pattern(delta: float) -> void:
+	_jiggle_mode_left -= delta
+	if _jiggle_mode_left <= 0.0:
+		_slow_jiggle = not _slow_jiggle
+		_jiggle_mode_left = _jiggle_random.randf_range(1.8, 3.2) if _slow_jiggle else _jiggle_random.randf_range(6.0, 11.0)
+	var target_speed := 0.42 if _slow_jiggle else 1.0
+	_jiggle_speed = move_toward(_jiggle_speed, target_speed, delta * 1.4)
+	_jiggle_clock += delta * _jiggle_speed
+
 func _dance_targets(time: float) -> Dictionary:
 	var beat_position := fmod(time * dance_beats_per_second, 4.0)
 	var beat_index := floori(beat_position)
@@ -109,10 +147,11 @@ func _dance_targets(time: float) -> Dictionary:
 	var result := _mix_targets(_dance_pose(beat_index), _dance_pose((beat_index + 1) % 4), beat_blend)
 
 	# Secondary motion supports the authored limb choreography without defining it.
-	var pulse := sin(time * dance_beats_per_second * TAU)
-	var lift := (sin(time * dance_beats_per_second * TAU * 2.0 - PI * 0.5) + 1.0) * 0.5
-	result[&"Body"] = _transform(Vector2(0, -body_bounce * lift), body_jiggle_degrees * pulse, Vector2(0.5 + 0.025 * lift, 0.5 - 0.02 * lift))
-	result[&"Face"] = _transform(Vector2(0, -body_bounce * lift), body_jiggle_degrees * pulse, Vector2.ONE * 0.5)
+	var pulse := sin(_jiggle_clock * dance_beats_per_second * TAU)
+	var lift := (sin(_jiggle_clock * dance_beats_per_second * TAU * 2.0 - PI * 0.5) + 1.0) * 0.5
+	var sway := sin(_jiggle_clock * dance_beats_per_second * TAU * 0.5 + 0.7) * body_sway
+	result[&"Body"] = _transform(Vector2(sway, -body_bounce * lift), body_jiggle_degrees * pulse, Vector2(0.5 + 0.025 * lift, 0.5 - 0.02 * lift))
+	result[&"Face"] = _transform(Vector2(sway, -body_bounce * lift), body_jiggle_degrees * pulse, Vector2.ONE * 0.5)
 	return result
 
 func _dance_pose(index: int) -> Dictionary:

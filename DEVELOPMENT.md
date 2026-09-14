@@ -33,6 +33,14 @@ participate. Up commits with rock hands, the screen-right dab uses open hands,
 Left mixes open/peace, and Down mixes thumbs-up/open. Source textures, tint shader,
 and mirrored screen-relative transforms remain unchanged.
 
+Base-dance refinement keeps command poses unchanged. Blinks last 30% longer than
+the first visual candidate (0.117–0.195 seconds). Dance hand textures change once
+per five beats—an 80% frequency reduction—with open/closed shapes comprising ten
+of fourteen sequence slots. The body now sways horizontally and occasionally
+enters a randomized 1.8–3.2 second slow-jiggle phrase before returning to its
+normal pattern; normal phrases last 6–11 seconds. These choices intentionally add
+organic irregularity without changing authored limb choreography or pose rules.
+
 Lab tunables are exported on the scene script (`charge_fill_seconds`,
 `charge_decay_seconds`, `auto_hold_seconds`, `auto_release_seconds`) and animator
 (`dance_beats_per_second`, `body_bounce`, `body_jiggle_degrees`,

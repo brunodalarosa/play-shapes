@@ -35,6 +35,25 @@ func _run() -> void:
 	animator._update_living_details(0.0)
 	if not _check(character.get_node("RightHand").texture.resource_path.ends_with("blue_hand_open.png"), "Dab uses open hands"):
 		return
+	var start_hands := animator.dance_hand_shapes_at(0.0)
+	if not _check(animator.dance_hand_shapes_at(4.9 / animator.dance_beats_per_second) == start_hands, "Dance hands stay stable for five beats"):
+		return
+	if not _check(animator.dance_hand_shapes_at(5.1 / animator.dance_beats_per_second) != start_hands, "Dance hands change after five beats"):
+		return
+	var common_hand_count := animator.DANCE_HANDS.count(&"open") + animator.DANCE_HANDS.count(&"closed")
+	if not _check(common_hand_count >= 10, "Open and closed hands dominate the dance sequence"):
+		return
+	animator.set_jiggle_seed(11011)
+	var saw_slow := false
+	var returned_to_normal := false
+	for unused: int in 400:
+		animator._update_jiggle_pattern(0.05)
+		if animator.jiggle_is_slow():
+			saw_slow = true
+		elif saw_slow:
+			returned_to_normal = true
+	if not _check(saw_slow and returned_to_normal, "Jiggle occasionally slows, then returns to normal"):
+		return
 	print("Animation lab integration checks passed")
 	quit(0)
 
