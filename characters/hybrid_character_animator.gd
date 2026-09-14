@@ -7,12 +7,23 @@ extends Node
 @export_range(0.0, 12.0, 0.5) var body_jiggle_degrees: float = 4.0
 @export_range(1.0, 30.0, 0.5) var visual_follow_speed: float = 12.0
 
+const HANDS: Dictionary = {
+	&"closed": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_closed.png"),
+	&"open": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_open.png"),
+	&"peace": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_peace.png"),
+	&"point": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_point.png"),
+	&"rock": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_rock.png"),
+	&"thumb": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_thumb.png"),
+}
+const DANCE_HANDS: Array[StringName] = [&"closed", &"open", &"peace", &"point", &"open", &"thumb"]
+
 var charge_state: PoseCharge
 var _character: ShapeCharacter
 var _dance_time: float = 0.0
 var _visual_charge: float = 0.0
 var _parts: Dictionary = {}
 var _base: Dictionary = {}
+var _expression := CharacterExpression.new()
 
 func setup(character: ShapeCharacter, state: PoseCharge) -> void:
 	_character = character
@@ -38,6 +49,58 @@ func _process(delta: float) -> void:
 		part.position = target.position
 		part.rotation_degrees = target.rotation
 		part.scale = target.scale
+	_update_living_details(delta)
+
+func _update_living_details(delta: float) -> void:
+	var committed := charge_state.is_committed()
+	var face: Sprite2D = _parts[&"Face"]
+	if committed:
+		face.texture = CharacterExpression.FACES[_pose_face(charge_state.direction)]
+	else:
+		face.texture = _expression.advance(delta)
+
+	var hand_shape := _pose_hand_shape(charge_state.direction) if charge_state.charge > 0.15 else &""
+	if hand_shape.is_empty():
+		var beat := floori(_dance_time * dance_beats_per_second)
+		_set_hands(DANCE_HANDS[posmod(beat, DANCE_HANDS.size())], DANCE_HANDS[posmod(beat + 2, DANCE_HANDS.size())])
+	elif charge_state.direction == &"left":
+		_set_hands(&"open", &"peace")
+	elif charge_state.direction == &"down":
+		_set_hands(&"thumb", &"open")
+	else:
+		_set_hands(hand_shape, hand_shape)
+
+func _set_hands(left_shape: StringName, right_shape: StringName) -> void:
+	(_parts[&"LeftHand"] as Sprite2D).texture = HANDS[left_shape]
+	(_parts[&"RightHand"] as Sprite2D).texture = HANDS[right_shape]
+
+func _pose_hand_shape(direction: StringName) -> StringName:
+	match direction:
+		&"up":
+			return &"rock"
+		&"right":
+			return &"open"
+		&"left":
+			return &"open"
+		&"down":
+			return &"thumb"
+	return &""
+
+func _pose_face(direction: StringName) -> StringName:
+	match direction:
+		&"up", &"left":
+			return &"delighted"
+		&"right":
+			return &"cheeky"
+		&"down":
+			return &"blink"
+	return &"neutral"
+
+func set_expression_seed(seed: int) -> void:
+	_expression.reset(seed)
+
+func expression_tag() -> StringName:
+	return _expression.current_tag()
 
 func _dance_targets(time: float) -> Dictionary:
 	var beat_position := fmod(time * dance_beats_per_second, 4.0)

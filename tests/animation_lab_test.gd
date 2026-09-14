@@ -23,6 +23,18 @@ func _run() -> void:
 		var targets: Dictionary = current_scene.get_node("%HybridAnimator")._pose_targets(direction)
 		if not _check(targets.size() == 6, "%s pose defines all character parts" % direction):
 			return
+	var animator := current_scene.get_node("%HybridAnimator") as HybridCharacterAnimator
+	var state: PoseCharge = current_scene.charge_state
+	state.advance(0.0, &"up")
+	state.advance(1.0, &"up")
+	animator._update_living_details(0.0)
+	if not _check(character.get_node("LeftHand").texture.resource_path.ends_with("blue_hand_rock.png"), "Up uses rock hands"):
+		return
+	state.advance(0.0, &"right")
+	state.advance(1.0, &"right")
+	animator._update_living_details(0.0)
+	if not _check(character.get_node("RightHand").texture.resource_path.ends_with("blue_hand_open.png"), "Dab uses open hands"):
+		return
 	print("Animation lab integration checks passed")
 	quit(0)
 

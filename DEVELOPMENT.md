@@ -23,6 +23,16 @@ to its still authored target until release. The production gameplay layer must
 continue to own evaluation and pass semantic state into animation; it must never
 infer authoritative outcomes from displayed transforms.
 
+`characters/character_expression.gd` adds presentation-only life without entering
+the charge contract. The neutral happy face blinks for short beats at randomized
+roughly 2–5.5 second intervals. Longer micro-expressions appear less often from a
+weighted happy/cheeky deck with rare subdued or worried faces. Committed poses use
+intentional faces for silhouette/emotion clarity. The animator also changes hand
+textures during the dance: closed, open, peace, point, rock, and thumbs-up all
+participate. Up commits with rock hands, the screen-right dab uses open hands,
+Left mixes open/peace, and Down mixes thumbs-up/open. Source textures, tint shader,
+and mirrored screen-relative transforms remain unchanged.
+
 Lab tunables are exported on the scene script (`charge_fill_seconds`,
 `charge_decay_seconds`, `auto_hold_seconds`, `auto_release_seconds`) and animator
 (`dance_beats_per_second`, `body_bounce`, `body_jiggle_degrees`,

@@ -8,6 +8,10 @@ Play Shapes is a local-network-first multiplayer party game. The shared game wor
 - Joining and controlling the game should feel approachable on an ordinary phone browser.
 - The shared display carries the common game world; phones provide private or contextual controls when useful.
 - Playable milestones should prove a player experience, not merely the existence of code.
+- Characters should feel alive, not like rigid assemblies: use natural blinking,
+  varied context-appropriate facial expressions, and expressive hand shapes and
+  gestures. Occasional subdued or sad expressions can add personality, but
+  animation variety must preserve gameplay-pose readability and emotional intent.
 - Automated checks, editor checks, device checks, and human playtests are distinct evidence and must be reported separately.
 
 ## Current technical baseline
