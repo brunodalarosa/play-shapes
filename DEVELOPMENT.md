@@ -1,5 +1,45 @@
 # Play Shapes development
 
+## PS-014 — minimal gameplay debug launcher (2026-09-13)
+
+`DebugLauncher` is a `CanvasLayer` autoload alongside `SessionHost`. Press F12 in
+any host scene to toggle its overlay. It never pauses the tree and does not own,
+start, or stop networking. Launch, restart, and lobby return use ordinary scene
+replacement, so the same `SessionHost` node, listeners, connections, and future
+host-owned player registry remain alive.
+
+The persistent launcher state owns the active scenario name and displays
+`DEBUG — <scenario name>` above every debug-launched scene. Restart reloads the
+registered scene path to reconstruct clean scenario-local state. Return to lobby
+clears the active registration and marker before loading `scenes/lobby.tscn`.
+The overlay and marker stay available in editor and exported builds for now.
+
+Scenario definitions live in `debug/scenario_catalog.gd`; add a single
+`DebugScenario` there when a real scene becomes available. Each entry has a
+stable ID, display name, scene path, and optional required feature. The launcher
+also exposes `register_scenario()` for focused tests or future composition. It
+checks the packed scene through `ResourceLoader` and renders missing destinations
+as disabled, explicitly unavailable buttons. PS-011 only needs to supply its
+scene at the catalogued path (or update that one catalog entry). The reserved
+one-player Simon Says entry additionally requires `registered_player`; PS-006 or
+its integration should call `set_feature_available(&"registered_player", true)`
+only from the authoritative registry. Never derive it from browser connections.
+
+Validation commands:
+
+```powershell
+godot --headless --editor --path . --quit-after 30
+godot --headless --path . --script res://tests/debug_launcher_test.gd
+godot --path . --resolution 1152x800 --script res://tests/debug_launcher_visual_check.gd
+```
+
+The focused runtime test covers unavailable entries, F12 toggle behavior,
+non-pausing state, launch, clean scene reconstruction, marker lifetime, lobby
+return, and identity/continuity of a running `SessionHost`. The visual helper
+captures `test-results/ps-014/debug-launcher.png` from the real Compatibility
+renderer. These checks do not prove exported-build behavior, physical phones,
+multiplayer identity, or game feel.
+
 ## PS-007 — approved minimal debug-suite design (2026-09-13)
 
 The first debug suite is intentionally only a host-side scenario launcher. F12
@@ -12,7 +52,7 @@ The launcher stays present in editor and exported builds during this early phase
 It does not include pause, time scaling, live tuning, forced state, logs, replay,
 simulated players, or a command console. One-player gameplay requires one real
 registered player after PS-006; raw browser connection count is not identity.
-PS-014 implements the launcher. PS-011 then registers the animation lab with it.
+PS-014 implements the launcher. PS-011 then supplies the animation lab scene.
 Do not expand either task merely to anticipate future debug needs.
 
 ## PS-010 — approved character animation strategy (2026-09-13)
