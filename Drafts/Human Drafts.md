@@ -22,4 +22,4 @@ What am I unsure about?
 
 A planning agent should next follow [[Workflow]], ask only the questions that matter for this idea, and produce a small set of exploration, design, implementation, and validation tasks as warranted.
 
-Existing informal vault notes such as [[Lobby playground]] and [[Minigames]] remain useful source material. Do not treat their brevity as permission to invent missing design decisions.
+Existing informal vault notes such as [[Lobby playground]] and [[Minigames main]] remain useful source material. Do not treat their brevity as permission to invent missing design decisions.

@@ -2,7 +2,7 @@
 id: PS-014
 title: Implement minimal gameplay debug launcher
 type: implementation
-status: backlog
+status: in progress
 release: Milestone 1
 owner: ai
 priority:
