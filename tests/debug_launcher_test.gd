@@ -17,7 +17,7 @@ func _run() -> void:
 	var simon: DebugScenario = launcher.scenario_for_id(&"one_player_simon")
 	if not _check(animation_lab != null, "Animation lab is registered"):
 		return
-	if not _check(not animation_lab.availability({}).available, "Missing animation lab is unavailable"):
+	if not _check(animation_lab.availability({}).available, "Implemented animation lab is available"):
 		return
 	if not _check(simon != null, "One-player Simon Says is reserved"):
 		return
