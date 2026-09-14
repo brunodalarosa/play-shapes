@@ -62,9 +62,9 @@ direction reset, snap/hold, and full release. The integration test covers launch
 availability/entry, persistent debug naming, six-part character integrity, and
 complete pose targets. The real Compatibility renderer produced the ignored
 `test-results/ps-011/animation-lab.gif` plus dance/pose stills for human review.
-Technical validation does not replace the required human motion approval. At the
-time of this note, visual approval is pending; PS-012 must not begin until the
-owner explicitly approves or requests revisions.
+Technical validation did not replace human motion review. The owner explicitly
+approved the final command poses and refined base dance on 2026-09-13. PS-011 is
+complete; PS-012 may begin only as a separate, newly scoped development session.
 
 ## PS-014 — minimal gameplay debug launcher (2026-09-13)
 

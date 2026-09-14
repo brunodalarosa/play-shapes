@@ -2,7 +2,7 @@
 id: PS-011
 title: Implement hybrid character animation lab
 type: implementation
-status: backlog
+status: done
 release: Milestone 1
 owner: ai
 priority:
@@ -87,3 +87,14 @@ Commitment should feel earned over the charge, then unmistakable at the snap.
 Read [[PS-011 - Implement Hybrid Character Animation Lab]], [[PS-010 - Explore Character Animation Strategy]], [[PS-014 - Implement Minimal Gameplay Debug Launcher]], [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-009 - Create and Import Character Feet Assets]], and [[DEVELOPMENT]]. Inspect the existing character scene and debug entry points before changing code. Implement one narrowly scoped hybrid-animation lab reachable from the approved in-game debug menu, using authored detached-sprite transforms plus limited procedural secondary motion. Demonstrate one dance loop, deterministic fill/decay behavior, release unwind, snap/hold, and all four canonical poses. Keep authoritative charge state separate from animation frames and do not implement networking or minigame rules. Add focused checks, run Godot parse/editor/runtime validation, capture visual evidence, and request human visual approval. Update DEVELOPMENT.md. Follow GitHub Flow and open a pull request; do not begin PS-012 in the same session.
 
 # Outcome
+
+2026-09-13: **done and approved**. The project owner approved the revised hybrid
+animation lab after three visual iterations. The final base dance uses authored
+detached-limb choreography, restrained normal/slow body jiggle with horizontal
+sway, 30%-longer natural blinks, weighted facial micro-expressions, and slower
+hand-shape variation dominated by open/closed hands. All four canonical command
+poses were explicitly approved: Up uses rock hands, the screen-right dab uses
+open hands, Left mixes open/peace, and Down mixes thumbs-up/open. Deterministic
+charge, expression, hand-frequency, jiggle-cycle, launcher, editor, renderer,
+foundation, and web checks passed. This approval completes PS-011 and permits a
+separate future session to begin PS-012; no PS-012 work was included here.
