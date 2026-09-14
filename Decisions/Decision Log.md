@@ -73,3 +73,21 @@ Record durable architectural, production, and game-design choices here so future
 - **Alternatives:** Implementing the scoreboard, sequencing multiple minigames, or adding fake stops in the first gameplay milestone were deferred.
 - **Related tasks:** [[PS-001 - Define the First Gameplay Milestone]], [[PS-007 - Define the Gameplay Debug Suite]], [[PS-008 - Design Fake Music Stops]]
 - **Revisit:** After Milestone 1 playtesting or when defining the next gameplay iteration.
+
+## DEC-009 — Hybrid detached-sprite character animation
+
+- **Date:** 2026-09-13
+- **Decision:** Animate Shape Characters with authored transforms on independent body, face, hand, and foot sprites, shared semantic pose data, and limited procedural bounce/jiggle. Gameplay supplies semantic state and normalized pose charge; animation never decides authoritative outcomes. Skeletal rigging is not used for Milestone 1.
+- **Reason:** Detached parts need precise, readable silhouettes and playful secondary motion but gain little from bone weighting or limb deformation. The hybrid keeps poses authorable, reusable, tint-compatible, and maintainable while preserving a clean gameplay boundary.
+- **Alternatives:** Bone-based cutout rigging was rejected as unnecessary complexity for non-bending detached parts. Pure procedural motion was rejected because it weakens direct control of command silhouettes. Fully hand-authored secondary motion was rejected because it duplicates common bounce and phase behavior.
+- **Related tasks:** [[PS-010 - Explore Character Animation Strategy]], [[PS-011 - Implement Hybrid Character Animation Lab]], [[PS-012 - Implement Milestone 1 Character Animation System]], [[PS-013 - Implement Pose Charge and Evaluation Rules]]
+- **Revisit:** If the prototype fails human visual review or future characters require bending/deforming connected limbs.
+
+## DEC-010 — Minimal host-side debug scenario launcher
+
+- **Date:** 2026-09-13
+- **Decision:** The first debug suite is an F12-toggleable, non-pausing overlay in the host Godot application. It launches named development scenarios, restarts the active debug scenario, and returns to the lobby while preserving LAN services. Debug scenarios display `DEBUG — <scenario name>`. The launcher remains available in exported builds during early development.
+- **Reason:** The project needs a fast route into focused experiments without prematurely building a console, simulated-player framework, or broad state editor.
+- **Alternatives:** A visible lobby button was rejected in favor of a host-only shortcut. Automatic pause, phone-side debug controls, runtime tuning, simulated players, and general-purpose debugging tools were deferred until a concrete need appears.
+- **Related tasks:** [[PS-007 - Define the Gameplay Debug Suite]], [[PS-014 - Implement Minimal Gameplay Debug Launcher]], [[PS-011 - Implement Hybrid Character Animation Lab]]
+- **Revisit:** Add capabilities only when active development workflows require them; remove or gate exported-build access before public distribution.
