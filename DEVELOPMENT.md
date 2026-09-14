@@ -1,5 +1,53 @@
 # Play Shapes development
 
+## PS-011 — hybrid character animation lab (2026-09-13)
+
+The lab scene is `debug/character_animation_lab.tscn`. Start the normal host,
+press F12, and choose **Hybrid character animation lab**; the PS-014 catalog now
+enables that entry because the packed scene exists. F6/direct scene launch remains
+a fallback, but launcher navigation is the acceptance path. F12 also provides
+clean restart and lobby return while preserving `SessionHost`.
+
+The lab begins in an automatic tour: two seconds of dance, then Up, Left, Right,
+and Down in sequence with fill, snap/hold, and release unwind. Press **A** or use
+the check button to disable the tour. Hold the arrow keys or the on-screen buttons
+to compare poses manually. The diagnostic text is intentionally debug-only; the
+character has no player-facing charge bar.
+
+`characters/pose_charge.gd` owns deterministic semantic state: normalized charge,
+held direction, fill/decay, reset-on-direction-change, and committed state. It has
+no animation-frame knowledge. `characters/hybrid_character_animator.gd` consumes
+that state, blends authored screen-relative part transforms, and adds restrained
+procedural bounce/jiggle while dancing and charging. At charge 1 the pose snaps
+to its still authored target until release. The production gameplay layer must
+continue to own evaluation and pass semantic state into animation; it must never
+infer authoritative outcomes from displayed transforms.
+
+Lab tunables are exported on the scene script (`charge_fill_seconds`,
+`charge_decay_seconds`, `auto_hold_seconds`, `auto_release_seconds`) and animator
+(`dance_beats_per_second`, `body_bounce`, `body_jiggle_degrees`,
+`visual_follow_speed`). Current values are provisional visual-review defaults,
+not production tuning. The shared `ShapeCharacter` scene, sprite pivots, tint
+material ownership, mirrored art, face texture, and asset provenance are unchanged.
+
+Validation commands:
+
+```powershell
+godot --headless --path . --script res://tests/pose_charge_test.gd
+godot --headless --path . --script res://tests/animation_lab_test.gd
+godot --path . --script res://tests/animation_lab_visual_check.gd
+godot --headless --editor --path . --quit-after 30
+```
+
+The model test covers deterministic fill, rapid-tap accumulation, fast decay,
+direction reset, snap/hold, and full release. The integration test covers launcher
+availability/entry, persistent debug naming, six-part character integrity, and
+complete pose targets. The real Compatibility renderer produced the ignored
+`test-results/ps-011/animation-lab.gif` plus dance/pose stills for human review.
+Technical validation does not replace the required human motion approval. At the
+time of this note, visual approval is pending; PS-012 must not begin until the
+owner explicitly approves or requests revisions.
+
 ## PS-014 — minimal gameplay debug launcher (2026-09-13)
 
 `DebugLauncher` is a `CanvasLayer` autoload alongside `SessionHost`. Press F12 in
