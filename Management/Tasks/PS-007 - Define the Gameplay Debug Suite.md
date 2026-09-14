@@ -2,8 +2,8 @@
 id: PS-007
 title: Define the gameplay debug suite
 type: design
-status: backlog
-release:
+status: done
+release: Milestone 1
 owner: shared
 priority:
 depends_on: []
@@ -55,8 +55,47 @@ The suite should shorten the loop for experimenting with timing, feedback, diffi
 
 [[PS-001 - Define the First Gameplay Milestone]] established that every minigame should remain testable with one player even when its normal supported range begins at two players. The first milestone's normal target is 2–10 simultaneous players.
 
+## Approved first iteration
+
+The first debug suite is deliberately a small host-side scenario launcher, not a
+general cheat console or inspection framework.
+
+- **Access:** F12 toggles the overlay from any host Godot scene. The shortcut
+  belongs only to the host window; phone browsers have no debug shortcut.
+- **Availability:** The launcher remains available in editor runs and exported
+  builds during early development and local testing.
+- **Runtime behavior:** Opening it does not pause the scene, animation, network
+  services, or clocks. Choosing an action takes effect immediately without a
+  confirmation dialog.
+- **Connection behavior:** Scene changes, scenario restart, and return to lobby
+  preserve the running LAN services and connected/registered players whenever
+  the underlying session architecture supports it.
+- **Visible state:** Every launched debug scenario displays a persistent marker
+  containing `DEBUG` and the active scenario name. The launcher overlay itself
+  is not sufficient indication.
+- **First actions:** launch the hybrid character animation lab; restart the current
+  debug scenario from clean scenario state; return to the lobby; and launch
+  one-player Dancer Simon Says once that scenario exists.
+- **One-player rule:** Debug start bypasses the normal two-player minimum but still
+  requires one real **registered player** after
+  [[PS-006 - Implement Player Join and Host-Owned Registry]]. A raw browser
+  connection count does not qualify, and this iteration creates no simulated
+  players.
+- **Tuning boundary:** The first launcher only navigates. It does not edit
+  game-feel values at runtime; exposure conventions remain with
+  [[PS-004 - Define the Game-Feel Tuning Strategy]].
+
+Pausing, simulated players, forced game states, live value editing, event or state
+logs, replay, disconnect controls, and general-purpose developer commands are
+deferred until a concrete workflow demonstrates a need.
+
 # Draft Execution Prompt
 
 Read [[PS-007 - Define the Gameplay Debug Suite]], [[PS-001 - Define the First Gameplay Milestone]], [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-005 - Define Multi-Phone and Agent Validation Strategy]], [[Project Overview]], and the current Godot and browser-client structure. Facilitate a focused design session with the human, inventory existing test and runtime capabilities, and propose the smallest reusable debug workflows needed for the first gameplay milestone. Keep debug tooling separate from normal player UX and validation evidence. Do not implement tools or assign priority or release scope without human approval.
 
 # Outcome
+
+2026-09-13: **done and approved**. The project owner approved the minimal F12
+host overlay, persistent scenario label, non-pausing and LAN-preserving behavior,
+registered one-player requirement, and launch-only scope. Implementation is
+bounded in [[PS-014 - Implement Minimal Gameplay Debug Launcher]].

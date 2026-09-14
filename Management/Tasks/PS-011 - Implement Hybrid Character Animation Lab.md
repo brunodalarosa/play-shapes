@@ -7,7 +7,7 @@ release: Milestone 1
 owner: ai
 priority:
 depends_on:
-  - PS-007
+  - PS-014
   - PS-010
 ---
 
@@ -31,7 +31,7 @@ judge it through the gameplay debug menu before production animation begins.
   remains held.
 - Keep charge calculation deterministic and separate from visual interpolation so
   this prototype can expose the contract later gameplay will use.
-- Make the lab accessible through the in-game debug menu defined by [[PS-007 - Define the Gameplay Debug Suite]]. A direct scene launch may remain as a developer fallback, but does not satisfy debug-menu acceptance.
+- Register the lab with the in-game debug launcher implemented by [[PS-014 - Implement Minimal Gameplay Debug Launcher]]. A direct scene launch may remain as a developer fallback, but does not satisfy debug-menu acceptance.
 - Expose provisional motion and timing controls in the Godot inspector or the
   project-approved mechanism from [[PS-004 - Define the Game-Feel Tuning Strategy]]
   when that strategy is available.
@@ -84,6 +84,6 @@ Commitment should feel earned over the charge, then unmistakable at the snap.
 
 # Draft Execution Prompt
 
-Read [[PS-011 - Implement Hybrid Character Animation Lab]], [[PS-010 - Explore Character Animation Strategy]], [[PS-007 - Define the Gameplay Debug Suite]], [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-009 - Create and Import Character Feet Assets]], and [[DEVELOPMENT]]. Inspect the existing character scene and debug entry points before changing code. Implement one narrowly scoped hybrid-animation lab reachable from the approved in-game debug menu, using authored detached-sprite transforms plus limited procedural secondary motion. Demonstrate one dance loop, deterministic fill/decay behavior, release unwind, snap/hold, and all four canonical poses. Keep authoritative charge state separate from animation frames and do not implement networking or minigame rules. Add focused checks, run Godot parse/editor/runtime validation, capture visual evidence, and request human visual approval. Update DEVELOPMENT.md. Follow GitHub Flow and open a pull request; do not begin PS-012 in the same session.
+Read [[PS-011 - Implement Hybrid Character Animation Lab]], [[PS-010 - Explore Character Animation Strategy]], [[PS-014 - Implement Minimal Gameplay Debug Launcher]], [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-009 - Create and Import Character Feet Assets]], and [[DEVELOPMENT]]. Inspect the existing character scene and debug entry points before changing code. Implement one narrowly scoped hybrid-animation lab reachable from the approved in-game debug menu, using authored detached-sprite transforms plus limited procedural secondary motion. Demonstrate one dance loop, deterministic fill/decay behavior, release unwind, snap/hold, and all four canonical poses. Keep authoritative charge state separate from animation frames and do not implement networking or minigame rules. Add focused checks, run Godot parse/editor/runtime validation, capture visual evidence, and request human visual approval. Update DEVELOPMENT.md. Follow GitHub Flow and open a pull request; do not begin PS-012 in the same session.
 
 # Outcome
