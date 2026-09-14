@@ -1,5 +1,28 @@
 # Play Shapes development
 
+## PS-010 — approved character animation strategy (2026-09-13)
+
+PS-010 selected a hybrid detached-sprite approach for Milestone 1: authored
+transforms on the existing six independent sprite parts, shared semantic command
+poses, and limited procedural bounce, jiggle, and phase offsets. Skeletal rigging
+is intentionally excluded because these floating parts do not need weighted limb
+deformation. Gameplay owns normalized charge and outcomes; animation consumes
+semantic state and never infers rules from visual frames.
+
+The approved vocabulary is three track-specific dance loops; four shared
+screen-relative poses (hands-up, hands-left wave, screen-right dab, playful low
+twerk); charge/unwind/snap/hold; life-loss recoil; survival celebration;
+elimination to persistent sad stillness; and happy/moody result reactions.
+Players may correct during a tunable grace window. Success requires the correct
+direction, full charge, and held input at authoritative evaluation. A 1-second
+fill and approximately 1.2-second expert grace are provisional starting points.
+
+Implementation is deliberately staged: PS-011 proves one character in a debug
+animation lab and requires human visual approval; PS-012 builds the production
+animation library/API and measures eleven-character behavior; PS-013 implements
+host-authoritative charge and evaluation. Do not combine these tasks into one
+large implementation session or bypass their dependencies.
+
 ## PS-009 — character feet and reusable asset setup (2026-09-13)
 
 **PS-009 is done.** The project owner explicitly approved the foot art on
