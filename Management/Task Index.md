@@ -8,7 +8,7 @@ This is the lightweight human-readable view of active work. The interactive stat
 
 ## In Progress
 
-- None.
+- [[PS-005 - Define Multi-Phone and Agent Validation Strategy]] — shared design; MVP device matrix and evidence convention in progress
 
 ## Blocked
 
@@ -16,7 +16,6 @@ This is the lightweight human-readable view of active work. The interactive stat
 
 ## Backlog
 
-- [[PS-005 - Define Multi-Phone and Agent Validation Strategy]] — shared design
 - [[PS-008 - Design Fake Music Stops]] — shared design
 - [[PS-014 - Implement Minimal Gameplay Debug Launcher]] — AI implementation; implements completed [[PS-007 - Define the Gameplay Debug Suite]]
 - [[PS-011 - Implement Hybrid Character Animation Lab]] — AI implementation; depends on [[PS-014 - Implement Minimal Gameplay Debug Launcher]] and completed [[PS-010 - Explore Character Animation Strategy]]

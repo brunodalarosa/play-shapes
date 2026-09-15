@@ -1,5 +1,23 @@
 # Play Shapes development
 
+## PS-005 — Multi-phone and agent validation strategy (2026-09-15 working draft)
+
+The MVP routine physical matrix is two real phones on normal home Wi-Fi with the
+host also on Wi-Fi: an iPhone 16 Pro (Safari by default, Chrome for a browser
+spot check) and a Pixel 7 (Chrome). Two simultaneous phones are sufficient for
+MVP validation; larger playtests are future coverage. VPN, guest-network
+isolation, hotspot, packet shaping, and unusual interfaces are not MVP gates.
+
+Keep these evidence labels distinct in task notes and reports: `[AUTO]`,
+`[EDITOR]`, `[GODOT-RUNTIME]`, `[DESKTOP-BROWSER]`, `[PHYSICAL-PHONE]`,
+`[EXPORTED-BUILD]`, and `[HUMAN-PLAY]`. Automated, editor/runtime, and desktop
+browser results can support technical claims, but they do not prove touch,
+real-phone LAN reachability, exported-build behavior, couch-distance
+readability, accessibility, or game feel. The complete matrix, two-phone
+scenario, report fields, and completion rules are in [[PS-005 - Define Multi-Phone and Agent Validation Strategy]]. This is a working draft pending
+owner approval; no device-farm, CI, network-emulation, or profiling tooling was
+added.
+
 ## PS-012 — Milestone 1 character animation system (2026-09-15)
 
 PS-012 upgrades `characters/hybrid_character_animator.gd` from the approved lab
