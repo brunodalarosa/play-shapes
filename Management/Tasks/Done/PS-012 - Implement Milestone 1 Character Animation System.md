@@ -2,7 +2,7 @@
 id: PS-012
 title: Implement Milestone 1 character animation system
 type: implementation
-status: backlog
+status: done
 release: Milestone 1
 owner: ai
 priority:
@@ -87,3 +87,13 @@ and group motion should feel lively rather than synchronized like machinery.
 Read [[PS-012 - Implement Milestone 1 Character Animation System]], the approved outcome and prototype from [[PS-011 - Implement Hybrid Character Animation Lab]], [[PS-010 - Explore Character Animation Strategy]], [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[001 - Dancer simon says]], and [[DEVELOPMENT]]. Preserve the validated detached-sprite and tint setup. Implement a reusable semantic animation component, three track-specific dance loops, shared command poses, role-specific lead presentation, normalized-charge visuals, and all required reactions. Keep authoritative rules outside animation. Exercise every state through debug tooling, validate eleven simultaneous characters, run focused automated and Godot checks, and obtain human visual review. Document exact authoring and tuning guidance in DEVELOPMENT.md. Follow GitHub Flow and open a pull request; do not implement PS-013 or full minigame integration in the same session.
 
 # Outcome
+
+2026-09-15: **done and approved**. Implementation and automated/runtime evidence
+are complete on `feat/ps-012-character-animation-system`. The
+production semantic component, three dance styles, shared poses, lead/player
+roles, ten evenly phased players, normalized charge display, lead freeze/flow,
+all required reactions, persistent elimination, debug stage, tuning fields, and
+focused checks are present. The project owner ran the game, tested the animations,
+and reported being 100% satisfied with the Milestone 1 result. This explicitly
+approves the motion and completes PS-012; later tuning may still evolve through
+the normal named-preset workflow.

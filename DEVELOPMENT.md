@@ -1,5 +1,68 @@
 # Play Shapes development
 
+## PS-012 — Milestone 1 character animation system (2026-09-15)
+
+PS-012 upgrades `characters/hybrid_character_animator.gd` from the approved lab
+prototype into the production animation boundary for `ShapeCharacter`. Gameplay
+may call `setup(character, is_lead, phase_index, phase_count)`,
+`set_dance_style(style)`, `set_pose_state(direction, normalized_charge, held)`,
+`set_dance_active(active)`, `play_lead_pose_flow(direction)`,
+`play_reaction(reaction)`, `set_eliminated(eliminated)`, and
+`set_result_mood(mood)`. Gameplay must not manipulate child sprites, easing, or
+animation clocks and must never read transforms or animation time to evaluate a
+pose. PS-013 remains responsible for authoritative charge and success.
+
+The three music-paired styles are `bounce`, `swing`, and `disco`. Each owns
+distinct authored limb choreography, while `_pose_targets()` is the sole shared
+source for Up, Left, Right, and Down across every style and both character
+roles. The lead starts at loop phase zero. Player setup uses indices 0–9 over a
+phase count of 10, producing deterministic 0.0–0.9 offsets. Seeded expression
+and jiggle variation supplements those offsets without changing command meaning.
+`set_dance_active(false)` freezes a genuine stopped lead; a full normalized pose
+remains exact and still. Eliminated characters override every other state,
+remain visible with a sad face, and ignore later transient reactions.
+
+Use F12 and choose **Milestone 1 character animation** to open
+`debug/character_animation_system.tscn`. It shows one emphasized lead and ten
+smaller players, three style choices, normalized command charge, short lead pose
+flows, life-loss recoil, survival celebration, elimination, and happy/moody
+results. This debug scene supplies semantics only and does not emulate scoring,
+lives, music stops, networking, or authoritative evaluation.
+
+Designer-facing animation values remain in
+`Tuning/Minigames/SimonSays/Default.tres`: base tempo, bounce, sway, jiggle,
+secondary-motion strength, visual follow speed, lead emphasis, transient
+reaction duration, results cycle duration, and lead pose-flow hold duration.
+The authored transforms in the animator are choreography data rather than
+gameplay rules. Add a new dance style by adding its semantic ID and authored
+poses; do not duplicate the canonical command poses. Add a reaction behind a
+semantic method/state and document its interruption priority. Current feel
+values remain adjustable through named presets even after this milestone approval.
+
+Focused API/state, tuning, charge, expression, launcher, and foundation checks
+pass. On this development machine, directly processing all eleven animator
+components for 600 synthetic 60 Hz frames measured 289.13–301.40 microseconds
+average and 474–534 microseconds worst across three runs; this is a CPU-side component sample, not whole-frame
+rendering or evidence for other hardware. The Godot Compatibility renderer
+successfully captured all three loops, command/reaction stills, and a review
+reel under `test-results/ps-012/`. The project owner then ran the game, tested
+the animations directly, and reported being 100% satisfied with the Milestone 1
+result on 2026-09-15. That is the required human motion/readability approval and
+completes PS-012. It does not claim validation on other hardware.
+
+Validation commands:
+
+```powershell
+godot --headless --path . --script res://tests/animation_lab_test.gd
+godot --headless --path . --script res://tests/character_animation_performance_test.gd
+godot --headless --path . --script res://tests/tuning_presets_test.gd
+godot --headless --path . --script res://tests/pose_charge_test.gd
+godot --headless --path . --script res://tests/character_expression_test.gd
+godot --headless --path . --script res://tests/debug_launcher_test.gd
+godot --headless --path . --script res://tests/foundation.gd
+godot --path . --resolution 1440x900 --script res://tests/character_animation_visual_check.gd
+```
+
 ## PS-015 — shared tuning assets and preset workflow (2026-09-14)
 
 ### Inspector tooltip correction (2026-09-15)

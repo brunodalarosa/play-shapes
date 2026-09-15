@@ -12,6 +12,8 @@ func _run() -> void:
 	if not _check_tooltip_contract("res://Tuning/Minigames/simon_says_tuning.gd", [
 		"charge_fill_seconds", "charge_decay_seconds", "dance_beats_per_second",
 		"body_bounce", "body_jiggle_degrees", "body_sway", "visual_follow_speed",
+		"secondary_motion_strength", "lead_emphasis", "reaction_seconds", "result_cycle_seconds",
+		"pose_flow_hold_seconds",
 		"auto_hold_seconds", "auto_release_seconds",
 	]):
 		return

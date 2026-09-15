@@ -20,12 +20,12 @@ This is the lightweight human-readable view of active work. The interactive stat
 - [[PS-008 - Design Fake Music Stops]] — shared design
 - [[PS-014 - Implement Minimal Gameplay Debug Launcher]] — AI implementation; implements completed [[PS-007 - Define the Gameplay Debug Suite]]
 - [[PS-011 - Implement Hybrid Character Animation Lab]] — AI implementation; depends on [[PS-014 - Implement Minimal Gameplay Debug Launcher]] and completed [[PS-010 - Explore Character Animation Strategy]]
-- [[PS-012 - Implement Milestone 1 Character Animation System]] — AI implementation; depends on [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], and human-approved [[PS-011 - Implement Hybrid Character Animation Lab]]
 - [[PS-013 - Implement Pose Charge and Evaluation Rules]] — AI implementation; depends on [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-006 - Implement Player Join and Host-Owned Registry]], and [[PS-012 - Implement Milestone 1 Character Animation System]]
 - [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]] — AI implementation; implements completed [[PS-004 - Define the Game-Feel Tuning Strategy]]
 
 ## Recently completed
 
+- [[PS-012 - Implement Milestone 1 Character Animation System]] — approved production animation API, three dance loops, shared command poses, reactions, and eleven-character validation
 - [[PS-006 - Implement Player Join and Host-Owned Registry]] — authoritative named players, reconnect grace, phone join states, and shared roster
 - [[PS-003 - Define Join Identity and Reconnection UX]] — approved session-scoped identity, reconnect, leave, capacity, and host-restart design
 - [[PS-007 - Define the Gameplay Debug Suite]] — approved minimal F12 host scenario launcher design
@@ -37,6 +37,7 @@ This is the lightweight human-readable view of active work. The interactive stat
 - Historical context: the Phase 1 LAN host, QR page, and browser handshake were implemented and merged before these task records were introduced. Remaining acceptance is represented by [[PS-002 - Validate Phase 1 on a Physical Phone]].
 
 ## Done
+- [[PS-012 - Implement Milestone 1 Character Animation System]] — approved Milestone 1 character animation system and debug review stage
 - [[PS-006 - Implement Player Join and Host-Owned Registry]] — host-owned identity and reconnect flow for [[Releases#Milestone 1 — Simon Says Gameplay Proof|Milestone 1]]
 - [[PS-003 - Define Join Identity and Reconnection UX]] — approved session-scoped identity, reconnect, leave, capacity, and host-restart design
 - [[PS-007 - Define the Gameplay Debug Suite]] — approved essential first-iteration debug workflows for Milestone 1

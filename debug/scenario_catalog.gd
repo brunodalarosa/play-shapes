@@ -6,8 +6,8 @@ static func scenarios() -> Array[DebugScenario]:
 	return [
 		DebugScenario.new(
 			&"animation_lab",
-			"Hybrid character animation lab",
-			"res://debug/character_animation_lab.tscn"
+			"Milestone 1 character animation",
+			"res://debug/character_animation_system.tscn"
 		),
 		DebugScenario.new(
 			&"one_player_simon",
