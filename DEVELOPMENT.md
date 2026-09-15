@@ -1,5 +1,62 @@
 # Play Shapes development
 
+## PS-015 — shared tuning assets and preset workflow (2026-09-14)
+
+PS-015 implements the editor-first workflow approved by PS-004. Open
+`Tuning/Active Presets.tres` for the project-level selector. Its Simon Says and
+Networking references point to committed, named assets; assigning the matching
+`Default.tres`, saving, and relaunching deterministically restores the known-good
+configuration. There is no runtime tuning UI.
+
+`Tuning/Minigames/SimonSays/Default.tres` is the minigame front door. It owns the
+currently implemented charge fill/decay, lab preview timing, dance tempo, body
+bounce/jiggle/sway, and visual-follow values. The animation lab and animator now
+consume that Resource without changing their provisional defaults.
+`Tuning/Shared/Networking/Default.tres` replaces `host/default_settings.tres`
+and owns the existing HTTP/WebSocket ports, transport/player limits, request
+timeout, and reconnect grace. `SessionHost` obtains it through Active Presets;
+the host remains authoritative.
+
+Each exported field includes Inspector documentation, units, a default, a safe
+range, and higher/lower guidance. Setters clamp individual values. Each Resource
+reports actionable cross-field errors, and `tests/tuning_presets_test.gd`
+recursively loads and validates every committed `.tres` below `Tuning/`. It also
+checks invalid individual values, invalid combinations, and missing active
+references. Future preset files are therefore included automatically rather than
+being allowlisted.
+
+The complete navigation, naming, reset, extension, and experiment workflow is in
+`Tuning/README.md`; copy `Tuning/Experiments/EXPERIMENT_TEMPLATE.md` for a feel
+comparison. The approved shared category map is documented there, but only
+Networking has a Resource today because the other categories have no concrete
+implemented values yet. Browser fetch timeout (5 seconds), WebSocket deadline
+(about 7 seconds), and retry delay (2 seconds) remain local to `web/src/app.ts`;
+no current behavior requires synchronizing them with the host.
+
+Validation commands:
+
+```powershell
+godot --headless --path . --script res://tests/tuning_presets_test.gd
+godot --headless --path . --script res://tests/pose_charge_test.gd
+godot --headless --path . --script res://tests/animation_lab_test.gd
+godot --headless --path . --script res://tests/player_registry_test.gd
+godot --headless --path . --script res://tests/player_lobby_test.gd
+godot --headless --path . --script res://tests/foundation.gd
+godot --headless --editor --path . --quit-after 30
+cd web
+npm.cmd run build
+npm.cmd run check
+npm.cmd test
+```
+
+Automated Resource, regression, TypeScript, and browser/host integration checks
+pass. The normal-profile Godot editor-load check passes without script/resource
+errors; its existing early-shutdown cleanup warnings remain non-failures. This
+session's Computer connection exposed no native Godot window, so a live Inspector
+walkthrough was not performed. No browser behavior changed, no physical-phone or
+exported-build check was run, and no subjective feel/readability/fun approval is
+claimed. The owner still controls candidate promotion into `Default`.
+
 ## PS-004 — shared editor-first tuning strategy (2026-09-14)
 
 PS-004 is complete. The approved workflow is editor-first: stopping and
@@ -64,8 +121,9 @@ the persistent registry and displays seat, public name, and a text connection
 state. It no longer treats raw browser connections as players. Registry changes
 also drive DebugLauncher's `registered_player` feature.
 
-Designer-facing host values live in `host/default_settings.tres`, backed by
-`HostSettings`: `max_players = 20` players and
+Designer-facing host values now live in
+`Tuning/Shared/Networking/Default.tres`, backed by `NetworkingTuning`:
+`max_players = 20` players and
 `reconnect_grace_seconds = 60.0` seconds. They are independent of the existing
 `max_connections = 32` transport cap. The provisional host request/handshake
 timeout remains 5 seconds. Browser constants remain near their behavior in
@@ -445,7 +503,7 @@ period; see the PS-006 section above.
   across scene changes, settings, address discovery, and URL construction.
   WebSocket bind failure rolls back HTTP startup. `stop()` releases listeners
   and connected peers.
-- `host/default_settings.tres`: inspector-editable ports, connection limit and
+- `Tuning/Shared/Networking/Default.tres`: inspector-editable ports, connection limit and
   request/handshake timeout, player capacity, and reconnect grace. Defaults:
   HTTP 8080, WebSocket 8081, 32 connections per service, 20 players, five-second
   timeout, and 60-second reconnect grace. Restart to apply changed settings.

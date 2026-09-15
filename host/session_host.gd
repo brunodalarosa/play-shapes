@@ -4,7 +4,8 @@ extends Node
 signal connection_count_changed(count: int)
 signal players_changed(players: Array[Dictionary])
 
-@export var settings: HostSettings = preload("res://host/default_settings.tres")
+@export var active_presets: ActivePresets = preload("res://Tuning/Active Presets.tres")
+var settings: NetworkingTuning
 var running: bool = false
 var startup_error: String = ""
 var http: HttpService
@@ -13,6 +14,7 @@ var player_registry: PlayerRegistry
 var accepting_new_players: bool = false
 
 func _ready() -> void:
+	settings = active_presets.networking
 	player_registry = PlayerRegistry.new(settings.max_players, settings.reconnect_grace_seconds)
 	http = HttpService.new()
 	websocket = WebsocketService.new()

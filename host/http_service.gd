@@ -10,11 +10,11 @@ const ASSETS: Dictionary = {
 }
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []
-var _settings: HostSettings
+var _settings: NetworkingTuning
 var _bodies: Dictionary = {}
 var _session_id: String
 
-func start(settings: HostSettings, session_id: String) -> Error:
+func start(settings: NetworkingTuning, session_id: String) -> Error:
 	_settings = settings
 	_session_id = session_id
 	for route: String in ASSETS:

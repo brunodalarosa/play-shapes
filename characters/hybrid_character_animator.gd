@@ -2,11 +2,11 @@ class_name HybridCharacterAnimator
 extends Node
 ## Lab-only hybrid motion: authored part targets plus restrained procedural bounce.
 
-@export_range(0.1, 3.0, 0.05) var dance_beats_per_second: float = 1.7
-@export_range(0.0, 16.0, 0.5) var body_bounce: float = 6.0
-@export_range(0.0, 12.0, 0.5) var body_jiggle_degrees: float = 4.0
-@export_range(0.0, 16.0, 0.5) var body_sway: float = 7.0
-@export_range(1.0, 30.0, 0.5) var visual_follow_speed: float = 12.0
+var dance_beats_per_second: float = 1.7
+var body_bounce: float = 6.0
+var body_jiggle_degrees: float = 4.0
+var body_sway: float = 7.0
+var visual_follow_speed: float = 12.0
 
 const HANDS: Dictionary = {
 	&"closed": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_closed.png"),
@@ -34,6 +34,13 @@ var _jiggle_clock: float = 0.0
 var _jiggle_speed: float = 1.0
 var _jiggle_mode_left: float = 0.0
 var _slow_jiggle: bool = false
+
+func apply_tuning(tuning: SimonSaysTuning) -> void:
+	dance_beats_per_second = tuning.dance_beats_per_second
+	body_bounce = tuning.body_bounce
+	body_jiggle_degrees = tuning.body_jiggle_degrees
+	body_sway = tuning.body_sway
+	visual_follow_speed = tuning.visual_follow_speed
 
 func setup(character: ShapeCharacter, state: PoseCharge) -> void:
 	_character = character
