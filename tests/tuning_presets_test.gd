@@ -9,6 +9,20 @@ func _initialize() -> void:
 	_run.call_deferred()
 
 func _run() -> void:
+	if not _check_tooltip_contract("res://Tuning/Minigames/simon_says_tuning.gd", [
+		"charge_fill_seconds", "charge_decay_seconds", "dance_beats_per_second",
+		"body_bounce", "body_jiggle_degrees", "body_sway", "visual_follow_speed",
+		"auto_hold_seconds", "auto_release_seconds",
+	]):
+		return
+	if not _check_tooltip_contract("res://Tuning/Shared/networking_tuning.gd", [
+		"http_port", "websocket_port", "max_connections", "request_timeout_seconds",
+		"max_players", "reconnect_grace_seconds",
+	]):
+		return
+	if not _check_tooltip_contract("res://Tuning/active_presets.gd", ["simon_says", "networking"]):
+		return
+
 	var preset_paths := _find_presets(TUNING_ROOT)
 	if not _check(preset_paths.has("res://Tuning/Active Presets.tres") and preset_paths.has("res://Tuning/Minigames/SimonSays/Default.tres") and preset_paths.has("res://Tuning/Shared/Networking/Default.tres"), "Default presets and Active Presets are discovered"):
 		return
@@ -50,6 +64,25 @@ func _run() -> void:
 		return
 	print("Tuning preset checks passed (%d committed assets)" % preset_paths.size())
 	quit(0)
+
+func _check_tooltip_contract(path: String, property_names: Array[String]) -> bool:
+	var source := FileAccess.get_file_as_string(path)
+	var lines := source.split("\n")
+	for property_name: String in property_names:
+		var declaration_index := -1
+		for index: int in lines.size():
+			if (lines[index] as String).begins_with("var %s:" % property_name):
+				declaration_index = index
+				break
+		if not _check(declaration_index >= 2, "Tunable declaration exists: %s" % property_name):
+			return false
+		# Godot associates the tooltip only when the documentation comment precedes
+		# the annotation and the annotation is on its own line before the variable.
+		if not _check((lines[declaration_index - 1] as String).begins_with("@export"), "Export annotation immediately precedes %s" % property_name):
+			return false
+		if not _check((lines[declaration_index - 2] as String).begins_with("## "), "Tooltip documentation immediately precedes the annotation for %s" % property_name):
+			return false
+	return true
 
 func _find_presets(path: String) -> PackedStringArray:
 	var result := PackedStringArray()

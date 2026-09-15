@@ -4,11 +4,13 @@ extends Resource
 
 @export_category("Minigames")
 ## Active Simon Says umbrella preset. Restore Default.tres to return to known-good values.
-@export var simon_says: SimonSaysTuning
+@export
+var simon_says: SimonSaysTuning
 
 @export_category("Shared categories")
 ## Active host networking/session preset. Browser-only values intentionally remain in web/src/app.ts.
-@export var networking: NetworkingTuning
+@export
+var networking: NetworkingTuning
 
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()

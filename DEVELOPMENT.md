@@ -2,6 +2,17 @@
 
 ## PS-015 — shared tuning assets and preset workflow (2026-09-14)
 
+### Inspector tooltip correction (2026-09-15)
+
+Godot 4.7.2 did not attach documentation comments to exports written as a
+single combined `@export_range(...) var value` line: the Inspector showed
+`No description available`. Keep every documented tunable in this exact order:
+the `##` documentation comment, then the export annotation on its own line,
+then the `var` declaration on the next line. This applies to range exports and
+plain Resource-reference exports. `tests/tuning_presets_test.gd` checks this
+source contract for every current tweakable so future additions cannot silently
+lose their Inspector tooltip.
+
 PS-015 implements the editor-first workflow approved by PS-004. Open
 `Tuning/Active Presets.tres` for the project-level selector. Its Simon Says and
 Networking references point to committed, named assets; assigning the matching

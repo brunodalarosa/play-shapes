@@ -78,3 +78,8 @@ normal-profile headless editor load. The current Computer connection exposed no
 native Godot window, so no live Inspector walkthrough is claimed. Physical-phone,
 exported-build, and human feel/readability/fun approval remain separate evidence;
 only the owner may promote a candidate into `Default`.
+
+2026-09-15 correction: Godot 4.7 requires the export annotation on its own line
+between a `##` documentation comment and its `var` declaration for the comment
+to appear as an Inspector tooltip. All current Simon Says, Networking, and Active
+Presets fields now follow that form, with a regression check covering every one.

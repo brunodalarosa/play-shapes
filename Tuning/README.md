@@ -22,6 +22,7 @@ Browser fetch timeout (5 seconds), WebSocket deadline (about 7 seconds), and ret
 
 1. Decide whether the value belongs to a minigame umbrella or a genuinely reusable shared category. Do not expose algorithmic constants without a concrete human tuning need.
 2. Add a typed exported property to the owning Resource. Include a plain label, units, default, safe range, purpose, higher/lower outcome, and individual clamp where Godot supports it.
+   Write it as three consecutive parts: the `##` description, the export annotation on its own line, then the `var` declaration. Combining the annotation and declaration makes Godot 4.7 show `No description available` in the Inspector.
 3. Replace the implementation constant with the selected Resource value without changing the default behavior.
 4. Add related-field rules to `validation_errors()` and extend `tests/tuning_presets_test.gd` with valid, clamped-invalid, and invalid-combination coverage.
 5. Add the value explicitly to every committed named preset, run the preset validator, and update this guide if navigation or ownership changed.
