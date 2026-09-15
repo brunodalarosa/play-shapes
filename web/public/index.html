@@ -11,11 +11,22 @@
   <main>
     <p class="brand">PLAY SHAPES</p>
     <div class="shapes" aria-hidden="true">● ▲ ■</div>
-    <h1>Hello world</h1>
-    <p>Your phone has reached the Play Shapes host.</p>
-    <p id="status" role="status" aria-live="polite">Connecting to the host…</p>
+    <h1>Join the game</h1>
+    <p>Your phone is your Play Shapes controller.</p>
+    <p id="status" class="status" role="status" aria-live="polite">Connecting to the host…</p>
+    <form id="join-form" hidden>
+      <label for="player-name">Your name</label>
+      <input id="player-name" name="player-name" type="text" maxlength="16" autocomplete="nickname" required>
+      <button id="join-button" type="submit">Join game</button>
+    </form>
+    <section id="player-card" aria-labelledby="player-name-heading" hidden>
+      <p class="eyebrow">Joined as</p>
+      <h2 id="player-name-heading"></h2>
+      <p id="player-state">Connected</p>
+      <button id="leave-button" class="secondary" type="button">Leave / Change player</button>
+    </section>
     <noscript>Enable JavaScript to connect to the game.</noscript>
-    <p class="footnote">Lobby playground · Phase 1</p>
+    <p class="footnote">Keep this page open while you play.</p>
   </main>
 </body>
 </html>

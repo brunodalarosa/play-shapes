@@ -99,8 +99,27 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "Copy link"
 
-[node name="Connections" type="Label" parent="Scroll/Center/Billboard"]
+[node name="RosterTitle" type="Label" parent="Scroll/Center/Billboard"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Players"
+horizontal_alignment = 1
+
+[node name="PlayerCount" type="Label" parent="Scroll/Center/Billboard"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "0 browser connections"
+text = "0 / 20 players"
+horizontal_alignment = 1
+
+[node name="EmptyRoster" type="Label" parent="Scroll/Center/Billboard"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Waiting for players to join"
+horizontal_alignment = 1
+
+[node name="PlayerRoster" type="VBoxContainer" parent="Scroll/Center/Billboard"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
 horizontal_alignment = 1

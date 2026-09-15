@@ -2,29 +2,38 @@ extends Node
 ## Persistent services survive scene changes. Boot owns starting them.
 
 signal connection_count_changed(count: int)
+signal players_changed(players: Array[Dictionary])
 
 @export var settings: HostSettings = preload("res://host/default_settings.tres")
 var running: bool = false
 var startup_error: String = ""
 var http: HttpService
 var websocket: WebsocketService
+var player_registry: PlayerRegistry
+var accepting_new_players: bool = false
 
 func _ready() -> void:
+	player_registry = PlayerRegistry.new(settings.max_players, settings.reconnect_grace_seconds)
 	http = HttpService.new()
 	websocket = WebsocketService.new()
 	add_child(http)
 	add_child(websocket)
 	websocket.connection_count_changed.connect(connection_count_changed.emit)
+	player_registry.players_changed.connect(_on_players_changed)
+	_on_players_changed()
+
+func _process(_delta: float) -> void:
+	player_registry.expire_players()
 
 func start() -> bool:
 	if running:
 		return true
-	var error := http.start(settings)
+	var error := http.start(settings, player_registry.session_id)
 	if error != OK:
 		startup_error = "Could not start HTTP on port %d: %s" % [settings.http_port, error_string(error)]
 		http.stop()
 		return false
-	error = websocket.start(settings)
+	error = websocket.start(settings, player_registry, func() -> bool: return accepting_new_players)
 	if error != OK:
 		http.stop()
 		startup_error = "Could not start WebSocket on port %d: %s" % [settings.websocket_port, error_string(error)]
@@ -57,3 +66,16 @@ func stop() -> void:
 
 func join_url(address: String) -> String:
 	return "http://%s:%d" % [address, settings.http_port]
+
+func set_accepting_new_players(accepting: bool) -> void:
+	accepting_new_players = accepting
+
+func players() -> Array[Dictionary]:
+	return player_registry.public_players()
+
+func _on_players_changed() -> void:
+	var public_players := player_registry.public_players()
+	players_changed.emit(public_players)
+	var launcher := get_node_or_null("/root/DebugLauncher")
+	if launcher != null:
+		launcher.set_feature_available(&"registered_player", not public_players.is_empty())

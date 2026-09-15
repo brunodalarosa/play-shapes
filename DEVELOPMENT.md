@@ -1,5 +1,70 @@
 # Play Shapes development
 
+## PS-006 — player join and host-owned registry (2026-09-14)
+
+`SessionHost` owns one `PlayerRegistry` for the lifetime of the host process. The
+registry uses four deliberately separate identities: each WebSocket gets a
+monotonic transport `connection_id`; each accepted player gets an opaque
+session-scoped `player_id`; the host process gets an opaque `session_id`; and the
+browser receives an opaque reconnect token. Only the host generates these values.
+The browser stores the session ID, reconnect token, and last-used name in
+`localStorage`; a client-supplied `player_id` has no protocol meaning.
+
+Protocol 1 keeps the original `hello`/`welcome` handshake. `hello` may include the
+stored `session_id` and `reconnect_token`. `welcome.resume_status` is one of
+`join_required`, `resumed`, `expired`, or `session_restarted`. A welcomed client
+may send `join` with a name or `leave`; the host replies with `join_accepted`,
+`join_rejected`, `left`, or an actionable `error`. Invalid JSON/handshakes close
+with policy code 1008. Unsupported post-handshake actions receive a bounded error
+and cannot mutate identity. A duplicate active-token resume gives the newest
+connection ownership and closes the older tab with code 4000; the bundled client
+stops that older tab from retrying, preventing a reconnect loop.
+
+Names are trimmed, 1–16 Unicode code points, and reject C0/C1 controls plus
+Unicode line separators. Duplicate comparison uses Unicode lowercase matching.
+Disconnected records change to `reconnecting`, reserve their name and capacity,
+and expire at the configured grace boundary. Explicit Leave removes the record
+and token immediately. New joins are enabled only while `scenes/lobby.tscn` is in
+the tree; valid resumes remain available in other scenes. The lobby roster reads
+the persistent registry and displays seat, public name, and a text connection
+state. It no longer treats raw browser connections as players. Registry changes
+also drive DebugLauncher's `registered_player` feature.
+
+Designer-facing host values live in `host/default_settings.tres`, backed by
+`HostSettings`: `max_players = 20` players and
+`reconnect_grace_seconds = 60.0` seconds. They are independent of the existing
+`max_connections = 32` transport cap. The provisional host request/handshake
+timeout remains 5 seconds. Browser constants remain near their behavior in
+`web/src/app.ts`: fetch timeout 5 seconds, WebSocket deadline about 7 seconds,
+and retry delay 2 seconds. Run `npm.cmd run build` from `web/` after editing the
+TypeScript source so the locally served `web/public/app.js` stays current.
+
+Validation commands:
+
+```powershell
+godot --headless --path . --script res://tests/player_registry_test.gd
+godot --headless --path . --script res://tests/player_lobby_test.gd
+godot --headless --path . --script res://tests/foundation.gd
+cd web
+npm.cmd run check
+npm.cmd test
+```
+
+The registry check covers identity separation, Unicode/name validation,
+case-insensitive duplicates, lobby-only joins, two-player capacity with a reserved
+reconnecting slot, resume while full, deterministic duplicate resume, exact
+60-second expiry, leave/token invalidation, name reuse, and new-session rejection.
+The lobby check covers roster text and persistence across lobby replacement. The
+Node suite exercises the real local HTTP/WebSocket host, bundled accessibility
+markup, handshake errors, host-owned identity, duplicate rejection, resume,
+leave, and session restart responses. A desktop in-app browser check at 390×844
+confirmed the join layout, named joined state, reload resume, and Leave/Change
+player with preserved name and returned focus. The headless editor-load check has
+no project parse errors; sandbox-only Godot profile/cache write errors are not an
+editor runtime result. Physical-phone screen-lock, Wi-Fi-loss, touch, mobile
+browser, and shared-display flow checks remain owner validation and are not
+claimed here.
+
 ## PS-011 — hybrid character animation lab (2026-09-13)
 
 The lab scene is `debug/character_animation_lab.tscn`. Start the normal host,
@@ -334,30 +399,38 @@ addresses are preferred, but this is a heuristic, not default-route detection.
 VPNs, multiple interfaces, and guest Wi-Fi can require manual selection.
 Loopback, link-local, and IPv6 addresses are excluded. No address means no QR.
 
-The browser connection count is diagnostic, **not** a player count. Reloading
-creates a new host-assigned connection ID; there is no player identity yet.
+PS-006 replaced the lobby's old browser-connection diagnostic with the
+authoritative player roster. Reloading still creates a new transport connection
+ID, but the browser-held token resumes the same session player during its grace
+period; see the PS-006 section above.
 
 ## Code map
 
 - `scenes/boot.*`: starts services, displays a startup error and Retry on failure.
-- `host/session_host.gd`: autoload owning service lifecycle across scene changes,
-  settings, address discovery, and URL construction. WebSocket bind failure
-  rolls back HTTP startup. `stop()` releases listeners and connected peers.
+- `host/session_host.gd`: autoload owning service and player-registry lifecycle
+  across scene changes, settings, address discovery, and URL construction.
+  WebSocket bind failure rolls back HTTP startup. `stop()` releases listeners
+  and connected peers.
 - `host/default_settings.tres`: inspector-editable ports, connection limit and
-  request/handshake timeout. Defaults: HTTP 8080, WebSocket 8081, 32 connections
-  per service, five-second timeout. Restart to apply changed settings.
+  request/handshake timeout, player capacity, and reconnect grace. Defaults:
+  HTTP 8080, WebSocket 8081, 32 connections per service, 20 players, five-second
+  timeout, and 60-second reconnect grace. Restart to apply changed settings.
+- `host/player_registry.gd`: authoritative session/player/token identities,
+  name validation, capacity, disconnect grace, resume, and explicit leave.
 - `host/http_service.gd`: fixed route allowlist, bundled assets, bounded request
   buffers, nonblocking partial reads/writes, one GET per connection. No arbitrary
   filesystem access or client-selected resource loading.
-- `host/websocket_service.gd`: bounded peers/messages and a JSON hello/welcome
-  protocol. It rejects unsupported, malformed, binary, and repeated greetings.
-  Clients cannot submit authoritative state. Future game messages should be
-  validated and dispatched to separate game components through signals.
+- `host/websocket_service.gd`: bounded peers/messages and versioned
+  hello/welcome, join, resume, and leave transport. It rejects malformed or
+  unauthorized actions and delegates authoritative identity changes to the
+  registry.
 - `scenes/lobby.*`: editor-visible Control/Container billboard, address picker,
-  refresh/copy actions and nearest-filtered QR texture with a four-module margin.
+  refresh/copy actions, nearest-filtered QR texture with a four-module margin,
+  and the public player roster.
 - `web/src/app.ts`: thin browser client, five-second config fetch timeout,
-  handshake timeout and two-second retry. It reconnects after host restart and
-  handles pagehide/pageshow for browser back-forward cache restoration.
+  seven-second WebSocket deadline, and two-second retry. It stores only the
+  session/token/last-name identity needed for resume and handles pagehide/pageshow
+  for browser back-forward cache restoration.
 - `web/public/`: offline HTML/CSS and committed compiled JavaScript. Godot serves
   these directly, so running the game requires neither Node nor internet access.
 - `addons/kenyoni/qr_code/`: unmodified MIT QR runtime files pinned to commit

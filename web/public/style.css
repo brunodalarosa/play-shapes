@@ -1,10 +1,27 @@
 :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #0e131f; color: #f0f3f8; }
 * { box-sizing: border-box; }
-body { margin: 0; min-height: 100svh; display: grid; place-items: center; padding: 24px; }
-main { width: min(100%, 440px); text-align: center; padding: 40px 20px; }
+body { margin: 0; min-block-size: 100svh; display: grid; place-items: center; padding: clamp(16px, 5vw, 32px); }
+main { inline-size: min(100%, 440px); text-align: center; padding-block: clamp(24px, 8vw, 48px); }
 .brand { letter-spacing: .2em; font-size: 14px; font-weight: 750; color: #a6e6bf; }
-.shapes { color: #a6e6bf; font-size: 48px; letter-spacing: .15em; margin-top: 40px; }
-h1 { font-size: clamp(36px, 10vw, 52px); margin: 20px 0; }
+.shapes { color: #a6e6bf; font-size: clamp(38px, 12vw, 48px); letter-spacing: .15em; margin-block-start: 32px; }
+h1 { font-size: clamp(34px, 10vw, 52px); margin-block: 20px; }
+h2 { font-size: clamp(28px, 8vw, 38px); margin-block: 8px 16px; overflow-wrap: anywhere; }
 p { line-height: 1.6; }
-#status { padding: 18px; border: 1px solid #3b544b; border-radius: 12px; background: #172820; }
-.footnote { margin-top: 40px; color: #a0abbd; font-size: 13px; }
+.status, #player-card { padding: 18px; border: 1px solid #587567; border-radius: 12px; background: #172820; }
+form { display: grid; gap: 12px; text-align: start; margin-block-start: 20px; }
+label { font-weight: 700; }
+input, button { min-block-size: 48px; inline-size: 100%; border-radius: 10px; font: inherit; }
+input { border: 2px solid #768496; background: #111925; color: #fff; padding-inline: 14px; font-size: 18px; }
+button { border: 0; background: #a6e6bf; color: #0e2418; padding: 12px 18px; font-weight: 800; cursor: pointer; }
+button.secondary { border: 2px solid #a6e6bf; background: transparent; color: #d8f7e4; }
+input:focus-visible, button:focus-visible { outline: 3px solid #ffd166; outline-offset: 3px; }
+button:disabled { cursor: wait; opacity: .65; }
+#player-card { margin-block-start: 20px; }
+.eyebrow { margin: 0; color: #b8c1cf; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+#player-state { font-weight: 700; }
+.footnote { margin-block-start: 40px; color: #b8c1cf; font-size: 13px; }
+[hidden] { display: none !important; }
+
+@media (prefers-contrast: more) {
+  .status, #player-card, input, button.secondary { border-color: currentColor; }
+}

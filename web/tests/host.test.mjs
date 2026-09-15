@@ -49,14 +49,22 @@ after(async () => {
 
 test('serves bundled HTML, JS, CSS and session configuration', async () => {
   for (const [path, mime, text] of [
-    ['/', 'text/html', 'Hello world'], ['/app.js', 'text/javascript', 'WebSocket'],
-    ['/style.css', 'text/css', 'color-scheme'], ['/session.json', 'application/json', 'websocket_port']
+    ['/', 'text/html', 'Join game'], ['/app.js', 'text/javascript', 'localStorage'],
+    ['/style.css', 'text/css', 'focus-visible'], ['/session.json', 'application/json', 'session_id']
   ]) {
     const response = await fetch(base + path);
     assert.equal(response.status, 200);
     assert.ok(response.headers.get('content-type').startsWith(mime));
     assert.ok((await response.text()).includes(text));
   }
+});
+
+test('phone join form has labels, live feedback, and explicit change-player action', async () => {
+  const html = await (await fetch(base)).text();
+  assert.match(html, /<label for="player-name">Your name<\/label>/);
+  assert.match(html, /id="status"[^>]*role="status"[^>]*aria-live="polite"/);
+  assert.match(html, />Leave \/ Change player<\/button>/);
+  assert.match(html, /maxlength="16"/);
 });
 
 test('lobby QR texture decodes to the exact join URL', () => {
@@ -91,7 +99,7 @@ function rawRequest(chunks) {
 }
 
 test('handles fragmented requests and rejects oversized headers', async () => {
-  assert.match(await rawRequest(['GET / HTTP/1.1\r\nHost:', ' localhost\r\n\r\n']), /200 OK[\s\S]*Hello world/);
+  assert.match(await rawRequest(['GET / HTTP/1.1\r\nHost:', ' localhost\r\n\r\n']), /200 OK[\s\S]*Join the game/);
   assert.match(await rawRequest(['GET / HTTP/1.1\r\nX: ' + 'a'.repeat(9000)]), /431 Request|^RESET$/);
 });
 
@@ -106,13 +114,25 @@ function connect(message) {
   });
 }
 
+function request(peer, message) {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error('WebSocket response timed out')), 7000);
+    peer.addEventListener('message', event => {
+      clearTimeout(timeout);
+      resolve(JSON.parse(event.data));
+    }, { once: true });
+    peer.send(JSON.stringify(message));
+  });
+}
+
 test('host assigns unique connection IDs to simultaneous browser clients', async () => {
   const clients = await Promise.all(Array.from({ length: 4 }, () => connect(JSON.stringify({ type: 'hello', protocol: 1 }))));
   try {
     for (const client of clients) {
       assert.equal(client.welcome.type, 'welcome');
-      assert.equal(client.welcome.message, 'Hello world');
+      assert.equal(client.welcome.resume_status, 'join_required');
       assert.equal(client.welcome.protocol, 1);
+      assert.equal(typeof client.welcome.session_id, 'string');
     }
     assert.equal(new Set(clients.map(client => client.welcome.connection_id)).size, 4);
   } finally { clients.forEach(client => client.peer?.close()); }
@@ -122,4 +142,73 @@ test('rejects malformed messages and client-authored state', async () => {
   for (const message of ['garbage', '{}', '{"type":"hello","protocol":99}', '{"type":"set_state","score":99}']) {
     assert.equal((await connect(message)).code, 1008);
   }
+});
+
+test('joins, rejects duplicate names, resumes, leaves, and invalidates identity', async () => {
+  const first = await connect(JSON.stringify({ type: 'hello', protocol: 1 }));
+  const second = await connect(JSON.stringify({ type: 'hello', protocol: 1 }));
+  let resumed;
+  let afterLeave;
+  try {
+    const joined = await request(first.peer, { type: 'join', name: '  Player One  ', player_id: 'client-choice' });
+    assert.equal(joined.type, 'join_accepted');
+    assert.equal(joined.player.name, 'Player One');
+    assert.notEqual(joined.player.player_id, 'client-choice');
+    assert.notEqual(joined.player.player_id, String(first.welcome.connection_id));
+    assert.notEqual(joined.reconnect_token, joined.player.player_id);
+
+    const duplicate = await request(second.peer, { type: 'join', name: 'PLAYER ONE' });
+    assert.equal(duplicate.type, 'join_rejected');
+    assert.equal(duplicate.code, 'duplicate_name');
+    assert.equal(duplicate.message, 'Name already in use');
+
+    first.peer.close();
+    await delay(100);
+    resumed = await connect(JSON.stringify({
+      type: 'hello', protocol: 1,
+      session_id: joined.session_id, reconnect_token: joined.reconnect_token
+    }));
+    assert.equal(resumed.welcome.resume_status, 'resumed');
+    assert.equal(resumed.welcome.player.player_id, joined.player.player_id);
+    assert.equal(resumed.welcome.player.seat, joined.player.seat);
+
+    assert.equal((await request(resumed.peer, { type: 'leave' })).type, 'left');
+    afterLeave = await connect(JSON.stringify({
+      type: 'hello', protocol: 1,
+      session_id: joined.session_id, reconnect_token: joined.reconnect_token
+    }));
+    assert.equal(afterLeave.welcome.resume_status, 'expired');
+    const reused = await request(afterLeave.peer, { type: 'join', name: 'player one' });
+    assert.equal(reused.type, 'join_accepted');
+    await request(afterLeave.peer, { type: 'leave' });
+  } finally {
+    first.peer?.close();
+    second.peer?.close();
+    resumed?.peer?.close();
+    afterLeave?.peer?.close();
+  }
+});
+
+test('returns actionable protocol errors after the handshake', async () => {
+  const client = await connect(JSON.stringify({ type: 'hello', protocol: 1 }));
+  try {
+    const invalidName = await request(client.peer, { type: 'join', name: 'Line\nBreak' });
+    assert.deepEqual(
+      { type: invalidName.type, code: invalidName.code, message: invalidName.message },
+      { type: 'join_rejected', code: 'invalid_name', message: 'Name cannot contain control characters' }
+    );
+    const unsupported = await request(client.peer, { type: 'set_state', score: 99 });
+    assert.equal(unsupported.type, 'error');
+    assert.equal(unsupported.code, 'unsupported_message');
+  } finally { client.peer.close(); }
+});
+
+test('distinguishes a token from a different host session', async () => {
+  const client = await connect(JSON.stringify({
+    type: 'hello', protocol: 1, session_id: 'old-session', reconnect_token: 'old-token'
+  }));
+  try {
+    assert.equal(client.welcome.resume_status, 'session_restarted');
+    assert.match(client.welcome.message, /new session/i);
+  } finally { client.peer.close(); }
 });

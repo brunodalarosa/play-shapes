@@ -91,3 +91,13 @@ Record durable architectural, production, and game-design choices here so future
 - **Alternatives:** A visible lobby button was rejected in favor of a host-only shortcut. Automatic pause, phone-side debug controls, runtime tuning, simulated players, and general-purpose debugging tools were deferred until a concrete need appears.
 - **Related tasks:** [[PS-007 - Define the Gameplay Debug Suite]], [[PS-014 - Implement Minimal Gameplay Debug Launcher]], [[PS-011 - Implement Hybrid Character Animation Lab]]
 - **Revisit:** Add capabilities only when active development workflows require them; remove or gate exported-build access before public distribution.
+
+## DEC-011 — Session-scoped browser player identity and reconnect grace
+
+- **Date:** 2026-09-14
+- **Decision:** A browser connection keeps its transport `connection_id`, while the host owns a separate session-scoped `player_id`. The browser may store an opaque reconnect token and last-used name locally. The registry survives scene changes but resets on host restart. Valid names are automatically accepted, duplicate names are rejected with `Name already in use`, the player capacity is 20, and a disconnected player reserves its slot for a tunable 60-second grace period. Explicit leave removes the player immediately. New players join through the lobby only; the future next-minigame queue is deferred.
+- **Reason:** This gives a small local-party flow that survives ordinary phone interruptions without introducing accounts, persistent profiles, host approval, or a general networking framework.
+- **Alternatives:** Using display names as identity, persisting identity across host restarts, allowing duplicate names without a disambiguation rule, and implementing a late-join queue in the registry task were deferred or rejected.
+- **Related tasks:** [[PS-003 - Define Join Identity and Reconnection UX]], [[PS-006 - Implement Player Join and Host-Owned Registry]]
+- **Revisit:** When the next-minigame queue, persistent profiles, or an online mode is explicitly designed.
+- **Implementation:** PS-006 keeps the registry as a typed session-lifetime data owner under `SessionHost`; WebSocket code adapts validated messages to it, the lobby only controls whether new joins are open, and gameplay scenes continue to permit valid resumes.
