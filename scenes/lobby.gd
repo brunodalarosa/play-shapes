@@ -3,13 +3,19 @@ extends Control
 @onready var address_picker: OptionButton = %AddressPicker
 @onready var qr: QRCodeRect = %JoinQR
 @onready var join_address: Label = %JoinAddress
+@onready var roster: VBoxContainer = %PlayerRoster
 
 func _ready() -> void:
-	SessionHost.connection_count_changed.connect(_show_count)
+	SessionHost.set_accepting_new_players(true)
+	SessionHost.players_changed.connect(_show_players)
 	address_picker.item_selected.connect(_select_address)
 	%Refresh.pressed.connect(_refresh_addresses)
 	%Copy.pressed.connect(func() -> void: DisplayServer.clipboard_set(join_address.text))
 	_refresh_addresses()
+	_show_players(SessionHost.players())
+
+func _exit_tree() -> void:
+	SessionHost.set_accepting_new_players(false)
 
 func _refresh_addresses() -> void:
 	var previous := address_picker.get_item_text(address_picker.selected) if address_picker.selected >= 0 else ""
@@ -33,5 +39,15 @@ func _select_address(index: int) -> void:
 	qr.show()
 	%Copy.disabled = false
 
-func _show_count(count: int) -> void:
-	%Connections.text = "%d browser connection%s" % [count, "" if count == 1 else "s"]
+func _show_players(players: Array[Dictionary]) -> void:
+	for child: Node in roster.get_children():
+		child.queue_free()
+	%PlayerCount.text = "%d / %d players" % [players.size(), SessionHost.settings.max_players]
+	%EmptyRoster.visible = players.is_empty()
+	for player: Dictionary in players:
+		var row := Label.new()
+		row.text = "%d. %s — %s" % [player.seat, player.name,
+			"Connected" if player.state == "connected" else "Reconnecting"]
+		row.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		row.add_theme_font_size_override("font_size", 18)
+		roster.add_child(row)

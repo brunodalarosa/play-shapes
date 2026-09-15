@@ -12,9 +12,11 @@ var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []
 var _settings: HostSettings
 var _bodies: Dictionary = {}
+var _session_id: String
 
-func start(settings: HostSettings) -> Error:
+func start(settings: HostSettings, session_id: String) -> Error:
 	_settings = settings
+	_session_id = session_id
 	for route: String in ASSETS:
 		var file := FileAccess.open(ASSETS[route][0], FileAccess.READ)
 		if file == null:
@@ -82,7 +84,11 @@ func _route(request: String) -> PackedByteArray:
 		return _response("405 Method Not Allowed", "text/plain", "GET only".to_utf8_buffer())
 	var route := parts[1].get_slice("?", 0)
 	if route == "/session.json":
-		return _response("200 OK", "application/json", JSON.stringify({"protocol": 1, "websocket_port": _settings.websocket_port}).to_utf8_buffer())
+		return _response("200 OK", "application/json", JSON.stringify({
+			"protocol": 1,
+			"websocket_port": _settings.websocket_port,
+			"session_id": _session_id,
+		}).to_utf8_buffer())
 	if not ASSETS.has(route):
 		return _response("404 Not Found", "text/plain", "Not found".to_utf8_buffer())
 	return _response("200 OK", ASSETS[route][1], _bodies[route])
