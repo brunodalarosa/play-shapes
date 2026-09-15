@@ -31,7 +31,7 @@ func _ready() -> void:
 	charge_state.fill_seconds = charge_fill_seconds
 	charge_state.decay_seconds = charge_decay_seconds
 	animator.apply_tuning(tuning)
-	animator.setup(character, charge_state)
+	animator.setup(character, true)
 	for direction: StringName in DIRECTIONS:
 		var button := get_node(NodePath("%" + direction.capitalize() + "Button")) as Button
 		button.button_down.connect(_set_button_direction.bind(direction))
@@ -44,6 +44,7 @@ func _process(delta: float) -> void:
 	charge_state.decay_seconds = charge_decay_seconds
 	var requested := _auto_direction(delta) if auto_preview.button_pressed else _manual_direction()
 	charge_state.advance(delta, requested)
+	animator.set_pose_state(charge_state.direction, charge_state.charge, charge_state.held)
 	var state := "DANCE"
 	if not charge_state.direction.is_empty():
 		state = "%s / %s" % [charge_state.direction.to_upper(), "SNAPPED + HELD" if charge_state.is_committed() else "CHARGING" if charge_state.held else "UNWINDING"]

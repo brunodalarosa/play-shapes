@@ -1,7 +1,7 @@
 @tool
 class_name ShapeCharacter
 extends Node2D
-## Six independent sprite pivots; animation strategy remains open for PS-010.
+## Six independent sprite pivots used by the Milestone 1 detached-sprite animator.
 ## Keep the root's modulate white: use player_color to leave the face untouched.
 
 const TINT_SHADER: Shader = preload("res://characters/player_tint.gdshader")
