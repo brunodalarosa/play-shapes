@@ -16,19 +16,20 @@ This is the lightweight human-readable view of active work. The interactive stat
 
 ## Backlog
 
-- [[PS-004 - Define the Game-Feel Tuning Strategy]] — shared design
 - [[PS-005 - Define Multi-Phone and Agent Validation Strategy]] — shared design
 - [[PS-008 - Design Fake Music Stops]] — shared design
 - [[PS-014 - Implement Minimal Gameplay Debug Launcher]] — AI implementation; implements completed [[PS-007 - Define the Gameplay Debug Suite]]
 - [[PS-011 - Implement Hybrid Character Animation Lab]] — AI implementation; depends on [[PS-014 - Implement Minimal Gameplay Debug Launcher]] and completed [[PS-010 - Explore Character Animation Strategy]]
-- [[PS-012 - Implement Milestone 1 Character Animation System]] — AI implementation; depends on [[PS-004 - Define the Game-Feel Tuning Strategy]] and human-approved [[PS-011 - Implement Hybrid Character Animation Lab]]
-- [[PS-013 - Implement Pose Charge and Evaluation Rules]] — AI implementation; depends on [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-006 - Implement Player Join and Host-Owned Registry]], and [[PS-012 - Implement Milestone 1 Character Animation System]]
+- [[PS-012 - Implement Milestone 1 Character Animation System]] — AI implementation; depends on [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], and human-approved [[PS-011 - Implement Hybrid Character Animation Lab]]
+- [[PS-013 - Implement Pose Charge and Evaluation Rules]] — AI implementation; depends on [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-006 - Implement Player Join and Host-Owned Registry]], and [[PS-012 - Implement Milestone 1 Character Animation System]]
+- [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]] — AI implementation; implements completed [[PS-004 - Define the Game-Feel Tuning Strategy]]
 
 ## Recently completed
 
 - [[PS-006 - Implement Player Join and Host-Owned Registry]] — authoritative named players, reconnect grace, phone join states, and shared roster
 - [[PS-003 - Define Join Identity and Reconnection UX]] — approved session-scoped identity, reconnect, leave, capacity, and host-restart design
 - [[PS-007 - Define the Gameplay Debug Suite]] — approved minimal F12 host scenario launcher design
+- [[PS-004 - Define the Game-Feel Tuning Strategy]] — approved editor-first shared tuning assets, presets, validation, and experiment workflow
 - [[PS-010 - Explore Character Animation Strategy]] — approved hybrid detached-sprite animation strategy and bounded follow-up work
 - [[PS-009 - Create and Import Character Feet Assets]] — implementation validated; foot art approved by the owner on 2026-09-13
 
@@ -39,6 +40,7 @@ This is the lightweight human-readable view of active work. The interactive stat
 - [[PS-006 - Implement Player Join and Host-Owned Registry]] — host-owned identity and reconnect flow for [[Releases#Milestone 1 — Simon Says Gameplay Proof|Milestone 1]]
 - [[PS-003 - Define Join Identity and Reconnection UX]] — approved session-scoped identity, reconnect, leave, capacity, and host-restart design
 - [[PS-007 - Define the Gameplay Debug Suite]] — approved essential first-iteration debug workflows for Milestone 1
+- [[PS-004 - Define the Game-Feel Tuning Strategy]] — approved editor-first shared tuning assets, presets, validation, and experiment workflow
 - [[PS-010 - Explore Character Animation Strategy]] — approved animation architecture, pose vocabulary, and charge behavior for Milestone 1
 - [[PS-009 - Create and Import Character Feet Assets]] — approved character assets and Godot setup for [[Releases#Milestone 1 — Simon Says Gameplay Proof|Milestone 1]]
 - [[PS-001 - Define the First Gameplay Milestone]] — shared design for [[Releases#Milestone 1 — Simon Says Gameplay Proof|Milestone 1]]

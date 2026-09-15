@@ -45,7 +45,7 @@ Relevant tasks must identify:
 5. How an implementation agent documents the controls.
 6. Which experiments or playtests should evaluate the behavior.
 
-Prefer designer-facing Godot resources, inspector properties, data/configuration assets, or focused editor tools when evidence supports them. This principle does not preselect one technical mechanism for every system. The project-wide convention remains to be designed in [[PS-004 - Define the Game-Feel Tuning Strategy]].
+Prefer designer-facing Godot resources, inspector properties, data/configuration assets, or focused editor tools when evidence supports them. This principle does not preselect one technical mechanism for every system. The project-wide convention is defined in [[PS-004 - Define the Game-Feel Tuning Strategy]]; implementation work is tracked in [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]].
 
 ## Major known unknowns
 

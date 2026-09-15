@@ -35,11 +35,11 @@ views:
     cardOrders:
       note.status:
         backlog:
-          - play-shapes/Management/Tasks/PS-004 - Define the Game-Feel Tuning Strategy.md
           - play-shapes/Management/Tasks/PS-005 - Define Multi-Phone and Agent Validation Strategy.md
           - play-shapes/Management/Tasks/PS-008 - Design Fake Music Stops.md
           - play-shapes/Management/Tasks/PS-012 - Implement Milestone 1 Character Animation System.md
           - play-shapes/Management/Tasks/PS-013 - Implement Pose Charge and Evaluation Rules.md
+          - play-shapes/Management/Tasks/PS-015 - Implement Shared Tuning Asset and Preset Workflow.md
         done:
           - play-shapes/Management/Tasks/Done/PS-006 - Implement Player Join and Host-Owned Registry.md
           - play-shapes/Management/Tasks/PS-001 - Define the First Gameplay Milestone.md
@@ -49,6 +49,7 @@ views:
           - play-shapes/Management/Tasks/Done/PS-007 - Define the Gameplay Debug Suite.md
           - play-shapes/Management/Tasks/Done/PS-009 - Create and Import Character Feet Assets.md
           - play-shapes/Management/Tasks/Done/PS-010 - Explore Character Animation Strategy.md
+          - play-shapes/Management/Tasks/Done/PS-004 - Define the Game-Feel Tuning Strategy.md
     columnColors:
       note.status:
         done: green

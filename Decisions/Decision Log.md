@@ -101,3 +101,13 @@ Record durable architectural, production, and game-design choices here so future
 - **Related tasks:** [[PS-003 - Define Join Identity and Reconnection UX]], [[PS-006 - Implement Player Join and Host-Owned Registry]]
 - **Revisit:** When the next-minigame queue, persistent profiles, or an online mode is explicitly designed.
 - **Implementation:** PS-006 keeps the registry as a typed session-lifetime data owner under `SessionHost`; WebSocket code adapts validated messages to it, the lobby only controls whether new joins are open, and gameplay scenes continue to permit valid resumes.
+
+## DEC-012 — Shared editor-first tuning assets and named presets
+
+- **Date:** 2026-09-14
+- **Decision:** Play Shapes uses a shared editor-first tuning system. Each minigame has one umbrella tuning asset shape with grouped sections, reusable concerns live in shared category assets, and a project-level `Active Presets` asset selects the named preset used after relaunch. Every preset has a known-good `Default` baseline, clear human-facing labels and Inspector/Markdown guidance, and automated invariant validation. Cross-platform values share a source only when host and browser genuinely need synchronized behavior; otherwise they remain platform-local.
+- **Reason:** A Unity-experienced but Godot-new designer needs to find and change values without reading AI-generated implementation code, while the system remains navigable as the game grows.
+- **Alternatives:** One monolithic tuning asset, scattered script constants, runtime-first tuning UI, and Git-history-only experiment copies were rejected or deferred because they reduce discoverability or add unnecessary early complexity.
+- **Ownership:** Agents may prepare candidate presets, validation, and experiment notes. Only the human may approve subjective feel, promote a preset to `Default`, or declare an experiment successful.
+- **Related tasks:** [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-012 - Implement Milestone 1 Character Animation System]], [[PS-013 - Implement Pose Charge and Evaluation Rules]]
+- **Revisit:** After the first tuning foundation and a real Milestone 1 playtest reveal navigation, validation, or cross-platform synchronization friction.

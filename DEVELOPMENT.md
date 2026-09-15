@@ -1,5 +1,39 @@
 # Play Shapes development
 
+## PS-004 — shared editor-first tuning strategy (2026-09-14)
+
+PS-004 is complete. The approved workflow is editor-first: stopping and
+relaunching between tuning runs is acceptable, and Milestone 1 does not need a
+runtime tuning overlay.
+
+The future tuning layout is a `Tuning/` root with one umbrella preset shape per
+minigame, shared assets grouped by concern, a project-level `Active Presets`
+selector, a Markdown tuning guide, and separate notes under
+`Tuning/Experiments/`. The initial shared categories are Input and phone
+controls, UI and presentation, Audio and haptics, Accessibility, Networking
+and session behavior, Camera, and Browser/platform behavior. These categories
+can grow when a real system justifies them.
+
+Every exposed value must be understandable without reading implementation code:
+use a plain-language label, explicit unit, default, safe range, purpose,
+higher/lower outcome guidance, invalid-value rules, and related-field
+constraints. Inspector constraints should prevent or clamp invalid individual
+values; focused automated tests must reject invalid combinations. Every
+committed named preset is validated, including non-active variants. Tests prove
+configuration safety, not subjective game feel.
+
+`Default` is the known-good recovery preset. Agents may create named candidate
+presets and experiment notes, but only the project owner may promote a preset
+to `Default` or approve a feel decision. An experiment changes one logical group
+under one hypothesis, uses a named preset, relaunches the relevant scene, and
+records the preset, conditions, observations, and decision in a separate note.
+
+Host and browser values share a source only when they genuinely need
+synchronized behavior. Browser-only interaction/presentation values remain
+platform-local; host-only settings remain in the networking/session category.
+The implementation follow-up is [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]]. No tuning resources, selectors, runtime UI, or gameplay
+values were implemented by the PS-004 design session.
+
 ## PS-006 — player join and host-owned registry (2026-09-14)
 
 `SessionHost` owns one `PlayerRegistry` for the lifetime of the host process. The

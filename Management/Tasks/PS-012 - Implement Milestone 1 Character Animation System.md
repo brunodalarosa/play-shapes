@@ -8,6 +8,7 @@ owner: ai
 priority:
 depends_on:
   - PS-004
+  - PS-015
   - PS-011
 ---
 
@@ -83,6 +84,6 @@ and group motion should feel lively rather than synchronized like machinery.
 
 # Draft Execution Prompt
 
-Read [[PS-012 - Implement Milestone 1 Character Animation System]], the approved outcome and prototype from [[PS-011 - Implement Hybrid Character Animation Lab]], [[PS-010 - Explore Character Animation Strategy]], [[PS-004 - Define the Game-Feel Tuning Strategy]], [[001 - Dancer simon says]], and [[DEVELOPMENT]]. Preserve the validated detached-sprite and tint setup. Implement a reusable semantic animation component, three track-specific dance loops, shared command poses, role-specific lead presentation, normalized-charge visuals, and all required reactions. Keep authoritative rules outside animation. Exercise every state through debug tooling, validate eleven simultaneous characters, run focused automated and Godot checks, and obtain human visual review. Document exact authoring and tuning guidance in DEVELOPMENT.md. Follow GitHub Flow and open a pull request; do not implement PS-013 or full minigame integration in the same session.
+Read [[PS-012 - Implement Milestone 1 Character Animation System]], the approved outcome and prototype from [[PS-011 - Implement Hybrid Character Animation Lab]], [[PS-010 - Explore Character Animation Strategy]], [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[001 - Dancer simon says]], and [[DEVELOPMENT]]. Preserve the validated detached-sprite and tint setup. Implement a reusable semantic animation component, three track-specific dance loops, shared command poses, role-specific lead presentation, normalized-charge visuals, and all required reactions. Keep authoritative rules outside animation. Exercise every state through debug tooling, validate eleven simultaneous characters, run focused automated and Godot checks, and obtain human visual review. Document exact authoring and tuning guidance in DEVELOPMENT.md. Follow GitHub Flow and open a pull request; do not implement PS-013 or full minigame integration in the same session.
 
 # Outcome
