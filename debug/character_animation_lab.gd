@@ -3,10 +3,7 @@ extends Control
 
 const DIRECTIONS: Array[StringName] = [&"up", &"left", &"right", &"down"]
 
-@export_range(0.1, 3.0, 0.05) var charge_fill_seconds: float = 1.0
-@export_range(0.05, 1.0, 0.01) var charge_decay_seconds: float = 0.28
-@export_range(0.5, 5.0, 0.1) var auto_hold_seconds: float = 1.5
-@export_range(0.1, 2.0, 0.1) var auto_release_seconds: float = 0.7
+@export var active_presets: ActivePresets = preload("res://Tuning/Active Presets.tres")
 
 @onready var character: ShapeCharacter = %Character
 @onready var animator: HybridCharacterAnimator = %HybridAnimator
@@ -18,9 +15,22 @@ var _button_direction: StringName = &""
 var _auto_index: int = -1
 var _auto_elapsed: float = 0.0
 
+var tuning: SimonSaysTuning:
+	get: return active_presets.simon_says
+
+var charge_fill_seconds: float:
+	get: return tuning.charge_fill_seconds
+var charge_decay_seconds: float:
+	get: return tuning.charge_decay_seconds
+var auto_hold_seconds: float:
+	get: return tuning.auto_hold_seconds
+var auto_release_seconds: float:
+	get: return tuning.auto_release_seconds
+
 func _ready() -> void:
 	charge_state.fill_seconds = charge_fill_seconds
 	charge_state.decay_seconds = charge_decay_seconds
+	animator.apply_tuning(tuning)
 	animator.setup(character, charge_state)
 	for direction: StringName in DIRECTIONS:
 		var button := get_node(NodePath("%" + direction.capitalize() + "Button")) as Button

@@ -83,7 +83,7 @@ name entry, joined/reconnecting/expired/full/error copy, reload resume, and
 Leave/Change player.
 
 `max_players = 20` and `reconnect_grace_seconds = 60.0` are exposed in
-`host/default_settings.tres`; the 32-connection transport cap and provisional
+`Tuning/Shared/Networking/Default.tres`; the 32-connection transport cap and provisional
 5/5/7/2-second host request, browser fetch, WebSocket deadline, and retry values
 remain unchanged. Focused registry, lobby, TypeScript, HTTP, and WebSocket checks
 pass. A desktop browser pass at a 390×844 viewport passed join, reload resume,

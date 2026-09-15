@@ -7,7 +7,7 @@ func _initialize() -> void:
 func _run() -> void:
 	var launcher := root.get_node("DebugLauncher")
 	var host := root.get_node("SessionHost")
-	host.settings = HostSettings.new()
+	host.settings = NetworkingTuning.new()
 	host.settings.http_port = 18080
 	host.settings.websocket_port = 18081
 	if not _check(host.start(), "Test LAN services start"):

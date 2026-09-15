@@ -1,5 +1,112 @@
 # Play Shapes development
 
+## PS-015 — shared tuning assets and preset workflow (2026-09-14)
+
+### Inspector tooltip correction (2026-09-15)
+
+Godot 4.7.2 showed `No description available` for the first tuning Resources.
+Keep every documented tunable in this exact order: the `##` documentation
+comment, then the export annotation on its own line, then the `var` declaration
+on the next line. Use `@export_group` for Inspector sections, not
+`@export_category`: categories change the Inspector's documentation context and
+can prevent subsequent custom-property descriptions from resolving. This applies
+to range exports and plain Resource-reference exports.
+`tests/tuning_presets_test.gd` checks both rules for every current tweakable so
+future additions cannot silently lose their Inspector tooltip.
+Godot's `--gdscript-docs res://Tuning` output was also inspected: all 17 current
+properties and their full descriptions are present in the generated
+`SimonSaysTuning.xml`, `NetworkingTuning.xml`, and `ActivePresets.xml`. These
+temporary XML files are verification output and are not committed.
+
+PS-015 implements the editor-first workflow approved by PS-004. Open
+`Tuning/Active Presets.tres` for the project-level selector. Its Simon Says and
+Networking references point to committed, named assets; assigning the matching
+`Default.tres`, saving, and relaunching deterministically restores the known-good
+configuration. There is no runtime tuning UI.
+
+`Tuning/Minigames/SimonSays/Default.tres` is the minigame front door. It owns the
+currently implemented charge fill/decay, lab preview timing, dance tempo, body
+bounce/jiggle/sway, and visual-follow values. The animation lab and animator now
+consume that Resource without changing their provisional defaults.
+`Tuning/Shared/Networking/Default.tres` replaces `host/default_settings.tres`
+and owns the existing HTTP/WebSocket ports, transport/player limits, request
+timeout, and reconnect grace. `SessionHost` obtains it through Active Presets;
+the host remains authoritative.
+
+Each exported field includes Inspector documentation, units, a default, a safe
+range, and higher/lower guidance. Setters clamp individual values. Each Resource
+reports actionable cross-field errors, and `tests/tuning_presets_test.gd`
+recursively loads and validates every committed `.tres` below `Tuning/`. It also
+checks invalid individual values, invalid combinations, and missing active
+references. Future preset files are therefore included automatically rather than
+being allowlisted.
+
+The complete navigation, naming, reset, extension, and experiment workflow is in
+`Tuning/README.md`; copy `Tuning/Experiments/EXPERIMENT_TEMPLATE.md` for a feel
+comparison. The approved shared category map is documented there, but only
+Networking has a Resource today because the other categories have no concrete
+implemented values yet. Browser fetch timeout (5 seconds), WebSocket deadline
+(about 7 seconds), and retry delay (2 seconds) remain local to `web/src/app.ts`;
+no current behavior requires synchronizing them with the host.
+
+Validation commands:
+
+```powershell
+godot --headless --path . --script res://tests/tuning_presets_test.gd
+godot --headless --path . --script res://tests/pose_charge_test.gd
+godot --headless --path . --script res://tests/animation_lab_test.gd
+godot --headless --path . --script res://tests/player_registry_test.gd
+godot --headless --path . --script res://tests/player_lobby_test.gd
+godot --headless --path . --script res://tests/foundation.gd
+godot --headless --editor --path . --quit-after 30
+cd web
+npm.cmd run build
+npm.cmd run check
+npm.cmd test
+```
+
+Automated Resource, regression, TypeScript, and browser/host integration checks
+pass. The normal-profile Godot editor-load check passes without script/resource
+errors; its existing early-shutdown cleanup warnings remain non-failures. This
+session's Computer connection exposed no native Godot window, so a live Inspector
+walkthrough was not performed. No browser behavior changed, no physical-phone or
+exported-build check was run, and no subjective feel/readability/fun approval is
+claimed. The owner still controls candidate promotion into `Default`.
+
+## PS-004 — shared editor-first tuning strategy (2026-09-14)
+
+PS-004 is complete. The approved workflow is editor-first: stopping and
+relaunching between tuning runs is acceptable, and Milestone 1 does not need a
+runtime tuning overlay.
+
+The future tuning layout is a `Tuning/` root with one umbrella preset shape per
+minigame, shared assets grouped by concern, a project-level `Active Presets`
+selector, a Markdown tuning guide, and separate notes under
+`Tuning/Experiments/`. The initial shared categories are Input and phone
+controls, UI and presentation, Audio and haptics, Accessibility, Networking
+and session behavior, Camera, and Browser/platform behavior. These categories
+can grow when a real system justifies them.
+
+Every exposed value must be understandable without reading implementation code:
+use a plain-language label, explicit unit, default, safe range, purpose,
+higher/lower outcome guidance, invalid-value rules, and related-field
+constraints. Inspector constraints should prevent or clamp invalid individual
+values; focused automated tests must reject invalid combinations. Every
+committed named preset is validated, including non-active variants. Tests prove
+configuration safety, not subjective game feel.
+
+`Default` is the known-good recovery preset. Agents may create named candidate
+presets and experiment notes, but only the project owner may promote a preset
+to `Default` or approve a feel decision. An experiment changes one logical group
+under one hypothesis, uses a named preset, relaunches the relevant scene, and
+records the preset, conditions, observations, and decision in a separate note.
+
+Host and browser values share a source only when they genuinely need
+synchronized behavior. Browser-only interaction/presentation values remain
+platform-local; host-only settings remain in the networking/session category.
+The implementation follow-up is [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]]. No tuning resources, selectors, runtime UI, or gameplay
+values were implemented by the PS-004 design session.
+
 ## PS-006 — player join and host-owned registry (2026-09-14)
 
 `SessionHost` owns one `PlayerRegistry` for the lifetime of the host process. The
@@ -30,8 +137,9 @@ the persistent registry and displays seat, public name, and a text connection
 state. It no longer treats raw browser connections as players. Registry changes
 also drive DebugLauncher's `registered_player` feature.
 
-Designer-facing host values live in `host/default_settings.tres`, backed by
-`HostSettings`: `max_players = 20` players and
+Designer-facing host values now live in
+`Tuning/Shared/Networking/Default.tres`, backed by `NetworkingTuning`:
+`max_players = 20` players and
 `reconnect_grace_seconds = 60.0` seconds. They are independent of the existing
 `max_connections = 32` transport cap. The provisional host request/handshake
 timeout remains 5 seconds. Browser constants remain near their behavior in
@@ -411,7 +519,7 @@ period; see the PS-006 section above.
   across scene changes, settings, address discovery, and URL construction.
   WebSocket bind failure rolls back HTTP startup. `stop()` releases listeners
   and connected peers.
-- `host/default_settings.tres`: inspector-editable ports, connection limit and
+- `Tuning/Shared/Networking/Default.tres`: inspector-editable ports, connection limit and
   request/handshake timeout, player capacity, and reconnect grace. Defaults:
   HTTP 8080, WebSocket 8081, 32 connections per service, 20 players, five-second
   timeout, and 60-second reconnect grace. Restart to apply changed settings.

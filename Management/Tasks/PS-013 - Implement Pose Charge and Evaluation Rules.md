@@ -8,6 +8,7 @@ owner: ai
 priority:
 depends_on:
   - PS-004
+  - PS-015
   - PS-006
   - PS-012
 ---
@@ -90,6 +91,6 @@ final balance values.
 
 # Draft Execution Prompt
 
-Read [[PS-013 - Implement Pose Charge and Evaluation Rules]], [[PS-010 - Explore Character Animation Strategy]], [[PS-012 - Implement Milestone 1 Character Animation System]], [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-006 - Implement Player Join and Host-Owned Registry]], [[001 - Dancer simon says]], [[Decision Log]], and [[DEVELOPMENT]]. Inspect the current host protocol and gameplay boundaries before editing. Implement deterministic host-authoritative normalized charge and grace-window evaluation with explicit timestamp behavior. Preserve correction during grace, fast nonzero decay after release, same-direction repress continuity, reset on direction change, and the three-part success condition. Feed semantic state to animation without reading visual frames. Add boundary-heavy automated tests and proportional runtime checks; keep networking validation and human feel evaluation distinct. Document tunables and caveats in DEVELOPMENT.md. Follow GitHub Flow and open a pull request; keep broader minigame orchestration outside this task.
+Read [[PS-013 - Implement Pose Charge and Evaluation Rules]], [[PS-010 - Explore Character Animation Strategy]], [[PS-012 - Implement Milestone 1 Character Animation System]], [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-006 - Implement Player Join and Host-Owned Registry]], [[001 - Dancer simon says]], [[Decision Log]], and [[DEVELOPMENT]]. Inspect the current host protocol and gameplay boundaries before editing. Implement deterministic host-authoritative normalized charge and grace-window evaluation with explicit timestamp behavior. Preserve correction during grace, fast nonzero decay after release, same-direction repress continuity, reset on direction change, and the three-part success condition. Feed semantic state to animation without reading visual frames. Add boundary-heavy automated tests and proportional runtime checks; keep networking validation and human feel evaluation distinct. Document tunables and caveats in DEVELOPMENT.md. Follow GitHub Flow and open a pull request; keep broader minigame orchestration outside this task.
 
 # Outcome

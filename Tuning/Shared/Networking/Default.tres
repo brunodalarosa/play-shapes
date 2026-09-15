@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="NetworkingTuning" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Tuning/Shared/networking_tuning.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+http_port = 8080
+websocket_port = 8081
+max_connections = 32
+request_timeout_seconds = 5.0
+max_players = 20
+reconnect_grace_seconds = 60.0

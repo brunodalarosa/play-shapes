@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="SimonSaysTuning" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Tuning/Minigames/simon_says_tuning.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+charge_fill_seconds = 1.0
+charge_decay_seconds = 0.28
+dance_beats_per_second = 1.7
+body_bounce = 6.0
+body_jiggle_degrees = 4.0
+body_sway = 7.0
+visual_follow_speed = 12.0
+auto_hold_seconds = 1.5
+auto_release_seconds = 0.7

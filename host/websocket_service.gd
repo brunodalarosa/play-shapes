@@ -8,12 +8,12 @@ const MAX_PACKET_BYTES := 1024
 
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []
-var _settings: HostSettings
+var _settings: NetworkingTuning
 var _registry: PlayerRegistry
 var _accepting_new_players: Callable
 var _next_id: int = 1
 
-func start(settings: HostSettings, registry: PlayerRegistry,
+func start(settings: NetworkingTuning, registry: PlayerRegistry,
 		accepting_new_players: Callable) -> Error:
 	_settings = settings
 	_registry = registry

@@ -6,7 +6,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	var host := root.get_node("SessionHost")
-	host.settings = HostSettings.new()
+	host.settings = NetworkingTuning.new()
 	host.settings.http_port = 18080
 	host.settings.websocket_port = 18081
 	var blocker := TCPServer.new()
