@@ -38,12 +38,12 @@ views:
           - play-shapes/Management/Tasks/PS-003 - Define Join Identity and Reconnection UX.md
           - play-shapes/Management/Tasks/PS-004 - Define the Game-Feel Tuning Strategy.md
           - play-shapes/Management/Tasks/PS-005 - Define Multi-Phone and Agent Validation Strategy.md
-          - play-shapes/Management/Tasks/PS-006 - Implement Player Join and Host-Owned Registry.md
           - play-shapes/Management/Tasks/PS-008 - Design Fake Music Stops.md
           - play-shapes/Management/Tasks/PS-011 - Implement Hybrid Character Animation Lab.md
           - play-shapes/Management/Tasks/PS-012 - Implement Milestone 1 Character Animation System.md
           - play-shapes/Management/Tasks/PS-013 - Implement Pose Charge and Evaluation Rules.md
         done:
+          - play-shapes/Management/Tasks/Done/PS-006 - Implement Player Join and Host-Owned Registry.md
           - play-shapes/Management/Tasks/PS-009 - Create and Import Character Feet Assets.md
         in progress:
           - play-shapes/Management/Tasks/PS-014 - Implement Minimal Gameplay Debug Launcher.md
