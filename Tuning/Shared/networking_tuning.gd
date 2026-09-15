@@ -2,7 +2,7 @@ class_name NetworkingTuning
 extends Resource
 ## Host-only LAN and session behavior. Changes apply after relaunching the project.
 
-@export_category("LAN listeners")
+@export_group("LAN listeners")
 ## HTTP listener port. Higher/lower has no game-feel effect; change only to avoid a local conflict. Default: 8080. Safe range: 1024-65535.
 @export_range(1024, 65535, 1)
 var http_port: int = 8080:
@@ -20,7 +20,7 @@ var max_connections: int = 32:
 var request_timeout_seconds: float = 5.0:
 	set(value): request_timeout_seconds = clampf(value, 0.25, 30.0)
 
-@export_category("Player session")
+@export_group("Player session")
 ## Maximum registered players. Higher allows larger parties; lower keeps the shared display less crowded. Default: 20. Safe range: 1-32.
 @export_range(1, 32, 1, "suffix: players")
 var max_players: int = 20:

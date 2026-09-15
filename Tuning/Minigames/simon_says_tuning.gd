@@ -2,7 +2,7 @@ class_name SimonSaysTuning
 extends Resource
 ## One front door for the Simon Says values that exist today. Changes apply after relaunch.
 
-@export_category("Gameplay and timing")
+@export_group("Gameplay and timing")
 ## Time to reach a committed command pose, in seconds. Higher feels more deliberate; lower feels more responsive. Default: 1.0. Safe range: 0.1-3.0.
 @export_range(0.1, 3.0, 0.05, "suffix:s")
 var charge_fill_seconds: float = 1.0:
@@ -12,7 +12,7 @@ var charge_fill_seconds: float = 1.0:
 var charge_decay_seconds: float = 0.28:
 	set(value): charge_decay_seconds = clampf(value, 0.05, 1.0)
 
-@export_category("Animation and motion")
+@export_group("Animation and motion")
 ## Dance tempo, in beats per second. Higher is more energetic; lower is calmer. Default: 1.7. Safe range: 0.1-3.0.
 @export_range(0.1, 3.0, 0.05, "suffix: beats/s")
 var dance_beats_per_second: float = 1.7:
@@ -34,7 +34,7 @@ var body_sway: float = 7.0:
 var visual_follow_speed: float = 12.0:
 	set(value): visual_follow_speed = clampf(value, 1.0, 30.0)
 
-@export_category("Debug preview only")
+@export_group("Debug preview only")
 ## Time the automatic lab keeps a fully charged pose, in seconds. Higher makes inspection easier; lower cycles faster. Default: 1.5. Safe range: 0.5-5.0.
 @export_range(0.5, 5.0, 0.1, "suffix:s")
 var auto_hold_seconds: float = 1.5:

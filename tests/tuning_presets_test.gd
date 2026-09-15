@@ -67,6 +67,8 @@ func _run() -> void:
 
 func _check_tooltip_contract(path: String, property_names: Array[String]) -> bool:
 	var source := FileAccess.get_file_as_string(path)
+	if not _check(not source.contains("@export_category"), "Tuning groups must not replace the script class used for Inspector documentation: %s" % path):
+		return false
 	var lines := source.split("\n")
 	for property_name: String in property_names:
 		var declaration_index := -1

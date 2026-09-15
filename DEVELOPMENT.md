@@ -4,14 +4,19 @@
 
 ### Inspector tooltip correction (2026-09-15)
 
-Godot 4.7.2 did not attach documentation comments to exports written as a
-single combined `@export_range(...) var value` line: the Inspector showed
-`No description available`. Keep every documented tunable in this exact order:
-the `##` documentation comment, then the export annotation on its own line,
-then the `var` declaration on the next line. This applies to range exports and
-plain Resource-reference exports. `tests/tuning_presets_test.gd` checks this
-source contract for every current tweakable so future additions cannot silently
-lose their Inspector tooltip.
+Godot 4.7.2 showed `No description available` for the first tuning Resources.
+Keep every documented tunable in this exact order: the `##` documentation
+comment, then the export annotation on its own line, then the `var` declaration
+on the next line. Use `@export_group` for Inspector sections, not
+`@export_category`: categories change the Inspector's documentation context and
+can prevent subsequent custom-property descriptions from resolving. This applies
+to range exports and plain Resource-reference exports.
+`tests/tuning_presets_test.gd` checks both rules for every current tweakable so
+future additions cannot silently lose their Inspector tooltip.
+Godot's `--gdscript-docs res://Tuning` output was also inspected: all 17 current
+properties and their full descriptions are present in the generated
+`SimonSaysTuning.xml`, `NetworkingTuning.xml`, and `ActivePresets.xml`. These
+temporary XML files are verification output and are not committed.
 
 PS-015 implements the editor-first workflow approved by PS-004. Open
 `Tuning/Active Presets.tres` for the project-level selector. Its Simon Says and
