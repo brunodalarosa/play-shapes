@@ -59,7 +59,7 @@ Record durable architectural, production, and game-design choices here so future
 ## DEC-007 — Lightweight Markdown planning layer
 
 - **Date:** 2026-09-12
-- **Decision:** Use one Markdown note per substantial task, small YAML frontmatter, stable sequential IDs, wikilinks, a manual index, and an embedded Obsidian Base for Kanban. Use only exploration, design, implementation, and validation task types until a demonstrated need arises.
+- **Decision:** Use one Markdown note per substantial task, small YAML frontmatter, stable sequential IDs, wikilinks, a manual index, and an embedded Obsidian Base for Kanban. Start with exploration, design, implementation, and validation task types; add a specialized type only when recurring work demonstrates the need.
 - **Reason:** The system must remain Git-friendly, human-readable, AI-readable, and usable without heavy process or a required query plugin.
 - **Alternatives:** Jira-like workflow replication and Dataview-dependent indexing were rejected.
 - **Related tasks:** [[Task System]], [[Task Index]], [[Task board]]
@@ -111,3 +111,12 @@ Record durable architectural, production, and game-design choices here so future
 - **Ownership:** Agents may prepare candidate presets, validation, and experiment notes. Only the human may approve subjective feel, promote a preset to `Default`, or declare an experiment successful.
 - **Related tasks:** [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-012 - Implement Milestone 1 Character Animation System]], [[PS-013 - Implement Pose Charge and Evaluation Rules]]
 - **Revisit:** After the first tuning foundation and a real Milestone 1 playtest reveal navigation, validation, or cross-platform synchronization friction.
+
+## DEC-013 — Specialized asset and visual-planning task types
+
+- **Date:** 2026-09-15
+- **Decision:** The task system adds `asset-hunt`, `asset-rework`, and `wireframes-and-art-mockups` types. Asset hunts and wireframes/art mockups are human-owned for now. Asset rework is normally AI-owned or shared and uses computer-based editing tools; generative image creation is not the default and must be explicitly requested in a task.
+- **Reason:** Sourcing, treating, and visually planning content have different ownership, evidence, and completion criteria from general design or implementation work.
+- **Alternatives:** Keeping all asset and mockup work under generic design or implementation tasks was rejected because it hides human approval boundaries and asset provenance.
+- **Related tasks:** [[Task System]], [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]], [[PS-017 - Find Environment Assets for 001 - Dancer Simon Says]]
+- **Revisit:** When repeated work shows that ownership defaults, evidence, or additional specialized types should change.

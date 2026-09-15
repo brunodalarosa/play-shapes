@@ -38,6 +38,10 @@ views:
           - play-shapes/Management/Tasks/PS-005 - Define Multi-Phone and Agent Validation Strategy.md
           - play-shapes/Management/Tasks/PS-008 - Design Fake Music Stops.md
           - play-shapes/Management/Tasks/PS-013 - Implement Pose Charge and Evaluation Rules.md
+          - play-shapes/Management/Tasks/PS-016 - Create Wireframe for 001 - Dancer Simon Says.md
+          - play-shapes/Management/Tasks/PS-017 - Find Environment Assets for 001 - Dancer Simon Says.md
+          - play-shapes/Management/Tasks/PS-018 - Create the 001 - Dancer Simon Says Minigame Scene.md
+          - play-shapes/Management/Tasks/PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation.md
         done:
           - play-shapes/Management/Tasks/Done/PS-012 - Implement Milestone 1 Character Animation System.md
           - play-shapes/Management/Tasks/Done/PS-006 - Implement Player Join and Host-Owned Registry.md

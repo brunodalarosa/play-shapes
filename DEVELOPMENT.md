@@ -1,5 +1,27 @@
 # Play Shapes development
 
+## PS-016–PS-019 — Dancer Simon Says visual planning and task set (2026-09-15)
+
+The planning layer now distinguishes three specialized task types in addition
+to exploration, design, implementation, and validation: `asset-hunt`,
+`asset-rework`, and `wireframes-and-art-mockups`. Asset hunts and wireframes or
+art mockups are human-owned for now because the owner must select visual
+direction and approve the result. Asset rework is intended for AI or shared
+computer-based treatment of existing media; generative image creation is not
+the default and must be explicitly requested in a task.
+
+PS-016 creates the human visual reference for the Dancer Simon Says shared
+screen and phone control. PS-017 selects the scenario/environment asset set
+with provenance and licensing notes. PS-019 plans the complete implementation
+and creates any remaining bounded follow-up tasks. PS-018 is deliberately
+narrow: it will compose an editor-visible Godot gameplay scene with human-
+editable lead and 2–10 player placement slots using the approved wireframe and
+selected environment assets. None of these tasks implement the minigame yet;
+the implementation task remains dependent on the planning and content outputs.
+
+This session changed Markdown planning records only. No runtime, asset, browser,
+Godot editor, or device validation was performed or claimed.
+
 ## PS-005 — Multi-phone and agent validation strategy (2026-09-15 working draft)
 
 The MVP routine physical matrix is two real phones on normal home Wi-Fi with the

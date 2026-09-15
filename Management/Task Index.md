@@ -17,10 +17,11 @@ This is the lightweight human-readable view of active work. The interactive stat
 ## Backlog
 
 - [[PS-008 - Design Fake Music Stops]] — shared design
-- [[PS-014 - Implement Minimal Gameplay Debug Launcher]] — AI implementation; implements completed [[PS-007 - Define the Gameplay Debug Suite]]
-- [[PS-011 - Implement Hybrid Character Animation Lab]] — AI implementation; depends on [[PS-014 - Implement Minimal Gameplay Debug Launcher]] and completed [[PS-010 - Explore Character Animation Strategy]]
 - [[PS-013 - Implement Pose Charge and Evaluation Rules]] — AI implementation; depends on [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-006 - Implement Player Join and Host-Owned Registry]], and [[PS-012 - Implement Milestone 1 Character Animation System]]
-- [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]] — AI implementation; implements completed [[PS-004 - Define the Game-Feel Tuning Strategy]]
+- [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]] — human-only wireframes and art mockups
+- [[PS-017 - Find Environment Assets for 001 - Dancer Simon Says]] — human-only asset hunt
+- [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]] — AI implementation; depends on PS-016, PS-017, and PS-019
+- [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]] — shared design; generates the remaining bounded implementation and validation tasks
 
 ## Recently completed
 
@@ -31,6 +32,9 @@ This is the lightweight human-readable view of active work. The interactive stat
 - [[PS-004 - Define the Game-Feel Tuning Strategy]] — approved editor-first shared tuning assets, presets, validation, and experiment workflow
 - [[PS-010 - Explore Character Animation Strategy]] — approved hybrid detached-sprite animation strategy and bounded follow-up work
 - [[PS-009 - Create and Import Character Feet Assets]] — implementation validated; foot art approved by the owner on 2026-09-13
+- [[PS-014 - Implement Minimal Gameplay Debug Launcher]] — approved F12 scenario launcher and LAN-preserving debug flow
+- [[PS-011 - Implement Hybrid Character Animation Lab]] — approved hybrid animation lab and visual review stage
+- [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]] — approved editor-first tuning resources and validation
 
 - [[PS-001 - Define the First Gameplay Milestone]] — approved Milestone 1 scope
 - Historical context: the Phase 1 LAN host, QR page, and browser handshake were implemented and merged before these task records were introduced. Remaining acceptance is represented by [[PS-002 - Validate Phase 1 on a Physical Phone]].
