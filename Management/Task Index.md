@@ -22,6 +22,7 @@ This is the lightweight human-readable view of active work. The interactive stat
 - [[PS-017 - Find Environment Assets for 001 - Dancer Simon Says]] — human-only asset hunt
 - [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]] — AI implementation; depends on PS-016, PS-017, and PS-019
 - [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]] — shared design; generates the remaining bounded implementation and validation tasks
+- [[PS-020 - Find Music and SFX for 001 - Dancer Simon Says]] — human-only asset hunt
 
 ## Recently completed
 

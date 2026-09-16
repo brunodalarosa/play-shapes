@@ -1,6 +1,6 @@
 # Play Shapes development
 
-## PS-016–PS-019 — Dancer Simon Says visual planning and task set (2026-09-15)
+## PS-016–PS-020 — Dancer Simon Says visual and audio planning task set (2026-09-15)
 
 The planning layer now distinguishes three specialized task types in addition
 to exploration, design, implementation, and validation: `asset-hunt`,
@@ -12,8 +12,9 @@ the default and must be explicitly requested in a task.
 
 PS-016 creates the human visual reference for the Dancer Simon Says shared
 screen and phone control. PS-017 selects the scenario/environment asset set
-with provenance and licensing notes. PS-019 plans the complete implementation
-and creates any remaining bounded follow-up tasks. PS-018 is deliberately
+with provenance and licensing notes. PS-020 selects music and SFX candidates
+with provenance, loop/stop metadata, and human listening approval. PS-019 plans
+the complete implementation and creates any remaining bounded follow-up tasks. PS-018 is deliberately
 narrow: it will compose an editor-visible Godot gameplay scene with human-
 editable lead and 2–10 player placement slots using the approved wireframe and
 selected environment assets. None of these tasks implement the minigame yet;

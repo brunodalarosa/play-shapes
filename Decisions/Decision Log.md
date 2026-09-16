@@ -118,5 +118,5 @@ Record durable architectural, production, and game-design choices here so future
 - **Decision:** The task system adds `asset-hunt`, `asset-rework`, and `wireframes-and-art-mockups` types. Asset hunts and wireframes/art mockups are human-owned for now. Asset rework is normally AI-owned or shared and uses computer-based editing tools; generative image creation is not the default and must be explicitly requested in a task.
 - **Reason:** Sourcing, treating, and visually planning content have different ownership, evidence, and completion criteria from general design or implementation work.
 - **Alternatives:** Keeping all asset and mockup work under generic design or implementation tasks was rejected because it hides human approval boundaries and asset provenance.
-- **Related tasks:** [[Task System]], [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]], [[PS-017 - Find Environment Assets for 001 - Dancer Simon Says]]
+- **Related tasks:** [[Task System]], [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]], [[PS-017 - Find Environment Assets for 001 - Dancer Simon Says]], [[PS-020 - Find Music and SFX for 001 - Dancer Simon Says]]
 - **Revisit:** When repeated work shows that ownership defaults, evidence, or additional specialized types should change.
