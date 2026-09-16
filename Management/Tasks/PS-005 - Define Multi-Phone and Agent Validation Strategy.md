@@ -2,7 +2,7 @@
 id: PS-005
 title: Define multi-phone and agent validation strategy
 type: design
-status: in-progress
+status: done
 release:
 owner: shared
 priority:

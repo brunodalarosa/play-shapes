@@ -23,6 +23,7 @@ This is the lightweight human-readable view of active work. The interactive stat
 - [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]] — AI implementation; depends on PS-016, PS-017, and PS-019
 - [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]] — shared design; generates the remaining bounded implementation and validation tasks
 - [[PS-020 - Find Music and SFX for 001 - Dancer Simon Says]] — human-only asset hunt
+- [[PS-021 - Implement Curated Runtime Asset Pipeline]] — AI implementation; establishes the optimized sprite intake, import, and export boundary before the asset library grows
 
 ## Recently completed
 
