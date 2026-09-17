@@ -1,6 +1,22 @@
 # Play Shapes development
 
-## PS-016–PS-020 — Dancer Simon Says visual and audio planning task set (2026-09-15)
+## PS-022 - Flash? Pose! rename and camera-flash feedback task (2026-09-16)
+
+PS-022 records the next AI-owned implementation slice for minigame `001`.
+The player-facing name is now specified as **Flash? Pose!** while the numeric
+identity and stable planning links remain unchanged. The task requires the
+current parent-vault definitions and nested-repository front doors to converge
+on that label, using `flash_pose` only for filesystem-safe internal names where
+code changes are actually needed.
+
+The task also defines the intended genuine-stop sequence: authoritative pose
+evaluation completes at the end of the existing grace period, one camera-flash
+SFX/VFX cue follows, and music resumes only after that cue. Future fake music
+stops explicitly do not flash. No runtime, asset, editor, browser, device, or
+human-feel validation was performed by creating this planning record; the
+implementation task owns those checks and must keep their evidence separate.
+
+## PS-016-PS-020 - Dancer Simon Says visual and audio planning task set (2026-09-15)
 
 The planning layer now distinguishes three specialized task types in addition
 to exploration, design, implementation, and validation: `asset-hunt`,
