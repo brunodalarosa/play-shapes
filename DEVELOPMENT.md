@@ -77,8 +77,14 @@ python tools/assets/runtime_asset_pipeline.py check-export --pack test-results/p
   `art/character-feet/runtime-showcase.png` without a tracked pixel change.
 - `[EXPORTED-BUILD]` Direct pack inspection confirms runtime paths are present
   and `assets/Kenney_Shape_Characters` is absent.
-- `[HUMAN-PLAY]` Visual approval for this migration is still pending. Do not mark
-  PS-021 done until the owner approves the rendered comparison.
+- `[HUMAN-PLAY]` Approved on 2026-09-16. The owner reviewed the regenerated
+  runtime showcase, confirmed that it looked good, and authorized marking
+  PS-021 done. This completes the separate human visual acceptance step.
+
+Once `.gdignore` established the source boundary, Godot removed the archive's
+215 generated `.import` sidecars. This is intentional cleanup of obsolete engine
+metadata, not deletion of source material: all source PNGs, license text,
+atlases/XML, previews, vectors, and PS-009 project additions remain preserved.
 
 The original file-hash baseline now records the repository's enforced LF form of
 `License.txt`; its earlier CRLF hash could not pass in a checkout governed by the
