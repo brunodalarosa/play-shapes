@@ -24,7 +24,6 @@ This is the lightweight human-readable view of active work. The interactive stat
 - [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]] — shared design; generates the remaining bounded implementation and validation tasks
 - [[PS-020 - Find Music and SFX for 001 - Dancer Simon Says]] — human-only asset hunt
 - [[PS-021 - Implement Curated Runtime Asset Pipeline]] — AI implementation; establishes the optimized sprite intake, import, and export boundary before the asset library grows
-- [[PS-022 - Implement Flash Pose Rename and Camera Flash Feedback]] — AI implementation; rebrands minigame 001 as **Flash? Pose!** and adds genuine-stop camera flash feedback after pose evaluation
 
 ## Recently completed
 

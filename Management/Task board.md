@@ -44,7 +44,6 @@ views:
           - play-shapes/Management/Tasks/PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation.md
           - play-shapes/Management/Tasks/PS-020 - Find Music and SFX for 001 - Dancer Simon Says.md
           - play-shapes/Management/Tasks/PS-021 - Implement Curated Runtime Asset Pipeline.md
-          - play-shapes/Management/Tasks/PS-022 - Implement Flash Pose Rename and Camera Flash Feedback.md
         done:
           - play-shapes/Management/Tasks/Done/PS-012 - Implement Milestone 1 Character Animation System.md
           - play-shapes/Management/Tasks/PS-005 - Define Multi-Phone and Agent Validation Strategy.md
