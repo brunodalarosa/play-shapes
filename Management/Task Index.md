@@ -1,14 +1,17 @@
 # Task Index
 
-This is the lightweight human-readable view of active work. The interactive status view is [[Task board]]. Priority and release fields remain blank unless the human has assigned them.
+This is the lightweight human-readable view of active work. The interactive
+status view is [[Task board]]. Priority and release fields remain blank unless
+the human has assigned them.
 
 ## Ready
 
-- None. The human has not prioritized an initial task yet.
+- None. The human project owner has not assigned implementation priority yet.
 
 ## In Progress
 
-- [[PS-005 - Define Multi-Phone and Agent Validation Strategy]] — shared design; MVP device matrix and evidence convention in progress
+- None. The first minigame plan is complete; implementation remains separately
+  scoped in the backlog below.
 
 ## Blocked
 
@@ -16,38 +19,64 @@ This is the lightweight human-readable view of active work. The interactive stat
 
 ## Backlog
 
-- [[PS-008 - Design Fake Music Stops]] — shared design
-- [[PS-013 - Implement Pose Charge and Evaluation Rules]] — AI implementation; depends on [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-006 - Implement Player Join and Host-Owned Registry]], and [[PS-012 - Implement Milestone 1 Character Animation System]]
-- [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]] — human-only wireframes and art mockups
-- [[PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says]] — human-only asset hunt
-- [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]] — AI implementation; depends on PS-016, PS-017, and PS-019
-- [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]] — shared design; generates the remaining bounded implementation and validation tasks
-- [[PS-020 - Find Music and SFX for 001 - Dancer Simon Says]] — human-only asset hunt
-- [[PS-021 - Implement Curated Runtime Asset Pipeline]] — AI implementation; establishes the optimized sprite intake, import, and export boundary before the asset library grows
+- [[PS-008 - Design Fake Music Stops]] — later shared design; excluded from
+  Milestone 1
+- [[PS-013 - Implement Pose Charge and Evaluation Rules]] — AI implementation;
+  host-authoritative charge/evaluation
+- [[PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says]] —
+  human-only asset hunt
+- [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]] — AI
+  implementation; depends on PS-016, PS-017, and PS-019
+- [[PS-023 - Prepare Flash Pose Runtime Music and SFX]] — AI asset rework;
+  depends on PS-019 and PS-020
+- [[PS-024 - Implement Flash Pose Host Round Controller]] — AI implementation;
+  authoritative lifecycle and round state
+- [[PS-025 - Implement Flash Pose Phone Protocol and Controller]] — AI
+  implementation; bundled phone controls and protocol adapter
+- [[PS-026 - Implement Flash Pose Shared Screen Feedback and Results]] — AI
+  implementation; shared presentation, audio/flash, and results
+- [[PS-027 - Integrate Flash Pose Lobby and Debug Flow]] — AI implementation;
+  host start, debug entry, and scene lifecycle
+- [[PS-028 - Validate Flash Pose Technical Loop]] — AI validation; automated,
+  editor/runtime, and desktop-browser evidence
+- [[PS-029 - Validate Flash Pose on Two Phones and in Human Play]] — human
+  validation; physical devices and final feel/readability approval
 
 ## Recently completed
 
-- [[PS-012 - Implement Milestone 1 Character Animation System]] — approved production animation API, three dance loops, shared command poses, reactions, and eleven-character validation
-- [[PS-006 - Implement Player Join and Host-Owned Registry]] — authoritative named players, reconnect grace, phone join states, and shared roster
-- [[PS-003 - Define Join Identity and Reconnection UX]] — approved session-scoped identity, reconnect, leave, capacity, and host-restart design
-- [[PS-007 - Define the Gameplay Debug Suite]] — approved minimal F12 host scenario launcher design
-- [[PS-004 - Define the Game-Feel Tuning Strategy]] — approved editor-first shared tuning assets, presets, validation, and experiment workflow
-- [[PS-010 - Explore Character Animation Strategy]] — approved hybrid detached-sprite animation strategy and bounded follow-up work
-- [[PS-009 - Create and Import Character Feet Assets]] — implementation validated; foot art approved by the owner on 2026-09-13
-- [[PS-014 - Implement Minimal Gameplay Debug Launcher]] — approved F12 scenario launcher and LAN-preserving debug flow
-- [[PS-011 - Implement Hybrid Character Animation Lab]] — approved hybrid animation lab and visual review stage
-- [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]] — approved editor-first tuning resources and validation
-
+- [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]] —
+  approved implementation decomposition and owner-confirmed gameplay policies
+- [[PS-020 - Find Music and SFX for 001 - Dancer Simon Says]] — candidate music
+  and flash SFX set is present in the repository
+- [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]] — approved shared
+  screen and phone-control reference
+- [[PS-005 - Define Multi-Phone and Agent Validation Strategy]] — MVP device
+  matrix and evidence convention
+- [[PS-021 - Implement Curated Runtime Asset Pipeline]] — curated runtime
+  character/environment asset boundary
+- [[PS-012 - Implement Milestone 1 Character Animation System]] — approved
+  production animation API and debug review stage
+- [[PS-006 - Implement Player Join and Host-Owned Registry]] — authoritative
+  named players, reconnect grace, and shared roster
+- [[PS-014 - Implement Minimal Gameplay Debug Launcher]] — F12 scenario
+  launcher and LAN-preserving navigation
+- [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]] — editor-first
+  tuning resources and preset validation
+- [[PS-007 - Define the Gameplay Debug Suite]] — approved minimal debug scope
+- [[PS-004 - Define the Game-Feel Tuning Strategy]] — approved tuning strategy
+- [[PS-010 - Explore Character Animation Strategy]] — approved hybrid animation
+  strategy
+- [[PS-011 - Implement Hybrid Character Animation Lab]] — approved animation
+  lab and visual review stage
+- [[PS-009 - Create and Import Character Feet Assets]] — approved character
+  feet and asset setup
+- [[PS-003 - Define Join Identity and Reconnection UX]] — approved session
+  identity and reconnect design
 - [[PS-001 - Define the First Gameplay Milestone]] — approved Milestone 1 scope
-- Historical context: the Phase 1 LAN host, QR page, and browser handshake were implemented and merged before these task records were introduced. Remaining acceptance is represented by [[PS-002 - Validate Phase 1 on a Physical Phone]].
+- [[PS-002 - Validate Phase 1 on a Physical Phone]] — local connection proof
 
 ## Done
-- [[PS-012 - Implement Milestone 1 Character Animation System]] — approved Milestone 1 character animation system and debug review stage
-- [[PS-006 - Implement Player Join and Host-Owned Registry]] — host-owned identity and reconnect flow for [[Releases#Milestone 1 — Simon Says Gameplay Proof|Milestone 1]]
-- [[PS-003 - Define Join Identity and Reconnection UX]] — approved session-scoped identity, reconnect, leave, capacity, and host-restart design
-- [[PS-007 - Define the Gameplay Debug Suite]] — approved essential first-iteration debug workflows for Milestone 1
-- [[PS-004 - Define the Game-Feel Tuning Strategy]] — approved editor-first shared tuning assets, presets, validation, and experiment workflow
-- [[PS-010 - Explore Character Animation Strategy]] — approved animation architecture, pose vocabulary, and charge behavior for Milestone 1
-- [[PS-009 - Create and Import Character Feet Assets]] — approved character assets and Godot setup for [[Releases#Milestone 1 — Simon Says Gameplay Proof|Milestone 1]]
-- [[PS-001 - Define the First Gameplay Milestone]] — shared design for [[Releases#Milestone 1 — Simon Says Gameplay Proof|Milestone 1]]
-- [[PS-002 - Validate Phase 1 on a Physical Phone]] — shared validation for [[Releases#Local Connection Proof|Local Connection Proof]]
+
+All completed task notes live under `Management/Tasks/Done/`; the list above is
+the concise retrieval view. The first minigame implementation is now ready to
+proceed through its separately scoped backlog tasks.

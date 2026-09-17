@@ -24,7 +24,8 @@ A release is a meaningful playable proof, not a sprint. The human project owner 
 
 ## Milestone 1 — Simon Says Gameplay Proof
 
-**State:** Scoped and approved; implementation tasks have not been assigned.
+**State:** Scoped and approved; the PS-019 implementation decomposition and
+owner-confirmed gameplay policies are complete.
 
 **What this release proves:** A group can move from the local lobby through one complete, readable, phone-controlled minigame and return to the lobby, demonstrating the first coherent Play Shapes gameplay loop.
 
@@ -49,4 +50,20 @@ A release is a meaningful playable proof, not a sprint. The human project owner 
 
 **Source design:** [[PS-001 - Define the First Gameplay Milestone]]
 
-**Included managed tasks:** None yet. The human project owner will assign implementation and validation tasks separately.
+**Included managed tasks:**
+
+- [[PS-013 - Implement Pose Charge and Evaluation Rules]]
+- [[PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says]]
+- [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]]
+- [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]]
+- [[PS-020 - Find Music and SFX for 001 - Dancer Simon Says]]
+- [[PS-023 - Prepare Flash Pose Runtime Music and SFX]]
+- [[PS-024 - Implement Flash Pose Host Round Controller]]
+- [[PS-025 - Implement Flash Pose Phone Protocol and Controller]]
+- [[PS-026 - Implement Flash Pose Shared Screen Feedback and Results]]
+- [[PS-027 - Integrate Flash Pose Lobby and Debug Flow]]
+- [[PS-028 - Validate Flash Pose Technical Loop]]
+- [[PS-029 - Validate Flash Pose on Two Phones and in Human Play]]
+
+[[PS-008 - Design Fake Music Stops]] is intentionally excluded from this
+release and may use the genuine-stop contract in a later iteration.
