@@ -7,6 +7,43 @@ their task notes instead of plain task IDs. This lets Bases filters resolve each
 dependency as a file and inspect its `status` property. Tasks with no
 dependencies continue to use `depends_on: []`.
 
+## PS-019 — Flash? Pose! implementation plan (2026-09-16)
+
+PS-019 is in progress while the owner reviews the implementation decomposition.
+The current checkout contains the persistent `SessionHost`/`PlayerRegistry`,
+the hello/join/leave WebSocket boundary, the editor-first tuning resources,
+the approved semantic character animator, the F12 launcher, and the supplied
+runtime music/flash candidates. It does not yet contain a gameplay scene,
+gameplay protocol, host start control, round coordinator, shared-screen results
+presentation, or phone pose controls.
+
+The proposed sequence is: human-confirmed PS-017 environment assets; PS-013
+pose rules and PS-018 editor-visible stage; PS-023 audio preparation; PS-024
+host round controller; PS-025 phone protocol/controller; PS-026 shared-screen
+feedback/audio/flash/results (with PS-025 able to proceed in parallel); PS-027
+lobby/debug/return integration; PS-028 technical validation; and PS-029 the
+owner's two-phone and human-play gate. PS-022 was a discarded historical draft
+and is not reused because task IDs are never reused.
+
+The recommended architecture is a scene-scoped host round coordinator using a
+small enum and explicit transitions, plain per-player state keyed by host
+`player_id`, the Godot `_process` loop, and narrow signals. It does not add a
+state-object hierarchy, universal event bus, simulated-player framework,
+device farm, or runtime tuning UI. The host owns deadlines and input receipt
+time; the presentation emits one genuine-stop flash request only after results
+are resolved and acknowledges completion before music resumes. The player-
+facing name is **Flash? Pose!**; the reserved internal scene path and existing
+`SimonSaysTuning` identifiers remain stable unless a real compatibility need
+justifies a migration.
+
+The proposed MVP rules still awaiting owner confirmation are clearing a held
+phone input at each new genuine stop, treating a reconnecting player's missing
+input as the normal no-input failure while an explicit Leave withdraws without
+a life loss, and pausing/resuming the same music position around the flash.
+Numeric timing, flash intensity, audio gain, accessibility, fairness, and fun
+remain human-play decisions. This planning session changed documentation only;
+no gameplay, editor/runtime, browser, device, or human-play validation was run.
+
 ## PS-021 — curated runtime asset pipeline (2026-09-16)
 
 Runtime-ready Shape Character art now lives under
