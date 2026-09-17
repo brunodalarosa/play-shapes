@@ -8,8 +8,11 @@ Use one Markdown file per substantial task in `Tasks/`. The system intentionally
 - `design`: define intended behavior or experience before implementation. Its output is normally documentation.
 - `implementation`: make a bounded change to the actual product. It must include a draft execution prompt.
 - `validation`: determine whether behavior, quality, or player experience meets an explicit expectation.
+- `asset-hunt`: locate, compare, license-check, and select supplied or externally sourced assets. This is human-owned for now; an agent may support it only after the owner changes the task's ownership.
+- `asset-rework`: modify or treat existing image, sound, or other media assets while preserving the intended style and provenance. This is normally AI-owned or shared and should use computer-based editing tools. Do not use generative image creation unless the task explicitly requests it.
+- `wireframes-and-art-mockups`: create rough screen layouts or visual mockups that communicate hierarchy, placement, and player experience before production implementation. This is human-owned for now; an agent may support it only after the owner changes the task's ownership.
 
-Do not add a new type until recurring work clearly fails to fit these four.
+These additional types exist because asset sourcing, asset treatment, and visual planning now recur as distinct work with different owners and acceptance evidence. Keep the type names stable and use the ownership field to reflect any future delegation change.
 
 ## Statuses
 
@@ -37,7 +40,7 @@ Do not add a new type until recurring work clearly fails to fit these four.
 ---
 id: PS-###
 title: Short task title
-type: exploration | design | implementation | validation
+type: exploration | design | implementation | validation | asset-hunt | asset-rework | wireframes-and-art-mockups
 status: backlog | ready | in-progress | blocked | done
 release:
 owner: human | ai | shared

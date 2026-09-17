@@ -1,5 +1,46 @@
 # Play Shapes development
 
+## PS-016-PS-020 - Dancer Simon Says visual and audio planning task set (2026-09-15)
+
+The planning layer now distinguishes three specialized task types in addition
+to exploration, design, implementation, and validation: `asset-hunt`,
+`asset-rework`, and `wireframes-and-art-mockups`. Asset hunts and wireframes or
+art mockups are human-owned for now because the owner must select visual
+direction and approve the result. Asset rework is intended for AI or shared
+computer-based treatment of existing media; generative image creation is not
+the default and must be explicitly requested in a task.
+
+PS-016 creates the human visual reference for the Dancer Simon Says shared
+screen and phone control. PS-017 selects the scenario/environment asset set
+with provenance and licensing notes. PS-020 selects music and SFX candidates
+with provenance, loop/stop metadata, and human listening approval. PS-019 plans
+the complete implementation and creates any remaining bounded follow-up tasks. PS-018 is deliberately
+narrow: it will compose an editor-visible Godot gameplay scene with human-
+editable lead and 2–10 player placement slots using the approved wireframe and
+selected environment assets. None of these tasks implement the minigame yet;
+the implementation task remains dependent on the planning and content outputs.
+
+This session changed Markdown planning records only. No runtime, asset, browser,
+Godot editor, or device validation was performed or claimed.
+
+## PS-005 — Multi-phone and agent validation strategy (2026-09-15 working draft)
+
+The MVP routine physical matrix is two real phones on normal home Wi-Fi with the
+host also on Wi-Fi: an iPhone 16 Pro (Safari by default, Chrome for a browser
+spot check) and a Pixel 7 (Chrome). Two simultaneous phones are sufficient for
+MVP validation; larger playtests are future coverage. VPN, guest-network
+isolation, hotspot, packet shaping, and unusual interfaces are not MVP gates.
+
+Keep these evidence labels distinct in task notes and reports: `[AUTO]`,
+`[EDITOR]`, `[GODOT-RUNTIME]`, `[DESKTOP-BROWSER]`, `[PHYSICAL-PHONE]`,
+`[EXPORTED-BUILD]`, and `[HUMAN-PLAY]`. Automated, editor/runtime, and desktop
+browser results can support technical claims, but they do not prove touch,
+real-phone LAN reachability, exported-build behavior, couch-distance
+readability, accessibility, or game feel. The complete matrix, two-phone
+scenario, report fields, and completion rules are in [[PS-005 - Define Multi-Phone and Agent Validation Strategy]]. This is a working draft pending
+owner approval; no device-farm, CI, network-emulation, or profiling tooling was
+added.
+
 ## PS-012 — Milestone 1 character animation system (2026-09-15)
 
 PS-012 upgrades `characters/hybrid_character_animator.gd` from the approved lab
