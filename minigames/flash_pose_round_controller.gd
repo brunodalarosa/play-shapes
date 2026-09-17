@@ -51,6 +51,13 @@ func _ready() -> void:
 	if session_host != null and session_host.has_signal("players_changed"):
 		session_host.players_changed.connect(
 			func(players: Array[Dictionary]) -> void: observe_registry(players, Time.get_ticks_msec()))
+		if session_host.has_method("register_flash_pose_controller"):
+			session_host.register_flash_pose_controller(self)
+
+func _exit_tree() -> void:
+	var session_host := get_node_or_null("/root/SessionHost")
+	if session_host != null and session_host.has_method("unregister_flash_pose_controller"):
+		session_host.unregister_flash_pose_controller(self)
 
 
 func _process(_delta: float) -> void:

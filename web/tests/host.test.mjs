@@ -67,6 +67,20 @@ test('phone join form has labels, live feedback, and explicit change-player acti
   assert.match(html, /maxlength="16"/);
 });
 
+test('Flash Pose controller exposes accessible hold controls and cancellation handling', async () => {
+  const html = await (await fetch(base)).text();
+  const css = await (await fetch(base + '/style.css')).text();
+  const js = await (await fetch(base + '/app.js')).text();
+  assert.match(html, /id="pose-grid"[^>]*aria-label="Pose controls"/);
+  assert.match(html, /id="lives"[^>]*aria-live="polite"/);
+  assert.match(css, /touch-action:\s*none/);
+  assert.match(css, /aspect-ratio:\s*1/);
+  for (const expected of ['Pose left', 'Pose right', 'Pose down', 'Pose up', 'pointercancel', 'lostpointercapture']) {
+    assert.ok(js.includes(expected), `compiled controller should include ${expected}`);
+  }
+  assert.ok(js.includes("You've been eliminated :(") );
+});
+
 test('lobby QR texture decodes to the exact join URL', () => {
   const png = PNG.sync.read(readFileSync(new URL('../../test-results/join-qr.png', import.meta.url)));
   const decoded = jsQR(new Uint8ClampedArray(png.data), png.width, png.height);
@@ -135,6 +149,19 @@ test('host assigns unique connection IDs to simultaneous browser clients', async
       assert.equal(typeof client.welcome.session_id, 'string');
     }
     assert.equal(new Set(clients.map(client => client.welcome.connection_id)).size, 4);
+  } finally { clients.forEach(client => client.peer?.close()); }
+});
+
+test('supports ten simultaneous protocol-1 browser clients', async () => {
+  // Connect sequentially so this checks ten live peers rather than the OS TCP
+  // accept backlog, which is deliberately outside the gameplay player limit.
+  const clients = [];
+  for (let index = 0; index < 10; index++) {
+    clients.push(await connect(JSON.stringify({ type: 'hello', protocol: 1 })));
+  }
+  try {
+    assert.equal(new Set(clients.map(client => client.welcome.connection_id)).size, 10);
+    assert.ok(clients.every(client => client.welcome.protocol === 1));
   } finally { clients.forEach(client => client.peer?.close()); }
 });
 

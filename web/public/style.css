@@ -7,7 +7,7 @@ main { inline-size: min(100%, 440px); text-align: center; padding-block: clamp(2
 h1 { font-size: clamp(34px, 10vw, 52px); margin-block: 20px; }
 h2 { font-size: clamp(28px, 8vw, 38px); margin-block: 8px 16px; overflow-wrap: anywhere; }
 p { line-height: 1.6; }
-.status, #player-card { padding: 18px; border: 1px solid #587567; border-radius: 12px; background: #172820; }
+.status, #player-card, #game-card { padding: 18px; border: 1px solid #587567; border-radius: 12px; background: #172820; }
 form { display: grid; gap: 12px; text-align: start; margin-block-start: 20px; }
 label { font-weight: 700; }
 input, button { min-block-size: 48px; inline-size: 100%; border-radius: 10px; font: inherit; }
@@ -17,11 +17,31 @@ button.secondary { border: 2px solid #a6e6bf; background: transparent; color: #d
 input:focus-visible, button:focus-visible { outline: 3px solid #ffd166; outline-offset: 3px; }
 button:disabled { cursor: wait; opacity: .65; }
 #player-card { margin-block-start: 20px; }
+#game-card { margin-block-start: 20px; }
+.lives { min-block-size: 1.6em; font-size: 20px; font-weight: 800; }
+.pose-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(10px, 3vw, 16px); margin-block-start: 18px; touch-action: none; user-select: none; }
+.pose-button { aspect-ratio: 1; min-block-size: 112px; display: grid; place-content: center; gap: 4px; border: 3px solid transparent; color: #101521; font-size: clamp(18px, 5vw, 24px); touch-action: none; -webkit-tap-highlight-color: transparent; }
+.pose-button .icon { font-size: clamp(34px, 12vw, 54px); line-height: 1; }
+.pose-button[data-direction="left"] { background: #79d6ff; }
+.pose-button[data-direction="right"] { background: #ff9ccf; }
+.pose-button[data-direction="down"] { background: #ffd166; }
+.pose-button[data-direction="up"] { background: #a6e6bf; }
+.pose-button.is-held { border-color: #fff; box-shadow: 0 0 0 4px #0e131f, 0 0 0 7px #ffd166; transform: scale(.96); }
+.pose-button:disabled { cursor: not-allowed; opacity: .42; }
 .eyebrow { margin: 0; color: #b8c1cf; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
 #player-state { font-weight: 700; }
 .footnote { margin-block-start: 40px; color: #b8c1cf; font-size: 13px; }
 [hidden] { display: none !important; }
 
 @media (prefers-contrast: more) {
-  .status, #player-card, input, button.secondary { border-color: currentColor; }
+  .status, #player-card, #game-card, input, button.secondary { border-color: currentColor; }
+  .pose-button { border-color: #fff; }
+}
+
+@media (prefers-reduced-motion: reduce) { .pose-button { transition: none; } }
+@media (max-height: 620px) {
+  body { align-items: start; }
+  main { padding-block: 12px; }
+  .brand, .shapes, .footnote { display: none; }
+  .pose-button { min-block-size: 92px; }
 }

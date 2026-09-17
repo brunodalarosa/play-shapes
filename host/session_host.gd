@@ -75,6 +75,14 @@ func set_accepting_new_players(accepting: bool) -> void:
 func players() -> Array[Dictionary]:
 	return player_registry.public_players()
 
+func register_flash_pose_controller(controller: FlashPoseRoundController) -> void:
+	if websocket != null:
+		websocket.set_flash_pose_controller(controller)
+
+func unregister_flash_pose_controller(controller: FlashPoseRoundController) -> void:
+	if websocket != null:
+		websocket.clear_flash_pose_controller(controller)
+
 func _on_players_changed() -> void:
 	var public_players := player_registry.public_players()
 	players_changed.emit(public_players)

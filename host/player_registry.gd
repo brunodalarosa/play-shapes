@@ -128,6 +128,13 @@ func public_players() -> Array[Dictionary]:
 func player_count() -> int:
 	return _players_by_id.size()
 
+func player_for_connection(connection_id: int) -> Dictionary:
+	if not _player_id_by_connection.has(connection_id):
+		return {}
+	var player_id: String = _player_id_by_connection[connection_id]
+	var player: Dictionary = _players_by_id.get(player_id, {})
+	return _public_player(player) if not player.is_empty() else {}
+
 func validate_name(raw_name: Variant) -> Dictionary:
 	if not raw_name is String:
 		return _rejected(&"invalid_name", "Enter a name")

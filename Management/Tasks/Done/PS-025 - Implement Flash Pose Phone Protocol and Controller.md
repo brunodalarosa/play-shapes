@@ -2,7 +2,7 @@
 id: PS-025
 title: "Implement Flash? Pose! phone protocol and controller"
 type: implementation
-status: backlog
+status: done
 release:
 owner: ai
 priority:
@@ -121,3 +121,20 @@ phone and human-play evidence. Follow GitHub Flow and keep unrelated changes
 out of the pull request.
 
 # Outcome
+
+Completed on 2026-09-17. The protocol-1 WebSocket service now resolves each
+registered connection to its host-owned player, rejects authority-shaped or
+malformed pose packets, and forwards only validated direction/held/sequence
+actions with host receipt time to the PS-024 controller. Controller signals
+produce personalized phase snapshots, challenges, pose results/lives, exact
+elimination copy, rankings, and lobby return. Reconnect embeds a current
+snapshot while disconnected held input remains cleared; new players remain
+lobby-only during a round.
+
+The committed offline TypeScript controller implements waiting/watch,
+two-to-four accessible square hold regions, pointer capture and all cancellation
+paths, authoritative result/lives feedback, elimination, results, and lobby
+return. Focused `[AUTO]` Godot and served-bundle checks cover valid, duplicate,
+late, malformed, reconnect, elimination, and ten-client cases. TypeScript
+build/check and the full browser/host suite pass. No `[DESKTOP-BROWSER]`,
+`[PHYSICAL-PHONE]`, accessibility approval, or `[HUMAN-PLAY]` claim is made.

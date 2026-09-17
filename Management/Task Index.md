@@ -20,8 +20,6 @@ the human has assigned them.
 
 - [[PS-008 - Design Fake Music Stops]] — later shared design; excluded from
   Milestone 1
-- [[PS-025 - Implement Flash Pose Phone Protocol and Controller]] — AI
-  implementation; bundled phone controls and protocol adapter
 - [[PS-026 - Implement Flash Pose Shared Screen Feedback and Results]] — AI
   implementation; shared presentation, audio/flash, and results
 - [[PS-027 - Integrate Flash Pose Lobby and Debug Flow]] — AI implementation;
@@ -33,6 +31,9 @@ the human has assigned them.
 
 ## Recently completed
 
+- [[PS-025 - Implement Flash Pose Phone Protocol and Controller]] — validated
+  host-owned pose packets, reconnect snapshots, accessible hold controls, and
+  personalized results backed by focused protocol/browser checks
 - [[PS-024 - Implement Flash Pose Host Round Controller]] — deterministic
   scene-scoped phases, lives/elimination/ranking, registry observation, and
   genuine-stop/flash contracts backed by focused state tests
