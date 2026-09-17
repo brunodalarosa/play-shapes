@@ -10,8 +10,8 @@ the human has assigned them.
 
 ## In Progress
 
-- None. The first minigame plan is complete; implementation remains separately
-  scoped in the backlog below.
+- [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]] — editor-
+  visible Flash? Pose! stage is implemented and awaiting owner visual approval
 
 ## Blocked
 
@@ -23,8 +23,6 @@ the human has assigned them.
   Milestone 1
 - [[PS-013 - Implement Pose Charge and Evaluation Rules]] — AI implementation;
   host-authoritative charge/evaluation
-- [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]] — AI
-  implementation; depends on PS-016, PS-017, and PS-019
 - [[PS-023 - Prepare Flash Pose Runtime Music and SFX]] — AI asset rework;
   depends on PS-019 and PS-020
 - [[PS-024 - Implement Flash Pose Host Round Controller]] — AI implementation;

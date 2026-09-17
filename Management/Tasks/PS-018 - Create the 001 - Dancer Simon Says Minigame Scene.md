@@ -2,7 +2,7 @@
 id: PS-018
 title: Create the 001 - Dancer Simon Says minigame scene
 type: implementation
-status: backlog
+status: in-progress
 release:
 owner: ai
 priority:
@@ -105,3 +105,26 @@ minigame implementation. [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Im
 Read this task, [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]], [[PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says]], [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]], [[001 - Dancer simon says]], [[PS-012 - Implement Milestone 1 Character Animation System]], [[PS-014 - Implement Minimal Gameplay Debug Launcher]], [[PS-005 - Define Multi-Phone and Agent Validation Strategy]], [[Project Overview]], [[Decision Log]], and [[DEVELOPMENT]] first. Inspect the existing scene, character, asset, and editor conventions before editing. Implement only the reusable editor-visible stage composition, the stable `res://minigames/dancer_simon_says.tscn` path, and named lead/seat anchors described here. Use the approved assets and preserve host authority, responsive layout, current character animation boundaries, stable seat identity, and human-editable scene data. Add focused scene/editor checks, distinguish `[AUTO]`, `[EDITOR]`, `[GODOT-RUNTIME]`, and `[HUMAN-PLAY]` evidence, document how a human tunes placements, and avoid implementing the broader gameplay loop or unrelated refactors.
 
 # Outcome
+
+Implementation and agent-run validation are prepared on
+`feature/ps-018-flash-pose-stage`. The stable
+`res://minigames/dancer_simon_says.tscn` scene contains a centered `LeadSlot`
+and `PlayerSlots/Seat01` through `Seat10`, with seat numbering expanding
+center-out so two-player and ten-player previews stay balanced. Every slot is
+an editor-authored screen-relative `Control` with an editor marker and an
+instance of the existing Shape Character scene for placement review.
+
+The scene composes the four manifest-selected Kenney environment sprites and
+exposes `preview_player_count` plus `show_character_previews` in the Inspector.
+Changing preview count only changes preview visibility; it never creates,
+removes, reorders, or moves the stable seats.
+
+`tests/dancer_simon_says_scene_test.gd` verifies the scene path, lead/seat
+structure, center-out two-player preview, persistent ten-seat boundary,
+editor-authored anchors, production character previews, and environment
+references. `tests/dancer_simon_says_scene_visual_check.gd` produces separate
+real-renderer captures for two and ten players.
+
+The task remains in progress until the project owner reviews and explicitly
+approves the visual placement. No round loop, networking, pose evaluation,
+audio, feedback, results, or lobby navigation was added.
