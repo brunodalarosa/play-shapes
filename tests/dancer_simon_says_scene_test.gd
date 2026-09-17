@@ -24,7 +24,16 @@ func _run() -> void:
 		return
 	var lead := stage.call("lead_slot") as Control
 	var seats: Array = stage.call("player_slots") as Array
+	var stage_art := stage.get_node(^"StageArt") as Control
+	var lead_platform := stage_art.get_node(^"LeadPlatformCenter") as Control
+	var player_platform := stage_art.get_node(^"PlayerPlatformCenter") as Control
 	if not _check(lead.name == &"LeadSlot" and lead.is_in_group(&"flash_pose_lead_slot"), "One named lead slot is available"):
+		return
+	if not _check(lead_platform.anchor_bottom - lead_platform.anchor_top <= 0.15, "Lead tiles keep a shallow non-stretched profile"):
+		return
+	if not _check(player_platform.anchor_bottom - player_platform.anchor_top <= 0.15, "Player tiles keep a shallow non-stretched profile"):
+		return
+	if not _check(lead.anchor_top < lead_platform.anchor_top, "Lead feet are authored above the platform surface"):
 		return
 	if not _check(seats.size() == 10, "Exactly ten persistent player seats are available"):
 		return
@@ -39,6 +48,8 @@ func _run() -> void:
 		if not _check(is_equal_approx(seat.anchor_left, seat.anchor_right) and is_equal_approx(seat.anchor_top, seat.anchor_bottom), "%s is an editor-authored screen-relative point" % expected_name):
 			return
 		if not _check(seat.anchor_left >= 0.079 and seat.anchor_left <= 0.921, "%s stays inside the authored lower safe area" % expected_name):
+			return
+		if not _check(seat.anchor_top < player_platform.anchor_top, "%s places the character feet above the player platform" % expected_name):
 			return
 		if not _check(not seen_anchors.has(seat.anchor_left), "%s has a unique placement" % expected_name):
 			return
