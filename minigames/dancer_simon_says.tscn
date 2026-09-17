@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://minigames/dancer_simon_says_stage.gd" id="1_stage"]
 [ext_resource type="PackedScene" path="res://characters/shape_character.tscn" id="2_character"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/environment/floor_left.png" id="4_floor_left"]
 [ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/environment/floor_center.png" id="5_floor_center"]
 [ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/environment/floor_right.png" id="6_floor_right"]
+[ext_resource type="Script" path="res://minigames/flash_pose_round_controller.gd" id="7_controller"]
 
 [node name="DancerSimonSays" type="Control"]
 layout_mode = 3
@@ -15,6 +16,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_stage")
+
+[node name="RoundController" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("7_controller")
 
 [node name="Sky" type="ColorRect" parent="."]
 layout_mode = 1

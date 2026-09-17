@@ -1,5 +1,70 @@
 # Play Shapes development
 
+## PS-024 — Flash? Pose! host round controller (2026-09-17)
+
+`minigames/flash_pose_round_controller.gd` is the scene-scoped authority for a
+single round. `dancer_simon_says.tscn` owns it as `RoundController`. The fixed
+phase graph is countdown -> dance -> genuine-stop grace -> resolve -> flash
+wait -> either another dance cycle or results wait -> lobby return. Later
+presentation code acknowledges a matching `stop_id` with
+`acknowledge_flash()`; the controller never resumes before that acknowledgement
+and never emits two flashes for one stop.
+
+The controller snapshots the registered `player_id`, name, and stable seat at
+start, chooses one of `bounce`, `swing`, or `disco` for the full round, and owns
+the host round clock, target sequence, two lives, life-loss/elimination order,
+withdrawal state, and limited ranking. It delegates direction/charge/held
+truth and the exact grace deadline to `PoseEvaluationRules`; animation receives
+semantic state only. `submit_pose_input()` is the narrow authenticated seam for
+PS-025. It accepts host receipt milliseconds and client sequence order but no
+client timestamp. The exact deadline remains inclusive; resolved stops and
+later input cannot mutate their snapshot.
+
+`observe_registry()` consumes public registry snapshots without owning
+identity. A reconnecting player keeps their participant/seat but loses the
+held input and must press again. A missing player is withdrawn with no life
+loss. Registry events received after a pose deadline first settle that deadline
+so a late disconnect or leave cannot retroactively rewrite the result. The
+scene controller also listens to `SessionHost.players_changed` when that
+autoload exists; deterministic tests can call the same method directly.
+
+Signals are intentionally narrow: `phase_changed`,
+`semantic_animation_updated`, `genuine_stop_started`,
+`pose_evaluation_resolved`, `flash_requested`, `flash_completed`,
+`round_results_ready`, and `return_to_lobby_requested`. They expose state to
+later protocol/presentation adapters without parsing packets, moving sprites,
+playing audio, or creating VFX here. Tests inject style, target, and interval
+queues; normal play uses the host random source.
+
+The active Simon Says preset now exposes provisional 3-second countdown,
+60-second round, 4–7-second initial stop interval, 0.25-second reduction per
+resolved stop, Down unlock at 15 seconds, and Up unlock at 30 seconds. These are
+safe, Inspector-visible starting hypotheses only. Human play must decide pacing,
+difficulty, fairness, and feel before any values are promoted as approved.
+
+Focused checks:
+
+```powershell
+godot --headless --path . --script res://tests/flash_pose_round_controller_test.gd
+godot --headless --path . --script res://tests/pose_evaluation_rules_test.gd
+godot --headless --path . --script res://tests/pose_charge_test.gd
+godot --headless --path . --script res://tests/tuning_presets_test.gd
+godot --headless --path . --script res://tests/dancer_simon_says_scene_test.gd
+godot --headless --editor --path . --quit-after 30
+```
+
+- **Automated state/rule checks: passed.** Coverage includes the explicit phase
+  path, injected style/target/intervals, inclusive deadline input, duplicate and
+  locked input, results-before-flash order, matching flash acknowledgement,
+  exactly-once life loss/elimination, disconnect/resume/withdrawal, timeout and
+  all-perfect ranking, result grouping, and the debug-only one-player gate.
+- **Editor load: passed** in Godot 4.7.2 with the normal profile. The forced
+  early shutdown reported the existing 68-object/33-resource cleanup warnings,
+  separately from script/import loading.
+- **Runtime/device/human evidence: not claimed.** PS-025 through PS-029 still
+  own phone packets and UI, shared-screen/audio/VFX integration, lobby/debug
+  navigation, runtime/desktop validation, two physical phones, and human feel.
+
 ## PS-023 — Flash? Pose! runtime music and SFX (2026-09-17)
 
 The supplied audio is consumed directly and remains byte-for-byte unchanged.

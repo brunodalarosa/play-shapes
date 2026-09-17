@@ -20,8 +20,6 @@ the human has assigned them.
 
 - [[PS-008 - Design Fake Music Stops]] — later shared design; excluded from
   Milestone 1
-- [[PS-024 - Implement Flash Pose Host Round Controller]] — AI implementation;
-  authoritative lifecycle and round state
 - [[PS-025 - Implement Flash Pose Phone Protocol and Controller]] — AI
   implementation; bundled phone controls and protocol adapter
 - [[PS-026 - Implement Flash Pose Shared Screen Feedback and Results]] — AI
@@ -35,6 +33,9 @@ the human has assigned them.
 
 ## Recently completed
 
+- [[PS-024 - Implement Flash Pose Host Round Controller]] — deterministic
+  scene-scoped phases, lives/elimination/ranking, registry observation, and
+  genuine-stop/flash contracts backed by focused state tests
 - [[PS-023 - Prepare Flash Pose Runtime Music and SFX]] — stable style/audio
   catalog, CC0 provenance manifest, deterministic loop imports, and focused
   metadata/load checks; final listening remains in PS-029

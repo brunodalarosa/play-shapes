@@ -10,6 +10,9 @@ func _initialize() -> void:
 
 func _run() -> void:
 	if not _check_tooltip_contract("res://Tuning/Minigames/simon_says_tuning.gd", [
+		"countdown_seconds", "round_duration_seconds", "stop_interval_min_seconds",
+		"stop_interval_max_seconds", "stop_interval_reduction_seconds",
+		"down_unlock_seconds", "up_unlock_seconds",
 		"charge_fill_seconds", "charge_decay_seconds", "pose_reveal_delay_seconds",
 		"pose_grace_seconds", "dance_beats_per_second",
 		"body_bounce", "body_jiggle_degrees", "body_sway", "visual_follow_speed",
@@ -50,6 +53,12 @@ func _run() -> void:
 	if not _check(simon.pose_reveal_delay_seconds == 0.5 and simon.pose_grace_seconds == 0.2,
 		"Pose reveal and grace values clamp to documented safe ranges"):
 		return
+	simon.stop_interval_min_seconds = 9.0
+	simon.stop_interval_max_seconds = 3.0
+	if not _check(simon.validation_errors()[0].contains("Minimum stop interval"),
+		"Simon Says invalid round timing reports an actionable message"):
+		return
+	simon.stop_interval_min_seconds = 3.0
 	simon.auto_release_seconds = 0.1
 	if not _check(simon.validation_errors()[0].contains("Auto release"), "Simon Says invalid combinations report an actionable message"):
 		return

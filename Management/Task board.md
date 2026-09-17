@@ -38,7 +38,6 @@ views:
           - play-shapes/Management/Tasks/PS-008 - Design Fake Music Stops.md
           - play-shapes/Management/Tasks/PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says.md
           - play-shapes/Management/Tasks/PS-018 - Create the 001 - Dancer Simon Says Minigame Scene.md
-          - play-shapes/Management/Tasks/PS-024 - Implement Flash Pose Host Round Controller.md
           - play-shapes/Management/Tasks/PS-025 - Implement Flash Pose Phone Protocol and Controller.md
           - play-shapes/Management/Tasks/PS-026 - Implement Flash Pose Shared Screen Feedback and Results.md
           - play-shapes/Management/Tasks/PS-027 - Integrate Flash Pose Lobby and Debug Flow.md
@@ -65,6 +64,7 @@ views:
           - play-shapes/Management/Tasks/Done/PS-020 - Find Music and SFX for 001 - Dancer Simon Says.md
           - play-shapes/Management/Tasks/Done/PS-021 - Implement Curated Runtime Asset Pipeline.md
           - play-shapes/Management/Tasks/Done/PS-023 - Prepare Flash Pose Runtime Music and SFX.md
+          - play-shapes/Management/Tasks/Done/PS-024 - Implement Flash Pose Host Round Controller.md
     columnColors:
       note.status:
         done: green
@@ -98,7 +98,7 @@ views:
         - play-shapes/Management/Tasks/PS-018 - Create the 001 - Dancer Simon Says Minigame Scene.md
         - play-shapes/Management/Tasks/Done/PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation.md
         - play-shapes/Management/Tasks/Done/PS-023 - Prepare Flash Pose Runtime Music and SFX.md
-        - play-shapes/Management/Tasks/PS-024 - Implement Flash Pose Host Round Controller.md
+        - play-shapes/Management/Tasks/Done/PS-024 - Implement Flash Pose Host Round Controller.md
         - play-shapes/Management/Tasks/PS-025 - Implement Flash Pose Phone Protocol and Controller.md
         - play-shapes/Management/Tasks/PS-026 - Implement Flash Pose Shared Screen Feedback and Results.md
         - play-shapes/Management/Tasks/PS-027 - Integrate Flash Pose Lobby and Debug Flow.md
