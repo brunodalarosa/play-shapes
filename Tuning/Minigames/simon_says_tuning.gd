@@ -11,6 +11,14 @@ var charge_fill_seconds: float = 1.0:
 @export_range(0.05, 1.0, 0.01, "suffix:s")
 var charge_decay_seconds: float = 0.28:
 	set(value): charge_decay_seconds = clampf(value, 0.05, 1.0)
+## Delay from the audible full stop until the command pose is revealed. Higher adds suspense but shortens no other timer; lower reveals sooner. Default: 0.0. Safe range: 0-0.5.
+@export_range(0.0, 0.5, 0.01, "suffix:s")
+var pose_reveal_delay_seconds: float = 0.0:
+	set(value): pose_reveal_delay_seconds = clampf(value, 0.0, 0.5)
+## Time from pose reveal until authoritative evaluation. Higher is more forgiving; lower is harder. Default: 1.2. Safe range: 0.2-3.0.
+@export_range(0.2, 3.0, 0.05, "suffix:s")
+var pose_grace_seconds: float = 1.2:
+	set(value): pose_grace_seconds = clampf(value, 0.2, 3.0)
 
 @export_group("Animation and motion")
 ## Dance tempo, in beats per second. Higher is more energetic; lower is calmer. Default: 1.7. Safe range: 0.1-3.0.

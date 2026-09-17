@@ -6,6 +6,8 @@
 script = ExtResource("1")
 charge_fill_seconds = 1.0
 charge_decay_seconds = 0.28
+pose_reveal_delay_seconds = 0.0
+pose_grace_seconds = 1.2
 dance_beats_per_second = 1.7
 body_bounce = 6.0
 body_jiggle_degrees = 4.0

@@ -1,5 +1,67 @@
 # Play Shapes development
 
+## PS-013 — host-authoritative pose charge and evaluation (2026-09-17)
+
+`host/pose_evaluation_rules.gd` is the scene-independent rules boundary for
+Flash? Pose! input. Create one `PoseEvaluationRules` for a round, call
+`add_player()` for the controller's participant snapshot, and feed it only
+authenticated `player_id` values plus host monotonic receipt milliseconds.
+`input_seq` rejects duplicate and out-of-order actions; no API accepts a client
+timestamp. The later WebSocket adapter remains responsible for packet parsing,
+connection-to-player lookup, and phone copy.
+
+Each participant owns a `PoseCharge`: a changed direction resets to zero, a held
+direction fills, release drains over `charge_decay_seconds`, and same-direction
+repress continues from what remains. `begin_stop()` preserves an uninterrupted
+hold across a genuine stop and fixes the pose-reveal and evaluation timestamps.
+Inputs received at the exact deadline are accepted until `evaluate_stop()` fixes
+the result; later actions and resolved-stop mutations are rejected. Evaluation
+uses the exact deadline even if a later process frame performs the call, and
+success requires the target direction, normalized charge `1.0`, and a current
+hold. Explicit Leave calls `withdraw_player()` and creates no failure. A
+disconnect calls `set_player_connected(..., false, ...)`, which clears the hold;
+resume restores connectivity but requires a new press.
+
+The normalized `semantic_state_changed` payload exposes direction/charge/held
+under both rules-oriented and `pose_*` animation keys, plus reaction and
+elimination. Presentation may pass these values to
+`HybridCharacterAnimator.set_pose_state()`, `play_reaction()`, and
+`set_eliminated()`; it must never read sprite transforms or animation frames to
+decide success. `evaluate_stop()` emits immutable per-player result records.
+The future lives owner calls `mark_eliminated()` only after a failed result to
+create the authoritative elimination record used by animation and the phone
+protocol. This object deliberately does not own lives, round phases, packet
+formats, or the message `You've been eliminated :(`.
+
+The Inspector-facing provisional timing values live in
+`Tuning/Minigames/SimonSays/Default.tres`: 1.0-second fill, 0.28-second full
+decay, zero delay from audible stop to pose reveal, and 1.2 seconds from reveal
+to evaluation. The first two preserve the approved animation behavior; the
+last two explicitly define `audible stop -> reveal -> grace -> evaluation`.
+They are starting hypotheses, not human-approved feel. Change them through a
+named tuning preset and record the experiment before promoting a new Default.
+
+Focused checks:
+
+```powershell
+godot --headless --path . --script res://tests/pose_evaluation_rules_test.gd
+godot --headless --path . --script res://tests/pose_charge_test.gd
+godot --headless --path . --script res://tests/tuning_presets_test.gd
+godot --headless --editor --path . --quit-after 30
+```
+
+- **Automated rules checks: passed.** They cover full holds, release decay,
+  inefficient tapping, direction resets, grace/deadline boundaries, correction,
+  duplicate/out-of-order/invalid/late input, immutable resolution, disconnect,
+  resume, withdrawal, semantic output, and elimination records.
+- **Editor load: passed** in Godot 4.7.2 with the normal profile. Forced shutdown
+  reports the existing 68-object/33-resource cleanup warnings, separately from
+  parse/import failures.
+- **Runtime integration and human feel: not claimed.** PS-024 and PS-025 still
+  need to wire the round and validated controller boundaries. Physical phones,
+  latency fairness, timing difficulty, and game feel remain PS-028/PS-029
+  evidence and owner decisions.
+
 ## PS-018 — editor-authored Flash? Pose! stage (2026-09-16)
 
 The reusable gameplay-stage shell lives at the reserved path
