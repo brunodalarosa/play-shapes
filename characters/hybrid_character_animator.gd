@@ -8,12 +8,12 @@ const REACTIONS: Array[StringName] = [&"none", &"life_loss", &"survived"]
 const RESULT_MOODS: Array[StringName] = [&"none", &"happy", &"moody"]
 const PART_NAMES: Array[StringName] = [&"Body", &"Face", &"LeftHand", &"RightHand", &"LeftFoot", &"RightFoot"]
 const HANDS: Dictionary = {
-	&"closed": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_closed.png"),
-	&"open": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_open.png"),
-	&"peace": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_peace.png"),
-	&"point": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_point.png"),
-	&"rock": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_rock.png"),
-	&"thumb": preload("res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_thumb.png"),
+	&"closed": preload("res://assets/runtime/shape_characters/hands/closed.png"),
+	&"open": preload("res://assets/runtime/shape_characters/hands/open.png"),
+	&"peace": preload("res://assets/runtime/shape_characters/hands/peace.png"),
+	&"point": preload("res://assets/runtime/shape_characters/hands/point.png"),
+	&"rock": preload("res://assets/runtime/shape_characters/hands/rock.png"),
+	&"thumb": preload("res://assets/runtime/shape_characters/hands/thumb.png"),
 }
 const DANCE_HANDS: Array[StringName] = [&"closed", &"open", &"closed", &"open", &"peace", &"open", &"closed", &"point", &"open", &"closed", &"rock", &"open", &"closed", &"thumb"]
 
