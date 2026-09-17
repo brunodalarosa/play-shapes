@@ -1,5 +1,59 @@
 # Play Shapes development
 
+## PS-018 — editor-authored Flash? Pose! stage (2026-09-16)
+
+The reusable gameplay-stage shell lives at the reserved path
+`res://minigames/dancer_simon_says.tscn`. It intentionally contains presentation
+and placement only: the player-facing title, the PS-017 environment art, one
+lead preview, and ten player previews. Round state, pose evaluation, audio,
+feedback, results, networking, and navigation remain in their later tasks.
+
+`LeadSlot` and `PlayerSlots/Seat01` through `Seat10` are stable `Control`
+anchors. Their positions are stored as screen-relative anchors directly in the
+scene, not calculated from viewport dimensions in code. Seat numbering expands
+center-out (`Seat01`/`Seat02` are the center pair), so assigning the first two
+through ten stable seats keeps smaller groups centered without reshuffling an
+already assigned player. Later systems may configure or replace a slot's
+`PreviewCharacter`, but must preserve the slot identity and authored position
+throughout a round.
+
+### Adjusting the composition in Godot
+
+1. Open `res://minigames/dancer_simon_says.tscn` in the 2D editor.
+2. Select `LeadSlot` or one of the named nodes under `PlayerSlots`.
+3. Move it with the 2D tool or edit its Layout anchor values, then save the
+   scene. Do not generate seat positions in a runtime script.
+4. On the scene root, set `preview_player_count` from 2 to 10 to compare small
+   and full formations. Hidden previews do not remove their seat nodes.
+5. Toggle `show_character_previews` only when an unobstructed environment pass
+   is useful. The lead and ten editor markers remain available for authoring.
+
+The scene uses only the manifest-owned runtime paths under
+`assets/runtime/shape_characters/environment/`: `floor_left.png`,
+`floor_center.png`, `floor_right.png`, and `tree_small.png`. Character previews
+instance `res://characters/shape_character.tscn`; they do not duplicate its
+textures or animation boundary.
+
+Focused checks:
+
+```powershell
+godot --headless --path . --script res://tests/dancer_simon_says_scene_test.gd
+godot --path . --resolution 1440x810 --script res://tests/dancer_simon_says_scene_visual_check.gd
+```
+
+The structural check covers the reserved path, one lead, ten stable named
+seats, center-out two-player preview, editor anchors, shallow platform
+proportions, raised character placement, character instances, and all selected
+environment references. The renderer check writes review images under
+`test-results/ps-018/`; those generated files are ignored.
+
+`[HUMAN-PLAY]` Visual placement approved on 2026-09-17. The owner reviewed the
+revised two-player and ten-player GL Compatibility captures after the tile
+platforms were made shallower and the character anchors were raised so the
+feet rest on the yellow surface. This approval covers the PS-018 composition;
+it does not approve future gameplay feel, animation in context, feedback,
+audio, results, networking, or physical-phone behavior.
+
 ## PS-017 — Milestone 1 environment asset decision (2026-09-16)
 
 PS-017 is complete by explicit owner decision. Flash? Pose! will use the
