@@ -55,8 +55,8 @@ func _test_input_rejection_and_immutable_resolution() -> void:
 	var controller := _controller(0.0, 10.0)
 	controller.inject_sequences([&"bounce"], [&"right"], [0])
 	controller.start_round(_participants(), 0)
-	_check(controller.submit_pose_input("p1", &"right", true, 1, 0).code == &"wrong_phase",
-		"Countdown rejects pose input")
+	_check(controller.submit_pose_input("p1", &"right", true, 1, 0).accepted,
+		"Free posing starts with the minigame countdown")
 	controller.advance(0)
 	controller.advance(0)
 	_check(controller.submit_pose_input("unknown", &"right", true, 1, 0).code == &"unknown_player",
@@ -70,10 +70,10 @@ func _test_input_rejection_and_immutable_resolution() -> void:
 	var deadline: int = controller._pose_rules.current_deadline_msec()
 	controller.advance(deadline)
 	var lives_after: int = controller._players.p2.lives
-	_check(controller.submit_pose_input("p2", &"right", true, 1, deadline + 1).code == &"wrong_phase",
-		"Late input cannot enter a resolved stop")
+	_check(controller.submit_pose_input("p2", &"right", true, 1, deadline + 1).accepted,
+		"Input after resolution drives free posing for the next dance segment")
 	controller.advance(deadline + 1)
-	_check(controller._players.p2.lives == lives_after, "Resolved life loss cannot be applied twice")
+	_check(controller._players.p2.lives == lives_after, "Post-result free posing cannot rewrite a resolved life loss")
 
 
 func _test_registry_disconnect_and_withdrawal() -> void:

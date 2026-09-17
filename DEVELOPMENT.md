@@ -1,5 +1,67 @@
 # Play Shapes development
 
+## PS-025 — Flash? Pose! phone protocol and controller (2026-09-17)
+
+`host/flash_pose_protocol.gd` is the narrow post-handshake adapter. A browser
+sends only `{"type":"pose_down|pose_up","direction":"left|right|down|up",
+"input_seq":N}`. The transport resolves the registered player from its
+host-owned connection and supplies `Time.get_ticks_msec()`; client player IDs,
+timestamps, targets, deadlines, charge, lives, and outcomes are rejected as
+unauthorized fields. The adapter validates packet shape before forwarding to
+`FlashPoseRoundController.submit_pose_input()`, whose phase, direction unlock,
+sequence, deadline, and active-player rules remain authoritative. Protocol 1
+and the existing hello/join/leave/reconnect behavior are unchanged.
+The browser persists only its monotonically increasing sequence alongside the
+existing reconnect identity so a reload cannot restart at a stale value; the
+host still treats that number solely as an ordering guard, never as authority.
+
+The round controller registers itself with the persistent `SessionHost` while
+its scene is alive. The WebSocket service translates controller signals into
+personalized `flash_pose_snapshot`, `flash_pose_challenge`,
+`flash_pose_result`, `flash_pose_results`, and `lobby` messages. A valid resume
+embeds the current personalized gameplay snapshot in `welcome.gameplay`, after
+the registry has cleared any disconnected hold. New players cannot join while
+the host closes lobby admission and are not inserted into an active round.
+
+The bundled controller now has waiting/watch, countdown/dance, challenge,
+result/lives, exact `You've been eliminated :(`, results, and lobby states.
+Two to four square native buttons stay visible and functional throughout the
+active minigame, including countdown, music playback, stops, and flash waits.
+Players can leave automatic dance running or freely pose at any time; only the
+host's genuine-stop grace deadline affects lives and outcomes. Direction
+unlocks update the layout at the boundary between gameplay cycles. Buttons use
+distinct arrow icons, text/accessible labels, and colors. Pointer capture
+prevents slide-off loss; pointer up,
+cancel, lost capture, disconnect, and page hide clean up local state. The page
+uses `touch-action: none` and suppresses context menus to prevent scrolling or
+double actions during a hold. A stable button grid is retained across a
+genuine stop, so an uninterrupted pointer remains held. Reconnect never sends
+an invented release or restores a lost pointer; the player must press again.
+
+After TypeScript changes, rebuild the committed offline artifact:
+
+```powershell
+cd web
+npm.cmd run check
+npm.cmd run build
+npm.cmd test
+cd ..
+godot --headless --path . --script res://tests/flash_pose_protocol_test.gd
+godot --headless --editor --path . --quit-after 30
+```
+
+- **[AUTO] protocol/browser checks: passed.** Focused coverage includes valid
+  press/release, duplicate and late actions, malformed and authority-shaped
+  packets, current reconnect snapshots, exact elimination copy, accessible
+  controls/cancellation hooks, and ten connected protocol-1 browser peers.
+- **[DESKTOP-BROWSER]: not claimed.** The automated browser assertions inspect
+  the served offline bundle; no interactive browser visual/usability run is
+  part of this task.
+- **[PHYSICAL-PHONE] / [HUMAN-PLAY]: not claimed.** Two-phone thumb reach,
+  persistent-hold fairness, VoiceOver/TalkBack behavior, mobile browser pointer
+  capture, and latency feel remain PS-029. Record a named device/browser issue
+  rather than adding a broad input abstraction if mobile capture differs.
+
 ## PS-024 — Flash? Pose! host round controller (2026-09-17)
 
 `minigames/flash_pose_round_controller.gd` is the scene-scoped authority for a

@@ -51,6 +51,13 @@ func _ready() -> void:
 	if session_host != null and session_host.has_signal("players_changed"):
 		session_host.players_changed.connect(
 			func(players: Array[Dictionary]) -> void: observe_registry(players, Time.get_ticks_msec()))
+		if session_host.has_method("register_flash_pose_controller"):
+			session_host.register_flash_pose_controller(self)
+
+func _exit_tree() -> void:
+	var session_host := get_node_or_null("/root/SessionHost")
+	if session_host != null and session_host.has_method("unregister_flash_pose_controller"):
+		session_host.unregister_flash_pose_controller(self)
 
 
 func _process(_delta: float) -> void:
@@ -142,11 +149,16 @@ func advance(host_time_msec: int) -> Dictionary:
 
 func submit_pose_input(player_id: String, direction: StringName, held: bool,
 		input_seq: int, host_receipt_msec: int) -> Dictionary:
-	if phase != Phase.GENUINE_STOP_GRACE:
+	# Settle any phase/deadline reached before this packet. A packet received
+	# after evaluation may begin a new free pose, but can never alter that result.
+	if phase not in [Phase.IDLE, Phase.RESULTS_WAIT, Phase.LOBBY_RETURN] \
+			and host_receipt_msec >= _last_host_time_msec:
+		advance(host_receipt_msec)
+	if phase not in [Phase.COUNTDOWN, Phase.DANCE, Phase.GENUINE_STOP_GRACE, Phase.FLASH_WAIT]:
 		return _rejected(&"wrong_phase")
 	if not _players.has(player_id):
 		return _rejected(&"unknown_player")
-	if direction not in available_directions():
+	if direction not in available_directions(host_receipt_msec):
 		return _rejected(&"locked_direction")
 	return _pose_rules.submit_input(player_id, direction, held, input_seq, host_receipt_msec)
 

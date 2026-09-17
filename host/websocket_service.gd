@@ -5,6 +5,7 @@ extends Node
 signal connection_count_changed(count: int)
 
 const MAX_PACKET_BYTES := 1024
+const FlashPoseProtocolScript = preload("res://host/flash_pose_protocol.gd")
 
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []
@@ -12,6 +13,7 @@ var _settings: NetworkingTuning
 var _registry: PlayerRegistry
 var _accepting_new_players: Callable
 var _next_id: int = 1
+var _flash_pose_protocol: RefCounted
 
 func start(settings: NetworkingTuning, registry: PlayerRegistry,
 		accepting_new_players: Callable) -> Error:
@@ -27,6 +29,19 @@ func stop() -> void:
 		client.tcp.disconnect_from_host()
 	_clients.clear()
 	connection_count_changed.emit(0)
+
+func set_flash_pose_controller(controller: FlashPoseRoundController) -> void:
+	_clear_flash_pose_controller()
+	_flash_pose_protocol = FlashPoseProtocolScript.new(controller)
+	controller.phase_changed.connect(_on_flash_pose_phase_changed)
+	controller.genuine_stop_started.connect(_on_flash_pose_challenge)
+	controller.pose_evaluation_resolved.connect(_on_flash_pose_results)
+	controller.round_results_ready.connect(_on_flash_pose_round_results)
+	controller.return_to_lobby_requested.connect(_on_flash_pose_return_to_lobby)
+
+func clear_flash_pose_controller(controller: FlashPoseRoundController) -> void:
+	if _flash_pose_protocol != null and _flash_pose_protocol.controller == controller:
+		_clear_flash_pose_controller()
 
 func _process(_delta: float) -> void:
 	if not _server.is_listening():
@@ -92,7 +107,7 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			)
 		if resume.accepted:
 			_close_replaced_connection(resume.replaced_connection_id, connection_id)
-		peer.send_text(JSON.stringify({
+		var welcome := {
 			"type": "welcome",
 			"protocol": 1,
 			"connection_id": connection_id,
@@ -101,7 +116,11 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			"message": "Connected to Play Shapes" if resume.accepted else resume.message,
 			"player": resume.get("player"),
 			"reconnect_token": resume.get("reconnect_token"),
-		}))
+		}
+		if resume.accepted:
+			welcome.gameplay = _flash_pose_protocol.snapshot_for(String(resume.player.player_id)) \
+				if _flash_pose_protocol != null else {"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}
+		peer.send_text(JSON.stringify(welcome))
 		_emit_count()
 		return
 
@@ -127,6 +146,12 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 				peer.send_text(JSON.stringify({"type": "left", "message": "You left the lobby"}))
 			else:
 				_send_rejection(peer, "error", result)
+		"pose_down", "pose_up":
+			var player := _registry.player_for_connection(client.connection_id)
+			var result: Dictionary = _flash_pose_protocol.handle_action(player, message, Time.get_ticks_msec()) \
+				if _flash_pose_protocol != null else {"accepted": false, "code": &"game_unavailable", "message": "Flash? Pose! is not active"}
+			if not result.accepted:
+				_send_rejection(peer, "error", result)
 		_:
 			_send_rejection(peer, "error", {
 				"code": &"unsupported_message",
@@ -139,6 +164,63 @@ func _send_rejection(peer: WebSocketPeer, response_type: String, result: Diction
 		"code": str(result.code),
 		"message": result.message,
 	}))
+
+func _send_gameplay_snapshot(peer: WebSocketPeer, player_id: String) -> void:
+	var message: Dictionary = _flash_pose_protocol.snapshot_for(player_id) if _flash_pose_protocol != null \
+		else {"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}
+	peer.send_text(JSON.stringify(message))
+
+func _send_to_player(player_id: String, message: Dictionary) -> void:
+	for client: Dictionary in _clients:
+		if client.welcomed and _registry.player_for_connection(client.connection_id).get("player_id") == player_id:
+			client.peer.send_text(JSON.stringify(message))
+			return
+
+func _broadcast_gameplay_snapshots() -> void:
+	for client: Dictionary in _clients:
+		if not client.welcomed:
+			continue
+		var player := _registry.player_for_connection(client.connection_id)
+		if not player.is_empty():
+			_send_gameplay_snapshot(client.peer, String(player.player_id))
+
+func _on_flash_pose_phase_changed(phase: StringName, _snapshot: Dictionary) -> void:
+	# Resolve and flash are covered by the personalized result message. Sending a
+	# generic snapshot immediately afterward would erase that feedback on phones.
+	if phase not in [&"resolve", &"flash_wait"]:
+		_broadcast_gameplay_snapshots()
+
+func _on_flash_pose_challenge(_stop_id: int, _direction: StringName, _available: Array[StringName]) -> void:
+	var message: Dictionary = _flash_pose_protocol.challenge_message()
+	for player: Dictionary in _flash_pose_protocol.controller.player_snapshot():
+		_send_to_player(String(player.player_id), message)
+
+func _on_flash_pose_results(stop_id: int, results: Array[Dictionary]) -> void:
+	for result: Dictionary in results:
+		var player_id := String(result.player_id)
+		_send_to_player(player_id, _flash_pose_protocol.result_for(player_id, stop_id, results))
+
+func _on_flash_pose_round_results(results: Dictionary) -> void:
+	for player: Dictionary in _flash_pose_protocol.controller.player_snapshot():
+		var player_id := String(player.player_id)
+		_send_to_player(player_id, _flash_pose_protocol.results_message(player_id, results))
+
+func _on_flash_pose_return_to_lobby() -> void:
+	for client: Dictionary in _clients:
+		if client.welcomed and not _registry.player_for_connection(client.connection_id).is_empty():
+			client.peer.send_text(JSON.stringify({"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}))
+
+func _clear_flash_pose_controller() -> void:
+	if _flash_pose_protocol == null:
+		return
+	var controller: FlashPoseRoundController = _flash_pose_protocol.controller
+	if is_instance_valid(controller):
+		if controller.phase_changed.is_connected(_on_flash_pose_phase_changed): controller.phase_changed.disconnect(_on_flash_pose_phase_changed)
+		if controller.genuine_stop_started.is_connected(_on_flash_pose_challenge): controller.genuine_stop_started.disconnect(_on_flash_pose_challenge)
+		if controller.pose_evaluation_resolved.is_connected(_on_flash_pose_results): controller.pose_evaluation_resolved.disconnect(_on_flash_pose_results)
+		if controller.round_results_ready.is_connected(_on_flash_pose_round_results): controller.round_results_ready.disconnect(_on_flash_pose_round_results)
+		if controller.return_to_lobby_requested.is_connected(_on_flash_pose_return_to_lobby): controller.return_to_lobby_requested.disconnect(_on_flash_pose_return_to_lobby)
+	_flash_pose_protocol = null
 
 func _close_replaced_connection(old_connection_id: int, new_connection_id: int) -> void:
 	if old_connection_id == PlayerRegistry.DISCONNECTED or old_connection_id == new_connection_id:

@@ -75,10 +75,10 @@ func _test_sequence_validation_and_late_input() -> void:
 	var resolved: Dictionary = rules.evaluate_stop(7, 1400)
 	var before: Dictionary = resolved.results[0]
 	_check(before.success and before.direction == &"down", "Rejected input cannot replace the valid held direction")
-	_check(rules.submit_input("ordered", &"up", true, 6, 1400).code == &"no_active_stop",
-		"Resolved stops cannot be mutated")
+	_check(rules.submit_input("ordered", &"up", true, 6, 1400).accepted,
+		"Free posing resumes after resolution for the next dance segment")
 	var repeated: Dictionary = rules.evaluate_stop(7, 1500).results[0]
-	_check(repeated == before, "Repeated evaluation returns the immutable authoritative result")
+	_check(repeated == before, "Free posing cannot rewrite the immutable authoritative result")
 
 
 func _test_disconnect_resume_and_withdrawal() -> void:
