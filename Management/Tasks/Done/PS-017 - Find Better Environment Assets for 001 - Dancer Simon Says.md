@@ -2,7 +2,7 @@
 id: PS-017
 title: Find scenario and environment assets for 001 - Dancer Simon Says minigame
 type: asset-hunt
-status: backlog
+status: done
 release:
 owner: human
 priority:
@@ -88,3 +88,23 @@ not use generative image creation or edit assets in this task. Obtain explicit
 human approval before treating the selected set as ready for [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]].
 
 # Outcome
+
+Closed on 2026-09-16 by owner decision. Milestone 1 will use the existing
+curated environment art under
+`assets/runtime/shape_characters/environment/`:
+
+- `floor_left.png` — 160 x 160, Kenney Shape Characters 1.0, CC0-1.0
+- `floor_center.png` — 160 x 160, Kenney Shape Characters 1.0, CC0-1.0
+- `floor_right.png` — 160 x 160, Kenney Shape Characters 1.0, CC0-1.0
+- `tree_small.png` — 144 x 220, Kenney Shape Characters 1.0, CC0-1.0
+
+These are manifest-owned runtime copies with their source paths and provenance
+recorded in `assets/runtime/shape_characters/manifest.json`. They provide the
+minimal floor/stage and decorative environment needed by PS-018 without a new
+asset hunt or untracked placeholder.
+
+The owner explicitly accepts this set for Milestone 1 so implementation can
+move forward. The selection is temporary in visual direction: finding or
+creating prettier environment art is deferred to a future task and is not a
+Milestone 1 blocker. PS-018 must preserve character and pose readability when
+composing these pieces.

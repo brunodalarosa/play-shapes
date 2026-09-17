@@ -147,3 +147,12 @@ Record durable architectural, production, and game-design choices here so future
 - **Alternatives:** Restarting the track or adding loop-safe musical-boundary scheduling was deferred.
 - **Related tasks:** [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]], [[PS-023 - Prepare Flash Pose Runtime Music and SFX]], [[PS-026 - Implement Flash Pose Shared Screen Feedback and Results]], [[PS-029 - Validate Flash Pose on Two Phones and in Human Play]]
 - **Revisit:** If human listening finds a click, rhythmic stumble, or unacceptable resume feel.
+
+## DEC-017 — Use the curated Shape Characters environment for Milestone 1
+
+- **Date:** 2026-09-16
+- **Decision:** The Flash? Pose! Milestone 1 environment uses the four curated Kenney Shape Characters assets under `assets/runtime/shape_characters/environment/`: the left, center, and right floor tiles plus the small tree.
+- **Reason:** The existing set is licensed, provenance-tracked, runtime-ready, and sufficient to build the first playable scene without delaying implementation for a prettier environment.
+- **Alternatives:** A new external asset hunt or new production environment artwork is deferred until after Milestone 1.
+- **Related tasks:** [[PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says]], [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]], [[PS-021 - Implement Curated Runtime Asset Pipeline]]
+- **Revisit:** After Milestone 1, when the owner is ready to source or create stronger environment art. Any replacement must preserve character contrast and pose readability.
