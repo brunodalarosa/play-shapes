@@ -3,6 +3,34 @@ extends Resource
 ## One front door for the Simon Says values that exist today. Changes apply after relaunch.
 
 @export_group("Gameplay and timing")
+## Shared-screen countdown before dancing begins, in seconds. Higher gives players more preparation; lower starts faster. Default: 3.0. Safe range: 0-10.
+@export_range(0.0, 10.0, 0.25, "suffix:s")
+var countdown_seconds: float = 3.0:
+	set(value): countdown_seconds = clampf(value, 0.0, 10.0)
+## Maximum dancing-round duration after the countdown, in seconds. Higher permits more stops; lower ends sooner. Default: 60. Safe range: 10-300.
+@export_range(10.0, 300.0, 1.0, "suffix:s")
+var round_duration_seconds: float = 60.0:
+	set(value): round_duration_seconds = clampf(value, 10.0, 300.0)
+## Earliest initial music stop, in seconds. Higher gives longer dance stretches; lower increases pressure. Default: 4.0. Safe range: 0.5-15.
+@export_range(0.5, 15.0, 0.1, "suffix:s")
+var stop_interval_min_seconds: float = 4.0:
+	set(value): stop_interval_min_seconds = clampf(value, 0.5, 15.0)
+## Latest initial music stop, in seconds. Higher makes stops less predictable; lower tightens pacing. Default: 7.0. Safe range: 0.5-20.
+@export_range(0.5, 20.0, 0.1, "suffix:s")
+var stop_interval_max_seconds: float = 7.0:
+	set(value): stop_interval_max_seconds = clampf(value, 0.5, 20.0)
+## Interval reduction after each resolved stop, in seconds. Higher ramps pressure faster; lower changes pacing gradually. Default: 0.25. Safe range: 0-2.
+@export_range(0.0, 2.0, 0.05, "suffix:s")
+var stop_interval_reduction_seconds: float = 0.25:
+	set(value): stop_interval_reduction_seconds = clampf(value, 0.0, 2.0)
+## Elapsed round time that unlocks the Down pose, in seconds. Lower introduces three choices sooner. Default: 15. Safe range: 0-300.
+@export_range(0.0, 300.0, 1.0, "suffix:s")
+var down_unlock_seconds: float = 15.0:
+	set(value): down_unlock_seconds = clampf(value, 0.0, 300.0)
+## Elapsed round time that unlocks the Up pose, in seconds. Lower introduces all four choices sooner. Default: 30. Safe range: 0-300.
+@export_range(0.0, 300.0, 1.0, "suffix:s")
+var up_unlock_seconds: float = 30.0:
+	set(value): up_unlock_seconds = clampf(value, 0.0, 300.0)
 ## Time to reach a committed command pose, in seconds. Higher feels more deliberate; lower feels more responsive. Default: 1.0. Safe range: 0.1-3.0.
 @export_range(0.1, 3.0, 0.05, "suffix:s")
 var charge_fill_seconds: float = 1.0:
@@ -74,6 +102,12 @@ var auto_release_seconds: float = 0.7:
 
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
+	if stop_interval_min_seconds > stop_interval_max_seconds:
+		errors.append("Simon Says: Minimum stop interval must not exceed the maximum stop interval.")
+	if down_unlock_seconds > up_unlock_seconds:
+		errors.append("Simon Says: Down must unlock no later than Up so difficulty progresses from two to four poses.")
+	if up_unlock_seconds > round_duration_seconds:
+		errors.append("Simon Says: Up unlock must occur within the round duration.")
 	if auto_release_seconds < charge_decay_seconds:
 		errors.append("Simon Says: Auto release (%.2fs) must be at least charge decay (%.2fs) so the preview can fully unwind." % [auto_release_seconds, charge_decay_seconds])
 	return errors

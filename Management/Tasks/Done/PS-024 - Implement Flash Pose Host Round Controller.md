@@ -2,7 +2,7 @@
 id: PS-024
 title: "Implement Flash? Pose! host round controller"
 type: implementation
-status: backlog
+status: done
 release:
 owner: ai
 priority:
@@ -125,3 +125,20 @@ evidence separately from runtime/device/human evidence. Follow GitHub Flow and
 keep unrelated changes out of the pull request.
 
 # Outcome
+
+Completed on 2026-09-17. `FlashPoseRoundController` is owned by the existing
+minigame scene and implements the explicit countdown, dance, genuine-stop
+grace, resolve, flash-wait, results-wait, and lobby-return phases. It snapshots
+stable participants/seats, uses PS-013 for host-deadline pose truth, owns two
+lives/elimination/withdrawal/ranking, observes public registry state, and emits
+narrow semantic/presentation signals without implementing protocol, UI, audio,
+VFX, or navigation.
+
+The Simon Says preset exposes provisional countdown, duration, stop-range,
+difficulty-reduction, and two-to-four-direction unlock values. Deterministic
+tests inject style/target/interval sequences and cover deadline behavior,
+invalid input, exact-once life loss/elimination, disconnect/resume/leave,
+flash ordering/acknowledgement, timeout ranking, and the explicit one-player
+debug gate. Focused rule/tuning/scene tests and the Godot 4.7.2 editor-load check
+passed. No phone, full runtime, physical-device, accessibility, fairness, or
+human game-feel approval is claimed; those remain PS-025 through PS-029.

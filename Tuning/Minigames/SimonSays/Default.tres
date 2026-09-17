@@ -4,6 +4,13 @@
 
 [resource]
 script = ExtResource("1")
+countdown_seconds = 3.0
+round_duration_seconds = 60.0
+stop_interval_min_seconds = 4.0
+stop_interval_max_seconds = 7.0
+stop_interval_reduction_seconds = 0.25
+down_unlock_seconds = 15.0
+up_unlock_seconds = 30.0
 charge_fill_seconds = 1.0
 charge_decay_seconds = 0.28
 pose_reveal_delay_seconds = 0.0
