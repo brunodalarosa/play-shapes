@@ -1,5 +1,89 @@
 # Play Shapes development
 
+## PS-021 — curated runtime asset pipeline (2026-09-16)
+
+Runtime-ready Shape Character art now lives under
+`assets/runtime/shape_characters/`. The complete
+`assets/Kenney_Shape_Characters/` folder remains the immutable provenance and
+authoring archive, but its root `.gdignore` prevents Godot from importing it.
+Release exports also exclude that archive and the build-time manifest. Production
+`.gd`, `.tscn`, and `.tres` files must reference only the runtime root.
+
+`assets/runtime/shape_characters/manifest.json` is the source of truth. Its 21
+entries currently select four blue Double-resolution bodies, six blue
+Double-resolution hand poses, the PS-009 Double-resolution foot, six used face
+expressions, and four used environment pieces. Body, hand, and foot entries use
+`player_tint`; faces and environment art use `untinted`. Runtime files are exact
+copies rather than derived images, so the approved shaded source, alpha edges,
+pivots, horizontal mirroring, half-scale presentation, and tint shader remain
+unchanged. Standalone textures remain simpler than an atlas at this size.
+
+### Add, replace, or remove a sprite
+
+1. Put editable or supplied source art in its provenance-bearing source location.
+   Do not hand-edit a file under `assets/runtime/shape_characters/`.
+2. Add or update one manifest entry. Give it a unique stable name and runtime
+   path; record source path, role, `player_tint` or `untinted`, Double canonical
+   resolution, `copy` behavior, creator/license/source provenance, mirror policy,
+   and exact pixel dimensions. The manifest-wide `smooth_sprite` import policy
+   applies unless a future schema explicitly adds a reviewed exception. Only
+   shaded body/hand/foot art compatible with `player_tint.gdshader` may use
+   `player_tint`; faces stay untinted.
+3. Run `python tools/assets/runtime_asset_pipeline.py sync`. Open/import the
+   project once (or run the headless editor-load command below), then run `sync`
+   again so the committed `.import` sidecars receive the required lossless,
+   mipmapped, alpha-border-fixed, repeat-disabled settings. Import once more.
+4. Run `python tools/assets/runtime_asset_pipeline.py check`. It rejects missing
+   sources, duplicate names/paths, invalid policies, missing provenance, wrong
+   dimensions, stale copies, unexpected output files, incorrect import settings,
+   production archive references, or a missing import/export boundary.
+5. Migrate callers to the stable runtime path. For removal, delete the manifest
+   entry and its exact runtime `.png` and `.png.import`; `check` must pass before
+   committing. Never delete the provenance source merely because runtime stopped
+   using it.
+6. Run relevant scene/animation tests and a Compatibility-renderer comparison.
+   Export `PS-021 Validation Pack`, run the export-boundary check, and obtain
+   human visual approval whenever visible art, policy, or presentation changes.
+
+Commands from the Godot project root:
+
+```powershell
+python tools/assets/runtime_asset_pipeline.py sync
+godot --headless --editor --path . --quit-after 30
+python tools/assets/runtime_asset_pipeline.py sync
+godot --headless --editor --path . --quit-after 30
+python tools/assets/runtime_asset_pipeline.py check
+python -m unittest tests/runtime_asset_pipeline_test.py
+godot --headless --path . --export-pack "PS-021 Validation Pack" test-results/ps-021/curated.pck
+python tools/assets/runtime_asset_pipeline.py check-export --pack test-results/ps-021/curated.pck
+```
+
+### Measurements and evidence
+
+- Before: the archive held 435 files / 1,168,853 bytes, including 214 PNGs and
+  215 `.import` sidecars; the representative all-resource PCK was 2,192,572 bytes.
+  Production directly referenced 15 archive textures.
+- After: the manifest owns 21 PNGs / 35,025 bytes and 21 import sidecars. Godot
+  actively imports those 21 runtime PNGs and ignores the archive. The comparable
+  PCK is 895,316 bytes, saving 1,297,256 bytes (59.17%). The repository remains
+  intentionally larger because the complete source archive is preserved.
+- `[AUTO]` Manifest/schema, stale-copy, import-setting, forbidden-reference,
+  archive/atlas preservation, animation, expression, and foundation checks pass.
+  A second sync reports zero copies and zero sidecar changes.
+- `[EDITOR]` Godot 4.7.2 imports the 21 runtime textures and loads without new
+  resource or script failures. Existing MCP early-shutdown leak warnings remain.
+- `[GODOT-RUNTIME]` GL Compatibility on the RTX 5070 passed the existing rendered
+  tint/isolation/face checks (260 opaque face pixels unchanged) and regenerated
+  `art/character-feet/runtime-showcase.png` without a tracked pixel change.
+- `[EXPORTED-BUILD]` Direct pack inspection confirms runtime paths are present
+  and `assets/Kenney_Shape_Characters` is absent.
+- `[HUMAN-PLAY]` Visual approval for this migration is still pending. Do not mark
+  PS-021 done until the owner approves the rendered comparison.
+
+The original file-hash baseline now records the repository's enforced LF form of
+`License.txt`; its earlier CRLF hash could not pass in a checkout governed by the
+existing `eol=lf` attribute. No license text changed.
+
 ## PS-016-PS-020 - Dancer Simon Says visual and audio planning task set (2026-09-15)
 
 The planning layer now distinguishes three specialized task types in addition

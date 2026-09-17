@@ -1,10 +1,10 @@
 [gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://characters/shape_character.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/Kenney_Shape_Characters/PNG/Double/blue_body_circle.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/Kenney_Shape_Characters/PNG/Double/face_a.png" id="3"]
-[ext_resource type="Texture2D" path="res://assets/Kenney_Shape_Characters/PNG/Double/blue_hand_closed.png" id="4"]
-[ext_resource type="Texture2D" path="res://assets/Kenney_Shape_Characters/PNG/Double/blue_foot_round.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/bodies/circle.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/faces/neutral.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/hands/closed.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/feet/round.png" id="5"]
 
 [node name="ShapeCharacter" type="Node2D"]
 texture_filter = 4

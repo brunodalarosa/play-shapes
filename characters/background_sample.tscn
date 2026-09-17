@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=3]
 
-[ext_resource type="Texture2D" path="res://assets/Kenney_Shape_Characters/PNG/Double/tile_background_tree_small.png" id="1"]
-[ext_resource type="Texture2D" path="res://assets/Kenney_Shape_Characters/PNG/Double/tile_left.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/Kenney_Shape_Characters/PNG/Double/tile_center.png" id="3"]
-[ext_resource type="Texture2D" path="res://assets/Kenney_Shape_Characters/PNG/Double/tile_right.png" id="4"]
+[ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/environment/tree_small.png" id="1"]
+[ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/environment/floor_left.png" id="2"]
+[ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/environment/floor_center.png" id="3"]
+[ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/environment/floor_right.png" id="4"]
 
 [node name="BackgroundSample" type="Node2D"]
 texture_filter = 4

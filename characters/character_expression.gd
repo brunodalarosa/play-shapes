@@ -3,12 +3,12 @@ extends RefCounted
 ## Life-like face timing kept separate from pose charge and transform animation.
 
 const FACES: Dictionary = {
-	&"neutral": preload("res://assets/Kenney_Shape_Characters/PNG/Double/face_a.png"),
-	&"blink": preload("res://assets/Kenney_Shape_Characters/PNG/Double/face_l.png"),
-	&"delighted": preload("res://assets/Kenney_Shape_Characters/PNG/Double/face_c.png"),
-	&"cheeky": preload("res://assets/Kenney_Shape_Characters/PNG/Double/face_f.png"),
-	&"sad": preload("res://assets/Kenney_Shape_Characters/PNG/Double/face_b.png"),
-	&"worried": preload("res://assets/Kenney_Shape_Characters/PNG/Double/face_i.png"),
+	&"neutral": preload("res://assets/runtime/shape_characters/faces/neutral.png"),
+	&"blink": preload("res://assets/runtime/shape_characters/faces/blink.png"),
+	&"delighted": preload("res://assets/runtime/shape_characters/faces/delighted.png"),
+	&"cheeky": preload("res://assets/runtime/shape_characters/faces/cheeky.png"),
+	&"sad": preload("res://assets/runtime/shape_characters/faces/sad.png"),
+	&"worried": preload("res://assets/runtime/shape_characters/faces/worried.png"),
 }
 const EXPRESSION_DECK: Array[StringName] = [
 	&"delighted", &"cheeky", &"delighted", &"cheeky", &"sad", &"delighted", &"worried"

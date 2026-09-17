@@ -2,7 +2,7 @@
 id: PS-021
 title: Implement curated runtime asset pipeline
 type: implementation
-status: backlog
+status: in-progress
 release:
 owner: ai
 priority:
@@ -188,3 +188,24 @@ Read [[PS-021 - Implement Curated Runtime Asset Pipeline]], [[PS-009 - Create an
 
 # Outcome
 
+2026-09-16: implementation and technical validation are complete on
+`feat/ps-021-curated-runtime-assets`; human visual approval remains the only task
+acceptance step still pending, so the task is intentionally still `in-progress`.
+
+- Added a 21-entry JSON manifest and deterministic sync/check tool under the
+  documented `assets/runtime/shape_characters/` boundary. A second sync is a
+  no-op; focused negative tests cover duplicate names, unsupported tint policy,
+  and missing provenance.
+- Migrated every production, debug, and test consumer from the Kenney archive to
+  stable runtime paths. The check rejects future `.gd`, `.tscn`, or `.tres`
+  bypasses and validates exact copies, dimensions, import policy, and outputs.
+- Preserved the complete archive, added its Godot import boundary, and added a
+  release validation preset. Direct PCK inspection found runtime assets present
+  and no archival path. The comparable pack fell from 2,192,572 to 895,316 bytes
+  (1,297,256 bytes / 59.17% smaller).
+- Archive/atlas validation, pipeline tests, animation/expression/foundation
+  checks, Godot 4.7.2 editor import/load, and GL Compatibility renderer checks
+  pass. Renderer evidence confirms per-instance tint isolation, mirrored feet,
+  preserved faces, and unchanged presentation.
+- See [[DEVELOPMENT]] for the exact add/replace/remove workflow, measurements,
+  commands, evidence labels, and the corrected LF license-baseline caveat.

@@ -120,3 +120,12 @@ Record durable architectural, production, and game-design choices here so future
 - **Alternatives:** Keeping all asset and mockup work under generic design or implementation tasks was rejected because it hides human approval boundaries and asset provenance.
 - **Related tasks:** [[Task System]], [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]], [[PS-017 - Find Environment Assets for 001 - Dancer Simon Says]], [[PS-020 - Find Music and SFX for 001 - Dancer Simon Says]]
 - **Revisit:** When repeated work shows that ownership defaults, evidence, or additional specialized types should change.
+
+## DEC-014 — Manifest-owned runtime art boundary
+
+- **Date:** 2026-09-16
+- **Decision:** Preserve complete supplied and project-created source packs as provenance archives, but ship only manifest-selected, stable-path copies under `assets/runtime/`. Godot ignores source archives; release presets explicitly exclude them. Character bodies, hands, and feet retain shaded Double-resolution sources at half scale with runtime tinting, while faces remain untinted.
+- **Reason:** A small explicit runtime set prevents color/resolution variants and future authoring material from becoming accidental imports or release content without destructively rewriting the source archive.
+- **Alternatives:** Deleting redundant archive variants, converting art to grayscale, and generating an atlas without measured benefit were rejected.
+- **Related tasks:** [[PS-009 - Create and Import Character Feet Assets]], [[PS-012 - Implement Milestone 1 Character Animation System]], [[PS-021 - Implement Curated Runtime Asset Pipeline]]
+- **Revisit:** If measured packaging or runtime behavior justifies an atlas, or if a future asset family needs a different derivation policy.
