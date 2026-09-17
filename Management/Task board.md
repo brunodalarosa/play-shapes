@@ -47,7 +47,6 @@ views:
           - play-shapes/Management/Tasks/PS-028 - Validate Flash Pose Technical Loop.md
           - play-shapes/Management/Tasks/PS-029 - Validate Flash Pose on Two Phones and in Human Play.md
         in-progress:
-          - play-shapes/Management/Tasks/PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation.md
         done:
           - play-shapes/Management/Tasks/Done/PS-001 - Define the First Gameplay Milestone.md
           - play-shapes/Management/Tasks/Done/PS-002 - Validate Phase 1 on a Physical Phone.md
@@ -63,6 +62,7 @@ views:
           - play-shapes/Management/Tasks/Done/PS-014 - Implement Minimal Gameplay Debug Launcher.md
           - play-shapes/Management/Tasks/Done/PS-015 - Implement Shared Tuning Asset and Preset Workflow.md
           - play-shapes/Management/Tasks/Done/PS-016 - Create Wireframe for 001 - Dancer Simon Says.md
+          - play-shapes/Management/Tasks/Done/PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation.md
           - play-shapes/Management/Tasks/Done/PS-020 - Find Music and SFX for 001 - Dancer Simon Says.md
           - play-shapes/Management/Tasks/Done/PS-021 - Implement Curated Runtime Asset Pipeline.md
     columnColors:
@@ -96,7 +96,7 @@ views:
         - play-shapes/Management/Tasks/PS-013 - Implement Pose Charge and Evaluation Rules.md
         - play-shapes/Management/Tasks/PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says.md
         - play-shapes/Management/Tasks/PS-018 - Create the 001 - Dancer Simon Says Minigame Scene.md
-        - play-shapes/Management/Tasks/PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation.md
+        - play-shapes/Management/Tasks/Done/PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation.md
         - play-shapes/Management/Tasks/PS-023 - Prepare Flash Pose Runtime Music and SFX.md
         - play-shapes/Management/Tasks/PS-024 - Implement Flash Pose Host Round Controller.md
         - play-shapes/Management/Tasks/PS-025 - Implement Flash Pose Phone Protocol and Controller.md

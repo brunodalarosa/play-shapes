@@ -2,7 +2,7 @@
 id: PS-019
 title: "Plan the 001 - Flash? Pose! minigame implementation"
 type: design
-status: in-progress
+status: done
 release:
 owner: shared
 priority:
@@ -63,7 +63,7 @@ the project owner.
   `music playing -> stop and pose reveal -> grace/evaluation -> authoritative
   resolve -> one camera-flash SFX/VFX -> music resume`. A future fake stop emits
   none of the camera-flash cues.
-- Every known unresolved behavior is either answered as a proposed MVP rule,
+- Every known unresolved behavior is either answered as a confirmed MVP rule,
   retained as a named owner decision, or converted into a bounded follow-up
   task with an explicit dependency.
 - Each new implementation or validation task has its own scope, non-goals,
@@ -155,7 +155,7 @@ must not be able to create a flash by merely pausing music.
 | Lobby | `SessionHost` accepts new players. A host control starts normal play only with at least two registered players. | Lobby shows the player roster and an actionable `Start minigame` control. Phones remain in their joined state. |
 | Countdown | Snapshot the participating registered players, assign stable seats, choose one style/track for the round, and run the tunable countdown. Stop accepting new players. | The stage loads with the Flash? Pose! label and a visible countdown. No pose actions are accepted yet. |
 | Dance | Start the selected looping track and automatic animation. Choose the next stop from the host-owned random source and difficulty curve. | All characters dance; phones show a waiting/watch state. |
-| Genuine stop / grace | Pause the track, freeze and reveal the lead pose, reset the current stop's charge baseline, and accept validated press/release actions until the host deadline. | The lead pose and redundant direction cue are visible. Phones enable the currently unlocked color-and-icon controls. |
+| Genuine stop / grace | Pause the track, freeze and reveal the lead pose, preserve any active player hold/pose while the touch remains held, and accept validated press/release actions until the host deadline. | The lead pose and redundant direction cue are visible. Phones enable the currently unlocked color-and-icon controls. |
 | Resolve | At the host grace deadline, evaluate every non-withdrawn player using PS-013. Correct direction + full charge + held input succeeds. Apply one life loss for wrong, missing, incomplete, or released input; eliminate at zero. Ignore late or duplicate actions. | Shared characters receive semantic charge/reaction/elimination state. Each phone receives its own result/lives state. |
 | Flash | Emit exactly one `flash_requested` event after results are fixed. Wait for `flash_completed` before resuming music. | A brief bright shared-screen camera-flash effect and one matching SFX play; results remain readable and the flash cannot retrigger for the same stop. |
 | Next cycle or end | If more than one eligible player remains and the round timer has not expired, resume dance and schedule the next stop. Otherwise create the limited ranking snapshot. | The next dance begins only after the flash; or the result presentation appears. |
@@ -165,10 +165,11 @@ must not be able to create a flash by merely pausing music.
 The player substate is separate from the round phase: `active`, `eliminated`,
 or `withdrawn`. Preserve a player's seat and shared-screen slot throughout the
 round. An explicit `Leave` withdraws the player without a life loss and removes
-the record under PS-006. A transient disconnect leaves the player reconnecting
-and contributes no held input until resumed; the proposed MVP behavior is that
-missing input at a stop follows the normal no-input failure rule. Reconnection
-must not carry a stale press into a new stop.
+the record under PS-006. An uninterrupted touch hold may continue through a
+genuine stop: the character keeps the corresponding pose and the player does
+not need to release and re-press between stops. A transient disconnect clears
+that hold; the reconnecting player contributes no input until a new press, and
+missing input at a stop follows the normal no-input failure rule.
 
 # Genuine-Stop Contract
 
@@ -178,8 +179,9 @@ flash request. The implementation must make this sequence deterministic:
 
 1. Music is playing and the characters are dancing.
 2. The controller pauses/silences the music and tells the lead/player
-   animators to show the command semantics.
-3. The grace window accepts new or corrected direction holds.
+   animators to show the command semantics without forcibly releasing an
+   active player hold.
+3. The grace window accepts continuing, new, or corrected direction holds.
 4. The controller resolves all results at the host deadline.
 5. The controller emits one flash request; the presentation plays one flash
    SFX and one shared-screen VFX.
@@ -200,9 +202,11 @@ rhythmic stumble. A future fake-stop source must have no route to
   client-authored timestamp. The first version performs no latency compensation;
   revisit only after the two-phone check produces evidence.
 - Keep one PS-013 pose-charge instance per participating player. A genuine stop
-  starts from a fresh neutral baseline and requires a new press event; a held
-  control from the previous stop is not silently carried across the flash.
-  This is a proposed fairness rule pending owner approval.
+  does not clear an active direction, normalized charge, or held status, and it
+  does not require a new press event. While the player keeps touching the same
+  control, the character keeps holding that pose across the flash. Release and
+  direction-change behavior remains governed by PS-013; a disconnect clears the
+  hold and requires a new press after reconnect.
 - Start with two directions (`left`, `right`), add `down` at the first
   provisional unlock threshold, then add `up` at the second. The four canonical
   directions remain screen-relative and are shared by every dance style.
@@ -254,7 +258,7 @@ the owner promotes or replaces them only after playtesting.
 | Group | Values to expose | Owner of the behavior |
 | --- | --- | --- |
 | Gameplay/timing | pre-game countdown, total round duration, pose grace, initial stop interval min/max, difficulty reduction, and the two pose-unlock thresholds | Round controller and PS-013 |
-| Input/feedback | fresh-stop input baseline if it becomes a toggle, plus any player-facing feedback hold/release duration | Phone/controller and round presentation |
+| Input/feedback | held-pose persistence across genuine stops, plus player-facing feedback hold/release duration | Phone/controller and round presentation |
 | Audio/flash | music gain, flash SFX gain, flash peak intensity/duration, and any resume fade that proves necessary | Audio/presentation task; final loudness and feel remain human-owned |
 | Results | No automatic result timeout for the first proof; expose a duration only if a later approved behavior needs one | Results presentation |
 
@@ -342,20 +346,19 @@ stop event contract later, but it does not add a fake stop to Milestone 1.
 - [[PS-029 - Validate Flash Pose on Two Phones and in Human Play]] — owner-run
   physical-phone, accessibility, feel, and final approval evidence.
 
-# Open Questions for Owner Approval
+# Owner-Confirmed Decisions
 
-These are the few choices that materially change the player experience; they
-are not requests to specify obscure failure permutations.
+These choices were confirmed by the project owner on 2026-09-16.
 
-- **Fresh stop input:** approve or reject the proposed rule that a hold from a
-  previous stop is cleared at the flash and the next stop requires a new press.
-- **Temporary disconnect:** approve or change the proposed MVP rule that a
-  reconnecting player remains in the round, but no input at evaluation follows
-  the normal no-input life loss; an explicit Leave withdraws without a life
-  loss.
-- **Audio resume:** approve exact playback-position pause/resume for the first
-  proof, with loop-safe musical-boundary work deferred unless listening finds a
-  problem.
+- **Held pose:** an uninterrupted touch hold persists through a genuine stop;
+  the character keeps holding the pose and the player does not need to
+  release/re-press between stops.
+- **Temporary disconnect:** a reconnecting player remains in the round, but a
+  disconnected hold is not restored; missing input at evaluation loses a life.
+  An explicit Leave withdraws without a life loss.
+- **Audio resume:** pause and resume the same looping stream at its exact
+  playback position for the first proof. Loop-safe musical-boundary work is
+  deferred unless listening finds a problem.
 
 Final countdown, stop intervals, grace duration, flash intensity, audio gain,
 and other numeric values remain provisional tuning rather than plan blockers.
@@ -374,9 +377,10 @@ state-object framework, general event bus, simulated-player system, device
 farm, networking abstraction, or runtime tuning UI. Revisit those only if a
 measured implementation problem creates a concrete need.
 
-This task changes planning records only. No gameplay, audio, browser, editor,
-runtime, device, or human-play validation is claimed until the follow-up tasks
-produce it.
+The owner-confirmed decisions above close the planning questions without
+claiming implementation or player validation. No gameplay, audio, browser,
+editor, runtime, device, or human-play validation is claimed until the
+follow-up tasks produce it.
 
 # Draft Execution Prompt
 
@@ -386,7 +390,12 @@ and supplied asset paths. Refine this plan and its bounded follow-up tasks
 with the human project owner. Do not implement code, assets, fake stops, or
 browser behavior. Preserve blank priority/release fields, stable task IDs and
 links, host authority, the approved animation boundary, and separate evidence
-categories. Leave this task in progress until the owner approves the plan;
-only then should implementation tasks be treated as ready.
+categories. This planning task is complete after the owner confirmed the
+decisions above; implementation tasks remain separately scoped and must still
+be prioritized and executed in the stated order.
 
 # Outcome
+
+Owner confirmed the three implementation-policy choices on 2026-09-16. The
+decomposition and execution order are complete; implementation and all runtime,
+device, and human-play validation remain in PS-013 and PS-023 through PS-029.

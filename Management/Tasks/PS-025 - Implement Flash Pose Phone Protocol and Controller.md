@@ -28,7 +28,8 @@ while the host remains authoritative for timing, charge, lives, and outcomes.
 - Add host-to-browser state messages for minigame start/countdown, challenge
   start, per-player pose result/lives, exact elimination copy, results, and
   return-to-lobby. Send a current snapshot after a valid reconnect without
-  restoring a stale held pointer.
+  restoring a held pointer lost by disconnect; an uninterrupted pointer may
+  remain held across a genuine stop.
 - Keep transport handshake `protocol: 1` and the existing hello/join/leave/
   reconnect behavior. New players remain lobby-only; existing players may
   resume but cannot join a new place in the middle of a round.
@@ -69,8 +70,9 @@ while the host remains authoritative for timing, charge, lives, and outcomes.
   four-input grid, result/lives feedback, the exact text `You've been
   eliminated :(` when eliminated, and a lobby state after return.
 - Reconnect receives a current snapshot, preserves the host-owned player
-  identity, clears stale local pointer state, and does not resume a held input
-  across a stop or disconnect.
+  identity, clears local pointer state lost by disconnect, and does not invent
+  or resume a held input after reconnect. An uninterrupted pointer remains
+  held across a genuine stop and continues to drive the character pose.
 - Existing hello/join/leave/reconnect tests remain green, TypeScript builds and
   checks, and focused browser/host tests cover at least ten simulated clients.
 - Host protocol and browser automated evidence is labeled `[AUTO]` or
@@ -90,9 +92,9 @@ press feedback, but only host results change the authoritative lives display.
 
 # Open Questions
 
-- Human two-phone review must decide whether the proposed fresh-stop reset and
-  reconnect behavior feels fair; do not add latency compensation based only on
-  desktop tests.
+- Human two-phone review should assess whether persistent holds and the
+  confirmed reconnect behavior feel fair; do not add latency compensation
+  based only on desktop tests.
 - If a device/browser exposes a touch-capture limitation, record the named
   device and create a focused compatibility follow-up rather than adding a
   broad input abstraction.

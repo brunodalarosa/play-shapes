@@ -73,8 +73,6 @@ experience is confusing, tiring, inaccessible, or not fun.
 
 - Which provisional timing, flash, audio, and accessibility adjustments should
   become the next named experiment after the first playthrough?
-- Does the owner approve the proposed fresh-stop reset and temporary
-  disconnect behavior, or should a bounded follow-up change them?
 
 # Notes / Findings
 

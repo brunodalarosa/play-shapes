@@ -129,3 +129,21 @@ Record durable architectural, production, and game-design choices here so future
 - **Alternatives:** Deleting redundant archive variants, converting art to grayscale, and generating an atlas without measured benefit were rejected.
 - **Related tasks:** [[PS-009 - Create and Import Character Feet Assets]], [[PS-012 - Implement Milestone 1 Character Animation System]], [[PS-021 - Implement Curated Runtime Asset Pipeline]]
 - **Revisit:** If measured packaging or runtime behavior justifies an atlas, or if a future asset family needs a different derivation policy.
+
+## DEC-015 — Flash Pose held-pose and reconnect behavior
+
+- **Date:** 2026-09-16
+- **Decision:** During a genuine Flash? Pose! stop, an uninterrupted phone touch hold persists. The character keeps holding the corresponding pose and the player does not need to release/re-press between stops. A disconnect clears the hold; the reconnecting player remains in the round but missing input at evaluation loses a life. Explicit Leave withdraws without a life loss.
+- **Reason:** The touch hold is the player's direct command to keep the character in the pose; forcing a release at every flash would contradict that interaction. Disconnect recovery must not fabricate input that the host did not receive.
+- **Alternatives:** Clearing every hold at the flash and restoring held input after reconnect were rejected for the first proof.
+- **Related tasks:** [[PS-013 - Implement Pose Charge and Evaluation Rules]], [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]], [[PS-024 - Implement Flash Pose Host Round Controller]], [[PS-025 - Implement Flash Pose Phone Protocol and Controller]], [[PS-029 - Validate Flash Pose on Two Phones and in Human Play]]
+- **Revisit:** If physical-phone play exposes an unfair or unusable hold/reconnect interaction.
+
+## DEC-016 — Flash Pose exact-position music resume
+
+- **Date:** 2026-09-16
+- **Decision:** The first Flash? Pose! implementation pauses the selected looping music stream at the genuine stop and resumes that same stream at its exact playback position after the single camera flash completes.
+- **Reason:** Exact-position pause/resume keeps the first implementation deterministic and avoids adding beat-quantized scheduling before listening evidence shows it is needed.
+- **Alternatives:** Restarting the track or adding loop-safe musical-boundary scheduling was deferred.
+- **Related tasks:** [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]], [[PS-023 - Prepare Flash Pose Runtime Music and SFX]], [[PS-026 - Implement Flash Pose Shared Screen Feedback and Results]], [[PS-029 - Validate Flash Pose on Two Phones and in Human Play]]
+- **Revisit:** If human listening finds a click, rhythmic stumble, or unacceptable resume feel.

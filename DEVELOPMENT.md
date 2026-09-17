@@ -9,7 +9,8 @@ dependencies continue to use `depends_on: []`.
 
 ## PS-019 — Flash? Pose! implementation plan (2026-09-16)
 
-PS-019 is in progress while the owner reviews the implementation decomposition.
+PS-019 is complete; the owner confirmed the implementation decomposition and
+the three gameplay-policy choices below.
 The current checkout contains the persistent `SessionHost`/`PlayerRegistry`,
 the hello/join/leave WebSocket boundary, the editor-first tuning resources,
 the approved semantic character animator, the F12 launcher, and the supplied
@@ -17,7 +18,7 @@ runtime music/flash candidates. It does not yet contain a gameplay scene,
 gameplay protocol, host start control, round coordinator, shared-screen results
 presentation, or phone pose controls.
 
-The proposed sequence is: human-confirmed PS-017 environment assets; PS-013
+The execution sequence is: human-confirmed PS-017 environment assets; PS-013
 pose rules and PS-018 editor-visible stage; PS-023 audio preparation; PS-024
 host round controller; PS-025 phone protocol/controller; PS-026 shared-screen
 feedback/audio/flash/results (with PS-025 able to proceed in parallel); PS-027
@@ -36,12 +37,12 @@ facing name is **Flash? Pose!**; the reserved internal scene path and existing
 `SimonSaysTuning` identifiers remain stable unless a real compatibility need
 justifies a migration.
 
-The proposed MVP rules still awaiting owner confirmation are clearing a held
-phone input at each new genuine stop, treating a reconnecting player's missing
-input as the normal no-input failure while an explicit Leave withdraws without
-a life loss, and pausing/resuming the same music position around the flash.
+The owner confirmed that an uninterrupted phone hold persists through a genuine
+stop and keeps the character holding its pose; a disconnect clears the hold,
+missing input loses a life, and explicit Leave withdraws without a life loss.
+The owner also confirmed exact playback-position pause/resume around the flash.
 Numeric timing, flash intensity, audio gain, accessibility, fairness, and fun
-remain human-play decisions. This planning session changed documentation only;
+remain human-play decisions. This planning update changed documentation only;
 no gameplay, editor/runtime, browser, device, or human-play validation was run.
 
 ## PS-021 — curated runtime asset pipeline (2026-09-16)

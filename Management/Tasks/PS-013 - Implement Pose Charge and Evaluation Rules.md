@@ -30,8 +30,10 @@ rules to character animation frames.
   instant reset. Re-pressing the same direction continues from the drained value,
   allowing rapid taps to accumulate less efficiently than holding.
 - Let players begin or correct their direction during the grace window following
-  a genuine music stop. Each stop receives a fresh neutral baseline; a stale
-  hold from an earlier stop is not evaluated for the new stop.
+  a genuine music stop. An uninterrupted hold may continue through the stop;
+  do not force a release or require a new press for the character to keep
+  holding that pose. A disconnect clears the hold and requires a new press
+  after reconnect.
 - At the authoritative evaluation instant, succeed only when direction matches,
   charge is 1, and that direction remains held. Treat changes after the grace
   window/evaluation as failure for that stop rather than retroactive correction.
@@ -47,7 +49,7 @@ rules to character animation frames.
   boundary.
 - Treat an explicit player Leave as withdrawal outside pose evaluation. A
   temporary reconnecting player has no held input until a valid resume and new
-  press; the proposed MVP consequence for missing input is the normal failure
+  press; the confirmed MVP consequence for missing input is the normal failure
   rule.
 - Add deterministic tests for holds, releases, taps, direction changes, boundary
   timestamps, full charge, grace timing, and late/invalid input.
@@ -72,9 +74,11 @@ rules to character animation frames.
 - Direction changes reset charge; releasing drains rather than resets; same-
   direction repress continues from the remaining value; fast tapping can build
   charge but is less effective than holding.
-- Each genuine stop starts neutral. Evaluation requires correct direction,
-  charge 1, and held input at the grace deadline. Corrections before that
-  deadline are accepted; late changes are not.
+- Each genuine stop preserves an uninterrupted direction, charge, and held
+  state. Evaluation requires correct direction, charge 1, and held input at
+  the grace deadline. Corrections before that deadline are accepted; late
+  changes are not. A disconnected player with no new hold follows the normal
+  no-input failure rule.
 - Default configuration supports a 1-second fill and an illustrative 1.2-second
   maximum-difficulty grace period, while all feel values remain human-tweakable
   and clearly documented as provisional.
@@ -93,8 +97,9 @@ rules to character animation frames.
 
 PS-013 owns semantic charge and evaluation only. It returns data/signals to the
 round controller; it does not know browser packet shapes, player-facing copy,
-audio, or scene presentation. The controller resets the charge baseline at a
-genuine stop and supplies the current host deadline.
+audio, or scene presentation. The controller preserves an uninterrupted hold
+and supplies the current host deadline; a disconnect clears held state before
+the player can submit a new press.
 
 # Game Feel / Player Experience
 
@@ -105,14 +110,12 @@ final balance values.
 
 # Open Questions
 
-- The owner must confirm the fresh-stop baseline and temporary disconnect rule
-  proposed by [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]] before this task is treated as ready.
 - Final difficulty, decay, and grace values remain provisional until human
   two-phone playtesting. Revisit latency compensation only if that test gives
   concrete evidence that host-receipt timing is unfair.
 
 # Draft Execution Prompt
 
-Read this task, [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]], [[PS-010 - Explore Character Animation Strategy]], [[PS-012 - Implement Milestone 1 Character Animation System]], [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-006 - Implement Player Join and Host-Owned Registry]], [[001 - Dancer simon says]], [[Decision Log]], and [[DEVELOPMENT]]. Inspect the current pose-charge class, host protocol boundary, and gameplay plan before editing. Implement deterministic host-authoritative normalized charge and grace-window evaluation with explicit host-time and sequence behavior. Preserve correction during grace, fast nonzero decay after release, same-direction repress continuity, reset on direction change and at each new stop, and the three-part success condition. Feed semantic state to animation without reading visual frames. Return authoritative result/elimination data without parsing packets or sending browser copy. Add boundary-heavy automated tests, document tunables and caveats in `DEVELOPMENT.md`, and keep networking, round orchestration, human feel, and physical-phone validation distinct. Follow GitHub Flow and open a pull request; keep broader minigame presentation outside this task.
+Read this task, [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]], [[PS-010 - Explore Character Animation Strategy]], [[PS-012 - Implement Milestone 1 Character Animation System]], [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-006 - Implement Player Join and Host-Owned Registry]], [[001 - Dancer simon says]], [[Decision Log]], and [[DEVELOPMENT]]. Inspect the current pose-charge class, host protocol boundary, and gameplay plan before editing. Implement deterministic host-authoritative normalized charge and grace-window evaluation with explicit host-time and sequence behavior. Preserve correction during grace, fast nonzero decay after release, same-direction repress continuity, uninterrupted holds across genuine stops, reset on direction change or disconnect, and the three-part success condition. Feed semantic state to animation without reading visual frames. Return authoritative result/elimination data without parsing packets or sending browser copy. Add boundary-heavy automated tests, document tunables and caveats in `DEVELOPMENT.md`, and keep networking, round orchestration, human feel, and physical-phone validation distinct. Follow GitHub Flow and open a pull request; keep broader minigame presentation outside this task.
 
 # Outcome

@@ -37,9 +37,9 @@ shared-screen presentation outside this controller.
   The controller must reject unknown players, unknown directions, wrong
   phases, duplicate/out-of-order sequences, and late input without mutating a
   resolved stop.
-- Reset each stop's pose-charge baseline, run PS-013 at the host grace
-  deadline, apply the three-part success rule, deduct one life for every
-  failure, and mark a player eliminated at zero lives.
+- Preserve each uninterrupted stop's direction, charge, and held state, run
+  PS-013 at the host grace deadline, apply the three-part success rule, deduct
+  one life for every failure, and mark a player eliminated at zero lives.
 - Observe registry changes without owning identity: explicit Leave withdraws a
   player without a life loss; a reconnecting player remains represented but
   has no held input until a valid resume and new press.
@@ -72,9 +72,9 @@ shared-screen presentation outside this controller.
 - Host time is the only authority for countdown, round timeout, stop deadline,
   and input lateness. A deterministic test proves an input at the deadline is
   handled consistently and an input after it cannot change the result.
-- Each genuine stop resets its charge baseline, resolves correct direction +
-  full charge + held input, applies exactly one life loss per failure, and
-  eliminates at zero lives without reading animation frames.
+- Each genuine stop preserves an uninterrupted hold and resolves correct
+  direction + full charge + held input, applies exactly one life loss per
+  failure, and eliminates at zero lives without reading animation frames.
 - Explicit Leave withdraws a player without a life loss; a temporary
   reconnecting state does not invent a held input or a new player identity.
 - The controller emits results before one `flash_requested` event and cannot
@@ -99,8 +99,6 @@ to the named tuning workflow and human play.
 
 # Open Questions
 
-- The owner must confirm the proposed fresh-stop reset and temporary
-  disconnect behavior in [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]] before this task is treated as ready.
 - If playtesting shows the no-latency-compensation rule is unfair, create a
   focused networking/timing task rather than expanding this controller.
 

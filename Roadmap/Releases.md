@@ -24,8 +24,8 @@ A release is a meaningful playable proof, not a sprint. The human project owner 
 
 ## Milestone 1 — Simon Says Gameplay Proof
 
-**State:** Scoped and approved; the PS-019 implementation decomposition is
-drafted and awaits owner approval before implementation is assigned.
+**State:** Scoped and approved; the PS-019 implementation decomposition and
+owner-confirmed gameplay policies are complete.
 
 **What this release proves:** A group can move from the local lobby through one complete, readable, phone-controlled minigame and return to the lobby, demonstrating the first coherent Play Shapes gameplay loop.
 

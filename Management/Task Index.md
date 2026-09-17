@@ -10,8 +10,8 @@ the human has assigned them.
 
 ## In Progress
 
-- [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]] — shared
-  planning; task decomposition and owner decisions are being refined
+- None. The first minigame plan is complete; implementation remains separately
+  scoped in the backlog below.
 
 ## Blocked
 
@@ -44,6 +44,8 @@ the human has assigned them.
 
 ## Recently completed
 
+- [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]] —
+  approved implementation decomposition and owner-confirmed gameplay policies
 - [[PS-020 - Find Music and SFX for 001 - Dancer Simon Says]] — candidate music
   and flash SFX set is present in the repository
 - [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]] — approved shared
@@ -76,6 +78,5 @@ the human has assigned them.
 ## Done
 
 All completed task notes live under `Management/Tasks/Done/`; the list above is
-the concise retrieval view. The only active planning record for the first
-minigame is PS-019, which remains in progress until the owner approves its
-decomposition.
+the concise retrieval view. The first minigame implementation is now ready to
+proceed through its separately scoped backlog tasks.

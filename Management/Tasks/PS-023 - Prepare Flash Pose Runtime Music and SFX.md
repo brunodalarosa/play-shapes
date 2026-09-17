@@ -71,9 +71,9 @@ without overpowering speech or teaching players that a fake stop is real.
 
 # Open Questions
 
-- If loop metadata is incomplete, should the first proof pause/resume the
-  stream at its current position or use a documented restart point? The plan
-  recommends pause/resume; listening may reopen this.
+- The first proof uses exact-position pause/resume. If loop metadata is
+  incomplete, record the technical caveat and keep any restart-point change as
+  a focused follow-up rather than changing the approved first-proof behavior.
 - Which of the two flash candidates best survives repeated genuine stops? The
   implementation may keep both as named candidates until the owner listens.
 
