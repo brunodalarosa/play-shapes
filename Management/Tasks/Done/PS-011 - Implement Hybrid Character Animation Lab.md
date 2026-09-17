@@ -7,8 +7,8 @@ release: Milestone 1
 owner: ai
 priority:
 depends_on:
-  - PS-014
-  - PS-010
+  - "[[PS-014 - Implement Minimal Gameplay Debug Launcher]]"
+  - "[[PS-010 - Explore Character Animation Strategy]]"
 ---
 
 # Goal

@@ -7,7 +7,7 @@ release:
 owner: ai
 priority:
 depends_on:
-  - PS-003
+  - "[[PS-003 - Define Join Identity and Reconnection UX]]"
 ---
 
 # Goal

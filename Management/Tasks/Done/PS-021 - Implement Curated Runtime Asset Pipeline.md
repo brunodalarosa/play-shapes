@@ -7,8 +7,8 @@ release:
 owner: ai
 priority:
 depends_on:
-  - PS-009
-  - PS-012
+  - "[[PS-009 - Create and Import Character Feet Assets]]"
+  - "[[PS-012 - Implement Milestone 1 Character Animation System]]"
 ---
 
 # Goal

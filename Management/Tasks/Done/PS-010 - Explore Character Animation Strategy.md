@@ -7,7 +7,7 @@ release: Milestone 1
 owner: shared
 priority:
 depends_on:
-  - PS-009
+  - "[[PS-009 - Create and Import Character Feet Assets]]"
 ---
 
 # Goal

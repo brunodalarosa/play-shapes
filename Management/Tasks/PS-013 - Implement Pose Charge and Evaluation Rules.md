@@ -7,11 +7,11 @@ release: Milestone 1
 owner: ai
 priority:
 depends_on:
-  - PS-004
-  - PS-015
-  - PS-006
-  - PS-012
-  - PS-019
+  - "[[PS-004 - Define the Game-Feel Tuning Strategy]]"
+  - "[[PS-015 - Implement Shared Tuning Asset and Preset Workflow]]"
+  - "[[PS-006 - Implement Player Join and Host-Owned Registry]]"
+  - "[[PS-012 - Implement Milestone 1 Character Animation System]]"
+  - "[[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]]"
 ---
 
 # Goal

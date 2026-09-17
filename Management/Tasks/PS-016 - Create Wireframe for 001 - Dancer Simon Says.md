@@ -2,7 +2,7 @@
 id: PS-016
 title: Create wireframe for 001 - Dancer Simon Says minigame
 type: wireframes-and-art-mockups
-status: backlog
+status: done
 release:
 owner: human
 priority:

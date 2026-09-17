@@ -7,9 +7,9 @@ release:
 owner: ai
 priority:
 depends_on:
-  - PS-016
-  - PS-017
-  - PS-019
+  - "[[PS-016 - Create Wireframe for 001 - Dancer Simon Says]]"
+  - "[[PS-017 - Find Environment Assets for 001 - Dancer Simon Says]]"
+  - "[[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]]"
 ---
 
 # Goal

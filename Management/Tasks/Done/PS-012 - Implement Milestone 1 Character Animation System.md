@@ -7,9 +7,9 @@ release: Milestone 1
 owner: ai
 priority:
 depends_on:
-  - PS-004
-  - PS-015
-  - PS-011
+  - "[[PS-004 - Define the Game-Feel Tuning Strategy]]"
+  - "[[PS-015 - Implement Shared Tuning Asset and Preset Workflow]]"
+  - "[[PS-011 - Implement Hybrid Character Animation Lab]]"
 ---
 
 # Goal

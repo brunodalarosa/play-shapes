@@ -1,5 +1,12 @@
 # Play Shapes development
 
+## Task dependency links (2026-09-16)
+
+All non-empty `depends_on` properties now store exact Obsidian wikilinks to
+their task notes instead of plain task IDs. This lets Bases filters resolve each
+dependency as a file and inspect its `status` property. Tasks with no
+dependencies continue to use `depends_on: []`.
+
 ## PS-021 — curated runtime asset pipeline (2026-09-16)
 
 Runtime-ready Shape Character art now lives under

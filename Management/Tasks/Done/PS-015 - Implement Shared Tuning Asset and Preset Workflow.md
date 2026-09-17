@@ -7,7 +7,7 @@ release:
 owner: ai
 priority:
 depends_on:
-  - PS-004
+  - "[[PS-004 - Define the Game-Feel Tuning Strategy]]"
 ---
 
 # Goal

@@ -7,7 +7,7 @@ release: Milestone 1
 owner: ai
 priority:
 depends_on:
-  - PS-007
+  - "[[PS-007 - Define the Gameplay Debug Suite]]"
 ---
 
 # Goal
