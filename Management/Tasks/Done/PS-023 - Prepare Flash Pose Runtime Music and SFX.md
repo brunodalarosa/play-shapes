@@ -2,7 +2,7 @@
 id: PS-023
 title: "Prepare Flash? Pose! runtime music and SFX"
 type: asset-rework
-status: backlog
+status: done
 release:
 owner: ai
 priority:
@@ -95,3 +95,22 @@ the development notes with exact paths and separate technical from human
 evidence.
 
 # Outcome
+
+Completed on 2026-09-17. The five supplied Ogg Vorbis files remain byte-for-byte
+unchanged. `assets/runtime/audio/flash_pose_audio_catalog.gd` is the stable load
+boundary: `bounce` maps to Bouncing music, `swing` to Swinging music, and `disco`
+to Wacky music; both flash sounds remain ordered candidates. The three music
+imports loop from the file boundary, while both flash sounds remain one-shot.
+
+`assets/runtime/audio/flash_pose_audio_manifest.json` records SHA-256 hashes,
+duration, 44.1 kHz stereo format, intended cues, and Kenney/CC0 provenance. The
+files' Windows download metadata points to `Kenney Game Assets All-in-1 3.7.0.zip`;
+that local archive was no longer available for inspection, so the exact original
+sub-pack is a recorded provenance caveat rather than an invented claim. Kenney's
+official support page confirms CC0 permission for assets on its asset pages.
+
+Automated container/hash/import checks, a Godot resource/load check, and an
+editor-load check passed. No processing, normalization, playback manager,
+gameplay, fake-stop behavior, or subjective audio choice was added. File-boundary
+loop seam quality, exact-position pause/resume sound, loudness, and the preferred
+flash candidate remain human listening/playtest gates in PS-029.

@@ -12,7 +12,7 @@ dest_files=["res://.godot/imported/Wacky_music.ogg-00113a50012c334a3bf1779876788
 
 [params]
 
-loop=false
+loop=true
 loop_offset=0
 bpm=0
 beat_count=0

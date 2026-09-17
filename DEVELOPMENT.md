@@ -1,5 +1,43 @@
 # Play Shapes development
 
+## PS-023 — Flash? Pose! runtime music and SFX (2026-09-17)
+
+The supplied audio is consumed directly and remains byte-for-byte unchanged.
+`assets/runtime/audio/flash_pose_audio_catalog.gd` is the stable runtime load
+boundary: `bounce` uses `Bouncing_music.ogg`, `swing` uses
+`Swinging_music.ogg`, and `disco` uses `Wacky_music.ogg`. Its ordered flash list
+keeps `flash_1.ogg` and `flash_2.ogg` as candidates; later presentation code may
+choose deterministically or from a seeded source. Do not select a subjective
+winner until the PS-029 listening/playtest gate.
+
+The three BGM `.import` files enable looping at offset zero. Both flash imports
+remain one-shot. DEC-016 still requires gameplay to pause the selected player,
+remember its exact playback position, and resume that same stream only after a
+resolved genuine-stop flash completes. Neither a music pause nor future fake
+stop may trigger flash audio. These files have no authored musical loop-point
+metadata, so looping wraps at the file boundary; seam quality and pause/resume
+clicks remain human-listening evidence, not an automated claim.
+
+`assets/runtime/audio/flash_pose_audio_manifest.json` records each file's hash,
+Ogg Vorbis format, duration, 44.1 kHz stereo metadata, intended cue, import
+behavior, and provenance. Each supplied file's Windows `Zone.Identifier` names
+`Kenney Game Assets All-in-1 3.7.0.zip` as its referrer. That local archive was
+not present during PS-023, so the exact originating Kenney sub-pack is unknown
+and recorded as a provenance caveat. Kenney's official support page confirms
+that assets on its asset pages are CC0, permitting commercial use and
+redistribution without required attribution. Keep the manifest with the files;
+do not extend that provenance claim to unrelated assets.
+
+No conversion, trimming, loudness normalization, or derived audio was needed.
+`python -m unittest tests.flash_pose_audio_metadata_test` passed, covering Ogg
+headers, durations, hashes, and import metadata. The Godot script
+`res://tests/flash_pose_audio_assets_test.gd` passed, loading three correctly
+mapped looping streams and two ordered one-shot SFX. Godot 4.7.2 completed a
+headless editor load with no script/import failure; its known forced-shutdown
+resource-cleanup warnings remained. These are technical checks only. Final
+loudness, loop feel, pause/resume feel, flash choice, speech masking, and
+gameplay approval remain explicitly unverified until PS-029.
+
 ## PS-013 — host-authoritative pose charge and evaluation (2026-09-17)
 
 `host/pose_evaluation_rules.gd` is the scene-independent rules boundary for
