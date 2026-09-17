@@ -36,7 +36,6 @@ views:
       note.status:
         backlog:
           - play-shapes/Management/Tasks/PS-008 - Design Fake Music Stops.md
-          - play-shapes/Management/Tasks/PS-013 - Implement Pose Charge and Evaluation Rules.md
           - play-shapes/Management/Tasks/PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says.md
           - play-shapes/Management/Tasks/PS-018 - Create the 001 - Dancer Simon Says Minigame Scene.md
           - play-shapes/Management/Tasks/PS-023 - Prepare Flash Pose Runtime Music and SFX.md
@@ -59,6 +58,7 @@ views:
           - play-shapes/Management/Tasks/Done/PS-010 - Explore Character Animation Strategy.md
           - play-shapes/Management/Tasks/Done/PS-011 - Implement Hybrid Character Animation Lab.md
           - play-shapes/Management/Tasks/Done/PS-012 - Implement Milestone 1 Character Animation System.md
+          - play-shapes/Management/Tasks/Done/PS-013 - Implement Pose Charge and Evaluation Rules.md
           - play-shapes/Management/Tasks/Done/PS-014 - Implement Minimal Gameplay Debug Launcher.md
           - play-shapes/Management/Tasks/Done/PS-015 - Implement Shared Tuning Asset and Preset Workflow.md
           - play-shapes/Management/Tasks/Done/PS-016 - Create Wireframe for 001 - Dancer Simon Says.md
@@ -93,7 +93,7 @@ views:
         - play-shapes/Management/Tasks/Done/PS-020 - Find Music and SFX for 001 - Dancer Simon Says.md
         - play-shapes/Management/Tasks/Done/PS-021 - Implement Curated Runtime Asset Pipeline.md
         - play-shapes/Management/Tasks/PS-008 - Design Fake Music Stops.md
-        - play-shapes/Management/Tasks/PS-013 - Implement Pose Charge and Evaluation Rules.md
+        - play-shapes/Management/Tasks/Done/PS-013 - Implement Pose Charge and Evaluation Rules.md
         - play-shapes/Management/Tasks/PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says.md
         - play-shapes/Management/Tasks/PS-018 - Create the 001 - Dancer Simon Says Minigame Scene.md
         - play-shapes/Management/Tasks/Done/PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation.md

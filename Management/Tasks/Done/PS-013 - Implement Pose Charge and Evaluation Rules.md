@@ -2,7 +2,7 @@
 id: PS-013
 title: Implement pose charge and evaluation rules
 type: implementation
-status: backlog
+status: done
 release: Milestone 1
 owner: ai
 priority:
@@ -119,3 +119,17 @@ final balance values.
 Read this task, [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]], [[PS-010 - Explore Character Animation Strategy]], [[PS-012 - Implement Milestone 1 Character Animation System]], [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-006 - Implement Player Join and Host-Owned Registry]], [[001 - Dancer simon says]], [[Decision Log]], and [[DEVELOPMENT]]. Inspect the current pose-charge class, host protocol boundary, and gameplay plan before editing. Implement deterministic host-authoritative normalized charge and grace-window evaluation with explicit host-time and sequence behavior. Preserve correction during grace, fast nonzero decay after release, same-direction repress continuity, uninterrupted holds across genuine stops, reset on direction change or disconnect, and the three-part success condition. Feed semantic state to animation without reading visual frames. Return authoritative result/elimination data without parsing packets or sending browser copy. Add boundary-heavy automated tests, document tunables and caveats in `DEVELOPMENT.md`, and keep networking, round orchestration, human feel, and physical-phone validation distinct. Follow GitHub Flow and open a pull request; keep broader minigame presentation outside this task.
 
 # Outcome
+
+Implemented on 2026-09-17 in `host/pose_evaluation_rules.gd` with the existing
+`PoseCharge` as the per-player fill/decay primitive. The host rules layer now
+owns monotonic receipt time, input ordering, genuine-stop deadlines, immutable
+evaluation results, disconnect/withdrawal behavior, semantic animation output,
+and explicit elimination records without taking over lives, packets, phone copy,
+or round orchestration.
+
+The shared Simon Says preset exposes the provisional 1.0-second fill,
+0.28-second decay, immediate reveal, and 1.2-second grace/evaluation
+relationship. Focused automated rules, existing pose-charge, tuning-preset, and
+normal-profile Godot editor-load checks passed. Runtime round/protocol wiring,
+physical-phone validation, and human game-feel approval remain explicitly
+unclaimed for PS-024, PS-025, PS-028, and PS-029.

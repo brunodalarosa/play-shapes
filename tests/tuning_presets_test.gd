@@ -10,7 +10,8 @@ func _initialize() -> void:
 
 func _run() -> void:
 	if not _check_tooltip_contract("res://Tuning/Minigames/simon_says_tuning.gd", [
-		"charge_fill_seconds", "charge_decay_seconds", "dance_beats_per_second",
+		"charge_fill_seconds", "charge_decay_seconds", "pose_reveal_delay_seconds",
+		"pose_grace_seconds", "dance_beats_per_second",
 		"body_bounce", "body_jiggle_degrees", "body_sway", "visual_follow_speed",
 		"secondary_motion_strength", "lead_emphasis", "reaction_seconds", "result_cycle_seconds",
 		"pose_flow_hold_seconds",
@@ -44,6 +45,11 @@ func _run() -> void:
 	if not _check(simon.charge_fill_seconds == 0.1 and simon.body_bounce == 16.0, "Simon Says individual values clamp to safe ranges"):
 		return
 	simon.charge_decay_seconds = 1.0
+	simon.pose_reveal_delay_seconds = 99.0
+	simon.pose_grace_seconds = -1.0
+	if not _check(simon.pose_reveal_delay_seconds == 0.5 and simon.pose_grace_seconds == 0.2,
+		"Pose reveal and grace values clamp to documented safe ranges"):
+		return
 	simon.auto_release_seconds = 0.1
 	if not _check(simon.validation_errors()[0].contains("Auto release"), "Simon Says invalid combinations report an actionable message"):
 		return

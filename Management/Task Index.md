@@ -20,8 +20,6 @@ the human has assigned them.
 
 - [[PS-008 - Design Fake Music Stops]] — later shared design; excluded from
   Milestone 1
-- [[PS-013 - Implement Pose Charge and Evaluation Rules]] — AI implementation;
-  host-authoritative charge/evaluation
 - [[PS-023 - Prepare Flash Pose Runtime Music and SFX]] — AI asset rework;
   depends on PS-019 and PS-020
 - [[PS-024 - Implement Flash Pose Host Round Controller]] — AI implementation;
@@ -39,6 +37,9 @@ the human has assigned them.
 
 ## Recently completed
 
+- [[PS-013 - Implement Pose Charge and Evaluation Rules]] — host-authoritative
+  charge, monotonic grace/deadline evaluation, semantic animation state, and
+  result/elimination records
 - [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]] — approved
   editor-visible stage with one lead, ten stable center-out seats, and the
   selected Milestone 1 environment art
