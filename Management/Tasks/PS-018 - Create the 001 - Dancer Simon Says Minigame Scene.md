@@ -8,7 +8,7 @@ owner: ai
 priority:
 depends_on:
   - "[[PS-016 - Create Wireframe for 001 - Dancer Simon Says]]"
-  - "[[PS-017 - Find Environment Assets for 001 - Dancer Simon Says]]"
+  - "[[PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says]]"
   - "[[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]]"
 ---
 
@@ -90,7 +90,7 @@ additional implementation tasks before this scene is executed.
 # Draft Execution Prompt
 
 Read this task, [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]],
-[[PS-017 - Find Environment Assets for 001 - Dancer Simon Says]], [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]], [[001 - Dancer simon says]], [[PS-012 - Implement Milestone 1 Character Animation System]],
+[[PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says]], [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]], [[001 - Dancer simon says]], [[PS-012 - Implement Milestone 1 Character Animation System]],
 [[PS-014 - Implement Minimal Gameplay Debug Launcher]], [[PS-005 - Define Multi-Phone and Agent Validation Strategy]], [[Project Overview]], [[Decision Log]], and [[DEVELOPMENT]] first. Inspect the existing scene, character, asset,
 and editor conventions before editing. Implement only the reusable
 editor-visible stage composition and placement slots described here. Use the

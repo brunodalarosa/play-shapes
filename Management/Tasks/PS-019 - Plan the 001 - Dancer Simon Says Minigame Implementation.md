@@ -110,7 +110,7 @@ not implement them.
 
 Read [[001 - Dancer simon says]], [[PS-001 - Define the First Gameplay Milestone]], [[PS-005 - Define Multi-Phone and Agent Validation Strategy]],
 [[PS-006 - Implement Player Join and Host-Owned Registry]], [[PS-007 - Define the Gameplay Debug Suite]], [[PS-012 - Implement Milestone 1 Character Animation System]], [[PS-013 - Implement Pose Charge and Evaluation Rules]],
-[[PS-014 - Implement Minimal Gameplay Debug Launcher]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]], [[PS-017 - Find Environment Assets for 001 - Dancer Simon Says]], [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]], [[Project Overview]], [[Workflow]], [[Decision Log]], [[Releases]], and
+[[PS-014 - Implement Minimal Gameplay Debug Launcher]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]], [[PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says]], [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]], [[Project Overview]], [[Workflow]], [[Decision Log]], [[Releases]], and
 [[DEVELOPMENT]]. Inspect the current implementation and scene boundaries. Write
 an implementation-ready plan for Flash? Pose!, including the genuine-stop
 camera-flash SFX/VFX event, its timing relative to authoritative evaluation,

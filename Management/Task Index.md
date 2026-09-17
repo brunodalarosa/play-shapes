@@ -19,7 +19,7 @@ This is the lightweight human-readable view of active work. The interactive stat
 - [[PS-008 - Design Fake Music Stops]] — shared design
 - [[PS-013 - Implement Pose Charge and Evaluation Rules]] — AI implementation; depends on [[PS-004 - Define the Game-Feel Tuning Strategy]], [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]], [[PS-006 - Implement Player Join and Host-Owned Registry]], and [[PS-012 - Implement Milestone 1 Character Animation System]]
 - [[PS-016 - Create Wireframe for 001 - Dancer Simon Says]] — human-only wireframes and art mockups
-- [[PS-017 - Find Environment Assets for 001 - Dancer Simon Says]] — human-only asset hunt
+- [[PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says]] — human-only asset hunt
 - [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]] — AI implementation; depends on PS-016, PS-017, and PS-019
 - [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]] — shared design; generates the remaining bounded implementation and validation tasks
 - [[PS-020 - Find Music and SFX for 001 - Dancer Simon Says]] — human-only asset hunt
