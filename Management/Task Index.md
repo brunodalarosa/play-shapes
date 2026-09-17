@@ -23,8 +23,6 @@ the human has assigned them.
   Milestone 1
 - [[PS-013 - Implement Pose Charge and Evaluation Rules]] — AI implementation;
   host-authoritative charge/evaluation
-- [[PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says]] —
-  human-only asset hunt
 - [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]] — AI
   implementation; depends on PS-016, PS-017, and PS-019
 - [[PS-023 - Prepare Flash Pose Runtime Music and SFX]] — AI asset rework;
@@ -44,6 +42,9 @@ the human has assigned them.
 
 ## Recently completed
 
+- [[PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says]] —
+  existing curated Shape Characters environment set approved for Milestone 1;
+  prettier replacement art is deferred
 - [[PS-019 - Plan the 001 - Dancer Simon Says Minigame Implementation]] —
   approved implementation decomposition and owner-confirmed gameplay policies
 - [[PS-020 - Find Music and SFX for 001 - Dancer Simon Says]] — candidate music

@@ -1,5 +1,21 @@
 # Play Shapes development
 
+## PS-017 — Milestone 1 environment asset decision (2026-09-16)
+
+PS-017 is complete by explicit owner decision. Flash? Pose! will use the
+existing curated environment sprites in
+`assets/runtime/shape_characters/environment/` for Milestone 1: the left,
+center, and right floor tiles plus the small tree. Their Kenney Shape
+Characters 1.0 / CC0-1.0 provenance, source paths, dimensions, and stable
+runtime paths are already recorded in
+`assets/runtime/shape_characters/manifest.json`.
+
+PS-018 may compose these assets into the editor-visible minigame scene while
+preserving character contrast and pose readability. This is a deliberate
+temporary visual choice so implementation can proceed; sourcing or creating a
+prettier environment is deferred until after Milestone 1 and is not a blocker.
+No runtime assets or Godot scenes changed in this decision-only update.
+
 ## Task dependency links (2026-09-16)
 
 All non-empty `depends_on` properties now store exact Obsidian wikilinks to
