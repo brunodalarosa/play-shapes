@@ -24,7 +24,7 @@ Agents may recommend sequence and dependencies. The human owns priority and rele
 
 ## 5. Execution
 
-Before implementation, the coding agent reads the task and linked sources, inspects the current project, and reports assumptions that would alter scope. It implements only the accepted boundary, preserves conventions, exposes player-feel controls, validates proportionally, and updates planning notes when implementation reveals durable information.
+Before implementation, the coding agent reads the task and linked sources, inspects the current project, and reports assumptions that would alter scope. It implements only the accepted boundary, preserves conventions, exposes player-feel controls, validates proportionally, and updates the active task or authoritative documents when implementation reveals durable information. It does not revise completed task notes.
 
 The draft execution prompt is a starting point, not permission to run. Refine it when necessary and begin implementation only in a separate execution session.
 
@@ -32,7 +32,18 @@ The draft execution prompt is a starting point, not permission to run. Refine it
 
 Code completion does not prove a feature is done. Create or perform the relevant automated, editor, device, network, performance, accessibility, and human play checks. Record the environment and evidence. Human feel/readability judgments cannot be replaced by passing automated tests.
 
-Findings may reopen a task, update a decision, or create focused follow-up tasks.
+Findings may update an active task, update a decision, or create focused
+follow-up tasks. A completed task is not reopened for later changes.
+
+## Completed-task rule
+
+Once a task is marked `done` and its `Outcome` is recorded, treat its note as
+immutable historical context. Later decisions belong in [[Decision Log]] or the
+relevant canonical design document; later implementation findings belong in the
+active task, [[DEVELOPMENT]], or a focused follow-up. Do not update every
+completed task when a shared decision changes, and do not silently reopen a
+completed task. The historical note may be corrected only when the human
+project owner explicitly requests that correction.
 
 ## Before a planning agent finishes
 

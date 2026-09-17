@@ -63,6 +63,23 @@ Follow the frontmatter with these sections:
 
 Acceptance criteria must be observable. Open questions should remain unanswered rather than being filled with guesses.
 
+## Completed-task immutability
+
+- A task becomes a frozen historical record when its acceptance criteria are met,
+  `Outcome` is recorded, and it moves to `done`.
+- Do not edit a completed task's content, frontmatter, links, findings, or
+  outcome to synchronize it with later decisions, implementation discoveries,
+  or changed design. Moving the note into `Tasks/Done/` as part of completion is
+  lifecycle bookkeeping, not an invitation to revise it later.
+- Record later durable decisions in [[Decision Log]] or the relevant canonical
+  design document, such as a minigame definition. Record implementation
+  discoveries in the active task, [[DEVELOPMENT]], or a focused follow-up task.
+- When behavior changes after completion, create or update an active follow-up
+  task and link back to the completed task as historical context. Do not reopen
+  or silently revise the completed note.
+- The only exception is an explicit human request to correct the historical
+  record itself.
+
 ## Implementation prompt minimum
 
 Every implementation task's draft prompt tells the coding agent to:
@@ -74,6 +91,8 @@ Every implementation task's draft prompt tells the coding agent to:
 - Keep game-feel parameters designer-accessible.
 - Add appropriate tests and distinguish automated evidence from live/editor/device evidence.
 - Update relevant Markdown when implementation discoveries affect planning.
+- Update active or authoritative documents when durable information changes;
+  never synchronize a completed task note with those later changes.
 - Report assumptions and deviations.
 - Summarize what changed and how the human can tune player-facing values.
 
@@ -86,3 +105,5 @@ Every implementation task's draft prompt tells the coding agent to:
 5. If blocked, record the precise blocker and required resolution.
 6. When acceptance criteria are met, fill `Outcome`, capture durable decisions in [[Decision Log]], create only necessary follow-ups, and move the task to `done`.
 7. Keep [[Task Index]] synchronized. [[Task board]] reads the same frontmatter automatically.
+8. After completion, treat the task note as immutable and route later changes
+   through authoritative documents or new active follow-up tasks.
