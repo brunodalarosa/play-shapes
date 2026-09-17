@@ -87,9 +87,10 @@ func begin_stop(stop_id: int, target_direction: StringName, host_time_msec: int)
 ## input_seq is client-provided only for ordering; timing always uses host_receipt_msec.
 func submit_input(player_id: String, requested_direction: StringName, held: bool,
 		input_seq: int, host_receipt_msec: int) -> Dictionary:
-	if _stop_resolved or _active_stop_id < 0:
-		return _rejected(&"no_active_stop")
-	if host_receipt_msec > _evaluation_deadline_msec:
+	# Free posing is part of play throughout the round. Only an unresolved stop
+	# adds a deadline; outside that window input still drives semantic animation
+	# and prepares whatever uninterrupted pose reaches the next genuine stop.
+	if not _stop_resolved and host_receipt_msec > _evaluation_deadline_msec:
 		return _rejected(&"late_input")
 	if not _accept_host_time(host_receipt_msec):
 		return _rejected(&"non_monotonic_host_time")

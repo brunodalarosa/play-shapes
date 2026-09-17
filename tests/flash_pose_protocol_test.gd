@@ -17,20 +17,18 @@ func _run() -> void:
 
 func _test_valid_ordered_actions_and_malformed_packets() -> void:
 	var controller := _controller()
-	controller.inject_sequences([&"bounce"], [&"left"], [0])
+	controller.inject_sequences([&"bounce"], [&"left"], [100])
 	controller.start_round(_participants(2), 0)
 	var protocol := Protocol.new(controller)
 	var player: Dictionary = _participants(2)[0]
-	_check(protocol.handle_action(player, {"type": "pose_down", "direction": "left", "input_seq": 1}, 0).code == &"wrong_phase",
-		"Countdown input is rejected by the controller phase")
-	controller.advance(0)
-	controller.advance(0)
 	_check(protocol.handle_action(player, {"type": "pose_down", "direction": "left", "input_seq": 1}, 0).accepted,
-		"A valid press is forwarded with host receipt time")
+		"Phone posing is active from the minigame countdown")
+	controller.advance(0)
 	_check(not protocol.handle_action(player, {"type": "pose_down", "direction": "left", "input_seq": 1}, 1).accepted,
 		"A duplicate sequence is rejected")
 	_check(protocol.handle_action(player, {"type": "pose_up", "direction": "left", "input_seq": 2}, 2).accepted,
-		"A matching release is forwarded")
+		"A matching release works while music is playing")
+	controller.advance(100)
 	for malformed: Dictionary in [
 		{"type": "pose_down", "direction": "spin", "input_seq": 3},
 		{"type": "pose_down", "direction": "left", "input_seq": -1},
@@ -44,8 +42,11 @@ func _test_valid_ordered_actions_and_malformed_packets() -> void:
 		"Rejected input does not mutate held state or accepted sequence")
 	var deadline: int = controller._pose_rules.current_deadline_msec()
 	controller.advance(deadline)
-	_check(not protocol.handle_action(player, {"type": "pose_down", "direction": "left", "input_seq": 4}, deadline + 1).accepted,
-		"Late input cannot mutate a resolved challenge")
+	var lives_before: int = controller._players.p1.lives
+	_check(protocol.handle_action(player, {"type": "pose_down", "direction": "left", "input_seq": 4}, deadline + 1).accepted,
+		"Post-resolution input resumes free posing")
+	_check(controller._players.p1.lives == lives_before,
+		"Post-resolution posing cannot mutate the resolved challenge")
 
 func _test_snapshots_elimination_and_ten_players() -> void:
 	var controller := _controller()

@@ -25,8 +25,13 @@ the host closes lobby admission and are not inserted into an active round.
 
 The bundled controller now has waiting/watch, countdown/dance, challenge,
 result/lives, exact `You've been eliminated :(`, results, and lobby states.
-Two to four square native buttons use distinct arrow icons, text/accessible
-labels, and colors. Pointer capture prevents slide-off loss; pointer up,
+Two to four square native buttons stay visible and functional throughout the
+active minigame, including countdown, music playback, stops, and flash waits.
+Players can leave automatic dance running or freely pose at any time; only the
+host's genuine-stop grace deadline affects lives and outcomes. Direction
+unlocks update the layout at the boundary between gameplay cycles. Buttons use
+distinct arrow icons, text/accessible labels, and colors. Pointer capture
+prevents slide-off loss; pointer up,
 cancel, lost capture, disconnect, and page hide clean up local state. The page
 uses `touch-action: none` and suppresses context menus to prevent scrolling or
 double actions during a hold. A stable button grid is retained across a

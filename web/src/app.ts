@@ -175,10 +175,13 @@ function showGame(message: HostMessage): void {
     gameHeading.textContent = "You've been eliminated :(";
     gameMessage.textContent = "Keep watching the big screen for the results.";
     poseGrid.replaceChildren();
-  } else if (phase === "genuine_stop_grace" || message.type === "flash_pose_challenge") {
+  } else if (message.type === "flash_pose_result") {
+    gameHeading.textContent = message.success ? "Pose locked!" : "Keep dancing!";
+    // Results update feedback and lives without taking away player agency.
+    // Existing controls and an uninterrupted hold remain active for free posing.
+  } else if (["countdown", "dance", "genuine_stop_grace", "resolve", "flash_wait"].includes(phase) ||
+             message.type === "flash_pose_challenge") {
     renderControls(message.available_directions ?? []);
-  } else if ((phase === "resolve" || phase === "flash_wait") && poseGrid.childElementCount > 0) {
-    gameMessage.textContent = "Hold steady — the host is checking every pose.";
   } else if (message.type === "flash_pose_results") {
     releaseHeld();
     gameHeading.textContent = message.placement ? `You placed #${message.placement}` : "Round complete";

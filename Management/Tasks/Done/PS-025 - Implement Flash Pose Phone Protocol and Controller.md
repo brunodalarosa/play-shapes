@@ -22,9 +22,10 @@ while the host remains authoritative for timing, charge, lives, and outcomes.
 # Scope
 
 - Add the post-handshake message adapter for `pose_down` and `pose_up`,
-  validating direction, phase, player ownership, and `input_seq` before
-  forwarding a narrow action to PS-024. Host receipt time is authoritative;
-  ignore client-authored player IDs and timestamps.
+  validating direction, active-minigame phase, player ownership, and
+  `input_seq` before forwarding a narrow action to PS-024. Free posing remains
+  active while music plays; only evaluation is grace-window-bound. Host receipt
+  time is authoritative; ignore client-authored player IDs and timestamps.
 - Add host-to-browser state messages for minigame start/countdown, challenge
   start, per-player pose result/lives, exact elimination copy, results, and
   return-to-lobby. Send a current snapshot after a valid reconnect without
@@ -59,9 +60,10 @@ while the host remains authoritative for timing, charge, lives, and outcomes.
 # Acceptance Criteria
 
 - A registered browser can receive the current Flash? Pose! phase and send
-  only its own valid `pose_down`/`pose_up` actions during the host grace
-  window. The client cannot choose a player, target, deadline, charge, life,
-  or outcome.
+  only its own valid `pose_down`/`pose_up` actions throughout the active
+  minigame. Inputs animate free poses while music plays; the host grace window
+  alone decides stop outcomes. The client cannot choose a player, target,
+  deadline, charge, life, or outcome.
 - Pressing and holding one region sends a bounded start action, releasing or
   cancelling sends a matching release, and a new direction is visible without
   duplicate held inputs. Unknown/late/duplicate/out-of-order actions do not
@@ -131,8 +133,9 @@ elimination copy, rankings, and lobby return. Reconnect embeds a current
 snapshot while disconnected held input remains cleared; new players remain
 lobby-only during a round.
 
-The committed offline TypeScript controller implements waiting/watch,
-two-to-four accessible square hold regions, pointer capture and all cancellation
+The committed offline TypeScript controller keeps two-to-four accessible square
+hold regions available from minigame start through completion, including while
+music plays, with pointer capture and all cancellation
 paths, authoritative result/lives feedback, elimination, results, and lobby
 return. Focused `[AUTO]` Godot and served-bundle checks cover valid, duplicate,
 late, malformed, reconnect, elimination, and ten-client cases. TypeScript
