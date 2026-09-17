@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "provenance": {
+    "creator": "Kenney",
+    "source": "Kenney Game Assets All-in-1 3.7.0.zip (recorded by each supplied file's Windows Zone.Identifier ReferrerUrl)",
+    "license": "CC0-1.0",
+    "permission": "Commercial use and redistribution permitted; attribution is not required",
+    "source_verification": "The referenced local archive was not present during PS-023. Kenney's official support page confirms that assets on its asset pages are CC0; the exact originating sub-pack remains unknown.",
+    "official_license_reference": "https://kenney.nl/support",
+    "redistribution_caveat": "Keep this manifest with the runtime copies. Do not infer that unrelated files are Kenney assets from directory placement alone."
+  },
+  "assets": [
+    {
+      "id": "bounce_music",
+      "path": "res://assets/runtime/bgm/Bouncing_music.ogg",
+      "sha256": "00cea1a7a89052312d9055dc6dda8c7e5cf577e8db8c5f2dbe1da7c3af89f9de",
+      "format": "Ogg Vorbis",
+      "duration_seconds": 14.781429,
+      "sample_rate_hz": 44100,
+      "channels": 2,
+      "intended_cue": "Looping BGM for the bounce animation style",
+      "loop": true,
+      "loop_offset_seconds": 0.0
+    },
+    {
+      "id": "swing_music",
+      "path": "res://assets/runtime/bgm/Swinging_music.ogg",
+      "sha256": "8f60328d8664e050b7fb5c8c7f97862aca0f190a3f6e31d00f0415726d76d52c",
+      "format": "Ogg Vorbis",
+      "duration_seconds": 24.21,
+      "sample_rate_hz": 44100,
+      "channels": 2,
+      "intended_cue": "Looping BGM for the swing animation style",
+      "loop": true,
+      "loop_offset_seconds": 0.0
+    },
+    {
+      "id": "disco_music",
+      "path": "res://assets/runtime/bgm/Wacky_music.ogg",
+      "sha256": "5b145cb963c583fd9a8728461a7ed3e3d98860b381ac0ef41ee2181e7baf0964",
+      "format": "Ogg Vorbis",
+      "duration_seconds": 12.0,
+      "sample_rate_hz": 44100,
+      "channels": 2,
+      "intended_cue": "Looping BGM for the disco animation style",
+      "loop": true,
+      "loop_offset_seconds": 0.0
+    },
+    {
+      "id": "flash_1",
+      "path": "res://assets/runtime/sfxs/flash_1.ogg",
+      "sha256": "1214059fdfbf1c396c0702244fc833739cc346d326a71e450b731f456e54d6fb",
+      "format": "Ogg Vorbis",
+      "duration_seconds": 0.937392,
+      "sample_rate_hz": 44100,
+      "channels": 2,
+      "intended_cue": "Candidate camera-flash SFX after a resolved genuine stop",
+      "loop": false,
+      "loop_offset_seconds": 0.0
+    },
+    {
+      "id": "flash_2",
+      "path": "res://assets/runtime/sfxs/flash_2.ogg",
+      "sha256": "d8f26c33a665dcbdcc6f632f6050bc9dd548feb0d4942d4547615926d3926810",
+      "format": "Ogg Vorbis",
+      "duration_seconds": 0.689116,
+      "sample_rate_hz": 44100,
+      "channels": 2,
+      "intended_cue": "Candidate camera-flash SFX after a resolved genuine stop",
+      "loop": false,
+      "loop_offset_seconds": 0.0
+    }
+  ]
+}

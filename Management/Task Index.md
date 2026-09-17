@@ -20,8 +20,6 @@ the human has assigned them.
 
 - [[PS-008 - Design Fake Music Stops]] — later shared design; excluded from
   Milestone 1
-- [[PS-023 - Prepare Flash Pose Runtime Music and SFX]] — AI asset rework;
-  depends on PS-019 and PS-020
 - [[PS-024 - Implement Flash Pose Host Round Controller]] — AI implementation;
   authoritative lifecycle and round state
 - [[PS-025 - Implement Flash Pose Phone Protocol and Controller]] — AI
@@ -37,6 +35,9 @@ the human has assigned them.
 
 ## Recently completed
 
+- [[PS-023 - Prepare Flash Pose Runtime Music and SFX]] — stable style/audio
+  catalog, CC0 provenance manifest, deterministic loop imports, and focused
+  metadata/load checks; final listening remains in PS-029
 - [[PS-013 - Implement Pose Charge and Evaluation Rules]] — host-authoritative
   charge, monotonic grace/deadline evaluation, semantic animation state, and
   result/elimination records
