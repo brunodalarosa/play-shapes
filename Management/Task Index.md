@@ -10,8 +10,7 @@ the human has assigned them.
 
 ## In Progress
 
-- [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]] — editor-
-  visible Flash? Pose! stage is implemented and awaiting owner visual approval
+- None.
 
 ## Blocked
 
@@ -40,6 +39,9 @@ the human has assigned them.
 
 ## Recently completed
 
+- [[PS-018 - Create the 001 - Dancer Simon Says Minigame Scene]] — approved
+  editor-visible stage with one lead, ten stable center-out seats, and the
+  selected Milestone 1 environment art
 - [[PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says]] —
   existing curated Shape Characters environment set approved for Milestone 1;
   prettier replacement art is deferred

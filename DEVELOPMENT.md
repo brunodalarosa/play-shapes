@@ -42,11 +42,17 @@ godot --path . --resolution 1440x810 --script res://tests/dancer_simon_says_scen
 ```
 
 The structural check covers the reserved path, one lead, ten stable named
-seats, center-out two-player preview, editor anchors, character instances, and
-all selected environment references. The renderer check writes review images
-under `test-results/ps-018/`; those generated files are ignored. These checks
-do not constitute owner visual approval. PS-018 remains in progress until the
-owner approves the composition.
+seats, center-out two-player preview, editor anchors, shallow platform
+proportions, raised character placement, character instances, and all selected
+environment references. The renderer check writes review images under
+`test-results/ps-018/`; those generated files are ignored.
+
+`[HUMAN-PLAY]` Visual placement approved on 2026-09-17. The owner reviewed the
+revised two-player and ten-player GL Compatibility captures after the tile
+platforms were made shallower and the character anchors were raised so the
+feet rest on the yellow surface. This approval covers the PS-018 composition;
+it does not approve future gameplay feel, animation in context, feedback,
+audio, results, networking, or physical-phone behavior.
 
 ## PS-017 — Milestone 1 environment asset decision (2026-09-16)
 

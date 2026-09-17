@@ -2,7 +2,7 @@
 id: PS-018
 title: Create the 001 - Dancer Simon Says minigame scene
 type: implementation
-status: in-progress
+status: done
 release:
 owner: ai
 priority:
@@ -125,6 +125,10 @@ editor-authored anchors, production character previews, and environment
 references. `tests/dancer_simon_says_scene_visual_check.gd` produces separate
 real-renderer captures for two and ten players.
 
-The task remains in progress until the project owner reviews and explicitly
-approves the visual placement. No round loop, networking, pose evaluation,
-audio, feedback, results, or lobby navigation was added.
+The project owner reviewed the revised two-player and ten-player GL
+Compatibility captures and explicitly approved the visual placement on
+2026-09-17. The approved revision uses shallower, aspect-conscious platform
+tiles and raises the characters so their feet rest on the yellow tile surface.
+
+No round loop, networking, pose evaluation, audio, feedback, results, or lobby
+navigation was added.
