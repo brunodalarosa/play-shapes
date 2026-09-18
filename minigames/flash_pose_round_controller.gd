@@ -144,6 +144,10 @@ func advance(host_time_msec: int) -> Dictionary:
 		Phase.GENUINE_STOP_GRACE:
 			if host_time_msec >= _pose_rules.current_deadline_msec():
 				_resolve_stop(host_time_msec)
+	# Input events establish held/released state; this host-clock tick makes the
+	# authoritative charge and its semantic animation update continuously.
+	if _pose_rules != null and phase in [Phase.COUNTDOWN, Phase.DANCE, Phase.GENUINE_STOP_GRACE, Phase.FLASH_WAIT]:
+		_pose_rules.advance(host_time_msec)
 	return {"accepted": true, "phase": phase_name()}
 
 

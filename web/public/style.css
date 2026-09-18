@@ -20,6 +20,7 @@ button:disabled { cursor: wait; opacity: .65; }
 #game-card { margin-block-start: 20px; }
 .lives { min-block-size: 1.6em; font-size: 20px; font-weight: 800; }
 .pose-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(10px, 3vw, 16px); margin-block-start: 18px; touch-action: none; user-select: none; }
+.pose-button, .pose-button * { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 .pose-button { aspect-ratio: 1; min-block-size: 112px; display: grid; place-content: center; gap: 4px; border: 3px solid transparent; color: #101521; font-size: clamp(18px, 5vw, 24px); touch-action: none; -webkit-tap-highlight-color: transparent; }
 .pose-button .icon { font-size: clamp(34px, 12vw, 54px); line-height: 1; }
 .pose-button[data-direction="left"] { background: #79d6ff; }

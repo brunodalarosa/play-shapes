@@ -75,9 +75,12 @@ test('Flash Pose controller exposes accessible hold controls and cancellation ha
   assert.match(html, /id="lives"[^>]*aria-live="polite"/);
   assert.match(css, /touch-action:\s*none/);
   assert.match(css, /aspect-ratio:\s*1/);
+  assert.match(css, /\.pose-button, \.pose-button \*\s*\{[^}]*-webkit-user-select:\s*none/s);
+  assert.match(css, /\.pose-button, \.pose-button \*\s*\{[^}]*-webkit-touch-callout:\s*none/s);
   for (const expected of ['Pose left', 'Pose right', 'Pose down', 'Pose up', 'pointercancel', 'lostpointercapture']) {
     assert.ok(js.includes(expected), `compiled controller should include ${expected}`);
   }
+  assert.match(js, /selectstart[^\n]+preventDefault/);
   assert.ok(js.includes("You've been eliminated :(") );
 });
 

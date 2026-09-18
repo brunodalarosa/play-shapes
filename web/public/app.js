@@ -130,6 +130,7 @@ function renderControls(available) {
         button.addEventListener("lostpointercapture", () => { if (held?.button === button)
             releaseHeld(); });
         button.addEventListener("contextmenu", event => event.preventDefault());
+        button.addEventListener("selectstart", event => event.preventDefault());
         button.addEventListener("keydown", event => {
             if ((event.key !== " " && event.key !== "Enter") || event.repeat || held)
                 return;

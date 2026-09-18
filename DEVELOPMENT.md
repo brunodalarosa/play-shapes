@@ -2,6 +2,33 @@
 
 ## PS-027 — Flash? Pose! lobby and debug flow (2026-09-18)
 
+### Phone pose-input correction after owner testing
+
+Owner testing on iPhone exposed `Pose input needs a non-negative sequence` for
+apparently valid left/right presses. Browser JSON may decode `input_seq` as a
+Godot float even when the transmitted JSON number is a whole integer. The
+protocol now accepts only finite, whole, non-negative JSON numbers within
+JavaScript's exact integer range, normalizes them to an `int`, and keeps
+rejecting fractions, negative values, non-numbers, stale sequences, and
+authority-shaped fields.
+
+A second gap prevented visible charging after an accepted press: pose charge
+was advanced only at another input or evaluation boundary. The round controller
+now advances the existing authoritative `PoseEvaluationRules` from host time on
+active frames, and presentation consumes its explicit `pose_direction`,
+`pose_charge`, and `pose_held` aliases. The controller still owns timing and
+outcomes; animation only receives semantic state. Regression checks prove a
+JSON-decoded press reaches the rules, becomes a held character pose, and gains
+visible charge before the evaluation deadline.
+
+The phone pose buttons and every child icon/label now explicitly disable
+standard and WebKit text selection and the iOS touch callout. A guarded
+`selectstart` handler provides an additional browser fallback without removing
+the native button semantics, accessible name, keyboard hold behavior, focus
+ring, pointer capture, or cancellation cleanup. Automated checks pass; the
+owner should still recheck actual Safari touch/selection behavior because this
+change is not new physical-phone evidence.
+
 `SessionHost.prepare_flash_pose_launch()` is the single handoff for both normal
 and debug play. It validates registered-player records (never raw browser
 connections), snapshots their public identity/name/seat/connectivity data,

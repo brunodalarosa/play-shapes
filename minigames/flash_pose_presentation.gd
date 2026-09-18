@@ -299,7 +299,7 @@ func _on_semantic_animation_updated(player_id: String, state: Dictionary) -> voi
 	var animator := _player_animators.get(player_id) as HybridCharacterAnimator
 	if animator == null:
 		return
-	animator.set_pose_state(StringName(state.get("pose_direction", &"")), float(state.get("pose_charge", 0.0)), bool(state.get("held", false)))
+	animator.set_pose_state(StringName(state.get("pose_direction", &"")), float(state.get("pose_charge", 0.0)), bool(state.get("pose_held", false)))
 
 
 func _on_genuine_stop_started(_stop_id: int, direction: StringName, _available: Array[StringName]) -> void:

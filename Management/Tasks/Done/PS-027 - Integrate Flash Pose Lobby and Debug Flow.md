@@ -127,3 +127,13 @@ observed as withdrawal without life loss. Focused automated/editor/runtime
 checks passed, including 12/12 browser integration tests and a reviewed
 1280×720 technical results render. Physical-phone and human-play evidence
 remain explicitly assigned to PS-029.
+
+Owner testing before merge then exposed two phone-control defects in this same
+acceptance boundary: JSON-decoded whole-number `input_seq` values were rejected
+when Godot represented them as floats, and held charge did not advance between
+input/deadline events. Both were corrected in this PR with bounded numeric
+normalization, host-time pose-rule ticking, and regression coverage from parsed
+browser packets through semantic character charge. The phone pose button and
+all child icon/label content also disable standard/WebKit selection and iOS
+touch callouts, backed by compiled-bundle checks. A fresh physical-phone retest
+is still required; no post-fix device approval is claimed here.

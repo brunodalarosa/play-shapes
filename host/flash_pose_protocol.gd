@@ -5,6 +5,7 @@ extends RefCounted
 
 const INPUT_TYPES := [&"pose_down", &"pose_up"]
 const DIRECTIONS := [&"left", &"right", &"down", &"up"]
+const MAX_INPUT_SEQUENCE := 9007199254740991 # JavaScript's largest exact integer.
 
 var controller: FlashPoseRoundController
 
@@ -28,11 +29,21 @@ func handle_action(player: Dictionary, message: Dictionary, host_receipt_msec: i
 	var raw_sequence: Variant = message.get("input_seq")
 	if not raw_direction is String or StringName(raw_direction) not in DIRECTIONS:
 		return _rejected(&"invalid_direction", "Choose an available pose direction")
-	if not raw_sequence is int or raw_sequence < 0:
+	# Godot's JSON decoder may represent a browser-authored JSON integer as a
+	# float. Accept only finite, whole, non-negative values within JS's exact
+	# integer range, then normalize before reaching the authoritative rules.
+	var input_sequence := -1
+	if raw_sequence is int and raw_sequence >= 0 and raw_sequence <= MAX_INPUT_SEQUENCE:
+		input_sequence = int(raw_sequence)
+	elif raw_sequence is float and is_finite(raw_sequence) \
+			and raw_sequence >= 0.0 and raw_sequence <= float(MAX_INPUT_SEQUENCE) \
+			and raw_sequence == floor(raw_sequence):
+		input_sequence = int(raw_sequence)
+	if input_sequence < 0:
 		return _rejected(&"invalid_sequence", "Pose input needs a non-negative sequence")
 	var result := controller.submit_pose_input(
 		String(player.player_id), StringName(raw_direction), message_type == &"pose_down",
-		raw_sequence, host_receipt_msec)
+		input_sequence, host_receipt_msec)
 	if result.accepted:
 		return {"accepted": true}
 	return _rejected(StringName(result.code), _message_for_code(StringName(result.code)))

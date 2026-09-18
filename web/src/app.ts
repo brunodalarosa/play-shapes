@@ -141,6 +141,7 @@ function renderControls(available: string[]): void {
     button.addEventListener("pointercancel", event => { if (held?.pointerId === event.pointerId) releaseHeld(); });
     button.addEventListener("lostpointercapture", () => { if (held?.button === button) releaseHeld(); });
     button.addEventListener("contextmenu", event => event.preventDefault());
+    button.addEventListener("selectstart", event => event.preventDefault());
     button.addEventListener("keydown", event => {
       if ((event.key !== " " && event.key !== "Enter") || event.repeat || held) return;
       event.preventDefault();
