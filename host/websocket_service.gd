@@ -43,6 +43,11 @@ func clear_flash_pose_controller(controller: FlashPoseRoundController) -> void:
 	if _flash_pose_protocol != null and _flash_pose_protocol.controller == controller:
 		_clear_flash_pose_controller()
 
+func send_lobby_state() -> void:
+	for client: Dictionary in _clients:
+		if client.welcomed and not _registry.player_for_connection(client.connection_id).is_empty():
+			client.peer.send_text(JSON.stringify({"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}))
+
 func _process(_delta: float) -> void:
 	if not _server.is_listening():
 		return
@@ -206,9 +211,7 @@ func _on_flash_pose_round_results(results: Dictionary) -> void:
 		_send_to_player(player_id, _flash_pose_protocol.results_message(player_id, results))
 
 func _on_flash_pose_return_to_lobby() -> void:
-	for client: Dictionary in _clients:
-		if client.welcomed and not _registry.player_for_connection(client.connection_id).is_empty():
-			client.peer.send_text(JSON.stringify({"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}))
+	send_lobby_state()
 
 func _clear_flash_pose_controller() -> void:
 	if _flash_pose_protocol == null:

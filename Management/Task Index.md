@@ -22,8 +22,6 @@ the human has assigned them.
   Milestone 1
 - [[PS-026 - Implement Flash Pose Shared Screen Feedback and Results]] — AI
   implementation; shared presentation, audio/flash, and results
-- [[PS-027 - Integrate Flash Pose Lobby and Debug Flow]] — AI implementation;
-  host start, debug entry, and scene lifecycle
 - [[PS-028 - Validate Flash Pose Technical Loop]] — AI validation; automated,
   editor/runtime, and desktop-browser evidence
 - [[PS-029 - Validate Flash Pose on Two Phones and in Human Play]] — human
@@ -31,6 +29,9 @@ the human has assigned them.
 
 ## Recently completed
 
+- [[PS-027 - Integrate Flash Pose Lobby and Debug Flow]] — gated host start,
+  shared normal/debug scene handoff, persistent-session return, and focused
+  lifecycle/service-continuity checks
 - [[PS-025 - Implement Flash Pose Phone Protocol and Controller]] — validated
   host-owned pose packets, reconnect snapshots, accessible hold controls, and
   personalized results backed by focused protocol/browser checks

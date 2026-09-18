@@ -22,6 +22,38 @@ extends Control
 
 func _ready() -> void:
 	_refresh_previews()
+	if Engine.is_editor_hint():
+		return
+	var controller := get_node(^"RoundController") as FlashPoseRoundController
+	controller.return_to_lobby_requested.connect(_on_return_to_lobby_requested)
+	var session_host := get_node_or_null("/root/SessionHost")
+	if session_host == null:
+		return
+	var launch: Dictionary = session_host.consume_flash_pose_launch()
+	if launch.is_empty():
+		return
+	var started := controller.start_round(
+		launch.get("participants", []),
+		Time.get_ticks_msec(),
+		bool(launch.get("allow_one_player_debug", false))
+	)
+	if not bool(started.accepted):
+		push_error("Flash? Pose! could not start: %s" % started.get("code", &"unknown"))
+		_on_return_to_lobby_requested()
+
+
+func _on_return_to_lobby_requested() -> void:
+	# Defer navigation until every protocol/presentation signal subscriber has
+	# observed the controller's return request.
+	_return_to_lobby.call_deferred()
+
+
+func _return_to_lobby() -> void:
+	var launcher := get_node_or_null("/root/DebugLauncher")
+	if launcher != null:
+		launcher.return_to_lobby(false)
+	else:
+		get_tree().change_scene_to_file("res://scenes/lobby.tscn")
 
 
 func lead_slot() -> Control:

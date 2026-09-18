@@ -1,5 +1,83 @@
 # Play Shapes development
 
+## PS-027 — Flash? Pose! lobby and debug flow (2026-09-18)
+
+`SessionHost.prepare_flash_pose_launch()` is the single handoff for both normal
+and debug play. It validates registered-player records (never raw browser
+connections), snapshots their public identity/name/seat/connectivity data,
+closes new-player admission, and leaves the persistent HTTP, WebSocket,
+registry, reconnect tokens, and seats alive across the scene change. Flash?
+Pose! accepts 2–10 registered players in normal play. The one-player path is
+available only as the F12 entry `One-player Flash? Pose!` and requires exactly
+one real registry player; it creates no simulated identity or alternate game.
+
+Normal host workflow:
+
+1. Start the project and let phones join the lobby normally.
+2. The shared display's `Start minigame` button stays disabled below two
+   registered players and explains the gate. It also explains the existing
+   ten-player Flash? Pose! limit if the wider 20-player lobby exceeds it.
+3. With 2–10 registered players, press `Start minigame`. The host closes new
+   joins, loads `res://minigames/dancer_simon_says.tscn`, consumes the snapshot
+   once, and starts the existing `FlashPoseRoundController`.
+4. Existing players may reconnect during the round and receive the current
+   personalized gameplay snapshot. A transient disconnect keeps the round
+   participant/seat but clears the held pose. Explicit Leave removes the
+   registry record and the controller marks that participant withdrawn without
+   a life loss.
+5. At results, use the shared-display `Return to lobby` button. The controller
+   first emits its host-owned return signal so phones receive lobby state; then
+   the scene is torn down, presentation audio/tweens/nodes and protocol signal
+   bindings are released, the debug marker is cleared if present, and the new
+   lobby reopens joins. `SessionHost` and the surviving registry records are
+   not restarted.
+
+Debug workflow: register exactly one real phone player, press F12, and choose
+`One-player Flash? Pose!`. The launcher remains non-pausing and shows
+`DEBUG — One-player Flash? Pose!`. `Restart current debug scenario` prepares a
+fresh snapshot and reconstructs the same scene/controller. `Return to lobby`
+sends lobby state, clears the marker, tears down the scene, and preserves the
+host process/services. If the real player leaves, the one-player launch/restart
+gate closes; browser connection count alone never unlocks it.
+
+Focused checks:
+
+```powershell
+godot --headless --path . --script res://tests/flash_pose_flow_test.gd
+godot --headless --path . --script res://tests/player_lobby_test.gd
+godot --headless --path . --script res://tests/debug_launcher_test.gd
+godot --headless --path . --script res://tests/flash_pose_round_controller_test.gd
+godot --headless --path . --script res://tests/flash_pose_protocol_test.gd
+godot --headless --path . --script res://tests/flash_pose_presentation_test.gd
+godot --headless --path . --script res://tests/dancer_simon_says_scene_test.gd
+cd web
+npm.cmd test
+cd ..
+godot --path . --resolution 1280x720 --script res://tests/flash_pose_presentation_visual_check.gd
+godot --headless --editor --path . --quit-after 10
+```
+
+- **[AUTO]: passed.** Focused checks cover the zero/one/two-player normal gate,
+  exact one-player debug gate, registry rather than connection authority,
+  participant snapshots, closed late joins, explicit withdrawal, shared-scene
+  reuse, clean debug restart, marker lifecycle, results return, and existing
+  controller/protocol/presentation/browser regressions. Browser integration is
+  12/12.
+- **[EDITOR]: passed.** With normal user access, Godot 4.7.2 completed project
+  initialization and script/import scanning with exit code zero and no parse or
+  import failures. The forced `--quit-after` shutdown still reports the known
+  scan-abort/object-cleanup warnings; restricted runs additionally cannot write
+  the user cache, neither of which is treated as runtime evidence.
+- **[GODOT-RUNTIME]: passed for the tested lifecycle and technical render.**
+  The integration test kept the same running `SessionHost` instance through
+  normal launch, results return, debug launch/restart, and debug return. The GL
+  Compatibility renderer produced the 1280×720 results capture, which was
+  inspected after moving the host return control fully below the result panels.
+  Generated captures remain ignored artifacts, not creative approval.
+- **[PHYSICAL-PHONE] / [HUMAN-PLAY]: not claimed.** PS-029 still owns real
+  iPhone/Pixel reconnect/Leave behavior, couch-distance readability, button
+  wording/placement preference, feel, audio, accessibility, and final approval.
+
 ## PS-026 — Flash? Pose! shared-screen feedback and results (2026-09-17)
 
 `minigames/flash_pose_presentation.gd` is the scene-owned presentation/audio

@@ -2,7 +2,7 @@
 id: PS-027
 title: "Integrate Flash? Pose! lobby and debug flow"
 type: implementation
-status: backlog
+status: done
 release:
 owner: ai
 priority:
@@ -110,3 +110,20 @@ phone and human-play evidence. Follow GitHub Flow and keep unrelated changes
 out of the pull request.
 
 # Outcome
+
+Completed on 2026-09-18. The lobby now exposes a host-only `Start minigame`
+control gated to 2–10 registered players with visible unavailable reasons.
+Normal and exactly-one-player F12 debug starts both snapshot the persistent
+registry through `SessionHost` and load the same reserved Flash? Pose! scene.
+The debug entry uses the player-facing name, retains its non-pausing marker,
+clean restart, and lobby-return behavior, and cannot be unlocked by raw browser
+connections.
+
+The shared results view now exposes `Return to lobby`. Controller notification
+precedes deferred scene teardown so phones receive lobby state; the persistent
+host, services, surviving identities, seats, and reconnect capability remain
+alive while joins reopen in the replacement lobby. Explicit gameplay Leave is
+observed as withdrawal without life loss. Focused automated/editor/runtime
+checks passed, including 12/12 browser integration tests and a reviewed
+1280×720 technical results render. Physical-phone and human-play evidence
+remain explicitly assigned to PS-029.

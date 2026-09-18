@@ -4,6 +4,8 @@ extends Control
 @onready var qr: QRCodeRect = %JoinQR
 @onready var join_address: Label = %JoinAddress
 @onready var roster: VBoxContainer = %PlayerRoster
+@onready var start_button: Button = %StartMinigame
+@onready var start_help: Label = %StartHelp
 
 func _ready() -> void:
 	SessionHost.set_accepting_new_players(true)
@@ -11,6 +13,7 @@ func _ready() -> void:
 	address_picker.item_selected.connect(_select_address)
 	%Refresh.pressed.connect(_refresh_addresses)
 	%Copy.pressed.connect(func() -> void: DisplayServer.clipboard_set(join_address.text))
+	start_button.pressed.connect(_start_minigame)
 	_refresh_addresses()
 	_show_players(SessionHost.players())
 
@@ -51,3 +54,15 @@ func _show_players(players: Array[Dictionary]) -> void:
 		row.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		row.add_theme_font_size_override("font_size", 18)
 		roster.add_child(row)
+	var availability := SessionHost.flash_pose_availability(false)
+	start_button.disabled = not bool(availability.available)
+	start_help.text = str(availability.reason) if not bool(availability.available) \
+		else "Starts Flash? Pose! for the registered players above."
+
+func _start_minigame() -> void:
+	var result := SessionHost.prepare_flash_pose_launch(false)
+	if not bool(result.accepted):
+		start_help.text = str(result.reason)
+		return
+	start_button.disabled = true
+	get_tree().change_scene_to_file(SessionHost.FLASH_POSE_SCENE_PATH)

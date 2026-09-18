@@ -21,9 +21,9 @@ func _run() -> void:
 		return
 	if not _check(simon != null, "One-player Simon Says is reserved"):
 		return
-	if not _check(not simon.availability({"registered_player": false}).available, "Simon stage still requires the registered-player debug feature"):
+	if not _check(not simon.availability({"one_registered_player": false}).available, "Flash? Pose! still requires the one-player debug feature"):
 		return
-	if not _check(simon.availability({"registered_player": true}).available, "Implemented Simon stage is available to its registered-player debug path"):
+	if not _check(simon.availability({"one_registered_player": true}).available, "Implemented Flash? Pose! stage is available to its one-player debug path"):
 		return
 	if not _check(not launcher.restart_scenario(), "Restart is disabled outside a debug scenario"):
 		return
