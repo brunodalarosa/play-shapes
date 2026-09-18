@@ -4,9 +4,10 @@ extends Node
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
 const ASSETS: Dictionary = {
-	"/": ["res://web/public/index.html", "text/html; charset=utf-8"],
-	"/app.js": ["res://web/public/app.js", "text/javascript; charset=utf-8"],
-	"/style.css": ["res://web/public/style.css", "text/css; charset=utf-8"],
+"/": ["res://web/public/index.html", "text/html; charset=utf-8"],
+"/app.js": ["res://web/public/app.js", "text/javascript; charset=utf-8"],
+"/controller_geometry.js": ["res://web/public/controller_geometry.js", "text/javascript; charset=utf-8"],
+"/style.css": ["res://web/public/style.css", "text/css; charset=utf-8"],
 }
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []

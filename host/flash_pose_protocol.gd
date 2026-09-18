@@ -62,6 +62,7 @@ func snapshot_for(player_id: String) -> Dictionary:
 		"stop_id": controller.current_stop_id,
 		"available_directions": Array(controller.available_directions()).map(func(value: StringName) -> String: return str(value)),
 		"player": _public_gameplay_state(own_state),
+		"presentation": _presentation_tuning(),
 	}
 
 func challenge_message() -> Dictionary:
@@ -70,7 +71,18 @@ func challenge_message() -> Dictionary:
 		"debug_mode": controller.is_one_player_debug(),
 		"stop_id": controller.current_stop_id,
 		"available_directions": Array(controller.available_directions()).map(func(value: StringName) -> String: return str(value)),
+		"presentation": _presentation_tuning(),
 		"message": "Music stopped! Hold your pose",
+	}
+
+func charge_update_for(player_id: String, semantic: Dictionary) -> Dictionary:
+	if _player_state(player_id).is_empty():
+		return {}
+	return {
+		"type": "flash_pose_charge",
+		"direction": str(semantic.get("pose_direction", &"")),
+		"charge": clampf(float(semantic.get("pose_charge", 0.0)), 0.0, 1.0),
+		"held": bool(semantic.get("pose_held", false)),
 	}
 
 func result_for(player_id: String, stop_id: int, results: Array[Dictionary]) -> Dictionary:
@@ -105,6 +117,24 @@ func _public_gameplay_state(state: Dictionary) -> Dictionary:
 	return {
 		"lives": int(state.get("lives", 0)),
 		"eliminated": StringName(state.get("state", &"")) == &"eliminated",
+		"direction": str(state.get("pose_direction", &"")),
+		"charge": clampf(float(state.get("pose_charge", 0.0)), 0.0, 1.0),
+		"held": bool(state.get("pose_held", false)),
+	}
+
+func _presentation_tuning() -> Dictionary:
+	var tuning: SimonSaysTuning = controller.tuning
+	return {
+		"colors": {
+			"left": "#" + tuning.controller_left_color.to_html(false),
+			"right": "#" + tuning.controller_right_color.to_html(false),
+			"down": "#" + tuning.controller_down_color.to_html(false),
+			"up": "#" + tuning.controller_up_color.to_html(false),
+		},
+		"minimum_brightness": tuning.controller_minimum_brightness,
+		"maximum_brightness": tuning.controller_maximum_brightness,
+		"charge_fill_seconds": tuning.charge_fill_seconds,
+		"charge_decay_seconds": tuning.charge_decay_seconds,
 	}
 
 func _message_for_code(code: StringName) -> String:

@@ -50,6 +50,7 @@ after(async () => {
 test('serves bundled HTML, JS, CSS and session configuration', async () => {
   for (const [path, mime, text] of [
     ['/', 'text/html', 'Join game'], ['/app.js', 'text/javascript', 'localStorage'],
+    ['/controller_geometry.js', 'text/javascript', 'directionAtPoint'],
     ['/style.css', 'text/css', 'focus-visible'], ['/session.json', 'application/json', 'session_id']
   ]) {
     const response = await fetch(base + path);
@@ -74,7 +75,9 @@ test('Flash Pose controller exposes accessible hold controls and cancellation ha
   assert.match(html, /id="pose-grid"[^>]*aria-label="Pose controls"/);
   assert.match(html, /id="lives"[^>]*aria-live="polite"/);
   assert.match(css, /touch-action:\s*none/);
-  assert.match(css, /aspect-ratio:\s*1/);
+  assert.match(css, /html\.gameplay-active[^}]*overflow:\s*hidden/s);
+  assert.match(css, /\.pose-grid\[data-count="3"\]/);
+  assert.match(css, /\.pose-grid\[data-count="4"\]/);
   assert.match(css, /\.pose-button, \.pose-button \*\s*\{[^}]*-webkit-user-select:\s*none/s);
   assert.match(css, /\.pose-button, \.pose-button \*\s*\{[^}]*-webkit-touch-callout:\s*none/s);
   for (const expected of ['Pose left', 'Pose right', 'Pose down', 'Pose up', 'pointercancel', 'lostpointercapture']) {
@@ -83,6 +86,8 @@ test('Flash Pose controller exposes accessible hold controls and cancellation ha
   assert.match(js, /selectstart[^\n]+preventDefault/);
   assert.ok(js.includes('Lives: DEBUG'));
   assert.ok(js.includes("You've been eliminated :(") );
+  assert.ok(js.includes('requestFullscreen'));
+  assert.ok(js.includes('flash_pose_charge'));
 });
 
 test('lobby QR texture decodes to the exact join URL', () => {

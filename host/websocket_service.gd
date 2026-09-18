@@ -35,6 +35,7 @@ func set_flash_pose_controller(controller: FlashPoseRoundController) -> void:
 	_flash_pose_protocol = FlashPoseProtocolScript.new(controller)
 	controller.phase_changed.connect(_on_flash_pose_phase_changed)
 	controller.genuine_stop_started.connect(_on_flash_pose_challenge)
+	controller.semantic_animation_updated.connect(_on_semantic_state_changed)
 	controller.pose_evaluation_resolved.connect(_on_flash_pose_results)
 	controller.round_results_ready.connect(_on_flash_pose_round_results)
 	controller.return_to_lobby_requested.connect(_on_flash_pose_return_to_lobby)
@@ -200,6 +201,13 @@ func _on_flash_pose_challenge(_stop_id: int, _direction: StringName, _available:
 	for player: Dictionary in _flash_pose_protocol.controller.player_snapshot():
 		_send_to_player(String(player.player_id), message)
 
+func _on_semantic_state_changed(player_id: String, state: Dictionary) -> void:
+	if _flash_pose_protocol == null:
+		return
+	var message: Dictionary = _flash_pose_protocol.charge_update_for(player_id, state)
+	if not message.is_empty():
+		_send_to_player(player_id, message)
+
 func _on_flash_pose_results(stop_id: int, results: Array[Dictionary]) -> void:
 	for result: Dictionary in results:
 		var player_id := String(result.player_id)
@@ -220,6 +228,7 @@ func _clear_flash_pose_controller() -> void:
 	if is_instance_valid(controller):
 		if controller.phase_changed.is_connected(_on_flash_pose_phase_changed): controller.phase_changed.disconnect(_on_flash_pose_phase_changed)
 		if controller.genuine_stop_started.is_connected(_on_flash_pose_challenge): controller.genuine_stop_started.disconnect(_on_flash_pose_challenge)
+		if controller.semantic_animation_updated.is_connected(_on_semantic_state_changed): controller.semantic_animation_updated.disconnect(_on_semantic_state_changed)
 		if controller.pose_evaluation_resolved.is_connected(_on_flash_pose_results): controller.pose_evaluation_resolved.disconnect(_on_flash_pose_results)
 		if controller.round_results_ready.is_connected(_on_flash_pose_round_results): controller.round_results_ready.disconnect(_on_flash_pose_round_results)
 		if controller.return_to_lobby_requested.is_connected(_on_flash_pose_return_to_lobby): controller.return_to_lobby_requested.disconnect(_on_flash_pose_return_to_lobby)

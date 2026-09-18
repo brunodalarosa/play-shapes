@@ -1,5 +1,83 @@
 # Play Shapes development
 
+## PS-030 — Flash? Pose! phone controller layout (2026-09-18)
+
+### Client startup regression correction
+
+The initial PS-030 commit compiled controller geometry into a second browser
+module and imported it from `app.js`, but the fixed HTTP asset allowlist did not
+serve `/controller_geometry.js`. Phones therefore received a 404 for the module,
+the application entry point never executed, and the static page remained at
+`Connecting to the host…`. `HttpService.ASSETS` now serves that exact committed
+module with the JavaScript MIME type. The served-assets integration test requests
+the imported module directly, so a successful `app.js` response alone can no
+longer hide a broken module graph.
+
+Active Flash? Pose! play adds `gameplay-active` to the document and turns
+`#pose-grid` into the fixed visual viewport. The active surface has no card,
+padding, scroll range, gutters, or dead regions. Two directions are equal
+halves; three use rays from the center to the top midpoint and bottom corners;
+four use both corner-to-corner diagonals. `controller_geometry.ts` is the
+single deterministic point-to-direction rule, including exact boundaries.
+The CSS polygons are presentation only; pointer input resolves through that
+geometry and therefore selects exactly one action.
+
+The stable surface owns pointer capture. Re-rendering after a host
+`available_directions` update preserves a held direction that still exists and
+does not send a second `pose_down`. If the host removes the held direction,
+the browser sends exactly one matching `pose_up` before rebuilding. Pointer
+up/cancel/lost-capture, keyboard keyup/blur, reconnect, page hide, elimination,
+and lobby return retain their previous release safety. Visible regions contain
+only `←`, `→`, `↓`, or `↑`; native buttons retain `aria-label`, `aria-pressed`,
+focus-visible styling, and Space/Enter hold behavior.
+
+Portrait active play shows only the non-scrolling `Rotate your phone` state.
+On the first pointer or keyboard pose gesture, the client attempts standard
+fullscreen, WebKit fullscreen when exposed, then landscape orientation lock.
+The attempt is made once. Safari standalone metadata and `viewport-fit=cover`
+are present, while region coverage continues under safe-area insets and arrows
+remain away from the edges. Denial or unsupported APIs are expected fallbacks:
+the largest available landscape viewport remains playable and the app never
+loops or claims browser chrome can be hidden.
+
+`SimonSaysTuning` owns provisional Left green, Right red, Down yellow, Up blue,
+idle brightness (`controller_minimum_brightness`), and full-charge brightness
+(`controller_maximum_brightness`). Inspector tooltips describe their outcomes
+and validation rejects an idle value above the charged value. The existing
+`charge_fill_seconds` and `charge_decay_seconds` drive browser interpolation;
+no competing timing was introduced. `FlashPoseProtocol` includes the tuning in
+personalized snapshots/challenges and sends narrow `flash_pose_charge` updates
+for the registered player. These values affect presentation only; the host
+continues to own semantic charge, deadlines, lives, and results.
+
+After TypeScript edits, rebuild both committed modules:
+
+```powershell
+cd web
+npm.cmd run build
+```
+
+Verification performed:
+
+- `[AUTO]` `npm.cmd run build` and `npm.cmd run check` passed.
+- `[AUTO]` `npm.cmd test` passed 14 tests, including representative and exact
+  boundary membership, color endpoints/interpolation, overflow CSS,
+  fullscreen fallback code, cancellation paths, and existing LAN protocol.
+- `[AUTO]` `tests/flash_pose_protocol_test.gd` and
+  `tests/tuning_presets_test.gd` passed; the latter validates all new Inspector
+  fields and brightness ordering.
+- `[AUTO]` a headless Godot editor load completed without script/parse errors;
+  its usual forced-shutdown resource warnings are not project-load failures.
+- Computer inspection loaded the actual served join page, but the isolated
+  desktop session did not enter an active round. This is not claimed as
+  `[DESKTOP-BROWSER]` gameplay layout evidence.
+
+PS-029 still owns `[PHYSICAL-PHONE]` checks on iPhone 16 Pro Safari and Pixel 7
+Chrome, including real safe areas, scrolling/zoom suppression, holds,
+2/3/4 transitions, fullscreen denial/standalone behavior, arrow legibility,
+and the separate `[HUMAN-PLAY]` brightness/comfort decision. The current color
+and brightness defaults remain provisional until that review.
+
 ## PS-027 — Flash? Pose! lobby and debug flow (2026-09-18)
 
 ### Phone pose-input correction after owner testing

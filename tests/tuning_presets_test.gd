@@ -18,6 +18,8 @@ func _run() -> void:
 		"body_bounce", "body_jiggle_degrees", "body_sway", "visual_follow_speed",
 		"secondary_motion_strength", "lead_emphasis", "reaction_seconds", "result_cycle_seconds",
 		"pose_flow_hold_seconds",
+		"controller_left_color", "controller_right_color", "controller_down_color", "controller_up_color",
+		"controller_minimum_brightness", "controller_maximum_brightness",
 		"auto_hold_seconds", "auto_release_seconds",
 	]):
 		return
@@ -61,6 +63,11 @@ func _run() -> void:
 	simon.stop_interval_min_seconds = 3.0
 	simon.auto_release_seconds = 0.1
 	if not _check(simon.validation_errors()[0].contains("Auto release"), "Simon Says invalid combinations report an actionable message"):
+		return
+	simon.auto_release_seconds = 2.0
+	simon.controller_minimum_brightness = 0.8
+	simon.controller_maximum_brightness = 0.6
+	if not _check(simon.validation_errors()[0].contains("idle brightness"), "Phone brightness ordering validates cleanly"):
 		return
 
 	var networking: Resource = NetworkingTuningScript.new()
