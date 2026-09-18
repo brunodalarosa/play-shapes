@@ -2,6 +2,17 @@
 
 ## PS-030 — Flash? Pose! phone controller layout (2026-09-18)
 
+### Client startup regression correction
+
+The initial PS-030 commit compiled controller geometry into a second browser
+module and imported it from `app.js`, but the fixed HTTP asset allowlist did not
+serve `/controller_geometry.js`. Phones therefore received a 404 for the module,
+the application entry point never executed, and the static page remained at
+`Connecting to the host…`. `HttpService.ASSETS` now serves that exact committed
+module with the JavaScript MIME type. The served-assets integration test requests
+the imported module directly, so a successful `app.js` response alone can no
+longer hide a broken module graph.
+
 Active Flash? Pose! play adds `gameplay-active` to the document and turns
 `#pose-grid` into the fixed visual viewport. The active surface has no card,
 padding, scroll range, gutters, or dead regions. Two directions are equal

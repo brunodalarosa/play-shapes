@@ -50,6 +50,7 @@ after(async () => {
 test('serves bundled HTML, JS, CSS and session configuration', async () => {
   for (const [path, mime, text] of [
     ['/', 'text/html', 'Join game'], ['/app.js', 'text/javascript', 'localStorage'],
+    ['/controller_geometry.js', 'text/javascript', 'directionAtPoint'],
     ['/style.css', 'text/css', 'focus-visible'], ['/session.json', 'application/json', 'session_id']
   ]) {
     const response = await fetch(base + path);

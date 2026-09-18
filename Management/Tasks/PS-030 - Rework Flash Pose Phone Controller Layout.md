@@ -188,8 +188,14 @@ phone`, and the first eligible control gesture makes one feature-detected
 fullscreen/orientation attempt with a stable denied/unsupported fallback.
 
 `[AUTO]` TypeScript build/check, exact region/boundary and color endpoint tests,
-the 14-test served browser/host suite, focused Godot protocol/tuning tests, and
+the 16-test served browser/host suite, focused Godot protocol/tuning tests, and
 the headless editor load pass. Computer inspection reached the served join page
 but could not enter an active round in that isolated desktop session, so no
 `[DESKTOP-BROWSER]` gameplay-layout claim is made. The named `[PHYSICAL-PHONE]`
 matrix and `[HUMAN-PLAY]` brightness/comfort approval remain in PS-029.
+
+Follow-up correction on 2026-09-18: the first implementation imported the new
+compiled `controller_geometry.js` module without adding it to Godot's fixed HTTP
+asset allowlist. That made browser startup stop before the WebSocket handshake.
+The module is now served explicitly, and the integration suite requests it as a
+required runtime asset rather than checking only the top-level `app.js`.
