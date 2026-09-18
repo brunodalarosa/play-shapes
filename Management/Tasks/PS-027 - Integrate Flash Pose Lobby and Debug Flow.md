@@ -2,7 +2,7 @@
 id: PS-027
 title: "Integrate Flash? Pose! lobby and debug flow"
 type: implementation
-status: done
+status: in-progress
 release:
 owner: ai
 priority:
@@ -137,3 +137,13 @@ browser packets through semantic character charge. The phone pose button and
 all child icon/label content also disable standard/WebKit selection and iOS
 touch callouts, backed by compiled-bundle checks. A fresh physical-phone retest
 is still required; no post-fix device approval is claimed here.
+
+The owner subsequently confirmed that the normal minigame is playable with an
+iPhone and an Android phone. One-player debug still ended after the first pose
+because it inherited the normal last-player rule. The controller now records
+the explicit one-player debug launch, preserves infinite lives across failed
+evaluations, bypasses `last_player` while its real participant remains, and
+finishes at the configured maximum duration. Debug protocol messages drive the
+phone label `Lives: DEBUG`; normal life and end rules are unchanged. Automated
+coverage passes, but the task is reopened until the owner verifies this debug
+flow on a phone.

@@ -81,6 +81,7 @@ test('Flash Pose controller exposes accessible hold controls and cancellation ha
     assert.ok(js.includes(expected), `compiled controller should include ${expected}`);
   }
   assert.match(js, /selectstart[^\n]+preventDefault/);
+  assert.ok(js.includes('Lives: DEBUG'));
   assert.ok(js.includes("You've been eliminated :(") );
 });
 

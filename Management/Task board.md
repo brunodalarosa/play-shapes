@@ -42,6 +42,7 @@ views:
           - play-shapes/Management/Tasks/PS-028 - Validate Flash Pose Technical Loop.md
           - play-shapes/Management/Tasks/PS-029 - Validate Flash Pose on Two Phones and in Human Play.md
         in-progress:
+          - play-shapes/Management/Tasks/PS-027 - Integrate Flash Pose Lobby and Debug Flow.md
         done:
           - play-shapes/Management/Tasks/Done/PS-001 - Define the First Gameplay Milestone.md
           - play-shapes/Management/Tasks/Done/PS-002 - Validate Phase 1 on a Physical Phone.md
@@ -64,7 +65,6 @@ views:
           - play-shapes/Management/Tasks/Done/PS-023 - Prepare Flash Pose Runtime Music and SFX.md
           - play-shapes/Management/Tasks/Done/PS-024 - Implement Flash Pose Host Round Controller.md
           - play-shapes/Management/Tasks/Done/PS-025 - Implement Flash Pose Phone Protocol and Controller.md
-          - play-shapes/Management/Tasks/Done/PS-027 - Integrate Flash Pose Lobby and Debug Flow.md
     columnColors:
       note.status:
         done: green
@@ -101,7 +101,7 @@ views:
         - play-shapes/Management/Tasks/Done/PS-024 - Implement Flash Pose Host Round Controller.md
         - play-shapes/Management/Tasks/Done/PS-025 - Implement Flash Pose Phone Protocol and Controller.md
         - play-shapes/Management/Tasks/PS-026 - Implement Flash Pose Shared Screen Feedback and Results.md
-        - play-shapes/Management/Tasks/Done/PS-027 - Integrate Flash Pose Lobby and Debug Flow.md
+        - play-shapes/Management/Tasks/PS-027 - Integrate Flash Pose Lobby and Debug Flow.md
         - play-shapes/Management/Tasks/PS-028 - Validate Flash Pose Technical Loop.md
         - play-shapes/Management/Tasks/PS-029 - Validate Flash Pose on Two Phones and in Human Play.md
       note.status:

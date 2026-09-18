@@ -82,6 +82,19 @@ func _test_snapshots_elimination_and_ten_players() -> void:
 	_check(protocol.snapshot_for("unknown").type == "lobby",
 		"A player outside the round remains lobby-only")
 
+	var debug_controller := _controller()
+	debug_controller.start_round([_participants(1)[0]], 0, true)
+	var debug_protocol := Protocol.new(debug_controller)
+	var debug_snapshot: Dictionary = debug_protocol.snapshot_for("p1")
+	var debug_result: Dictionary = debug_protocol.result_for("p1", 1, [{
+		"player_id": "p1", "success": false, "lives": 2, "eliminated": false,
+	}])
+	_check(debug_snapshot.debug_mode and debug_protocol.challenge_message().debug_mode,
+		"One-player debug state is explicit in snapshots and challenges")
+	_check(debug_result.debug_mode and debug_result.lives == 2 \
+		and debug_result.message == "Missed it — debug mode continues",
+		"Debug results expose infinite-life behavior without false life-loss copy")
+
 func _controller() -> Node:
 	var controller := Controller.new()
 	var tuning := SimonSaysTuning.new()

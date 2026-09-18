@@ -56,6 +56,7 @@ func snapshot_for(player_id: String) -> Dictionary:
 		return {"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}
 	return {
 		"type": "flash_pose_snapshot",
+		"debug_mode": controller.is_one_player_debug(),
 		"phase": str(controller.phase_name()),
 		"style": str(controller.style),
 		"stop_id": controller.current_stop_id,
@@ -66,6 +67,7 @@ func snapshot_for(player_id: String) -> Dictionary:
 func challenge_message() -> Dictionary:
 	return {
 		"type": "flash_pose_challenge",
+		"debug_mode": controller.is_one_player_debug(),
 		"stop_id": controller.current_stop_id,
 		"available_directions": Array(controller.available_directions()).map(func(value: StringName) -> String: return str(value)),
 		"message": "Music stopped! Hold your pose",
@@ -77,9 +79,10 @@ func result_for(player_id: String, stop_id: int, results: Array[Dictionary]) -> 
 			var eliminated := bool(result.get("eliminated", false))
 			return {
 				"type": "flash_pose_result", "stop_id": stop_id,
+				"debug_mode": controller.is_one_player_debug(),
 				"success": bool(result.get("success", false)),
 				"lives": int(result.get("lives", 0)), "eliminated": eliminated,
-				"message": "You've been eliminated :(" if eliminated else ("Pose locked!" if result.get("success", false) else "Missed it — one life lost"),
+				"message": "You've been eliminated :(" if eliminated else ("Pose locked!" if result.get("success", false) else ("Missed it — debug mode continues" if controller.is_one_player_debug() else "Missed it — one life lost")),
 			}
 	return {}
 
@@ -89,7 +92,8 @@ func results_message(player_id: String, results: Dictionary) -> Dictionary:
 		if String(entry.get("player_id", "")) == player_id:
 			placement = int(entry.get("placement", 0))
 			break
-	return {"type": "flash_pose_results", "placement": placement, "message": "Round complete"}
+	return {"type": "flash_pose_results", "debug_mode": controller.is_one_player_debug(),
+		"placement": placement, "message": "Round complete"}
 
 func _player_state(player_id: String) -> Dictionary:
 	for state: Dictionary in controller.player_snapshot():

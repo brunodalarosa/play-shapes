@@ -159,7 +159,10 @@ function showGame(message) {
     gameMessage.textContent = message.message ?? (phase === "genuine_stop_grace" ? "Music stopped! Hold your pose." : "Keep watching the shared screen.");
     const player = message.player;
     const lifeCount = message.lives ?? player?.lives;
-    lives.textContent = Number.isInteger(lifeCount) ? `Lives: ${"♥".repeat(Math.max(0, lifeCount))}${"♡".repeat(Math.max(0, 2 - lifeCount))}` : "";
+    if (message.debug_mode === true)
+        lives.textContent = "Lives: DEBUG";
+    else if (Number.isInteger(lifeCount))
+        lives.textContent = `Lives: ${"♥".repeat(Math.max(0, lifeCount))}${"♡".repeat(Math.max(0, 2 - lifeCount))}`;
     const eliminated = message.eliminated === true || player?.eliminated === true;
     if (eliminated) {
         releaseHeld();

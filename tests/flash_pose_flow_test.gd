@@ -93,7 +93,8 @@ func _run() -> void:
 	await scene_changed
 	await process_frame
 	controller = current_scene.get_node(^"RoundController") as FlashPoseRoundController
-	if not _check(controller.player_snapshot().size() == 1 and controller.phase_name() == &"countdown",
+	if not _check(controller.player_snapshot().size() == 1 and controller.phase_name() == &"countdown" \
+			and controller.is_one_player_debug(),
 			"[GODOT-RUNTIME] Debug uses the same scene/controller with one participant"):
 		return
 	if not _check(launcher.marker_text() == "DEBUG — One-player Flash? Pose!",

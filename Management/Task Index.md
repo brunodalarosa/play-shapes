@@ -10,7 +10,9 @@ the human has assigned them.
 
 ## In Progress
 
-- None.
+- [[PS-027 - Integrate Flash Pose Lobby and Debug Flow]] — normal two-phone
+  flow confirmed; infinite-life one-player debug correction awaits owner
+  device verification
 
 ## Blocked
 
@@ -29,9 +31,6 @@ the human has assigned them.
 
 ## Recently completed
 
-- [[PS-027 - Integrate Flash Pose Lobby and Debug Flow]] — gated host start,
-  shared normal/debug scene handoff, persistent-session return, and focused
-  lifecycle/service-continuity checks
 - [[PS-025 - Implement Flash Pose Phone Protocol and Controller]] — validated
   host-owned pose packets, reconnect snapshots, accessible hold controls, and
   personalized results backed by focused protocol/browser checks

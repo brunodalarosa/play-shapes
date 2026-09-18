@@ -29,6 +29,31 @@ ring, pointer capture, or cancellation cleanup. Automated checks pass; the
 owner should still recheck actual Safari touch/selection behavior because this
 change is not new physical-phone evidence.
 
+### Infinite-life one-player debug correction
+
+Owner testing confirmed the normal two-player minigame flow on one iPhone and
+one Android phone after the input correction. That is real-device evidence for
+the normal flow, but not blanket approval of the remaining PS-029 experience
+matrix.
+
+The same testing found that one-player debug stopped after its first pose
+evaluation because the normal `eligible_player_count <= 1` end condition was
+still active. `FlashPoseRoundController` now records the explicit debug launch
+flag only when `allow_one_player_debug` is used with exactly one participant.
+In that mode, failed evaluations still produce failure feedback/reactions but
+do not deduct lives or eliminate the player, and the sole active participant
+does not trigger `last_player`. The round continues through repeated stops and
+ends normally at `round_duration_seconds`; withdrawal of the only real player
+still ends the round rather than running an empty debug session.
+
+Protocol snapshots, challenges, and per-stop results carry `debug_mode`, and
+the phone renders `Lives: DEBUG` instead of hearts. Normal launches never infer
+debug behavior from player count and retain two lives, elimination, and the
+last-player finish. Automated checks cover repeated failed debug evaluations,
+unchanged lives, continued dance cycles, timeout completion, launch-flag
+propagation, protocol copy, and the compiled phone label. A fresh one-player
+device run is still required before PS-027 returns to `done`.
+
 `SessionHost.prepare_flash_pose_launch()` is the single handoff for both normal
 and debug play. It validates registered-player records (never raw browser
 connections), snapshots their public identity/name/seat/connectivity data,
