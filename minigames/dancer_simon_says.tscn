@@ -1,15 +1,15 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene format=3 uid="uid://cbd1gib7ugnd3"]
 
-[ext_resource type="Script" path="res://minigames/dancer_simon_says_stage.gd" id="1_stage"]
+[ext_resource type="Script" uid="uid://bgoka3e4erc5b" path="res://minigames/dancer_simon_says_stage.gd" id="1_stage"]
 [ext_resource type="PackedScene" path="res://characters/shape_character.tscn" id="2_character"]
-[ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/environment/tree_small.png" id="3_tree"]
-[ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/environment/floor_left.png" id="4_floor_left"]
-[ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/environment/floor_center.png" id="5_floor_center"]
-[ext_resource type="Texture2D" path="res://assets/runtime/shape_characters/environment/floor_right.png" id="6_floor_right"]
-[ext_resource type="Script" path="res://minigames/flash_pose_round_controller.gd" id="7_controller"]
-[ext_resource type="Script" path="res://minigames/flash_pose_presentation.gd" id="8_presentation"]
+[ext_resource type="Texture2D" uid="uid://cacidpry1ie26" path="res://assets/runtime/shape_characters/environment/tree_small.png" id="3_tree"]
+[ext_resource type="Texture2D" uid="uid://cb3i6h4scl6ss" path="res://assets/runtime/shape_characters/environment/floor_left.png" id="4_floor_left"]
+[ext_resource type="Texture2D" uid="uid://dtkrs6h1yv87m" path="res://assets/runtime/shape_characters/environment/floor_center.png" id="5_floor_center"]
+[ext_resource type="Texture2D" uid="uid://caucf3xk5w3vb" path="res://assets/runtime/shape_characters/environment/floor_right.png" id="6_floor_right"]
+[ext_resource type="Script" uid="uid://bmyxamr031i5i" path="res://minigames/flash_pose_round_controller.gd" id="7_controller"]
+[ext_resource type="Script" uid="uid://bi56e8cejb5og" path="res://minigames/flash_pose_presentation.gd" id="8_presentation"]
 
-[node name="DancerSimonSays" type="Control"]
+[node name="DancerSimonSays" type="Control" unique_id=1013679207]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -18,15 +18,15 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_stage")
 
-[node name="RoundController" type="Node" parent="."]
+[node name="RoundController" type="Node" parent="." unique_id=736851312]
 unique_name_in_owner = true
 script = ExtResource("7_controller")
 
-[node name="Presentation" type="Node" parent="."]
+[node name="Presentation" type="Node" parent="." unique_id=752655543]
 unique_name_in_owner = true
 script = ExtResource("8_presentation")
 
-[node name="Sky" type="ColorRect" parent="."]
+[node name="Sky" type="ColorRect" parent="." unique_id=1972289595]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -36,8 +36,9 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.345, 0.725, 0.91, 1)
 
-[node name="DistantGround" type="ColorRect" parent="."]
+[node name="DistantGround" type="ColorRect" parent="." unique_id=1671104873]
 layout_mode = 1
+anchors_preset = -1
 anchor_top = 0.55
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -46,7 +47,7 @@ grow_vertical = 0
 mouse_filter = 2
 color = Color(0.53, 0.79, 0.38, 1)
 
-[node name="StageArt" type="Control" parent="."]
+[node name="StageArt" type="Control" parent="." unique_id=1118258635]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -55,10 +56,11 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="LeftTree" type="TextureRect" parent="StageArt"]
+[node name="LeftTree" type="TextureRect" parent="StageArt" unique_id=515956167]
 layout_mode = 1
+anchors_preset = -1
 anchor_left = 0.04
-anchor_top = 0.20
+anchor_top = 0.2
 anchor_right = 0.18
 anchor_bottom = 0.64
 grow_horizontal = 2
@@ -68,10 +70,11 @@ texture = ExtResource("3_tree")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="RightTree" type="TextureRect" parent="StageArt"]
+[node name="RightTree" type="TextureRect" parent="StageArt" unique_id=690442451]
 layout_mode = 1
+anchors_preset = -1
 anchor_left = 0.82
-anchor_top = 0.20
+anchor_top = 0.2
 anchor_right = 0.96
 anchor_bottom = 0.64
 grow_horizontal = 2
@@ -82,8 +85,9 @@ expand_mode = 1
 stretch_mode = 5
 flip_h = true
 
-[node name="LeadPlatformLeft" type="TextureRect" parent="StageArt"]
+[node name="LeadPlatformLeft" type="TextureRect" parent="StageArt" unique_id=719727042]
 layout_mode = 1
+anchors_preset = -1
 anchor_left = 0.382
 anchor_top = 0.35
 anchor_right = 0.461
@@ -95,8 +99,9 @@ texture = ExtResource("4_floor_left")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="LeadPlatformCenter" type="TextureRect" parent="StageArt"]
+[node name="LeadPlatformCenter" type="TextureRect" parent="StageArt" unique_id=1093097515]
 layout_mode = 1
+anchors_preset = -1
 anchor_left = 0.461
 anchor_top = 0.35
 anchor_right = 0.539
@@ -106,10 +111,10 @@ grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("5_floor_center")
 expand_mode = 1
-stretch_mode = 0
 
-[node name="LeadPlatformRight" type="TextureRect" parent="StageArt"]
+[node name="LeadPlatformRight" type="TextureRect" parent="StageArt" unique_id=1008686075]
 layout_mode = 1
+anchors_preset = -1
 anchor_left = 0.539
 anchor_top = 0.35
 anchor_right = 0.618
@@ -121,10 +126,11 @@ texture = ExtResource("6_floor_right")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="PlayerPlatformLeft" type="TextureRect" parent="StageArt"]
+[node name="PlayerPlatformLeft" type="TextureRect" parent="StageArt" unique_id=1882276204]
 layout_mode = 1
+anchors_preset = -1
 anchor_left = 0.015
-anchor_top = 0.70
+anchor_top = 0.7
 anchor_right = 0.094
 anchor_bottom = 0.84
 grow_horizontal = 2
@@ -134,10 +140,11 @@ texture = ExtResource("4_floor_left")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="PlayerPlatformCenter" type="TextureRect" parent="StageArt"]
+[node name="PlayerPlatformCenter" type="TextureRect" parent="StageArt" unique_id=56464801]
 layout_mode = 1
+anchors_preset = -1
 anchor_left = 0.094
-anchor_top = 0.70
+anchor_top = 0.7
 anchor_right = 0.906
 anchor_bottom = 0.84
 grow_horizontal = 2
@@ -145,12 +152,12 @@ grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("5_floor_center")
 expand_mode = 1
-stretch_mode = 0
 
-[node name="PlayerPlatformRight" type="TextureRect" parent="StageArt"]
+[node name="PlayerPlatformRight" type="TextureRect" parent="StageArt" unique_id=1700282930]
 layout_mode = 1
+anchors_preset = -1
 anchor_left = 0.906
-anchor_top = 0.70
+anchor_top = 0.7
 anchor_right = 0.985
 anchor_bottom = 0.84
 grow_horizontal = 2
@@ -160,14 +167,14 @@ texture = ExtResource("6_floor_right")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="StageTitle" type="Label" parent="."]
+[node name="StageTitle" type="Label" parent="." unique_id=2121295724]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_top = 18.0
 offset_bottom = 70.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.09, 0.12, 0.20, 1)
+theme_override_colors/font_color = Color(0.09, 0.12, 0.2, 1)
 theme_override_colors/font_shadow_color = Color(1, 1, 1, 0.72)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
@@ -175,7 +182,7 @@ theme_override_font_sizes/font_size = 36
 text = "Flash? Pose!"
 horizontal_alignment = 1
 
-[node name="LeadSlot" type="Control" parent="." groups=["flash_pose_lead_slot"]]
+[node name="LeadSlot" type="Control" parent="." unique_id=1622039938 groups=["flash_pose_lead_slot"]]
 unique_name_in_owner = true
 layout_mode = 1
 anchor_left = 0.5
@@ -186,14 +193,14 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="AnchorMarker" type="Marker2D" parent="LeadSlot"]
+[node name="AnchorMarker" type="Marker2D" parent="LeadSlot" unique_id=286864989]
 gizmo_extents = 42.0
 
-[node name="PreviewCharacter" parent="LeadSlot" instance=ExtResource("2_character")]
+[node name="PreviewCharacter" parent="LeadSlot" unique_id=1263381480 instance=ExtResource("2_character")]
 scale = Vector2(0.92, 0.92)
 player_color = Color(0.965, 0.357, 0.478, 1)
 
-[node name="PlayerSlots" type="Control" parent="."]
+[node name="PlayerSlots" type="Control" parent="." unique_id=532860404]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -203,7 +210,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="Seat01" type="Control" parent="PlayerSlots" groups=["flash_pose_player_seat"]]
+[node name="Seat01" type="Control" parent="PlayerSlots" unique_id=409017147 groups=["flash_pose_player_seat"]]
 layout_mode = 1
 anchor_left = 0.453
 anchor_top = 0.66
@@ -212,13 +219,15 @@ anchor_bottom = 0.66
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat01"]
+
+[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat01" unique_id=67890598]
 gizmo_extents = 28.0
-[node name="PreviewCharacter" parent="PlayerSlots/Seat01" instance=ExtResource("2_character")]
+
+[node name="PreviewCharacter" parent="PlayerSlots/Seat01" unique_id=1328294830 instance=ExtResource("2_character")]
 scale = Vector2(0.54, 0.54)
 player_color = Color(0.357, 0.553, 0.949, 1)
 
-[node name="Seat02" type="Control" parent="PlayerSlots" groups=["flash_pose_player_seat"]]
+[node name="Seat02" type="Control" parent="PlayerSlots" unique_id=406937691 groups=["flash_pose_player_seat"]]
 layout_mode = 1
 anchor_left = 0.547
 anchor_top = 0.66
@@ -227,13 +236,15 @@ anchor_bottom = 0.66
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat02"]
+
+[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat02" unique_id=762530526]
 gizmo_extents = 28.0
-[node name="PreviewCharacter" parent="PlayerSlots/Seat02" instance=ExtResource("2_character")]
+
+[node name="PreviewCharacter" parent="PlayerSlots/Seat02" unique_id=83392806 instance=ExtResource("2_character")]
 scale = Vector2(0.54, 0.54)
 player_color = Color(0.306, 0.796, 0.553, 1)
 
-[node name="Seat03" type="Control" parent="PlayerSlots" groups=["flash_pose_player_seat"]]
+[node name="Seat03" type="Control" parent="PlayerSlots" unique_id=2012732174 groups=["flash_pose_player_seat"]]
 layout_mode = 1
 anchor_left = 0.36
 anchor_top = 0.66
@@ -242,13 +253,15 @@ anchor_bottom = 0.66
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat03"]
+
+[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat03" unique_id=548807486]
 gizmo_extents = 28.0
-[node name="PreviewCharacter" parent="PlayerSlots/Seat03" instance=ExtResource("2_character")]
+
+[node name="PreviewCharacter" parent="PlayerSlots/Seat03" unique_id=1536158614 instance=ExtResource("2_character")]
 scale = Vector2(0.54, 0.54)
 player_color = Color(0.965, 0.769, 0.325, 1)
 
-[node name="Seat04" type="Control" parent="PlayerSlots" groups=["flash_pose_player_seat"]]
+[node name="Seat04" type="Control" parent="PlayerSlots" unique_id=1189172463 groups=["flash_pose_player_seat"]]
 layout_mode = 1
 anchor_left = 0.64
 anchor_top = 0.66
@@ -257,13 +270,15 @@ anchor_bottom = 0.66
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat04"]
-gizmo_extents = 28.0
-[node name="PreviewCharacter" parent="PlayerSlots/Seat04" instance=ExtResource("2_character")]
-scale = Vector2(0.54, 0.54)
-player_color = Color(0.612, 0.447, 0.910, 1)
 
-[node name="Seat05" type="Control" parent="PlayerSlots" groups=["flash_pose_player_seat"]]
+[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat04" unique_id=1089059788]
+gizmo_extents = 28.0
+
+[node name="PreviewCharacter" parent="PlayerSlots/Seat04" unique_id=151946649 instance=ExtResource("2_character")]
+scale = Vector2(0.54, 0.54)
+player_color = Color(0.612, 0.447, 0.91, 1)
+
+[node name="Seat05" type="Control" parent="PlayerSlots" unique_id=967043351 groups=["flash_pose_player_seat"]]
 layout_mode = 1
 anchor_left = 0.267
 anchor_top = 0.66
@@ -272,13 +287,15 @@ anchor_bottom = 0.66
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat05"]
+
+[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat05" unique_id=2020081323]
 gizmo_extents = 28.0
-[node name="PreviewCharacter" parent="PlayerSlots/Seat05" instance=ExtResource("2_character")]
+
+[node name="PreviewCharacter" parent="PlayerSlots/Seat05" unique_id=1250376849 instance=ExtResource("2_character")]
 scale = Vector2(0.54, 0.54)
 player_color = Color(0.937, 0.498, 0.271, 1)
 
-[node name="Seat06" type="Control" parent="PlayerSlots" groups=["flash_pose_player_seat"]]
+[node name="Seat06" type="Control" parent="PlayerSlots" unique_id=1106777204 groups=["flash_pose_player_seat"]]
 layout_mode = 1
 anchor_left = 0.733
 anchor_top = 0.66
@@ -287,13 +304,15 @@ anchor_bottom = 0.66
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat06"]
-gizmo_extents = 28.0
-[node name="PreviewCharacter" parent="PlayerSlots/Seat06" instance=ExtResource("2_character")]
-scale = Vector2(0.54, 0.54)
-player_color = Color(0.333, 0.780, 0.851, 1)
 
-[node name="Seat07" type="Control" parent="PlayerSlots" groups=["flash_pose_player_seat"]]
+[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat06" unique_id=989585789]
+gizmo_extents = 28.0
+
+[node name="PreviewCharacter" parent="PlayerSlots/Seat06" unique_id=219180267 instance=ExtResource("2_character")]
+scale = Vector2(0.54, 0.54)
+player_color = Color(0.333, 0.78, 0.851, 1)
+
+[node name="Seat07" type="Control" parent="PlayerSlots" unique_id=879055159 groups=["flash_pose_player_seat"]]
 layout_mode = 1
 anchor_left = 0.173
 anchor_top = 0.66
@@ -302,13 +321,15 @@ anchor_bottom = 0.66
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat07"]
-gizmo_extents = 28.0
-[node name="PreviewCharacter" parent="PlayerSlots/Seat07" instance=ExtResource("2_character")]
-scale = Vector2(0.54, 0.54)
-player_color = Color(0.910, 0.404, 0.710, 1)
 
-[node name="Seat08" type="Control" parent="PlayerSlots" groups=["flash_pose_player_seat"]]
+[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat07" unique_id=472024171]
+gizmo_extents = 28.0
+
+[node name="PreviewCharacter" parent="PlayerSlots/Seat07" unique_id=1197949652 instance=ExtResource("2_character")]
+scale = Vector2(0.54, 0.54)
+player_color = Color(0.91, 0.404, 0.71, 1)
+
+[node name="Seat08" type="Control" parent="PlayerSlots" unique_id=1694723631 groups=["flash_pose_player_seat"]]
 layout_mode = 1
 anchor_left = 0.827
 anchor_top = 0.66
@@ -317,13 +338,15 @@ anchor_bottom = 0.66
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat08"]
+
+[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat08" unique_id=1370536639]
 gizmo_extents = 28.0
-[node name="PreviewCharacter" parent="PlayerSlots/Seat08" instance=ExtResource("2_character")]
+
+[node name="PreviewCharacter" parent="PlayerSlots/Seat08" unique_id=1984466587 instance=ExtResource("2_character")]
 scale = Vector2(0.54, 0.54)
 player_color = Color(0.537, 0.702, 0.298, 1)
 
-[node name="Seat09" type="Control" parent="PlayerSlots" groups=["flash_pose_player_seat"]]
+[node name="Seat09" type="Control" parent="PlayerSlots" unique_id=384710280 groups=["flash_pose_player_seat"]]
 layout_mode = 1
 anchor_left = 0.08
 anchor_top = 0.66
@@ -332,13 +355,15 @@ anchor_bottom = 0.66
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat09"]
+
+[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat09" unique_id=960114357]
 gizmo_extents = 28.0
-[node name="PreviewCharacter" parent="PlayerSlots/Seat09" instance=ExtResource("2_character")]
+
+[node name="PreviewCharacter" parent="PlayerSlots/Seat09" unique_id=481757469 instance=ExtResource("2_character")]
 scale = Vector2(0.54, 0.54)
 player_color = Color(0.498, 0.569, 0.659, 1)
 
-[node name="Seat10" type="Control" parent="PlayerSlots" groups=["flash_pose_player_seat"]]
+[node name="Seat10" type="Control" parent="PlayerSlots" unique_id=1032057068 groups=["flash_pose_player_seat"]]
 layout_mode = 1
 anchor_left = 0.92
 anchor_top = 0.66
@@ -347,8 +372,10 @@ anchor_bottom = 0.66
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat10"]
+
+[node name="AnchorMarker" type="Marker2D" parent="PlayerSlots/Seat10" unique_id=880633605]
 gizmo_extents = 28.0
-[node name="PreviewCharacter" parent="PlayerSlots/Seat10" instance=ExtResource("2_character")]
+
+[node name="PreviewCharacter" parent="PlayerSlots/Seat10" unique_id=995551011 instance=ExtResource("2_character")]
 scale = Vector2(0.54, 0.54)
 player_color = Color(0.843, 0.392, 0.392, 1)

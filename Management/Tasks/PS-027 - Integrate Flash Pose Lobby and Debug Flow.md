@@ -2,7 +2,7 @@
 id: PS-027
 title: "Integrate Flash? Pose! lobby and debug flow"
 type: implementation
-status: backlog
+status: in-progress
 release:
 owner: ai
 priority:
@@ -110,3 +110,40 @@ phone and human-play evidence. Follow GitHub Flow and keep unrelated changes
 out of the pull request.
 
 # Outcome
+
+Completed on 2026-09-18. The lobby now exposes a host-only `Start minigame`
+control gated to 2–10 registered players with visible unavailable reasons.
+Normal and exactly-one-player F12 debug starts both snapshot the persistent
+registry through `SessionHost` and load the same reserved Flash? Pose! scene.
+The debug entry uses the player-facing name, retains its non-pausing marker,
+clean restart, and lobby-return behavior, and cannot be unlocked by raw browser
+connections.
+
+The shared results view now exposes `Return to lobby`. Controller notification
+precedes deferred scene teardown so phones receive lobby state; the persistent
+host, services, surviving identities, seats, and reconnect capability remain
+alive while joins reopen in the replacement lobby. Explicit gameplay Leave is
+observed as withdrawal without life loss. Focused automated/editor/runtime
+checks passed, including 12/12 browser integration tests and a reviewed
+1280×720 technical results render. Physical-phone and human-play evidence
+remain explicitly assigned to PS-029.
+
+Owner testing before merge then exposed two phone-control defects in this same
+acceptance boundary: JSON-decoded whole-number `input_seq` values were rejected
+when Godot represented them as floats, and held charge did not advance between
+input/deadline events. Both were corrected in this PR with bounded numeric
+normalization, host-time pose-rule ticking, and regression coverage from parsed
+browser packets through semantic character charge. The phone pose button and
+all child icon/label content also disable standard/WebKit selection and iOS
+touch callouts, backed by compiled-bundle checks. A fresh physical-phone retest
+is still required; no post-fix device approval is claimed here.
+
+The owner subsequently confirmed that the normal minigame is playable with an
+iPhone and an Android phone. One-player debug still ended after the first pose
+because it inherited the normal last-player rule. The controller now records
+the explicit one-player debug launch, preserves infinite lives across failed
+evaluations, bypasses `last_player` while its real participant remains, and
+finishes at the configured maximum duration. Debug protocol messages drive the
+phone label `Lives: DEBUG`; normal life and end rules are unchanged. Automated
+coverage passes, but the task is reopened until the owner verifies this debug
+flow on a phone.

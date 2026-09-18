@@ -30,6 +30,7 @@ var _feedback_label: Label
 var _results: Control
 var _happy_names: Label
 var _moody_names: Label
+var _return_button: Button
 var _flash_overlay: ColorRect
 var _music: AudioStreamPlayer
 var _flash_sfx: AudioStreamPlayer
@@ -158,12 +159,15 @@ func _build_results_view() -> void:
 	_moody_names = _result_label("", 28)
 	happy_panel.add_child(_section("HAPPY CREW  ★", _happy_names))
 	moody_panel.add_child(_section("MOODY CREW  ☁", _moody_names))
-	var hint := _result_label("Waiting for the host to return to the lobby", 18)
-	hint.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	hint.position = Vector2(-300, -58)
-	hint.size = Vector2(600, 30)
-	hint.modulate = Color(1, 1, 1, 0.72)
-	_results.add_child(hint)
+	_return_button = Button.new()
+	_return_button.name = "ReturnToLobby"
+	_return_button.text = "Return to lobby"
+	_return_button.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	_return_button.position = Vector2(-110, -68)
+	_return_button.size = Vector2(220, 44)
+	_return_button.pressed.connect(func() -> void:
+		_return_button.disabled = _controller.request_return_to_lobby())
+	_results.add_child(_return_button)
 
 
 func _result_panel(color: Color, top: float, bottom: float) -> PanelContainer:
@@ -295,7 +299,7 @@ func _on_semantic_animation_updated(player_id: String, state: Dictionary) -> voi
 	var animator := _player_animators.get(player_id) as HybridCharacterAnimator
 	if animator == null:
 		return
-	animator.set_pose_state(StringName(state.get("pose_direction", &"")), float(state.get("pose_charge", 0.0)), bool(state.get("held", false)))
+	animator.set_pose_state(StringName(state.get("pose_direction", &"")), float(state.get("pose_charge", 0.0)), bool(state.get("pose_held", false)))
 
 
 func _on_genuine_stop_started(_stop_id: int, direction: StringName, _available: Array[StringName]) -> void:

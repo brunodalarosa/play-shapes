@@ -48,6 +48,13 @@ func _run() -> void:
 		"Genuine stop pauses music and shows text plus icon direction feedback")
 	controller.submit_pose_input("p1", &"left", true, 1, start_msec)
 	controller.submit_pose_input("p2", &"left", true, 1, start_msec)
+	var player_animator := presentation._player_animators["p1"] as HybridCharacterAnimator
+	_check(player_animator.semantic_state().pose_held \
+		and player_animator.semantic_state().pose_direction == &"left",
+		"Accepted phone press reaches the character as a held pose")
+	controller.advance(start_msec + 50)
+	_check(player_animator.semantic_state().pose_charge > 0.0,
+		"Held phone input visibly advances character pose charge")
 	controller.advance(start_msec + 200)
 	_check(presentation._flashed_stop_ids.size() == 1, "Resolved genuine stop starts exactly one guarded flash")
 	await create_timer(0.4).timeout

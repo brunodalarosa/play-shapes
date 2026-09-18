@@ -114,6 +114,17 @@ func submit_input(player_id: String, requested_direction: StringName, held: bool
 	return {"accepted": true, "state": semantic_state(player_id)}
 
 
+## Advances held charge from the host clock between input events. The round
+## controller remains responsible for settling an expired genuine-stop window.
+func advance(host_time_msec: int) -> bool:
+	if not _accept_host_time(host_time_msec):
+		return false
+	if not _stop_resolved and host_time_msec > _evaluation_deadline_msec:
+		return false
+	_advance_to(host_time_msec)
+	return true
+
+
 ## Clears a held input immediately. Reconnect does not restore it; a new press is required.
 func set_player_connected(player_id: String, connected: bool, host_time_msec: int) -> bool:
 	if (not _stop_resolved and host_time_msec > _evaluation_deadline_msec) \

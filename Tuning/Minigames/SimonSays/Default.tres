@@ -1,34 +1,14 @@
-[gd_resource type="Resource" script_class="SimonSaysTuning" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="SimonSaysTuning" format=3 uid="uid://b546s71x06rdq"]
 
-[ext_resource type="Script" path="res://Tuning/Minigames/simon_says_tuning.gd" id="1"]
+[ext_resource type="Script" uid="uid://c2ladmmxvjjvt" path="res://Tuning/Minigames/simon_says_tuning.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
-countdown_seconds = 3.0
-round_duration_seconds = 60.0
-stop_interval_min_seconds = 4.0
-stop_interval_max_seconds = 7.0
-stop_interval_reduction_seconds = 0.25
-down_unlock_seconds = 15.0
-up_unlock_seconds = 30.0
-charge_fill_seconds = 1.0
-charge_decay_seconds = 0.28
-pose_reveal_delay_seconds = 0.0
-pose_grace_seconds = 1.2
-dance_beats_per_second = 1.7
-body_bounce = 6.0
-body_jiggle_degrees = 4.0
-body_sway = 7.0
-visual_follow_speed = 12.0
-secondary_motion_strength = 1.0
-lead_emphasis = 1.16
-reaction_seconds = 0.7
-result_cycle_seconds = 1.8
-pose_flow_hold_seconds = 0.45
-flash_duration_seconds = 0.22
-flash_intensity = 0.78
-music_gain_db = -8.0
-flash_sfx_gain_db = -5.0
-music_resume_fade_seconds = 0.12
-auto_hold_seconds = 1.5
-auto_release_seconds = 0.7
+round_duration_seconds = 300.0
+down_unlock_seconds = 30.0
+up_unlock_seconds = 60.0
+charge_fill_seconds = 0.7999999999999999
+pose_grace_seconds = 2.3000000000000003
+reaction_seconds = 0.6
+result_cycle_seconds = 3.0
+pose_flow_hold_seconds = 0.6000000000000001

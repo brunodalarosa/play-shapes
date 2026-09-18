@@ -146,6 +146,27 @@ func _test_timeout_ranking_and_one_player_debug() -> void:
 		"Normal start rejects one participant")
 	_check(debug_controller.start_round([_participants()[0]], 0, true).accepted,
 		"Explicit debug start accepts one participant")
+	debug_controller.inject_sequences([], [&"left", &"right"], [0, 0])
+	debug_controller.advance(0)
+	debug_controller.advance(0)
+	var first_deadline: int = debug_controller._pose_rules.current_deadline_msec()
+	debug_controller.advance(first_deadline)
+	_check(debug_controller._players.p1.lives == 2 \
+		and debug_controller._players.p1.state == &"active",
+		"One-player debug failure keeps infinite lives and an active player")
+	debug_controller.acknowledge_flash(1, first_deadline)
+	_check(debug_controller.phase_name() == &"dance",
+		"One-player debug continues after its first pose evaluation")
+	debug_controller.advance(first_deadline)
+	var second_deadline: int = debug_controller._pose_rules.current_deadline_msec()
+	debug_controller.advance(second_deadline)
+	debug_controller.acknowledge_flash(2, second_deadline)
+	_check(debug_controller.phase_name() == &"dance" \
+		and debug_controller._players.p1.lives == 2,
+		"Repeated debug failures continue without life loss or elimination")
+	debug_controller.advance(10_000)
+	_check(debug_controller.phase_name() == &"results_wait",
+		"One-player debug still ends at the configured maximum duration")
 
 
 func _controller(countdown: float, duration: float) -> Node:

@@ -29,6 +29,7 @@ var phase: Phase = Phase.IDLE
 var style: StringName = &""
 var current_stop_id := 0
 var current_target: StringName = &""
+var _one_player_debug := false
 var _players: Dictionary = {}
 var _pose_rules: PoseEvaluationRules
 var _round_started_msec := -1
@@ -90,6 +91,7 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 		if candidate_id.is_empty() or participant_ids.has(candidate_id):
 			return _rejected(&"invalid_participants")
 		participant_ids[candidate_id] = true
+	_one_player_debug = allow_one_player_debug and participants.size() == 1
 	_players.clear()
 	_pose_rules = PoseEvaluationRules.new(tuning)
 	_pose_rules.semantic_state_changed.connect(_on_semantic_state_changed)
@@ -144,6 +146,10 @@ func advance(host_time_msec: int) -> Dictionary:
 		Phase.GENUINE_STOP_GRACE:
 			if host_time_msec >= _pose_rules.current_deadline_msec():
 				_resolve_stop(host_time_msec)
+	# Input events establish held/released state; this host-clock tick makes the
+	# authoritative charge and its semantic animation update continuously.
+	if _pose_rules != null and phase in [Phase.COUNTDOWN, Phase.DANCE, Phase.GENUINE_STOP_GRACE, Phase.FLASH_WAIT]:
+		_pose_rules.advance(host_time_msec)
 	return {"accepted": true, "phase": phase_name()}
 
 
@@ -191,7 +197,7 @@ func observe_registry(players: Array, host_time_msec: int) -> void:
 			state.state = &"withdrawn"
 			state.connected = false
 			_pose_rules.withdraw_player(player_id, host_time_msec)
-	if phase in [Phase.DANCE, Phase.GENUINE_STOP_GRACE] and _eligible_player_count() <= 1:
+	if phase in [Phase.DANCE, Phase.GENUINE_STOP_GRACE] and _has_too_few_players():
 		_finish_round(&"last_player")
 
 
@@ -200,8 +206,8 @@ func acknowledge_flash(stop_id: int, host_time_msec: int) -> Dictionary:
 		return _rejected(&"unexpected_flash_completion")
 	_last_host_time_msec = host_time_msec
 	flash_completed.emit(stop_id)
-	if _eligible_player_count() <= 1 or host_time_msec >= _round_deadline_msec:
-		_finish_round(&"last_player" if _eligible_player_count() <= 1 else &"timeout")
+	if _has_too_few_players() or host_time_msec >= _round_deadline_msec:
+		_finish_round(&"last_player" if _has_too_few_players() else &"timeout")
 	else:
 		_transition_to(Phase.DANCE)
 		_schedule_next_stop(host_time_msec)
@@ -223,6 +229,10 @@ func phase_name() -> StringName:
 
 func last_host_time_msec() -> int:
 	return _last_host_time_msec
+
+
+func is_one_player_debug() -> bool:
+	return _one_player_debug
 
 
 func available_directions(at_msec: int = _last_host_time_msec) -> Array[StringName]:
@@ -271,18 +281,20 @@ func _resolve_stop(host_time_msec: int) -> void:
 		var result := raw_result.duplicate(true)
 		var state: Dictionary = _players[result.player_id]
 		if not result.success:
-			state.lives -= 1
-			_life_loss_counter += 1
-			state.life_loss_order = _life_loss_counter
-		state.reaction = &"survived" if result.success else &"life_loss"
-		if state.lives <= 0:
-			state.state = &"eliminated"
-			state.reaction = &"none"
-			_elimination_counter += 1
-			state.elimination_order = _elimination_counter
-			_pose_rules.mark_eliminated(result.player_id, current_stop_id, host_time_msec)
+			state.reaction = &"life_loss"
+			if not _one_player_debug:
+				state.lives -= 1
+				_life_loss_counter += 1
+				state.life_loss_order = _life_loss_counter
+				if state.lives <= 0:
+					state.state = &"eliminated"
+					state.reaction = &"none"
+					_elimination_counter += 1
+					state.elimination_order = _elimination_counter
+					_pose_rules.mark_eliminated(result.player_id, current_stop_id, host_time_msec)
 		result.lives = state.lives
 		result.eliminated = state.state == &"eliminated"
+		result.debug_mode = _one_player_debug
 		enriched.append(result)
 	pose_evaluation_resolved.emit(current_stop_id, enriched.duplicate(true))
 	_transition_to(Phase.FLASH_WAIT)
@@ -364,6 +376,11 @@ func _eligible_player_count() -> int:
 		if state.state == &"active":
 			count += 1
 	return count
+
+
+func _has_too_few_players() -> bool:
+	var eligible := _eligible_player_count()
+	return eligible == 0 or (eligible == 1 and not _one_player_debug)
 
 
 func _on_semantic_state_changed(player_id: String, semantic: Dictionary) -> void:

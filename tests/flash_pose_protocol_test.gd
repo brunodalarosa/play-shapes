@@ -32,6 +32,8 @@ func _test_valid_ordered_actions_and_malformed_packets() -> void:
 	for malformed: Dictionary in [
 		{"type": "pose_down", "direction": "spin", "input_seq": 3},
 		{"type": "pose_down", "direction": "left", "input_seq": -1},
+		{"type": "pose_down", "direction": "left", "input_seq": 3.5},
+		{"type": "pose_down", "direction": "left", "input_seq": "3"},
 		{"type": "pose_down", "direction": "left", "input_seq": 3, "player_id": "p2"},
 		{"type": "pose_down", "direction": "left", "input_seq": 3, "timestamp": 999999},
 	]:
@@ -40,6 +42,13 @@ func _test_valid_ordered_actions_and_malformed_packets() -> void:
 	var semantic: Dictionary = controller._pose_rules.semantic_state("p1")
 	_check(not semantic.held and semantic.latest_input_seq == 2,
 		"Rejected input does not mutate held state or accepted sequence")
+	var browser_packet: Dictionary = JSON.parse_string(
+		'{"type":"pose_down","direction":"left","input_seq":3}')
+	_check(protocol.handle_action(player, browser_packet, 101).accepted,
+		"A JSON-decoded browser sequence is normalized and accepted")
+	semantic = controller._pose_rules.semantic_state("p1")
+	_check(semantic.held and semantic.latest_input_seq == 3,
+		"Normalized browser input reaches the authoritative pose rules")
 	var deadline: int = controller._pose_rules.current_deadline_msec()
 	controller.advance(deadline)
 	var lives_before: int = controller._players.p1.lives
@@ -72,6 +81,19 @@ func _test_snapshots_elimination_and_ten_players() -> void:
 		"Elimination uses the exact player-facing copy")
 	_check(protocol.snapshot_for("unknown").type == "lobby",
 		"A player outside the round remains lobby-only")
+
+	var debug_controller := _controller()
+	debug_controller.start_round([_participants(1)[0]], 0, true)
+	var debug_protocol := Protocol.new(debug_controller)
+	var debug_snapshot: Dictionary = debug_protocol.snapshot_for("p1")
+	var debug_result: Dictionary = debug_protocol.result_for("p1", 1, [{
+		"player_id": "p1", "success": false, "lives": 2, "eliminated": false,
+	}])
+	_check(debug_snapshot.debug_mode and debug_protocol.challenge_message().debug_mode,
+		"One-player debug state is explicit in snapshots and challenges")
+	_check(debug_result.debug_mode and debug_result.lives == 2 \
+		and debug_result.message == "Missed it — debug mode continues",
+		"Debug results expose infinite-life behavior without false life-loss copy")
 
 func _controller() -> Node:
 	var controller := Controller.new()

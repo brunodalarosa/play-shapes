@@ -34,6 +34,7 @@ type HostMessage = {
   available_directions?: string[];
   success?: boolean;
   lives?: number;
+  debug_mode?: boolean;
   eliminated?: boolean;
   placement?: number;
   state?: string;
@@ -141,6 +142,7 @@ function renderControls(available: string[]): void {
     button.addEventListener("pointercancel", event => { if (held?.pointerId === event.pointerId) releaseHeld(); });
     button.addEventListener("lostpointercapture", () => { if (held?.button === button) releaseHeld(); });
     button.addEventListener("contextmenu", event => event.preventDefault());
+    button.addEventListener("selectstart", event => event.preventDefault());
     button.addEventListener("keydown", event => {
       if ((event.key !== " " && event.key !== "Enter") || event.repeat || held) return;
       event.preventDefault();
@@ -168,7 +170,8 @@ function showGame(message: HostMessage): void {
   gameMessage.textContent = message.message ?? (phase === "genuine_stop_grace" ? "Music stopped! Hold your pose." : "Keep watching the shared screen.");
   const player = message.player as unknown as { lives?: number; eliminated?: boolean } | undefined;
   const lifeCount = message.lives ?? player?.lives;
-  lives.textContent = Number.isInteger(lifeCount) ? `Lives: ${"♥".repeat(Math.max(0, lifeCount!))}${"♡".repeat(Math.max(0, 2 - lifeCount!))}` : "";
+  if (message.debug_mode === true) lives.textContent = "Lives: DEBUG";
+  else if (Number.isInteger(lifeCount)) lives.textContent = `Lives: ${"♥".repeat(Math.max(0, lifeCount!))}${"♡".repeat(Math.max(0, 2 - lifeCount!))}`;
   const eliminated = message.eliminated === true || player?.eliminated === true;
   if (eliminated) {
     releaseHeld();

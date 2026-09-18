@@ -10,7 +10,9 @@ the human has assigned them.
 
 ## In Progress
 
-- None.
+- [[PS-027 - Integrate Flash Pose Lobby and Debug Flow]] — normal two-phone
+  flow confirmed; infinite-life one-player debug correction awaits owner
+  device verification
 
 ## Blocked
 
@@ -22,8 +24,6 @@ the human has assigned them.
   Milestone 1
 - [[PS-026 - Implement Flash Pose Shared Screen Feedback and Results]] — AI
   implementation; shared presentation, audio/flash, and results
-- [[PS-027 - Integrate Flash Pose Lobby and Debug Flow]] — AI implementation;
-  host start, debug entry, and scene lifecycle
 - [[PS-028 - Validate Flash Pose Technical Loop]] — AI validation; automated,
   editor/runtime, and desktop-browser evidence
 - [[PS-029 - Validate Flash Pose on Two Phones and in Human Play]] — human

@@ -1,5 +1,135 @@
 # Play Shapes development
 
+## PS-027 — Flash? Pose! lobby and debug flow (2026-09-18)
+
+### Phone pose-input correction after owner testing
+
+Owner testing on iPhone exposed `Pose input needs a non-negative sequence` for
+apparently valid left/right presses. Browser JSON may decode `input_seq` as a
+Godot float even when the transmitted JSON number is a whole integer. The
+protocol now accepts only finite, whole, non-negative JSON numbers within
+JavaScript's exact integer range, normalizes them to an `int`, and keeps
+rejecting fractions, negative values, non-numbers, stale sequences, and
+authority-shaped fields.
+
+A second gap prevented visible charging after an accepted press: pose charge
+was advanced only at another input or evaluation boundary. The round controller
+now advances the existing authoritative `PoseEvaluationRules` from host time on
+active frames, and presentation consumes its explicit `pose_direction`,
+`pose_charge`, and `pose_held` aliases. The controller still owns timing and
+outcomes; animation only receives semantic state. Regression checks prove a
+JSON-decoded press reaches the rules, becomes a held character pose, and gains
+visible charge before the evaluation deadline.
+
+The phone pose buttons and every child icon/label now explicitly disable
+standard and WebKit text selection and the iOS touch callout. A guarded
+`selectstart` handler provides an additional browser fallback without removing
+the native button semantics, accessible name, keyboard hold behavior, focus
+ring, pointer capture, or cancellation cleanup. Automated checks pass; the
+owner should still recheck actual Safari touch/selection behavior because this
+change is not new physical-phone evidence.
+
+### Infinite-life one-player debug correction
+
+Owner testing confirmed the normal two-player minigame flow on one iPhone and
+one Android phone after the input correction. That is real-device evidence for
+the normal flow, but not blanket approval of the remaining PS-029 experience
+matrix.
+
+The same testing found that one-player debug stopped after its first pose
+evaluation because the normal `eligible_player_count <= 1` end condition was
+still active. `FlashPoseRoundController` now records the explicit debug launch
+flag only when `allow_one_player_debug` is used with exactly one participant.
+In that mode, failed evaluations still produce failure feedback/reactions but
+do not deduct lives or eliminate the player, and the sole active participant
+does not trigger `last_player`. The round continues through repeated stops and
+ends normally at `round_duration_seconds`; withdrawal of the only real player
+still ends the round rather than running an empty debug session.
+
+Protocol snapshots, challenges, and per-stop results carry `debug_mode`, and
+the phone renders `Lives: DEBUG` instead of hearts. Normal launches never infer
+debug behavior from player count and retain two lives, elimination, and the
+last-player finish. Automated checks cover repeated failed debug evaluations,
+unchanged lives, continued dance cycles, timeout completion, launch-flag
+propagation, protocol copy, and the compiled phone label. A fresh one-player
+device run is still required before PS-027 returns to `done`.
+
+`SessionHost.prepare_flash_pose_launch()` is the single handoff for both normal
+and debug play. It validates registered-player records (never raw browser
+connections), snapshots their public identity/name/seat/connectivity data,
+closes new-player admission, and leaves the persistent HTTP, WebSocket,
+registry, reconnect tokens, and seats alive across the scene change. Flash?
+Pose! accepts 2–10 registered players in normal play. The one-player path is
+available only as the F12 entry `One-player Flash? Pose!` and requires exactly
+one real registry player; it creates no simulated identity or alternate game.
+
+Normal host workflow:
+
+1. Start the project and let phones join the lobby normally.
+2. The shared display's `Start minigame` button stays disabled below two
+   registered players and explains the gate. It also explains the existing
+   ten-player Flash? Pose! limit if the wider 20-player lobby exceeds it.
+3. With 2–10 registered players, press `Start minigame`. The host closes new
+   joins, loads `res://minigames/dancer_simon_says.tscn`, consumes the snapshot
+   once, and starts the existing `FlashPoseRoundController`.
+4. Existing players may reconnect during the round and receive the current
+   personalized gameplay snapshot. A transient disconnect keeps the round
+   participant/seat but clears the held pose. Explicit Leave removes the
+   registry record and the controller marks that participant withdrawn without
+   a life loss.
+5. At results, use the shared-display `Return to lobby` button. The controller
+   first emits its host-owned return signal so phones receive lobby state; then
+   the scene is torn down, presentation audio/tweens/nodes and protocol signal
+   bindings are released, the debug marker is cleared if present, and the new
+   lobby reopens joins. `SessionHost` and the surviving registry records are
+   not restarted.
+
+Debug workflow: register exactly one real phone player, press F12, and choose
+`One-player Flash? Pose!`. The launcher remains non-pausing and shows
+`DEBUG — One-player Flash? Pose!`. `Restart current debug scenario` prepares a
+fresh snapshot and reconstructs the same scene/controller. `Return to lobby`
+sends lobby state, clears the marker, tears down the scene, and preserves the
+host process/services. If the real player leaves, the one-player launch/restart
+gate closes; browser connection count alone never unlocks it.
+
+Focused checks:
+
+```powershell
+godot --headless --path . --script res://tests/flash_pose_flow_test.gd
+godot --headless --path . --script res://tests/player_lobby_test.gd
+godot --headless --path . --script res://tests/debug_launcher_test.gd
+godot --headless --path . --script res://tests/flash_pose_round_controller_test.gd
+godot --headless --path . --script res://tests/flash_pose_protocol_test.gd
+godot --headless --path . --script res://tests/flash_pose_presentation_test.gd
+godot --headless --path . --script res://tests/dancer_simon_says_scene_test.gd
+cd web
+npm.cmd test
+cd ..
+godot --path . --resolution 1280x720 --script res://tests/flash_pose_presentation_visual_check.gd
+godot --headless --editor --path . --quit-after 10
+```
+
+- **[AUTO]: passed.** Focused checks cover the zero/one/two-player normal gate,
+  exact one-player debug gate, registry rather than connection authority,
+  participant snapshots, closed late joins, explicit withdrawal, shared-scene
+  reuse, clean debug restart, marker lifecycle, results return, and existing
+  controller/protocol/presentation/browser regressions. Browser integration is
+  12/12.
+- **[EDITOR]: passed.** With normal user access, Godot 4.7.2 completed project
+  initialization and script/import scanning with exit code zero and no parse or
+  import failures. The forced `--quit-after` shutdown still reports the known
+  scan-abort/object-cleanup warnings; restricted runs additionally cannot write
+  the user cache, neither of which is treated as runtime evidence.
+- **[GODOT-RUNTIME]: passed for the tested lifecycle and technical render.**
+  The integration test kept the same running `SessionHost` instance through
+  normal launch, results return, debug launch/restart, and debug return. The GL
+  Compatibility renderer produced the 1280×720 results capture, which was
+  inspected after moving the host return control fully below the result panels.
+  Generated captures remain ignored artifacts, not creative approval.
+- **[PHYSICAL-PHONE] / [HUMAN-PLAY]: not claimed.** PS-029 still owns real
+  iPhone/Pixel reconnect/Leave behavior, couch-distance readability, button
+  wording/placement preference, feel, audio, accessibility, and final approval.
+
 ## PS-026 — Flash? Pose! shared-screen feedback and results (2026-09-17)
 
 `minigames/flash_pose_presentation.gd` is the scene-owned presentation/audio
