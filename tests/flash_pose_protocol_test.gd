@@ -70,6 +70,16 @@ func _test_snapshots_elimination_and_ten_players() -> void:
 	_check(snapshot.type == "flash_pose_snapshot" and snapshot.phase == "genuine_stop_grace" \
 		and snapshot.available_directions == ["left", "right"] and snapshot.player.lives == 2,
 		"Reconnect snapshot is personalized and exposes only current phone state")
+	_check(snapshot.presentation.colors.left == "#48d16f" \
+		and snapshot.presentation.minimum_brightness == 0.42 \
+		and snapshot.presentation.charge_fill_seconds == controller.tuning.charge_fill_seconds,
+		"Host snapshot owns phone colors, brightness, and charge timing")
+	var charge_update: Dictionary = protocol.charge_update_for("p10", {
+		"pose_direction": &"left", "pose_charge": 0.75, "pose_held": true,
+	})
+	_check(charge_update.type == "flash_pose_charge" and charge_update.direction == "left" \
+		and charge_update.charge == 0.75 and charge_update.held,
+		"Personalized semantic charge update contains no gameplay outcome authority")
 	controller.advance(10)
 	controller.acknowledge_flash(1, 10)
 	controller.advance(10)

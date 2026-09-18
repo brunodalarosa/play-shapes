@@ -1,3 +1,4 @@
+import { attemptImmersive, chargedColor, directionAtPoint, heldDirectionAfterUpdate } from "./controller_geometry.js";
 const status = document.querySelector("#status");
 const joinForm = document.querySelector("#join-form");
 const nameInput = document.querySelector("#player-name");
@@ -11,49 +12,48 @@ const gameHeading = document.querySelector("#game-heading");
 const gameMessage = document.querySelector("#game-message");
 const lives = document.querySelector("#lives");
 const poseGrid = document.querySelector("#pose-grid");
-const STORAGE = {
-    session: "play-shapes.session-id",
-    token: "play-shapes.reconnect-token",
-    name: "play-shapes.last-name",
-    inputSeq: "play-shapes.input-seq",
-};
+const rotateState = document.querySelector("#rotate-state");
+const STORAGE = { session: "play-shapes.session-id", token: "play-shapes.reconnect-token", name: "play-shapes.last-name", inputSeq: "play-shapes.input-seq" };
+const POSES = [
+    { direction: "left", icon: "←", label: "Pose left" }, { direction: "right", icon: "→", label: "Pose right" },
+    { direction: "down", icon: "↓", label: "Pose down" }, { direction: "up", icon: "↑", label: "Pose up" },
+];
+const DEFAULT_COLORS = { left: "#48d16f", right: "#f04f55", down: "#f4c542", up: "#3489eb" };
 let socket;
 let retry;
 let stopped = false;
 let joined = false;
 let inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
 let held;
-const POSES = [
-    { direction: "left", icon: "←", label: "Pose left" },
-    { direction: "right", icon: "→", label: "Pose right" },
-    { direction: "down", icon: "▼", label: "Pose down" },
-    { direction: "up", icon: "▲", label: "Pose up" },
-];
-function stored(key) {
-    try {
-        return localStorage.getItem(key) ?? "";
-    }
-    catch {
-        return "";
-    }
+let directions = [];
+let presentation = { colors: DEFAULT_COLORS, minimum_brightness: 0.42, maximum_brightness: 1, charge_fill_seconds: 1, charge_decay_seconds: 0.28 };
+let visualCharge = { left: 0, right: 0, down: 0, up: 0 };
+let authoritativeDirection;
+let authoritativeCharge = 0;
+let authoritativeHeld = false;
+let lastAnimationTime = performance.now();
+let fullscreenAttempted = false;
+function stored(key) { try {
+    return localStorage.getItem(key) ?? "";
 }
-function store(key, value) {
-    try {
-        localStorage.setItem(key, value);
-    }
-    catch { /* Joining still works for this page. */ }
+catch {
+    return "";
+} }
+function store(key, value) { try {
+    localStorage.setItem(key, value);
 }
-function forgetIdentity() {
-    try {
-        localStorage.removeItem(STORAGE.session);
-        localStorage.removeItem(STORAGE.token);
-        localStorage.removeItem(STORAGE.inputSeq);
-    }
-    catch { /* Nothing else can be cleared in restricted storage. */ }
-    inputSeq = 0;
+catch { /* Page remains usable. */ } }
+function forgetIdentity() { try {
+    localStorage.removeItem(STORAGE.session);
+    localStorage.removeItem(STORAGE.token);
+    localStorage.removeItem(STORAGE.inputSeq);
 }
+catch { /* Restricted storage. */ } inputSeq = 0; }
+function setGameplaySurface(active) { document.documentElement.classList.toggle("gameplay-active", active); updateOrientation(); }
+function updateOrientation() { const portrait = matchMedia("(orientation: portrait)").matches; const active = document.documentElement.classList.contains("gameplay-active"); rotateState.hidden = !(active && portrait); poseGrid.hidden = !active || portrait; }
 function showJoin(message, focus = false) {
     joined = false;
+    setGameplaySurface(false);
     playerCard.hidden = true;
     gameCard.hidden = true;
     joinForm.hidden = false;
@@ -66,6 +66,7 @@ function showJoin(message, focus = false) {
 }
 function showJoined(player, state = "Connected") {
     joined = true;
+    setGameplaySurface(false);
     joinForm.hidden = true;
     playerCard.hidden = false;
     gameCard.hidden = true;
@@ -74,13 +75,8 @@ function showJoined(player, state = "Connected") {
     leaveButton.disabled = false;
     status.textContent = state === "Connected" ? "Joined. Keep this page open while you play." : state;
 }
-function sendPose(type, direction) {
-    if (!socket || socket.readyState !== WebSocket.OPEN)
-        return;
-    inputSeq += 1;
-    store(STORAGE.inputSeq, String(inputSeq));
-    socket.send(JSON.stringify({ type, direction, input_seq: inputSeq }));
-}
+function sendPose(type, direction) { if (!socket || socket.readyState !== WebSocket.OPEN)
+    return; inputSeq += 1; store(STORAGE.inputSeq, String(inputSeq)); socket.send(JSON.stringify({ type, direction, input_seq: inputSeq })); }
 function releaseHeld(send = true) {
     if (!held)
         return;
@@ -88,69 +84,116 @@ function releaseHeld(send = true) {
     held = undefined;
     current.button.classList.remove("is-held");
     current.button.setAttribute("aria-pressed", "false");
-    if (current.pointerId !== undefined) {
-        try {
-            current.button.releasePointerCapture(current.pointerId);
-        }
-        catch { /* Capture may already be gone. */ }
-    }
+    if (current.pointerId !== undefined && poseGrid.hasPointerCapture(current.pointerId))
+        poseGrid.releasePointerCapture(current.pointerId);
     if (send)
         sendPose("pose_up", current.direction);
 }
-function renderControls(available) {
-    const existing = Array.from(poseGrid.querySelectorAll(".pose-button"), button => button.dataset.direction);
-    const desired = POSES.filter(item => available.includes(item.direction)).map(item => item.direction);
-    if (existing.length === desired.length && existing.every((value, index) => value === desired[index]))
+function beginHold(direction, button, pointerId) {
+    if (held?.direction === direction)
         return;
     releaseHeld();
+    held = { direction, button, ...(pointerId === undefined ? {} : { pointerId }) };
+    if (pointerId !== undefined)
+        poseGrid.setPointerCapture(pointerId);
+    button.classList.add("is-held");
+    button.setAttribute("aria-pressed", "true");
+    visualCharge[direction] = 0;
+    authoritativeDirection = direction;
+    authoritativeCharge = 0;
+    authoritativeHeld = true;
+    sendPose("pose_down", direction);
+    void requestImmersiveMode();
+}
+function readPresentation(value) {
+    if (!value)
+        return;
+    presentation = { colors: { ...DEFAULT_COLORS, ...(value.colors ?? {}) }, minimum_brightness: Number(value.minimum_brightness ?? presentation.minimum_brightness), maximum_brightness: Number(value.maximum_brightness ?? presentation.maximum_brightness), charge_fill_seconds: Math.max(0.1, Number(value.charge_fill_seconds ?? presentation.charge_fill_seconds)), charge_decay_seconds: Math.max(0.05, Number(value.charge_decay_seconds ?? presentation.charge_decay_seconds)) };
+}
+function renderControls(available) {
+    const desired = POSES.filter(item => available.includes(item.direction)).map(item => item.direction);
+    if (held && heldDirectionAfterUpdate(held.direction, desired) === undefined)
+        releaseHeld();
+    directions = desired;
+    const existing = Array.from(poseGrid.querySelectorAll(".pose-button"), button => button.dataset.direction);
+    if (existing.length === desired.length && existing.every((value, index) => value === desired[index]))
+        return;
     poseGrid.replaceChildren();
-    for (const pose of POSES.filter(item => available.includes(item.direction))) {
+    poseGrid.dataset.count = String(desired.length);
+    for (const pose of POSES.filter(item => desired.includes(item.direction))) {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "pose-button";
         button.dataset.direction = pose.direction;
         button.setAttribute("aria-label", pose.label);
-        button.setAttribute("aria-pressed", "false");
-        button.innerHTML = `<span class="icon" aria-hidden="true">${pose.icon}</span><span>${pose.label}</span>`;
-        button.addEventListener("pointerdown", event => {
+        button.setAttribute("aria-pressed", held?.direction === pose.direction ? "true" : "false");
+        button.innerHTML = `<span class="icon" aria-hidden="true">${pose.icon}</span>`;
+        if (held?.direction === pose.direction) {
+            held.button = button;
+            button.classList.add("is-held");
+        }
+        button.addEventListener("keydown", event => { if ((event.key !== " " && event.key !== "Enter") || event.repeat || held)
+            return; event.preventDefault(); beginHold(pose.direction, button); });
+        button.addEventListener("keyup", event => { if ((event.key === " " || event.key === "Enter") && held?.button === button) {
             event.preventDefault();
-            if (held?.direction === pose.direction)
-                return;
             releaseHeld();
-            held = { direction: pose.direction, pointerId: event.pointerId, button };
-            button.setPointerCapture(event.pointerId);
-            button.classList.add("is-held");
-            button.setAttribute("aria-pressed", "true");
-            sendPose("pose_down", pose.direction);
-        });
-        button.addEventListener("pointerup", event => { event.preventDefault(); if (held?.pointerId === event.pointerId)
-            releaseHeld(); });
-        button.addEventListener("pointercancel", event => { if (held?.pointerId === event.pointerId)
-            releaseHeld(); });
-        button.addEventListener("lostpointercapture", () => { if (held?.button === button)
-            releaseHeld(); });
-        button.addEventListener("contextmenu", event => event.preventDefault());
-        button.addEventListener("selectstart", event => event.preventDefault());
-        button.addEventListener("keydown", event => {
-            if ((event.key !== " " && event.key !== "Enter") || event.repeat || held)
-                return;
-            event.preventDefault();
-            held = { direction: pose.direction, button };
-            button.classList.add("is-held");
-            button.setAttribute("aria-pressed", "true");
-            sendPose("pose_down", pose.direction);
-        });
-        button.addEventListener("keyup", event => {
-            if ((event.key === " " || event.key === "Enter") && held?.button === button) {
-                event.preventDefault();
-                releaseHeld();
-            }
-        });
-        button.addEventListener("blur", () => { if (held?.button === button)
+        } });
+        button.addEventListener("blur", () => { if (held?.button === button && held.pointerId === undefined)
             releaseHeld(); });
         poseGrid.append(button);
     }
 }
+poseGrid.addEventListener("pointerdown", event => {
+    event.preventDefault();
+    if (event.button !== 0 && event.pointerType === "mouse")
+        return;
+    const rect = poseGrid.getBoundingClientRect();
+    const direction = directionAtPoint(directions.length, event.clientX - rect.left, event.clientY - rect.top, rect.width, rect.height);
+    const button = poseGrid.querySelector(`[data-direction="${direction}"]`);
+    if (button)
+        beginHold(direction, button, event.pointerId);
+});
+poseGrid.addEventListener("pointerup", event => { event.preventDefault(); if (held?.pointerId === event.pointerId)
+    releaseHeld(); });
+poseGrid.addEventListener("pointercancel", event => { if (held?.pointerId === event.pointerId)
+    releaseHeld(); });
+poseGrid.addEventListener("lostpointercapture", event => { if (held?.pointerId === event.pointerId)
+    releaseHeld(); });
+poseGrid.addEventListener("contextmenu", event => event.preventDefault());
+poseGrid.addEventListener("selectstart", event => event.preventDefault());
+async function requestImmersiveMode() {
+    if (fullscreenAttempted)
+        return;
+    fullscreenAttempted = true;
+    const root = document.documentElement;
+    const orientation = screen.orientation;
+    const fullscreen = root.requestFullscreen ? () => root.requestFullscreen({ navigationUI: "hide" }) : root.webkitRequestFullscreen?.bind(root);
+    await attemptImmersive(fullscreen, orientation.lock ? () => orientation.lock("landscape") : undefined);
+}
+function updateCharge(message) {
+    authoritativeDirection = POSES.some(item => item.direction === message.direction) ? message.direction : undefined;
+    authoritativeCharge = Math.min(1, Math.max(0, Number(message.charge ?? 0)));
+    authoritativeHeld = message.held === true;
+}
+function animate(now) {
+    const delta = Math.min(0.1, Math.max(0, (now - lastAnimationTime) / 1000));
+    lastAnimationTime = now;
+    for (const direction of directions) {
+        const locallyHeld = held?.direction === direction;
+        const hostDirection = authoritativeDirection === direction;
+        let target = hostDirection ? authoritativeCharge : 0;
+        if (locallyHeld && authoritativeHeld)
+            target = Math.max(target, visualCharge[direction] + delta / presentation.charge_fill_seconds);
+        const rate = (locallyHeld || (hostDirection && authoritativeHeld)) ? 1 / presentation.charge_fill_seconds : 1 / presentation.charge_decay_seconds;
+        const step = rate * delta;
+        visualCharge[direction] += Math.max(-step, Math.min(step, target - visualCharge[direction]));
+        const button = poseGrid.querySelector(`[data-direction="${direction}"]`);
+        if (button)
+            button.style.backgroundColor = chargedColor(presentation.colors[direction] ?? DEFAULT_COLORS[direction], presentation.minimum_brightness, presentation.maximum_brightness, visualCharge[direction]);
+    }
+    requestAnimationFrame(animate);
+}
+requestAnimationFrame(animate);
 function showGame(message) {
     playerCard.hidden = true;
     gameCard.hidden = false;
@@ -164,52 +207,55 @@ function showGame(message) {
     else if (Number.isInteger(lifeCount))
         lives.textContent = `Lives: ${"♥".repeat(Math.max(0, lifeCount))}${"♡".repeat(Math.max(0, 2 - lifeCount))}`;
     const eliminated = message.eliminated === true || player?.eliminated === true;
+    readPresentation(message.presentation);
+    if (player)
+        updateCharge(player);
     if (eliminated) {
         releaseHeld();
+        setGameplaySurface(false);
         gameHeading.textContent = "You've been eliminated :(";
         gameMessage.textContent = "Keep watching the big screen for the results.";
         poseGrid.replaceChildren();
     }
-    else if (message.type === "flash_pose_result") {
+    else if (message.type === "flash_pose_result")
         gameHeading.textContent = message.success ? "Pose locked!" : "Keep dancing!";
-        // Results update feedback and lives without taking away player agency.
-        // Existing controls and an uninterrupted hold remain active for free posing.
-    }
-    else if (["countdown", "dance", "genuine_stop_grace", "resolve", "flash_wait"].includes(phase) ||
-        message.type === "flash_pose_challenge") {
-        renderControls(message.available_directions ?? []);
+    else if (["countdown", "dance", "genuine_stop_grace", "resolve", "flash_wait"].includes(phase) || message.type === "flash_pose_challenge") {
+        renderControls(message.available_directions ?? directions);
+        setGameplaySurface(true);
     }
     else if (message.type === "flash_pose_results") {
         releaseHeld();
+        setGameplaySurface(false);
         gameHeading.textContent = message.placement ? `You placed #${message.placement}` : "Round complete";
         gameMessage.textContent = "Check the big screen for the final results.";
         poseGrid.replaceChildren();
     }
     else {
         releaseHeld();
+        setGameplaySurface(false);
         poseGrid.replaceChildren();
     }
 }
 function rememberIdentity(message) {
-    if (!message.player || typeof message.player.name !== "string" ||
-        typeof message.session_id !== "string" || typeof message.reconnect_token !== "string")
+    const player = message.player;
+    if (!player || typeof player.name !== "string" || typeof message.session_id !== "string" || typeof message.reconnect_token !== "string")
         return false;
-    store(STORAGE.name, message.player.name);
+    store(STORAGE.name, player.name);
     store(STORAGE.session, message.session_id);
     store(STORAGE.token, message.reconnect_token);
-    showJoined(message.player);
+    showJoined(player);
     return true;
 }
 function reconnect() {
     if (stopped || retry !== undefined)
         return;
+    setGameplaySurface(false);
     if (joined) {
         playerState.textContent = "Reconnecting";
         leaveButton.disabled = true;
     }
-    else {
+    else
         joinForm.hidden = true;
-    }
     status.textContent = "Host disconnected. Reconnecting…";
     retry = setTimeout(() => { retry = undefined; void connect(); }, 2000);
 }
@@ -220,26 +266,14 @@ async function connect() {
         if (!response.ok)
             throw new Error("Session unavailable");
         const config = await response.json();
-        if (!config || typeof config !== "object" || !("protocol" in config) || config.protocol !== 1 ||
-            !("websocket_port" in config) || !Number.isInteger(config.websocket_port) ||
-            Number(config.websocket_port) < 1024 || Number(config.websocket_port) > 65535 ||
-            !("session_id" in config) || typeof config.session_id !== "string") {
+        if (!config || typeof config !== "object" || !("protocol" in config) || config.protocol !== 1 || !("websocket_port" in config) || !Number.isInteger(config.websocket_port) || Number(config.websocket_port) < 1024 || Number(config.websocket_port) > 65535 || !("session_id" in config) || typeof config.session_id !== "string")
             throw new Error("Unsupported session");
-        }
         if (stopped)
             return;
         const peer = new WebSocket(`ws://${location.hostname}:${config.websocket_port}`);
         socket = peer;
         const deadline = setTimeout(() => peer.close(), 7000);
-        peer.onopen = () => {
-            const reconnectToken = stored(STORAGE.token);
-            const priorSession = stored(STORAGE.session);
-            peer.send(JSON.stringify({
-                type: "hello",
-                protocol: 1,
-                ...(reconnectToken ? { reconnect_token: reconnectToken, session_id: priorSession } : {}),
-            }));
-        };
+        peer.onopen = () => peer.send(JSON.stringify({ type: "hello", protocol: 1, ...(stored(STORAGE.token) ? { reconnect_token: stored(STORAGE.token), session_id: stored(STORAGE.session) } : {}) }));
         peer.onmessage = (event) => {
             let message;
             try {
@@ -265,9 +299,8 @@ async function connect() {
                     forgetIdentity();
                     showJoin("Your previous player expired. Join again with your name.", true);
                 }
-                else {
+                else
                     showJoin("Connected. Enter your name to join.", true);
-                }
             }
             else if (message.type === "join_accepted") {
                 if (!rememberIdentity(message))
@@ -283,12 +316,13 @@ async function connect() {
                 forgetIdentity();
                 showJoin("You left the lobby. Enter a name to join again.", true);
             }
-            else if (message.type === "flash_pose_snapshot" || message.type === "flash_pose_challenge" ||
-                message.type === "flash_pose_result" || message.type === "flash_pose_results") {
+            else if (message.type === "flash_pose_charge")
+                updateCharge(message);
+            else if (["flash_pose_snapshot", "flash_pose_challenge", "flash_pose_result", "flash_pose_results"].includes(message.type ?? ""))
                 showGame(message);
-            }
             else if (message.type === "lobby") {
                 releaseHeld(false);
+                setGameplaySurface(false);
                 if (message.player)
                     rememberIdentity(message);
                 else if (joined) {
@@ -299,57 +333,31 @@ async function connect() {
                 }
             }
         };
-        peer.onclose = event => {
-            clearTimeout(deadline);
-            releaseHeld(false);
-            if (socket === peer)
-                socket = undefined;
-            if (event.code === 4000) {
-                stopped = true;
-                leaveButton.disabled = true;
-                status.textContent = "This player continued in another tab.";
-                playerState.textContent = "Open in another tab";
-                return;
-            }
-            reconnect();
-        };
+        peer.onclose = event => { clearTimeout(deadline); releaseHeld(false); if (socket === peer)
+            socket = undefined; if (event.code === 4000) {
+            stopped = true;
+            leaveButton.disabled = true;
+            status.textContent = "This player continued in another tab.";
+            playerState.textContent = "Open in another tab";
+            return;
+        } reconnect(); };
         peer.onerror = () => peer.close();
     }
     catch {
         reconnect();
     }
 }
-joinForm.addEventListener("submit", event => {
-    event.preventDefault();
-    const name = nameInput.value.trim();
-    store(STORAGE.name, name);
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
-        status.textContent = "Still connecting. Try again in a moment.";
-        return;
-    }
-    joinButton.disabled = true;
-    status.textContent = "Joining…";
-    socket.send(JSON.stringify({ type: "join", name }));
-});
-leaveButton.addEventListener("click", () => {
-    if (!socket || socket.readyState !== WebSocket.OPEN)
-        return;
-    leaveButton.disabled = true;
-    status.textContent = "Leaving…";
-    socket.send(JSON.stringify({ type: "leave" }));
-});
-window.addEventListener("pagehide", () => {
-    stopped = true;
-    releaseHeld(false);
-    clearTimeout(retry);
-    retry = undefined;
-    socket?.close();
-});
-window.addEventListener("pageshow", event => {
-    if (event.persisted) {
-        stopped = false;
-        void connect();
-    }
-});
+joinForm.addEventListener("submit", event => { event.preventDefault(); const name = nameInput.value.trim(); store(STORAGE.name, name); if (!socket || socket.readyState !== WebSocket.OPEN) {
+    status.textContent = "Still connecting. Try again in a moment.";
+    return;
+} joinButton.disabled = true; status.textContent = "Joining…"; socket.send(JSON.stringify({ type: "join", name })); });
+leaveButton.addEventListener("click", () => { if (!socket || socket.readyState !== WebSocket.OPEN)
+    return; leaveButton.disabled = true; status.textContent = "Leaving…"; socket.send(JSON.stringify({ type: "leave" })); });
+addEventListener("orientationchange", updateOrientation);
+addEventListener("resize", updateOrientation);
+window.addEventListener("pagehide", () => { stopped = true; releaseHeld(false); clearTimeout(retry); retry = undefined; socket?.close(); });
+window.addEventListener("pageshow", event => { if (event.persisted) {
+    stopped = false;
+    void connect();
+} });
 void connect();
-export {};

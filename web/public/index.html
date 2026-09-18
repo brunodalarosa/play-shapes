@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Play Shapes</title>
   <link rel="stylesheet" href="/style.css">
   <script type="module" src="/app.js"></script>
@@ -31,6 +34,7 @@
       <p id="game-message">Get ready to pose when the music stops.</p>
       <p id="lives" class="lives" aria-live="polite"></p>
       <div id="pose-grid" class="pose-grid" aria-label="Pose controls"></div>
+      <div id="rotate-state" class="rotate-state" role="status" hidden>Rotate your phone</div>
     </section>
     <noscript>Enable JavaScript to connect to the game.</noscript>
     <p class="footnote">Keep this page open while you play.</p>

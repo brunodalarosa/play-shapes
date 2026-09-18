@@ -112,6 +112,28 @@ var flash_sfx_gain_db: float = -5.0:
 var music_resume_fade_seconds: float = 0.12:
 	set(value): music_resume_fade_seconds = clampf(value, 0.0, 1.0)
 
+@export_group("Phone controller")
+## Left-region base color. Keep it visibly green so players can identify the direction peripherally. Provisional until PS-029 phone review.
+@export
+var controller_left_color: Color = Color("48d16f")
+## Right-region base color. Keep it visibly red and distinct from the green Left region. Provisional until PS-029 phone review.
+@export
+var controller_right_color: Color = Color("f04f55")
+## Down-region base color. Keep it visibly yellow with enough contrast for the black arrow. Provisional until PS-029 phone review.
+@export
+var controller_down_color: Color = Color("f4c542")
+## Up-region base color. Keep it visibly blue and distinct from the green Left region. Provisional until PS-029 phone review.
+@export
+var controller_up_color: Color = Color("3489eb")
+## Region brightness at zero charge. Lower makes charge growth more obvious; higher improves idle visibility. Provisional default: 0.42. Safe range: 0.2-0.8.
+@export_range(0.2, 0.8, 0.01)
+var controller_minimum_brightness: float = 0.42:
+	set(value): controller_minimum_brightness = clampf(value, 0.2, 0.8)
+## Region brightness at full charge. Higher is more vivid; lower is gentler in dim rooms. Must not be below idle brightness. Provisional default: 1.0. Safe range: 0.6-1.0.
+@export_range(0.6, 1.0, 0.01)
+var controller_maximum_brightness: float = 1.0:
+	set(value): controller_maximum_brightness = clampf(value, 0.6, 1.0)
+
 @export_group("Debug preview only")
 ## Time the automatic lab keeps a fully charged pose, in seconds. Higher makes inspection easier; lower cycles faster. Default: 1.5. Safe range: 0.5-5.0.
 @export_range(0.5, 5.0, 0.1, "suffix:s")
@@ -132,4 +154,6 @@ func validation_errors() -> PackedStringArray:
 		errors.append("Simon Says: Up unlock must occur within the round duration.")
 	if auto_release_seconds < charge_decay_seconds:
 		errors.append("Simon Says: Auto release (%.2fs) must be at least charge decay (%.2fs) so the preview can fully unwind." % [auto_release_seconds, charge_decay_seconds])
+	if controller_minimum_brightness > controller_maximum_brightness:
+		errors.append("Simon Says: Phone controller idle brightness must not exceed fully charged brightness.")
 	return errors

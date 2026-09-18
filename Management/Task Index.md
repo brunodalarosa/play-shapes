@@ -31,6 +31,9 @@ the human has assigned them.
 
 ## Recently completed
 
+- [[PS-030 - Rework Flash Pose Phone Controller Layout]] — full-viewport
+  landscape 2/3/4-region controller, host-owned charge/color feedback,
+  accessible arrow controls, and fullscreen/orientation fallback
 - [[PS-025 - Implement Flash Pose Phone Protocol and Controller]] — validated
   host-owned pose packets, reconnect snapshots, accessible hold controls, and
   personalized results backed by focused protocol/browser checks
