@@ -221,6 +221,10 @@ func phase_name() -> StringName:
 	return PHASE_NAMES[phase]
 
 
+func last_host_time_msec() -> int:
+	return _last_host_time_msec
+
+
 func available_directions(at_msec: int = _last_host_time_msec) -> Array[StringName]:
 	var result: Array[StringName] = [&"left", &"right"]
 	if _round_started_msec < 0:

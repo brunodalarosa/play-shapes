@@ -1,5 +1,72 @@
 # Play Shapes development
 
+## PS-026 — Flash? Pose! shared-screen feedback and results (2026-09-17)
+
+`minigames/flash_pose_presentation.gd` is the scene-owned presentation/audio
+boundary under `dancer_simon_says.tscn`. It consumes the narrow PS-024 signals
+and never derives outcomes from sprite transforms. At countdown it maps the
+participant snapshot to the stable `Seat01`–`Seat10` anchors, gives each visible
+seat its fixed color and evenly distributed animator phase, and configures the
+lead plus players through `HybridCharacterAnimator` only. Player labels combine
+names with filled/empty heart symbols and explicit `OUT` text, so lives and
+elimination are not communicated by color or audio alone.
+
+The responsive overlay keeps the player-facing `Flash? Pose!` title, a centered
+countdown, a text-plus-arrow direction cue, hold/capture feedback, and margins
+clear of the authored lead/player platforms. UI uses anchors and containers;
+there are no hard-coded viewport dimensions. The lead remains the largest
+character, while status labels stay directly below their stable seat.
+
+`FlashPoseAudioCatalog` remains the sole style mapping: `bounce`, `swing`, and
+`disco` select their prepared looping stream once per round. A genuine
+`genuine_stop_started` signal pauses that player at its current position.
+Authoritative `pose_evaluation_resolved` feedback is applied before
+`flash_requested`. Presentation keeps its own handled-`stop_id` set, plays one
+deterministically alternating supplied flash candidate, fades a code-native
+white overlay, then acknowledges that same stop. Only `flash_completed` resumes
+the existing stream and optional fade; a generic pause has no flash path. Both
+audio players stop on scene teardown.
+
+Results stop music and remain visible until PS-027 supplies the host return.
+The controller-provided `top_group_size` divides named players into a green
+`HAPPY CREW` upper section and a purple `MOODY CREW` lower section. The same
+semantic animator API receives `happy`/`moody` result state. No points,
+scoreboard, or new tiebreaker is rendered.
+
+The active Simon Says preset now exposes provisional, clamped Inspector values:
+`flash_duration_seconds` 0.22 s, `flash_intensity` 0.78, `music_gain_db` -8 dB,
+`flash_sfx_gain_db` -5 dB, and `music_resume_fade_seconds` 0.12 s. These are
+reversible starting values, not human-approved feel or mix.
+
+Focused checks:
+
+```powershell
+godot --headless --path . --script res://tests/flash_pose_presentation_test.gd
+godot --headless --path . --script res://tests/dancer_simon_says_scene_test.gd
+godot --headless --path . --script res://tests/flash_pose_round_controller_test.gd
+godot --headless --path . --script res://tests/flash_pose_audio_assets_test.gd
+godot --headless --path . --script res://tests/tuning_presets_test.gd
+godot --path . --resolution 1280x720 --script res://tests/flash_pose_presentation_visual_check.gd
+godot --headless --editor --path . --quit-after 10
+```
+
+- **[AUTO]: passed.** The presentation test covers stable-seat population,
+  semantic animator mapping, non-color lives, style-to-stream mapping,
+  genuine-stop-only direction feedback, one guarded flash, post-flash dance
+  continuation on the same stream, and persistent named result groups without
+  scores. Existing scene, controller, audio, and tuning checks also pass.
+- **[EDITOR]: passed.** Godot 4.7.2 loaded the project with no script/import
+  errors. Under the restricted profile it still reports the known inability to
+  write user cache/settings plus forced-shutdown cleanup warnings; exit is zero.
+- **[GODOT-RUNTIME]: passed for technical rendering.** The GL Compatibility
+  renderer produced `test-results/ps-026/dance-10-players.png` and
+  `results-groups.png` at 1280x720. Both were visually inspected for clipping,
+  player/platform placement, status visibility, title, and result grouping.
+  Captures are ignored test artifacts and are not creative approval.
+- **[HUMAN-PLAY] / [PHYSICAL-PHONE]: not claimed.** PS-029 still owns flash
+  comfort/brightness, preferred SFX, audible exact-position resume and loop
+  quality, mix, couch-distance readability, two-phone behavior, and final feel.
+
 ## PS-025 — Flash? Pose! phone protocol and controller (2026-09-17)
 
 `host/flash_pose_protocol.gd` is the narrow post-handshake adapter. A browser

@@ -90,6 +90,28 @@ var result_cycle_seconds: float = 1.8:
 var pose_flow_hold_seconds: float = 0.45:
 	set(value): pose_flow_hold_seconds = clampf(value, 0.2, 1.5)
 
+@export_group("Shared-screen feedback")
+## Camera-flash fade duration after authoritative resolution. Higher lingers longer; lower is snappier. Provisional default: 0.22. Safe range: 0.08-0.6.
+@export_range(0.08, 0.6, 0.01, "suffix:s")
+var flash_duration_seconds: float = 0.22:
+	set(value): flash_duration_seconds = clampf(value, 0.08, 0.6)
+## Peak opacity of the code-native camera flash. Higher is brighter; lower preserves more scene detail. Provisional default: 0.78. Safe range: 0.2-1.0.
+@export_range(0.2, 1.0, 0.01)
+var flash_intensity: float = 0.78:
+	set(value): flash_intensity = clampf(value, 0.2, 1.0)
+## Music playback level. Provisional until PS-029 listening review. Default: -8 dB. Safe range: -30 to 0.
+@export_range(-30.0, 0.0, 0.5, "suffix:dB")
+var music_gain_db: float = -8.0:
+	set(value): music_gain_db = clampf(value, -30.0, 0.0)
+## Flash SFX level. Provisional until PS-029 listening review. Default: -5 dB. Safe range: -30 to 0.
+@export_range(-30.0, 0.0, 0.5, "suffix:dB")
+var flash_sfx_gain_db: float = -5.0:
+	set(value): flash_sfx_gain_db = clampf(value, -30.0, 0.0)
+## Music fade after the flash completes. Zero resumes immediately. Provisional default: 0.12. Safe range: 0-1.
+@export_range(0.0, 1.0, 0.01, "suffix:s")
+var music_resume_fade_seconds: float = 0.12:
+	set(value): music_resume_fade_seconds = clampf(value, 0.0, 1.0)
+
 @export_group("Debug preview only")
 ## Time the automatic lab keeps a fully charged pose, in seconds. Higher makes inspection easier; lower cycles faster. Default: 1.5. Safe range: 0.5-5.0.
 @export_range(0.5, 5.0, 0.1, "suffix:s")

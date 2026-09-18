@@ -2,7 +2,7 @@
 id: PS-026
 title: "Implement Flash? Pose! shared-screen feedback and results"
 type: implementation
-status: backlog
+status: done
 release:
 owner: ai
 priority:
@@ -121,3 +121,21 @@ technical captures from human readability/audio/feel approval. Follow GitHub
 Flow and keep unrelated changes out of the pull request.
 
 # Outcome
+
+Completed on 2026-09-17. `dancer_simon_says.tscn` now owns a focused
+`FlashPosePresentation` that populates the approved lead/seat anchors, drives
+the existing semantic animator API, shows responsive countdown/direction/status
+feedback, maps all three styles through the prepared audio catalog, and performs
+one code-native flash/SFX per genuine resolved `stop_id` before resuming the
+same music stream.
+
+The persistent results overlay uses the controller's canonical
+`top_group_size` to show named happy and moody groups without points or a
+scoreboard. Flash duration/intensity, BGM/SFX gain, and resume fade are clamped,
+Inspector-visible provisional values in the default Simon Says preset.
+
+Focused presentation, scene, controller, audio, tuning, editor-load, and real
+GL renderer checks passed. The 1280x720 dance/results captures are technical
+rendering evidence only. PS-029 still owns human approval of flash comfort,
+audio choice/mix/resume, couch-distance readability, physical-phone behavior,
+and overall game feel.
