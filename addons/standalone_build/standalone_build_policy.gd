@@ -11,14 +11,24 @@ const PACK_NAME := "Play Shapes.pck"
 const METADATA_NAME := "build-info.json"
 const ZIP_RELATIVE := "builds/standalone/Play-Shapes-windows-x86_64.zip"
 const INCLUDE_FILTER := "web/public/*.html,web/public/*.css,web/public/*.js"
-const EXCLUDE_FILTER := "addons/**,assets/Kenney_Shape_Characters/**,assets/runtime/shape_characters/manifest.json,art/**,builds/**,Management/**,Project/**,tools/**,tests/**,test-results/**,web/node_modules/**,web/src/**,web/tests/**"
+const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,assets/Kenney_Shape_Characters/**,assets/runtime/shape_characters/manifest.json,art/**,builds/**,Management/**,opencode.json,Project/**,tools/**,tests/**,test-results/**,web/*.json,web/node_modules/**,web/src/**,web/tests/**"
 const REQUIRED_BROWSER_PATHS := [
 	"web/public/index.html",
 	"web/public/app.js",
 	"web/public/controller_geometry.js",
 	"web/public/style.css",
 ]
+const REQUIRED_RUNTIME_PATHS := [
+	"web/public/index.html",
+	"web/public/app.js",
+	"web/public/controller_geometry.js",
+	"web/public/style.css",
+	"addons/kenyoni/qr_code/qr_code_rect.gd",
+	"scenes/boot.tscn",
+	"scenes/lobby.tscn",
+]
 const EXPECTED_ZIP_ENTRIES := [
+	"Play-Shapes-windows-x86_64/",
 	"Play-Shapes-windows-x86_64/Play Shapes.exe",
 	"Play-Shapes-windows-x86_64/Play Shapes.pck",
 	"Play-Shapes-windows-x86_64/build-info.json",
@@ -92,16 +102,32 @@ static func validate_export_result(exit_code: int, executable_path: String, pack
 	return ""
 
 static func pack_contains_required_browser_paths(pack_path: String) -> PackedStringArray:
+	return pack_missing_paths(pack_path, REQUIRED_BROWSER_PATHS)
+
+static func pack_contains_required_runtime_paths(pack_path: String) -> PackedStringArray:
+	return pack_missing_paths(pack_path, REQUIRED_RUNTIME_PATHS)
+
+static func pack_missing_paths(pack_path: String, required_paths: Array) -> PackedStringArray:
 	var missing := PackedStringArray()
 	var file := FileAccess.open(pack_path, FileAccess.READ)
 	if file == null:
 		missing.append("<unreadable PCK>")
 		return missing
 	var bytes := file.get_buffer(file.get_length())
-	for path in REQUIRED_BROWSER_PATHS:
+	for path in required_paths:
 		if not _bytes_contain(bytes, path.to_utf8_buffer()):
 			missing.append(path)
 	return missing
+
+static func pack_contains_any_path(pack_path: String, paths: Array) -> String:
+	var file := FileAccess.open(pack_path, FileAccess.READ)
+	if file == null:
+		return "<unreadable PCK>"
+	var bytes := file.get_buffer(file.get_length())
+	for path in paths:
+		if _bytes_contain(bytes, path.to_utf8_buffer()):
+			return path
+	return ""
 
 static func _bytes_contain(haystack: PackedByteArray, needle: PackedByteArray) -> bool:
 	if needle.is_empty() or needle.size() > haystack.size():

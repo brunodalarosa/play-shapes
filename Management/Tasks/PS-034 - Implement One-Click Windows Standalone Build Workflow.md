@@ -197,11 +197,20 @@ progress/cancellation, artifact metadata, PCK route verification, portable ZIP,
 and Explorer reveal on verified success. Focused automated checks and a normal
 Godot 4.7.2 editor load pass.
 
-The current machine does not have the matching Godot 4.7.2 Windows x86_64
-export templates installed. A real export therefore stops with Godot's missing
-`windows_debug_x86_64.exe` and `windows_release_x86_64.exe` configuration
-errors, matching the plugin's actionable preflight failure. `[EXPORTED-BUILD]`,
-desktop-browser-on-export, physical-phone, and human-play evidence remain
-unclaimed until the owner installs those templates and reruns the workflow.
+The first owner run correctly exposed missing Godot 4.7.2 Windows x86_64 export
+templates, and its dialog also proved too tall/narrow under Windows display
+scaling. The exact official debug/release templates are now installed. The
+dialog opens at a bounded 960×540 logical 16:9 size with a shorter expandable
+details area.
+
+A real export then exposed and fixed two export-boundary defects: development
+JSON files were being packaged, while the runtime Kenyoni QR addon had been
+excluded with editor tooling and prevented the lobby from loading. The final
+filter excludes the MCP/builder addons and browser tooling but preserves the QR
+dependency. The actual plugin workflow now produces and verifies the EXE, PCK,
+metadata, and ZIP. `[EXPORTED-BUILD]` localhost evidence confirms all four
+bundled browser routes return HTTP 200, `/session.json` is valid, port 8081 is
+listening, and the exported process has empty stderr. `[DESKTOP-BROWSER]`,
+`[PHYSICAL-PHONE]`, and `[HUMAN-PLAY]` remain unclaimed.
 
 # Outcome

@@ -21,6 +21,7 @@ var _zip_index := 0
 var _project_root := ""
 var _staging_path := ""
 var _zip_path := ""
+var _reveal_on_success := true
 
 func _enter_tree() -> void:
 	_create_dialog()
@@ -67,7 +68,9 @@ func _on_build_requested() -> void:
 	_details.text = ""
 	_cancel_button.disabled = false
 	_dialog.get_ok_button().disabled = true
-	_dialog.popup_centered(Vector2i(760, 500))
+	# A 16:9 logical size stays comfortably landscape-shaped under Windows DPI
+	# scaling instead of allowing the output field to make a tall narrow dialog.
+	_dialog.popup_centered(Vector2i(960, 540))
 	call_deferred("_run_preflight")
 
 func _run_preflight() -> void:
@@ -110,9 +113,9 @@ func _on_export_finished(exit_code: int) -> void:
 		_fail(error)
 		return
 	_set_stage("Verifying exported files and bundled browser routes...", 70, false)
-	var missing := Policy.pack_contains_required_browser_paths(pack_path)
+	var missing := Policy.pack_contains_required_runtime_paths(pack_path)
 	if not missing.is_empty():
-		_fail("The exported PCK is missing required browser assets:\n- %s" % "\n- ".join(missing))
+		_fail("The exported PCK is missing required runtime assets:\n- %s" % "\n- ".join(missing))
 		return
 	var metadata_error := _write_build_info()
 	if not metadata_error.is_empty():
@@ -256,7 +259,8 @@ func _succeed() -> void:
 	_details.text = "Portable folder:\n%s\n\nZIP:\n%s" % [_staging_path, _zip_path]
 	_cancel_button.disabled = true
 	_dialog.get_ok_button().disabled = false
-	OS.shell_show_in_file_manager(_staging_path, true)
+	if _reveal_on_success:
+		OS.shell_show_in_file_manager(_staging_path, true)
 
 func _fail(message: String) -> void:
 	if _zipper != null:
@@ -288,6 +292,7 @@ func _create_dialog() -> void:
 	_dialog = AcceptDialog.new()
 	_dialog.exclusive = true
 	_dialog.unresizable = false
+	_dialog.min_size = Vector2i(800, 450)
 	var layout := VBoxContainer.new()
 	layout.add_theme_constant_override("separation", 10)
 	_title_label = Label.new()
@@ -304,7 +309,8 @@ func _create_dialog() -> void:
 	_progress.show_percentage = true
 	layout.add_child(_progress)
 	_details = TextEdit.new()
-	_details.custom_minimum_size = Vector2(700, 280)
+	_details.custom_minimum_size = Vector2(860, 190)
+	_details.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_details.editable = false
 	_details.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
 	layout.add_child(_details)

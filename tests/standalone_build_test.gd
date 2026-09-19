@@ -15,6 +15,7 @@ func _init() -> void:
 	_check(Policy.STAGING_RELATIVE == "builds/standalone/windows-x86_64", "staging path is stable")
 	_check(Policy.ZIP_RELATIVE == "builds/standalone/Play-Shapes-windows-x86_64.zip", "ZIP path is stable")
 	_check(Policy.REQUIRED_BROWSER_PATHS.size() == 4, "all four HttpService browser routes are required")
+	_check(Policy.REQUIRED_RUNTIME_PATHS.has("addons/kenyoni/qr_code/qr_code_rect.gd"), "runtime QR addon remains inside the export boundary")
 	_check(Policy.validate_templates("res://tests/missing-release.exe", "res://tests/missing-debug.exe").contains("Manage Export Templates"), "missing-template error is actionable")
 	_check(Policy.validate_export_result(7, "missing.exe", "missing.pck", "synthetic export failure").contains("exit code 7"), "export errors retain the exit code")
 	_check(Policy.validate_export_result(0, "missing.exe", "missing.pck", "").contains("did not create"), "false export success is rejected")
@@ -23,6 +24,7 @@ func _init() -> void:
 		_check(metadata.has(key), "metadata contains %s" % key)
 	_check(metadata.source_revision == "abc123", "metadata keeps the source revision")
 	_check(Policy.EXPECTED_ZIP_ENTRIES == [
+		"Play-Shapes-windows-x86_64/",
 		"Play-Shapes-windows-x86_64/Play Shapes.exe",
 		"Play-Shapes-windows-x86_64/Play Shapes.pck",
 		"Play-Shapes-windows-x86_64/build-info.json",
@@ -34,6 +36,8 @@ func _init() -> void:
 	_check(plugin_source.contains("OS.execute_with_pipe"), "export uses a non-blocking child process")
 	_check(plugin_source.contains("OS.shell_show_in_file_manager"), "successful builds reveal the staging folder")
 	_check(plugin_source.contains("ZIPPacker"), "portable artifact uses Godot ZIP support")
+	_check(plugin_source.contains("popup_centered(Vector2i(960, 540))"), "build dialog opens in a bounded 16:9 landscape size")
+	_check(plugin_source.contains("Vector2(860, 190)"), "details field favors width over excessive height")
 	var project_source := FileAccess.get_file_as_string("res://project.godot")
 	_check(project_source.contains("res://addons/standalone_build/plugin.cfg"), "standalone builder plugin is enabled")
 	var ignore_source := FileAccess.get_file_as_string("res://.gitignore")

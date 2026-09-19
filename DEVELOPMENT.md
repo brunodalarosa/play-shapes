@@ -19,6 +19,10 @@ templates, a missing/changed preset, unsafe output paths, preparation failures,
 and export errors stop before any success claim and remain visible in the build
 dialog with captured output.
 
+The dialog opens at a 960×540 logical 16:9 size with an 800×450 minimum. Its
+details field has a wide 860×190 minimum and expands within the window, avoiding
+the original tall/narrow layout under Windows display scaling.
+
 The build output is Git-ignored and has this shape:
 
 ```text
@@ -38,7 +42,9 @@ index contains the four fixed `HttpService` browser inputs: `index.html`,
 `app.js`, `controller_geometry.js`, and `style.css`. The release preset keeps
 the confirmed `web/public` allowlist and excludes browser sources/dependencies,
 tests/results, tools, planning notes, source art, the runtime asset manifest,
-build output, and editor addons. Node.js is never started by this workflow.
+build output, the MCP/editor builder addons, and browser package configuration.
+The runtime Kenyoni QR addon remains included because the lobby depends on it.
+Node.js is never started by this workflow.
 
 Cancel terminates the owned child export when one is active. During ZIP work it
 finishes closing/removing only the partial owned ZIP. Other partial files may
@@ -66,6 +72,26 @@ requires launching the produced executable without Godot or Node.js and testing
 the lobby plus HTTP/WebSocket/browser flow. `[PHYSICAL-PHONE]` and
 `[HUMAN-PLAY]` require their own real-device/human sessions and are not implied
 by a successful ZIP.
+
+Verification performed after the matching official Godot 4.7.2 templates were
+installed:
+
+- `[AUTO]` `tests/standalone_build_test.gd` passes preset, path ownership,
+  metadata, failure-path, runtime-boundary, ZIP-shape, and landscape-dialog
+  assertions.
+- `[EDITOR]` `tests/standalone_build_editor_integration_test.gd` drives the
+  actual plugin workflow in a headless editor. It produced and inspected the
+  executable, external PCK, metadata, and ZIP; confirmed the browser routes,
+  boot/lobby scenes, and runtime QR dependency; and rejected known development
+  paths. Headless RID/ObjectDB cleanup warnings occur after the successful test
+  and are not export or artifact failures.
+- `[EXPORTED-BUILD]` the generated release executable started without the
+  editor or Node.js, served `/`, `/app.js`, `/controller_geometry.js`, and
+  `/style.css` with HTTP 200, returned a valid `/session.json`, and listened on
+  WebSocket port 8081. Its stderr was empty. The smoke process was deliberately
+  stopped afterward, so its forced exit code is not an application failure.
+- `[DESKTOP-BROWSER]`, `[PHYSICAL-PHONE]`, and `[HUMAN-PLAY]` are not claimed by
+  this automated localhost smoke.
 
 ## PS-032 — Results labels and return action (2026-09-19)
 
