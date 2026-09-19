@@ -2,7 +2,7 @@
 id: PS-032
 title: "Clarify Results labels and strengthen return button"
 type: implementation
-status: backlog
+status: done
 release:
 owner: ai
 priority:
@@ -146,3 +146,17 @@ instructions during implementation and keep unrelated changes out of the
 work.
 
 # Outcome
+
+Completed on 2026-09-19. The Results overlay now shows exact `WINNERS` and
+`LOSERS` headings and name-only ranked entries while preserving the controller's
+ranking split and the animators' internal `happy`/`moody` result moods. Each
+panel's viewport-height span was reduced from 36% to 28.8%, exactly 80% of the
+baseline footprint. The centered host action increased from 220×44 to 320×64
+and received a high-contrast gold treatment with explicit interaction states
+and a separate lower action area.
+
+Focused presentation and lobby-flow checks passed, as did the Godot 4.7.2
+editor load. GL Compatibility captures at 1280×720 and 1920×1080 were inspected
+with ten names and showed no clipping, overlap, or scrolling. These captures
+are technical composition evidence; final couch-distance readability and
+prominence remain a human review rather than a claimed approval.

@@ -1,5 +1,51 @@
 # Play Shapes development
 
+## PS-032 — Results labels and return action (2026-09-19)
+
+The shared Flash? Pose! Results view now uses the exact player-facing headings
+`WINNERS` and `LOSERS`. The star/cloud decorations were removed from both the
+headings and player-name lists, so each ranked entry renders as the name only.
+The controller-owned ranking and `top_group_size` split are unchanged, and the
+internal animator states remain `happy` for the upper group and `moody` for the
+lower group.
+
+The baseline panels each spanned 36% of viewport height (`0.12`–`0.48` and
+`0.53`–`0.89`). Each final panel spans 28.8% (`0.12`–`0.408` and
+`0.462`–`0.75`): `0.288 / 0.36 = 0.8`, an exact 20% reduction in each panel's
+vertical footprint. Their upper/lower order, 84%-viewport width, centered
+content, 28-point names, 30-point headings, border treatment, and clear gap are
+preserved. The recovered lower space is a distinct action area rather than
+part of either ranking group.
+
+`Return to lobby` remains centered and invokes the same host controller request;
+the existing assignment of the request result to `disabled` is unchanged. Its
+presentation increased from 220×44 to 320×64 with 24-point dark text, 28-pixel
+horizontal and 12-pixel vertical style padding, a high-contrast gold fill,
+light border, rounded corners, and explicit hover, pressed, disabled, and focus
+states. The control ends 28 pixels above the viewport bottom and does not
+overlap the lower panel.
+
+Verification performed:
+
+- `[AUTO]` `tests/flash_pose_presentation_test.gd` passed. It checks exact
+  headings, name-only formatting, both 28.8% panel spans, the 320×64 button,
+  panel/action separation, no scoreboard copy, and preserved internal
+  `happy`/`moody` result moods.
+- `[AUTO]` `tests/flash_pose_flow_test.gd` passed. It retains the existing
+  results lifetime, host-controlled request, disabled request handling, audio
+  teardown, `SessionHost` continuity, and lobby-return coverage.
+- `[EDITOR]` Godot 4.7.2 completed a normal-profile headless editor load with no
+  script or scene parse errors. The known forced-shutdown 68-object/33-resource
+  cleanup warnings remain non-load errors.
+- `[GODOT-RUNTIME]` GL Compatibility captures were rendered and inspected at
+  1280×720 and the current 1920×1080 default. Both show the two headings, all
+  ten test names, and the centered action without clipping, overlap, scrolling,
+  or unreadable technical contrast. The deterministic harness writes
+  `test-results/ps-032/results-1280x720.png` and
+  `test-results/ps-032/results-1920x1080.png`.
+- `[HUMAN-PLAY]` is not claimed. The captures establish technical composition,
+  not final couch-distance readability or button prominence approval.
+
 ## PS-031 — FHD host resolution and horizontal lobby (2026-09-19)
 
 The host now starts with an explicit 1920×1080 viewport and window override in
