@@ -36,16 +36,14 @@ views:
       note.status:
         backlog:
           - play-shapes/Management/Tasks/PS-008 - Design Fake Music Stops.md
-          - play-shapes/Management/Tasks/PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says.md
-          - play-shapes/Management/Tasks/PS-018 - Create the 001 - Dancer Simon Says Minigame Scene.md
-          - play-shapes/Management/Tasks/PS-026 - Implement Flash Pose Shared Screen Feedback and Results.md
-          - play-shapes/Management/Tasks/PS-028 - Validate Flash Pose Technical Loop.md
           - play-shapes/Management/Tasks/PS-029 - Validate Flash Pose on Two Phones and in Human Play.md
-        in-progress:
-          - play-shapes/Management/Tasks/PS-027 - Integrate Flash Pose Lobby and Debug Flow.md
+          - play-shapes/Management/Tasks/PS-032 - Clarify Results Labels and Return Button.md
+          - play-shapes/Management/Tasks/PS-033 - Design Standalone Windows and Linux Build Workflow.md
+        in-progress: []
         done:
           - play-shapes/Management/Tasks/Done/PS-001 - Define the First Gameplay Milestone.md
           - play-shapes/Management/Tasks/Done/PS-002 - Validate Phase 1 on a Physical Phone.md
+          - play-shapes/Management/Tasks/PS-031 - Set FHD Host Resolution and Rework Lobby Layout.md
           - play-shapes/Management/Tasks/Done/PS-003 - Define Join Identity and Reconnection UX.md
           - play-shapes/Management/Tasks/Done/PS-004 - Define the Game-Feel Tuning Strategy.md
           - play-shapes/Management/Tasks/Done/PS-005 - Define Multi-Phone and Agent Validation Strategy.md
@@ -65,6 +63,12 @@ views:
           - play-shapes/Management/Tasks/Done/PS-023 - Prepare Flash Pose Runtime Music and SFX.md
           - play-shapes/Management/Tasks/Done/PS-024 - Implement Flash Pose Host Round Controller.md
           - play-shapes/Management/Tasks/Done/PS-025 - Implement Flash Pose Phone Protocol and Controller.md
+          - play-shapes/Management/Tasks/Done/PS-017 - Find Better Environment Assets for 001 - Dancer Simon Says.md
+          - play-shapes/Management/Tasks/Done/PS-018 - Create the 001 - Dancer Simon Says Minigame Scene.md
+          - play-shapes/Management/Tasks/Done/PS-026 - Implement Flash Pose Shared Screen Feedback and Results.md
+          - play-shapes/Management/Tasks/Done/PS-027 - Integrate Flash Pose Lobby and Debug Flow.md
+          - play-shapes/Management/Tasks/Done/PS-028 - Validate Flash Pose Technical Loop.md
+          - play-shapes/Management/Tasks/Done/PS-030 - Rework Flash Pose Phone Controller Layout.md
     columnColors:
       note.status:
         done: green
@@ -116,4 +120,5 @@ views:
       note.status: {}
     groupByProperty: note.status
     swimlaneByProperty: note.status
+
 ```

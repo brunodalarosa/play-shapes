@@ -28,6 +28,14 @@ the human has assigned them.
   editor/runtime, and desktop-browser evidence
 - [[PS-029 - Validate Flash Pose on Two Phones and in Human Play]] — human
   validation; physical devices and final feel/readability approval
+- [[PS-031 - Set FHD Host Resolution and Rework Lobby Layout]] — AI
+  implementation; 1920×1080 host defaults and compact two-section lobby
+- [[PS-032 - Clarify Results Labels and Return Button]] — AI implementation;
+  direct Winners/Losers labels, emoji removal, tighter result groups, and a
+  more prominent host return button
+- [[PS-033 - Design Standalone Windows and Linux Build Workflow]] — shared
+  design; Windows-first export shape, single-file feasibility, Linux probe,
+  runtime asset boundary, and exported-build verification plan
 
 ## Recently completed
 

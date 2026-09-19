@@ -1,8 +1,8 @@
 ---
 id: PS-027
-title: "Integrate Flash? Pose! lobby and debug flow"
+title: Integrate Flash? Pose! lobby and debug flow
 type: implementation
-status: in-progress
+status: done
 release:
 owner: ai
 priority:
