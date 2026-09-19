@@ -11,7 +11,7 @@ const PACK_NAME := "Play Shapes.pck"
 const METADATA_NAME := "build-info.json"
 const ZIP_RELATIVE := "builds/standalone/Play-Shapes-windows-x86_64.zip"
 const INCLUDE_FILTER := "web/public/*.html,web/public/*.css,web/public/*.js"
-const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,assets/Kenney_Shape_Characters/**,assets/runtime/shape_characters/manifest.json,art/**,builds/**,Management/**,opencode.json,Project/**,tools/**,tests/**,test-results/**,web/*.json,web/node_modules/**,web/src/**,web/tests/**"
+const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,assets/Kenney_Shape_Characters/**,assets/runtime/shape_characters/manifest.json,art/**,builds/**,opencode.json,tools/**,tests/**,test-results/**,web/*.json,web/node_modules/**,web/src/**,web/tests/**"
 const REQUIRED_BROWSER_PATHS := [
 	"web/public/index.html",
 	"web/public/app.js",

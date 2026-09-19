@@ -1475,12 +1475,14 @@ when launched with `--log-file`; its committed screenshot is refreshed each run.
 
 ## Planning and task context
 
-The canonical planning layer is Markdown under `Project/`, `Drafts/`, `Roadmap/`,
-`Tasks/`, and `Decisions/`. Future agents should begin with
-[Project Overview](Project/Project%20Overview.md), then read
-[Task Index](Task%20Index.md), the selected task, and its linked decisions
-before proposing or implementing work. The interactive Obsidian view is
-[Task board](Task%20board.md); its manual-index fallback requires no plugin.
+The canonical planning layer is Markdown in the parent notes vault under
+`../Project/`, `../Drafts/`, `../Roadmap/`, `../Management/Tasks/`, and
+`../Decisions/`. Future agents should begin with
+[Project Overview](../Project/Project%20Overview.md), then read
+[Task Index](../Management/Task%20Index.md), the selected task, and its linked
+decisions before proposing or implementing work. The interactive Obsidian view
+is the [Task board](../Management/Task%20board.md); its manual-index fallback
+requires no plugin.
 
 Implementation work must happen in a separate execution session from planning.
 An implementation task is not ready until its scope, acceptance criteria,
@@ -1500,10 +1502,11 @@ displayed the connected state. Do not equate this with a physical-phone test.
 ## Project location and running
 
 The Git repository and Godot root are this `play-shapes/` directory, nested
-inside the parent notes vault. Keep `project.godot` here. The parent contains
-`AGENTS.md`, `Development phase 1.md`, `Main.md`, `Stack.md`, and
-`Lobby playground.md`; read those before expanding scope. Their instruction
-that the parent is the Godot root does not match the existing filesystem.
+inside the parent notes vault. Keep `project.godot` here. This repository
+contains `AGENTS.md`, `README.md`, and `DEVELOPMENT.md`. The parent contains
+`Main.md`, `Stack.md`, `Lobby playground.md`, the `Minigames/` notes, and the
+planning layer under `Project/`, `Drafts/`, `Roadmap/`, `Management/`, and
+`Decisions/`; read the relevant planning notes before expanding scope.
 
 Open `project.godot` in Godot 4.7.2 and press F6 for an individual scene only
 when appropriate; use **F5** for the complete boot flow. Or from this directory:
