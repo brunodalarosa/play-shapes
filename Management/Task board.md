@@ -36,11 +36,11 @@ views:
       note.status:
         backlog:
           - play-shapes/Management/Tasks/PS-008 - Design Fake Music Stops.md
-          - play-shapes/Management/Tasks/PS-029 - Validate Flash Pose on Two Phones and in Human Play.md
-        in-progress:
-          - play-shapes/Management/Tasks/PS-034 - Implement One-Click Windows Standalone Build Workflow.md
+        in-progress: []
         done:
           - play-shapes/Management/Tasks/Done/PS-001 - Define the First Gameplay Milestone.md
+          - play-shapes/Management/Tasks/PS-029 - Validate Flash Pose on Two Phones and in Human Play.md
+          - play-shapes/Management/Tasks/PS-034 - Implement One-Click Windows Standalone Build Workflow.md
           - play-shapes/Management/Tasks/PS-033 - Design Standalone Windows and Linux Build Workflow.md
           - play-shapes/Management/Tasks/Done/PS-002 - Validate Phase 1 on a Physical Phone.md
           - play-shapes/Management/Tasks/PS-031 - Set FHD Host Resolution and Rework Lobby Layout.md

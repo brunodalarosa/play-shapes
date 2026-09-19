@@ -2,7 +2,7 @@
 id: PS-034
 title: Implement one-click Windows standalone build workflow
 type: implementation
-status: in-progress
+status: done
 release:
 owner: ai
 priority:
@@ -187,5 +187,38 @@ and `[EXPORTED-BUILD]` evidence separately. Do not claim `[PHYSICAL-PHONE]` or
 `[HUMAN-PLAY]` approval. Update [[DEVELOPMENT]] with exact usage and caveats,
 report assumptions/deviations, keep all changes local for this task, and do not
 open a pull request unless the owner later requests one.
+
+## Implementation Findings — 2026-09-19
+
+Implementation is present on `codex/ps-034-windows-standalone-build`: a
+project-local editor plugin, named Windows release preset, strict export
+boundary, ignored owned output area, non-blocking export process, honest staged
+progress/cancellation, artifact metadata, PCK route verification, portable ZIP,
+and Explorer reveal on verified success. Focused automated checks and a normal
+Godot 4.7.2 editor load pass.
+
+The first owner run correctly exposed missing Godot 4.7.2 Windows x86_64 export
+templates, and its dialog also proved too tall/narrow under Windows display
+scaling. The exact official debug/release templates are now installed. The
+dialog opens at a bounded 960×540 logical 16:9 size with a shorter expandable
+details area.
+
+The first landscape-size correction still allowed an extreme vertical opening
+because `popup_centered(size)` treats `size` as a minimum and the wrapped target
+path calculated its minimum height before it had a usable width. The final fix
+assigns the window size before calling parameterless `popup_centered()`, keeps
+the target path to one ellipsized line with a full tooltip, and live-checks the
+result. The headless editor reproduced 878×3098 before the correction and
+878×450 afterward.
+
+A real export then exposed and fixed two export-boundary defects: development
+JSON files were being packaged, while the runtime Kenyoni QR addon had been
+excluded with editor tooling and prevented the lobby from loading. The final
+filter excludes the MCP/builder addons and browser tooling but preserves the QR
+dependency. The actual plugin workflow now produces and verifies the EXE, PCK,
+metadata, and ZIP. `[EXPORTED-BUILD]` localhost evidence confirms all four
+bundled browser routes return HTTP 200, `/session.json` is valid, port 8081 is
+listening, and the exported process has empty stderr. `[DESKTOP-BROWSER]`,
+`[PHYSICAL-PHONE]`, and `[HUMAN-PLAY]` remain unclaimed.
 
 # Outcome

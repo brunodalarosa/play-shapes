@@ -1,5 +1,104 @@
 # Play Shapes development
 
+## PS-034 — One-click Windows standalone host build (2026-09-19)
+
+The editor-only plugin at `addons/standalone_build/` adds **Project > Tools >
+Build Standalone Host**. On a Windows editor host it resolves the named `Play
+Shapes Windows Release` preset, verifies its x86_64/external-PCK/filter policy,
+checks the matching Godot 4.7.2 Windows templates, cleans only its owned staging
+area, and launches a separate headless Godot release export. The editor polls
+that child process and its output instead of blocking the main thread. The
+export stage is deliberately shown as busy/indeterminate because the CLI does
+not expose an honest file or byte percentage.
+
+Install the exact editor-version export templates through **Editor > Manage
+Export Templates** before building. Godot validates both
+`windows_release_x86_64.exe` and `windows_debug_x86_64.exe` for the Windows
+preset even though this action produces only the normal release build. Missing
+templates, a missing/changed preset, unsafe output paths, preparation failures,
+and export errors stop before any success claim and remain visible in the build
+dialog with captured output.
+
+The dialog resets to a 960×540 logical 16:9 size every time it opens, with an
+800×450 minimum. Passing those dimensions to `popup_centered()` was insufficient
+because Godot treats them as a minimum and can retain a previously stretched
+native-window size. The target ZIP path is also a single clipped/ellipsized line
+with a full-path tooltip; wrapping that label before the window had a width made
+Godot calculate a roughly 3,000-pixel minimum height. The details field has a
+wide 860×190 minimum and remains scrollable within the window.
+
+The build output is Git-ignored and has this shape:
+
+```text
+builds/standalone/
+├── Play-Shapes-windows-x86_64.zip
+└── windows-x86_64/
+    ├── Play Shapes.exe
+    ├── Play Shapes.pck
+    └── build-info.json
+```
+
+`build-info.json` records the preset, architecture, Godot version, renderer,
+UTC build time, and source revision when Git's current loose ref is available.
+The ZIP contains one `Play-Shapes-windows-x86_64/` portable folder with exactly
+those three files. Before archiving, the plugin checks that the external PCK's
+index contains the four fixed `HttpService` browser inputs: `index.html`,
+`app.js`, `controller_geometry.js`, and `style.css`. The release preset keeps
+the confirmed `web/public` allowlist and excludes browser sources/dependencies,
+tests/results, tools, planning notes, source art, the runtime asset manifest,
+build output, the MCP/editor builder addons, and browser package configuration.
+The runtime Kenyoni QR addon remains included because the lobby depends on it.
+Node.js is never started by this workflow.
+
+Cancel terminates the owned child export when one is active. During ZIP work it
+finishes closing/removing only the partial owned ZIP. Other partial files may
+remain only below `builds/standalone/`; the next build replaces them. Successful
+verification opens the extracted `windows-x86_64` folder in Explorer without
+launching the game. Failure and cancellation do not open Explorer.
+
+Troubleshooting:
+
+- A template error means the template version must exactly match the running
+  editor. Install it in Godot, then retry the menu action.
+- A preset/filter error means `export_presets.cfg` drifted from the intentional
+  release boundary. Review the change rather than broadening the filter merely
+  to make export pass.
+- Export failures include the tail of the child process output. Partial output
+  is safe to inspect or delete because it is confined to `builds/standalone/`.
+- Port `8080`/`8081`, Windows Firewall/private-network prompts, LAN reachability,
+  and SmartScreen are runtime/human environment concerns; the builder does not
+  change or bypass them.
+
+Verification evidence remains distinct. `[AUTO]` covers policy/config/failure
+checks. `[EDITOR]` covers plugin loading and the visible menu/dialog. A headless
+editor load does not prove the menu's visual interaction. `[EXPORTED-BUILD]`
+requires launching the produced executable without Godot or Node.js and testing
+the lobby plus HTTP/WebSocket/browser flow. `[PHYSICAL-PHONE]` and
+`[HUMAN-PLAY]` require their own real-device/human sessions and are not implied
+by a successful ZIP.
+
+Verification performed after the matching official Godot 4.7.2 templates were
+installed:
+
+- `[AUTO]` `tests/standalone_build_test.gd` passes preset, path ownership,
+  metadata, failure-path, runtime-boundary, ZIP-shape, and landscape-dialog
+  assertions.
+- `[EDITOR]` `tests/standalone_build_editor_integration_test.gd` drives the
+  actual plugin workflow in a headless editor. It produced and inspected the
+  executable, external PCK, metadata, and ZIP; confirmed the browser routes,
+  boot/lobby scenes, and runtime QR dependency; and rejected known development
+  paths. It also reproduces the dialog layout and verifies a bounded landscape
+  opening size; the restricted headless display produced 878×450 rather than
+  the prior 878×3098 failure. Headless RID/ObjectDB cleanup warnings occur after
+  the successful test and are not export or artifact failures.
+- `[EXPORTED-BUILD]` the generated release executable started without the
+  editor or Node.js, served `/`, `/app.js`, `/controller_geometry.js`, and
+  `/style.css` with HTTP 200, returned a valid `/session.json`, and listened on
+  WebSocket port 8081. Its stderr was empty. The smoke process was deliberately
+  stopped afterward, so its forced exit code is not an application failure.
+- `[DESKTOP-BROWSER]`, `[PHYSICAL-PHONE]`, and `[HUMAN-PLAY]` are not claimed by
+  this automated localhost smoke.
+
 ## PS-032 — Results labels and return action (2026-09-19)
 
 The shared Flash? Pose! Results view now uses the exact player-facing headings
