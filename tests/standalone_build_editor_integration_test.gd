@@ -13,6 +13,7 @@ const FORBIDDEN_PACK_PATHS := [
 
 var _plugin: EditorPlugin
 var _elapsed := 0.0
+var _dialog_size_checked := false
 
 func _initialize() -> void:
 	_plugin = Plugin.new()
@@ -27,6 +28,12 @@ func _process(delta: float) -> bool:
 		push_error("Standalone builder integration test timed out.")
 		quit(1)
 		return true
+	if _plugin._build_active and not _dialog_size_checked:
+		_dialog_size_checked = true
+		var dialog_size: Vector2i = _plugin._dialog.size
+		var landscape: bool = dialog_size.y <= 600 and float(dialog_size.x) / float(dialog_size.y) >= 1.5
+		if not _require(landscape, "dialog opens in a bounded landscape shape (actual %s)" % dialog_size):
+			return true
 	if _plugin._build_active:
 		return false
 	var root_path := ProjectSettings.globalize_path("res://").trim_suffix("/")

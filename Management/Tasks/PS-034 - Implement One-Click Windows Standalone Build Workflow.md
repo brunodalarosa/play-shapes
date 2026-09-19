@@ -203,6 +203,14 @@ scaling. The exact official debug/release templates are now installed. The
 dialog opens at a bounded 960×540 logical 16:9 size with a shorter expandable
 details area.
 
+The first landscape-size correction still allowed an extreme vertical opening
+because `popup_centered(size)` treats `size` as a minimum and the wrapped target
+path calculated its minimum height before it had a usable width. The final fix
+assigns the window size before calling parameterless `popup_centered()`, keeps
+the target path to one ellipsized line with a full tooltip, and live-checks the
+result. The headless editor reproduced 878×3098 before the correction and
+878×450 afterward.
+
 A real export then exposed and fixed two export-boundary defects: development
 JSON files were being packaged, while the runtime Kenyoni QR addon had been
 excluded with editor tooling and prevented the lobby from loading. The final

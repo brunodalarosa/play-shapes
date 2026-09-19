@@ -3,6 +3,7 @@ extends EditorPlugin
 
 const Policy := preload("res://addons/standalone_build/standalone_build_policy.gd")
 const MENU_NAME := "Build Standalone Host"
+const DIALOG_SIZE := Vector2i(960, 540)
 
 var _dialog: AcceptDialog
 var _title_label: Label
@@ -64,13 +65,16 @@ func _on_build_requested() -> void:
 	_dialog.title = "Build Standalone Host"
 	_title_label.text = "Preparing Windows x86_64 standalone host"
 	_target_label.text = "Target: %s" % _zip_path
+	_target_label.tooltip_text = _zip_path
 	_set_stage("Preflight checks...", 5, false)
 	_details.text = ""
 	_cancel_button.disabled = false
 	_dialog.get_ok_button().disabled = true
-	# A 16:9 logical size stays comfortably landscape-shaped under Windows DPI
-	# scaling instead of allowing the output field to make a tall narrow dialog.
-	_dialog.popup_centered(Vector2i(960, 540))
+	# popup_centered(size) treats its argument as a minimum and can preserve a
+	# previously stretched native-window size. Assigning size first guarantees
+	# that every build starts from the same landscape dimensions.
+	_dialog.size = DIALOG_SIZE
+	_dialog.popup_centered()
 	call_deferred("_run_preflight")
 
 func _run_preflight() -> void:
@@ -299,7 +303,11 @@ func _create_dialog() -> void:
 	_title_label.add_theme_font_size_override("font_size", 20)
 	layout.add_child(_title_label)
 	_target_label = Label.new()
-	_target_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	# Wrapping a long absolute path before the native window has a width can make
+	# Label report a multi-thousand-pixel minimum height. Keep it to one line;
+	# the complete value remains available in the tooltip and details states.
+	_target_label.clip_text = true
+	_target_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	layout.add_child(_target_label)
 	_stage_label = Label.new()
 	layout.add_child(_stage_label)

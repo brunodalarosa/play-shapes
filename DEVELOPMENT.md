@@ -19,9 +19,13 @@ templates, a missing/changed preset, unsafe output paths, preparation failures,
 and export errors stop before any success claim and remain visible in the build
 dialog with captured output.
 
-The dialog opens at a 960×540 logical 16:9 size with an 800×450 minimum. Its
-details field has a wide 860×190 minimum and expands within the window, avoiding
-the original tall/narrow layout under Windows display scaling.
+The dialog resets to a 960×540 logical 16:9 size every time it opens, with an
+800×450 minimum. Passing those dimensions to `popup_centered()` was insufficient
+because Godot treats them as a minimum and can retain a previously stretched
+native-window size. The target ZIP path is also a single clipped/ellipsized line
+with a full-path tooltip; wrapping that label before the window had a width made
+Godot calculate a roughly 3,000-pixel minimum height. The details field has a
+wide 860×190 minimum and remains scrollable within the window.
 
 The build output is Git-ignored and has this shape:
 
@@ -83,8 +87,10 @@ installed:
   actual plugin workflow in a headless editor. It produced and inspected the
   executable, external PCK, metadata, and ZIP; confirmed the browser routes,
   boot/lobby scenes, and runtime QR dependency; and rejected known development
-  paths. Headless RID/ObjectDB cleanup warnings occur after the successful test
-  and are not export or artifact failures.
+  paths. It also reproduces the dialog layout and verifies a bounded landscape
+  opening size; the restricted headless display produced 878×450 rather than
+  the prior 878×3098 failure. Headless RID/ObjectDB cleanup warnings occur after
+  the successful test and are not export or artifact failures.
 - `[EXPORTED-BUILD]` the generated release executable started without the
   editor or Node.js, served `/`, `/app.js`, `/controller_geometry.js`, and
   `/style.css` with HTTP 200, returned a valid `/session.json`, and listened on
