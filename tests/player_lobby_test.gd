@@ -16,7 +16,7 @@ func _run() -> void:
 
 	var joined: Dictionary = host.player_registry.join_player(90, "Lobby Tester", true, 1000)
 	await process_frame
-	var roster: VBoxContainer = lobby.get_node("%PlayerRoster")
+	var roster: GridContainer = lobby.get_node("%PlayerRoster")
 	if not _check(joined.accepted and roster.get_child_count() == 1, "Joined player appears in the shared roster"):
 		return
 	if not _check(roster.get_child(0).text == "1. Lobby Tester — Connected", "Roster includes seat, public name, and text state"):
