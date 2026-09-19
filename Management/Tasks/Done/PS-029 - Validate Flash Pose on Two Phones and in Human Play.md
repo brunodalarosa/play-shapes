@@ -1,8 +1,8 @@
 ---
 id: PS-029
-title: "Validate Flash? Pose! on two phones and in human play"
+title: Validate Flash? Pose! on two phones and in human play
 type: validation
-status: backlog
+status: done
 release:
 owner: human
 priority:
@@ -95,3 +95,4 @@ middle of the test without recording it, or expand coverage beyond the stated
 MVP matrix unless a concrete issue justifies a focused follow-up.
 
 # Outcome
+I've tested and it works! Tested with an android and an iphone

@@ -2,7 +2,7 @@
 id: PS-034
 title: Implement one-click Windows standalone build workflow
 type: implementation
-status: in-progress
+status: done
 release:
 owner: ai
 priority:
