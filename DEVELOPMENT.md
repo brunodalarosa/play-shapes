@@ -1,5 +1,52 @@
 # Play Shapes development
 
+## PS-031 — FHD host resolution and horizontal lobby (2026-09-19)
+
+The host now starts with an explicit 1920×1080 viewport and window override in
+`project.godot`. The existing `canvas_items` stretch mode, `expand` aspect, and
+GL Compatibility renderer are unchanged, so resizing the FHD window preserves
+the responsive 16:9 presentation rather than introducing a second rendering
+path.
+
+The lobby no longer uses a page-level `ScrollContainer`. A full-window margin
+container owns a centered green `PLAY SHAPES` title and an `HBoxContainer`
+below it. The left expanding section contains the Phase 1 subtitle, join title,
+QR code, instructions, current URL, address picker, refresh action, and copy
+action. The right expanding section contains the player heading/count, roster,
+start action, and availability text. Container relationships, margins, minimum
+sizes, wrapping, and size flags define the layout; no viewport coordinates are
+encoded in the scene or script.
+
+The QR code keeps a 260×260 logical minimum. Lobby rosters use one column and
+18-point rows for 1–10 players. At 11–20 players the same `GridContainer`
+switches to two row-major columns with 20-point, 27-high rows. This keeps the
+maximum supported lobby visible without scrolling and preserves an obvious
+left-to-right, top-to-bottom reading order. These values live in
+`scenes/lobby.tscn` and `scenes/lobby.gd` if later couch-distance review calls
+for larger type or different spacing; they are presentation-only and do not
+change the 20-player lobby or 10-player Flash? Pose! limits.
+
+Verification performed:
+
+- `[AUTO]` `tests/lobby_layout_test.gd` passed. It verifies the missing page
+  scroll container, centered green title, left/right section order, FHD-canvas
+  bounds, and the 20-player two-column roster.
+- `[AUTO]` `tests/player_lobby_test.gd`, `tests/foundation.gd`, and
+  `tests/flash_pose_flow_test.gd` passed, covering registry-driven roster
+  updates, QR generation, session behavior, start availability, and the scene
+  transition/return flow.
+- `[EDITOR]` Godot 4.7.2 completed a headless editor load with no script or
+  scene parse errors. Forced-shutdown cleanup warnings are not runtime errors.
+- `[GODOT-RUNTIME]` GL Compatibility captures were rendered and inspected at
+  the FHD default (1920×1080) and at a temporarily resized 1152×648 16:9
+  window, each with empty and 20-player states. Required content remained
+  visible with no scrollbar, clipping, or overlap; the QR remained intact and
+  the two sections retained their hierarchy. The 1152×648 run is compatibility
+  evidence only—the project default remains FHD.
+- `[PHYSICAL-PHONE]` and `[HUMAN-PLAY]` are not claimed. This is a host-only
+  composition change; final couch-distance readability and real-phone QR scan
+  comfort remain human/device checks.
+
 ## PS-030 — Flash? Pose! phone controller layout (2026-09-18)
 
 ### Client startup regression correction

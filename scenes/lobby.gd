@@ -3,7 +3,7 @@ extends Control
 @onready var address_picker: OptionButton = %AddressPicker
 @onready var qr: QRCodeRect = %JoinQR
 @onready var join_address: Label = %JoinAddress
-@onready var roster: VBoxContainer = %PlayerRoster
+@onready var roster: GridContainer = %PlayerRoster
 @onready var start_button: Button = %StartMinigame
 @onready var start_help: Label = %StartHelp
 
@@ -45,14 +45,19 @@ func _select_address(index: int) -> void:
 func _show_players(players: Array[Dictionary]) -> void:
 	for child: Node in roster.get_children():
 		child.queue_free()
+	# A second column above ten players keeps the full 20-player lobby readable
+	# at the shorter supported 16:9 height without making the page scroll.
+	roster.columns = 2 if players.size() > 10 else 1
 	%PlayerCount.text = "%d / %d players" % [players.size(), SessionHost.settings.max_players]
 	%EmptyRoster.visible = players.is_empty()
 	for player: Dictionary in players:
 		var row := Label.new()
 		row.text = "%d. %s — %s" % [player.seat, player.name,
 			"Connected" if player.state == "connected" else "Reconnecting"]
-		row.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		row.add_theme_font_size_override("font_size", 18)
+		row.custom_minimum_size.y = 27.0
+		row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		row.add_theme_font_size_override("font_size", 20 if players.size() > 10 else 18)
 		roster.add_child(row)
 	var availability := SessionHost.flash_pose_availability(false)
 	start_button.disabled = not bool(availability.available)
