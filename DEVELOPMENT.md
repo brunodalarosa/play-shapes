@@ -26,6 +26,16 @@ left-to-right, top-to-bottom reading order. These values live in
 for larger type or different spacing; they are presentation-only and do not
 change the 20-player lobby or 10-player Flash? Pose! limits.
 
+After owner screenshot review, the FHD composition uses an 80-pixel horizontal
+safe margin, 48 pixels above the enlarged 44-point title, and 56 pixels below
+the content. The join body is a centered 720-pixel cluster within the left
+section, which vertically centers the QR and its instructions/actions while
+leaving the section headings anchored. Address selection, Refresh, and Copy
+link use fixed 52-pixel-tall controls instead of stretching to the column
+edges. Start minigame is centered at 360×60. Empty and populated roster states
+share one 300-pixel `RosterArea`, preventing their reserved heights from
+combining and displacing the 20-player layout.
+
 Verification performed:
 
 - `[AUTO]` `tests/lobby_layout_test.gd` passed. It verifies the missing page

@@ -27,31 +27,32 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 32
-theme_override_constants/margin_top = 24
-theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 24
+theme_override_constants/margin_left = 80
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 80
+theme_override_constants/margin_bottom = 56
 
 [node name="Page" type="VBoxContainer" parent="PageMargin"]
 layout_mode = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 28
 
 [node name="Title" type="Label" parent="PageMargin/Page"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65, 0.9, 0.75, 1)
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 44
 text = "PLAY SHAPES"
 horizontal_alignment = 1
 
 [node name="Sections" type="HBoxContainer" parent="PageMargin/Page"]
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 40
 
 [node name="JoinSection" type="VBoxContainer" parent="PageMargin/Page/Sections"]
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 0
+size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="Subtitle" type="Label" parent="PageMargin/Page/Sections/JoinSection"]
@@ -64,10 +65,19 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 24
 text = "Join session"
 
-[node name="QRCenter" type="CenterContainer" parent="PageMargin/Page/Sections/JoinSection"]
+[node name="JoinBodyCenter" type="CenterContainer" parent="PageMargin/Page/Sections/JoinSection"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="JoinBody" type="VBoxContainer" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter"]
+custom_minimum_size = Vector2(720, 0)
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="QRCenter" type="CenterContainer" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody"]
 layout_mode = 2
 
-[node name="JoinQR" type="TextureRect" parent="PageMargin/Page/Sections/JoinSection/QRCenter"]
+[node name="JoinQR" type="TextureRect" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody/QRCenter"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(260, 260)
 layout_mode = 2
@@ -80,42 +90,42 @@ auto_module_size = false
 module_size = 8
 quiet_zone_size = 4
 
-[node name="Instructions" type="Label" parent="PageMargin/Page/Sections/JoinSection"]
+[node name="Instructions" type="Label" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Connect your phone to the same network, then scan."
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="JoinAddress" type="Label" parent="PageMargin/Page/Sections/JoinSection"]
+[node name="JoinAddress" type="Label" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Network" type="HBoxContainer" parent="PageMargin/Page/Sections/JoinSection"]
+[node name="Network" type="HBoxContainer" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody"]
 layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 8
 
-[node name="AddressPicker" type="OptionButton" parent="PageMargin/Page/Sections/JoinSection/Network"]
+[node name="AddressPicker" type="OptionButton" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody/Network"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 52)
 layout_mode = 2
-size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 tooltip_text = "Choose the PC address on your phone's network. VPN addresses may not work."
 
-[node name="Refresh" type="Button" parent="PageMargin/Page/Sections/JoinSection/Network"]
+[node name="Refresh" type="Button" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody/Network"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(96, 40)
+custom_minimum_size = Vector2(120, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Refresh"
 
-[node name="Copy" type="Button" parent="PageMargin/Page/Sections/JoinSection/Network"]
+[node name="Copy" type="Button" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody/Network"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(104, 40)
+custom_minimum_size = Vector2(128, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "Copy link"
@@ -124,7 +134,7 @@ text = "Copy link"
 custom_minimum_size = Vector2(0, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 0
+size_flags_vertical = 3
 theme_override_constants/separation = 8
 
 [node name="RosterTitle" type="Label" parent="PageMargin/Page/Sections/PlayerSection"]
@@ -140,9 +150,12 @@ theme_override_font_sizes/font_size = 18
 text = "0 / 20 players"
 horizontal_alignment = 1
 
-[node name="EmptyRoster" type="Label" parent="PageMargin/Page/Sections/PlayerSection"]
-unique_name_in_owner = true
+[node name="RosterArea" type="CenterContainer" parent="PageMargin/Page/Sections/PlayerSection"]
 custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+
+[node name="EmptyRoster" type="Label" parent="PageMargin/Page/Sections/PlayerSection/RosterArea"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_font_sizes/font_size = 18
@@ -150,18 +163,20 @@ text = "Waiting for players to join"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="PlayerRoster" type="GridContainer" parent="PageMargin/Page/Sections/PlayerSection"]
+[node name="PlayerRoster" type="GridContainer" parent="PageMargin/Page/Sections/PlayerSection/RosterArea"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 300)
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_constants/separation = 6
 theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 2
 
-[node name="StartMinigame" type="Button" parent="PageMargin/Page/Sections/PlayerSection"]
+[node name="StartCenter" type="CenterContainer" parent="PageMargin/Page/Sections/PlayerSection"]
+layout_mode = 2
+
+[node name="StartMinigame" type="Button" parent="PageMargin/Page/Sections/PlayerSection/StartCenter"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(360, 60)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 disabled = true

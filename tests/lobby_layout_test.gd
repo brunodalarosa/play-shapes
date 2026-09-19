@@ -25,6 +25,8 @@ func _run() -> void:
 		"[AUTO] PLAY SHAPES remains horizontally centered")
 	_check(title.get_theme_color("font_color").g > title.get_theme_color("font_color").r,
 		"[AUTO] PLAY SHAPES retains its green emphasis")
+	_check(title.get_theme_font_size("font_size") == 44 and title.get_global_rect().position.y >= 48.0,
+		"[AUTO] PLAY SHAPES uses the larger title size and safe top margin")
 	var sections := lobby.get_node("PageMargin/Page/Sections") as HBoxContainer
 	_check(sections.get_child_count() == 2
 		and sections.get_child(0).name == &"JoinSection"
@@ -32,6 +34,13 @@ func _run() -> void:
 		"[AUTO] Join and player content are ordered as two horizontal sections")
 	_check(_visible_controls_fit(lobby, FHD_CANVAS_SIZE),
 		"[AUTO] Empty lobby controls fit inside the FHD canvas")
+	var refresh := lobby.get_node("%Refresh") as Button
+	var copy := lobby.get_node("%Copy") as Button
+	var start := lobby.get_node("%StartMinigame") as Button
+	_check(refresh.size.y >= 52.0 and copy.size.y >= 52.0 and start.size.y >= 60.0,
+		"[AUTO] Lobby actions use the taller button treatment")
+	_check(start.size.x == 360.0 and start.get_global_rect().get_center().x > FHD_CANVAS_SIZE.x * 0.5,
+		"[AUTO] Start action is fixed-width and centered in the player section")
 
 	var host := root.get_node("SessionHost")
 	for index: int in 20:
