@@ -28,6 +28,8 @@ var _cue_panel: PanelContainer
 var _cue_label: Label
 var _feedback_label: Label
 var _results: Control
+var _winner_panel: PanelContainer
+var _loser_panel: PanelContainer
 var _happy_names: Label
 var _moody_names: Label
 var _return_button: Button
@@ -151,27 +153,41 @@ func _build_results_view() -> void:
 	title.position = Vector2(-320, 22)
 	title.size = Vector2(640, 54)
 	_results.add_child(title)
-	var happy_panel := _result_panel(Color("276749"), 0.12, 0.48)
-	var moody_panel := _result_panel(Color("3f3c67"), 0.53, 0.89)
-	_results.add_child(happy_panel)
-	_results.add_child(moody_panel)
+	# Each panel previously occupied 36% of the viewport height. The 28.8%
+	# spans below are exactly 80% of that footprint and leave a distinct action
+	# area for the larger return button.
+	_winner_panel = _result_panel("WinnerPanel", Color("276749"), 0.12, 0.408)
+	_loser_panel = _result_panel("LoserPanel", Color("3f3c67"), 0.462, 0.75)
+	_results.add_child(_winner_panel)
+	_results.add_child(_loser_panel)
 	_happy_names = _result_label("", 28)
 	_moody_names = _result_label("", 28)
-	happy_panel.add_child(_section("HAPPY CREW  ★", _happy_names))
-	moody_panel.add_child(_section("MOODY CREW  ☁", _moody_names))
+	_winner_panel.add_child(_section("WINNERS", _happy_names))
+	_loser_panel.add_child(_section("LOSERS", _moody_names))
 	_return_button = Button.new()
 	_return_button.name = "ReturnToLobby"
 	_return_button.text = "Return to lobby"
 	_return_button.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	_return_button.position = Vector2(-110, -68)
-	_return_button.size = Vector2(220, 44)
+	_return_button.position = Vector2(-160, -92)
+	_return_button.size = Vector2(320, 64)
+	_return_button.add_theme_font_size_override("font_size", 24)
+	_return_button.add_theme_color_override("font_color", Color("172033"))
+	_return_button.add_theme_color_override("font_hover_color", Color("101827"))
+	_return_button.add_theme_color_override("font_pressed_color", Color("101827"))
+	_return_button.add_theme_color_override("font_disabled_color", Color("536078"))
+	_return_button.add_theme_stylebox_override("normal", _return_button_style(Color("f6c453"), Color("fff0b8")))
+	_return_button.add_theme_stylebox_override("hover", _return_button_style(Color("ffd86b"), Color.WHITE))
+	_return_button.add_theme_stylebox_override("pressed", _return_button_style(Color("dfa832"), Color("fff0b8")))
+	_return_button.add_theme_stylebox_override("disabled", _return_button_style(Color("9b8b62"), Color("c6b98f")))
+	_return_button.add_theme_stylebox_override("focus", _return_button_style(Color.TRANSPARENT, Color.WHITE, 4))
 	_return_button.pressed.connect(func() -> void:
 		_return_button.disabled = _controller.request_return_to_lobby())
 	_results.add_child(_return_button)
 
 
-func _result_panel(color: Color, top: float, bottom: float) -> PanelContainer:
+func _result_panel(panel_name: String, color: Color, top: float, bottom: float) -> PanelContainer:
 	var panel := PanelContainer.new()
+	panel.name = panel_name
 	panel.anchor_left = 0.08
 	panel.anchor_right = 0.92
 	panel.anchor_top = top
@@ -191,11 +207,26 @@ func _result_panel(color: Color, top: float, bottom: float) -> PanelContainer:
 	return panel
 
 
+func _return_button_style(background: Color, border: Color, border_width: int = 3) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = background
+	style.border_color = border
+	style.set_border_width_all(border_width)
+	style.set_corner_radius_all(14)
+	style.content_margin_left = 28.0
+	style.content_margin_right = 28.0
+	style.content_margin_top = 12.0
+	style.content_margin_bottom = 12.0
+	return style
+
+
 func _section(title_text: String, names: Label) -> VBoxContainer:
 	var column := VBoxContainer.new()
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
 	column.add_theme_constant_override("separation", 14)
-	column.add_child(_result_label(title_text, 30))
+	var heading := _result_label(title_text, 30)
+	heading.name = "%sHeading" % title_text.to_pascal_case()
+	column.add_child(heading)
 	column.add_child(names)
 	return column
 
@@ -364,9 +395,9 @@ func _on_round_results_ready(snapshot: Dictionary) -> void:
 		var player: Dictionary = ranking[index]
 		var player_name := String(player.get("name", player.get("player_id", "Player")))
 		if index < top_count:
-			happy.append("★ %s" % player_name)
+			happy.append(player_name)
 		else:
-			moody.append("☁ %s" % player_name)
+			moody.append(player_name)
 		var animator := _player_animators.get(String(player.player_id)) as HybridCharacterAnimator
 		if animator != null:
 			animator.set_eliminated(false)

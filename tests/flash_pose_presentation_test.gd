@@ -73,10 +73,28 @@ func _run() -> void:
 	})
 	_check(presentation._results.visible and presentation._happy_names.text.contains("One") \
 		and presentation._moody_names.text.contains("Two"),
-		"Persistent results separate named happy and moody groups without points")
+		"Persistent results separate named winner and loser groups without points")
+	var winner_heading := presentation._winner_panel.find_child("WinnersHeading", true, false) as Label
+	var loser_heading := presentation._loser_panel.find_child("LosersHeading", true, false) as Label
+	_check(winner_heading.text == "WINNERS" and loser_heading.text == "LOSERS",
+		"Results use exact neutral winner and loser headings")
+	_check(presentation._happy_names.text == "One" and presentation._moody_names.text == "Two",
+		"Result player names have no decorative emoji prefixes")
+	_check(is_equal_approx(presentation._winner_panel.anchor_bottom - presentation._winner_panel.anchor_top, 0.288) \
+		and is_equal_approx(presentation._loser_panel.anchor_bottom - presentation._loser_panel.anchor_top, 0.288),
+		"Each result panel uses 80 percent of the former 36-percent vertical footprint")
+	_check(presentation._return_button.size.x >= 320.0 and presentation._return_button.size.y >= 64.0,
+		"Return action is materially larger than the former 220 by 44 presentation")
+	_check(presentation._loser_panel.anchor_bottom < presentation._return_button.anchor_top,
+		"Result groups end above the centered return action")
 	_check(not presentation._happy_names.text.to_lower().contains("score") \
 		and not presentation._moody_names.text.to_lower().contains("score"),
 		"Results do not introduce a scoreboard")
+	_check(player_animator.semantic_state().result_mood == &"happy",
+		"Winner retains the internal happy result mood")
+	var loser_animator := presentation._player_animators["p2"] as HybridCharacterAnimator
+	_check(loser_animator.semantic_state().result_mood == &"moody",
+		"Loser retains the internal moody result mood")
 
 	stage.queue_free()
 	await process_frame

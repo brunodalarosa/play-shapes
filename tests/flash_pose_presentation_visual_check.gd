@@ -10,6 +10,14 @@ func _initialize() -> void:
 
 
 func _capture() -> void:
+	var capture_size := Vector2i(1920, 1080)
+	for argument: String in OS.get_cmdline_user_args():
+		if argument == "capture-1280x720":
+			capture_size = Vector2i(1280, 720)
+	var capture_viewport := SubViewport.new()
+	capture_viewport.size = capture_size
+	capture_viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	root.add_child(capture_viewport)
 	var stage := STAGE_SCENE.instantiate() as DancerSimonSaysStage
 	var controller := stage.get_node(^"RoundController") as FlashPoseRoundController
 	var presentation := stage.get_node(^"Presentation") as FlashPosePresentation
@@ -17,7 +25,7 @@ func _capture() -> void:
 	tuning.countdown_seconds = 0.0
 	controller.tuning = tuning
 	presentation.tuning = tuning
-	root.add_child(stage)
+	capture_viewport.add_child(stage)
 	await process_frame
 	var participants: Array[Dictionary] = []
 	for index: int in 10:
@@ -32,16 +40,17 @@ func _capture() -> void:
 	assert(controller.start_round(participants, now).accepted)
 	controller.advance(now)
 	await _settle()
-	DirAccess.make_dir_recursive_absolute("res://test-results/ps-026")
-	assert(root.get_texture().get_image().save_png("res://test-results/ps-026/dance-10-players.png") == OK)
+	DirAccess.make_dir_recursive_absolute("res://test-results/ps-032")
 
 	presentation._on_round_results_ready({
 		"top_group_size": 5,
 		"ranking": participants,
 	})
 	await _settle()
-	assert(root.get_texture().get_image().save_png("res://test-results/ps-026/results-groups.png") == OK)
-	print("PS-026 technical renderer captures saved for dance and results")
+	var viewport_size := capture_viewport.get_visible_rect().size
+	var size_label := "%dx%d" % [int(viewport_size.x), int(viewport_size.y)]
+	assert(capture_viewport.get_texture().get_image().save_png("res://test-results/ps-032/results-%s.png" % size_label) == OK)
+	print("[GODOT-RUNTIME] PS-032 technical results capture saved at %s" % size_label)
 	quit(0)
 
 
