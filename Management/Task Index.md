@@ -34,8 +34,11 @@ the human has assigned them.
   direct Winners/Losers labels, emoji removal, tighter result groups, and a
   more prominent host return button
 - [[PS-033 - Design Standalone Windows and Linux Build Workflow]] — shared
-  design; Windows-first export shape, single-file feasibility, Linux probe,
-  runtime asset boundary, and exported-build verification plan
+  design refined; one-click editor flow, Windows x86_64 ZIP recommendation,
+  Linux follow-up boundary, and exported-build evidence plan
+- [[PS-034 - Implement One-Click Windows Standalone Build Workflow]] — AI
+  implementation; Project > Tools build command, honest progress UI, portable
+  x86_64 release ZIP, artifact checks, and Explorer reveal
 
 ## Recently completed
 

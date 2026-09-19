@@ -37,11 +37,11 @@ views:
         backlog:
           - play-shapes/Management/Tasks/PS-008 - Design Fake Music Stops.md
           - play-shapes/Management/Tasks/PS-029 - Validate Flash Pose on Two Phones and in Human Play.md
-          - play-shapes/Management/Tasks/PS-032 - Clarify Results Labels and Return Button.md
-          - play-shapes/Management/Tasks/PS-033 - Design Standalone Windows and Linux Build Workflow.md
-        in-progress: []
+        in-progress:
+          - play-shapes/Management/Tasks/PS-034 - Implement One-Click Windows Standalone Build Workflow.md
         done:
           - play-shapes/Management/Tasks/Done/PS-001 - Define the First Gameplay Milestone.md
+          - play-shapes/Management/Tasks/PS-033 - Design Standalone Windows and Linux Build Workflow.md
           - play-shapes/Management/Tasks/Done/PS-002 - Validate Phase 1 on a Physical Phone.md
           - play-shapes/Management/Tasks/PS-031 - Set FHD Host Resolution and Rework Lobby Layout.md
           - play-shapes/Management/Tasks/Done/PS-003 - Define Join Identity and Reconnection UX.md
@@ -69,6 +69,7 @@ views:
           - play-shapes/Management/Tasks/Done/PS-027 - Integrate Flash Pose Lobby and Debug Flow.md
           - play-shapes/Management/Tasks/Done/PS-028 - Validate Flash Pose Technical Loop.md
           - play-shapes/Management/Tasks/Done/PS-030 - Rework Flash Pose Phone Controller Layout.md
+          - play-shapes/Management/Tasks/Done/PS-032 - Clarify Results Labels and Return Button.md
     columnColors:
       note.status:
         done: green
