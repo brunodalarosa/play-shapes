@@ -31,7 +31,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
+enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg", "res://addons/standalone_build/plugin.cfg")
 
 [physics]
 

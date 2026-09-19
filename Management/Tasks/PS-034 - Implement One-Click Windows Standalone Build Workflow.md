@@ -188,4 +188,20 @@ and `[EXPORTED-BUILD]` evidence separately. Do not claim `[PHYSICAL-PHONE]` or
 report assumptions/deviations, keep all changes local for this task, and do not
 open a pull request unless the owner later requests one.
 
+## Implementation Findings — 2026-09-19
+
+Implementation is present on `codex/ps-034-windows-standalone-build`: a
+project-local editor plugin, named Windows release preset, strict export
+boundary, ignored owned output area, non-blocking export process, honest staged
+progress/cancellation, artifact metadata, PCK route verification, portable ZIP,
+and Explorer reveal on verified success. Focused automated checks and a normal
+Godot 4.7.2 editor load pass.
+
+The current machine does not have the matching Godot 4.7.2 Windows x86_64
+export templates installed. A real export therefore stops with Godot's missing
+`windows_debug_x86_64.exe` and `windows_release_x86_64.exe` configuration
+errors, matching the plugin's actionable preflight failure. `[EXPORTED-BUILD]`,
+desktop-browser-on-export, physical-phone, and human-play evidence remain
+unclaimed until the owner installs those templates and reruns the workflow.
+
 # Outcome
