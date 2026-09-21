@@ -1482,6 +1482,11 @@ The canonical planning layer is Markdown in the parent notes vault under
 task and its linked decisions before proposing or implementing work. The
 interactive Obsidian view for current work is the [Task board](../Management/Task%20board.md);
 it reads task frontmatter directly and requires no separate task index.
+The active rules in [Task System](../Project/Task%20System.md) and
+[Workflow](../Project/Workflow.md) supersede older historical sections below:
+new work does not create exploration or validation tasks, uses `asset-import`
+for development media without a provenance gate for placeholders, and waits
+for explicit human approval before remote publication.
 
 Implementation work must happen in a separate execution session from planning.
 An implementation task is not ready until its scope, acceptance criteria,
