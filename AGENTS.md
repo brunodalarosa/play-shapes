@@ -1,7 +1,15 @@
 # AGENTS.md
 
 ### Version control workflow
-Any iteration on this project should be performed following the GitHub Flow version control strategy. In the end of each development session a pull request to main should be made. I'll review the changes and manually merge it into main if I'm satisfied.
+Every change is made on a new local task branch and committed locally as the
+work progresses. Implementation tasks carry the machine-readable
+`human_approval: pending` gate in their task frontmatter. Until the human has
+performed post-coding validation and explicitly approved the change, do not
+push the branch or open/update a pull request. After approval, set the gate to
+`human_approval: approved`, then push and open the pull request to `main` for
+human review and manual merge. Planning-only changes follow the same local
+branch and commit rule and also wait for explicit approval before remote
+publication.
 
 ## Project
 

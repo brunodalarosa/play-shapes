@@ -1478,11 +1478,15 @@ when launched with `--log-file`; its committed screenshot is refreshed each run.
 The canonical planning layer is Markdown in the parent notes vault under
 `../Project/`, `../Drafts/`, `../Roadmap/`, `../Management/Tasks/`, and
 `../Decisions/`. Future agents should begin with
-[Project Overview](../Project/Project%20Overview.md), then read
-[Task Index](../Management/Task%20Index.md), the selected task, and its linked
-decisions before proposing or implementing work. The interactive Obsidian view
-is the [Task board](../Management/Task%20board.md); its manual-index fallback
-requires no plugin.
+[Project Overview](../Project/Project%20Overview.md), then read the selected
+task and its linked decisions before proposing or implementing work. The
+interactive Obsidian view for current work is the [Task board](../Management/Task%20board.md);
+it reads task frontmatter directly and requires no separate task index.
+The active rules in [Task System](../Project/Task%20System.md) and
+[Workflow](../Project/Workflow.md) supersede older historical sections below:
+new work does not create exploration or validation tasks, uses `asset-import`
+for development media without a provenance gate for placeholders, and waits
+for explicit human approval before remote publication.
 
 Implementation work must happen in a separate execution session from planning.
 An implementation task is not ready until its scope, acceptance criteria,
