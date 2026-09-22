@@ -1,870 +1,99 @@
 # Play Shapes development
 
-## PS-034 — One-click Windows standalone host build (2026-09-19)
+This is the compact implementation manual for the current checkout. It records how the project works now, how to run and verify it, and operational caveats that are easy to rediscover. It is not the planning system or the task history.
 
-The editor-only plugin at `addons/standalone_build/` adds **Project > Tools >
-Build Standalone Host**. On a Windows editor host it resolves the named `Play
-Shapes Windows Release` preset, verifies its x86_64/external-PCK/filter policy,
-checks the matching Godot 4.7.2 Windows templates, cleans only its owned staging
-area, and launches a separate headless Godot release export. The editor polls
-that child process and its output instead of blocking the main thread. The
-export stage is deliberately shown as busy/indeterminate because the CLI does
-not expose an honest file or byte percentage.
+## Current status
 
-Install the exact editor-version export templates through **Editor > Manage
-Export Templates** before building. Godot validates both
-`windows_release_x86_64.exe` and `windows_debug_x86_64.exe` for the Windows
-preset even though this action produces only the normal release build. Missing
-templates, a missing/changed preset, unsafe output paths, preparation failures,
-and export errors stop before any success claim and remain visible in the build
-dialog with captured output.
+- Godot 4.7.2 is the authoritative host; phone controllers are bundled HTML/CSS/JavaScript clients over local HTTP and WebSockets.
+- The playable minigame is **Flash? Pose!**. Normal play supports 2–10 registered players; the lobby supports 20.
+- F12 provides an explicit one-real-player Flash? Pose! debug flow with infinite debug lives. It creates no simulated player.
+- The host defaults to a responsive 1920×1080 GL Compatibility presentation.
+- **Project > Tools > Build Standalone Host** creates a portable Windows x86_64 release ZIP. Linux is deliberately deferred.
+- The loop has automated/editor/runtime coverage and an MVP human check with one iPhone and one Android phone. Do not generalize that evidence to every device, browser, network, accessibility setup, or feel call.
 
-The dialog resets to a 960×540 logical 16:9 size every time it opens, with an
-800×450 minimum. Passing those dimensions to `popup_centered()` was insufficient
-because Godot treats them as a minimum and can retain a previously stretched
-native-window size. The target ZIP path is also a single clipped/ellipsized line
-with a full-path tooltip; wrapping that label before the window had a width made
-Godot calculate a roughly 3,000-pixel minimum height. The details field has a
-wide 860×190 minimum and remains scrollable within the window.
+## Documentation boundaries
 
-The build output is Git-ignored and has this shape:
+The parent `Play Shapes/` directory is the Markdown planning and game-design vault. This nested `play-shapes/` directory is the Git repository and Godot project root. Do not move material between those layers merely for convenience.
 
-```text
-builds/standalone/
-├── Play-Shapes-windows-x86_64.zip
-└── windows-x86_64/
-    ├── Play Shapes.exe
-    ├── Play Shapes.pck
-    └── build-info.json
-```
+Canonical sources:
 
-`build-info.json` records the preset, architecture, Godot version, renderer,
-UTC build time, and source revision when Git's current loose ref is available.
-The ZIP contains one `Play-Shapes-windows-x86_64/` portable folder with exactly
-those three files. Before archiving, the plugin checks that the external PCK's
-index contains the four fixed `HttpService` browser inputs: `index.html`,
-`app.js`, `controller_geometry.js`, and `style.css`. The release preset keeps
-the confirmed `web/public` allowlist and excludes browser sources/dependencies,
-tests/results, tools, planning notes, source art, the runtime asset manifest,
-build output, the MCP/editor builder addons, and browser package configuration.
-The runtime Kenyoni QR addon remains included because the lobby depends on it.
-Node.js is never started by this workflow.
+- Repository execution rules: [AGENTS.md](AGENTS.md)
+- Human + AI workflow: [Workflow](../Project/Workflow.md)
+- Task types, lifecycle, frontmatter, and gates: [Task System](../Project/Task%20System.md)
+- Product context: [Project Overview](../Project/Project%20Overview.md)
+- Durable choices: [Decision Log](../Decisions/Decision%20Log.md)
+- Current tasks: [Task board](../Management/Task%20board.md)
+- Task-specific scope and evidence: notes under `../Management/Tasks/`
+- Player setup and use: [README.md](README.md)
+- Tuning workflow: [Tuning/README.md](Tuning/README.md)
 
-Cancel terminates the owned child export when one is active. During ZIP work it
-finishes closing/removing only the partial owned ZIP. Other partial files may
-remain only below `builds/standalone/`; the next build replaces them. Successful
-verification opens the extracted `windows-x86_64` folder in Explorer without
-launching the game. Failure and cancellation do not open Explorer.
+Completed task notes are immutable historical records. Their old terminology or then-current limitations must not be treated as active instructions. Current work does not create exploration or validation tasks; it uses `asset-import` for new development media, includes human validation in the implementation flow, and waits for explicit human approval before remote publication. Refer to the canonical sources above instead of duplicating those rules here.
 
-Troubleshooting:
+## Project location and running
 
-- A template error means the template version must exactly match the running
-  editor. Install it in Godot, then retry the menu action.
-- A preset/filter error means `export_presets.cfg` drifted from the intentional
-  release boundary. Review the change rather than broadening the filter merely
-  to make export pass.
-- Export failures include the tail of the child process output. Partial output
-  is safe to inspect or delete because it is confined to `builds/standalone/`.
-- Port `8080`/`8081`, Windows Firewall/private-network prompts, LAN reachability,
-  and SmartScreen are runtime/human environment concerns; the builder does not
-  change or bypass them.
-
-Verification evidence remains distinct. `[AUTO]` covers policy/config/failure
-checks. `[EDITOR]` covers plugin loading and the visible menu/dialog. A headless
-editor load does not prove the menu's visual interaction. `[EXPORTED-BUILD]`
-requires launching the produced executable without Godot or Node.js and testing
-the lobby plus HTTP/WebSocket/browser flow. `[PHYSICAL-PHONE]` and
-`[HUMAN-PLAY]` require their own real-device/human sessions and are not implied
-by a successful ZIP.
-
-Verification performed after the matching official Godot 4.7.2 templates were
-installed:
-
-- `[AUTO]` `tests/standalone_build_test.gd` passes preset, path ownership,
-  metadata, failure-path, runtime-boundary, ZIP-shape, and landscape-dialog
-  assertions.
-- `[EDITOR]` `tests/standalone_build_editor_integration_test.gd` drives the
-  actual plugin workflow in a headless editor. It produced and inspected the
-  executable, external PCK, metadata, and ZIP; confirmed the browser routes,
-  boot/lobby scenes, and runtime QR dependency; and rejected known development
-  paths. It also reproduces the dialog layout and verifies a bounded landscape
-  opening size; the restricted headless display produced 878×450 rather than
-  the prior 878×3098 failure. Headless RID/ObjectDB cleanup warnings occur after
-  the successful test and are not export or artifact failures.
-- `[EXPORTED-BUILD]` the generated release executable started without the
-  editor or Node.js, served `/`, `/app.js`, `/controller_geometry.js`, and
-  `/style.css` with HTTP 200, returned a valid `/session.json`, and listened on
-  WebSocket port 8081. Its stderr was empty. The smoke process was deliberately
-  stopped afterward, so its forced exit code is not an application failure.
-- `[DESKTOP-BROWSER]`, `[PHYSICAL-PHONE]`, and `[HUMAN-PLAY]` are not claimed by
-  this automated localhost smoke.
-
-## PS-032 — Results labels and return action (2026-09-19)
-
-The shared Flash? Pose! Results view now uses the exact player-facing headings
-`WINNERS` and `LOSERS`. The star/cloud decorations were removed from both the
-headings and player-name lists, so each ranked entry renders as the name only.
-The controller-owned ranking and `top_group_size` split are unchanged, and the
-internal animator states remain `happy` for the upper group and `moody` for the
-lower group.
-
-The baseline panels each spanned 36% of viewport height (`0.12`–`0.48` and
-`0.53`–`0.89`). Each final panel spans 28.8% (`0.12`–`0.408` and
-`0.462`–`0.75`): `0.288 / 0.36 = 0.8`, an exact 20% reduction in each panel's
-vertical footprint. Their upper/lower order, 84%-viewport width, centered
-content, 28-point names, 30-point headings, border treatment, and clear gap are
-preserved. The recovered lower space is a distinct action area rather than
-part of either ranking group.
-
-`Return to lobby` remains centered and invokes the same host controller request;
-the existing assignment of the request result to `disabled` is unchanged. Its
-presentation increased from 220×44 to 320×64 with 24-point dark text, 28-pixel
-horizontal and 12-pixel vertical style padding, a high-contrast gold fill,
-light border, rounded corners, and explicit hover, pressed, disabled, and focus
-states. The control ends 28 pixels above the viewport bottom and does not
-overlap the lower panel.
-
-Verification performed:
-
-- `[AUTO]` `tests/flash_pose_presentation_test.gd` passed. It checks exact
-  headings, name-only formatting, both 28.8% panel spans, the 320×64 button,
-  panel/action separation, no scoreboard copy, and preserved internal
-  `happy`/`moody` result moods.
-- `[AUTO]` `tests/flash_pose_flow_test.gd` passed. It retains the existing
-  results lifetime, host-controlled request, disabled request handling, audio
-  teardown, `SessionHost` continuity, and lobby-return coverage.
-- `[EDITOR]` Godot 4.7.2 completed a normal-profile headless editor load with no
-  script or scene parse errors. The known forced-shutdown 68-object/33-resource
-  cleanup warnings remain non-load errors.
-- `[GODOT-RUNTIME]` GL Compatibility captures were rendered and inspected at
-  1280×720 and the current 1920×1080 default. Both show the two headings, all
-  ten test names, and the centered action without clipping, overlap, scrolling,
-  or unreadable technical contrast. The deterministic harness writes
-  `test-results/ps-032/results-1280x720.png` and
-  `test-results/ps-032/results-1920x1080.png`.
-- `[HUMAN-PLAY]` is not claimed. The captures establish technical composition,
-  not final couch-distance readability or button prominence approval.
-
-## PS-031 — FHD host resolution and horizontal lobby (2026-09-19)
-
-The host now starts with an explicit 1920×1080 viewport and window override in
-`project.godot`. The existing `canvas_items` stretch mode, `expand` aspect, and
-GL Compatibility renderer are unchanged, so resizing the FHD window preserves
-the responsive 16:9 presentation rather than introducing a second rendering
-path.
-
-The lobby no longer uses a page-level `ScrollContainer`. A full-window margin
-container owns a centered green `PLAY SHAPES` title and an `HBoxContainer`
-below it. The left expanding section contains the Phase 1 subtitle, join title,
-QR code, instructions, current URL, address picker, refresh action, and copy
-action. The right expanding section contains the player heading/count, roster,
-start action, and availability text. Container relationships, margins, minimum
-sizes, wrapping, and size flags define the layout; no viewport coordinates are
-encoded in the scene or script.
-
-The QR code keeps a 260×260 logical minimum. Lobby rosters use one column and
-18-point rows for 1–10 players. At 11–20 players the same `GridContainer`
-switches to two row-major columns with 20-point, 27-high rows. This keeps the
-maximum supported lobby visible without scrolling and preserves an obvious
-left-to-right, top-to-bottom reading order. These values live in
-`scenes/lobby.tscn` and `scenes/lobby.gd` if later couch-distance review calls
-for larger type or different spacing; they are presentation-only and do not
-change the 20-player lobby or 10-player Flash? Pose! limits.
-
-After owner screenshot review, the FHD composition uses an 80-pixel horizontal
-safe margin, 48 pixels above the enlarged 44-point title, and 56 pixels below
-the content. The join body is a centered 720-pixel cluster within the left
-section, which vertically centers the QR and its instructions/actions while
-leaving the section headings anchored. Address selection, Refresh, and Copy
-link use fixed 52-pixel-tall controls instead of stretching to the column
-edges. Start minigame is centered at 360×60. Empty and populated roster states
-share one 300-pixel `RosterArea`, preventing their reserved heights from
-combining and displacing the 20-player layout.
-
-Verification performed:
-
-- `[AUTO]` `tests/lobby_layout_test.gd` passed. It verifies the missing page
-  scroll container, centered green title, left/right section order, FHD-canvas
-  bounds, and the 20-player two-column roster.
-- `[AUTO]` `tests/player_lobby_test.gd`, `tests/foundation.gd`, and
-  `tests/flash_pose_flow_test.gd` passed, covering registry-driven roster
-  updates, QR generation, session behavior, start availability, and the scene
-  transition/return flow.
-- `[EDITOR]` Godot 4.7.2 completed a headless editor load with no script or
-  scene parse errors. Forced-shutdown cleanup warnings are not runtime errors.
-- `[GODOT-RUNTIME]` GL Compatibility captures were rendered and inspected at
-  the FHD default (1920×1080) and at a temporarily resized 1152×648 16:9
-  window, each with empty and 20-player states. Required content remained
-  visible with no scrollbar, clipping, or overlap; the QR remained intact and
-  the two sections retained their hierarchy. The 1152×648 run is compatibility
-  evidence only—the project default remains FHD.
-- `[PHYSICAL-PHONE]` and `[HUMAN-PLAY]` are not claimed. This is a host-only
-  composition change; final couch-distance readability and real-phone QR scan
-  comfort remain human/device checks.
-
-## PS-030 — Flash? Pose! phone controller layout (2026-09-18)
-
-### Client startup regression correction
-
-The initial PS-030 commit compiled controller geometry into a second browser
-module and imported it from `app.js`, but the fixed HTTP asset allowlist did not
-serve `/controller_geometry.js`. Phones therefore received a 404 for the module,
-the application entry point never executed, and the static page remained at
-`Connecting to the host…`. `HttpService.ASSETS` now serves that exact committed
-module with the JavaScript MIME type. The served-assets integration test requests
-the imported module directly, so a successful `app.js` response alone can no
-longer hide a broken module graph.
-
-Active Flash? Pose! play adds `gameplay-active` to the document and turns
-`#pose-grid` into the fixed visual viewport. The active surface has no card,
-padding, scroll range, gutters, or dead regions. Two directions are equal
-halves; three use rays from the center to the top midpoint and bottom corners;
-four use both corner-to-corner diagonals. `controller_geometry.ts` is the
-single deterministic point-to-direction rule, including exact boundaries.
-The CSS polygons are presentation only; pointer input resolves through that
-geometry and therefore selects exactly one action.
-
-The stable surface owns pointer capture. Re-rendering after a host
-`available_directions` update preserves a held direction that still exists and
-does not send a second `pose_down`. If the host removes the held direction,
-the browser sends exactly one matching `pose_up` before rebuilding. Pointer
-up/cancel/lost-capture, keyboard keyup/blur, reconnect, page hide, elimination,
-and lobby return retain their previous release safety. Visible regions contain
-only `←`, `→`, `↓`, or `↑`; native buttons retain `aria-label`, `aria-pressed`,
-focus-visible styling, and Space/Enter hold behavior.
-
-Portrait active play shows only the non-scrolling `Rotate your phone` state.
-On the first pointer or keyboard pose gesture, the client attempts standard
-fullscreen, WebKit fullscreen when exposed, then landscape orientation lock.
-The attempt is made once. Safari standalone metadata and `viewport-fit=cover`
-are present, while region coverage continues under safe-area insets and arrows
-remain away from the edges. Denial or unsupported APIs are expected fallbacks:
-the largest available landscape viewport remains playable and the app never
-loops or claims browser chrome can be hidden.
-
-`SimonSaysTuning` owns provisional Left green, Right red, Down yellow, Up blue,
-idle brightness (`controller_minimum_brightness`), and full-charge brightness
-(`controller_maximum_brightness`). Inspector tooltips describe their outcomes
-and validation rejects an idle value above the charged value. The existing
-`charge_fill_seconds` and `charge_decay_seconds` drive browser interpolation;
-no competing timing was introduced. `FlashPoseProtocol` includes the tuning in
-personalized snapshots/challenges and sends narrow `flash_pose_charge` updates
-for the registered player. These values affect presentation only; the host
-continues to own semantic charge, deadlines, lives, and results.
-
-After TypeScript edits, rebuild both committed modules:
+Run Git, Godot, browser build, and tests from this `play-shapes/` repository, not from the parent vault. `project.godot` must remain at its root.
 
 ```powershell
-cd web
-npm.cmd run build
+godot --version
+godot --path .
 ```
 
-Verification performed:
+Use **F5** for the complete boot/lobby flow. Use **F6** only when an individual scene is designed for direct execution. The user shim is `C:\Users\backup pc\.local\bin\godot.cmd`; see `AGENTS.md` for the installed GUI path and optional MCP/OpenCode setup.
 
-- `[AUTO]` `npm.cmd run build` and `npm.cmd run check` passed.
-- `[AUTO]` `npm.cmd test` passed 14 tests, including representative and exact
-  boundary membership, color endpoints/interpolation, overflow CSS,
-  fullscreen fallback code, cancellation paths, and existing LAN protocol.
-- `[AUTO]` `tests/flash_pose_protocol_test.gd` and
-  `tests/tuning_presets_test.gd` passed; the latter validates all new Inspector
-  fields and brightness ordering.
-- `[AUTO]` a headless Godot editor load completed without script/parse errors;
-  its usual forced-shutdown resource warnings are not project-load failures.
-- Computer inspection loaded the actual served join page, but the isolated
-  desktop session did not enter an active round. This is not claimed as
-  `[DESKTOP-BROWSER]` gameplay layout evidence.
+In the lobby, choose a reachable Wi-Fi/Ethernet IPv4 address, then scan the QR or type the displayed URL on a phone on the same LAN. Discovery runs at launch and on Refresh; it prefers common `192.168.*` addresses but is not default-route detection. Loopback, link-local, and IPv6 addresses are excluded. VPNs, multiple adapters, guest Wi-Fi, and client isolation can require a manual choice or prevent access.
 
-PS-029 still owns `[PHYSICAL-PHONE]` checks on iPhone 16 Pro Safari and Pixel 7
-Chrome, including real safe areas, scrolling/zoom suppression, holds,
-2/3/4 transitions, fullscreen denial/standalone behavior, arrow legibility,
-and the separate `[HUMAN-PLAY]` brightness/comfort decision. The current color
-and brightness defaults remain provisional until that review.
+Normal play starts with 2–10 registered players. For debug, register exactly one phone, press F12, and choose **One-player Flash? Pose!**. Restart and lobby return preserve the running `SessionHost` and LAN services.
 
-## PS-027 — Flash? Pose! lobby and debug flow (2026-09-18)
+## Runtime architecture and code map
 
-### Phone pose-input correction after owner testing
+- `scenes/boot.*` starts services and presents Retry after startup failure.
+- `host/session_host.gd` persists services and the registry across scene changes. It discovers addresses, constructs URLs, and rolls HTTP back if WebSocket binding fails.
+- `host/http_service.gd` serves a fixed asset allowlist with bounded requests; it never serves a client-selected filesystem path.
+- `host/websocket_service.gd` owns bounded protocol-1 peers/messages and resolves each connection to a host-owned player before forwarding gameplay input.
+- `host/player_registry.gd` owns session/player/token identities, names, capacity, reconnect grace, resume, and explicit leave.
+- `scenes/lobby.*` owns the responsive lobby, QR/address controls, roster, and host-only start gate. The roster switches to two columns above ten players and fits the supported 20 without page scrolling.
+- `minigames/flash_pose_round_controller.gd` owns phases, timing, targets, two normal-play lives, elimination, withdrawal, and ranking. It delegates pose truth to `host/pose_evaluation_rules.gd`.
+- `minigames/flash_pose_presentation.gd` owns shared-screen animation, audio, flash, feedback, and the persistent `WINNERS`/`LOSERS` results view. It consumes semantic outcomes and never infers rules from sprite transforms.
+- `host/flash_pose_protocol.gd` is the narrow gameplay protocol adapter.
+- `characters/hybrid_character_animator.gd` consumes semantic dance, pose, reaction, elimination, and result states. Gameplay must not manipulate child sprites or inspect animation frames to decide outcomes.
+- `debug/` contains the non-pausing F12 scenario catalog and debug scenes. The launcher remains present in development exports.
+- `Tuning/` contains the active selector, named resources, guide, and experiment template. There is no runtime tuning UI.
+- `web/src/` is TypeScript source. `web/public/` is the committed offline runtime bundle served by Godot; normal play needs neither Node nor Internet.
+- `assets/runtime/` is the curated runtime-media boundary. Source/archive art remains outside it and is excluded from Godot import/export.
+- `addons/standalone_build/` is the editor-only Windows builder. `addons/kenyoni/qr_code/` is the required vendored runtime QR dependency.
+- `tests/` holds focused headless, integration, policy, and render checks; generated evidence belongs under ignored `test-results/`.
 
-Owner testing on iPhone exposed `Pose input needs a non-negative sequence` for
-apparently valid left/right presses. Browser JSON may decode `input_seq` as a
-Godot float even when the transmitted JSON number is a whole integer. The
-protocol now accepts only finite, whole, non-negative JSON numbers within
-JavaScript's exact integer range, normalizes them to an `int`, and keeps
-rejecting fractions, negative values, non-numbers, stale sequences, and
-authority-shaped fields.
+## Host authority and protocol reference
 
-A second gap prevented visible charging after an accepted press: pose charge
-was advanced only at another input or evaluation boundary. The round controller
-now advances the existing authoritative `PoseEvaluationRules` from host time on
-active frames, and presentation consumes its explicit `pose_direction`,
-`pose_charge`, and `pose_held` aliases. The controller still owns timing and
-outcomes; animation only receives semantic state. Regression checks prove a
-JSON-decoded press reaches the rules, becomes a held character pose, and gains
-visible charge before the evaluation deadline.
+The host owns session state, player identity, deadlines, lives, results, and receipt time. Phones send UI actions and controller input only.
 
-The phone pose buttons and every child icon/label now explicitly disable
-standard and WebKit text selection and the iOS touch callout. A guarded
-`selectstart` handler provides an additional browser fallback without removing
-the native button semantics, accessible name, keyboard hold behavior, focus
-ring, pointer capture, or cancellation cleanup. Automated checks pass; the
-owner should still recheck actual Safari touch/selection behavior because this
-change is not new physical-phone evidence.
+Defaults in `Tuning/Shared/Networking/Default.tres`:
 
-### Infinite-life one-player debug correction
+- HTTP `8080`; WebSocket `8081`
+- 32 transport connections per service; 20 registered players
+- five-second request/handshake timeout; 60-second reconnect grace
 
-Owner testing confirmed the normal two-player minigame flow on one iPhone and
-one Android phone after the input correction. That is real-device evidence for
-the normal flow, but not blanket approval of the remaining PS-029 experience
-matrix.
+`GET /session.json` returns protocol and WebSocket port. The browser uses the page hostname for `ws://HOST:PORT`. Fixed HTTP routes are `/`, `/app.js`, `/controller_geometry.js`, `/style.css`, and `/session.json`. Unknown routes return 404; non-GET methods return 405; headers beyond 8192 bytes are rejected with 431 or a TCP reset when unread bytes remain on Windows.
 
-The same testing found that one-player debug stopped after its first pose
-evaluation because the normal `eligible_player_count <= 1` end condition was
-still active. `FlashPoseRoundController` now records the explicit debug launch
-flag only when `allow_one_player_debug` is used with exactly one participant.
-In that mode, failed evaluations still produce failure feedback/reactions but
-do not deduct lives or eliminate the player, and the sole active participant
-does not trigger `last_player`. The round continues through repeated stops and
-ends normally at `round_duration_seconds`; withdrawal of the only real player
-still ends the round rather than running an empty debug session.
+Protocol 1 begins with `hello`/`welcome`, then supports join, resume, leave, and personalized lobby/gameplay state. The registry deliberately separates transport `connection_id`, host-owned session-scoped `player_id`, host-owned `session_id`, and opaque browser-held reconnect token. The browser stores only the session ID, token, last-used name, and monotonically increasing gameplay sequence needed to resume safely. A client-supplied player ID has no authority. New joins are lobby-only; valid resumes remain available during gameplay. Disconnect clears a held pose; resume requires a new press.
 
-Protocol snapshots, challenges, and per-stop results carry `debug_mode`, and
-the phone renders `Lives: DEBUG` instead of hearts. Normal launches never infer
-debug behavior from player count and retain two lives, elimination, and the
-last-player finish. Automated checks cover repeated failed debug evaluations,
-unchanged lives, continued dance cycles, timeout completion, launch-flag
-propagation, protocol copy, and the compiled phone label. A fresh one-player
-device run is still required before PS-027 returns to `done`.
+The only phone-to-host Flash? Pose! gameplay payload is:
 
-`SessionHost.prepare_flash_pose_launch()` is the single handoff for both normal
-and debug play. It validates registered-player records (never raw browser
-connections), snapshots their public identity/name/seat/connectivity data,
-closes new-player admission, and leaves the persistent HTTP, WebSocket,
-registry, reconnect tokens, and seats alive across the scene change. Flash?
-Pose! accepts 2–10 registered players in normal play. The one-player path is
-available only as the F12 entry `One-player Flash? Pose!` and requires exactly
-one real registry player; it creates no simulated identity or alternate game.
-
-Normal host workflow:
-
-1. Start the project and let phones join the lobby normally.
-2. The shared display's `Start minigame` button stays disabled below two
-   registered players and explains the gate. It also explains the existing
-   ten-player Flash? Pose! limit if the wider 20-player lobby exceeds it.
-3. With 2–10 registered players, press `Start minigame`. The host closes new
-   joins, loads `res://minigames/dancer_simon_says.tscn`, consumes the snapshot
-   once, and starts the existing `FlashPoseRoundController`.
-4. Existing players may reconnect during the round and receive the current
-   personalized gameplay snapshot. A transient disconnect keeps the round
-   participant/seat but clears the held pose. Explicit Leave removes the
-   registry record and the controller marks that participant withdrawn without
-   a life loss.
-5. At results, use the shared-display `Return to lobby` button. The controller
-   first emits its host-owned return signal so phones receive lobby state; then
-   the scene is torn down, presentation audio/tweens/nodes and protocol signal
-   bindings are released, the debug marker is cleared if present, and the new
-   lobby reopens joins. `SessionHost` and the surviving registry records are
-   not restarted.
-
-Debug workflow: register exactly one real phone player, press F12, and choose
-`One-player Flash? Pose!`. The launcher remains non-pausing and shows
-`DEBUG — One-player Flash? Pose!`. `Restart current debug scenario` prepares a
-fresh snapshot and reconstructs the same scene/controller. `Return to lobby`
-sends lobby state, clears the marker, tears down the scene, and preserves the
-host process/services. If the real player leaves, the one-player launch/restart
-gate closes; browser connection count alone never unlocks it.
-
-Focused checks:
-
-```powershell
-godot --headless --path . --script res://tests/flash_pose_flow_test.gd
-godot --headless --path . --script res://tests/player_lobby_test.gd
-godot --headless --path . --script res://tests/debug_launcher_test.gd
-godot --headless --path . --script res://tests/flash_pose_round_controller_test.gd
-godot --headless --path . --script res://tests/flash_pose_protocol_test.gd
-godot --headless --path . --script res://tests/flash_pose_presentation_test.gd
-godot --headless --path . --script res://tests/dancer_simon_says_scene_test.gd
-cd web
-npm.cmd test
-cd ..
-godot --path . --resolution 1280x720 --script res://tests/flash_pose_presentation_visual_check.gd
-godot --headless --editor --path . --quit-after 10
+```json
+{"type":"pose_down|pose_up","direction":"left|right|down|up","input_seq":1}
 ```
 
-- **[AUTO]: passed.** Focused checks cover the zero/one/two-player normal gate,
-  exact one-player debug gate, registry rather than connection authority,
-  participant snapshots, closed late joins, explicit withdrawal, shared-scene
-  reuse, clean debug restart, marker lifecycle, results return, and existing
-  controller/protocol/presentation/browser regressions. Browser integration is
-  12/12.
-- **[EDITOR]: passed.** With normal user access, Godot 4.7.2 completed project
-  initialization and script/import scanning with exit code zero and no parse or
-  import failures. The forced `--quit-after` shutdown still reports the known
-  scan-abort/object-cleanup warnings; restricted runs additionally cannot write
-  the user cache, neither of which is treated as runtime evidence.
-- **[GODOT-RUNTIME]: passed for the tested lifecycle and technical render.**
-  The integration test kept the same running `SessionHost` instance through
-  normal launch, results return, debug launch/restart, and debug return. The GL
-  Compatibility renderer produced the 1280×720 results capture, which was
-  inspected after moving the host return control fully below the result panels.
-  Generated captures remain ignored artifacts, not creative approval.
-- **[PHYSICAL-PHONE] / [HUMAN-PLAY]: not claimed.** PS-029 still owns real
-  iPhone/Pixel reconnect/Leave behavior, couch-distance readability, button
-  wording/placement preference, feel, audio, accessibility, and final approval.
+The adapter rejects client timestamps, player IDs, targets, deadlines, charge, lives, outcomes, malformed values, and stale sequences. JSON-decoded sequences may arrive as Godot floats, so validation accepts only finite, whole, non-negative values within JavaScript's exact integer range, then normalizes to `int`. The exact evaluation deadline is inclusive until resolution.
 
-## PS-026 — Flash? Pose! shared-screen feedback and results (2026-09-17)
+The host sends personalized `flash_pose_snapshot`, `flash_pose_challenge`, `flash_pose_result`, `flash_pose_results`, and `lobby` messages. Controls remain available throughout the round; only the host's genuine-stop deadline determines success. Direction availability progresses from two to three to four.
 
-`minigames/flash_pose_presentation.gd` is the scene-owned presentation/audio
-boundary under `dancer_simon_says.tscn`. It consumes the narrow PS-024 signals
-and never derives outcomes from sprite transforms. At countdown it maps the
-participant snapshot to the stable `Seat01`–`Seat10` anchors, gives each visible
-seat its fixed color and evenly distributed animator phase, and configures the
-lead plus players through `HybridCharacterAnimator` only. Player labels combine
-names with filled/empty heart symbols and explicit `OUT` text, so lives and
-elimination are not communicated by color or audio alone.
+## Tuning and content boundaries
 
-The responsive overlay keeps the player-facing `Flash? Pose!` title, a centered
-countdown, a text-plus-arrow direction cue, hold/capture feedback, and margins
-clear of the authored lead/player platforms. UI uses anchors and containers;
-there are no hard-coded viewport dimensions. The lead remains the largest
-character, while status labels stay directly below their stable seat.
+Open `Tuning/Active Presets.tres` to select named resources. Current front doors are `Tuning/Minigames/SimonSays/Default.tres` and `Tuning/Shared/Networking/Default.tres`. Restart to apply a changed selection. Only the human owner promotes subjective feel into `Default`; tests establish configuration safety, not fun or comfort.
 
-`FlashPoseAudioCatalog` remains the sole style mapping: `bounce`, `swing`, and
-`disco` select their prepared looping stream once per round. A genuine
-`genuine_stop_started` signal pauses that player at its current position.
-Authoritative `pose_evaluation_resolved` feedback is applied before
-`flash_requested`. Presentation keeps its own handled-`stop_id` set, plays one
-deterministically alternating supplied flash candidate, fades a code-native
-white overlay, then acknowledges that same stop. Only `flash_completed` resumes
-the existing stream and optional fade; a generic pause has no flash path. Both
-audio players stop on scene teardown.
+For Inspector help, put a `##` documentation comment immediately before the export annotation and variable declaration. Use `@export_group`, not `@export_category`, because categories can break subsequent property help. `tests/tuning_presets_test.gd` enforces this and recursively checks committed presets.
 
-Results stop music and remain visible until PS-027 supplies the host return.
-The controller-provided `top_group_size` divides named players into a green
-`HAPPY CREW` upper section and a purple `MOODY CREW` lower section. The same
-semantic animator API receives `happy`/`moody` result state. No points,
-scoreboard, or new tiebreaker is rendered.
-
-The active Simon Says preset now exposes provisional, clamped Inspector values:
-`flash_duration_seconds` 0.22 s, `flash_intensity` 0.78, `music_gain_db` -8 dB,
-`flash_sfx_gain_db` -5 dB, and `music_resume_fade_seconds` 0.12 s. These are
-reversible starting values, not human-approved feel or mix.
-
-Focused checks:
-
-```powershell
-godot --headless --path . --script res://tests/flash_pose_presentation_test.gd
-godot --headless --path . --script res://tests/dancer_simon_says_scene_test.gd
-godot --headless --path . --script res://tests/flash_pose_round_controller_test.gd
-godot --headless --path . --script res://tests/flash_pose_audio_assets_test.gd
-godot --headless --path . --script res://tests/tuning_presets_test.gd
-godot --path . --resolution 1280x720 --script res://tests/flash_pose_presentation_visual_check.gd
-godot --headless --editor --path . --quit-after 10
-```
-
-- **[AUTO]: passed.** The presentation test covers stable-seat population,
-  semantic animator mapping, non-color lives, style-to-stream mapping,
-  genuine-stop-only direction feedback, one guarded flash, post-flash dance
-  continuation on the same stream, and persistent named result groups without
-  scores. Existing scene, controller, audio, and tuning checks also pass.
-- **[EDITOR]: passed.** Godot 4.7.2 loaded the project with no script/import
-  errors. Under the restricted profile it still reports the known inability to
-  write user cache/settings plus forced-shutdown cleanup warnings; exit is zero.
-- **[GODOT-RUNTIME]: passed for technical rendering.** The GL Compatibility
-  renderer produced `test-results/ps-026/dance-10-players.png` and
-  `results-groups.png` at 1280x720. Both were visually inspected for clipping,
-  player/platform placement, status visibility, title, and result grouping.
-  Captures are ignored test artifacts and are not creative approval.
-- **[HUMAN-PLAY] / [PHYSICAL-PHONE]: not claimed.** PS-029 still owns flash
-  comfort/brightness, preferred SFX, audible exact-position resume and loop
-  quality, mix, couch-distance readability, two-phone behavior, and final feel.
-
-## PS-025 — Flash? Pose! phone protocol and controller (2026-09-17)
-
-`host/flash_pose_protocol.gd` is the narrow post-handshake adapter. A browser
-sends only `{"type":"pose_down|pose_up","direction":"left|right|down|up",
-"input_seq":N}`. The transport resolves the registered player from its
-host-owned connection and supplies `Time.get_ticks_msec()`; client player IDs,
-timestamps, targets, deadlines, charge, lives, and outcomes are rejected as
-unauthorized fields. The adapter validates packet shape before forwarding to
-`FlashPoseRoundController.submit_pose_input()`, whose phase, direction unlock,
-sequence, deadline, and active-player rules remain authoritative. Protocol 1
-and the existing hello/join/leave/reconnect behavior are unchanged.
-The browser persists only its monotonically increasing sequence alongside the
-existing reconnect identity so a reload cannot restart at a stale value; the
-host still treats that number solely as an ordering guard, never as authority.
-
-The round controller registers itself with the persistent `SessionHost` while
-its scene is alive. The WebSocket service translates controller signals into
-personalized `flash_pose_snapshot`, `flash_pose_challenge`,
-`flash_pose_result`, `flash_pose_results`, and `lobby` messages. A valid resume
-embeds the current personalized gameplay snapshot in `welcome.gameplay`, after
-the registry has cleared any disconnected hold. New players cannot join while
-the host closes lobby admission and are not inserted into an active round.
-
-The bundled controller now has waiting/watch, countdown/dance, challenge,
-result/lives, exact `You've been eliminated :(`, results, and lobby states.
-Two to four square native buttons stay visible and functional throughout the
-active minigame, including countdown, music playback, stops, and flash waits.
-Players can leave automatic dance running or freely pose at any time; only the
-host's genuine-stop grace deadline affects lives and outcomes. Direction
-unlocks update the layout at the boundary between gameplay cycles. Buttons use
-distinct arrow icons, text/accessible labels, and colors. Pointer capture
-prevents slide-off loss; pointer up,
-cancel, lost capture, disconnect, and page hide clean up local state. The page
-uses `touch-action: none` and suppresses context menus to prevent scrolling or
-double actions during a hold. A stable button grid is retained across a
-genuine stop, so an uninterrupted pointer remains held. Reconnect never sends
-an invented release or restores a lost pointer; the player must press again.
-
-After TypeScript changes, rebuild the committed offline artifact:
-
-```powershell
-cd web
-npm.cmd run check
-npm.cmd run build
-npm.cmd test
-cd ..
-godot --headless --path . --script res://tests/flash_pose_protocol_test.gd
-godot --headless --editor --path . --quit-after 30
-```
-
-- **[AUTO] protocol/browser checks: passed.** Focused coverage includes valid
-  press/release, duplicate and late actions, malformed and authority-shaped
-  packets, current reconnect snapshots, exact elimination copy, accessible
-  controls/cancellation hooks, and ten connected protocol-1 browser peers.
-- **[DESKTOP-BROWSER]: not claimed.** The automated browser assertions inspect
-  the served offline bundle; no interactive browser visual/usability run is
-  part of this task.
-- **[PHYSICAL-PHONE] / [HUMAN-PLAY]: not claimed.** Two-phone thumb reach,
-  persistent-hold fairness, VoiceOver/TalkBack behavior, mobile browser pointer
-  capture, and latency feel remain PS-029. Record a named device/browser issue
-  rather than adding a broad input abstraction if mobile capture differs.
-
-## PS-024 — Flash? Pose! host round controller (2026-09-17)
-
-`minigames/flash_pose_round_controller.gd` is the scene-scoped authority for a
-single round. `dancer_simon_says.tscn` owns it as `RoundController`. The fixed
-phase graph is countdown -> dance -> genuine-stop grace -> resolve -> flash
-wait -> either another dance cycle or results wait -> lobby return. Later
-presentation code acknowledges a matching `stop_id` with
-`acknowledge_flash()`; the controller never resumes before that acknowledgement
-and never emits two flashes for one stop.
-
-The controller snapshots the registered `player_id`, name, and stable seat at
-start, chooses one of `bounce`, `swing`, or `disco` for the full round, and owns
-the host round clock, target sequence, two lives, life-loss/elimination order,
-withdrawal state, and limited ranking. It delegates direction/charge/held
-truth and the exact grace deadline to `PoseEvaluationRules`; animation receives
-semantic state only. `submit_pose_input()` is the narrow authenticated seam for
-PS-025. It accepts host receipt milliseconds and client sequence order but no
-client timestamp. The exact deadline remains inclusive; resolved stops and
-later input cannot mutate their snapshot.
-
-`observe_registry()` consumes public registry snapshots without owning
-identity. A reconnecting player keeps their participant/seat but loses the
-held input and must press again. A missing player is withdrawn with no life
-loss. Registry events received after a pose deadline first settle that deadline
-so a late disconnect or leave cannot retroactively rewrite the result. The
-scene controller also listens to `SessionHost.players_changed` when that
-autoload exists; deterministic tests can call the same method directly.
-
-Signals are intentionally narrow: `phase_changed`,
-`semantic_animation_updated`, `genuine_stop_started`,
-`pose_evaluation_resolved`, `flash_requested`, `flash_completed`,
-`round_results_ready`, and `return_to_lobby_requested`. They expose state to
-later protocol/presentation adapters without parsing packets, moving sprites,
-playing audio, or creating VFX here. Tests inject style, target, and interval
-queues; normal play uses the host random source.
-
-The active Simon Says preset now exposes provisional 3-second countdown,
-60-second round, 4–7-second initial stop interval, 0.25-second reduction per
-resolved stop, Down unlock at 15 seconds, and Up unlock at 30 seconds. These are
-safe, Inspector-visible starting hypotheses only. Human play must decide pacing,
-difficulty, fairness, and feel before any values are promoted as approved.
-
-Focused checks:
-
-```powershell
-godot --headless --path . --script res://tests/flash_pose_round_controller_test.gd
-godot --headless --path . --script res://tests/pose_evaluation_rules_test.gd
-godot --headless --path . --script res://tests/pose_charge_test.gd
-godot --headless --path . --script res://tests/tuning_presets_test.gd
-godot --headless --path . --script res://tests/dancer_simon_says_scene_test.gd
-godot --headless --editor --path . --quit-after 30
-```
-
-- **Automated state/rule checks: passed.** Coverage includes the explicit phase
-  path, injected style/target/intervals, inclusive deadline input, duplicate and
-  locked input, results-before-flash order, matching flash acknowledgement,
-  exactly-once life loss/elimination, disconnect/resume/withdrawal, timeout and
-  all-perfect ranking, result grouping, and the debug-only one-player gate.
-- **Editor load: passed** in Godot 4.7.2 with the normal profile. The forced
-  early shutdown reported the existing 68-object/33-resource cleanup warnings,
-  separately from script/import loading.
-- **Runtime/device/human evidence: not claimed.** PS-025 through PS-029 still
-  own phone packets and UI, shared-screen/audio/VFX integration, lobby/debug
-  navigation, runtime/desktop validation, two physical phones, and human feel.
-
-## PS-023 — Flash? Pose! runtime music and SFX (2026-09-17)
-
-The supplied audio is consumed directly and remains byte-for-byte unchanged.
-`assets/runtime/audio/flash_pose_audio_catalog.gd` is the stable runtime load
-boundary: `bounce` uses `Bouncing_music.ogg`, `swing` uses
-`Swinging_music.ogg`, and `disco` uses `Wacky_music.ogg`. Its ordered flash list
-keeps `flash_1.ogg` and `flash_2.ogg` as candidates; later presentation code may
-choose deterministically or from a seeded source. Do not select a subjective
-winner until the PS-029 listening/playtest gate.
-
-The three BGM `.import` files enable looping at offset zero. Both flash imports
-remain one-shot. DEC-016 still requires gameplay to pause the selected player,
-remember its exact playback position, and resume that same stream only after a
-resolved genuine-stop flash completes. Neither a music pause nor future fake
-stop may trigger flash audio. These files have no authored musical loop-point
-metadata, so looping wraps at the file boundary; seam quality and pause/resume
-clicks remain human-listening evidence, not an automated claim.
-
-`assets/runtime/audio/flash_pose_audio_manifest.json` records each file's hash,
-Ogg Vorbis format, duration, 44.1 kHz stereo metadata, intended cue, import
-behavior, and provenance. Each supplied file's Windows `Zone.Identifier` names
-`Kenney Game Assets All-in-1 3.7.0.zip` as its referrer. That local archive was
-not present during PS-023, so the exact originating Kenney sub-pack is unknown
-and recorded as a provenance caveat. Kenney's official support page confirms
-that assets on its asset pages are CC0, permitting commercial use and
-redistribution without required attribution. Keep the manifest with the files;
-do not extend that provenance claim to unrelated assets.
-
-No conversion, trimming, loudness normalization, or derived audio was needed.
-`python -m unittest tests.flash_pose_audio_metadata_test` passed, covering Ogg
-headers, durations, hashes, and import metadata. The Godot script
-`res://tests/flash_pose_audio_assets_test.gd` passed, loading three correctly
-mapped looping streams and two ordered one-shot SFX. Godot 4.7.2 completed a
-headless editor load with no script/import failure; its known forced-shutdown
-resource-cleanup warnings remained. These are technical checks only. Final
-loudness, loop feel, pause/resume feel, flash choice, speech masking, and
-gameplay approval remain explicitly unverified until PS-029.
-
-## PS-013 — host-authoritative pose charge and evaluation (2026-09-17)
-
-`host/pose_evaluation_rules.gd` is the scene-independent rules boundary for
-Flash? Pose! input. Create one `PoseEvaluationRules` for a round, call
-`add_player()` for the controller's participant snapshot, and feed it only
-authenticated `player_id` values plus host monotonic receipt milliseconds.
-`input_seq` rejects duplicate and out-of-order actions; no API accepts a client
-timestamp. The later WebSocket adapter remains responsible for packet parsing,
-connection-to-player lookup, and phone copy.
-
-Each participant owns a `PoseCharge`: a changed direction resets to zero, a held
-direction fills, release drains over `charge_decay_seconds`, and same-direction
-repress continues from what remains. `begin_stop()` preserves an uninterrupted
-hold across a genuine stop and fixes the pose-reveal and evaluation timestamps.
-Inputs received at the exact deadline are accepted until `evaluate_stop()` fixes
-the result; later actions and resolved-stop mutations are rejected. Evaluation
-uses the exact deadline even if a later process frame performs the call, and
-success requires the target direction, normalized charge `1.0`, and a current
-hold. Explicit Leave calls `withdraw_player()` and creates no failure. A
-disconnect calls `set_player_connected(..., false, ...)`, which clears the hold;
-resume restores connectivity but requires a new press.
-
-The normalized `semantic_state_changed` payload exposes direction/charge/held
-under both rules-oriented and `pose_*` animation keys, plus reaction and
-elimination. Presentation may pass these values to
-`HybridCharacterAnimator.set_pose_state()`, `play_reaction()`, and
-`set_eliminated()`; it must never read sprite transforms or animation frames to
-decide success. `evaluate_stop()` emits immutable per-player result records.
-The future lives owner calls `mark_eliminated()` only after a failed result to
-create the authoritative elimination record used by animation and the phone
-protocol. This object deliberately does not own lives, round phases, packet
-formats, or the message `You've been eliminated :(`.
-
-The Inspector-facing provisional timing values live in
-`Tuning/Minigames/SimonSays/Default.tres`: 1.0-second fill, 0.28-second full
-decay, zero delay from audible stop to pose reveal, and 1.2 seconds from reveal
-to evaluation. The first two preserve the approved animation behavior; the
-last two explicitly define `audible stop -> reveal -> grace -> evaluation`.
-They are starting hypotheses, not human-approved feel. Change them through a
-named tuning preset and record the experiment before promoting a new Default.
-
-Focused checks:
-
-```powershell
-godot --headless --path . --script res://tests/pose_evaluation_rules_test.gd
-godot --headless --path . --script res://tests/pose_charge_test.gd
-godot --headless --path . --script res://tests/tuning_presets_test.gd
-godot --headless --editor --path . --quit-after 30
-```
-
-- **Automated rules checks: passed.** They cover full holds, release decay,
-  inefficient tapping, direction resets, grace/deadline boundaries, correction,
-  duplicate/out-of-order/invalid/late input, immutable resolution, disconnect,
-  resume, withdrawal, semantic output, and elimination records.
-- **Editor load: passed** in Godot 4.7.2 with the normal profile. Forced shutdown
-  reports the existing 68-object/33-resource cleanup warnings, separately from
-  parse/import failures.
-- **Runtime integration and human feel: not claimed.** PS-024 and PS-025 still
-  need to wire the round and validated controller boundaries. Physical phones,
-  latency fairness, timing difficulty, and game feel remain PS-028/PS-029
-  evidence and owner decisions.
-
-## PS-018 — editor-authored Flash? Pose! stage (2026-09-16)
-
-The reusable gameplay-stage shell lives at the reserved path
-`res://minigames/dancer_simon_says.tscn`. It intentionally contains presentation
-and placement only: the player-facing title, the PS-017 environment art, one
-lead preview, and ten player previews. Round state, pose evaluation, audio,
-feedback, results, networking, and navigation remain in their later tasks.
-
-`LeadSlot` and `PlayerSlots/Seat01` through `Seat10` are stable `Control`
-anchors. Their positions are stored as screen-relative anchors directly in the
-scene, not calculated from viewport dimensions in code. Seat numbering expands
-center-out (`Seat01`/`Seat02` are the center pair), so assigning the first two
-through ten stable seats keeps smaller groups centered without reshuffling an
-already assigned player. Later systems may configure or replace a slot's
-`PreviewCharacter`, but must preserve the slot identity and authored position
-throughout a round.
-
-### Adjusting the composition in Godot
-
-1. Open `res://minigames/dancer_simon_says.tscn` in the 2D editor.
-2. Select `LeadSlot` or one of the named nodes under `PlayerSlots`.
-3. Move it with the 2D tool or edit its Layout anchor values, then save the
-   scene. Do not generate seat positions in a runtime script.
-4. On the scene root, set `preview_player_count` from 2 to 10 to compare small
-   and full formations. Hidden previews do not remove their seat nodes.
-5. Toggle `show_character_previews` only when an unobstructed environment pass
-   is useful. The lead and ten editor markers remain available for authoring.
-
-The scene uses only the manifest-owned runtime paths under
-`assets/runtime/shape_characters/environment/`: `floor_left.png`,
-`floor_center.png`, `floor_right.png`, and `tree_small.png`. Character previews
-instance `res://characters/shape_character.tscn`; they do not duplicate its
-textures or animation boundary.
-
-Focused checks:
-
-```powershell
-godot --headless --path . --script res://tests/dancer_simon_says_scene_test.gd
-godot --path . --resolution 1440x810 --script res://tests/dancer_simon_says_scene_visual_check.gd
-```
-
-The structural check covers the reserved path, one lead, ten stable named
-seats, center-out two-player preview, editor anchors, shallow platform
-proportions, raised character placement, character instances, and all selected
-environment references. The renderer check writes review images under
-`test-results/ps-018/`; those generated files are ignored.
-
-`[HUMAN-PLAY]` Visual placement approved on 2026-09-17. The owner reviewed the
-revised two-player and ten-player GL Compatibility captures after the tile
-platforms were made shallower and the character anchors were raised so the
-feet rest on the yellow surface. This approval covers the PS-018 composition;
-it does not approve future gameplay feel, animation in context, feedback,
-audio, results, networking, or physical-phone behavior.
-
-## PS-017 — Milestone 1 environment asset decision (2026-09-16)
-
-PS-017 is complete by explicit owner decision. Flash? Pose! will use the
-existing curated environment sprites in
-`assets/runtime/shape_characters/environment/` for Milestone 1: the left,
-center, and right floor tiles plus the small tree. Their Kenney Shape
-Characters 1.0 / CC0-1.0 provenance, source paths, dimensions, and stable
-runtime paths are already recorded in
-`assets/runtime/shape_characters/manifest.json`.
-
-PS-018 may compose these assets into the editor-visible minigame scene while
-preserving character contrast and pose readability. This is a deliberate
-temporary visual choice so implementation can proceed; sourcing or creating a
-prettier environment is deferred until after Milestone 1 and is not a blocker.
-No runtime assets or Godot scenes changed in this decision-only update.
-
-## Task dependency links (2026-09-16)
-
-All non-empty `depends_on` properties now store exact Obsidian wikilinks to
-their task notes instead of plain task IDs. This lets Bases filters resolve each
-dependency as a file and inspect its `status` property. Tasks with no
-dependencies continue to use `depends_on: []`.
-
-## PS-019 — Flash? Pose! implementation plan (2026-09-16)
-
-PS-019 is complete; the owner confirmed the implementation decomposition and
-the three gameplay-policy choices below.
-The current checkout contains the persistent `SessionHost`/`PlayerRegistry`,
-the hello/join/leave WebSocket boundary, the editor-first tuning resources,
-the approved semantic character animator, the F12 launcher, and the supplied
-runtime music/flash candidates. It does not yet contain a gameplay scene,
-gameplay protocol, host start control, round coordinator, shared-screen results
-presentation, or phone pose controls.
-
-The execution sequence is: human-confirmed PS-017 environment assets; PS-013
-pose rules and PS-018 editor-visible stage; PS-023 audio preparation; PS-024
-host round controller; PS-025 phone protocol/controller; PS-026 shared-screen
-feedback/audio/flash/results (with PS-025 able to proceed in parallel); PS-027
-lobby/debug/return integration; PS-028 technical validation; and PS-029 the
-owner's two-phone and human-play gate. PS-022 was a discarded historical draft
-and is not reused because task IDs are never reused.
-
-The recommended architecture is a scene-scoped host round coordinator using a
-small enum and explicit transitions, plain per-player state keyed by host
-`player_id`, the Godot `_process` loop, and narrow signals. It does not add a
-state-object hierarchy, universal event bus, simulated-player framework,
-device farm, or runtime tuning UI. The host owns deadlines and input receipt
-time; the presentation emits one genuine-stop flash request only after results
-are resolved and acknowledges completion before music resumes. The player-
-facing name is **Flash? Pose!**; the reserved internal scene path and existing
-`SimonSaysTuning` identifiers remain stable unless a real compatibility need
-justifies a migration.
-
-The owner confirmed that an uninterrupted phone hold persists through a genuine
-stop and keeps the character holding its pose; a disconnect clears the hold,
-missing input loses a life, and explicit Leave withdraws without a life loss.
-The owner also confirmed exact playback-position pause/resume around the flash.
-Numeric timing, flash intensity, audio gain, accessibility, fairness, and fun
-remain human-play decisions. This planning update changed documentation only;
-no gameplay, editor/runtime, browser, device, or human-play validation was run.
-
-## PS-021 — curated runtime asset pipeline (2026-09-16)
-
-Runtime-ready Shape Character art now lives under
-`assets/runtime/shape_characters/`. The complete
-`assets/Kenney_Shape_Characters/` folder remains the immutable provenance and
-authoring archive, but its root `.gdignore` prevents Godot from importing it.
-Release exports also exclude that archive and the build-time manifest. Production
-`.gd`, `.tscn`, and `.tres` files must reference only the runtime root.
-
-`assets/runtime/shape_characters/manifest.json` is the source of truth. Its 21
-entries currently select four blue Double-resolution bodies, six blue
-Double-resolution hand poses, the PS-009 Double-resolution foot, six used face
-expressions, and four used environment pieces. Body, hand, and foot entries use
-`player_tint`; faces and environment art use `untinted`. Runtime files are exact
-copies rather than derived images, so the approved shaded source, alpha edges,
-pivots, horizontal mirroring, half-scale presentation, and tint shader remain
-unchanged. Standalone textures remain simpler than an atlas at this size.
-
-### Add, replace, or remove a sprite
-
-1. Put editable or supplied source art in its provenance-bearing source location.
-   Do not hand-edit a file under `assets/runtime/shape_characters/`.
-2. Add or update one manifest entry. Give it a unique stable name and runtime
-   path; record source path, role, `player_tint` or `untinted`, Double canonical
-   resolution, `copy` behavior, creator/license/source provenance, mirror policy,
-   and exact pixel dimensions. The manifest-wide `smooth_sprite` import policy
-   applies unless a future schema explicitly adds a reviewed exception. Only
-   shaded body/hand/foot art compatible with `player_tint.gdshader` may use
-   `player_tint`; faces stay untinted.
-3. Run `python tools/assets/runtime_asset_pipeline.py sync`. Open/import the
-   project once (or run the headless editor-load command below), then run `sync`
-   again so the committed `.import` sidecars receive the required lossless,
-   mipmapped, alpha-border-fixed, repeat-disabled settings. Import once more.
-4. Run `python tools/assets/runtime_asset_pipeline.py check`. It rejects missing
-   sources, duplicate names/paths, invalid policies, missing provenance, wrong
-   dimensions, stale copies, unexpected output files, incorrect import settings,
-   production archive references, or a missing import/export boundary.
-5. Migrate callers to the stable runtime path. For removal, delete the manifest
-   entry and its exact runtime `.png` and `.png.import`; `check` must pass before
-   committing. Never delete the provenance source merely because runtime stopped
-   using it.
-6. Run relevant scene/animation tests and a Compatibility-renderer comparison.
-   Export `PS-021 Validation Pack`, run the export-boundary check, and obtain
-   human visual approval whenever visible art, policy, or presentation changes.
-
-Commands from the Godot project root:
+Shape Character runtime art is manifest-owned under `assets/runtime/shape_characters/`; production `.gd`, `.tscn`, and `.tres` files must reference that root, never `assets/Kenney_Shape_Characters/`. To change the curated set:
 
 ```powershell
 python tools/assets/runtime_asset_pipeline.py sync
@@ -877,770 +106,116 @@ godot --headless --path . --export-pack "PS-021 Validation Pack" test-results/ps
 python tools/assets/runtime_asset_pipeline.py check-export --pack test-results/ps-021/curated.pck
 ```
 
-### Measurements and evidence
+Do not hand-edit generated runtime copies. Preserve source archives after runtime removal. If GIMP displays false transparent stripes in indexed originals, do not overwrite them; use `tools/assets/prepare_gimp_inputs.py` to make verified RGBA working copies under ignored `test-results/`. If the normal uv cache is blocked, point `UV_CACHE_DIR` at an ignored subdirectory there.
 
-- Before: the archive held 435 files / 1,168,853 bytes, including 214 PNGs and
-  215 `.import` sidecars; the representative all-resource PCK was 2,192,572 bytes.
-  Production directly referenced 15 archive textures.
-- After: the manifest owns 21 PNGs / 35,025 bytes and 21 import sidecars. Godot
-  actively imports those 21 runtime PNGs and ignores the archive. The comparable
-  PCK is 895,316 bytes, saving 1,297,256 bytes (59.17%). The repository remains
-  intentionally larger because the complete source archive is preserved.
-- `[AUTO]` Manifest/schema, stale-copy, import-setting, forbidden-reference,
-  archive/atlas preservation, animation, expression, and foundation checks pass.
-  A second sync reports zero copies and zero sidecar changes.
-- `[EDITOR]` Godot 4.7.2 imports the 21 runtime textures and loads without new
-  resource or script failures. Existing MCP early-shutdown leak warnings remain.
-- `[GODOT-RUNTIME]` GL Compatibility on the RTX 5070 passed the existing rendered
-  tint/isolation/face checks (260 opaque face pixels unchanged) and regenerated
-  `art/character-feet/runtime-showcase.png` without a tracked pixel change.
-- `[EXPORTED-BUILD]` Direct pack inspection confirms runtime paths are present
-  and `assets/Kenney_Shape_Characters` is absent.
-- `[HUMAN-PLAY]` Approved on 2026-09-16. The owner reviewed the regenerated
-  runtime showcase, confirmed that it looked good, and authorized marking
-  PS-021 done. This completes the separate human visual acceptance step.
+## Browser build
 
-Once `.gdignore` established the source boundary, Godot removed the archive's
-215 generated `.import` sidecars. This is intentional cleanup of obsolete engine
-metadata, not deletion of source material: all source PNGs, license text,
-atlases/XML, previews, vectors, and PS-009 project additions remain preserved.
-
-The original file-hash baseline now records the repository's enforced LF form of
-`License.txt`; its earlier CRLF hash could not pass in a checkout governed by the
-existing `eol=lf` attribute. No license text changed.
-
-## PS-016-PS-020 - Dancer Simon Says visual and audio planning task set (2026-09-15)
-
-The planning layer now distinguishes three specialized task types in addition
-to exploration, design, implementation, and validation: `asset-hunt`,
-`asset-rework`, and `wireframes-and-art-mockups`. Asset hunts and wireframes or
-art mockups are human-owned for now because the owner must select visual
-direction and approve the result. Asset rework is intended for AI or shared
-computer-based treatment of existing media; generative image creation is not
-the default and must be explicitly requested in a task.
-
-PS-016 creates the human visual reference for the Dancer Simon Says shared
-screen and phone control. PS-017 selects the scenario/environment asset set
-with provenance and licensing notes. PS-020 selects music and SFX candidates
-with provenance, loop/stop metadata, and human listening approval. PS-019 plans
-the complete implementation and creates any remaining bounded follow-up tasks. PS-018 is deliberately
-narrow: it will compose an editor-visible Godot gameplay scene with human-
-editable lead and 2–10 player placement slots using the approved wireframe and
-selected environment assets. None of these tasks implement the minigame yet;
-the implementation task remains dependent on the planning and content outputs.
-
-This session changed Markdown planning records only. No runtime, asset, browser,
-Godot editor, or device validation was performed or claimed.
-
-## PS-005 — Multi-phone and agent validation strategy (2026-09-15 working draft)
-
-The MVP routine physical matrix is two real phones on normal home Wi-Fi with the
-host also on Wi-Fi: an iPhone 16 Pro (Safari by default, Chrome for a browser
-spot check) and a Pixel 7 (Chrome). Two simultaneous phones are sufficient for
-MVP validation; larger playtests are future coverage. VPN, guest-network
-isolation, hotspot, packet shaping, and unusual interfaces are not MVP gates.
-
-Keep these evidence labels distinct in task notes and reports: `[AUTO]`,
-`[EDITOR]`, `[GODOT-RUNTIME]`, `[DESKTOP-BROWSER]`, `[PHYSICAL-PHONE]`,
-`[EXPORTED-BUILD]`, and `[HUMAN-PLAY]`. Automated, editor/runtime, and desktop
-browser results can support technical claims, but they do not prove touch,
-real-phone LAN reachability, exported-build behavior, couch-distance
-readability, accessibility, or game feel. The complete matrix, two-phone
-scenario, report fields, and completion rules are in [[PS-005 - Define Multi-Phone and Agent Validation Strategy]]. This is a working draft pending
-owner approval; no device-farm, CI, network-emulation, or profiling tooling was
-added.
-
-## PS-012 — Milestone 1 character animation system (2026-09-15)
-
-PS-012 upgrades `characters/hybrid_character_animator.gd` from the approved lab
-prototype into the production animation boundary for `ShapeCharacter`. Gameplay
-may call `setup(character, is_lead, phase_index, phase_count)`,
-`set_dance_style(style)`, `set_pose_state(direction, normalized_charge, held)`,
-`set_dance_active(active)`, `play_lead_pose_flow(direction)`,
-`play_reaction(reaction)`, `set_eliminated(eliminated)`, and
-`set_result_mood(mood)`. Gameplay must not manipulate child sprites, easing, or
-animation clocks and must never read transforms or animation time to evaluate a
-pose. PS-013 remains responsible for authoritative charge and success.
-
-The three music-paired styles are `bounce`, `swing`, and `disco`. Each owns
-distinct authored limb choreography, while `_pose_targets()` is the sole shared
-source for Up, Left, Right, and Down across every style and both character
-roles. The lead starts at loop phase zero. Player setup uses indices 0–9 over a
-phase count of 10, producing deterministic 0.0–0.9 offsets. Seeded expression
-and jiggle variation supplements those offsets without changing command meaning.
-`set_dance_active(false)` freezes a genuine stopped lead; a full normalized pose
-remains exact and still. Eliminated characters override every other state,
-remain visible with a sad face, and ignore later transient reactions.
-
-Use F12 and choose **Milestone 1 character animation** to open
-`debug/character_animation_system.tscn`. It shows one emphasized lead and ten
-smaller players, three style choices, normalized command charge, short lead pose
-flows, life-loss recoil, survival celebration, elimination, and happy/moody
-results. This debug scene supplies semantics only and does not emulate scoring,
-lives, music stops, networking, or authoritative evaluation.
-
-Designer-facing animation values remain in
-`Tuning/Minigames/SimonSays/Default.tres`: base tempo, bounce, sway, jiggle,
-secondary-motion strength, visual follow speed, lead emphasis, transient
-reaction duration, results cycle duration, and lead pose-flow hold duration.
-The authored transforms in the animator are choreography data rather than
-gameplay rules. Add a new dance style by adding its semantic ID and authored
-poses; do not duplicate the canonical command poses. Add a reaction behind a
-semantic method/state and document its interruption priority. Current feel
-values remain adjustable through named presets even after this milestone approval.
-
-Focused API/state, tuning, charge, expression, launcher, and foundation checks
-pass. On this development machine, directly processing all eleven animator
-components for 600 synthetic 60 Hz frames measured 289.13–301.40 microseconds
-average and 474–534 microseconds worst across three runs; this is a CPU-side component sample, not whole-frame
-rendering or evidence for other hardware. The Godot Compatibility renderer
-successfully captured all three loops, command/reaction stills, and a review
-reel under `test-results/ps-012/`. The project owner then ran the game, tested
-the animations directly, and reported being 100% satisfied with the Milestone 1
-result on 2026-09-15. That is the required human motion/readability approval and
-completes PS-012. It does not claim validation on other hardware.
-
-Validation commands:
-
-```powershell
-godot --headless --path . --script res://tests/animation_lab_test.gd
-godot --headless --path . --script res://tests/character_animation_performance_test.gd
-godot --headless --path . --script res://tests/tuning_presets_test.gd
-godot --headless --path . --script res://tests/pose_charge_test.gd
-godot --headless --path . --script res://tests/character_expression_test.gd
-godot --headless --path . --script res://tests/debug_launcher_test.gd
-godot --headless --path . --script res://tests/foundation.gd
-godot --path . --resolution 1440x900 --script res://tests/character_animation_visual_check.gd
-```
-
-## PS-015 — shared tuning assets and preset workflow (2026-09-14)
-
-### Inspector tooltip correction (2026-09-15)
-
-Godot 4.7.2 showed `No description available` for the first tuning Resources.
-Keep every documented tunable in this exact order: the `##` documentation
-comment, then the export annotation on its own line, then the `var` declaration
-on the next line. Use `@export_group` for Inspector sections, not
-`@export_category`: categories change the Inspector's documentation context and
-can prevent subsequent custom-property descriptions from resolving. This applies
-to range exports and plain Resource-reference exports.
-`tests/tuning_presets_test.gd` checks both rules for every current tweakable so
-future additions cannot silently lose their Inspector tooltip.
-Godot's `--gdscript-docs res://Tuning` output was also inspected: all 17 current
-properties and their full descriptions are present in the generated
-`SimonSaysTuning.xml`, `NetworkingTuning.xml`, and `ActivePresets.xml`. These
-temporary XML files are verification output and are not committed.
-
-PS-015 implements the editor-first workflow approved by PS-004. Open
-`Tuning/Active Presets.tres` for the project-level selector. Its Simon Says and
-Networking references point to committed, named assets; assigning the matching
-`Default.tres`, saving, and relaunching deterministically restores the known-good
-configuration. There is no runtime tuning UI.
-
-`Tuning/Minigames/SimonSays/Default.tres` is the minigame front door. It owns the
-currently implemented charge fill/decay, lab preview timing, dance tempo, body
-bounce/jiggle/sway, and visual-follow values. The animation lab and animator now
-consume that Resource without changing their provisional defaults.
-`Tuning/Shared/Networking/Default.tres` replaces `host/default_settings.tres`
-and owns the existing HTTP/WebSocket ports, transport/player limits, request
-timeout, and reconnect grace. `SessionHost` obtains it through Active Presets;
-the host remains authoritative.
-
-Each exported field includes Inspector documentation, units, a default, a safe
-range, and higher/lower guidance. Setters clamp individual values. Each Resource
-reports actionable cross-field errors, and `tests/tuning_presets_test.gd`
-recursively loads and validates every committed `.tres` below `Tuning/`. It also
-checks invalid individual values, invalid combinations, and missing active
-references. Future preset files are therefore included automatically rather than
-being allowlisted.
-
-The complete navigation, naming, reset, extension, and experiment workflow is in
-`Tuning/README.md`; copy `Tuning/Experiments/EXPERIMENT_TEMPLATE.md` for a feel
-comparison. The approved shared category map is documented there, but only
-Networking has a Resource today because the other categories have no concrete
-implemented values yet. Browser fetch timeout (5 seconds), WebSocket deadline
-(about 7 seconds), and retry delay (2 seconds) remain local to `web/src/app.ts`;
-no current behavior requires synchronizing them with the host.
-
-Validation commands:
-
-```powershell
-godot --headless --path . --script res://tests/tuning_presets_test.gd
-godot --headless --path . --script res://tests/pose_charge_test.gd
-godot --headless --path . --script res://tests/animation_lab_test.gd
-godot --headless --path . --script res://tests/player_registry_test.gd
-godot --headless --path . --script res://tests/player_lobby_test.gd
-godot --headless --path . --script res://tests/foundation.gd
-godot --headless --editor --path . --quit-after 30
-cd web
-npm.cmd run build
-npm.cmd run check
-npm.cmd test
-```
-
-Automated Resource, regression, TypeScript, and browser/host integration checks
-pass. The normal-profile Godot editor-load check passes without script/resource
-errors; its existing early-shutdown cleanup warnings remain non-failures. This
-session's Computer connection exposed no native Godot window, so a live Inspector
-walkthrough was not performed. No browser behavior changed, no physical-phone or
-exported-build check was run, and no subjective feel/readability/fun approval is
-claimed. The owner still controls candidate promotion into `Default`.
-
-## PS-004 — shared editor-first tuning strategy (2026-09-14)
-
-PS-004 is complete. The approved workflow is editor-first: stopping and
-relaunching between tuning runs is acceptable, and Milestone 1 does not need a
-runtime tuning overlay.
-
-The future tuning layout is a `Tuning/` root with one umbrella preset shape per
-minigame, shared assets grouped by concern, a project-level `Active Presets`
-selector, a Markdown tuning guide, and separate notes under
-`Tuning/Experiments/`. The initial shared categories are Input and phone
-controls, UI and presentation, Audio and haptics, Accessibility, Networking
-and session behavior, Camera, and Browser/platform behavior. These categories
-can grow when a real system justifies them.
-
-Every exposed value must be understandable without reading implementation code:
-use a plain-language label, explicit unit, default, safe range, purpose,
-higher/lower outcome guidance, invalid-value rules, and related-field
-constraints. Inspector constraints should prevent or clamp invalid individual
-values; focused automated tests must reject invalid combinations. Every
-committed named preset is validated, including non-active variants. Tests prove
-configuration safety, not subjective game feel.
-
-`Default` is the known-good recovery preset. Agents may create named candidate
-presets and experiment notes, but only the project owner may promote a preset
-to `Default` or approve a feel decision. An experiment changes one logical group
-under one hypothesis, uses a named preset, relaunches the relevant scene, and
-records the preset, conditions, observations, and decision in a separate note.
-
-Host and browser values share a source only when they genuinely need
-synchronized behavior. Browser-only interaction/presentation values remain
-platform-local; host-only settings remain in the networking/session category.
-The implementation follow-up is [[PS-015 - Implement Shared Tuning Asset and Preset Workflow]]. No tuning resources, selectors, runtime UI, or gameplay
-values were implemented by the PS-004 design session.
-
-## PS-006 — player join and host-owned registry (2026-09-14)
-
-`SessionHost` owns one `PlayerRegistry` for the lifetime of the host process. The
-registry uses four deliberately separate identities: each WebSocket gets a
-monotonic transport `connection_id`; each accepted player gets an opaque
-session-scoped `player_id`; the host process gets an opaque `session_id`; and the
-browser receives an opaque reconnect token. Only the host generates these values.
-The browser stores the session ID, reconnect token, and last-used name in
-`localStorage`; a client-supplied `player_id` has no protocol meaning.
-
-Protocol 1 keeps the original `hello`/`welcome` handshake. `hello` may include the
-stored `session_id` and `reconnect_token`. `welcome.resume_status` is one of
-`join_required`, `resumed`, `expired`, or `session_restarted`. A welcomed client
-may send `join` with a name or `leave`; the host replies with `join_accepted`,
-`join_rejected`, `left`, or an actionable `error`. Invalid JSON/handshakes close
-with policy code 1008. Unsupported post-handshake actions receive a bounded error
-and cannot mutate identity. A duplicate active-token resume gives the newest
-connection ownership and closes the older tab with code 4000; the bundled client
-stops that older tab from retrying, preventing a reconnect loop.
-
-Names are trimmed, 1–16 Unicode code points, and reject C0/C1 controls plus
-Unicode line separators. Duplicate comparison uses Unicode lowercase matching.
-Disconnected records change to `reconnecting`, reserve their name and capacity,
-and expire at the configured grace boundary. Explicit Leave removes the record
-and token immediately. New joins are enabled only while `scenes/lobby.tscn` is in
-the tree; valid resumes remain available in other scenes. The lobby roster reads
-the persistent registry and displays seat, public name, and a text connection
-state. It no longer treats raw browser connections as players. Registry changes
-also drive DebugLauncher's `registered_player` feature.
-
-Designer-facing host values now live in
-`Tuning/Shared/Networking/Default.tres`, backed by `NetworkingTuning`:
-`max_players = 20` players and
-`reconnect_grace_seconds = 60.0` seconds. They are independent of the existing
-`max_connections = 32` transport cap. The provisional host request/handshake
-timeout remains 5 seconds. Browser constants remain near their behavior in
-`web/src/app.ts`: fetch timeout 5 seconds, WebSocket deadline about 7 seconds,
-and retry delay 2 seconds. Run `npm.cmd run build` from `web/` after editing the
-TypeScript source so the locally served `web/public/app.js` stays current.
-
-Validation commands:
-
-```powershell
-godot --headless --path . --script res://tests/player_registry_test.gd
-godot --headless --path . --script res://tests/player_lobby_test.gd
-godot --headless --path . --script res://tests/foundation.gd
-cd web
-npm.cmd run check
-npm.cmd test
-```
-
-The registry check covers identity separation, Unicode/name validation,
-case-insensitive duplicates, lobby-only joins, two-player capacity with a reserved
-reconnecting slot, resume while full, deterministic duplicate resume, exact
-60-second expiry, leave/token invalidation, name reuse, and new-session rejection.
-The lobby check covers roster text and persistence across lobby replacement. The
-Node suite exercises the real local HTTP/WebSocket host, bundled accessibility
-markup, handshake errors, host-owned identity, duplicate rejection, resume,
-leave, and session restart responses. A desktop in-app browser check at 390×844
-confirmed the join layout, named joined state, reload resume, and Leave/Change
-player with preserved name and returned focus. The headless editor-load check has
-no project parse errors; sandbox-only Godot profile/cache write errors are not an
-editor runtime result. Physical-phone screen-lock, Wi-Fi-loss, touch, mobile
-browser, and shared-display flow checks remain owner validation and are not
-claimed here.
-
-## PS-011 — hybrid character animation lab (2026-09-13)
-
-The lab scene is `debug/character_animation_lab.tscn`. Start the normal host,
-press F12, and choose **Hybrid character animation lab**; the PS-014 catalog now
-enables that entry because the packed scene exists. F6/direct scene launch remains
-a fallback, but launcher navigation is the acceptance path. F12 also provides
-clean restart and lobby return while preserving `SessionHost`.
-
-The lab begins in an automatic tour: two seconds of dance, then Up, Left, Right,
-and Down in sequence with fill, snap/hold, and release unwind. Press **A** or use
-the check button to disable the tour. Hold the arrow keys or the on-screen buttons
-to compare poses manually. The diagnostic text is intentionally debug-only; the
-character has no player-facing charge bar.
-
-`characters/pose_charge.gd` owns deterministic semantic state: normalized charge,
-held direction, fill/decay, reset-on-direction-change, and committed state. It has
-no animation-frame knowledge. `characters/hybrid_character_animator.gd` consumes
-that state, blends authored screen-relative part transforms, and adds restrained
-procedural bounce/jiggle while dancing and charging. At charge 1 the pose snaps
-to its still authored target until release. The production gameplay layer must
-continue to own evaluation and pass semantic state into animation; it must never
-infer authoritative outcomes from displayed transforms.
-
-`characters/character_expression.gd` adds presentation-only life without entering
-the charge contract. The neutral happy face blinks for short beats at randomized
-roughly 2–5.5 second intervals. Longer micro-expressions appear less often from a
-weighted happy/cheeky deck with rare subdued or worried faces. Committed poses use
-intentional faces for silhouette/emotion clarity. The animator also changes hand
-textures during the dance: closed, open, peace, point, rock, and thumbs-up all
-participate. Up commits with rock hands, the screen-right dab uses open hands,
-Left mixes open/peace, and Down mixes thumbs-up/open. Source textures, tint shader,
-and mirrored screen-relative transforms remain unchanged.
-
-Base-dance refinement keeps command poses unchanged. Blinks last 30% longer than
-the first visual candidate (0.117–0.195 seconds). Dance hand textures change once
-per five beats—an 80% frequency reduction—with open/closed shapes comprising ten
-of fourteen sequence slots. The body now sways horizontally and occasionally
-enters a randomized 1.8–3.2 second slow-jiggle phrase before returning to its
-normal pattern; normal phrases last 6–11 seconds. These choices intentionally add
-organic irregularity without changing authored limb choreography or pose rules.
-
-Lab tunables are exported on the scene script (`charge_fill_seconds`,
-`charge_decay_seconds`, `auto_hold_seconds`, `auto_release_seconds`) and animator
-(`dance_beats_per_second`, `body_bounce`, `body_jiggle_degrees`,
-`visual_follow_speed`). Current values are provisional visual-review defaults,
-not production tuning. The shared `ShapeCharacter` scene, sprite pivots, tint
-material ownership, mirrored art, face texture, and asset provenance are unchanged.
-
-Validation commands:
-
-```powershell
-godot --headless --path . --script res://tests/pose_charge_test.gd
-godot --headless --path . --script res://tests/animation_lab_test.gd
-godot --path . --script res://tests/animation_lab_visual_check.gd
-godot --headless --editor --path . --quit-after 30
-```
-
-The model test covers deterministic fill, rapid-tap accumulation, fast decay,
-direction reset, snap/hold, and full release. The integration test covers launcher
-availability/entry, persistent debug naming, six-part character integrity, and
-complete pose targets. The real Compatibility renderer produced the ignored
-`test-results/ps-011/animation-lab.gif` plus dance/pose stills for human review.
-Technical validation did not replace human motion review. The owner explicitly
-approved the final command poses and refined base dance on 2026-09-13. PS-011 is
-complete; PS-012 may begin only as a separate, newly scoped development session.
-
-## PS-014 — minimal gameplay debug launcher (2026-09-13)
-
-`DebugLauncher` is a `CanvasLayer` autoload alongside `SessionHost`. Press F12 in
-any host scene to toggle its overlay. It never pauses the tree and does not own,
-start, or stop networking. Launch, restart, and lobby return use ordinary scene
-replacement, so the same `SessionHost` node, listeners, connections, and future
-host-owned player registry remain alive.
-
-The persistent launcher state owns the active scenario name and displays
-`DEBUG — <scenario name>` above every debug-launched scene. Restart reloads the
-registered scene path to reconstruct clean scenario-local state. Return to lobby
-clears the active registration and marker before loading `scenes/lobby.tscn`.
-The overlay and marker stay available in editor and exported builds for now.
-
-Scenario definitions live in `debug/scenario_catalog.gd`; add a single
-`DebugScenario` there when a real scene becomes available. Each entry has a
-stable ID, display name, scene path, and optional required feature. The launcher
-also exposes `register_scenario()` for focused tests or future composition. It
-checks the packed scene through `ResourceLoader` and renders missing destinations
-as disabled, explicitly unavailable buttons. PS-011 only needs to supply its
-scene at the catalogued path (or update that one catalog entry). The reserved
-one-player Simon Says entry additionally requires `registered_player`; PS-006 or
-its integration should call `set_feature_available(&"registered_player", true)`
-only from the authoritative registry. Never derive it from browser connections.
-
-Validation commands:
-
-```powershell
-godot --headless --editor --path . --quit-after 30
-godot --headless --path . --script res://tests/debug_launcher_test.gd
-godot --path . --resolution 1152x800 --script res://tests/debug_launcher_visual_check.gd
-```
-
-The focused runtime test covers unavailable entries, F12 toggle behavior,
-non-pausing state, launch, clean scene reconstruction, marker lifetime, lobby
-return, and identity/continuity of a running `SessionHost`. The visual helper
-captures `test-results/ps-014/debug-launcher.png` from the real Compatibility
-renderer. These checks do not prove exported-build behavior, physical phones,
-multiplayer identity, or game feel.
-
-## PS-007 — approved minimal debug-suite design (2026-09-13)
-
-The first debug suite is intentionally only a host-side scenario launcher. F12
-toggles a non-pausing overlay from any Godot scene. It preserves the running LAN
-services across scenario launch, clean scenario restart, and return to lobby.
-Every debug-launched scene carries a persistent `DEBUG — <scenario name>` marker.
-The host shortcut has no phone-browser behavior.
-
-The launcher stays present in editor and exported builds during this early phase.
-It does not include pause, time scaling, live tuning, forced state, logs, replay,
-simulated players, or a command console. One-player gameplay requires one real
-registered player after PS-006; raw browser connection count is not identity.
-PS-014 implements the launcher. PS-011 then supplies the animation lab scene.
-Do not expand either task merely to anticipate future debug needs.
-
-## PS-010 — approved character animation strategy (2026-09-13)
-
-PS-010 selected a hybrid detached-sprite approach for Milestone 1: authored
-transforms on the existing six independent sprite parts, shared semantic command
-poses, and limited procedural bounce, jiggle, and phase offsets. Skeletal rigging
-is intentionally excluded because these floating parts do not need weighted limb
-deformation. Gameplay owns normalized charge and outcomes; animation consumes
-semantic state and never infers rules from visual frames.
-
-The approved vocabulary is three track-specific dance loops; four shared
-screen-relative poses (hands-up, hands-left wave, screen-right dab, playful low
-twerk); charge/unwind/snap/hold; life-loss recoil; survival celebration;
-elimination to persistent sad stillness; and happy/moody result reactions.
-Players may correct during a tunable grace window. Success requires the correct
-direction, full charge, and held input at authoritative evaluation. A 1-second
-fill and approximately 1.2-second expert grace are provisional starting points.
-
-Implementation is deliberately staged: PS-011 proves one character in a debug
-animation lab and requires human visual approval; PS-012 builds the production
-animation library/API and measures eleven-character behavior; PS-013 implements
-host-authoritative charge and evaluation. Do not combine these tasks into one
-large implementation session or bypass their dependencies.
-
-## PS-009 — character feet and reusable asset setup (2026-09-13)
-
-**PS-009 is done.** The project owner explicitly approved the foot art on
-2026-09-13 and requested completion. Pull-request merging remains an owner action.
-This branch includes the preceding PS-009/PS-010 task-definition commit because
-it is not yet on `main`. Unrelated local draft and task-board edits are excluded.
-
-### Files and provenance
-
-- `assets/Kenney_Shape_Characters/`: supplied Kenney Shape Characters 1.0,
-  including both 104-image source sets, preview/sample, SVG/SWF overview,
-  original CC0 license, and two updated PNG/XML atlases.
-- `PNG/{Default,Double}/blue_foot_round.png`: one new right-facing rounded
-  foot, 40 x 24 / 80 x 48, transparent and antialiased. Mirror for the left foot.
-  One silhouette is the smallest useful set; additional poses await PS-010.
-- `art/character-feet/blue_foot_round.xcf`: editable GIMP source with silhouette
-  and highlight paths, blue gradient fill, and separate 20%-opacity white rim.
-  Default was exported from a cubic downscale of the Double source.
-- `art/character-feet/comparison-{default,double}.png`: native-resolution
-  comparisons beside bodies, hands, face, assembled character, and environment.
-- `art/character-feet/runtime-showcase.png`: captured from the actual Godot
-  Compatibility renderer. `PROJECT_ADDITIONS.md` in the pack identifies the new
-  feet as project additions, not Kenney originals.
-
-Source inspection covered all 104 names at both resolutions, both atlases,
-preview/sample, and the SVG overview. Bodies are 80 x 80 at Default, with smooth
-vertical gradients and subtle top rims, not black outlines. Hands are roughly
-28–38 pixels wide. The foot's rounded instep/toe and small bright rim follow
-that treatment; neither realistic ankles nor a shoe sole outline were added.
-
-Original standalone PNGs, license, preview/sample, and vector files remain
-byte-identical. Atlas canvases grow only at the bottom: 577 x 605 and 1154 x 1210.
-The new rectangles are (2,579,40,24) and (4,1158,80,48). Original rectangles
-retain all coordinates and visible pixels. The atlases now use RGBA; invisible
-RGB beneath alpha zero is not part of the appearance-preservation comparison.
-Do not downscale the entire atlas to regenerate Default: original entries must
-remain their supplied resolution-specific exports.
-
-### Godot usage and designer controls
-
-Instance `characters/shape_character.tscn`. Its six direct `Sprite2D` children
-are `Body`, `Face`, `LeftHand`, `RightHand`, `LeftFoot`, and `RightFoot`.
-Each has an independent position, rotation, scale, texture, and draw order.
-Enable Editable Children on an instance to tune these in the inspector.
-Body/face origins are their centers; hand origins are centers; feet have a
-heel-biased pivot through ±12 Double-pixel sprite offsets. The root origin is
-the body center. Default hand positions are (±55,20), feet (±20,60).
-Body z=0, limbs z=1, face z=2. The left hand and foot use `flip_h`; transform
-the whole root to place a character, not to recolor it. These defaults are
-starting points for human pose experiments, not a committed rig or dance system.
-
-Double is canonical at runtime, with each sprite scaled to 0.5 (80 world-unit
-body). Set `player_color` on the root in the inspector or at runtime. Each
-instance owns one shader material shared across its five colored parts.
-Face has no tint material and retains the source white eyes and dark features.
-The shader maps the canonical BLUE art's lightness into colored shadows and
-highlights; keep blue body/hand textures when swapping the four body shapes or
-six hand poses. Faces can use any `face_*.png`. No atlas parser, color-specific
-assemblies, broad customization API, or per-color exports are required.
-
-Keep root/ancestor `modulate` white, otherwise Godot will also modulate the face.
-Use `player_color.a` for colored-part opacity only; use ancestor alpha deliberately
-when fading the entire character. Very dark colors are lifted toward slate to
-keep the dark face readable. This palette favors readability over exact requested
-RGB reproduction. Color alone does not guarantee distinguishability for every
-player or background; group readability and accessibility remain human checks.
-
-`characters/background_sample.tscn` composes tree and three floor tiles as
-ordinary sprites, with no collision, physics, or navigation. It can be instanced
-and repositioned independently. It is a composition example, not a final level.
-
-Open `characters/asset_showcase.tscn` and press **F6** for six color/pose examples
-against light and dark backgrounds. F5 still starts the existing LAN lobby.
-The review scene uses a responsive grid and static transforms only. It neither
-starts services nor implements gameplay, networking, rigging, or animation clips.
-
-### Import and authoring settings
-
-All standalone PNGs use lossless compression, mipmaps, alpha-border fixing,
-and disabled automatic 3D compression detection. Character and background roots
-explicitly use **Linear with Mipmaps** and **Repeat Disabled**; children inherit.
-This suits smooth art scaled down for a shared screen. Atlas imports retain no
-mipmaps because the original pack has tightly adjacent entries without extrusion;
-runtime uses standalone textures to avoid atlas bleed. Source previews/vectors
-retain their original import defaults. `art/`, `tools/`, and `test-results/` are
-excluded from Godot scanning via `.gdignore`, keeping review material and caches
-out of the resource import/export set.
-
-GIMP 3.2.6 showed false transparent stripes when loading some indexed originals.
-Never overwrite those originals to fix the editor display. Run
-`uv run --with pillow python tools/assets/prepare_gimp_inputs.py` to create
-pixel-identical RGBA working copies in ignored `test-results/ps-009/gimp-rgba`.
-GIMP performs the actual image composition using those copies. The preparation
-script verifies each round-trip; it does not modify source files.
-For review regeneration, set `PLAY_SHAPES_ROOT` to the checkout path in GIMP's
-Python console, execute `tools/assets/compose_gimp_review.py`, call
-`review('Default')` or `review('Double')`, and export that image as PNG.
-Open the XCF to edit feet; save source before downscaling a duplicate for Default.
-Update both atlas shelves and XML entries after any dimension/shape changes.
-
-### Validation evidence and caveats
-
-From the Godot project root:
-
-```powershell
-uv run --with pillow python tools/assets/validate_character_pack.py
-godot --headless --editor --path . --quit-after 30
-godot --path . --resolution 1152x800 --script res://tests/character_assets_test.gd
-```
-
-- **Automated image checks: passed.** 105 names per atlas, complete source sets,
-  no overlaps, all rectangles in bounds, preserved original pixel hashes and
-  source-file hashes, exact new-foot atlas pixels, transparent antialiased feet,
-  exact 2x dimensions throughout, and intentional standalone import settings.
-  Baselines in `art/character-feet/original_{manifest,file_hashes}.json` describe
-  the supplied originals. Do not regenerate them to conceal a mismatch.
-- **Editor load: passed** on Godot 4.7.2. No script or import failures on the final
-  run. Early editor shutdown emits the existing MCP resource-cleanup warnings
-  (68 objects / 33 resources), separately from loading errors. The initial
-  sandboxed attempt could not access Godot's normal settings/cache directories;
-  rerunning with access resolved that environmental failure.
-- **Real renderer tests: passed** with GL Compatibility on RTX 5070. Six independent
-  parts, per-instance material isolation, mirrored feet, changed body pixels after
-  tinting, unchanged other player, and 260 unchanged opaque facial pixels.
-  The test uses a five-source-pixel interior mask to exclude mipmapped alpha edges;
-  a tighter mask falsely included blended body/face edge pixels. It has a timeout
-  so an assertion cannot leave a test process running indefinitely.
-- **Visual inspection: performed.** Both source-resolution sheets, the vector
-  overview, live Godot window through Computer Use, and final renderer capture
-  were inspected. Very dark tints were lifted after the first runtime comparison.
-- **Human art approval: approved on 2026-09-13.** The owner explicitly approved
-  the foot art and requested PS-009 be marked done. The comparison images retain
-  their original review-time "art approval pending" captions as historical evidence;
-  this approval record supersedes those captions.
-  Physical-phone checks, game-feel playtesting, final dance readability, and
-  exported-build verification are outside this asset task's technical evidence.
-
-The image scripts were verified with Pillow 12.3.0 (`get_flattened_data`); the `uv --with`
-commands install an isolated tool dependency, not a game runtime dependency.
-If the normal uv cache is blocked, set `UV_CACHE_DIR` to an ignored folder under
-`test-results/`. Renderer-test output is in `test-results/ps-009/render-test.log`
-when launched with `--log-file`; its committed screenshot is refreshed each run.
-
-## Planning and task context
-
-The canonical planning layer is Markdown in the parent notes vault under
-`../Project/`, `../Drafts/`, `../Roadmap/`, `../Management/Tasks/`, and
-`../Decisions/`. Future agents should begin with
-[Project Overview](../Project/Project%20Overview.md), then read the selected
-task and its linked decisions before proposing or implementing work. The
-interactive Obsidian view for current work is the [Task board](../Management/Task%20board.md);
-it reads task frontmatter directly and requires no separate task index.
-The active rules in [Task System](../Project/Task%20System.md) and
-[Workflow](../Project/Workflow.md) supersede older historical sections below:
-new work does not create exploration or validation tasks, uses `asset-import`
-for development media without a provenance gate for placeholders, and waits
-for explicit human approval before remote publication.
-
-Implementation work must happen in a separate execution session from planning.
-An implementation task is not ready until its scope, acceptance criteria,
-dependencies, and draft execution prompt reflect approved design decisions.
-
-## Phase 1 — LAN hello world (2026-09-09)
-
-Implemented: boot starts HTTP and WebSocket services, then opens the lobby
-playground with a join QR code. A browser on the same LAN loads the bundled
-Hello world page and completes a versioned WebSocket handshake with Godot.
-No player names, characters, controller inputs, persistence, or minigames yet.
-
-Physical-phone scanning and cross-device network access are the remaining
-acceptance check. Desktop Chrome successfully loaded the Wi-Fi address and
-displayed the connected state. Do not equate this with a physical-phone test.
-
-## Project location and running
-
-The Git repository and Godot root are this `play-shapes/` directory, nested
-inside the parent notes vault. Keep `project.godot` here. This repository
-contains `AGENTS.md`, `README.md`, and `DEVELOPMENT.md`. The parent contains
-`Main.md`, `Stack.md`, `Lobby playground.md`, the `Minigames/` notes, and the
-planning layer under `Project/`, `Drafts/`, `Roadmap/`, `Management/`, and
-`Decisions/`; read the relevant planning notes before expanding scope.
-
-Open `project.godot` in Godot 4.7.2 and press F6 for an individual scene only
-when appropriate; use **F5** for the complete boot flow. Or from this directory:
-
-```powershell
-godot --path .
-```
-
-Select the host's Wi-Fi/Ethernet IPv4 address in the lobby. Phones must use
-the same reachable LAN. Scan the QR or type its displayed URL. The current
-address is detected each launch; it is not stored in source. Refresh rescans
-adapters and preserves the current choice when possible. Common `192.168.*`
-addresses are preferred, but this is a heuristic, not default-route detection.
-VPNs, multiple interfaces, and guest Wi-Fi can require manual selection.
-Loopback, link-local, and IPv6 addresses are excluded. No address means no QR.
-
-PS-006 replaced the lobby's old browser-connection diagnostic with the
-authoritative player roster. Reloading still creates a new transport connection
-ID, but the browser-held token resumes the same session player during its grace
-period; see the PS-006 section above.
-
-## Code map
-
-- `scenes/boot.*`: starts services, displays a startup error and Retry on failure.
-- `host/session_host.gd`: autoload owning service and player-registry lifecycle
-  across scene changes, settings, address discovery, and URL construction.
-  WebSocket bind failure rolls back HTTP startup. `stop()` releases listeners
-  and connected peers.
-- `Tuning/Shared/Networking/Default.tres`: inspector-editable ports, connection limit and
-  request/handshake timeout, player capacity, and reconnect grace. Defaults:
-  HTTP 8080, WebSocket 8081, 32 connections per service, 20 players, five-second
-  timeout, and 60-second reconnect grace. Restart to apply changed settings.
-- `host/player_registry.gd`: authoritative session/player/token identities,
-  name validation, capacity, disconnect grace, resume, and explicit leave.
-- `host/http_service.gd`: fixed route allowlist, bundled assets, bounded request
-  buffers, nonblocking partial reads/writes, one GET per connection. No arbitrary
-  filesystem access or client-selected resource loading.
-- `host/websocket_service.gd`: bounded peers/messages and versioned
-  hello/welcome, join, resume, and leave transport. It rejects malformed or
-  unauthorized actions and delegates authoritative identity changes to the
-  registry.
-- `scenes/lobby.*`: editor-visible Control/Container billboard, address picker,
-  refresh/copy actions, nearest-filtered QR texture with a four-module margin,
-  and the public player roster.
-- `web/src/app.ts`: thin browser client, five-second config fetch timeout,
-  seven-second WebSocket deadline, and two-second retry. It stores only the
-  session/token/last-name identity needed for resume and handles pagehide/pageshow
-  for browser back-forward cache restoration.
-- `web/public/`: offline HTML/CSS and committed compiled JavaScript. Godot serves
-  these directly, so running the game requires neither Node nor internet access.
-- `addons/kenyoni/qr_code/`: unmodified MIT QR runtime files pinned to commit
-  `3d92d1bab93c0a8cb58951c039ddb17acd70a449`. See UPSTREAM.md and LICENSE.md.
-  The existing Godot MCP addon and configuration were left unchanged. Upstream
-  trailing whitespace is preserved; exclude this vendor directory from whitespace
-  checks. GitHub marks the directory as vendored to keep reviews focused.
-
-## Protocol version 1
-
-GET `/session.json` returns `protocol` and `websocket_port`. The browser uses
-the page hostname for `ws://HOST:PORT`.
-
-```json
-{"type":"hello","protocol":1}
-```
-
-Godot assigns the connection ID and replies:
-
-```json
-{"type":"welcome","protocol":1,"connection_id":1,"message":"Hello world"}
-```
-
-The HTTP server also serves `/`, `/app.js`, `/style.css`; unknown routes return
-404 and non-GET methods return 405. Headers exceeding 8192 bytes are rejected
-with 431 or a TCP reset if unread request bytes remain (Windows socket behavior).
-There is no TLS, authentication, public hosting, or CORS API in this phase.
-The listeners bind all interfaces for LAN access. Do not forward these ports
-to the internet. Console packaging/network permissions remain future work.
-
-## Build and verification
-
-Node 22+ is needed only for development/tests (validated with Node 24.20.0).
-After TypeScript changes, rebuild and commit `web/public/app.js` with its source.
+Node 22+ is development-only. After any TypeScript edit, rebuild and commit all affected modules under `web/public/`:
 
 ```powershell
 cd web
 npm.cmd ci --ignore-scripts
-npm.cmd run build
 npm.cmd run check
+npm.cmd run build
 npm.cmd test
+cd ..
 ```
 
-Close the interactive game before tests. The suite refuses to test over an
-existing host and launches its own Godot process. `GODOT_BIN` can override the
-Windows executable default in `web/tests/host.test.mjs`. Tests also use ports
-18080/18081 for startup rollback/retry/restart checks. QR decoder dependencies
-are development-only; they are never shipped to phones.
+Every top-level module imported by `app.js` must also appear in the explicit `HttpService` allowlist and release filter. A 200 response for `/app.js` does not prove its module graph works: a missing `/controller_geometry.js` previously left phones forever at `Connecting to the host…`.
 
-From the Godot root:
+The active phone surface is fixed, non-scrolling, and landscape-oriented. The browser attempts fullscreen/orientation lock once after a user gesture; denial or unsupported APIs are valid fallbacks. Portrait active play shows `Rotate your phone`. Safari works, but Chrome currently provides the most consistent fullscreen/orientation behavior.
+
+## Windows standalone build
+
+Install the exact Godot 4.7.2 Windows export templates with **Editor > Manage Export Templates**, then use **Project > Tools > Build Standalone Host**. Godot requires both release and debug x86_64 template files even though this action exports release only.
+
+```text
+builds/standalone/
+├── Play-Shapes-windows-x86_64.zip
+└── windows-x86_64/
+    ├── Play Shapes.exe
+    ├── Play Shapes.pck
+    └── build-info.json
+```
+
+The ZIP contains one `Play-Shapes-windows-x86_64/` folder. The manifest records preset, architecture, Godot version, renderer, UTC time, and source revision when available. Before archiving, the builder verifies the external PCK, fixed browser inputs, boot/lobby scenes, and QR dependency. It never starts Node.
+
+The `Play Shapes Windows Release` preset includes the committed browser runtime while excluding browser source/dependencies, tests/results, tools, planning notes, source art, runtime asset manifests, build output, editor addons, and package configuration. Do not broaden filters just to silence a policy failure. `addons/kenyoni/qr_code/` must remain included.
+
+The editor polls a separate headless export process. Cancel terminates that owned process or removes only its partial ZIP. Success opens the extracted folder but never launches the game. For builder UI maintenance, set `Window.size` before parameterless `popup_centered()`; Godot treats a size passed to `popup_centered(size)` as a minimum and may retain an oversized native window. Keep the target path single-line/ellipsized because early wrapping can create an extreme minimum height.
+
+## Verification
+
+Keep evidence labels separate: `[AUTO]`, `[EDITOR]`, `[GODOT-RUNTIME]`, `[DESKTOP-BROWSER]`, `[PHYSICAL-PHONE]`, `[EXPORTED-BUILD]`, and `[HUMAN-PLAY]`. One never implies another. Render captures establish technical composition, not couch-distance readability, accessibility, comfort, or creative approval.
+
+Close any interactive host before integration tests; the browser suite refuses to run over an existing host. It uses `18080`/`18081` for startup lifecycle checks. `GODOT_BIN` can override the executable used by `web/tests/host.test.mjs`.
 
 ```powershell
 godot --headless --editor --path . --quit-after 30
+godot --headless --path . --script res://tests/foundation.gd
+godot --headless --path . --script res://tests/player_registry_test.gd
+godot --headless --path . --script res://tests/player_lobby_test.gd
+godot --headless --path . --script res://tests/lobby_layout_test.gd
+godot --headless --path . --script res://tests/pose_evaluation_rules_test.gd
+godot --headless --path . --script res://tests/flash_pose_round_controller_test.gd
+godot --headless --path . --script res://tests/flash_pose_protocol_test.gd
+godot --headless --path . --script res://tests/flash_pose_presentation_test.gd
+godot --headless --path . --script res://tests/flash_pose_flow_test.gd
+godot --headless --path . --script res://tests/debug_launcher_test.gd
+godot --headless --path . --script res://tests/tuning_presets_test.gd
 ```
 
-Validated: TypeScript build/check; six integration tests covering actual HTTP
-assets/config, independent QR decoding, route/method rejection, fragmented and
-oversized requests, four simultaneous WebSockets with distinct IDs, malformed
-and unauthorized state messages; startup rollback, retry and restart checks.
-Godot runtime logs had no script/runtime errors. Headless editor import had no
-parse errors; early editor shutdown reports MCP resource-cleanup warnings.
-Visually checked the lobby QR and Chrome's Hello world/connected page via the
-LAN address, including reconnection after restarting the host. A real phone scan
-and mobile-browser layout check remain pending.
+Builder checks require matching installed export templates:
 
-## Networking and export caveats
+```powershell
+godot --headless --path . --script res://tests/standalone_build_test.gd
+godot --headless --editor --path . --script res://tests/standalone_build_editor_integration_test.gd
+```
 
-If a phone cannot load the page, check the displayed adapter, same Wi-Fi,
-VPN LAN restrictions, guest-network client isolation, and Windows Firewall.
-HTTP **and** WebSocket TCP ports must be reachable. If Windows asks to allow
-Godot on a private network, the user should handle that permission. This work
-does not change firewall or VPN settings. A busy port produces Retry in boot.
+Run visual helpers only when their output will be inspected; they write ignored artifacts under `test-results/`. A normal-profile editor load may emit forced-shutdown RID/ObjectDB cleanup warnings after a successful scan. Treat exit zero plus no script/import error as the result; do not confuse cache/profile permission failures with product failures.
 
-No export preset is created in this phase. When adding one, explicitly include
-`web/public/*.html,web/public/*.css,web/public/*.js` as non-resource files and
-exclude `web/node_modules/*`, `web/src/*`, `web/tests/*`, `tests/*` and
-`test-results/*`. Otherwise Godot's export filtering can omit the web assets.
-Validate an exported build separately; editor/runtime checks do not prove export.
+## Networking, export, and operational warnings
 
-## Next iteration
+- Listeners bind all interfaces for LAN play. There is no TLS, authentication, public hosting, or CORS API. Never forward ports 8080/8081 to the Internet.
+- If a phone cannot connect, check the selected adapter, both TCP ports, same Wi-Fi, guest/client isolation, VPN LAN restrictions, and Windows Firewall. The user handles private-network permission prompts; tooling does not change firewall or VPN settings.
+- A busy service port shows Retry in boot. WebSocket bind failure rolls HTTP back rather than leaving a partial host.
+- Editor/runtime checks do not prove a package. Smoke the exported executable without Godot or Node, including lobby, HTTP routes, WebSocket, and a browser connection.
+- Preserve `web/public/`, the Kenyoni QR addon, external-PCK output, and the curated runtime/source-archive boundary in export changes.
+- A phone reload creates a new transport connection but may resume the same player during grace. Duplicate active-token resume gives the newest tab ownership and closes the old connection.
+- Controls intentionally remain active during countdown, dance, stops, and flash waits. Do not make phone UI visibility decide a host outcome.
 
-Confirm the physical-phone acceptance check, then add validated join/name
-messages and a host-owned player registry as separate components. Keep browser
-connection IDs separate from stable player identity. Add gameplay only after
-that layer has explicit reconnect/disconnect rules.
+## Historical implementation index
+
+These are historical context, not active instructions. The linked note owns detailed scope, findings, evidence, and outcome.
+
+| Task | Date | Result |
+|---|---|---|
+| [PS-004](../Management/Tasks/Done/PS-004%20-%20Define%20the%20Game-Feel%20Tuning%20Strategy.md) | 2026-09-14 | Approved the editor-first tuning and preset model. |
+| [PS-005](../Management/Tasks/Done/PS-005%20-%20Define%20Multi-Phone%20and%20Agent%20Validation%20Strategy.md) | 2026-09-15 | Defined evidence labels and the MVP two-phone matrix. |
+| [PS-006](../Management/Tasks/Done/PS-006%20-%20Implement%20Player%20Join%20and%20Host-Owned%20Registry.md) | 2026-09-14 | Added host-owned identity, join, resume, leave, and roster. |
+| [PS-007](../Management/Tasks/Done/PS-007%20-%20Define%20the%20Gameplay%20Debug%20Suite.md) | 2026-09-13 | Approved the minimal F12 host scenario launcher. |
+| [PS-009](../Management/Tasks/Done/PS-009%20-%20Create%20and%20Import%20Character%20Feet%20Assets.md) | 2026-09-13 | Added approved feet and the six-part character setup. |
+| [PS-010](../Management/Tasks/Done/PS-010%20-%20Explore%20Character%20Animation%20Strategy.md) | 2026-09-13 | Selected hybrid detached-sprite animation. |
+| [PS-011](../Management/Tasks/Done/PS-011%20-%20Implement%20Hybrid%20Character%20Animation%20Lab.md) | 2026-09-13 | Proved and visually approved the animation lab. |
+| [PS-012](../Management/Tasks/Done/PS-012%20-%20Implement%20Milestone%201%20Character%20Animation%20System.md) | 2026-09-15 | Promoted semantic animation to production. |
+| [PS-013](../Management/Tasks/Done/PS-013%20-%20Implement%20Pose%20Charge%20and%20Evaluation%20Rules.md) | 2026-09-17 | Added authoritative charge, deadlines, and evaluation. |
+| [PS-014](../Management/Tasks/Done/PS-014%20-%20Implement%20Minimal%20Gameplay%20Debug%20Launcher.md) | 2026-09-13 | Implemented the persistent F12 launcher. |
+| [PS-015](../Management/Tasks/Done/PS-015%20-%20Implement%20Shared%20Tuning%20Asset%20and%20Preset%20Workflow.md) | 2026-09-14 | Added active presets, validation, and guidance. |
+| [PS-016](../Management/Tasks/Done/PS-016%20-%20Create%20Wireframe%20for%20001%20-%20Dancer%20Simon%20Says.md) | 2026-09-15 | Recorded shared-screen and phone wireframes. |
+| [PS-017](../Management/Tasks/Done/PS-017%20-%20Find%20Better%20Environment%20Assets%20for%20001%20-%20Dancer%20Simon%20Says.md) | 2026-09-16 | Selected the Milestone 1 environment set. |
+| [PS-018](../Management/Tasks/Done/PS-018%20-%20Create%20the%20001%20-%20Dancer%20Simon%20Says%20Minigame%20Scene.md) | 2026-09-17 | Added the editor-authored lead and ten-seat stage. |
+| [PS-019](../Management/Tasks/Done/PS-019%20-%20Plan%20the%20001%20-%20Dancer%20Simon%20Says%20Minigame%20Implementation.md) | 2026-09-16 | Fixed the bounded implementation sequence and policies. |
+| [PS-020](../Management/Tasks/Done/PS-020%20-%20Find%20Music%20and%20SFX%20for%20001%20-%20Dancer%20Simon%20Says.md) | 2026-09-16 | Selected music and flash candidates. |
+| [PS-021](../Management/Tasks/Done/PS-021%20-%20Implement%20Curated%20Runtime%20Asset%20Pipeline.md) | 2026-09-16 | Added the manifest-owned runtime art boundary. |
+| [PS-023](../Management/Tasks/Done/PS-023%20-%20Prepare%20Flash%20Pose%20Runtime%20Music%20and%20SFX.md) | 2026-09-17 | Added the runtime audio catalog and metadata. |
+| [PS-024](../Management/Tasks/Done/PS-024%20-%20Implement%20Flash%20Pose%20Host%20Round%20Controller.md) | 2026-09-17 | Implemented authoritative round phases. |
+| [PS-025](../Management/Tasks/Done/PS-025%20-%20Implement%20Flash%20Pose%20Phone%20Protocol%20and%20Controller.md) | 2026-09-17 | Added validated pose packets and phone states. |
+| [PS-026](../Management/Tasks/Done/PS-026%20-%20Implement%20Flash%20Pose%20Shared%20Screen%20Feedback%20and%20Results.md) | 2026-09-17 | Added presentation, audio, flash, and results. |
+| [PS-027](../Management/Tasks/Done/PS-027%20-%20Integrate%20Flash%20Pose%20Lobby%20and%20Debug%20Flow.md) | 2026-09-18 | Integrated normal/debug launch and return. |
+| [PS-028](../Management/Tasks/Done/PS-028%20-%20Validate%20Flash%20Pose%20Technical%20Loop.md) | 2026-09-18 | Recorded owner verification of the integrated loop. |
+| [PS-029](../Management/Tasks/Done/PS-029%20-%20Validate%20Flash%20Pose%20on%20Two%20Phones%20and%20in%20Human%20Play.md) | 2026-09-18 | Recorded working Android and iPhone play. |
+| [PS-030](../Management/Tasks/Done/PS-030%20-%20Rework%20Flash%20Pose%20Phone%20Controller%20Layout.md) | 2026-09-18 | Added 2/3/4-region landscape controls and fixed module serving. |
+| [PS-031](../Management/Tasks/Done/PS-031%20-%20Set%20FHD%20Host%20Resolution%20and%20Rework%20Lobby%20Layout.md) | 2026-09-19 | Set FHD defaults and a non-scrolling lobby. |
+| [PS-032](../Management/Tasks/Done/PS-032%20-%20Clarify%20Results%20Labels%20and%20Return%20Button.md) | 2026-09-19 | Added `WINNERS`/`LOSERS` and clearer return. |
+| [PS-033](../Management/Tasks/Done/PS-033%20-%20Design%20Standalone%20Windows%20and%20Linux%20Build%20Workflow.md) | 2026-09-19 | Chose Windows ZIP first and deferred Linux. |
+| [PS-034](../Management/Tasks/Done/PS-034%20-%20Implement%20One-Click%20Windows%20Standalone%20Build%20Workflow.md) | 2026-09-19 | Implemented and smoke-tested the Windows package. |

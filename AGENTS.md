@@ -108,7 +108,7 @@ Clients must never directly modify authoritative game state.
 1. Check scripts for parse errors.
 2. Run relevant tests.
 3. Inspect the Godot output for errors.
-4. Please create / update DEVELOPMENT.md with your development notes on how you've done things, any possible caveats and useful information that other agents might find useful. Consider that I'll use both frontier models and also local limited models to iterate on this project.
+4. Update `DEVELOPMENT.md` only when the change adds or alters current operational knowledge: commands, paths, architecture boundaries, protocols, build/verification steps, caveats, or recurring failure modes. Keep task-specific narrative and evidence in the active task note, link to its completed historical record, and remove superseded guidance instead of appending another chronology. Keep the manual concise enough for both frontier and local limited models.
 ### Local agent access
 You have access to a local OpenCode instance through the terminal using the command: run-local-opencode
 
