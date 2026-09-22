@@ -53,6 +53,7 @@ Normal play starts with 2–10 registered players. For debug, register exactly o
 - `host/player_registry.gd` owns session/player/token identities, names, capacity, reconnect grace, resume, and explicit leave.
 - `scenes/lobby.*` owns the responsive lobby, QR/address controls, roster, and host-only start gate. The roster switches to two columns above ten players and fits the supported 20 without page scrolling.
 - `minigames/flash_pose_round_controller.gd` owns phases, timing, targets, two normal-play lives, elimination, withdrawal, and ranking. It delegates pose truth to `host/pose_evaluation_rules.gd`.
+- `minigames/bubbles_round_controller.gd` owns the separate Bubbles instructions/countdown/active/results lifecycle, score and pop state, host-time finish freeze, and snapshots keyed by player ID. `bubbles_gesture_classifier.gd` validates and classifies one completed normalized trace. Physics, NPC spawning, browser packets, and presentation are later integrations; no Bubbles scene is launched yet.
 - `minigames/flash_pose_presentation.gd` owns shared-screen animation, audio, flash, feedback, and the persistent `WINNERS`/`LOSERS` results view. It consumes semantic outcomes and never infers rules from sprite transforms.
 - `host/flash_pose_protocol.gd` is the narrow gameplay protocol adapter.
 - `characters/hybrid_character_animator.gd` consumes semantic dance, pose, reaction, elimination, and result states. Gameplay must not manipulate child sprites or inspect animation frames to decide outcomes.
@@ -90,7 +91,7 @@ The host sends personalized `flash_pose_snapshot`, `flash_pose_challenge`, `flas
 
 ## Tuning and content boundaries
 
-Open `Tuning/Active Presets.tres` to select named resources. Current front doors are `Tuning/Minigames/SimonSays/Default.tres` and `Tuning/Shared/Networking/Default.tres`. Restart to apply a changed selection. Only the human owner promotes subjective feel into `Default`; tests establish configuration safety, not fun or comfort.
+Open `Tuning/Active Presets.tres` to select named resources. Current front doors are `Tuning/Minigames/SimonSays/Default.tres`, `Tuning/Minigames/Bubbles/Default.tres`, and `Tuning/Shared/Networking/Default.tres`. Restart to apply a changed selection. Bubbles field descriptions are in `Tuning/Minigames/Bubbles/README.md`. Only the human owner promotes subjective feel into `Default`; tests establish configuration safety, not fun or comfort.
 
 For Inspector help, put a `##` documentation comment immediately before the export annotation and variable declaration. Use `@export_group`, not `@export_category`, because categories can break subsequent property help. `tests/tuning_presets_test.gd` enforces this and recursively checks committed presets.
 
@@ -159,6 +160,8 @@ godot --headless --path . --script res://tests/player_lobby_test.gd
 godot --headless --path . --script res://tests/lobby_layout_test.gd
 godot --headless --path . --script res://tests/pose_evaluation_rules_test.gd
 godot --headless --path . --script res://tests/flash_pose_round_controller_test.gd
+godot --headless --path . --script res://tests/bubbles_gesture_classifier_test.gd
+godot --headless --path . --script res://tests/bubbles_round_controller_test.gd
 godot --headless --path . --script res://tests/flash_pose_protocol_test.gd
 godot --headless --path . --script res://tests/flash_pose_presentation_test.gd
 godot --headless --path . --script res://tests/flash_pose_flow_test.gd

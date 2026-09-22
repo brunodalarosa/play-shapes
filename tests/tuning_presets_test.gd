@@ -2,6 +2,7 @@ extends SceneTree
 
 const TUNING_ROOT := "res://Tuning"
 const SimonTuningScript := preload("res://Tuning/Minigames/simon_says_tuning.gd")
+const BubblesTuningScript := preload("res://Tuning/Minigames/bubbles_tuning.gd")
 const NetworkingTuningScript := preload("res://Tuning/Shared/networking_tuning.gd")
 const ActivePresetsScript := preload("res://Tuning/active_presets.gd")
 
@@ -28,11 +29,25 @@ func _run() -> void:
 		"max_players", "reconnect_grace_seconds",
 	]):
 		return
-	if not _check_tooltip_contract("res://Tuning/active_presets.gd", ["simon_says", "networking"]):
+	if not _check_tooltip_contract("res://Tuning/Minigames/bubbles_tuning.gd", [
+		"instructions_seconds", "countdown_seconds", "round_duration_seconds",
+		"starting_radius", "max_radius", "radius_per_jellyfish", "captured_visual_cap",
+		"mass_growth_per_jellyfish", "speed_reduction_per_jellyfish",
+		"swipe_impulse", "swipe_min_distance", "max_player_speed", "water_drag", "wall_bounciness",
+		"circles_to_charge", "circle_tolerance", "spin_duration_seconds", "spin_cooldown_seconds", "spin_shove_impulse",
+		"jellyfish_collider_radius", "starting_jellyfish", "max_free_jellyfish",
+		"jellyfish_low_spawn_rate", "jellyfish_high_spawn_rate", "jellyfish_wave_min_seconds", "jellyfish_wave_max_seconds",
+		"jellyfish_speed", "jellyfish_spawn_clearance", "jellyfish_entrance_seconds", "released_collection_lockout_seconds",
+		"pufferfish_collider_radius", "pufferfish_start_spawn_rate", "pufferfish_max_spawn_rate", "pufferfish_speed",
+		"pop_disappear_ratio", "pop_invulnerability_seconds", "pufferfish_warning_enabled", "pufferfish_warning_seconds",
+		"final_timer_emphasis_seconds",
+	]):
+		return
+	if not _check_tooltip_contract("res://Tuning/active_presets.gd", ["simon_says", "bubbles", "networking"]):
 		return
 
 	var preset_paths := _find_presets(TUNING_ROOT)
-	if not _check(preset_paths.has("res://Tuning/Active Presets.tres") and preset_paths.has("res://Tuning/Minigames/SimonSays/Default.tres") and preset_paths.has("res://Tuning/Shared/Networking/Default.tres"), "Default presets and Active Presets are discovered"):
+	if not _check(preset_paths.has("res://Tuning/Active Presets.tres") and preset_paths.has("res://Tuning/Minigames/SimonSays/Default.tres") and preset_paths.has("res://Tuning/Minigames/Bubbles/Default.tres") and preset_paths.has("res://Tuning/Shared/Networking/Default.tres"), "Default presets and Active Presets are discovered"):
 		return
 	for path: String in preset_paths:
 		var preset: Resource = load(path)
@@ -82,9 +97,32 @@ func _run() -> void:
 	var network_errors: PackedStringArray = networking.validation_errors()
 	if not _check(network_errors.size() == 2 and network_errors[0].contains("must be different") and network_errors[1].contains("cannot exceed"), "Networking invalid combinations report actionable messages"):
 		return
+	var bubbles: Resource = BubblesTuningScript.new()
+	bubbles.starting_radius = -1.0
+	if not _check(bubbles.starting_radius == 16.0, "Bubbles individual values clamp to safe ranges"):
+		return
+	bubbles.starting_radius = 100.0
+	bubbles.max_radius = 32.0
+	bubbles.starting_jellyfish = 100
+	bubbles.max_free_jellyfish = 1
+	if not _check(bubbles.validation_errors().size() == 2, "Bubbles invalid radius and population combinations are rejected"):
+		return
+	bubbles.max_radius = 110.0
+	bubbles.starting_jellyfish = 20
+	bubbles.max_free_jellyfish = 70
+	bubbles.jellyfish_low_spawn_rate = 3.0
+	bubbles.jellyfish_high_spawn_rate = 1.0
+	bubbles.pufferfish_start_spawn_rate = 0.8
+	bubbles.pufferfish_max_spawn_rate = 0.2
+	if not _check(bubbles.validation_errors().size() == 2, "Bubbles invalid spawn-rate ordering is rejected"):
+		return
+	bubbles = BubblesTuningScript.new()
+	bubbles.water_drag = INF
+	if not _check(bubbles.water_drag == 8.0 and bubbles.validation_errors().is_empty(), "Bubbles clamps non-finite positive input to a safe bound"):
+		return
 
 	var active: Resource = ActivePresetsScript.new()
-	if not _check(active.validation_errors().size() == 2, "Active selector rejects missing preset references"):
+	if not _check(active.validation_errors().size() == 3, "Active selector rejects missing preset references"):
 		return
 	print("Tuning preset checks passed (%d committed assets)" % preset_paths.size())
 	quit(0)
