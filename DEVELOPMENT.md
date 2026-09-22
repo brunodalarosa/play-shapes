@@ -60,6 +60,7 @@ Normal play starts with 2–10 registered players. For debug, register exactly o
 - `Tuning/` contains the active selector, named resources, guide, and experiment template. There is no runtime tuning UI.
 - `web/src/` is TypeScript source. `web/public/` is the committed offline runtime bundle served by Godot; normal play needs neither Node nor Internet.
 - `assets/runtime/` is the curated runtime-media boundary. Source/archive art remains outside it and is excluded from Godot import/export.
+- Bubbles static art lives in `assets/runtime/minigames/bubbles_and_jellyfishes/`; its [asset guide](assets/runtime/minigames/bubbles_and_jellyfishes/README.md) records scale, filtering, layer composition and provenance. [GIMP regeneration and isolated export-pack checks](art/bubbles/README.md) remain separate from gameplay implementation.
 - `addons/standalone_build/` is the editor-only Windows builder. `addons/kenyoni/qr_code/` is the required vendored runtime QR dependency.
 - `tests/` holds focused headless, integration, policy, and render checks; generated evidence belongs under ignored `test-results/`.
 
