@@ -1,0 +1,480 @@
+{
+  "source_sheet": "bubbles-paper-ghibli-master-sprite-sheet.png",
+  "source_background": "bubbles-paper-craft-far-background-fhd.png",
+  "source_sha256": {
+    "bubbles-paper-ghibli-master-sprite-sheet.png": "c232b1f1a44c4f8a0ea149fccf9b4e6c940a125219580737644d1bd5efe45911",
+    "bubbles-paper-craft-far-background-fhd.png": "6f8a9e6610731cf7db176c44397fa9a77d79cbf62ed932494b53c2d9d8bcbbbd"
+  },
+  "tool": "GIMP 3.2.6 / GEGL through MCP",
+  "assets": [
+    {
+      "path": "environment/far_background.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "padding": 0,
+      "sha256": "9cd9d394049321031623fa5427cba995f9600955b85d94c1503eaddebfd8916e"
+    },
+    {
+      "path": "jellyfish/jellyfish_small.png",
+      "size": [
+        127,
+        165
+      ],
+      "sheet_rect": [
+        48,
+        311,
+        140,
+        174
+      ],
+      "trim_in_rect": [
+        12,
+        9,
+        111,
+        149
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "f104b51a3db292c8282146bccd7b3c7a4bf87f4dcd7874fe798903963f360643"
+    },
+    {
+      "path": "jellyfish/jellyfish.png",
+      "size": [
+        157,
+        201
+      ],
+      "sheet_rect": [
+        230,
+        291,
+        170,
+        207
+      ],
+      "trim_in_rect": [
+        14,
+        9,
+        141,
+        185
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "a5b661e75082b03144e391c342ad6b768c3a1aa59047ad7aebbf3a1cbad95a58"
+    },
+    {
+      "path": "jellyfish/jellyfish_drifting.png",
+      "size": [
+        178,
+        201
+      ],
+      "sheet_rect": [
+        442,
+        291,
+        185,
+        213
+      ],
+      "trim_in_rect": [
+        12,
+        10,
+        162,
+        185
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "31c38306f63e650e2bd026f08d2d41ba1289bb8732cd4288fa0c678d8ee72bdd"
+    },
+    {
+      "path": "pufferfish/pufferfish_left.png",
+      "size": [
+        225,
+        211
+      ],
+      "sheet_rect": [
+        636,
+        276,
+        247,
+        222
+      ],
+      "trim_in_rect": [
+        18,
+        9,
+        209,
+        195
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "43e6cc5c8014312795a855060879bab411122ca12f09e6fff179364967ca43b6"
+    },
+    {
+      "path": "pufferfish/pufferfish_right.png",
+      "size": [
+        225,
+        206
+      ],
+      "sheet_rect": [
+        896,
+        276,
+        234,
+        222
+      ],
+      "trim_in_rect": [
+        11,
+        14,
+        209,
+        190
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "3e806063937bbf7a2fda61cb55bed81da554a90afb639d66de5cb244173b29ad"
+    },
+    {
+      "path": "environment/kelp.png",
+      "size": [
+        195,
+        253
+      ],
+      "sheet_rect": [
+        10,
+        700,
+        202,
+        249
+      ],
+      "trim_in_rect": [
+        10,
+        1,
+        179,
+        237
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "49c68d9792c7a5d9d959f2da8b5aa17c220ada7a1696b065c7bca0ebc82b238e"
+    },
+    {
+      "path": "environment/sea_plant.png",
+      "size": [
+        227,
+        185
+      ],
+      "sheet_rect": [
+        211,
+        751,
+        222,
+        198
+      ],
+      "trim_in_rect": [
+        7,
+        16,
+        211,
+        169
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "b9a3b2774e7a5cc46449fe60c45a6215e94e0dcd2d86e65a933c8d912e30bd5d"
+    },
+    {
+      "path": "environment/coral_red.png",
+      "size": [
+        235,
+        220
+      ],
+      "sheet_rect": [
+        430,
+        722,
+        235,
+        227
+      ],
+      "trim_in_rect": [
+        10,
+        11,
+        219,
+        204
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "6c1606757f681cf5ea6c0113935ccb27d058230bb32d9a2911828c2eba455471"
+    },
+    {
+      "path": "environment/sponge_purple.png",
+      "size": [
+        209,
+        205
+      ],
+      "sheet_rect": [
+        673,
+        734,
+        210,
+        215
+      ],
+      "trim_in_rect": [
+        4,
+        12,
+        193,
+        189
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "0ed793e66aa14c9d9f7c5bc0bde495be1931ed6ad1c3b7afdbcf8403f8261db4"
+    },
+    {
+      "path": "environment/rocks.png",
+      "size": [
+        280,
+        160
+      ],
+      "sheet_rect": [
+        883,
+        789,
+        275,
+        160
+      ],
+      "trim_in_rect": [
+        8,
+        9,
+        264,
+        144
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "7598169dcacbdfe22553c089469a7c85944db092c2f38e3da216864d756f42dd"
+    },
+    {
+      "path": "environment/shell_starfish.png",
+      "size": [
+        248,
+        173
+      ],
+      "sheet_rect": [
+        1133,
+        771,
+        241,
+        178
+      ],
+      "trim_in_rect": [
+        7,
+        10,
+        232,
+        157
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "7e2c3687cebdb16a6e44beedceb1afbffd45f0f8c078ff4580fe513b07280417"
+    },
+    {
+      "path": "environment/sponge_orange.png",
+      "size": [
+        194,
+        177
+      ],
+      "sheet_rect": [
+        10,
+        958,
+        195,
+        187
+      ],
+      "trim_in_rect": [
+        11,
+        8,
+        178,
+        161
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "4881081f8dc7005c8b0f559b187275980cd7bb4cd6d4b7349cf51e3e31c31c15"
+    },
+    {
+      "path": "environment/coral_pink.png",
+      "size": [
+        214,
+        193
+      ],
+      "sheet_rect": [
+        202,
+        948,
+        210,
+        197
+      ],
+      "trim_in_rect": [
+        8,
+        3,
+        198,
+        177
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "8499e299eefbd0c5637831c2c235a22ed656254752f9eb3213a6c5dcaa0ef151"
+    },
+    {
+      "path": "environment/hanging_reef.png",
+      "size": [
+        250,
+        200
+      ],
+      "sheet_rect": [
+        405,
+        945,
+        246,
+        200
+      ],
+      "trim_in_rect": [
+        6,
+        2,
+        234,
+        184
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "448f17e5803783b7611b59448cf9fad818053cdb5d9f421adbb830f9c29d2792"
+    },
+    {
+      "path": "environment/reef_shelf.png",
+      "size": [
+        312,
+        200
+      ],
+      "sheet_rect": [
+        631,
+        945,
+        310,
+        200
+      ],
+      "trim_in_rect": [
+        5,
+        0,
+        296,
+        184
+      ],
+      "padding": 8,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "d9a980b907de37bf5d2bea918aa0152903c2da82cefce35b09e08c2d29955ec8"
+    },
+    {
+      "path": "environment/midground.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "fe2a755a13c990870fe3db2a2fd9b1070c03bda1c50c509aeb65f261da7ab5a5"
+    },
+    {
+      "path": "environment/foreground.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "sha256": "4ca066e75054e1a23b18b021d2c921d8467f509967289d9aea51792d000fc922"
+    }
+  ],
+  "compositions": {
+    "midground": [
+      [
+        "reef_shelf",
+        -95,
+        950,
+        410,
+        62
+      ],
+      [
+        "reef_shelf",
+        1650,
+        945,
+        370,
+        62
+      ],
+      [
+        "sea_plant",
+        -80,
+        810,
+        240,
+        55
+      ],
+      [
+        "sponge_purple",
+        1830,
+        855,
+        210,
+        55
+      ]
+    ],
+    "foreground": [
+      [
+        "kelp",
+        -95,
+        872,
+        205,
+        85
+      ],
+      [
+        "coral_red",
+        1770,
+        960,
+        220,
+        85
+      ],
+      [
+        "hanging_reef",
+        -65,
+        -128,
+        240,
+        75
+      ],
+      [
+        "hanging_reef",
+        1760,
+        -138,
+        230,
+        75
+      ],
+      [
+        "shell_starfish",
+        1620,
+        1040,
+        145,
+        80
+      ]
+    ]
+  }
+}
