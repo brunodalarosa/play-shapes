@@ -155,6 +155,10 @@ var pop_disappear_ratio: float = 0.5:
 @export_range(0.0, 8.0, 0.1, "suffix:s")
 var pop_invulnerability_seconds: float = 2.0:
 	set(value): pop_invulnerability_seconds = clampf(value, 0.0, 8.0)
+## Bubble re-form animation after a pop, in seconds. Higher makes recovery more visible; lower feels snappier. Default: 0.35. Safe range: 0.1-1.5.
+@export_range(0.1, 1.5, 0.05, "suffix:s")
+var bubble_reform_seconds: float = 0.35:
+	set(value): bubble_reform_seconds = clampf(value, 0.1, 1.5)
 ## Show an edge warning before pufferfish enter. Disabling removes visual notice. Default: enabled.
 @export
 var pufferfish_warning_enabled: bool = true

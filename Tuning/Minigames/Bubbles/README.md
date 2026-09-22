@@ -42,6 +42,7 @@ Every Inspector tooltip gives the field's purpose, default, safe range, and high
 | Pufferfish speed (world pixels/second) | 120; 20–400 | Reduces reaction time |
 | Disappear on pop (fraction) | 0.5; 0–1 | Leaves fewer to recollect |
 | Pop invulnerability (seconds) | 2; 0–8 | Gives safer recovery, without collection |
+| Bubble re-form time (seconds) | 0.35; 0.1–1.5 | Makes recovery more visible |
 | Pufferfish warning (on/off) | On; boolean | Enables edge notice |
 | Pufferfish warning time (seconds) | 0.8; 0–3 | Gives more visual notice |
 | Final timer emphasis threshold (whole seconds) | 10; 1–30 | Starts countdown pulses earlier |

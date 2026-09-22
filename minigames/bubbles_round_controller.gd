@@ -89,6 +89,7 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 			"player_id": player_id, "name": String(source.get("name", "")),
 			"seat": seat, "score": 0, "connected": source.get("state", "connected") == "connected",
 			"left": false, "invulnerable_until_msec": -1,
+			"last_pop_msec": -1,
 			"spin_until_msec": -1, "spin_ready_msec": -1, "last_input_seq": -1,
 		}
 		order.append(player_id)
@@ -167,7 +168,7 @@ func submit_trace(player_id: String, input_seq: Variant, trace: Variant, host_re
 			return {"accepted": true, "action": &"none", "reason": &"spin_cooldown"}
 		state.spin_until_msec = host_receipt_msec + roundi(tuning.spin_duration_seconds * 1000.0)
 		state.spin_ready_msec = state.spin_until_msec + roundi(tuning.spin_cooldown_seconds * 1000.0)
-		arena_event_requested.emit(&"spin", player_id, {"direction": classified.direction, "until_msec": state.spin_until_msec})
+		arena_event_requested.emit(&"spin", player_id, {"direction": classified.direction, "started_msec": host_receipt_msec, "until_msec": state.spin_until_msec})
 		feedback_requested.emit(player_id, &"spin", {"until_msec": state.spin_until_msec})
 	elif action == &"swipe":
 		arena_event_requested.emit(&"swipe", player_id, {"direction": classified.direction, "strength": tuning.swipe_impulse})
@@ -232,6 +233,7 @@ func personal_snapshot(player_id: String) -> Dictionary:
 		return {}
 	var state: Dictionary = (_players[player_id] as Dictionary).duplicate(true)
 	state.phase = phase_name()
+	state.host_time_msec = _last_host_msec
 	state.finish_msec = _finish_msec
 	state.visual_jellyfish = mini(state.score, tuning.captured_visual_cap)
 	state.bubble_radius = minf(tuning.max_radius, tuning.starting_radius + state.score * tuning.radius_per_jellyfish)
@@ -252,8 +254,9 @@ func _pop(player_id: String, host_time_msec: int, forced_leave: bool) -> Diction
 	var released := clampi(roundi(float(lost) * (1.0 - tuning.pop_disappear_ratio)), 0, lost)
 	state.score = 0
 	state.spin_until_msec = -1
+	state.last_pop_msec = host_time_msec
 	state.invulnerable_until_msec = host_time_msec + roundi(tuning.pop_invulnerability_seconds * 1000.0)
-	var data := {"lost": lost, "released": released, "lockout_msec": roundi(tuning.released_collection_lockout_seconds * 1000.0), "invulnerable_until_msec": state.invulnerable_until_msec}
+	var data := {"lost": lost, "released": released, "at_msec": host_time_msec, "lockout_msec": roundi(tuning.released_collection_lockout_seconds * 1000.0), "invulnerable_until_msec": state.invulnerable_until_msec}
 	arena_event_requested.emit(&"pop", player_id, data.duplicate(true))
 	feedback_requested.emit(player_id, &"pop", data.duplicate(true))
 	personal_state_changed.emit(player_id, personal_snapshot(player_id))

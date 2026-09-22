@@ -54,6 +54,7 @@ Normal play starts with 2–10 registered players. For debug, register exactly o
 - `scenes/lobby.*` owns the responsive lobby, QR/address controls, roster, and host-only start gate. The roster switches to two columns above ten players and fits the supported 20 without page scrolling.
 - `minigames/flash_pose_round_controller.gd` owns phases, timing, targets, two normal-play lives, elimination, withdrawal, and ranking. It delegates pose truth to `host/pose_evaluation_rules.gd`.
 - `minigames/bubbles_round_controller.gd` owns the separate Bubbles instructions/countdown/active/results lifecycle, score and pop state, host-time finish freeze, and snapshots keyed by player ID. `bubbles_gesture_classifier.gd` validates and classifies one completed normalized trace. Physics, NPC spawning, browser packets, and presentation are later integrations; no Bubbles scene is launched yet.
+- `minigames/bubbles_player_bubble.tscn` reuses `ShapeCharacter` in a code-drawn translucent bubble with a per-instance circle collider and readable name. `bubbles_player_arena.gd` creates 1–10 bodies and steps movement, invisible bounds, and player pairs in sorted player-ID order. Call `setup(controller, bounds)`, then `add_bubble(player_id, position)` from the controller's participant snapshot; call `simulate_step(fixed_delta, host_time_msec)` from the host physics loop (normally 1/60 second, maximum 0.05). The arena settles the controller clock before movement, so exact-zero results freeze first. Bodies consume only the controller's accepted swipe/spin/pop signals and score snapshots; future NPC systems call `request_jellyfish_collection()` and `request_puffer_pop()` on a body. This component is available for later integration but has no standalone playable Bubbles scene yet.
 - `minigames/flash_pose_presentation.gd` owns shared-screen animation, audio, flash, feedback, and the persistent `WINNERS`/`LOSERS` results view. It consumes semantic outcomes and never infers rules from sprite transforms.
 - `host/flash_pose_protocol.gd` is the narrow gameplay protocol adapter.
 - `characters/hybrid_character_animator.gd` consumes semantic dance, pose, reaction, elimination, and result states. Gameplay must not manipulate child sprites or inspect animation frames to decide outcomes.
@@ -162,6 +163,7 @@ godot --headless --path . --script res://tests/pose_evaluation_rules_test.gd
 godot --headless --path . --script res://tests/flash_pose_round_controller_test.gd
 godot --headless --path . --script res://tests/bubbles_gesture_classifier_test.gd
 godot --headless --path . --script res://tests/bubbles_round_controller_test.gd
+godot --headless --path . --script res://tests/bubbles_player_physics_test.gd
 godot --headless --path . --script res://tests/flash_pose_protocol_test.gd
 godot --headless --path . --script res://tests/flash_pose_presentation_test.gd
 godot --headless --path . --script res://tests/flash_pose_flow_test.gd
@@ -177,6 +179,7 @@ godot --headless --editor --path . --script res://tests/standalone_build_editor_
 ```
 
 Run visual helpers only when their output will be inspected; they write ignored artifacts under `test-results/`. A normal-profile editor load may emit forced-shutdown RID/ObjectDB cleanup warnings after a successful scan. Treat exit zero plus no script/import error as the result; do not confuse cache/profile permission failures with product failures.
+For isolated Bubbles player-component review, `godot --path . --script res://tests/bubbles_player_visual_check.gd` uses the Compatibility renderer and saves small/grown/spinning, pop/re-form, and ten-player captures under ignored `test-results/ps-042/`. These are component renders, not a composed arena or human feel evidence.
 
 ## Networking, export, and operational warnings
 
