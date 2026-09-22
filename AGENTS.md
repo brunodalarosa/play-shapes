@@ -1,7 +1,7 @@
 # AGENTS.md
 
 ### Version control workflow
-Every change is made on a new local task branch and committed locally as the
+Every change in this implementation repository is made on a new local task branch and committed locally as the
 work progresses. Implementation tasks carry the machine-readable
 `human_approval: pending` gate in their task frontmatter. Until the human has
 performed post-coding validation and explicitly approved the change, do not
@@ -10,6 +10,8 @@ push the branch or open/update a pull request. After approval, set the gate to
 human review and manual merge. Planning-only changes follow the same local
 branch and commit rule and also wait for explicit approval before remote
 publication.
+
+The parent design and management repository is owner-managed: the owner manually handles every branch, commit, push, and pull request there. Agents may edit its task/design notes when requested, but must leave those management-layer changes uncommitted and unpublished. This does not change the implementation-repository workflow above.
 
 ## Project
 
