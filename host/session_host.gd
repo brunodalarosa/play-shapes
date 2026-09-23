@@ -40,13 +40,15 @@ func start() -> bool:
 		return true
 	var error := http.start(settings, player_registry.session_id)
 	if error != OK:
-		startup_error = "Could not start HTTP on port %d: %s" % [settings.http_port, error_string(error)]
+		startup_error = http.startup_error
+		if startup_error.is_empty():
+			startup_error = "Could not start HTTP service: %s" % error_string(error)
 		http.stop()
 		return false
 	error = websocket.start(settings, player_registry, func() -> bool: return accepting_new_players)
 	if error != OK:
 		http.stop()
-		startup_error = "Could not start WebSocket on port %d: %s" % [settings.websocket_port, error_string(error)]
+		startup_error = "Could not listen for WebSocket on port %d: %s" % [settings.websocket_port, error_string(error)]
 		return false
 	running = true
 	startup_error = ""

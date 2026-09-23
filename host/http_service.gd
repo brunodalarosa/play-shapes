@@ -4,28 +4,80 @@ extends Node
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
 const ASSETS: Dictionary = {
-"/": ["res://web/public/index.html", "text/html; charset=utf-8"],
-"/app.js": ["res://web/public/app.js", "text/javascript; charset=utf-8"],
-"/controller_geometry.js": ["res://web/public/controller_geometry.js", "text/javascript; charset=utf-8"],
-"/bubbles_gesture.js": ["res://web/public/bubbles_gesture.js", "text/javascript; charset=utf-8"],
-"/bubbles-jellyfish.png": ["res://assets/runtime/minigames/bubbles_and_jellyfishes/jellyfish/jellyfish_small.png", "image/png"],
-"/style.css": ["res://web/public/style.css", "text/css; charset=utf-8"],
+"/": {
+	"path": "res://web/public/index.html",
+	"content_type": "text/html; charset=utf-8",
+},
+"/app.js": {
+	"path": "res://web/public/app.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
+"/controller_geometry.js": {
+	"path": "res://web/public/controller_geometry.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
+"/bubbles_gesture.js": {
+	"path": "res://web/public/bubbles_gesture.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
+"/bubbles-jellyfish.png": {
+	"path": "res://assets/runtime/minigames/bubbles_and_jellyfishes/jellyfish/jellyfish_small.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/style.css": {
+	"path": "res://web/public/style.css",
+	"content_type": "text/css; charset=utf-8",
+},
 }
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []
 var _settings: NetworkingTuning
 var _bodies: Dictionary = {}
 var _session_id: String
+var startup_error: String = ""
 
 func start(settings: NetworkingTuning, session_id: String) -> Error:
 	_settings = settings
 	_session_id = session_id
+	startup_error = ""
+	_bodies.clear()
 	for route: String in ASSETS:
-		var file := FileAccess.open(ASSETS[route][0], FileAccess.READ)
-		if file == null:
+		var asset: Dictionary = ASSETS[route]
+		var error := _load_asset(route, asset)
+		if error != OK:
+			return error
+	var listen_error := _server.listen(settings.http_port, "*")
+	if listen_error != OK:
+		startup_error = "Could not listen for HTTP on port %d: %s" % [
+			settings.http_port, error_string(listen_error),
+		]
+	return listen_error
+
+func _load_asset(route: String, asset: Dictionary) -> Error:
+	var path: String = asset.path
+	if asset.get("resource_type", "") == "Texture2D":
+		var texture := ResourceLoader.load(path) as Texture2D
+		if texture == null:
+			startup_error = "Could not load HTTP image resource '%s'." % path
 			return ERR_FILE_NOT_FOUND
-		_bodies[route] = file.get_buffer(file.get_length())
-	return _server.listen(settings.http_port, "*")
+		var image := texture.get_image()
+		if image.is_empty():
+			startup_error = "Could not read HTTP image resource '%s'." % path
+			return ERR_FILE_CORRUPT
+		var png_bytes := image.save_png_to_buffer()
+		if png_bytes.is_empty():
+			startup_error = "Could not encode HTTP image resource '%s' as PNG." % path
+			return ERR_CANT_CREATE
+		_bodies[route] = png_bytes
+		return OK
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		var error := FileAccess.get_open_error()
+		startup_error = "Could not read HTTP asset '%s': %s" % [path, error_string(error)]
+		return error
+	_bodies[route] = file.get_buffer(file.get_length())
+	return OK
 
 func stop() -> void:
 	_server.stop()
@@ -100,7 +152,7 @@ func _route(request: String) -> PackedByteArray:
 		}).to_utf8_buffer())
 	if not ASSETS.has(route):
 		return _response("404 Not Found", "text/plain", "Not found".to_utf8_buffer())
-	return _response("200 OK", ASSETS[route][1], _bodies[route])
+	return _response("200 OK", ASSETS[route].content_type, _bodies[route])
 
 func _response(status: String, mime: String, body: PackedByteArray) -> PackedByteArray:
 	var headers := "HTTP/1.1 %s\r\nContent-Type: %s\r\nContent-Length: %d\r\nConnection: close\r\nCache-Control: no-store\r\nX-Content-Type-Options: nosniff\r\n\r\n" % [status, mime, body.size()]

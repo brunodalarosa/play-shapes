@@ -18,6 +18,14 @@ func _run() -> void:
 	host.settings.websocket_port = 18089
 	if not _check(host.start(), "Persistent host services start"):
 		return
+	var jellyfish_png: PackedByteArray = host.http._bodies["/bubbles-jellyfish.png"]
+	if not _check(jellyfish_png.size() > 8 and jellyfish_png.slice(0, 8) == PackedByteArray([137, 80, 78, 71, 13, 10, 26, 10]),
+			"HTTP serves the imported Bubbles jellyfish texture as PNG bytes"):
+		return
+	var jellyfish_response: PackedByteArray = host.http._route("GET /bubbles-jellyfish.png HTTP/1.1\r\n\r\n")
+	if not _check(jellyfish_response.slice(0, 128).get_string_from_utf8().contains("Content-Type: image/png"),
+			"Bubbles jellyfish HTTP route uses the PNG content type"):
+		return
 	var host_id := host.get_instance_id()
 	host.active_presets.simon_says.countdown_seconds = 0.0
 	host.active_presets.bubbles.instructions_seconds = 0.0
