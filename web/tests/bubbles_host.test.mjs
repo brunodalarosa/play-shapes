@@ -68,6 +68,7 @@ test('active Bubbles routes authenticated traces, rejects forged input, and rest
     const snapshot = await client.next(message => message.type === 'bubbles_snapshot' && message.score === 8);
     assert.equal(snapshot.visual_jellyfish, 8);
     assert.equal(snapshot.phase, 'active');
+    assert.equal(snapshot.debug_mode, true);
     assert.equal(snapshot.seat, joined.player.seat);
     const trace = [[0.1, 0.5], [0.9, 0.5]];
     client.send({ type: 'bubbles_trace', input_seq: 1, trace, player_id: 'forged' });

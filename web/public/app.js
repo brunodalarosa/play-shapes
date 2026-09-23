@@ -18,6 +18,7 @@ const bubblesCard = document.querySelector("#bubbles-card");
 const bubblesPad = document.querySelector("#bubbles-pad");
 const bubblesRotate = document.querySelector("#bubbles-rotate");
 const bubblesStatus = document.querySelector("#bubbles-status");
+const bubblesDebug = document.querySelector("#bubbles-debug");
 const bubblesScore = document.querySelector("#bubbles-score");
 const bubblesState = document.querySelector("#bubbles-state");
 const bubblesReplica = document.querySelector("#bubbles-replica");
@@ -88,6 +89,7 @@ function setGameplaySurface(active, mode = "flash") {
     }
     document.documentElement.classList.toggle("gameplay-active", active);
     document.documentElement.classList.toggle("bubbles-active", next === "bubbles");
+    document.documentElement.classList.toggle("bubbles-debug-active", next === "bubbles" && !bubblesDebug.hidden);
     updateOrientation();
 }
 function updateOrientation() {
@@ -98,6 +100,8 @@ function updateOrientation() {
 }
 function showJoin(message, focus = false) {
     joined = false;
+    bubblesSnapshot = undefined;
+    bubblesDebug.hidden = true;
     setGameplaySurface(false);
     playerCard.hidden = true;
     gameCard.hidden = true;
@@ -112,6 +116,8 @@ function showJoin(message, focus = false) {
 }
 function showJoined(player, state = "Connected") {
     joined = true;
+    bubblesSnapshot = undefined;
+    bubblesDebug.hidden = true;
     setGameplaySurface(false);
     joinForm.hidden = true;
     playerCard.hidden = false;
@@ -323,6 +329,7 @@ function showBubbles(message) {
     gameCard.hidden = true;
     playerCard.hidden = true;
     bubblesCard.hidden = false;
+    bubblesDebug.hidden = message.debug_mode !== true;
     const phase = message.phase ?? "waiting";
     const active = phase === "results" || (["instructions", "countdown", "active"].includes(phase) && message.left !== true);
     setGameplaySurface(active, "bubbles");
@@ -487,7 +494,11 @@ async function connect() {
                 clearTimeout(deadline);
                 if (message.resume_status === "resumed" && rememberIdentity(message)) {
                     releaseHeld(false);
-                    if (message.gameplay)
+                    if (message.gameplay?.type === "bubbles_snapshot")
+                        showBubbles(message.gameplay);
+                    else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player)
+                        showJoined(message.player, message.gameplay.message ?? "Waiting for the next game");
+                    else if (message.gameplay)
                         showGame(message.gameplay);
                     return;
                 }
@@ -535,6 +546,7 @@ async function connect() {
                 releaseHeld(false);
                 setGameplaySurface(false);
                 bubblesCard.hidden = true;
+                bubblesDebug.hidden = true;
                 bubblesSnapshot = undefined;
                 if (message.player)
                     rememberIdentity(message);

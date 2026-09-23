@@ -2,7 +2,6 @@ extends CanvasLayer
 ## Persistent host-only launcher. This autoload never owns or restarts LAN services.
 
 const LOBBY_PATH := "res://scenes/lobby.tscn"
-const FLASH_POSE_SCENARIO_ID := &"one_player_simon"
 
 var active_scenario: DebugScenario
 var _features: Dictionary = {}
@@ -32,8 +31,7 @@ func launch(scenario_id: StringName) -> bool:
 	var scenario := scenario_for_id(scenario_id)
 	if scenario == null or not bool(scenario.availability(_features).available):
 		return false
-	if scenario.id == FLASH_POSE_SCENARIO_ID \
-			and not bool(SessionHost.prepare_flash_pose_launch(true).accepted):
+	if not _prepare_scenario_launch(scenario):
 		return false
 	active_scenario = scenario
 	_panel.hide()
@@ -44,8 +42,7 @@ func launch(scenario_id: StringName) -> bool:
 func restart_scenario() -> bool:
 	if active_scenario == null:
 		return false
-	if active_scenario.id == FLASH_POSE_SCENARIO_ID \
-			and not bool(SessionHost.prepare_flash_pose_launch(true).accepted):
+	if not _prepare_scenario_launch(active_scenario):
 		return false
 	_panel.hide()
 	get_tree().change_scene_to_file(active_scenario.scene_path)
@@ -54,7 +51,7 @@ func restart_scenario() -> bool:
 func return_to_lobby(notify_players := true) -> void:
 	if notify_players:
 		SessionHost.send_players_to_lobby()
-	SessionHost.clear_flash_pose_launch()
+	SessionHost.clear_minigame_launch()
 	active_scenario = null
 	_panel.hide()
 	_update_marker()
@@ -167,3 +164,9 @@ func _refresh_actions() -> void:
 func _update_marker() -> void:
 	_marker.visible = active_scenario != null
 	_marker.text = "DEBUG — %s" % active_scenario.display_name if active_scenario != null else ""
+
+
+func _prepare_scenario_launch(scenario: DebugScenario) -> bool:
+	if scenario.minigame_id.is_empty():
+		return true
+	return bool(SessionHost.prepare_minigame_launch(scenario.minigame_id, true).get("accepted", false))

@@ -4,13 +4,23 @@ extends Control
 @onready var qr: QRCodeRect = %JoinQR
 @onready var join_address: Label = %JoinAddress
 @onready var roster: GridContainer = %PlayerRoster
+@onready var minigame_selector: OptionButton = %MinigameSelector
 @onready var start_button: Button = %StartMinigame
 @onready var start_help: Label = %StartHelp
+
+const MINIGAMES := [
+	{"id": &"flash_pose", "name": "Flash? Pose!"},
+	{"id": &"bubbles", "name": "Bubbles and Jellyfishes"},
+]
 
 func _ready() -> void:
 	SessionHost.set_accepting_new_players(true)
 	SessionHost.players_changed.connect(_show_players)
 	address_picker.item_selected.connect(_select_address)
+	for minigame: Dictionary in MINIGAMES:
+		minigame_selector.add_item(String(minigame.name))
+		minigame_selector.set_item_metadata(minigame_selector.item_count - 1, minigame.id)
+	minigame_selector.item_selected.connect(_on_minigame_selected)
 	%Refresh.pressed.connect(_refresh_addresses)
 	%Copy.pressed.connect(func() -> void: DisplayServer.clipboard_set(join_address.text))
 	start_button.pressed.connect(_start_minigame)
@@ -59,15 +69,33 @@ func _show_players(players: Array[Dictionary]) -> void:
 		row.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		row.add_theme_font_size_override("font_size", 20 if players.size() > 10 else 18)
 		roster.add_child(row)
-	var availability := SessionHost.flash_pose_availability(false)
+	_update_start_state()
+
+func _on_minigame_selected(_index: int) -> void:
+	_update_start_state()
+
+func _selected_minigame_id() -> StringName:
+	if minigame_selector.selected < 0:
+		return SessionHost.MINIGAME_FLASH_POSE
+	return StringName(minigame_selector.get_item_metadata(minigame_selector.selected))
+
+func _update_start_state() -> void:
+	var minigame_id := _selected_minigame_id()
+	var availability := SessionHost.minigame_availability(minigame_id)
 	start_button.disabled = not bool(availability.available)
 	start_help.text = str(availability.reason) if not bool(availability.available) \
-		else "Starts Flash? Pose! for the registered players above."
+		else "Starts %s for the registered players above." % SessionHost.minigame_display_name(minigame_id)
 
 func _start_minigame() -> void:
-	var result := SessionHost.prepare_flash_pose_launch(false)
+	var minigame_id := _selected_minigame_id()
+	var result := SessionHost.prepare_minigame_launch(minigame_id)
 	if not bool(result.accepted):
 		start_help.text = str(result.reason)
 		return
 	start_button.disabled = true
-	get_tree().change_scene_to_file(SessionHost.FLASH_POSE_SCENE_PATH)
+	var error := get_tree().change_scene_to_file(SessionHost.minigame_scene_path(minigame_id))
+	if error != OK:
+		SessionHost.clear_minigame_launch(minigame_id)
+		SessionHost.set_accepting_new_players(true)
+		start_help.text = "Could not open %s (error %d)." % [SessionHost.minigame_display_name(minigame_id), error]
+		_update_start_state()

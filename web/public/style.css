@@ -34,6 +34,7 @@ button:disabled { cursor: wait; opacity: .65; }
 .pose-button:disabled { cursor: not-allowed; opacity: .42; }
 .rotate-state { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left)); background: #0e131f; color: #fff; font-size: clamp(28px, 8vw, 56px); font-weight: 850; text-align: center; }
 .eyebrow { margin: 0; color: #b8c1cf; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+.debug-badge { inline-size: fit-content; margin: 4px auto 12px; padding: 4px 12px; border: 1px solid #ffd166; border-radius: 999px; color: #ffd166; font-size: 13px; font-weight: 850; letter-spacing: .08em; }
 #player-state { font-weight: 700; }
 .footnote { margin-block-start: 40px; color: #b8c1cf; font-size: 13px; }
 [hidden] { display: none !important; }
@@ -52,6 +53,9 @@ html.bubbles-active main, html.bubbles-active #bubbles-card { inline-size: 100%;
 html.bubbles-active main > :not(#bubbles-card), html.bubbles-active #bubbles-heading { position: absolute !important; inline-size: 1px !important; block-size: 1px !important; overflow: hidden !important; clip-path: inset(50%) !important; white-space: nowrap !important; }
 html.bubbles-active #bubbles-pad { position: fixed; inset: 0; display: grid; place-items: center; touch-action: none; user-select: none; -webkit-user-select: none; overflow: hidden; background: radial-gradient(circle at 50% 48%, #276a82, #10354e 72%); }
 html.bubbles-active #bubbles-pad:focus-visible { outline: 5px solid #ffd166; outline-offset: -8px; }
+html.bubbles-active #bubbles-debug { position: absolute; top: max(8px, env(safe-area-inset-top)); left: 50%; z-index: 4; inline-size: max-content; max-inline-size: calc(100vw - 32px); margin: 0; transform: translateX(-50%); pointer-events: none; white-space: nowrap; }
+html.bubbles-active.bubbles-debug-active .bubbles-hud { top: max(52px, calc(env(safe-area-inset-top) + 44px)); }
+html.bubbles-active.bubbles-debug-active #bubbles-status { top: max(90px, calc(env(safe-area-inset-top) + 82px)); }
 .bubbles-hud { position: absolute; top: max(18px, env(safe-area-inset-top)); inset-inline: 20px; display: flex; justify-content: space-between; gap: 12px; text-align: start; font-weight: 800; z-index: 2; }
 #bubbles-score { font-size: clamp(21px, 6vw, 30px); }
 #bubbles-state { font-size: clamp(15px, 4vw, 20px); text-align: end; }

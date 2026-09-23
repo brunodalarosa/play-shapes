@@ -69,6 +69,7 @@ test('phone join form has labels, live feedback, and explicit change-player acti
   const html = await (await fetch(base)).text();
   assert.match(html, /<label for="player-name">Your name<\/label>/);
   assert.match(html, /id="status"[^>]*role="status"[^>]*aria-live="polite"/);
+  assert.match(html, /id="bubbles-debug" class="debug-badge" hidden/);
   assert.match(html, />Leave \/ Change player<\/button>/);
   assert.match(html, /maxlength="16"/);
 });
@@ -101,6 +102,11 @@ test('Bubbles controller exposes portrait touch, score, live feedback, and cance
   const js = await (await fetch(base + '/app.js')).text();
   assert.match(html, /id="bubbles-pad"[^>]*role="button"[^>]*tabindex="0"[^>]*aria-label=/);
   assert.match(html, /id="bubbles-status"[^>]*aria-live="polite"/);
+  assert.match(css, /\.debug-badge[^}]*#ffd166/);
+  assert.ok(css.includes('html.bubbles-active #bubbles-debug'));
+  assert.ok(css.includes('white-space: nowrap'));
+  assert.ok(css.includes('html.bubbles-active.bubbles-debug-active .bubbles-hud'));
+  assert.ok(js.includes('bubbles-debug-active'));
   assert.match(html, /id="bubbles-score"/);
   assert.match(css, /html\.bubbles-active/);
   for (const expected of ['bubbles_trace', 'pointercancel', 'lostpointercapture', 'bubbles_trace_result', 'bubbles_snapshot', 'portrait', 'navigator.vibrate']) {

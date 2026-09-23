@@ -19,6 +19,7 @@ const bubblesCard = document.querySelector<HTMLElement>("#bubbles-card")!;
 const bubblesPad = document.querySelector<HTMLElement>("#bubbles-pad")!;
 const bubblesRotate = document.querySelector<HTMLElement>("#bubbles-rotate")!;
 const bubblesStatus = document.querySelector<HTMLElement>("#bubbles-status")!;
+const bubblesDebug = document.querySelector<HTMLElement>("#bubbles-debug")!;
 const bubblesScore = document.querySelector<HTMLElement>("#bubbles-score")!;
 const bubblesState = document.querySelector<HTMLElement>("#bubbles-state")!;
 const bubblesReplica = document.querySelector<HTMLElement>("#bubbles-replica")!;
@@ -73,6 +74,7 @@ function setGameplaySurface(active: boolean, mode: "flash" | "bubbles" = "flash"
   }
   document.documentElement.classList.toggle("gameplay-active", active);
   document.documentElement.classList.toggle("bubbles-active", next === "bubbles");
+  document.documentElement.classList.toggle("bubbles-debug-active", next === "bubbles" && !bubblesDebug.hidden);
   updateOrientation();
 }
 function updateOrientation(): void {
@@ -83,11 +85,11 @@ function updateOrientation(): void {
 }
 
 function showJoin(message: string, focus = false): void {
-  joined = false; setGameplaySurface(false); playerCard.hidden = true; gameCard.hidden = true; bubblesCard.hidden = true; joinForm.hidden = false; joinButton.disabled = false; leaveButton.disabled = false;
+  joined = false; bubblesSnapshot = undefined; bubblesDebug.hidden = true; setGameplaySurface(false); playerCard.hidden = true; gameCard.hidden = true; bubblesCard.hidden = true; joinForm.hidden = false; joinButton.disabled = false; leaveButton.disabled = false;
   status.textContent = message; nameInput.value = stored(STORAGE.name); if (focus) queueMicrotask(() => nameInput.focus());
 }
 function showJoined(player: PublicPlayer, state = "Connected"): void {
-  joined = true; setGameplaySurface(false); joinForm.hidden = true; playerCard.hidden = false; gameCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false;
+  joined = true; bubblesSnapshot = undefined; bubblesDebug.hidden = true; setGameplaySurface(false); joinForm.hidden = true; playerCard.hidden = false; gameCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false;
   status.textContent = state === "Connected" ? "Joined. Keep this page open while you play." : state;
 }
 function sendPose(type: "pose_down" | "pose_up", direction: Direction): void { if (!socket || socket.readyState !== WebSocket.OPEN) return; inputSeq += 1; store(STORAGE.inputSeq, String(inputSeq)); socket.send(JSON.stringify({ type, direction, input_seq: inputSeq })); }
@@ -205,6 +207,7 @@ bubblesPad.addEventListener("keydown", event => {
 function showBubbles(message: HostMessage): void {
   releaseHeld(false); bubblesSnapshot = message; bubblesSnapshotTime = performance.now();
   gameCard.hidden = true; playerCard.hidden = true; bubblesCard.hidden = false;
+  bubblesDebug.hidden = message.debug_mode !== true;
   const phase = message.phase ?? "waiting"; const active = phase === "results" || (["instructions", "countdown", "active"].includes(phase) && message.left !== true);
   setGameplaySurface(active, "bubbles");
   bubblesHelp.textContent = phase === "results" ? "Check the shared screen for the final ranking" : phase === "active" ? "Swipe to move · Draw circles and release to spin" : "Watch the shared screen for GO";
@@ -291,7 +294,7 @@ async function connect(): Promise<void> {
     peer.onmessage = (event: MessageEvent<string>) => {
       let message: HostMessage; try { message = JSON.parse(event.data) as HostMessage; } catch { peer.close(); return; }
       if (message.type === "welcome" && message.protocol === 1 && Number.isInteger(message.connection_id)) {
-        clearTimeout(deadline); if (message.resume_status === "resumed" && rememberIdentity(message)) { releaseHeld(false); if (message.gameplay) showGame(message.gameplay); return; }
+        clearTimeout(deadline); if (message.resume_status === "resumed" && rememberIdentity(message)) { releaseHeld(false); if (message.gameplay?.type === "bubbles_snapshot") showBubbles(message.gameplay); else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player) showJoined(message.player as PublicPlayer, message.gameplay.message ?? "Waiting for the next game"); else if (message.gameplay) showGame(message.gameplay); return; }
         if (message.resume_status === "session_restarted") { forgetIdentity(); showJoin("The host started a new session. Join again with your name.", true); }
         else if (message.resume_status === "expired") { forgetIdentity(); showJoin("Your previous player expired. Join again with your name.", true); } else showJoin("Connected. Enter your name to join.", true);
       } else if (message.type === "join_accepted") { if (!rememberIdentity(message)) peer.close(); }
@@ -301,7 +304,7 @@ async function connect(): Promise<void> {
       else if (["flash_pose_snapshot", "flash_pose_challenge", "flash_pose_result", "flash_pose_results"].includes(message.type ?? "")) showGame(message);
       else if (message.type === "bubbles_trace_result") { bubblesLocalCharge = 0; if (message.action === "none") { bubblesStatus.textContent = message.reason === "spin_cooldown" ? "Spin is cooling down. Swipes still move you." : "Keep drawing a complete circle to spin."; bubblesFeedbackUntil = performance.now() + 1800; } }
       else if (message.type === "bubbles_snapshot" || message.type === "bubbles_feedback") showBubbles(message);
-      else if (message.type === "lobby") { releaseHeld(false); setGameplaySurface(false); bubblesCard.hidden = true; bubblesSnapshot = undefined; if (message.player) rememberIdentity(message); else if (joined) { gameCard.hidden = true; playerCard.hidden = false; playerState.textContent = "Waiting for the next game"; status.textContent = message.message ?? "Waiting for the next game"; } }
+      else if (message.type === "lobby") { releaseHeld(false); setGameplaySurface(false); bubblesCard.hidden = true; bubblesDebug.hidden = true; bubblesSnapshot = undefined; if (message.player) rememberIdentity(message); else if (joined) { gameCard.hidden = true; playerCard.hidden = false; playerState.textContent = "Waiting for the next game"; status.textContent = message.message ?? "Waiting for the next game"; } }
     };
     peer.onclose = event => { clearTimeout(deadline); releaseHeld(false); if (socket === peer) socket = undefined; if (event.code === 4000) { stopped = true; leaveButton.disabled = true; status.textContent = "This player continued in another tab."; playerState.textContent = "Open in another tab"; return; } reconnect(); };
     peer.onerror = () => peer.close();

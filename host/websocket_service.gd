@@ -57,6 +57,7 @@ func set_bubbles_controller(controller: BubblesRoundController) -> void:
 	controller.phase_changed.connect(_on_bubbles_phase_changed)
 	controller.personal_state_changed.connect(_on_bubbles_personal_state_changed)
 	controller.feedback_requested.connect(_on_bubbles_feedback)
+	controller.return_to_lobby_requested.connect(_on_bubbles_return_to_lobby)
 	_broadcast_gameplay_snapshots()
 
 func clear_bubbles_controller(controller: BubblesRoundController) -> void:
@@ -264,6 +265,10 @@ func _on_bubbles_feedback(player_id: String, kind: StringName, data: Dictionary)
 	if not message.is_empty():
 		_send_to_player(player_id, message)
 
+
+func _on_bubbles_return_to_lobby() -> void:
+	send_lobby_state()
+
 func _clear_flash_pose_controller() -> void:
 	if _flash_pose_protocol == null:
 		return
@@ -287,6 +292,7 @@ func _clear_bubbles_controller() -> void:
 		if controller.phase_changed.is_connected(_on_bubbles_phase_changed): controller.phase_changed.disconnect(_on_bubbles_phase_changed)
 		if controller.personal_state_changed.is_connected(_on_bubbles_personal_state_changed): controller.personal_state_changed.disconnect(_on_bubbles_personal_state_changed)
 		if controller.feedback_requested.is_connected(_on_bubbles_feedback): controller.feedback_requested.disconnect(_on_bubbles_feedback)
+		if controller.return_to_lobby_requested.is_connected(_on_bubbles_return_to_lobby): controller.return_to_lobby_requested.disconnect(_on_bubbles_return_to_lobby)
 	if _active_protocol == _bubbles_protocol:
 		_active_protocol = null
 	_bubbles_protocol = null

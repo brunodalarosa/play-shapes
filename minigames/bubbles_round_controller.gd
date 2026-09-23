@@ -223,6 +223,10 @@ func phase_name() -> StringName:
 	return PHASE_NAMES[phase]
 
 
+func is_one_player_debug() -> bool:
+	return _debug_one_player
+
+
 func active_start_msec() -> int:
 	return _active_start_msec
 

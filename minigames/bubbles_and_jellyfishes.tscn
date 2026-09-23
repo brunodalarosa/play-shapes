@@ -79,6 +79,21 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="DebugLabel" type="Label" parent="Hud"]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 34.0
+offset_top = 24.0
+offset_right = 430.0
+offset_bottom = 62.0
+theme_override_colors/font_color = Color(1, 0.82, 0.35, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.07, 0.1, 0.95)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/font_size = 22
+text = "DEBUG MODE · ONE PLAYER"
+mouse_filter = 2
+visible = false
+
 [node name="Timer" type="Label" parent="Hud"]
 layout_mode = 1
 anchors_preset = 5

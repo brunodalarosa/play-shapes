@@ -29,6 +29,7 @@ const SFX: Dictionary = {
 @onready var _results: ColorRect = $Hud/Results
 @onready var _results_list: VBoxContainer = $Hud/Results/ResultsList
 @onready var _return_button: Button = $Hud/Results/ReturnToLobby
+@onready var _debug_label: Label = $Hud/DebugLabel
 
 var _music: AudioStreamPlayer
 var _audio_players: Dictionary = {}
@@ -42,6 +43,7 @@ var _go_until_msec := -1
 var _pending_reforms: Dictionary = {}
 var _last_shove_by_pair: Dictionary = {}
 var _ambient_seconds := 0.0
+var _protocol_registered := false
 
 
 func _ready() -> void:
@@ -61,6 +63,25 @@ func _ready() -> void:
 	_layout_world()
 	set_process(false)
 	set_physics_process(false)
+	var session_host := get_node_or_null("/root/SessionHost")
+	if session_host == null:
+		return
+	var launch: Dictionary = session_host.consume_bubbles_launch()
+	if launch.is_empty():
+		return
+	controller.return_to_lobby_requested.connect(_on_return_to_lobby_requested)
+	session_host.players_changed.connect(_on_registry_players_changed)
+	var started := start_round(
+		launch.get("participants", []),
+		Time.get_ticks_msec(),
+		bool(launch.get("allow_one_player_debug", false))
+	)
+	if not bool(started.accepted):
+		push_error("Bubbles and Jellyfishes could not start: %s" % started.get("code", &"unknown"))
+		_return_to_lobby.call_deferred()
+		return
+	_protocol_registered = true
+	session_host.register_bubbles_controller(controller)
 
 
 ## PS-046 will call this after choosing Bubbles and registering the active protocol.
@@ -71,6 +92,7 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 	if not outcome.accepted:
 		return outcome
 	_started = true
+	_debug_label.visible = controller.is_one_player_debug()
 	player_arena.setup(controller, ARENA_BOUNDS)
 	var ordered: Array[Dictionary] = []
 	for state: Dictionary in controller.player_snapshot().values():
@@ -100,6 +122,11 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 
 
 func _exit_tree() -> void:
+	if _protocol_registered:
+		var session_host := get_node_or_null("/root/SessionHost")
+		if session_host != null:
+			session_host.unregister_bubbles_controller(controller)
+		_protocol_registered = false
 	if _music != null:
 		_music.stop()
 	for players: Array in _audio_players.values():
@@ -280,6 +307,27 @@ func _result_label(value: String, ratio: float, font_size: int) -> Label:
 
 func _on_return_pressed() -> void:
 	_return_button.disabled = controller.request_return_to_lobby()
+
+
+func _on_return_to_lobby_requested() -> void:
+	_return_to_lobby.call_deferred()
+
+
+func _return_to_lobby() -> void:
+	var launcher := get_node_or_null("/root/DebugLauncher")
+	if launcher != null:
+		launcher.return_to_lobby(false)
+	else:
+		var session_host := get_node_or_null("/root/SessionHost")
+		if session_host != null:
+			session_host.send_players_to_lobby()
+			session_host.clear_minigame_launch()
+		get_tree().change_scene_to_file("res://scenes/lobby.tscn")
+
+
+func _on_registry_players_changed(players: Array[Dictionary]) -> void:
+	if _started:
+		controller.observe_registry(players, Time.get_ticks_msec())
 
 
 func _style_instruction_card() -> void:

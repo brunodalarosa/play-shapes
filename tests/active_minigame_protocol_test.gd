@@ -25,6 +25,8 @@ func _run() -> void:
 	service.set_bubbles_controller(bubbles)
 	_check(service._active_protocol == service._bubbles_protocol and service._active_protocol.snapshot_for("p0").type == "bubbles_snapshot",
 		"Bubbles is the only active gameplay protocol")
+	_check(bubbles.return_to_lobby_requested.is_connected(service._on_bubbles_return_to_lobby),
+		"Bubbles results return resets the connected phones")
 	var flash := FlashController.new()
 	root.add_child(flash)
 	flash.tuning = SimonSaysTuning.new()

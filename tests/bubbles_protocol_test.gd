@@ -57,6 +57,7 @@ func _run() -> void:
 	var snapshot := protocol.snapshot_for("p0")
 	_check(snapshot.type == "bubbles_snapshot" and snapshot.score == 0 and snapshot.visual_jellyfish == 0 and snapshot.seat == 1,
 		"Personal snapshot contains exact score and visual state")
+	_check(not snapshot.debug_mode, "Normal Bubbles snapshots do not claim debug mode")
 	_check(protocol.snapshot_for("unknown").type == "lobby", "Unknown player receives no gameplay state")
 	controller.record_jellyfish_capture("p0", 5)
 	var collected := protocol.feedback_for("p0", &"captured", {})
@@ -69,6 +70,11 @@ func _run() -> void:
 	controller.advance(10000)
 	var results := protocol.snapshot_for("p0")
 	_check(results.phase == "results" and results.rank > 0, "Result snapshot includes placement")
+	var debug_controller := _controller()
+	debug_controller.start_round([{"player_id": "debug", "name": "Debug", "seat": 1}], 0, true)
+	var debug_snapshot: Dictionary = Protocol.new(debug_controller).snapshot_for("debug")
+	_check(debug_controller.is_one_player_debug() and debug_snapshot.debug_mode,
+		"One-player debug state reaches the phone snapshot")
 	print("Bubbles protocol checks: %d failures" % _failures)
 	quit(0 if _failures == 0 else 1)
 
@@ -85,6 +91,13 @@ func _circle() -> Array:
 	for index: int in 65:
 		var angle := float(index) / 32.0 * TAU
 		result.append([0.5 + 0.2 * cos(angle), 0.5 + 0.2 * sin(angle)])
+	return result
+
+
+func _controller() -> BubblesRoundController:
+	var result := Controller.new() as BubblesRoundController
+	root.add_child(result)
+	result.tuning = BubblesTuning.new()
 	return result
 
 

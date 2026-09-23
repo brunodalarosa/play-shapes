@@ -52,6 +52,7 @@ func snapshot_for(player_id: String) -> Dictionary:
 	var now := int(own.host_time_msec)
 	return {
 		"type": "bubbles_snapshot", "phase": str(own.phase),
+		"debug_mode": controller.is_one_player_debug(),
 		"score": int(own.score), "bubble_radius": float(own.bubble_radius),
 		"visual_jellyfish": int(own.visual_jellyfish), "visual_cap": controller.tuning.captured_visual_cap,
 		"seat": int(own.seat), "connected": bool(own.connected), "left": bool(own.left),

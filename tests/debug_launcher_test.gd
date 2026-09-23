@@ -15,6 +15,7 @@ func _run() -> void:
 	var original_host_id := host.get_instance_id()
 	var animation_lab: DebugScenario = launcher.scenario_for_id(&"animation_lab")
 	var simon: DebugScenario = launcher.scenario_for_id(&"one_player_simon")
+	var bubbles: DebugScenario = launcher.scenario_for_id(&"one_player_bubbles")
 	if not _check(animation_lab != null, "Animation lab is registered"):
 		return
 	if not _check(animation_lab.availability({}).available, "Implemented animation lab is available"):
@@ -24,6 +25,12 @@ func _run() -> void:
 	if not _check(not simon.availability({"one_registered_player": false}).available, "Flash? Pose! still requires the one-player debug feature"):
 		return
 	if not _check(simon.availability({"one_registered_player": true}).available, "Implemented Flash? Pose! stage is available to its one-player debug path"):
+		return
+	if not _check(bubbles != null and bubbles.minigame_id == &"bubbles", "One-player Bubbles is registered as a separate minigame debug scenario"):
+		return
+	if not _check(not bubbles.availability({"one_registered_player": false}).available \
+		and bubbles.availability({"one_registered_player": true}).available,
+		"Bubbles debug requires exactly one registered player"):
 		return
 	if not _check(not launcher.restart_scenario(), "Restart is disabled outside a debug scenario"):
 		return
