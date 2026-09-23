@@ -1,0 +1,192 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://minigames/bubbles_round_controller.gd" id="1"]
+[ext_resource type="Script" path="res://minigames/bubbles_player_arena.gd" id="2"]
+[ext_resource type="Script" path="res://minigames/bubbles_creature_arena.gd" id="3"]
+[ext_resource type="Script" path="res://minigames/bubbles_presentation.gd" id="4"]
+[ext_resource type="Texture2D" path="res://assets/runtime/minigames/bubbles_and_jellyfishes/environment/far_background.png" id="5"]
+[ext_resource type="Texture2D" path="res://assets/runtime/minigames/bubbles_and_jellyfishes/environment/midground.png" id="6"]
+[ext_resource type="Texture2D" path="res://assets/runtime/minigames/bubbles_and_jellyfishes/environment/foreground.png" id="7"]
+
+[node name="BubblesAndJellyfishes" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+clip_contents = true
+script = ExtResource("4")
+
+[node name="FarBackground" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture_filter = 4
+texture = ExtResource("5")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Midground" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture_filter = 4
+texture = ExtResource("6")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="PlayerArena" type="Node2D" parent="World"]
+script = ExtResource("2")
+
+[node name="CreatureArena" type="Node2D" parent="World"]
+script = ExtResource("3")
+
+[node name="Foreground" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture_filter = 4
+texture = ExtResource("7")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="RoundController" type="Node" parent="."]
+script = ExtResource("1")
+
+[node name="Hud" type="Control" parent="."]
+layout_mode = 1
+z_index = 10
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Timer" type="Label" parent="Hud"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -155.0
+offset_top = 22.0
+offset_right = 155.0
+offset_bottom = 106.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.035, 0.14, 0.2, 1)
+theme_override_constants/outline_size = 9
+theme_override_font_sizes/font_size = 64
+horizontal_alignment = 1
+vertical_alignment = 1
+visible = false
+
+[node name="CenterCue" type="Label" parent="Hud"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -100.0
+offset_right = 240.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.035, 0.14, 0.2, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 112
+horizontal_alignment = 1
+vertical_alignment = 1
+visible = false
+
+[node name="InstructionCard" type="PanelContainer" parent="Hud"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -420.0
+offset_top = -160.0
+offset_right = 420.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+visible = false
+
+[node name="InstructionText" type="Label" parent="Hud/InstructionCard"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 32
+text = "BUBBLES AND JELLYFISHES\n\nSwipe to move.\nDraw circles and release to spin.\nCollect jellyfish. Avoid pufferfish."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Results" type="ColorRect" parent="Hud"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.035, 0.11, 0.17, 1)
+
+[node name="ResultsTitle" type="Label" parent="Hud/Results"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 18.0
+offset_bottom = 86.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 45
+text = "BUBBLES AND JELLYFISHES — RESULTS"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResultsList" type="VBoxContainer" parent="Hud/Results"]
+layout_mode = 1
+anchors_preset = 15
+anchor_left = 0.08
+anchor_top = 0.12
+anchor_right = 0.92
+anchor_bottom = 0.87
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 4
+
+[node name="ReturnToLobby" type="Button" parent="Hud/Results"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -170.0
+offset_top = -83.0
+offset_right = 170.0
+offset_bottom = -18.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 25
+text = "Return to lobby"

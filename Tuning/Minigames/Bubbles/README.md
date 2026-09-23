@@ -1,6 +1,6 @@
 # Bubbles tuning
 
-Open `Tuning/Active Presets.tres`, then the Bubbles resource. `Default.tres` contains provisional values, not approved game feel. Copy it to a named preset for experiments, select that copy, save, and relaunch. This rules task consumes lifecycle, gesture, score/pop, and presentation snapshot values; later arena and presentation tasks will consume the remaining fields. World pixels are Godot 2D coordinates. Normalized gesture distances are fractions of the phone input area's width/height.
+Open `Tuning/Active Presets.tres`, then the Bubbles resource. `Default.tres` contains provisional values, not approved game feel. Copy it to a named preset for experiments, select that copy, save, and relaunch. The rules, arenas, and shared-screen scene consume these values. World pixels are Godot 2D coordinates. Normalized gesture distances are fractions of the phone input area's width/height.
 
 Every Inspector tooltip gives the field's purpose, default, safe range, and higher/lower effect. The map below makes the complete contract searchable without opening code. Individual fields clamp to their listed safe ranges; related invalid combinations fail preset validation.
 
@@ -46,5 +46,9 @@ Every Inspector tooltip gives the field's purpose, default, safe range, and high
 | Pufferfish warning (on/off) | On; boolean | Enables edge notice |
 | Pufferfish warning time (seconds) | 0.8; 0–3 | Gives more visual notice |
 | Final timer emphasis threshold (whole seconds) | 10; 1–30 | Starts countdown pulses earlier |
+| Parallax strength (multiplier) | 1; 0–2 | Moves the environment layers farther |
+| Timer pulse strength (multiplier) | 1; 0–2 | Enlarges final countdown beats more |
+| Music gain (dB) | -12; -30–0 | Raises Bubbles background music |
+| Effect gain (dB) | -6; -30–0 | Raises semantic sound effects |
 
 The maximum radius must exceed the starting radius. Starting jellyfish cannot exceed the free cap. High jellyfish spawn rate must be at least low rate; maximum wave duration must be at least minimum; late pufferfish rate must be at least early rate. Inspector setters clamp out-of-range values; the preset validator rejects any non-finite value that remains. Passing checks establishes safe configuration only; phone feel, accessibility, and balance still need human review.

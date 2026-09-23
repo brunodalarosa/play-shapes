@@ -172,6 +172,22 @@ var pufferfish_warning_seconds: float = 0.8:
 @export_range(1, 30, 1, "suffix:s")
 var final_timer_emphasis_seconds: int = 10:
 	set(value): final_timer_emphasis_seconds = clampi(value, 1, 30)
+## Strength of gentle environment layer motion. Zero holds the plates still; higher increases drift. Default: 1. Safe range: 0-2.
+@export_range(0.0, 2.0, 0.05)
+var parallax_strength: float = 1.0:
+	set(value): parallax_strength = clampf(value, 0.0, 2.0)
+## Multiplier for final timer size pulses. Zero keeps numbers steady; higher emphasizes each beat. Default: 1. Safe range: 0-2.
+@export_range(0.0, 2.0, 0.05)
+var timer_pulse_strength: float = 1.0:
+	set(value): timer_pulse_strength = clampf(value, 0.0, 2.0)
+## Bubbles background music level in decibels. Higher is louder; lower leaves more room for effects. Default: -12. Safe range: -30-0.
+@export_range(-30.0, 0.0, 0.5, "suffix:dB")
+var music_gain_db: float = -12.0:
+	set(value): music_gain_db = clampf(value, -30.0, 0.0)
+## Base effect level in decibels. Higher makes feedback louder; lower keeps it softer. Default: -6. Safe range: -30-0.
+@export_range(-30.0, 0.0, 0.5, "suffix:dB")
+var sfx_gain_db: float = -6.0:
+	set(value): sfx_gain_db = clampf(value, -30.0, 0.0)
 
 
 func validation_errors() -> PackedStringArray:
