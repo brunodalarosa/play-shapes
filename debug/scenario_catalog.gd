@@ -13,6 +13,14 @@ static func scenarios() -> Array[DebugScenario]:
 			&"one_player_simon",
 			"One-player Flash? Pose!",
 			"res://minigames/dancer_simon_says.tscn",
-			"one_registered_player"
+			"one_registered_player",
+			&"flash_pose"
+		),
+		DebugScenario.new(
+			&"one_player_bubbles",
+			"One-player Bubbles and Jellyfishes",
+			"res://minigames/bubbles_and_jellyfishes.tscn",
+			"one_registered_player",
+			&"bubbles"
 		),
 	]

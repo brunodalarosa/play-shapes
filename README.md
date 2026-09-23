@@ -4,9 +4,9 @@ Play Shapes is a local-network multiplayer party game. The Godot application
 runs the authoritative host on a PC, while players use their phones as web
 controllers.
 
-The current playable minigame is **001 — Flash? Pose!** (the Dancer Simon Says
-prototype). The shared PC display shows the round and each phone provides its
-personalized pose controls.
+The lobby can start **001 — Flash? Pose!** (the Dancer Simon Says prototype)
+or **002 — Bubbles and Jellyfishes**. The shared PC display shows the round;
+phones switch to the selected minigame's controls.
 
 ## Requirements
 
@@ -55,24 +55,24 @@ The host uses HTTP port `8080` and WebSocket port `8081` by default. If those
 ports are already in use, stop the other host or change the values in
 `Tuning/Shared/Networking/Default.tres` before restarting Godot.
 
-## Test minigame 001 with the debug flow
+## Test the minigames with the debug flow
 
-The debug flow is for testing the minigame with one real registered player. It
-does not create simulated players.
+The debug flow is for testing either minigame with one real registered player.
+It does not create simulated players.
 
 1. Start the project and connect exactly one phone to the lobby.
 2. Enter a player name and choose **Join game**.
 3. On the PC, press **F12** to open the non-pausing debug launcher.
-4. Choose **One-player Flash? Pose!**.
-5. Play from the phone while watching the shared PC display. The PC shows the
-   `DEBUG — One-player Flash? Pose!` marker and debug lives remain available
-   for repeated rule and presentation checks.
+4. Choose **One-player Flash? Pose!** or **One-player Bubbles and Jellyfishes**.
+5. Play from the phone while watching the shared PC display. The PC labels the
+   selected debug scenario; Bubbles also shows a one-player debug badge on the
+   phone and shared screen.
 6. Use **Restart current debug scenario** in the F12 launcher to restart with
    a fresh snapshot.
 7. Use **Return to lobby** when finished. This keeps the host services alive
    and reopens the lobby for new joins.
 
-The one-player entry is available only when exactly one real player is
+Each one-player entry is available only when exactly one real player is
 registered. A browser connection by itself does not count as a player.
 
 ## Play with 2 or more players
@@ -82,16 +82,19 @@ registered. A browser connection by itself does not count as a player.
 2. Each player enters a name and chooses **Join game**.
 3. On the shared PC display, wait until at least two players appear in the
    roster.
-4. Choose **Start minigame**. This starts Flash? Pose! with the registered
-   players and closes new-player admission for the round.
-5. Players use their phones to respond to the pose prompts when the music
-   stops.
+4. Choose **Flash? Pose!** or **Bubbles and Jellyfishes** from the minigame
+   dropdown, then choose **Start selected minigame**. New-player admission
+   closes for the round.
+5. For Flash? Pose!, players respond to the pose prompts when the music stops.
+   For Bubbles, swipe to move and draw a circle, then release to spin; the
+   phone controller uses portrait orientation.
 6. At the results screen, use **Return to lobby** on the shared PC display to
-   start another session.
+   switch games or start another round. Existing players and LAN services stay
+   connected.
 
-Normal Flash? Pose! supports **2–10 registered players**. The wider lobby can
-hold more players, but players beyond ten cannot currently be included in
-this minigame.
+Both minigames support **2–10 registered players** in normal play. The wider
+lobby can hold more players, but players beyond ten cannot currently be
+included in a round.
 
 The minigame works in Safari, but it currently plays best in Chrome. Chrome is
 recommended for the most consistent phone controls and fullscreen/orientation
@@ -115,18 +118,18 @@ The generated files in `web/public/` are the files Godot serves to phones.
 
 - This is an early local-network prototype, not an internet-hosted service.
   The host PC and phones must be able to reach one another on the same LAN.
-- Flash? Pose! is currently limited to 2–10 players in normal play and one
-  real player in the explicit debug flow. There is no matchmaking, queue, or
-  remote multiplayer service.
+- Flash? Pose! and Bubbles are currently limited to 2–10 players in normal
+  play and one real player in their explicit debug flows. There is no
+  matchmaking, queue, or remote multiplayer service.
 - Reconnecting players keep their registered seat during the configured
   reconnect grace period, but a disconnected phone's held pose is cleared and
   the player must press again after reconnecting.
 - Safari is supported, but Chrome is the preferred browser. Phone-specific
   layout, orientation, and touch behavior still need broader device coverage.
-- The current phone and human-play validation is an MVP-level check, not a
-  guarantee for every phone, browser, Wi-Fi configuration, or accessibility
-  setup. See `DEVELOPMENT.md` for the detailed verification status and
-  troubleshooting notes.
+- The recorded iPhone/Android and human-play check covers Flash? Pose!. Bubbles
+  still needs its owner-led two-phone and game-feel review. No validation here
+  guarantees every phone, browser, Wi-Fi configuration, or accessibility
+  setup. See `DEVELOPMENT.md` for evidence and troubleshooting notes.
 
 ## Project notes
 

@@ -171,6 +171,19 @@ theme_override_constants/separation = 6
 theme_override_constants/h_separation = 16
 theme_override_constants/v_separation = 2
 
+[node name="MinigameTitle" type="Label" parent="PageMargin/Page/Sections/PlayerSection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Minigame"
+horizontal_alignment = 1
+
+[node name="MinigameSelector" type="OptionButton" parent="PageMargin/Page/Sections/PlayerSection"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(360, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+tooltip_text = "Choose which minigame to start for the registered players."
+
 [node name="StartCenter" type="CenterContainer" parent="PageMargin/Page/Sections/PlayerSection"]
 layout_mode = 2
 
@@ -180,7 +193,7 @@ custom_minimum_size = Vector2(360, 60)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 disabled = true
-text = "Start minigame"
+text = "Start selected minigame"
 
 [node name="StartHelp" type="Label" parent="PageMargin/Page/Sections/PlayerSection"]
 unique_name_in_owner = true

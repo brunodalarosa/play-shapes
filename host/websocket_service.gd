@@ -4,8 +4,9 @@ extends Node
 
 signal connection_count_changed(count: int)
 
-const MAX_PACKET_BYTES := 1024
+const MAX_PACKET_BYTES := 8192 # One bounded 128-point Bubbles trace plus protocol envelope.
 const FlashPoseProtocolScript = preload("res://host/flash_pose_protocol.gd")
+const BubblesProtocolScript = preload("res://host/bubbles_protocol.gd")
 
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []
@@ -14,6 +15,8 @@ var _registry: PlayerRegistry
 var _accepting_new_players: Callable
 var _next_id: int = 1
 var _flash_pose_protocol: RefCounted
+var _bubbles_protocol: RefCounted
+var _active_protocol: RefCounted
 
 func start(settings: NetworkingTuning, registry: PlayerRegistry,
 		accepting_new_players: Callable) -> Error:
@@ -31,8 +34,10 @@ func stop() -> void:
 	connection_count_changed.emit(0)
 
 func set_flash_pose_controller(controller: FlashPoseRoundController) -> void:
+	_clear_bubbles_controller()
 	_clear_flash_pose_controller()
 	_flash_pose_protocol = FlashPoseProtocolScript.new(controller)
+	_active_protocol = _flash_pose_protocol
 	controller.phase_changed.connect(_on_flash_pose_phase_changed)
 	controller.genuine_stop_started.connect(_on_flash_pose_challenge)
 	controller.semantic_animation_updated.connect(_on_semantic_state_changed)
@@ -43,6 +48,21 @@ func set_flash_pose_controller(controller: FlashPoseRoundController) -> void:
 func clear_flash_pose_controller(controller: FlashPoseRoundController) -> void:
 	if _flash_pose_protocol != null and _flash_pose_protocol.controller == controller:
 		_clear_flash_pose_controller()
+
+func set_bubbles_controller(controller: BubblesRoundController) -> void:
+	_clear_flash_pose_controller()
+	_clear_bubbles_controller()
+	_bubbles_protocol = BubblesProtocolScript.new(controller)
+	_active_protocol = _bubbles_protocol
+	controller.phase_changed.connect(_on_bubbles_phase_changed)
+	controller.personal_state_changed.connect(_on_bubbles_personal_state_changed)
+	controller.feedback_requested.connect(_on_bubbles_feedback)
+	controller.return_to_lobby_requested.connect(_on_bubbles_return_to_lobby)
+	_broadcast_gameplay_snapshots()
+
+func clear_bubbles_controller(controller: BubblesRoundController) -> void:
+	if _bubbles_protocol != null and _bubbles_protocol.controller == controller:
+		_clear_bubbles_controller()
 
 func send_lobby_state() -> void:
 	for client: Dictionary in _clients:
@@ -60,7 +80,7 @@ func _process(_delta: float) -> void:
 			tcp.disconnect_from_host()
 			continue
 		var peer := WebSocketPeer.new()
-		peer.inbound_buffer_size = 4096
+		peer.inbound_buffer_size = 16384
 		peer.outbound_buffer_size = 4096
 		peer.max_queued_packets = 8
 		peer.heartbeat_interval = 5.0
@@ -124,8 +144,8 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			"reconnect_token": resume.get("reconnect_token"),
 		}
 		if resume.accepted:
-			welcome.gameplay = _flash_pose_protocol.snapshot_for(String(resume.player.player_id)) \
-				if _flash_pose_protocol != null else {"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}
+			welcome.gameplay = _active_protocol.snapshot_for(String(resume.player.player_id)) \
+				if _active_protocol != null else {"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}
 		peer.send_text(JSON.stringify(welcome))
 		_emit_count()
 		return
@@ -154,10 +174,20 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 				_send_rejection(peer, "error", result)
 		"pose_down", "pose_up":
 			var player := _registry.player_for_connection(client.connection_id)
-			var result: Dictionary = _flash_pose_protocol.handle_action(player, message, Time.get_ticks_msec()) \
-				if _flash_pose_protocol != null else {"accepted": false, "code": &"game_unavailable", "message": "Flash? Pose! is not active"}
+			var result: Dictionary = _active_protocol.handle_action(player, message, Time.get_ticks_msec()) \
+				if _active_protocol == _flash_pose_protocol and _flash_pose_protocol != null else {"accepted": false, "code": &"game_unavailable", "message": "Flash? Pose! is not active"}
 			if not result.accepted:
 				_send_rejection(peer, "error", result)
+		"bubbles_trace":
+			var player := _registry.player_for_connection(client.connection_id)
+			var result: Dictionary = _active_protocol.handle_action(player, message, Time.get_ticks_msec()) \
+				if _active_protocol == _bubbles_protocol and _bubbles_protocol != null else {"accepted": false, "code": &"game_unavailable", "message": "Bubbles is not active"}
+			if not result.accepted:
+				_send_rejection(peer, "error", result)
+			else:
+				peer.send_text(JSON.stringify({"type": "bubbles_trace_result", "action": result.action,
+					"reason": result.reason, "charge": 0.0}))
+				_send_gameplay_snapshot(peer, String(player.player_id))
 		_:
 			_send_rejection(peer, "error", {
 				"code": &"unsupported_message",
@@ -172,7 +202,7 @@ func _send_rejection(peer: WebSocketPeer, response_type: String, result: Diction
 	}))
 
 func _send_gameplay_snapshot(peer: WebSocketPeer, player_id: String) -> void:
-	var message: Dictionary = _flash_pose_protocol.snapshot_for(player_id) if _flash_pose_protocol != null \
+	var message: Dictionary = _active_protocol.snapshot_for(player_id) if _active_protocol != null \
 		else {"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}
 	peer.send_text(JSON.stringify(message))
 
@@ -221,6 +251,24 @@ func _on_flash_pose_round_results(results: Dictionary) -> void:
 func _on_flash_pose_return_to_lobby() -> void:
 	send_lobby_state()
 
+func _on_bubbles_phase_changed(_phase: StringName, _snapshot: Dictionary) -> void:
+	_broadcast_gameplay_snapshots()
+
+func _on_bubbles_personal_state_changed(player_id: String, _snapshot: Dictionary) -> void:
+	if _bubbles_protocol != null:
+		_send_to_player(player_id, _bubbles_protocol.snapshot_for(player_id))
+
+func _on_bubbles_feedback(player_id: String, kind: StringName, data: Dictionary) -> void:
+	if _bubbles_protocol == null or kind not in [&"captured", &"spin", &"pop"]:
+		return
+	var message: Dictionary = _bubbles_protocol.feedback_for(player_id, kind, data)
+	if not message.is_empty():
+		_send_to_player(player_id, message)
+
+
+func _on_bubbles_return_to_lobby() -> void:
+	send_lobby_state()
+
 func _clear_flash_pose_controller() -> void:
 	if _flash_pose_protocol == null:
 		return
@@ -232,7 +280,22 @@ func _clear_flash_pose_controller() -> void:
 		if controller.pose_evaluation_resolved.is_connected(_on_flash_pose_results): controller.pose_evaluation_resolved.disconnect(_on_flash_pose_results)
 		if controller.round_results_ready.is_connected(_on_flash_pose_round_results): controller.round_results_ready.disconnect(_on_flash_pose_round_results)
 		if controller.return_to_lobby_requested.is_connected(_on_flash_pose_return_to_lobby): controller.return_to_lobby_requested.disconnect(_on_flash_pose_return_to_lobby)
+	if _active_protocol == _flash_pose_protocol:
+		_active_protocol = null
 	_flash_pose_protocol = null
+
+func _clear_bubbles_controller() -> void:
+	if _bubbles_protocol == null:
+		return
+	var controller: BubblesRoundController = _bubbles_protocol.controller
+	if is_instance_valid(controller):
+		if controller.phase_changed.is_connected(_on_bubbles_phase_changed): controller.phase_changed.disconnect(_on_bubbles_phase_changed)
+		if controller.personal_state_changed.is_connected(_on_bubbles_personal_state_changed): controller.personal_state_changed.disconnect(_on_bubbles_personal_state_changed)
+		if controller.feedback_requested.is_connected(_on_bubbles_feedback): controller.feedback_requested.disconnect(_on_bubbles_feedback)
+		if controller.return_to_lobby_requested.is_connected(_on_bubbles_return_to_lobby): controller.return_to_lobby_requested.disconnect(_on_bubbles_return_to_lobby)
+	if _active_protocol == _bubbles_protocol:
+		_active_protocol = null
+	_bubbles_protocol = null
 
 func _close_replaced_connection(old_connection_id: int, new_connection_id: int) -> void:
 	if old_connection_id == PlayerRegistry.DISCONNECTED or old_connection_id == new_connection_id:

@@ -6,17 +6,20 @@ var id: StringName
 var display_name: String
 var scene_path: String
 var required_feature: String
+var minigame_id: StringName
 
 func _init(
 		new_id: StringName,
 		new_display_name: String,
 		new_scene_path: String,
-		new_required_feature: String = ""
+		new_required_feature: String = "",
+		new_minigame_id: StringName = &""
 ) -> void:
 	id = new_id
 	display_name = new_display_name
 	scene_path = new_scene_path
 	required_feature = new_required_feature
+	minigame_id = new_minigame_id
 
 func availability(features: Dictionary) -> Dictionary:
 	if scene_path.is_empty() or not ResourceLoader.exists(scene_path, "PackedScene"):

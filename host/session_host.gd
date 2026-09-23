@@ -6,6 +6,10 @@ signal players_changed(players: Array[Dictionary])
 
 const FLASH_POSE_SCENE_PATH := "res://minigames/dancer_simon_says.tscn"
 const FLASH_POSE_MAX_PLAYERS := 10
+const BUBBLES_SCENE_PATH := "res://minigames/bubbles_and_jellyfishes.tscn"
+const BUBBLES_MAX_PLAYERS := 10
+const MINIGAME_FLASH_POSE := &"flash_pose"
+const MINIGAME_BUBBLES := &"bubbles"
 
 @export var active_presets: ActivePresets = preload("res://Tuning/Active Presets.tres")
 var settings: NetworkingTuning
@@ -15,7 +19,7 @@ var http: HttpService
 var websocket: WebsocketService
 var player_registry: PlayerRegistry
 var accepting_new_players: bool = false
-var _pending_flash_pose_launch: Dictionary = {}
+var _pending_minigame_launch: Dictionary = {}
 
 func _ready() -> void:
 	settings = active_presets.networking
@@ -36,13 +40,15 @@ func start() -> bool:
 		return true
 	var error := http.start(settings, player_registry.session_id)
 	if error != OK:
-		startup_error = "Could not start HTTP on port %d: %s" % [settings.http_port, error_string(error)]
+		startup_error = http.startup_error
+		if startup_error.is_empty():
+			startup_error = "Could not start HTTP service: %s" % error_string(error)
 		http.stop()
 		return false
 	error = websocket.start(settings, player_registry, func() -> bool: return accepting_new_players)
 	if error != OK:
 		http.stop()
-		startup_error = "Could not start WebSocket on port %d: %s" % [settings.websocket_port, error_string(error)]
+		startup_error = "Could not listen for WebSocket on port %d: %s" % [settings.websocket_port, error_string(error)]
 		return false
 	running = true
 	startup_error = ""
@@ -79,7 +85,24 @@ func set_accepting_new_players(accepting: bool) -> void:
 func players() -> Array[Dictionary]:
 	return player_registry.public_players()
 
-func flash_pose_availability(allow_one_player_debug := false) -> Dictionary:
+func minigame_scene_path(minigame_id: StringName) -> String:
+	match minigame_id:
+		MINIGAME_FLASH_POSE:
+			return FLASH_POSE_SCENE_PATH
+		MINIGAME_BUBBLES:
+			return BUBBLES_SCENE_PATH
+	return ""
+
+
+func minigame_availability(minigame_id: StringName, allow_one_player_debug := false) -> Dictionary:
+	var maximum_players := 0
+	match minigame_id:
+		MINIGAME_FLASH_POSE:
+			maximum_players = FLASH_POSE_MAX_PLAYERS
+		MINIGAME_BUBBLES:
+			maximum_players = BUBBLES_MAX_PLAYERS
+		_:
+			return {"available": false, "reason": "Choose a supported minigame"}
 	var player_count := players().size()
 	if allow_one_player_debug:
 		if player_count != 1:
@@ -92,33 +115,84 @@ func flash_pose_availability(allow_one_player_debug := false) -> Dictionary:
 			"available": false,
 			"reason": "At least 2 registered players are needed",
 		}
-	if player_count > FLASH_POSE_MAX_PLAYERS:
+	if player_count > maximum_players:
 		return {
 			"available": false,
-			"reason": "Flash? Pose! supports up to %d players" % FLASH_POSE_MAX_PLAYERS,
+			"reason": "%s supports up to %d players" % [minigame_display_name(minigame_id), maximum_players],
 		}
 	return {"available": true, "reason": ""}
 
-func prepare_flash_pose_launch(allow_one_player_debug := false) -> Dictionary:
-	var availability := flash_pose_availability(allow_one_player_debug)
+
+func minigame_display_name(minigame_id: StringName) -> String:
+	match minigame_id:
+		MINIGAME_FLASH_POSE:
+			return "Flash? Pose!"
+		MINIGAME_BUBBLES:
+			return "Bubbles and Jellyfishes"
+	return "Minigame"
+
+
+func prepare_minigame_launch(minigame_id: StringName, allow_one_player_debug := false) -> Dictionary:
+	if minigame_scene_path(minigame_id).is_empty():
+		return {"accepted": false, "reason": "Choose a supported minigame"}
+	var availability := minigame_availability(minigame_id, allow_one_player_debug)
 	if not bool(availability.available):
 		return {"accepted": false, "reason": availability.reason}
 	# Snapshot before leaving the lobby so later registry changes cannot alter the
 	# participant list. Connectivity changes still reach the scene controller.
-	_pending_flash_pose_launch = {
+	_pending_minigame_launch = {
+		"minigame_id": minigame_id,
 		"participants": players().duplicate(true),
 		"allow_one_player_debug": allow_one_player_debug,
 	}
 	set_accepting_new_players(false)
 	return {"accepted": true}
 
-func consume_flash_pose_launch() -> Dictionary:
-	var launch := _pending_flash_pose_launch
-	_pending_flash_pose_launch = {}
+func consume_minigame_launch(minigame_id: StringName) -> Dictionary:
+	if StringName(_pending_minigame_launch.get("minigame_id", &"")) != minigame_id:
+		return {}
+	var launch := _pending_minigame_launch
+	_pending_minigame_launch = {}
 	return launch
 
+
+func clear_minigame_launch(minigame_id: StringName = &"") -> void:
+	if minigame_id.is_empty() or StringName(_pending_minigame_launch.get("minigame_id", &"")) == minigame_id:
+		_pending_minigame_launch = {}
+
+
+# Keep the existing Flash? Pose! entry points while both games share one gate
+# and one launch snapshot contract.
+func flash_pose_availability(allow_one_player_debug := false) -> Dictionary:
+	return minigame_availability(MINIGAME_FLASH_POSE, allow_one_player_debug)
+
+
+func bubbles_availability(allow_one_player_debug := false) -> Dictionary:
+	return minigame_availability(MINIGAME_BUBBLES, allow_one_player_debug)
+
+
+func prepare_flash_pose_launch(allow_one_player_debug := false) -> Dictionary:
+	return prepare_minigame_launch(MINIGAME_FLASH_POSE, allow_one_player_debug)
+
+
+func prepare_bubbles_launch(allow_one_player_debug := false) -> Dictionary:
+	return prepare_minigame_launch(MINIGAME_BUBBLES, allow_one_player_debug)
+
+
+func consume_flash_pose_launch() -> Dictionary:
+	return consume_minigame_launch(MINIGAME_FLASH_POSE)
+
+
+func consume_bubbles_launch() -> Dictionary:
+	return consume_minigame_launch(MINIGAME_BUBBLES)
+
+
 func clear_flash_pose_launch() -> void:
-	_pending_flash_pose_launch = {}
+	clear_minigame_launch(MINIGAME_FLASH_POSE)
+
+
+func clear_bubbles_launch() -> void:
+	clear_minigame_launch(MINIGAME_BUBBLES)
 
 func send_players_to_lobby() -> void:
 	if websocket != null:
@@ -131,6 +205,14 @@ func register_flash_pose_controller(controller: FlashPoseRoundController) -> voi
 func unregister_flash_pose_controller(controller: FlashPoseRoundController) -> void:
 	if websocket != null:
 		websocket.clear_flash_pose_controller(controller)
+
+func register_bubbles_controller(controller: BubblesRoundController) -> void:
+	if websocket != null:
+		websocket.set_bubbles_controller(controller)
+
+func unregister_bubbles_controller(controller: BubblesRoundController) -> void:
+	if websocket != null:
+		websocket.clear_bubbles_controller(controller)
 
 func _on_players_changed() -> void:
 	var public_players := player_registry.public_players()

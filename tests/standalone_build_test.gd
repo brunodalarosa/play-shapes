@@ -14,7 +14,11 @@ func _init() -> void:
 	_check(Policy.validate_owned_paths(ProjectSettings.globalize_path("res://")).is_empty(), "owned build paths stay below builds/standalone")
 	_check(Policy.STAGING_RELATIVE == "builds/standalone/windows-x86_64", "staging path is stable")
 	_check(Policy.ZIP_RELATIVE == "builds/standalone/Play-Shapes-windows-x86_64.zip", "ZIP path is stable")
-	_check(Policy.REQUIRED_BROWSER_PATHS.size() == 4, "all four HttpService browser routes are required")
+	_check(Policy.REQUIRED_BROWSER_PATHS.size() == 5 and Policy.REQUIRED_BROWSER_PATHS.has("web/public/bubbles_gesture.js"), "every browser module is required in the PCK")
+	_check(Policy.REQUIRED_RUNTIME_PATHS.has("minigames/bubbles_and_jellyfishes.tscn") \
+		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/bgm/Beach_music.ogg") \
+		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/sfxs/woosh4.ogg"),
+		"Bubbles scene, music, and sound effects remain in the standalone PCK")
 	_check(Policy.REQUIRED_RUNTIME_PATHS.has("addons/kenyoni/qr_code/qr_code_rect.gd"), "runtime QR addon remains inside the export boundary")
 	_check(Policy.validate_templates("res://tests/missing-release.exe", "res://tests/missing-debug.exe").contains("Manage Export Templates"), "missing-template error is actionable")
 	_check(Policy.validate_export_result(7, "missing.exe", "missing.pck", "synthetic export failure").contains("exit code 7"), "export errors retain the exit code")
@@ -29,7 +33,10 @@ func _init() -> void:
 		"Play-Shapes-windows-x86_64/Play Shapes.pck",
 		"Play-Shapes-windows-x86_64/build-info.json",
 	], "ZIP layout contains only the portable executable, external PCK, and metadata")
-	var synthetic_pack := "prefix web/public/index.html web/public/app.js web/public/controller_geometry.js web/public/style.css suffix".to_utf8_buffer()
+	var synthetic_pack_text := "prefix"
+	for path in Policy.REQUIRED_BROWSER_PATHS:
+		synthetic_pack_text += " %s" % path
+	var synthetic_pack := (synthetic_pack_text + " suffix").to_utf8_buffer()
 	for path in Policy.REQUIRED_BROWSER_PATHS:
 		_check(Policy._bytes_contain(synthetic_pack, path.to_utf8_buffer()), "pack verifier finds %s" % path)
 	var plugin_source := FileAccess.get_file_as_string("res://addons/standalone_build/standalone_build_plugin.gd")

@@ -9,6 +9,7 @@ h1 { font-size: clamp(34px, 10vw, 52px); margin-block: 20px; }
 h2 { font-size: clamp(28px, 8vw, 38px); margin-block: 8px 16px; overflow-wrap: anywhere; }
 p { line-height: 1.6; }
 .status, #player-card, #game-card { padding: 18px; border: 1px solid #587567; border-radius: 12px; background: #172820; }
+.status, #bubbles-card { padding: 18px; border: 1px solid #587567; border-radius: 12px; background: #172820; }
 form { display: grid; gap: 12px; text-align: start; margin-block-start: 20px; }
 label { font-weight: 700; }
 input, button { min-block-size: 48px; inline-size: 100%; border-radius: 10px; font: inherit; }
@@ -19,6 +20,7 @@ input:focus-visible, button:focus-visible { outline: 3px solid #ffd166; outline-
 button:disabled { cursor: wait; opacity: .65; }
 #player-card { margin-block-start: 20px; }
 #game-card { margin-block-start: 20px; }
+#bubbles-card { margin-block-start: 20px; }
 .lives { min-block-size: 1.6em; font-size: 20px; font-weight: 800; }
 .pose-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(10px, 3vw, 16px); margin-block-start: 18px; touch-action: none; user-select: none; }
 .pose-button, .pose-button * { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
@@ -32,6 +34,7 @@ button:disabled { cursor: wait; opacity: .65; }
 .pose-button:disabled { cursor: not-allowed; opacity: .42; }
 .rotate-state { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left)); background: #0e131f; color: #fff; font-size: clamp(28px, 8vw, 56px); font-weight: 850; text-align: center; }
 .eyebrow { margin: 0; color: #b8c1cf; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+.debug-badge { inline-size: fit-content; margin: 4px auto 12px; padding: 4px 12px; border: 1px solid #ffd166; border-radius: 999px; color: #ffd166; font-size: 13px; font-weight: 850; letter-spacing: .08em; }
 #player-state { font-weight: 700; }
 .footnote { margin-block-start: 40px; color: #b8c1cf; font-size: 13px; }
 [hidden] { display: none !important; }
@@ -39,12 +42,38 @@ button:disabled { cursor: wait; opacity: .65; }
 html.gameplay-active, html.gameplay-active body { inline-size: 100%; block-size: 100%; min-block-size: 100%; overflow: hidden; position: fixed; inset: 0; }
 html.gameplay-active body { display: block; padding: 0; touch-action: none; }
 html.gameplay-active main, html.gameplay-active #game-card { inline-size: 100%; max-inline-size: none; block-size: 100%; padding: 0; margin: 0; border: 0; border-radius: 0; background: #000; }
-html.gameplay-active main > :not(#game-card), html.gameplay-active #game-card > :not(.pose-grid):not(.rotate-state) { position: absolute !important; inline-size: 1px !important; block-size: 1px !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; clip-path: inset(50%) !important; white-space: nowrap !important; }
+html.gameplay-active:not(.bubbles-active) main > :not(#game-card), html.gameplay-active #game-card > :not(.pose-grid):not(.rotate-state) { position: absolute !important; inline-size: 1px !important; block-size: 1px !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; clip-path: inset(50%) !important; white-space: nowrap !important; }
 html.gameplay-active .pose-grid { position: fixed; inset: 0; inline-size: 100%; block-size: 100%; margin: 0; display: block; overflow: hidden; background: #000; touch-action: none; }
 html.gameplay-active .pose-button { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; min-block-size: 0; aspect-ratio: auto; padding: 0; border: 1px solid rgb(255 255 255 / .7); border-radius: 0; display: grid; place-items: center; color: #fff; text-shadow: 0 2px 5px rgb(0 0 0 / .8); transition: background-color 80ms linear, filter 80ms linear; -webkit-tap-highlight-color: transparent; }
 html.gameplay-active .pose-button .icon { font-size: clamp(64px, 17vmin, 144px); line-height: 1; transform: translate(var(--arrow-x, 0), var(--arrow-y, 0)); }
 html.gameplay-active .pose-button.is-held { border-color: #fff; box-shadow: inset 0 0 0 4px rgb(255 255 255 / .85); transform: none; }
 html.gameplay-active .pose-button:focus-visible { z-index: 2; outline: 5px solid #fff; outline-offset: -8px; }
+
+html.bubbles-active main, html.bubbles-active #bubbles-card { inline-size: 100%; max-inline-size: none; block-size: 100%; padding: 0; margin: 0; border: 0; border-radius: 0; background: #113850; }
+html.bubbles-active main > :not(#bubbles-card), html.bubbles-active #bubbles-heading { position: absolute !important; inline-size: 1px !important; block-size: 1px !important; overflow: hidden !important; clip-path: inset(50%) !important; white-space: nowrap !important; }
+html.bubbles-active #bubbles-pad { position: fixed; inset: 0; display: grid; place-items: center; touch-action: none; user-select: none; -webkit-user-select: none; overflow: hidden; background: radial-gradient(circle at 50% 48%, #276a82, #10354e 72%); }
+html.bubbles-active #bubbles-pad:focus-visible { outline: 5px solid #ffd166; outline-offset: -8px; }
+html.bubbles-active #bubbles-debug { position: absolute; top: max(8px, env(safe-area-inset-top)); left: 50%; z-index: 4; inline-size: max-content; max-inline-size: calc(100vw - 32px); margin: 0; transform: translateX(-50%); pointer-events: none; white-space: nowrap; }
+html.bubbles-active.bubbles-debug-active .bubbles-hud { top: max(52px, calc(env(safe-area-inset-top) + 44px)); }
+html.bubbles-active.bubbles-debug-active #bubbles-status { top: max(90px, calc(env(safe-area-inset-top) + 82px)); }
+.bubbles-hud { position: absolute; top: max(18px, env(safe-area-inset-top)); inset-inline: 20px; display: flex; justify-content: space-between; gap: 12px; text-align: start; font-weight: 800; z-index: 2; }
+#bubbles-score { font-size: clamp(21px, 6vw, 30px); }
+#bubbles-state { font-size: clamp(15px, 4vw, 20px); text-align: end; }
+.bubbles-replica { position: relative; inline-size: min(62vw, 35vh, 230px); aspect-ratio: 1; border: 5px solid #c3efff; border-radius: 50%; background: rgb(133 220 250 / .16); box-shadow: inset -18px -20px 28px rgb(16 64 105 / .28), 0 0 24px rgb(123 221 255 / .22); display: grid; place-items: center; transform: scale(var(--bubble-scale, 1)); transition: transform 100ms ease; }
+.bubbles-character { inline-size: 43%; aspect-ratio: 1; background: var(--shape-color, #5b8df2); border-radius: 50%; position: relative; display: flex; justify-content: center; align-items: center; gap: 16%; box-shadow: 0 8px 0 rgb(0 0 0 / .16); }
+.bubbles-character.square { border-radius: 17%; }
+.bubbles-character.triangle { clip-path: polygon(50% 0, 100% 95%, 0 95%); padding-top: 24%; }
+.bubbles-character i { display: block; inline-size: 12%; aspect-ratio: 1; border-radius: 50%; background: #fff; box-shadow: 1px 1px 0 2px #182b45; }
+.bubbles-captured { position: absolute; inset: 0; pointer-events: none; }
+.bubbles-captured img { position: absolute; inline-size: clamp(20px, 5vw, 30px); block-size: auto; transform: translate(-50%, -50%); }
+.bubbles-meter { position: absolute; inline-size: min(70vw, 40vh, 260px); overflow: visible; transform: rotate(-90deg); pointer-events: none; }
+.bubbles-meter circle { fill: none; stroke-width: 8; }
+.meter-track { stroke: rgb(255 255 255 / .28); }
+.meter-fill { stroke: #ffe18d; stroke-linecap: round; stroke-dasharray: 635; stroke-dashoffset: var(--meter-offset, 635); transition: stroke-dashoffset 80ms linear; }
+.bubbles-help { position: absolute; bottom: max(22px, env(safe-area-inset-bottom)); inset-inline: 20px; font-size: clamp(15px, 4vw, 20px); font-weight: 750; line-height: 1.3; pointer-events: none; }
+#bubbles-status { position: fixed; top: 60px; inset-inline: 22px; z-index: 3; pointer-events: none; font-size: 17px; font-weight: 800; }
+html.bubbles-active #bubbles-rotate { display: grid; }
+html.bubbles-active .footnote { display: none; }
 
 .pose-grid[data-count="2"] [data-direction="left"] { clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); --arrow-x: -25vw; }
 .pose-grid[data-count="2"] [data-direction="right"] { clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%); --arrow-x: 25vw; }
@@ -62,6 +91,7 @@ html.gameplay-active .pose-button:focus-visible { z-index: 2; outline: 5px solid
 }
 
 @media (prefers-reduced-motion: reduce) { .pose-button { transition: none !important; } }
+@media (prefers-reduced-motion: reduce) { .bubbles-replica, .meter-fill { transition: none !important; } }
 @media (max-height: 620px) {
   body { align-items: start; }
   main { padding-block: 12px; }
