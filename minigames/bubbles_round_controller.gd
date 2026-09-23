@@ -22,6 +22,7 @@ var _debug_one_player := false
 var _last_host_msec := -1
 var _instruction_deadline_msec := -1
 var _countdown_deadline_msec := -1
+var _active_start_msec := -1
 var _finish_msec := -1
 var _frozen_results: Dictionary = {}
 var _random := RandomNumberGenerator.new()
@@ -119,7 +120,8 @@ func advance(host_time_msec: int) -> Dictionary:
 		return _reject(&"non_monotonic_host_time")
 	_last_host_msec = host_time_msec
 	if phase == Phase.COUNTDOWN and host_time_msec >= _countdown_deadline_msec:
-		_finish_msec = _countdown_deadline_msec + roundi(tuning.round_duration_seconds * 1000.0)
+		_active_start_msec = _countdown_deadline_msec
+		_finish_msec = _active_start_msec + roundi(tuning.round_duration_seconds * 1000.0)
 		_transition(Phase.ACTIVE)
 	if phase == Phase.ACTIVE and host_time_msec >= _finish_msec:
 		_freeze_results()
@@ -219,6 +221,14 @@ func request_return_to_lobby() -> bool:
 
 func phase_name() -> StringName:
 	return PHASE_NAMES[phase]
+
+
+func active_start_msec() -> int:
+	return _active_start_msec
+
+
+func last_host_time_msec() -> int:
+	return _last_host_msec
 
 
 func player_snapshot() -> Dictionary:

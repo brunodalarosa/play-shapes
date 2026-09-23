@@ -48,6 +48,10 @@ func get_bubble(player_id: String) -> BubblesPlayerBubble:
 	return _bubbles.get(player_id) as BubblesPlayerBubble
 
 
+func bubble_ids() -> Array[String]:
+	return _ordered_ids.duplicate()
+
+
 ## Caller supplies the host clock and a fixed delta, normally 1/60 second.
 func simulate_step(delta: float, host_time_msec: int) -> bool:
 	if _controller == null or not is_finite(delta) or delta < 0.0 or delta > 0.05 or host_time_msec < 0:

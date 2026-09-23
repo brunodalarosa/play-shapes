@@ -1,6 +1,8 @@
 class_name BubblesPlayerVisual
 extends Node2D
-## Code-drawn bubble and temporary captured-jellyfish markers. Never decides rules.
+## Code-drawn bubble with approved small jellyfish art. Never decides rules.
+
+const SMALL_JELLYFISH: Texture2D = preload("res://assets/runtime/minigames/bubbles_and_jellyfishes/jellyfish/jellyfish_small.png")
 
 var radius := 48.0
 var captured_visual_count := 0
@@ -26,10 +28,9 @@ func _draw() -> void:
 		var turn := float(index) * 2.39996323
 		var distance := sqrt((float(index) + 0.5) / float(maxi(captured_visual_count, 1))) * radius * 0.67
 		var center := Vector2(cos(turn), sin(turn)) * distance
-		var size := clampf(radius * 0.075, 3.0, 7.0)
-		draw_circle(center, size, Color(0.61, 0.48, 0.95, 0.72), true, -1.0, true)
-		draw_line(center + Vector2(-size * 0.4, size * 0.4), center + Vector2(-size * 0.55, size * 1.6), Color(0.84, 0.72, 1.0, 0.8), 1.5, true)
-		draw_line(center + Vector2(size * 0.4, size * 0.4), center + Vector2(size * 0.55, size * 1.6), Color(0.84, 0.72, 1.0, 0.8), 1.5, true)
+		var width := clampf(radius * 0.25, 22.0, 32.0)
+		var size := Vector2(width, width * float(SMALL_JELLYFISH.get_height()) / float(SMALL_JELLYFISH.get_width()))
+		draw_texture_rect(SMALL_JELLYFISH, Rect2(center - size * 0.5, size), false, Color(1.0, 1.0, 1.0, 0.82))
 	if spinning:
 		draw_arc(Vector2.ZERO, radius + 9.0, -0.3, 1.6, 24, Color(0.98, 0.91, 0.52, 0.95), 4.0, true)
 		draw_arc(Vector2.ZERO, radius + 9.0, PI - 0.3, PI + 1.6, 24, Color(0.98, 0.91, 0.52, 0.95), 4.0, true)

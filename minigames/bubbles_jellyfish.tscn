@@ -1,0 +1,22 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://minigames/bubbles_jellyfish.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/runtime/minigames/bubbles_and_jellyfishes/jellyfish/jellyfish.png" id="2"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_jellyfish"]
+radius = 14.0
+
+[node name="BubblesJellyfish" type="Area2D"]
+texture_filter = 4
+texture_repeat = 1
+collision_layer = 32
+collision_mask = 0
+monitoring = false
+monitorable = false
+script = ExtResource("1")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_jellyfish")
