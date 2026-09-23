@@ -7,6 +7,8 @@ const ASSETS: Dictionary = {
 "/": ["res://web/public/index.html", "text/html; charset=utf-8"],
 "/app.js": ["res://web/public/app.js", "text/javascript; charset=utf-8"],
 "/controller_geometry.js": ["res://web/public/controller_geometry.js", "text/javascript; charset=utf-8"],
+"/bubbles_gesture.js": ["res://web/public/bubbles_gesture.js", "text/javascript; charset=utf-8"],
+"/bubbles-jellyfish.png": ["res://assets/runtime/minigames/bubbles_and_jellyfishes/jellyfish/jellyfish_small.png", "image/png"],
 "/style.css": ["res://web/public/style.css", "text/css; charset=utf-8"],
 }
 var _server: TCPServer = TCPServer.new()
@@ -43,13 +45,17 @@ func _process(_delta: float) -> void:
 			peer.disconnect_from_host()
 		else:
 			_clients.append({"peer": peer, "input": PackedByteArray(),
-				"output": PackedByteArray(), "sent": 0, "created": Time.get_ticks_msec()})
+				"output": PackedByteArray(), "sent": 0, "created": Time.get_ticks_msec(), "finished": -1})
 	for index: int in range(_clients.size() - 1, -1, -1):
 		var client: Dictionary = _clients[index]
 		var peer: StreamPeerTCP = client.peer
 		peer.poll()
 		if peer.get_status() != StreamPeerTCP.STATUS_CONNECTED or Time.get_ticks_msec() - client.created > _settings.request_timeout_seconds * 1000:
 			_drop(index)
+			continue
+		if client.finished >= 0:
+			if Time.get_ticks_msec() - client.finished >= 100:
+				_drop(index)
 			continue
 		if client.output.is_empty():
 			var available := peer.get_available_bytes()
@@ -70,8 +76,10 @@ func _process(_delta: float) -> void:
 				_drop(index)
 				continue
 			client.sent += write[1]
+			if write[1] > 0:
+				client.created = Time.get_ticks_msec() # Timeout measures stalls, not total transfer time.
 			if client.sent == client.output.size():
-				_drop(index)
+				client.finished = Time.get_ticks_msec() # Let TCP flush before closing a larger asset response.
 
 func _drop(index: int) -> void:
 	_clients[index].peer.disconnect_from_host()

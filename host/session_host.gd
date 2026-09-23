@@ -132,6 +132,14 @@ func unregister_flash_pose_controller(controller: FlashPoseRoundController) -> v
 	if websocket != null:
 		websocket.clear_flash_pose_controller(controller)
 
+func register_bubbles_controller(controller: BubblesRoundController) -> void:
+	if websocket != null:
+		websocket.set_bubbles_controller(controller)
+
+func unregister_bubbles_controller(controller: BubblesRoundController) -> void:
+	if websocket != null:
+		websocket.clear_bubbles_controller(controller)
+
 func _on_players_changed() -> void:
 	var public_players := player_registry.public_players()
 	players_changed.emit(public_players)

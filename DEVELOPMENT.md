@@ -53,11 +53,12 @@ Normal play starts with 2–10 registered players. For debug, register exactly o
 - `host/player_registry.gd` owns session/player/token identities, names, capacity, reconnect grace, resume, and explicit leave.
 - `scenes/lobby.*` owns the responsive lobby, QR/address controls, roster, and host-only start gate. The roster switches to two columns above ten players and fits the supported 20 without page scrolling.
 - `minigames/flash_pose_round_controller.gd` owns phases, timing, targets, two normal-play lives, elimination, withdrawal, and ranking. It delegates pose truth to `host/pose_evaluation_rules.gd`.
-- `minigames/bubbles_round_controller.gd` owns the separate Bubbles instructions/countdown/active/results lifecycle, score and pop state, host-time finish freeze, and snapshots keyed by player ID. `bubbles_gesture_classifier.gd` validates and classifies one completed normalized trace. Browser packets and presentation are later integrations; no Bubbles scene is launched yet.
+- `minigames/bubbles_round_controller.gd` owns the separate Bubbles instructions/countdown/active/results lifecycle, score and pop state, host-time finish freeze, and snapshots keyed by player ID. `bubbles_gesture_classifier.gd` validates and classifies one completed normalized trace. Shared-screen presentation and a playable Bubbles scene are later integrations.
 - `minigames/bubbles_player_bubble.tscn` reuses `ShapeCharacter` in a code-drawn translucent bubble with a per-instance circle collider, capped approved small-jellyfish art, and readable name. `bubbles_player_arena.gd` creates 1–10 bodies and steps movement, invisible bounds, and player pairs in sorted player-ID order. Call `setup(controller, bounds)`, then `add_bubble(player_id, position)` from the controller's participant snapshot; call `simulate_step(fixed_delta, host_time_msec)` from the host physics loop (normally 1/60 second, maximum 0.05). The arena settles the controller clock before movement, so exact-zero results freeze first. Bodies consume only the controller's accepted swipe/spin/pop signals and score snapshots.
 - `minigames/bubbles_creature_arena.gd` owns free jellyfish and pufferfish scenes, initial safe spawns, alternating waves, warning/crossing paths, and host-time collection/hit checks. After player bodies are added, call `setup(controller, player_arena)` before `complete_entrance()`. Each fixed host step calls the player arena first, then `creature_arena.simulate_step(fixed_delta, host_time_msec)` with the same time. The controller alone accepts collections and pops; creature sprites never decide rules. Free jellyfish obey the tuning cap, including scatter after a pop; overflow is reported by `jellyfish_scattered` and discarded. This is a reusable component, not yet a standalone playable Bubbles scene.
 - `minigames/flash_pose_presentation.gd` owns shared-screen animation, audio, flash, feedback, and the persistent `WINNERS`/`LOSERS` results view. It consumes semantic outcomes and never infers rules from sprite transforms.
 - `host/flash_pose_protocol.gd` is the narrow gameplay protocol adapter.
+- `host/bubbles_protocol.gd` validates completed normalized traces and makes personalized Bubbles snapshots. `WebsocketService` keeps one active protocol at a time; a future Bubbles scene calls `SessionHost.register_bubbles_controller(controller)` on entry and `unregister_bubbles_controller(controller)` on exit. The browser never supplies player ID or host time. Bubbles has no playable host scene yet.
 - `characters/hybrid_character_animator.gd` consumes semantic dance, pose, reaction, elimination, and result states. Gameplay must not manipulate child sprites or inspect animation frames to decide outcomes.
 - `debug/` contains the non-pausing F12 scenario catalog and debug scenes. The launcher remains present in development exports.
 - `Tuning/` contains the active selector, named resources, guide, and experiment template. There is no runtime tuning UI.
@@ -77,9 +78,9 @@ Defaults in `Tuning/Shared/Networking/Default.tres`:
 - 32 transport connections per service; 20 registered players
 - five-second request/handshake timeout; 60-second reconnect grace
 
-`GET /session.json` returns protocol and WebSocket port. The browser uses the page hostname for `ws://HOST:PORT`. Fixed HTTP routes are `/`, `/app.js`, `/controller_geometry.js`, `/style.css`, and `/session.json`. Unknown routes return 404; non-GET methods return 405; headers beyond 8192 bytes are rejected with 431 or a TCP reset when unread bytes remain on Windows.
+`GET /session.json` returns protocol and WebSocket port. The browser uses the page hostname for `ws://HOST:PORT`. Fixed HTTP routes are `/`, `/app.js`, `/controller_geometry.js`, `/bubbles_gesture.js`, `/bubbles-jellyfish.png`, `/style.css`, and `/session.json`. Unknown routes return 404; non-GET methods return 405; headers beyond 8192 bytes are rejected with 431 or a TCP reset when unread bytes remain on Windows. Responses close after the final bytes have time to flush, so the larger jellyfish PNG loads completely.
 
-Protocol 1 begins with `hello`/`welcome`, then supports join, resume, leave, and personalized lobby/gameplay state. The registry deliberately separates transport `connection_id`, host-owned session-scoped `player_id`, host-owned `session_id`, and opaque browser-held reconnect token. The browser stores only the session ID, token, last-used name, and monotonically increasing gameplay sequence needed to resume safely. A client-supplied player ID has no authority. New joins are lobby-only; valid resumes remain available during gameplay. Disconnect clears a held pose; resume requires a new press.
+Protocol 1 begins with `hello`/`welcome`, then supports join, resume, leave, and personalized lobby/gameplay state. The registry deliberately separates transport `connection_id`, host-owned session-scoped `player_id`, host-owned `session_id`, and opaque browser-held reconnect token. The browser stores only the session ID, token, last-used name, and monotonically increasing gameplay sequence needed to resume safely. A client-supplied player ID has no authority. New joins are lobby-only; valid resumes remain available during gameplay. Disconnect clears a held pose or unfinished Bubbles trace; resume requires a new gesture. Bubbles sends one `bubbles_trace` (at most 128 normalized points, 8192-byte packet ceiling) on touch release. The host replies with `bubbles_trace_result` and a `bubbles_snapshot`; `bubbles_feedback` carries collection, spin, and pop cues. Reconnect embeds the latest personalized snapshot in `welcome.gameplay`.
 
 The only phone-to-host Flash? Pose! gameplay payload is:
 
@@ -125,9 +126,9 @@ npm.cmd test
 cd ..
 ```
 
-Every top-level module imported by `app.js` must also appear in the explicit `HttpService` allowlist and release filter. A 200 response for `/app.js` does not prove its module graph works: a missing `/controller_geometry.js` previously left phones forever at `Connecting to the host…`.
+Every top-level module imported by `app.js` must also appear in the explicit `HttpService` allowlist and release filter. A 200 response for `/app.js` does not prove its module graph works: a missing `/controller_geometry.js` previously left phones forever at `Connecting to the host…`. The export presets already include `web/public/*.js`; served tests request both imported modules and the Bubbles art route.
 
-The active phone surface is fixed, non-scrolling, and landscape-oriented. The browser attempts fullscreen/orientation lock once after a user gesture; denial or unsupported APIs are valid fallbacks. Portrait active play shows `Rotate your phone`. Safari works, but Chrome currently provides the most consistent fullscreen/orientation behavior.
+The Flash? Pose! phone surface remains fixed, non-scrolling, and landscape-oriented. The Bubbles surface is a full-screen portrait touch area with exact host score, capped decorative jellyfish, and a visual spin meter. The browser attempts fullscreen/orientation lock after a gesture eligible for that game, unlocks when returning to lobby, and adjusts the lock on game changes; denial or unsupported APIs are valid fallbacks. The opposite orientation shows a rotate prompt. Safari works, but Chrome currently provides the most consistent fullscreen/orientation behavior.
 
 ## Windows standalone build
 
@@ -166,6 +167,8 @@ godot --headless --path . --script res://tests/bubbles_gesture_classifier_test.g
 godot --headless --path . --script res://tests/bubbles_round_controller_test.gd
 godot --headless --path . --script res://tests/bubbles_player_physics_test.gd
 godot --headless --path . --script res://tests/bubbles_creature_arena_test.gd
+godot --headless --path . --script res://tests/bubbles_protocol_test.gd
+godot --headless --path . --script res://tests/active_minigame_protocol_test.gd
 godot --headless --path . --script res://tests/flash_pose_protocol_test.gd
 godot --headless --path . --script res://tests/flash_pose_presentation_test.gd
 godot --headless --path . --script res://tests/flash_pose_flow_test.gd
@@ -183,6 +186,7 @@ godot --headless --editor --path . --script res://tests/standalone_build_editor_
 Run visual helpers only when their output will be inspected; they write ignored artifacts under `test-results/`. A normal-profile editor load may emit forced-shutdown RID/ObjectDB cleanup warnings after a successful scan. Treat exit zero plus no script/import error as the result; do not confuse cache/profile permission failures with product failures.
 For isolated Bubbles player-component review, `godot --path . --script res://tests/bubbles_player_visual_check.gd` uses the Compatibility renderer and saves small/grown/spinning, pop/re-form, and ten-player captures under ignored `test-results/ps-042/`. These are component renders, not a composed arena or human feel evidence.
 For isolated Bubbles creature review, `godot --path . --rendering-method gl_compatibility --script res://tests/bubbles_creature_visual_check.gd` saves entrance/warning, active creatures, and white-blinking scatter captures under ignored `test-results/ps-043/`. These renders do not establish collision fairness or a complete scene.
+For a local desktop-browser phone preview, run `godot --headless --path . --script res://tests/bubbles_phone_preview.gd`, then join at `http://127.0.0.1:8080`. It starts a one-player Bubbles protocol fixture with eight collected jellyfish. Stop it before starting normal play. The browser/host suite runs the same fixture on separate ports; neither preview represents a playable arena or physical-phone validation.
 
 ## Networking, export, and operational warnings
 

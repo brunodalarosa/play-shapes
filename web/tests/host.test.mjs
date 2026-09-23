@@ -51,12 +51,17 @@ test('serves bundled HTML, JS, CSS and session configuration', async () => {
   for (const [path, mime, text] of [
     ['/', 'text/html', 'Join game'], ['/app.js', 'text/javascript', 'localStorage'],
     ['/controller_geometry.js', 'text/javascript', 'directionAtPoint'],
+    ['/bubbles_gesture.js', 'text/javascript', 'GestureTrace'],
+    ['/bubbles-jellyfish.png', 'image/png', null],
     ['/style.css', 'text/css', 'focus-visible'], ['/session.json', 'application/json', 'session_id']
   ]) {
-    const response = await fetch(base + path);
-    assert.equal(response.status, 200);
-    assert.ok(response.headers.get('content-type').startsWith(mime));
-    assert.ok((await response.text()).includes(text));
+    try {
+      const response = await fetch(base + path);
+      assert.equal(response.status, 200);
+      assert.ok(response.headers.get('content-type').startsWith(mime));
+      if (text) assert.ok((await response.text()).includes(text));
+      else await response.arrayBuffer();
+    } catch (error) { throw new Error(`Failed to serve ${path}`, { cause: error }); }
   }
 });
 
@@ -88,6 +93,19 @@ test('Flash Pose controller exposes accessible hold controls and cancellation ha
   assert.ok(js.includes("You've been eliminated :(") );
   assert.ok(js.includes('requestFullscreen'));
   assert.ok(js.includes('flash_pose_charge'));
+});
+
+test('Bubbles controller exposes portrait touch, score, live feedback, and cancel paths', async () => {
+  const html = await (await fetch(base)).text();
+  const css = await (await fetch(base + '/style.css')).text();
+  const js = await (await fetch(base + '/app.js')).text();
+  assert.match(html, /id="bubbles-pad"[^>]*role="button"[^>]*tabindex="0"[^>]*aria-label=/);
+  assert.match(html, /id="bubbles-status"[^>]*aria-live="polite"/);
+  assert.match(html, /id="bubbles-score"/);
+  assert.match(css, /html\.bubbles-active/);
+  for (const expected of ['bubbles_trace', 'pointercancel', 'lostpointercapture', 'bubbles_trace_result', 'bubbles_snapshot', 'portrait', 'navigator.vibrate']) {
+    assert.ok(js.includes(expected), `compiled controller should include ${expected}`);
+  }
 });
 
 test('lobby QR texture decodes to the exact join URL', () => {
