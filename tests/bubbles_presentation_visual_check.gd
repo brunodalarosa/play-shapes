@@ -48,7 +48,7 @@ func _capture() -> void:
 	var active_time := stage.controller.active_start_msec()
 	for index: int in 10:
 		var bubble := stage.player_arena.get_bubble("p%d" % index)
-		bubble.position = BubblesPresentation.ARENA_BOUNDS.get_center() + Vector2.from_angle(TAU * float(index) / 10.0) * Vector2(550, 270)
+		bubble.position = BubblesPresentation.NPC_ARENA_BOUNDS.get_center() + Vector2.from_angle(TAU * float(index) / 10.0) * Vector2(550, 270)
 		for score_index: int in 8 + index:
 			stage.controller.record_jellyfish_capture("p%d" % index, active_time)
 	stage._entrance_tween.kill()

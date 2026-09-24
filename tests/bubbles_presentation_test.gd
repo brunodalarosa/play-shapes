@@ -32,17 +32,37 @@ func _run() -> void:
 	_check(view.start_round(roster, now).accepted, "Ten-player scene starts")
 	_check(view.player_arena.bubble_ids().size() == 10, "All ten named bubble scenes exist")
 	_check(view._world.scale.x > 0.0 and view._world.scale.x < 1.0, "World fits a 1280x720 viewport")
+	_check(_rect_matches(view.player_arena.wall_bounds, root.get_viewport().get_visible_rect()), "Player walls match the active 1280x720 viewport")
+	_check(_rect_matches(view.player_arena.bounds, BubblesPresentation.NPC_ARENA_BOUNDS), "Existing NPC arena bounds remain unchanged")
 	_check(view._far.texture != null and view._mid.texture != null and view._foreground.texture != null, "Three approved environment layers load")
 	_check(view._music.stream is AudioStreamOggVorbis and (view._music.stream as AudioStreamOggVorbis).loop, "Selected BGM loops")
 	_check(is_equal_approx(view._music.volume_db, -14.0) and is_equal_approx((view._audio_players[&"pop"][0] as AudioStreamPlayer).volume_db, -7.0), "Scene applies selected audio gains")
 	_check(view._instructions.visible, "Instruction card appears")
 	_check(not view.controller.complete_entrance(now - 1).accepted, "Entrance cannot move time backward")
 	_check(view.controller.complete_entrance(now).accepted, "Entrance can enter countdown")
+	root.size = Vector2i(1920, 1080)
+	root.content_scale_size = Vector2i(1920, 1080)
+	await process_frame
+	_check(_rect_matches(view.player_arena.wall_bounds, root.get_viewport().get_visible_rect()), "Player walls update with a resized FHD viewport")
+	_check(_rect_matches(view.player_arena.bounds, BubblesPresentation.NPC_ARENA_BOUNDS), "NPC arena bounds stay unchanged after resizing")
+	root.size = Vector2i(1280, 720)
+	root.content_scale_size = Vector2i(1280, 720)
+	await process_frame
+	_check(_rect_matches(view.player_arena.wall_bounds, root.get_viewport().get_visible_rect()), "Player walls update when returning to 1280x720")
 	view._process(0.0)
 	_check(view._cue.visible and view._cue.text == "3", "Countdown displays first whole second")
 	view.controller.advance(now + 3000)
 	_check(view._timer.visible and view._timer.text == "20", "Top-center timer begins at active start")
 	_check(view._cue.text == "GO", "Active phase shows GO")
+	_check_viewport_wall_cases(view, "1280x720")
+	root.size = Vector2i(1920, 1080)
+	root.content_scale_size = Vector2i(1920, 1080)
+	await process_frame
+	_check(_rect_matches(view.player_arena.wall_bounds, root.get_viewport().get_visible_rect()), "Active player walls follow the FHD viewport")
+	_check_viewport_wall_cases(view, "1920x1080")
+	root.size = Vector2i(1280, 720)
+	root.content_scale_size = Vector2i(1280, 720)
+	await process_frame
 	_check(view.controller.record_jellyfish_capture("p0", now + 3000).accepted, "Collection accepted")
 	_check(view.audio_event_count(&"collect") == 1, "Collection cue plays once per accepted event")
 	_check(view.controller.pop_player("p0", now + 3000).accepted, "Pop accepted")
@@ -89,3 +109,41 @@ func _check(condition: bool, message: String) -> void:
 	if not condition:
 		failures += 1
 		push_error(message)
+
+
+func _rect_matches(first: Rect2, second: Rect2) -> bool:
+	return is_equal_approx(first.position.x, second.position.x) \
+		and is_equal_approx(first.position.y, second.position.y) \
+		and is_equal_approx(first.size.x, second.size.x) \
+		and is_equal_approx(first.size.y, second.size.y)
+
+
+func _check_viewport_wall_cases(view: BubblesPresentation, viewport_label: String) -> void:
+	var bubble := view.player_arena.get_bubble("p0")
+	var bounds := view.player_arena.wall_bounds
+	var radius_x := bubble.collision_radius() * bubble.global_transform.x.length()
+	var radius_y := bubble.collision_radius() * bubble.global_transform.y.length()
+	var center := bounds.get_center()
+	var cases: Array[Dictionary] = [
+		{"position": Vector2(bounds.position.x + radius_x, center.y), "incoming": Vector2(-100.0, 0.0), "outgoing": Vector2(1.0, 0.0), "label": "left edge"},
+		{"position": Vector2(bounds.end.x - radius_x, center.y), "incoming": Vector2(100.0, 0.0), "outgoing": Vector2(-1.0, 0.0), "label": "right edge"},
+		{"position": Vector2(center.x, bounds.position.y + radius_y), "incoming": Vector2(0.0, -100.0), "outgoing": Vector2(0.0, 1.0), "label": "top edge"},
+		{"position": Vector2(center.x, bounds.end.y - radius_y), "incoming": Vector2(0.0, 100.0), "outgoing": Vector2(0.0, -1.0), "label": "bottom edge"},
+		{"position": bounds.position + Vector2(radius_x, radius_y), "incoming": Vector2(-100.0, -100.0), "outgoing": Vector2(1.0, 1.0), "label": "top-left corner"},
+		{"position": Vector2(bounds.end.x - radius_x, bounds.position.y + radius_y), "incoming": Vector2(100.0, -100.0), "outgoing": Vector2(-1.0, 1.0), "label": "top-right corner"},
+		{"position": Vector2(bounds.position.x + radius_x, bounds.end.y - radius_y), "incoming": Vector2(-100.0, 100.0), "outgoing": Vector2(1.0, -1.0), "label": "bottom-left corner"},
+		{"position": bounds.end - Vector2(radius_x, radius_y), "incoming": Vector2(100.0, 100.0), "outgoing": Vector2(-1.0, -1.0), "label": "bottom-right corner"},
+	]
+	for collision: Dictionary in cases:
+		bubble.global_position = collision.position
+		bubble.velocity = collision.incoming
+		bubble.simulate_step(0.05, bounds, view.controller.last_host_time_msec())
+		var within_bounds := bubble.global_position.x >= bounds.position.x + radius_x - 0.001
+		within_bounds = within_bounds and bubble.global_position.x <= bounds.end.x - radius_x + 0.001
+		within_bounds = within_bounds and bubble.global_position.y >= bounds.position.y + radius_y - 0.001
+		within_bounds = within_bounds and bubble.global_position.y <= bounds.end.y - radius_y + 0.001
+		var outgoing: Vector2 = collision.outgoing
+		var rebounds_inward: bool = outgoing.x == 0.0 or signf(bubble.velocity.x) == outgoing.x
+		rebounds_inward = rebounds_inward and (outgoing.y == 0.0 or signf(bubble.velocity.y) == outgoing.y)
+		_check(within_bounds and rebounds_inward, "%s %s bounces at the visible edge" % [viewport_label, collision.label])
+	bubble.velocity = Vector2.ZERO

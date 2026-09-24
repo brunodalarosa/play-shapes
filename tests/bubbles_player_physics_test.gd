@@ -12,6 +12,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_test_swipe_growth_drag_and_wall()
+	_test_wall_edges_and_corners()
 	_test_spin_collision_and_pop()
 	_test_player_counts_and_disconnect()
 	_test_extreme_tuning()
@@ -124,6 +125,35 @@ func _test_spin_collision_and_pop() -> void:
 	arena.simulate_step(0.0, 2020)
 	_check(not a.is_invulnerable(2020) and a.get_node("ShapeCharacter").player_color != Color.WHITE, "I-frames end and original color returns")
 	_check(a.request_jellyfish_collection(2021).accepted, "Collection resumes after i-frames")
+
+
+func _test_wall_edges_and_corners() -> void:
+	var system := _setup(1)
+	var arena: BubblesPlayerArena = system.arena
+	var bubble := arena.get_bubble("p0")
+	var radius := bubble.collision_radius()
+	var cases: Array[Dictionary] = [
+		{"start": Vector2(radius, 200.0), "incoming": Vector2(-100.0, 0.0), "outgoing": Vector2(1.0, 0.0), "label": "left edge"},
+		{"start": Vector2(arena.bounds.end.x - radius, 200.0), "incoming": Vector2(100.0, 0.0), "outgoing": Vector2(-1.0, 0.0), "label": "right edge"},
+		{"start": Vector2(300.0, radius), "incoming": Vector2(0.0, -100.0), "outgoing": Vector2(0.0, 1.0), "label": "top edge"},
+		{"start": Vector2(300.0, arena.bounds.end.y - radius), "incoming": Vector2(0.0, 100.0), "outgoing": Vector2(0.0, -1.0), "label": "bottom edge"},
+		{"start": Vector2(radius, radius), "incoming": Vector2(-100.0, -100.0), "outgoing": Vector2(1.0, 1.0), "label": "top-left corner"},
+		{"start": arena.bounds.end - Vector2.ONE * radius, "incoming": Vector2(100.0, 100.0), "outgoing": Vector2(-1.0, -1.0), "label": "bottom-right corner"},
+	]
+	var host_time := 1
+	for collision: Dictionary in cases:
+		bubble.global_position = collision.start
+		bubble.velocity = collision.incoming
+		_check(arena.simulate_step(0.05, host_time), "%s step is accepted" % collision.label)
+		var outgoing: Vector2 = collision.outgoing
+		var inside := bubble.global_position.x >= arena.bounds.position.x + radius - 0.001
+		inside = inside and bubble.global_position.x <= arena.bounds.end.x - radius + 0.001
+		inside = inside and bubble.global_position.y >= arena.bounds.position.y + radius - 0.001
+		inside = inside and bubble.global_position.y <= arena.bounds.end.y - radius + 0.001
+		var direction_ok := (outgoing.x == 0.0 or signf(bubble.velocity.x) == outgoing.x)
+		direction_ok = direction_ok and (outgoing.y == 0.0 or signf(bubble.velocity.y) == outgoing.y)
+		_check(inside and direction_ok, "%s rebounds inward and stays inside the arena" % collision.label)
+		host_time += 1
 
 
 func _test_player_counts_and_disconnect() -> void:

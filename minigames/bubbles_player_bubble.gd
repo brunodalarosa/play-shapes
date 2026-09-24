@@ -143,9 +143,11 @@ func limit_speed() -> void:
 
 
 func _bounce_inside(bounds: Rect2) -> void:
-	var r := collision_radius()
-	var low := bounds.position + Vector2.ONE * r
-	var high := bounds.end - Vector2.ONE * r
+	var radius := collision_radius()
+	var radius_x := radius * global_transform.x.length()
+	var radius_y := radius * global_transform.y.length()
+	var low := bounds.position + Vector2(radius_x, radius_y)
+	var high := bounds.end - Vector2(radius_x, radius_y)
 	if low.x > high.x:
 		global_position.x = bounds.get_center().x
 		velocity.x = 0.0
