@@ -55,7 +55,7 @@ let authoritativeHeld = false;
 let lastAnimationTime = performance.now();
 let fullscreenAttempted = { flash: false, bubbles: false };
 let activeGame: "flash" | "bubbles" | null = null;
-let bubblesPointer: { id: number; trace: GestureTrace } | undefined;
+let bubblesPointer: { id: number; trace: GestureTrace; seq: number; step: number } | undefined;
 let bubblesSnapshot: HostMessage | undefined;
 let bubblesSnapshotTime = 0;
 let bubblesLocalCharge = 0;
@@ -159,15 +159,19 @@ function animate(now: number): void {
 }
 requestAnimationFrame(animate);
 
-function cancelBubblesPointer(): void {
+function sendBubblesCharge(seq: number, stage: "start" | "progress" | "cancel", step = 0): void {
+  if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "bubbles_charge", input_seq: seq, stage, step }));
+}
+function cancelBubblesPointer(sendCancel = true): void {
   if (!bubblesPointer) return;
-  const id = bubblesPointer.id; bubblesPointer = undefined; bubblesLocalCharge = 0;
+  const { id, seq } = bubblesPointer; bubblesPointer = undefined; bubblesLocalCharge = 0;
+  if (sendCancel) sendBubblesCharge(seq, "cancel");
   if (bubblesPad.hasPointerCapture(id)) bubblesPad.releasePointerCapture(id);
 }
-function sendBubblesTrace(trace: Point[]): void {
+function sendBubblesTrace(trace: Point[], gestureSeq?: number): void {
   if (activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active" || trace.length < 2 || !socket || socket.readyState !== WebSocket.OPEN) return;
-  inputSeq += 1; store(STORAGE.inputSeq, String(inputSeq));
-  socket.send(JSON.stringify({ type: "bubbles_trace", input_seq: inputSeq, trace }));
+  if (gestureSeq === undefined) { inputSeq += 1; store(STORAGE.inputSeq, String(inputSeq)); }
+  socket.send(JSON.stringify({ type: "bubbles_trace", input_seq: gestureSeq ?? inputSeq, trace }));
 }
 function vibrate(pattern: number | number[]): void { try { navigator.vibrate?.(pattern); } catch { /* Best effort only. */ } }
 
@@ -175,8 +179,10 @@ bubblesPad.addEventListener("pointerdown", event => {
   if (activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active" || bubblesPointer || (event.pointerType === "mouse" && event.button !== 0)) return;
   event.preventDefault();
   const trace = new GestureTrace(bubblesPad.getBoundingClientRect()); trace.add(event.clientX, event.clientY);
-  bubblesPointer = { id: event.pointerId, trace };
+  inputSeq += 1; store(STORAGE.inputSeq, String(inputSeq));
+  bubblesPointer = { id: event.pointerId, trace, seq: inputSeq, step: 0 };
   try { bubblesPad.setPointerCapture(event.pointerId); } catch { cancelBubblesPointer(); return; }
+  sendBubblesCharge(inputSeq, "start");
   void requestImmersiveMode("bubbles");
 });
 bubblesPad.addEventListener("pointermove", event => {
@@ -184,11 +190,14 @@ bubblesPad.addEventListener("pointermove", event => {
   event.preventDefault();
   for (const sample of event.getCoalescedEvents?.() ?? [event]) bubblesPointer.trace.add(sample.clientX, sample.clientY);
   bubblesLocalCharge = bubblesPointer.trace.preview(bubblesSnapshot?.circles_to_charge ?? 1);
+  const step = Math.min(4, Math.floor(bubblesLocalCharge * 4));
+  if (step > bubblesPointer.step) { bubblesPointer.step = step; sendBubblesCharge(bubblesPointer.seq, "progress", step); }
 });
 bubblesPad.addEventListener("pointerup", event => {
   if (bubblesPointer?.id !== event.pointerId) return;
   event.preventDefault(); bubblesPointer.trace.add(event.clientX, event.clientY);
-  const trace = bubblesPointer.trace.completed(); cancelBubblesPointer(); sendBubblesTrace(trace);
+  const { seq } = bubblesPointer; const trace = bubblesPointer.trace.completed(); cancelBubblesPointer(false);
+  if (trace.length < 2) sendBubblesCharge(seq, "cancel"); else sendBubblesTrace(trace, seq);
 });
 bubblesPad.addEventListener("pointercancel", event => { if (bubblesPointer?.id === event.pointerId) cancelBubblesPointer(); });
 bubblesPad.addEventListener("lostpointercapture", event => { if (bubblesPointer?.id === event.pointerId) cancelBubblesPointer(); });

@@ -247,21 +247,29 @@ function animate(now) {
     requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
-function cancelBubblesPointer() {
+function sendBubblesCharge(seq, stage, step = 0) {
+    if (socket?.readyState === WebSocket.OPEN)
+        socket.send(JSON.stringify({ type: "bubbles_charge", input_seq: seq, stage, step }));
+}
+function cancelBubblesPointer(sendCancel = true) {
     if (!bubblesPointer)
         return;
-    const id = bubblesPointer.id;
+    const { id, seq } = bubblesPointer;
     bubblesPointer = undefined;
     bubblesLocalCharge = 0;
+    if (sendCancel)
+        sendBubblesCharge(seq, "cancel");
     if (bubblesPad.hasPointerCapture(id))
         bubblesPad.releasePointerCapture(id);
 }
-function sendBubblesTrace(trace) {
+function sendBubblesTrace(trace, gestureSeq) {
     if (activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active" || trace.length < 2 || !socket || socket.readyState !== WebSocket.OPEN)
         return;
-    inputSeq += 1;
-    store(STORAGE.inputSeq, String(inputSeq));
-    socket.send(JSON.stringify({ type: "bubbles_trace", input_seq: inputSeq, trace }));
+    if (gestureSeq === undefined) {
+        inputSeq += 1;
+        store(STORAGE.inputSeq, String(inputSeq));
+    }
+    socket.send(JSON.stringify({ type: "bubbles_trace", input_seq: gestureSeq ?? inputSeq, trace }));
 }
 function vibrate(pattern) { try {
     navigator.vibrate?.(pattern);
@@ -273,7 +281,9 @@ bubblesPad.addEventListener("pointerdown", event => {
     event.preventDefault();
     const trace = new GestureTrace(bubblesPad.getBoundingClientRect());
     trace.add(event.clientX, event.clientY);
-    bubblesPointer = { id: event.pointerId, trace };
+    inputSeq += 1;
+    store(STORAGE.inputSeq, String(inputSeq));
+    bubblesPointer = { id: event.pointerId, trace, seq: inputSeq, step: 0 };
     try {
         bubblesPad.setPointerCapture(event.pointerId);
     }
@@ -281,6 +291,7 @@ bubblesPad.addEventListener("pointerdown", event => {
         cancelBubblesPointer();
         return;
     }
+    sendBubblesCharge(inputSeq, "start");
     void requestImmersiveMode("bubbles");
 });
 bubblesPad.addEventListener("pointermove", event => {
@@ -290,15 +301,24 @@ bubblesPad.addEventListener("pointermove", event => {
     for (const sample of event.getCoalescedEvents?.() ?? [event])
         bubblesPointer.trace.add(sample.clientX, sample.clientY);
     bubblesLocalCharge = bubblesPointer.trace.preview(bubblesSnapshot?.circles_to_charge ?? 1);
+    const step = Math.min(4, Math.floor(bubblesLocalCharge * 4));
+    if (step > bubblesPointer.step) {
+        bubblesPointer.step = step;
+        sendBubblesCharge(bubblesPointer.seq, "progress", step);
+    }
 });
 bubblesPad.addEventListener("pointerup", event => {
     if (bubblesPointer?.id !== event.pointerId)
         return;
     event.preventDefault();
     bubblesPointer.trace.add(event.clientX, event.clientY);
+    const { seq } = bubblesPointer;
     const trace = bubblesPointer.trace.completed();
-    cancelBubblesPointer();
-    sendBubblesTrace(trace);
+    cancelBubblesPointer(false);
+    if (trace.length < 2)
+        sendBubblesCharge(seq, "cancel");
+    else
+        sendBubblesTrace(trace, seq);
 });
 bubblesPad.addEventListener("pointercancel", event => { if (bubblesPointer?.id === event.pointerId)
     cancelBubblesPointer(); });

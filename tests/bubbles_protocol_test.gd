@@ -25,8 +25,43 @@ func _run() -> void:
 	controller.complete_entrance(0)
 	controller.advance(0)
 	var protocol := Protocol.new(controller)
+	var visual_updates: Array[float] = []
+	controller.charge_visual_changed.connect(func(id: String, progress: float) -> void:
+		if id == "p0": visual_updates.append(progress))
+	var charge_start := {"type": "bubbles_charge", "input_seq": 1, "stage": "start", "step": 0}
+	_check(protocol.handle_action(players[0], charge_start, 1).accepted, "Authenticated charge starts a visual gesture")
+	_check(protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 1, "stage": "progress", "step": 2}, 2).accepted,
+		"Coarse charge step reaches presentation")
+	_check(visual_updates.back() == 0.5 and controller.personal_snapshot("p0").last_input_seq == -1,
+		"Charge changes only presentation, never accepted gameplay sequence")
+	_check(not protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 1, "stage": "progress", "step": 1}, 3).accepted,
+		"Out-of-order progress is rejected")
+	_check(not protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 1, "stage": "progress", "step": 5}, 3).accepted,
+		"Over-range progress is rejected")
+	_check(not protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 1, "stage": "progress", "step": 3, "player_id": "p1"}, 3).accepted,
+		"Client-authored player identity is rejected")
+	_check(not protocol.handle_action(players[1], {"type": "bubbles_charge", "input_seq": 1, "stage": "progress", "step": 3}, 3).accepted,
+		"Another authenticated player cannot advance the gesture")
+	var json_charge: Dictionary = JSON.parse_string('{"type":"bubbles_charge","input_seq":1,"stage":"progress","step":3}')
+	_check(protocol.handle_action(players[0], json_charge, 4).accepted, "JSON numeric charge step reaches the host")
 	var swipe := {"type": "bubbles_trace", "input_seq": 1, "trace": [[0.1, 0.5], [0.9, 0.5]]}
 	_check(protocol.handle_action(players[0], swipe, 1).accepted, "Authenticated swipe reaches controller")
+	_check(visual_updates.back() == 0.0, "Completed trace clears charge cue")
+	_check(protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 2, "stage": "start", "step": 0}, 6).accepted,
+		"Next gesture may start")
+	_check(protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 2, "stage": "cancel", "step": 0}, 7).accepted,
+		"Canceled gesture clears visual cue")
+	_check(not protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 2, "stage": "progress", "step": 3}, 8).accepted,
+		"Canceled gesture cannot resume")
+	_check(not protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 2, "stage": "start", "step": 0}, 9).accepted,
+		"Canceled gesture sequence cannot restart")
+	_check(protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 3, "stage": "start", "step": 0}, 9).accepted,
+		"A fresh gesture can start after cancel")
+	_check(not protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 3, "stage": "progress", "step": 3}, 2000).accepted,
+		"Timed-out charge cannot resume")
+	_check(not protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 3, "stage": "start", "step": 0}, 2001).accepted,
+		"Timed-out gesture sequence cannot restart")
+	_check(controller.personal_snapshot("p0").spin_until_msec == -1, "Charge and cancellation never activate spin")
 	_check(controller.personal_snapshot("p0").last_input_seq == 1 and controller.personal_snapshot("p1").last_input_seq == -1,
 		"Action only mutates authenticated player")
 	_check(not protocol.handle_action(players[0], swipe, 2).accepted, "Duplicate sequence rejected")

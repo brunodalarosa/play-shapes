@@ -178,13 +178,13 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 				if _active_protocol == _flash_pose_protocol and _flash_pose_protocol != null else {"accepted": false, "code": &"game_unavailable", "message": "Flash? Pose! is not active"}
 			if not result.accepted:
 				_send_rejection(peer, "error", result)
-		"bubbles_trace":
+		"bubbles_trace", "bubbles_charge":
 			var player := _registry.player_for_connection(client.connection_id)
 			var result: Dictionary = _active_protocol.handle_action(player, message, Time.get_ticks_msec()) \
 				if _active_protocol == _bubbles_protocol and _bubbles_protocol != null else {"accepted": false, "code": &"game_unavailable", "message": "Bubbles is not active"}
 			if not result.accepted:
 				_send_rejection(peer, "error", result)
-			else:
+			elif message.get("type") == "bubbles_trace":
 				peer.send_text(JSON.stringify({"type": "bubbles_trace_result", "action": result.action,
 					"reason": result.reason, "charge": 0.0}))
 				_send_gameplay_snapshot(peer, String(player.player_id))

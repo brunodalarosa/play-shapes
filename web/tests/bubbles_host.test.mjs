@@ -71,6 +71,12 @@ test('active Bubbles routes authenticated traces, rejects forged input, and rest
     assert.equal(snapshot.debug_mode, true);
     assert.equal(snapshot.seat, joined.player.seat);
     const trace = [[0.1, 0.5], [0.9, 0.5]];
+    client.send({ type: 'bubbles_charge', input_seq: 1, stage: 'start', step: 0, player_id: 'forged' });
+    assert.equal((await client.next(message => message.type === 'error')).code, 'unauthorized_field');
+    client.send({ type: 'bubbles_charge', input_seq: 1, stage: 'start', step: 0 });
+    client.send({ type: 'bubbles_charge', input_seq: 1, stage: 'progress', step: 2 });
+    client.send({ type: 'bubbles_charge', input_seq: 1, stage: 'progress', step: 1 });
+    assert.equal((await client.next(message => message.type === 'error')).code, 'stale_charge');
     client.send({ type: 'bubbles_trace', input_seq: 1, trace, player_id: 'forged' });
     assert.equal((await client.next(message => message.type === 'error')).code, 'unauthorized_field');
     client.send({ type: 'bubbles_trace', input_seq: 1, trace });

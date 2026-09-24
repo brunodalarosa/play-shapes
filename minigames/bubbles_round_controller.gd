@@ -6,6 +6,7 @@ signal phase_changed(phase: StringName, snapshot: Dictionary)
 signal arena_event_requested(kind: StringName, player_id: String, data: Dictionary)
 signal personal_state_changed(player_id: String, snapshot: Dictionary)
 signal feedback_requested(player_id: String, kind: StringName, data: Dictionary)
+signal charge_visual_changed(player_id: String, progress: float)
 signal round_results_ready(results: Dictionary)
 signal return_to_lobby_requested
 

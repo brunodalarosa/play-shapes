@@ -6,6 +6,16 @@ Every Inspector tooltip gives the field's purpose, default, safe range, and high
 
 | Field | Default; safe range | Higher value does this |
 | --- | --- | --- |
+| Character float (pixels) | 4; 0–12 | Makes idle buoyancy more visible |
+| Blink interval (seconds) | 3.4; 1.5–7 | Spaces natural blinks farther apart |
+| Swipe reaction (seconds) | 0.34; 0.12–0.9 | Holds the push and bubble pull longer |
+| Swipe pull (fraction) | 0.17; 0–0.22 | Stretches the drawn bubble farther, without changing collision |
+| Character swipe push (pixels) | 13; 0–24 | Moves the character farther within the bubble |
+| Charge turning (revolutions/second) | 2.4; 0.5–5 | Turns body and limbs faster while preserving the audience-facing face |
+| Spin release (seconds) | 0.22; 0.08–0.6 | Lengthens the character unwind after an accepted spin |
+| Spin surface speed (revolutions/second) | 1.8; 0.2–5 | Rotates the bubble rim faster during authoritative spin |
+| Burst (seconds) | 0.26; 0.1–0.6 | Lets curved fragments and motes remain visible longer |
+| Decorative particles (count) | 10; 0–32 | Adds spin bubbles and burst motes per player |
 | Instruction time (seconds) | 3; 0–15 | Allows more reading and entrance time |
 | Countdown (seconds) | 3; 0–10 | Gives more preparation |
 | Round duration (seconds) | 90; 10–300 | Allows more collecting |
