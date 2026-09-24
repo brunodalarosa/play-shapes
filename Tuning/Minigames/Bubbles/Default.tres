@@ -1,6 +1,26 @@
-[gd_resource type="Resource" script_class="BubblesTuning" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="BubblesTuning" format=3 uid="uid://cudlwubldgpr7"]
 
-[ext_resource type="Script" path="res://Tuning/Minigames/bubbles_tuning.gd" id="1"]
+[ext_resource type="Script" uid="uid://cvuwa0ru0pqpe" path="res://Tuning/Minigames/bubbles_tuning.gd" id="1"]
 
 [resource]
 script = ExtResource("1")
+max_radius = 170.0
+captured_visual_cap = 16
+mass_growth_per_jellyfish = 0.02
+speed_reduction_per_jellyfish = 0.004
+swipe_impulse = 320.0
+swipe_max_hold_seconds = 0.8
+swipe_min_distance = 0.06
+max_player_speed = 500.0
+circles_to_charge = 4
+jellyfish_low_spawn_rate = 1.0
+jellyfish_high_spawn_rate = 2.5
+jellyfish_wave_min_seconds = 3.0
+jellyfish_speed = 50.0
+jellyfish_entrance_seconds = 0.5
+pufferfish_start_spawn_rate = 0.15
+pufferfish_max_spawn_rate = 0.4
+pufferfish_speed = 140.0
+pufferfish_warning_seconds = 1.1
+pufferfish_telegraph_bubble_count = 32
+pufferfish_telegraph_bubble_radius = 6.0
