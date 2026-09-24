@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="ActivePresets" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="ActivePresets" format=3 uid="uid://d4fjlwvh66m2g"]
 
-[ext_resource type="Script" path="res://Tuning/active_presets.gd" id="1"]
-[ext_resource type="Resource" path="res://Tuning/Minigames/SimonSays/Default.tres" id="2"]
+[ext_resource type="Script" uid="uid://30jj0wxp5yer" path="res://Tuning/active_presets.gd" id="1"]
+[ext_resource type="Resource" uid="uid://b546s71x06rdq" path="res://Tuning/Minigames/SimonSays/Default.tres" id="2"]
 [ext_resource type="Resource" path="res://Tuning/Shared/Networking/Default.tres" id="3"]
-[ext_resource type="Resource" path="res://Tuning/Minigames/Bubbles/Default.tres" id="4"]
+[ext_resource type="Resource" uid="uid://cudlwubldgpr7" path="res://Tuning/Minigames/Bubbles/Default.tres" id="4"]
 
 [resource]
 script = ExtResource("1")

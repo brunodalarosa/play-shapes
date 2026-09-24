@@ -174,6 +174,18 @@ func snapshot_for(player_id: String) -> Dictionary:
 		"score": int(own.score), "bubble_radius": float(own.bubble_radius),
 		"visual_jellyfish": int(own.visual_jellyfish), "visual_cap": controller.tuning.captured_visual_cap,
 		"seat": int(own.seat), "connected": bool(own.connected), "left": bool(own.left),
+		"host_time_msec": now,
+		"visual_tuning": {
+			"starting_radius": controller.tuning.starting_radius,
+			"live_drag_pull_strength": controller.tuning.live_drag_pull_strength,
+			"live_drag_response_seconds": controller.tuning.live_drag_response_seconds,
+			"charge_wobble_strength": controller.tuning.charge_wobble_strength,
+			"charge_glow_strength": controller.tuning.charge_glow_strength,
+			"swipe_reaction_seconds": controller.tuning.swipe_reaction_seconds,
+			"spin_surface_turns_per_second": controller.tuning.spin_surface_turns_per_second,
+			"bubble_reform_seconds": controller.tuning.bubble_reform_seconds,
+			"burst_seconds": controller.tuning.burst_seconds,
+		},
 		"spin_remaining_msec": maxi(0, int(own.spin_until_msec) - now),
 		"cooldown_remaining_msec": maxi(0, int(own.spin_ready_msec) - now),
 		"invulnerable_remaining_msec": maxi(0, int(own.invulnerable_until_msec) - now),
@@ -193,6 +205,8 @@ func feedback_for(player_id: String, kind: StringName, data: Dictionary) -> Dict
 	result.event = str(kind)
 	if kind == &"pop":
 		result.lost = int(data.get("lost", 0))
+		result.burst_radius = minf(controller.tuning.max_radius,
+			controller.tuning.starting_radius + (int(result.score) + int(result.lost)) * controller.tuning.radius_per_jellyfish)
 	return result
 
 

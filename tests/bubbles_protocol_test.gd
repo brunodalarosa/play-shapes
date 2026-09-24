@@ -92,6 +92,8 @@ func _run() -> void:
 	var snapshot := protocol.snapshot_for("p0")
 	_check(snapshot.type == "bubbles_snapshot" and snapshot.score == 0 and snapshot.visual_jellyfish == 0 and snapshot.seat == 1,
 		"Personal snapshot contains exact score and visual state")
+	_check(snapshot.host_time_msec >= 0 and snapshot.visual_tuning.live_drag_pull_strength == controller.tuning.live_drag_pull_strength,
+		"Phone receives the shared host clock and configured visual response")
 	_check(not snapshot.debug_mode, "Normal Bubbles snapshots do not claim debug mode")
 	_check(protocol.snapshot_for("unknown").type == "lobby", "Unknown player receives no gameplay state")
 	controller.record_jellyfish_capture("p0", 5)
@@ -100,7 +102,7 @@ func _run() -> void:
 		"Collection feedback reflects host score")
 	controller.pop_player("p0", 6)
 	var pop := protocol.feedback_for("p0", &"pop", {"lost": 1})
-	_check(pop.score == 0 and pop.lost == 1 and pop.invulnerable_remaining_msec > 0 and pop.reform_remaining_msec > 0,
+	_check(pop.score == 0 and pop.lost == 1 and pop.burst_radius == 50.0 and pop.invulnerable_remaining_msec > 0 and pop.reform_remaining_msec > 0,
 		"Pop feedback carries authoritative re-form and invulnerability state")
 	controller.advance(10000)
 	var results := protocol.snapshot_for("p0")

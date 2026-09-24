@@ -38,18 +38,13 @@
     </section>
     <section id="bubbles-card" aria-labelledby="bubbles-heading" hidden>
       <h2 id="bubbles-heading">Bubbles and Jellyfishes</h2>
-      <p id="bubbles-status" role="status" aria-live="polite">Waiting for the round</p>
       <div id="bubbles-pad" role="button" tabindex="0" aria-label="Bubbles controller. Swipe to move, or draw circles and release to spin. Arrow keys move; Space spins." aria-describedby="bubbles-help">
-        <p id="bubbles-debug" class="debug-badge" hidden>DEBUG MODE · ONE PLAYER</p>
-        <div class="bubbles-hud"><span id="bubbles-score">0 jellyfish</span><span id="bubbles-state">Get ready</span></div>
-        <div id="bubbles-replica" class="bubbles-replica" aria-hidden="true">
-          <div id="bubbles-character" class="bubbles-character"><i></i><i></i></div>
-          <div id="bubbles-captured" class="bubbles-captured"></div>
+        <span id="bubbles-help" class="visually-hidden">Swipe to move. Draw circles and release to spin. Arrow keys move; Space spins.</span>
+        <div class="bubbles-content">
+          <span id="bubbles-score" aria-live="polite">0</span>
+          <canvas id="bubbles-visual" aria-hidden="true"></canvas>
         </div>
-        <svg class="bubbles-meter" viewBox="0 0 220 220" aria-hidden="true"><circle class="meter-track" cx="110" cy="110" r="101"/><circle id="bubbles-meter-fill" class="meter-fill" cx="110" cy="110" r="101"/></svg>
-        <p id="bubbles-help" class="bubbles-help">Swipe to move · Draw circles and release to spin</p>
       </div>
-      <div id="bubbles-rotate" class="rotate-state" role="status" hidden>Rotate your phone upright</div>
     </section>
     <noscript>Enable JavaScript to connect to the game.</noscript>
     <p class="footnote">Keep this page open while you play.</p>

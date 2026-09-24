@@ -5,6 +5,7 @@ extends CharacterBody2D
 const CHARACTER_MAX_SCALE := 0.55
 const CHARACTER_OUTER_RADIUS := 75.0
 const BLINK_PERIOD_MSEC := 100
+const PHONE_VISUAL_SEND_INTERVAL_MSEC := 50
 
 @onready var _collider: CollisionShape2D = $CollisionShape2D
 @onready var _visual: BubblesPlayerVisual = $BubbleVisual
@@ -35,6 +36,10 @@ var _live_drag_started_msec := -1
 var _blink_next_msec := 0
 var _blink_until_msec := -1
 var _blink_index := 0
+var _phone_visual_sent_msec := -1
+var _swipe_pull := Vector2.ZERO
+var _drag_pull := Vector2.ZERO
+var _charge_pull := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -107,6 +112,9 @@ func simulate_step(delta: float, bounds: Rect2, host_time_msec: int) -> void:
 	_live_drag_display = _live_drag_display.lerp(_live_drag_target,
 		1.0 - exp(-delta / tuning.live_drag_response_seconds))
 	_refresh_visual(host_time_msec)
+	if _controller != null and host_time_msec - _phone_visual_sent_msec >= PHONE_VISUAL_SEND_INTERVAL_MSEC:
+		_phone_visual_sent_msec = host_time_msec
+		_controller.personal_visual_changed.emit(player_id, _phone_visual_state(host_time_msec))
 	if not _active or not bounds.has_area():
 		return
 	velocity *= exp(-tuning.water_drag * delta)
@@ -217,15 +225,49 @@ func _refresh_visual(host_time_msec: int) -> void:
 	_character.scale = Vector2.ONE * minf(CHARACTER_MAX_SCALE, bubble_radius() * 0.82 / CHARACTER_OUTER_RADIUS)
 	_animate_character(host_time_msec, burst)
 	var swipe_age := float(host_time_msec - _swipe_at_msec) / 1000.0 if _swipe_at_msec >= 0 else 999.0
-	var pull := _swipe_direction * tuning.swipe_pull_strength * sin(PI * clampf(swipe_age / tuning.swipe_reaction_seconds, 0.0, 1.0))
-	pull += _live_drag_display * tuning.live_drag_pull_strength
+	_swipe_pull = _swipe_direction * tuning.swipe_pull_strength * sin(PI * clampf(swipe_age / tuning.swipe_reaction_seconds, 0.0, 1.0))
+	_drag_pull = _live_drag_display * tuning.live_drag_pull_strength
+	_charge_pull = Vector2.ZERO
 	if _charge_progress > 0.0:
 		var seconds := float(host_time_msec) / 1000.0
-		pull += Vector2(sin(seconds * 13.0), cos(seconds * 17.0)) * tuning.charge_wobble_strength * _charge_progress
+		_charge_pull = Vector2(sin(seconds * 13.0), cos(seconds * 17.0)) * tuning.charge_wobble_strength * _charge_progress
+	var pull := _swipe_pull + _drag_pull + _charge_pull
 	var surface_angle := float(host_time_msec - _spin_started_msec) / 1000.0 * TAU * tuning.spin_surface_turns_per_second if is_spinning(host_time_msec) and _spin_started_msec >= 0 else 0.0
 	_visual.update_appearance(rendered_radius, mini(_score, tuning.captured_visual_cap), is_spinning(host_time_msec),
 		white_blink, pull, surface_angle, burst, tuning.decorative_particle_count, _charge_progress * tuning.charge_glow_strength)
 	_name_label.position = Vector2(-110.0, -rendered_radius - 42.0)
+
+
+func _phone_visual_state(host_time_msec: int) -> Dictionary:
+	var body := _character.get_node("Body") as Sprite2D
+	var face := _character.get_node("Face") as Sprite2D
+	var left_hand := _character.get_node("LeftHand") as Sprite2D
+	var right_hand := _character.get_node("RightHand") as Sprite2D
+	var left_foot := _character.get_node("LeftFoot") as Sprite2D
+	var right_foot := _character.get_node("RightFoot") as Sprite2D
+	return {
+		"host_time_msec": host_time_msec,
+		"radius": _visual.radius,
+		"pull": [_visual.pull.x, _visual.pull.y],
+		"drag_pull": [_drag_pull.x, _drag_pull.y],
+		"charge_pull": [_charge_pull.x, _charge_pull.y],
+		"surface_angle": _visual.surface_angle,
+		"spinning": _visual.spinning,
+		"recovery_white": _visual.recovery_white,
+		"burst_progress": _visual.burst_progress,
+		"particle_density": _visual.particle_density,
+		"charge_glow": _visual.charge_glow,
+		"character_visible": _character.visible,
+		"character_scale": _character.scale.x,
+		"character_position": [_character.position.x, _character.position.y],
+		"body_rotation": body.rotation,
+		"face_position": [face.position.x, face.position.y],
+		"face_blink": face.texture == CharacterExpression.FACES[&"blink"],
+		"left_hand_position": [left_hand.position.x, left_hand.position.y],
+		"right_hand_position": [right_hand.position.x, right_hand.position.y],
+		"left_foot_position": [left_foot.position.x + left_foot.offset.x, left_foot.position.y + left_foot.offset.y],
+		"right_foot_position": [right_foot.position.x + right_foot.offset.x, right_foot.position.y + right_foot.offset.y],
+	}
 
 
 func _animate_character(host_time_msec: int, burst: float) -> void:

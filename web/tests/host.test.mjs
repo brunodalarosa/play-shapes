@@ -69,7 +69,6 @@ test('phone join form has labels, live feedback, and explicit change-player acti
   const html = await (await fetch(base)).text();
   assert.match(html, /<label for="player-name">Your name<\/label>/);
   assert.match(html, /id="status"[^>]*role="status"[^>]*aria-live="polite"/);
-  assert.match(html, /id="bubbles-debug" class="debug-badge" hidden/);
   assert.match(html, />Leave \/ Change player<\/button>/);
   assert.match(html, /maxlength="16"/);
 });
@@ -96,20 +95,21 @@ test('Flash Pose controller exposes accessible hold controls and cancellation ha
   assert.ok(js.includes('flash_pose_charge'));
 });
 
-test('Bubbles controller exposes portrait touch, score, live feedback, and cancel paths', async () => {
+test('Bubbles controller keeps a clean portrait screen and accessible touch controls', async () => {
   const html = await (await fetch(base)).text();
   const css = await (await fetch(base + '/style.css')).text();
   const js = await (await fetch(base + '/app.js')).text();
   assert.match(html, /id="bubbles-pad"[^>]*role="button"[^>]*tabindex="0"[^>]*aria-label=/);
-  assert.match(html, /id="bubbles-status"[^>]*aria-live="polite"/);
-  assert.match(css, /\.debug-badge[^}]*#ffd166/);
-  assert.ok(css.includes('html.bubbles-active #bubbles-debug'));
-  assert.ok(css.includes('white-space: nowrap'));
-  assert.ok(css.includes('html.bubbles-active.bubbles-debug-active .bubbles-hud'));
-  assert.ok(js.includes('bubbles-debug-active'));
-  assert.match(html, /id="bubbles-score"/);
+  assert.match(html, /id="bubbles-help" class="visually-hidden"/);
+  assert.match(html, /id="bubbles-score" aria-live="polite">0<\/span>/);
+  assert.match(html, /id="bubbles-visual"[^>]*aria-hidden="true"/);
+  assert.doesNotMatch(html, /bubbles-status|bubbles-debug|bubbles-meter|bubbles-state/);
+  assert.match(css, /inset-block-start: 15%/);
+  assert.match(css, /env\(safe-area-inset-top\)/);
+  assert.match(css, /bubbles-phone-background\.png/);
+  assert.doesNotMatch(css, /#bubbles-status|#bubbles-debug|\.debug-badge/);
   assert.match(css, /html\.bubbles-active/);
-  for (const expected of ['bubbles_trace', 'pointercancel', 'lostpointercapture', 'bubbles_trace_result', 'bubbles_snapshot', 'portrait', 'navigator.vibrate']) {
+  for (const expected of ['bubbles_trace', 'pointercancel', 'lostpointercapture', 'bubbles_trace_result', 'bubbles_snapshot', 'bubbles_visual', 'portrait', 'navigator.vibrate']) {
     assert.ok(js.includes(expected), `compiled controller should include ${expected}`);
   }
 });
