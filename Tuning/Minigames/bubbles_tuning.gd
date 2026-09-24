@@ -93,6 +93,14 @@ var spin_shove_impulse: float = 250.0:
 @export_range(4.0, 60.0, 1.0, "suffix:px")
 var jellyfish_collider_radius: float = 14.0:
 	set(value): jellyfish_collider_radius = clampf(value, 4.0, 60.0)
+## Jellyfish sprite breathing amplitude as a fraction of its resting size. Zero disables breathing. Default: 0.045. Safe range: 0-0.12.
+@export_range(0.0, 0.12, 0.005, "suffix:fraction")
+var jellyfish_breath_amplitude: float = 0.045:
+	set(value): jellyfish_breath_amplitude = clampf(value, 0.0, 0.12)
+## Time for one jellyfish breathing cycle, in seconds. Default: 2.4. Safe range: 1.2-5.
+@export_range(1.2, 5.0, 0.1, "suffix:s")
+var jellyfish_breath_period_seconds: float = 2.4:
+	set(value): jellyfish_breath_period_seconds = clampf(value, 1.2, 5.0)
 ## Initial free jellyfish population at GO. Higher gives earlier opportunities. Default: 20. Safe range: 0-100; cannot exceed free cap.
 @export_range(0, 100, 1)
 var starting_jellyfish: int = 20:
@@ -135,10 +143,26 @@ var released_collection_lockout_seconds: float = 0.5:
 	set(value): released_collection_lockout_seconds = clampf(value, 0.0, 3.0)
 
 @export_group("Pufferfish and pop")
-## Pufferfish collision radius, in world pixels. Higher increases hazard reach. Default: 30. Safe range: 8-100.
+## Pufferfish baseline collision radius before the creature-size multiplier, in world pixels. Default: 30. Safe range: 8-100.
 @export_range(8.0, 100.0, 1.0, "suffix:px")
 var pufferfish_collider_radius: float = 30.0:
 	set(value): pufferfish_collider_radius = clampf(value, 8.0, 100.0)
+## Multiplies both the pufferfish art and collision radius. Default: 1.5 (50% larger). Safe range: 1-2.
+@export_range(1.0, 2.0, 0.05, "suffix:×")
+var pufferfish_size_multiplier: float = 1.5:
+	set(value): pufferfish_size_multiplier = clampf(value, 1.0, 2.0)
+## Pufferfish body jiggle rotation while swimming, in degrees. Zero disables rotation. Default: 3.5. Safe range: 0-12.
+@export_range(0.0, 12.0, 0.5, "suffix:deg")
+var pufferfish_jiggle_degrees: float = 3.5:
+	set(value): pufferfish_jiggle_degrees = clampf(value, 0.0, 12.0)
+## Time for one pufferfish body jiggle cycle, in seconds. Default: 0.32. Safe range: 0.15-1.2.
+@export_range(0.15, 1.2, 0.05, "suffix:s")
+var pufferfish_jiggle_period_seconds: float = 0.32:
+	set(value): pufferfish_jiggle_period_seconds = clampf(value, 0.15, 1.2)
+## Body squash during a pufferfish jiggle as a fraction of its size. Zero disables squash. Default: 0.035. Safe range: 0-0.1.
+@export_range(0.0, 0.1, 0.005, "suffix:fraction")
+var pufferfish_jiggle_squash: float = 0.035:
+	set(value): pufferfish_jiggle_squash = clampf(value, 0.0, 0.1)
 ## Early pufferfish spawns per second. Higher increases early risk. Default: 0.08. Safe range: 0-2.
 @export_range(0.0, 2.0, 0.01, "suffix:/s")
 var pufferfish_start_spawn_rate: float = 0.08:
@@ -166,10 +190,22 @@ var bubble_reform_seconds: float = 0.35:
 ## Show an edge warning before pufferfish enter. Disabling removes visual notice. Default: enabled.
 @export
 var pufferfish_warning_enabled: bool = true
-## Pufferfish edge warning time, in seconds. Higher gives more notice. Default: 0.8. Safe range: 0-3.
+## Time the offscreen bubble burst precedes the pufferfish reveal, in seconds. Higher gives more notice. Default: 0.8. Safe range: 0-3.
 @export_range(0.0, 3.0, 0.05, "suffix:s")
 var pufferfish_warning_seconds: float = 0.8:
 	set(value): pufferfish_warning_seconds = clampf(value, 0.0, 3.0)
+## Count of bubbles in the pufferfish's one-shot edge burst. Higher makes the cue denser. Default: 24. Safe range: 4-64.
+@export_range(4, 64, 1)
+var pufferfish_telegraph_bubble_count: int = 24:
+	set(value): pufferfish_telegraph_bubble_count = clampi(value, 4, 64)
+## Radius of each pufferfish telegraph bubble, in world pixels. Higher makes particles more prominent. Default: 4.5. Safe range: 2-10.
+@export_range(2.0, 10.0, 0.5, "suffix:px")
+var pufferfish_telegraph_bubble_radius: float = 4.5:
+	set(value): pufferfish_telegraph_bubble_radius = clampf(value, 2.0, 10.0)
+## Strength of randomized bubble drift. Zero disables extra acceleration; higher values create more varied paths. Default: 3.0. Safe range: 0-10.
+@export_range(0.0, 10.0, 0.25)
+var pufferfish_telegraph_noise_strength: float = 3.0:
+	set(value): pufferfish_telegraph_noise_strength = clampf(value, 0.0, 10.0)
 
 @export_group("Presentation")
 ## Gentle character bob in pixels. Zero holds the idle pose still. Default: 4. Safe range: 0-12.

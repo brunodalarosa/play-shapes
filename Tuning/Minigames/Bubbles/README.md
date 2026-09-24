@@ -39,6 +39,8 @@ Every Inspector tooltip gives the field's purpose, default, safe range, and high
 | Spin cooldown (seconds) | 5; 0–20 | Spaces out spin activations |
 | Spin shove impulse (world pixels/second) | 250; 0–1000 | Pushes opponents farther |
 | Jellyfish collider radius (world pixels) | 14; 4–60 | Makes collection easier |
+| Jellyfish breathing amplitude (fraction) | 0.045; 0–0.12 | Makes the sprite expand and contract more |
+| Jellyfish breathing cycle (seconds) | 2.4; 1.2–5 | Changes the breathing pace |
 | Starting jellyfish (count) | 20; 0–100 | Gives more early catches |
 | Free jellyfish cap (count) | 70; 1–200 | Permits a busier arena |
 | Low wave spawn rate (jellyfish/second) | 0.5; 0–10 | Makes quiet periods busier |
@@ -49,15 +51,22 @@ Every Inspector tooltip gives the field's purpose, default, safe range, and high
 | Safe spawn clearance (world pixels) | 90; 0–300 | Reduces immediate spawn collisions |
 | Jellyfish entrance (seconds) | 0.6; 0–3 | Delays collection after spawn |
 | Released jellyfish lockout (seconds) | 0.5; 0–3 | Delays collection after a pop |
-| Pufferfish collider radius (world pixels) | 30; 8–100 | Increases hazard reach |
+| Pufferfish baseline collider radius (world pixels) | 30; 8–100 | Sets hazard size before the multiplier |
+| Pufferfish size multiplier | 1.5; 1–2 | Scales the art and collider together |
+| Pufferfish jiggle rotation (degrees) | 3.5; 0–12 | Makes the body pitch while swimming |
+| Pufferfish jiggle cycle (seconds) | 0.32; 0.15–1.2 | Changes the body motion pace |
+| Pufferfish jiggle squash (fraction) | 0.035; 0–0.1 | Adds more body flex to the jiggle |
 | Early pufferfish rate (per second) | 0.08; 0–2 | Raises early risk |
 | Late pufferfish rate (per second) | 0.3; 0–3 | Raises endgame risk |
 | Pufferfish speed (world pixels/second) | 120; 20–400 | Reduces reaction time |
 | Disappear on pop (fraction) | 0.5; 0–1 | Leaves fewer to recollect |
 | Pop invulnerability (seconds) | 2; 0–8 | Gives safer recovery, without collection |
 | Bubble re-form time (seconds) | 0.35; 0.1–1.5 | Makes recovery more visible |
-| Pufferfish warning (on/off) | On; boolean | Enables edge notice |
-| Pufferfish warning time (seconds) | 0.8; 0–3 | Gives more visual notice |
+| Pufferfish warning (on/off) | On; boolean | Enables the offscreen burst and reveal delay |
+| Pufferfish warning time (seconds) | 0.8; 0–3 | Delays the pufferfish reveal while bubbles drift inward |
+| Telegraph bubble count | 24; 4–64 | Makes the one-shot particle burst denser |
+| Telegraph bubble radius (world pixels) | 4.5; 2–10 | Makes individual burst bubbles larger |
+| Telegraph noise strength | 3; 0–10 | Adds varied acceleration to individual bubble paths |
 | Final timer emphasis threshold (whole seconds) | 10; 1–30 | Starts countdown pulses earlier |
 | Parallax strength (multiplier) | 1; 0–2 | Moves the environment layers farther |
 | Timer pulse strength (multiplier) | 1; 0–2 | Enlarges final countdown beats more |
@@ -65,3 +74,5 @@ Every Inspector tooltip gives the field's purpose, default, safe range, and high
 | Effect gain (dB) | -6; -30–0 | Raises semantic sound effects |
 
 The maximum radius must exceed the starting radius. Starting jellyfish cannot exceed the free cap. High jellyfish spawn rate must be at least low rate; maximum wave duration must be at least minimum; late pufferfish rate must be at least early rate. Inspector setters clamp out-of-range values; the preset validator rejects any non-finite value that remains. Passing checks establishes safe configuration only; phone feel, accessibility, and balance still need human review.
+
+The jellyfish breathing and pufferfish body jiggle affect sprites only. The pufferfish size multiplier scales both its sprite and collision radius from the configured baseline radius. With warnings enabled, a one-shot `GPUParticles2D` burst starts at the offscreen path origin and drifts inward during the configured warning delay. The pufferfish sprite and collider remain disabled until the host warning deadline, when the fish appears at that same origin and begins its existing path. Random per-particle spread, speed, and acceleration add small movement variations to these decorative bubbles, which have no collision. Disabling warnings skips both the burst and delay.

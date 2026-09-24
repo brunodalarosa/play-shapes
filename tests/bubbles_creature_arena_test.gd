@@ -15,6 +15,7 @@ func _run() -> void:
 	_test_starting_spawn_and_entrance()
 	_test_waves_cap_and_edges()
 	_test_puffer_warning_crossing_and_pop()
+	_test_creature_visuals_are_decorative()
 	_test_scatter_lockout_and_extreme_count()
 	print("Bubbles creature arena checks: %d failures" % _failures)
 	quit(0 if _failures == 0 else 1)
@@ -113,6 +114,17 @@ func _test_waves_cap_and_edges() -> void:
 		_check(puffer.collision_layer == 64 and puffer.collision_mask == 0, "Pufferfish does not collide with NPC layer")
 	_check(creatures.spawn_fresh_at(creatures.get_pufferfish(path_ids[0]).global_position, 4000) == -1, "Safe spawn avoids a warned hazard")
 	_check(creatures.puffer_rate_at(0) < creatures.puffer_rate_at(5000) and creatures.puffer_rate_at(5000) < creatures.puffer_rate_at(10000), "Puffer spawn rate rises through the round")
+	controller.tuning.pufferfish_size_multiplier = 1.0
+	controller.inject_random_values([0.1, 0.2, 0.8])
+	creatures._spawn_random_puffer(5000)
+	var baseline_path := creatures.get_pufferfish(creatures._next_creature_id - 1)
+	controller.tuning.pufferfish_size_multiplier = 1.5
+	controller.inject_random_values([0.1, 0.2, 0.8])
+	creatures._spawn_random_puffer(5000)
+	var scaled_path := creatures.get_pufferfish(creatures._next_creature_id - 1)
+	_check(baseline_path.start_position == scaled_path.start_position
+		and baseline_path.end_position == scaled_path.end_position,
+		"Pufferfish size multiplier does not change the seeded crossing path")
 
 
 func _test_puffer_warning_crossing_and_pop() -> void:
@@ -132,11 +144,22 @@ func _test_puffer_warning_crossing_and_pop() -> void:
 	_check(players.get_bubble("p0").is_spinning(5), "Hazard fixture starts during active spin")
 	var hits: Array[String] = []
 	creatures.pufferfish_hit.connect(func(_id: int, player_id: String) -> void: hits.append(player_id))
-	var id := creatures.schedule_puffer_path(Vector2(-50, 300), Vector2(1050, 300), Vector2(16, 300), 0)
+	var start := Vector2(-50, 300)
+	var id := creatures.schedule_puffer_path(start, Vector2(1050, 300), 0)
 	var puffer := creatures.get_pufferfish(id)
-	_check(not puffer.active and puffer.warning_until_msec == 500, "Enabled edge warning precedes hazard")
+	_check(not puffer.active and puffer.warning_until_msec == 500 and puffer.global_position == start,
+		"Enabled offscreen bubble burst precedes the pufferfish at its path start")
+	_check(puffer._warning_particles.emitting and puffer._warning_particles.one_shot
+		and puffer._warning_particles.amount == controller.tuning.pufferfish_telegraph_bubble_count,
+		"Warning uses a tuned one-shot particle burst")
+	_check(puffer._sprite.visible == false and puffer._collider.disabled,
+		"Pufferfish art and collision stay hidden during its particle warning")
 	creatures.simulate_step(0.0, 499)
-	_check(not puffer.active and controller.personal_snapshot("p0").score == 5, "Warning alone never pops a player")
+	_check(not puffer.active and puffer._collider.disabled and controller.personal_snapshot("p0").score == 5,
+		"Warning alone never activates or pops a player")
+	creatures.simulate_step(0.0, 500)
+	_check(puffer.active and puffer.global_position == start and not puffer._collider.disabled,
+		"Pufferfish appears at its particle origin when the tuned delay ends")
 	for tick: int in 55:
 		creatures.simulate_step(0.05, 500 + tick * 50)
 	_check(hits == ["p0"] and controller.personal_snapshot("p0").score == 0, "Puffer pops spinning bubble once through host rule")
@@ -145,8 +168,94 @@ func _test_puffer_warning_crossing_and_pop() -> void:
 	var no_warning_controller: BubblesRoundController = no_warning.controller
 	var no_warning_creatures: BubblesCreatureArena = no_warning.creatures
 	no_warning_controller.tuning.pufferfish_warning_enabled = false
-	var immediate := no_warning_creatures.schedule_puffer_path(Vector2(-50, 300), Vector2(1050, 300), Vector2(16, 300), 0)
-	_check(no_warning_creatures.get_pufferfish(immediate).active, "Disabled warning activates puffer immediately")
+	var immediate := no_warning_creatures.schedule_puffer_path(Vector2(-50, 300), Vector2(1050, 300), 0)
+	_check(no_warning_creatures.get_pufferfish(immediate).active
+		and not no_warning_creatures.get_pufferfish(immediate)._warning_particles.emitting,
+		"Disabled warning activates puffer immediately without particles")
+	no_warning_creatures.simulate_step(0.05, 50)
+
+
+func _test_creature_visuals_are_decorative() -> void:
+	var fixture := _setup()
+	var controller: BubblesRoundController = fixture.controller
+	var creatures: BubblesCreatureArena = fixture.creatures
+	controller.tuning.pufferfish_warning_seconds = 0.5
+	controller.tuning.pufferfish_speed = 120.0
+	controller.tuning.pufferfish_start_spawn_rate = 0.0
+	controller.tuning.pufferfish_max_spawn_rate = 0.0
+	var id := creatures.schedule_puffer_path(Vector2(-50, 80), Vector2(1050, 80), 0)
+	var puffer := creatures.get_pufferfish(id)
+	var path_start := puffer.start_position
+	var path_end := puffer.end_position
+	var expected_radius := controller.tuning.pufferfish_collider_radius * 1.5
+	var expected_scale := expected_radius * 3.5 / float(puffer._sprite.texture.get_width())
+	_check(is_equal_approx(puffer.radius, expected_radius)
+		and is_equal_approx((puffer._collider.shape as CircleShape2D).radius, expected_radius),
+		"Pufferfish size multiplier grows its collision radius by 50 percent")
+	_check(is_equal_approx(puffer._sprite.scale.x, expected_scale), "Pufferfish art scale matches its enlarged radius")
+	_check(not puffer.active and puffer._warning_enabled, "Enabled visual warning remains separate from activation")
+	creatures.simulate_step(0.0, 500)
+	creatures.simulate_step(0.05, 550)
+	_check(puffer.active and puffer.can_hit_player(), "Pufferfish remains governed by its active path")
+	_check(puffer.start_position == path_start and puffer.end_position == path_end
+		and puffer.global_position.distance_to(path_start + puffer.direction * 6.0) < 0.001,
+		"Pufferfish visual jiggle and bubbles leave its host path unchanged")
+	_check(absf(puffer._sprite.rotation - puffer._base_sprite_rotation) > 0.001
+		and absf(puffer._sprite.scale.y - puffer._base_sprite_scale.y) > 0.001,
+		"Pufferfish body jiggles while swimming")
+	var particle_material := puffer._warning_particles.process_material as ParticleProcessMaterial
+	_check((puffer._collider.shape as CircleShape2D).radius == expected_radius
+		and puffer._warning_particles.amount == controller.tuning.pufferfish_telegraph_bubble_count
+		and particle_material != null and particle_material.tangential_accel_min < 0.0
+		and particle_material.tangential_accel_max > 0.0,
+		"Noisy decorative particles leave the creature collider unchanged")
+	var warning_node: Node = puffer._warning_particles
+	_check(puffer.get_child_count() == 3 and warning_node is GPUParticles2D
+		and not (warning_node is CollisionObject2D),
+		"Warning is a 2D particle node without gameplay collision")
+	for tick: int in 45:
+		creatures.simulate_step(0.05, 600 + tick * 50)
+	_check(puffer.active and not puffer.finished and puffer.start_position == path_start
+		and puffer.end_position == path_end,
+		"Pufferfish completes its unchanged opening path while particles remain decorative")
+
+	var jelly_fixture := _setup()
+	var jelly_controller: BubblesRoundController = jelly_fixture.controller
+	var jelly_creatures: BubblesCreatureArena = jelly_fixture.creatures
+	jelly_controller.tuning.jellyfish_collider_radius = 8.0
+	var small_id := jelly_creatures._create_jellyfish(Vector2(100, 80), Vector2.RIGHT, 0, false, 0)
+	var small_jelly := jelly_creatures.get_jellyfish(small_id)
+	jelly_controller.tuning.jellyfish_collider_radius = 60.0
+	var large_id := jelly_creatures._create_jellyfish(Vector2(200, 80), Vector2.RIGHT, 0, false, 0)
+	var large_jelly := jelly_creatures.get_jellyfish(large_id)
+	var small_start := small_jelly.global_position
+	var large_start := large_jelly.global_position
+	small_jelly.simulate_step(0.05, 599)
+	large_jelly.simulate_step(0.05, 599)
+	_check(not small_jelly.is_collectible(599) and not large_jelly.is_collectible(599)
+		and small_jelly._collider.disabled and large_jelly._collider.disabled,
+		"Jellyfish breathing preserves the entrance collection lock")
+	var small_expanded := small_jelly._sprite.scale.x
+	var large_expanded := large_jelly._sprite.scale.x
+	small_jelly.simulate_step(0.05, 600)
+	large_jelly.simulate_step(0.05, 600)
+	_check(small_jelly.is_collectible(600) and large_jelly.is_collectible(600)
+		and not small_jelly._collider.disabled and not large_jelly._collider.disabled,
+		"Jellyfish become collectible at the unchanged host-time unlock")
+	small_jelly.simulate_step(0.0, 600)
+	large_jelly.simulate_step(0.0, 600)
+	small_expanded = small_jelly._sprite.scale.x
+	large_expanded = large_jelly._sprite.scale.x
+	small_jelly.simulate_step(0.0, 1800)
+	large_jelly.simulate_step(0.0, 1800)
+	_check(small_jelly._sprite.scale.x < small_expanded and large_jelly._sprite.scale.x < large_expanded,
+		"Jellyfish breathing is visible at small and large sprite sizes")
+	_check(small_jelly.global_position.distance_to(small_start + Vector2.RIGHT * 4.5) < 0.001
+		and large_jelly.global_position.distance_to(large_start + Vector2.RIGHT * 4.5) < 0.001,
+		"Jellyfish breathing leaves wander displacement unchanged")
+	_check((small_jelly._collider.shape as CircleShape2D).radius == 8.0
+		and (large_jelly._collider.shape as CircleShape2D).radius == 60.0,
+		"Jellyfish breathing does not resize gameplay colliders")
 
 
 func _test_scatter_lockout_and_extreme_count() -> void:
@@ -168,7 +277,7 @@ func _test_scatter_lockout_and_extreme_count() -> void:
 	var protected_hits: Array[String] = []
 	creatures.pufferfish_hit.connect(func(_id: int, id: String) -> void: protected_hits.append(id))
 	var protected_id := creatures.schedule_puffer_path(players.get_bubble("p0").global_position,
-		players.get_bubble("p0").global_position + Vector2(100, 0), players.get_bubble("p0").global_position, 10)
+		players.get_bubble("p0").global_position + Vector2(100, 0), 10)
 	creatures.simulate_step(0.0, 10)
 	_check(creatures.get_pufferfish(protected_id) != null and protected_hits.is_empty(),
 		"Puffer collision respects post-pop invulnerability")

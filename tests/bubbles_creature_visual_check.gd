@@ -53,7 +53,7 @@ func _capture() -> void:
 		controller.record_jellyfish_capture("p0", now)
 	creatures._create_jellyfish(Vector2(620, 270), Vector2.ZERO, now, false, 0)
 	creatures._create_jellyfish(Vector2(740, 430), Vector2.ZERO, now, false, 0)
-	creatures.schedule_puffer_path(Vector2(-60, 520), Vector2(1340, 520), Vector2(48, 520), now)
+	creatures.schedule_puffer_path(Vector2(-60, 520), Vector2(1340, 520), now)
 	await _frames(5)
 	if not _save("entrance-and-warning"):
 		return

@@ -17,6 +17,8 @@ var spawned_at_msec := 0
 var collectible_at_msec := 0
 var _next_turn_msec := 0
 var _base_sprite_scale := 1.0
+var _breath_amplitude := 0.045
+var _breath_period_seconds := 2.4
 var _white_material: ShaderMaterial
 
 
@@ -36,6 +38,8 @@ func configure(id: int, selected_tuning: BubblesTuning, at_msec: int, position_w
 	spawned_at_msec = at_msec
 	collectible_at_msec = at_msec + (maxi(1, release_lockout_msec) if from_pop else roundi(selected_tuning.jellyfish_entrance_seconds * 1000.0))
 	_next_turn_msec = at_msec + TURN_INTERVAL_MSEC
+	_breath_amplitude = selected_tuning.jellyfish_breath_amplitude
+	_breath_period_seconds = selected_tuning.jellyfish_breath_period_seconds
 	global_position = position_world
 	velocity = movement.normalized() * selected_tuning.jellyfish_speed if movement.length_squared() > 0.0 else Vector2.ZERO
 	(_collider.shape as CircleShape2D).radius = radius
@@ -68,7 +72,9 @@ func _refresh(host_time_msec: int) -> void:
 	if not released and collectible_at_msec > spawned_at_msec:
 		var progress := clampf(float(host_time_msec - spawned_at_msec) / float(collectible_at_msec - spawned_at_msec), 0.0, 1.0)
 		scale_factor = 0.15 + 0.85 * progress
-	_sprite.scale = Vector2.ONE * _base_sprite_scale * scale_factor
+	var elapsed_seconds := float(maxi(0, host_time_msec - spawned_at_msec)) / 1000.0
+	var breath := 1.0 + sin(TAU * elapsed_seconds / _breath_period_seconds) * _breath_amplitude
+	_sprite.scale = Vector2.ONE * _base_sprite_scale * scale_factor * breath
 	var white_on := released and not is_collectible(host_time_msec) and (host_time_msec / BLINK_INTERVAL_MSEC) % 2 == 0
 	_white_material.set_shader_parameter("whiten", 1.0 if white_on else 0.0)
 	_collider.disabled = not is_collectible(host_time_msec)

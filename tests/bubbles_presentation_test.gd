@@ -79,11 +79,11 @@ func _run() -> void:
 	_check(view.audio_event_count(&"shove") == 1, "One contact does not spam shove audio")
 	var before_warning := view._audio_counts.duplicate()
 	tuning.pufferfish_warning_enabled = true
-	var warned_id := view.creature_arena.schedule_puffer_path(Vector2(-100, 400), Vector2(2000, 400), Vector2(140, 400), now + 3000)
+	var warned_id := view.creature_arena.schedule_puffer_path(Vector2(-100, 400), Vector2(2000, 400), now + 3000)
 	_check(warned_id > 0 and not view.creature_arena.get_pufferfish(warned_id).active, "Enabled puffer warning precedes entry")
 	_check(view._audio_counts == before_warning, "Puffer warning has no audio")
 	tuning.pufferfish_warning_enabled = false
-	var silent_id := view.creature_arena.schedule_puffer_path(Vector2(-100, 600), Vector2(2000, 600), Vector2(140, 600), now + 3000)
+	var silent_id := view.creature_arena.schedule_puffer_path(Vector2(-100, 600), Vector2(2000, 600), now + 3000)
 	_check(silent_id > 0 and view.creature_arena.get_pufferfish(silent_id).active, "Disabled warning enters without delay")
 	view._update_timer(now + 3000 + 11000)
 	_check(view._timer.text == "9" and view.audio_event_count(&"final_beat") == 1, "Final timer is numerical and audible")

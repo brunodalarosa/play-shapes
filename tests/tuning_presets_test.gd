@@ -40,6 +40,7 @@ func _run() -> void:
 		"jellyfish_speed", "jellyfish_spawn_clearance", "jellyfish_entrance_seconds", "released_collection_lockout_seconds",
 		"pufferfish_collider_radius", "pufferfish_start_spawn_rate", "pufferfish_max_spawn_rate", "pufferfish_speed",
 		"pop_disappear_ratio", "pop_invulnerability_seconds", "bubble_reform_seconds", "pufferfish_warning_enabled", "pufferfish_warning_seconds",
+		"pufferfish_telegraph_bubble_count", "pufferfish_telegraph_bubble_radius", "pufferfish_telegraph_noise_strength",
 		"final_timer_emphasis_seconds",
 	]):
 		return
