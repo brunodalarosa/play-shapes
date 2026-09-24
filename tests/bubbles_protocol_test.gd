@@ -145,7 +145,7 @@ func _test_timed_swipes() -> void:
 	var drags: Array[Vector2] = []
 	controller.arena_event_requested.connect(func(kind: StringName, id: String, _data: Dictionary) -> void:
 		if id == "a" and kind in [&"swipe", &"spin"]: impulses.append(kind))
-	controller.drag_visual_changed.connect(func(id: String, drag: Vector2) -> void:
+	controller.drag_visual_changed.connect(func(id: String, drag: Vector2, _gesture_started_msec: int) -> void:
 		if id == "a": drags.append(drag))
 	var swipe := [[0.1, 0.5], [0.9, 0.5]]
 	var limit := roundi(controller.tuning.swipe_max_hold_seconds * 1000.0)
@@ -163,6 +163,8 @@ func _test_timed_swipes() -> void:
 		"Fractional drag cell is rejected")
 	_check(not protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 2, "stage": "motion", "drag": [1, 0], "player_id": "b"}, 1080).accepted,
 		"Forged drag identity is rejected")
+	protocol.handle_action(players[0], {"type": "bubbles_charge", "input_seq": 2, "stage": "motion", "drag": [-4, 1]}, 1000 + limit + 1)
+	_check(drags.back() == Vector2.ZERO, "Held drag cue clears after the swipe activation limit")
 	var slow := protocol.handle_action(players[0], {"type": "bubbles_trace", "input_seq": 2, "trace": swipe}, 1000 + limit + 1)
 	_check(slow.accepted and slow.action == "none" and slow.reason == "swipe_too_slow" and impulses.size() == 1,
 		"Slow touch consumes its sequence without applying swipe impulse")

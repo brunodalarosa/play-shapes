@@ -124,7 +124,7 @@ func _handle_charge(player_id: String, message: Dictionary, now: int) -> Diction
 		_charges[player_id] = {"seq": seq, "step": 0, "time": now, "motions": 0, "last_motion": -1}
 		_gesture_starts[player_id] = {"seq": seq, "time": now}
 		controller.charge_visual_changed.emit(player_id, 0.0)
-		controller.drag_visual_changed.emit(player_id, Vector2.ZERO)
+		controller.drag_visual_changed.emit(player_id, Vector2.ZERO, now)
 	elif prior.is_empty() or seq != int(prior.seq):
 		return _reject(&"stale_charge")
 	elif stage == "cancel":
@@ -140,7 +140,9 @@ func _handle_charge(player_id: String, message: Dictionary, now: int) -> Diction
 		prior.last_motion = now
 		prior.time = now
 		_charges[player_id] = prior
-		controller.drag_visual_changed.emit(player_id, drag)
+		var started_msec := int(_gesture_starts[player_id].time)
+		var held_too_long := now - started_msec > roundi(controller.tuning.swipe_max_hold_seconds * 1000.0)
+		controller.drag_visual_changed.emit(player_id, Vector2.ZERO if held_too_long else drag, started_msec)
 	elif step <= int(prior.step):
 		return _reject(&"stale_charge")
 	else:
@@ -156,7 +158,7 @@ func _clear_charge(player_id: String, through_seq: int) -> void:
 	if not prior.is_empty() and int(prior.seq) <= through_seq:
 		_charges.erase(player_id)
 		controller.charge_visual_changed.emit(player_id, 0.0)
-		controller.drag_visual_changed.emit(player_id, Vector2.ZERO)
+		controller.drag_visual_changed.emit(player_id, Vector2.ZERO, -1)
 
 
 func snapshot_for(player_id: String) -> Dictionary:

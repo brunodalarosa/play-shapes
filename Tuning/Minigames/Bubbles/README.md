@@ -11,7 +11,7 @@ Every Inspector tooltip gives the field's purpose, default, safe range, and high
 | Swipe reaction (seconds) | 0.34; 0.12–0.9 | Holds the push and bubble pull longer |
 | Swipe pull (fraction) | 0.17; 0–0.22 | Stretches the drawn bubble farther, without changing collision |
 | Character swipe push (pixels) | 13; 0–24 | Moves the character farther within the bubble |
-| Maximum swipe hold (seconds) | 0.65; 0.2–2 | Allows a longer touch before its swipe impulse is canceled; completed spins are unaffected |
+| Maximum swipe hold (seconds) | 0.65; 0.2–2 | Ends live drag stretch and cancels a late swipe impulse; completed spins are unaffected |
 | Live drag pull (fraction) | 0.20; 0–0.22 | Stretches the bubble farther toward the held drag without changing collision |
 | Live drag response (seconds) | 0.08; 0.02–0.4 | Makes deformation follow and settle more slowly |
 | Charge glow (opacity) | 0.12; 0–0.25 | Brightens the faint inner glow as circular charge grows |

@@ -31,6 +31,7 @@ var _charge_progress := 0.0
 var _charge_last_msec := -1
 var _live_drag_target := Vector2.ZERO
 var _live_drag_display := Vector2.ZERO
+var _live_drag_started_msec := -1
 var _blink_next_msec := 0
 var _blink_until_msec := -1
 var _blink_index := 0
@@ -100,6 +101,8 @@ func simulate_step(delta: float, bounds: Rect2, host_time_msec: int) -> void:
 	_visual_host_msec = host_time_msec
 	if (_charge_progress > 0.0 or _live_drag_target.length_squared() > 0.0) and host_time_msec - _charge_last_msec > BubblesProtocol.CHARGE_TIMEOUT_MSEC:
 		_charge_progress = 0.0
+		_live_drag_target = Vector2.ZERO
+	if _live_drag_started_msec >= 0 and host_time_msec - _live_drag_started_msec > roundi(tuning.swipe_max_hold_seconds * 1000.0):
 		_live_drag_target = Vector2.ZERO
 	_live_drag_display = _live_drag_display.lerp(_live_drag_target,
 		1.0 - exp(-delta / tuning.live_drag_response_seconds))
@@ -293,9 +296,12 @@ func _on_charge_visual_changed(id: String, progress: float) -> void:
 		_charge_last_msec = _visual_host_msec
 
 
-func _on_drag_visual_changed(id: String, drag: Vector2) -> void:
+func _on_drag_visual_changed(id: String, drag: Vector2, gesture_started_msec: int) -> void:
 	if id == player_id and _active and _connected:
-		_live_drag_target = drag.limit_length(1.0)
+		_live_drag_started_msec = gesture_started_msec
+		var within_swipe_window := (gesture_started_msec >= 0
+			and _visual_host_msec - gesture_started_msec <= roundi(tuning.swipe_max_hold_seconds * 1000.0))
+		_live_drag_target = drag.limit_length(1.0) if within_swipe_window else Vector2.ZERO
 		_charge_last_msec = _visual_host_msec
 
 
