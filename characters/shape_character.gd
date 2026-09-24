@@ -13,6 +13,12 @@ const COLORED_PARTS: Array[NodePath] = [^"Body", ^"LeftHand", ^"RightHand", ^"Le
 		if is_node_ready():
 			_update_tint()
 
+var body_shape: StringName = CharacterSelection.FALLBACK_SHAPE:
+	set(value):
+		body_shape = CharacterSelection.normalize_shape(value)
+		if is_node_ready():
+			_update_body_texture()
+
 var _tint_material: ShaderMaterial
 
 
@@ -24,7 +30,21 @@ func _ready() -> void:
 	for path: NodePath in COLORED_PARTS:
 		var part := get_node(path) as Sprite2D
 		part.material = _tint_material
+	_update_body_texture()
 	_update_tint()
+
+
+func apply_selection(selection: Dictionary) -> void:
+	var resolved := CharacterSelection.resolve_selection(
+		selection.get("character_shape"),
+		selection.get("character_color")
+	)
+	body_shape = StringName(resolved.character_shape)
+	player_color = Color(String(resolved.character_color))
+
+
+func _update_body_texture() -> void:
+	(get_node(^"Body") as Sprite2D).texture = CharacterSelection.body_texture_for(body_shape)
 
 
 func _update_tint() -> void:

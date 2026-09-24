@@ -312,6 +312,8 @@ func _populate_players(players: Array[Dictionary]) -> void:
 		var seat := clampi(int(player.get("seat", 1)), 1, slots.size())
 		var slot := slots[seat - 1] as Control
 		slot.visible = true
+		var character := slot.get_node(^"PreviewCharacter") as ShapeCharacter
+		character.apply_selection(CharacterSelection.for_player(player))
 		var animator := _seat_animators[seat] as HybridCharacterAnimator
 		_player_animators[String(player.player_id)] = animator
 		_update_player_status(player)

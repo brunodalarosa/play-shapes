@@ -27,10 +27,24 @@ func _run() -> void:
 	view.controller.tuning = tuning
 	var roster: Array = []
 	for index: int in 10:
-		roster.append({"player_id": "p%d" % index, "name": "Player %d" % index, "seat": index + 1})
+		var player := {"player_id": "p%d" % index, "name": "Player %d" % index, "seat": index + 1}
+		if index == 0:
+			player.merge({"character_shape": "square", "character_color": "#EC407A"})
+		elif index == 1:
+			player.merge({"character_shape": "rhombus", "character_color": "#00ACC1"})
+		roster.append(player)
 	var now := Time.get_ticks_msec()
 	_check(view.start_round(roster, now).accepted, "Ten-player scene starts")
 	_check(view.player_arena.bubble_ids().size() == 10, "All ten named bubble scenes exist")
+	var first_character := view.player_arena.get_bubble("p0").get_node(^"ShapeCharacter") as ShapeCharacter
+	var second_character := view.player_arena.get_bubble("p1").get_node(^"ShapeCharacter") as ShapeCharacter
+	var fallback_character := view.player_arena.get_bubble("p2").get_node(^"ShapeCharacter") as ShapeCharacter
+	_check(first_character.body_shape == &"square" and first_character.player_color.is_equal_approx(Color("#EC407A"))
+		and second_character.body_shape == &"rhombus" and second_character.player_color.is_equal_approx(Color("#00ACC1")),
+		"Distinct registered player styles appear simultaneously on Bubbles bodies")
+	_check(fallback_character.body_shape == CharacterSelection.FALLBACK_SHAPE
+		and fallback_character.player_color.is_equal_approx(Color(CharacterSelection.FALLBACK_COLOR)),
+		"A host-created player without a style gets the current circle-and-blue fallback")
 	_check(view._world.scale.x > 0.0 and view._world.scale.x < 1.0, "World fits a 1280x720 viewport")
 	_check(_rect_matches(view.player_arena.wall_bounds, root.get_viewport().get_visible_rect()), "Player walls match the active 1280x720 viewport")
 	_check(_rect_matches(view.player_arena.bounds, BubblesPresentation.NPC_ARENA_BOUNDS), "Existing NPC arena bounds remain unchanged")
@@ -96,6 +110,11 @@ func _run() -> void:
 	var ranking: Array = view.controller.result_snapshot().ranking
 	_check(int(ranking[0].rank) == 1 and int(ranking[1].rank) == 1 and int(ranking[9].rank) == 1, "Equal final counts retain shared rank")
 	_check((view._results_list.get_child(0) as HBoxContainer).get_child_count() == 4, "Result row has rank, character, name and count")
+	var first_result_character := (((view._results_list.get_child(0) as HBoxContainer).get_child(1) as Control).get_child(0) as ShapeCharacter)
+	var second_result_character := (((view._results_list.get_child(1) as HBoxContainer).get_child(1) as Control).get_child(0) as ShapeCharacter)
+	_check(first_result_character.body_shape == &"square" and first_result_character.player_color.is_equal_approx(Color("#EC407A"))
+		and second_result_character.body_shape == &"rhombus" and second_result_character.player_color.is_equal_approx(Color("#00ACC1")),
+		"Frozen results retain each participant's selected body shape and color")
 	_check(view._results_list.size.y > 0.0 and view._results_list.size.y < view.size.y, "Results fit without scrolling")
 	_check(view.controller.request_return_to_lobby(), "Host can request return")
 	_check(not view.controller.request_return_to_lobby(), "Return fires once")

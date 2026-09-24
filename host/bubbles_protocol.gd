@@ -171,6 +171,8 @@ func snapshot_for(player_id: String) -> Dictionary:
 	return {
 		"type": "bubbles_snapshot", "phase": str(own.phase),
 		"debug_mode": controller.is_one_player_debug(),
+		"character_shape": String(own.get("character_shape", CharacterSelection.FALLBACK_SHAPE)),
+		"character_color": String(own.get("character_color", CharacterSelection.FALLBACK_COLOR)),
 		"score": int(own.score), "bubble_radius": float(own.bubble_radius),
 		"visual_jellyfish": int(own.visual_jellyfish), "visual_cap": controller.tuning.captured_visual_cap,
 		"seat": int(own.seat), "connected": bool(own.connected), "left": bool(own.left),

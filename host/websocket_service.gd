@@ -156,7 +156,10 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			var result := _registry.join_player(
 				client.connection_id,
 				message.get("name"),
-				_accepting_new_players.call()
+				_accepting_new_players.call(),
+				Time.get_ticks_msec(),
+				message.get("character_shape"),
+				message.get("character_color")
 			)
 			if result.accepted:
 				peer.send_text(JSON.stringify({

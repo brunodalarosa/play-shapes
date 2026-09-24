@@ -22,6 +22,8 @@ func _run() -> void:
 	second.position = Vector2(240, 70)
 	viewport.add_child(first)
 	viewport.add_child(second)
+	first.apply_selection({"character_shape": "square", "character_color": "#EC407A"})
+	second.apply_selection({"character_shape": "rhombus", "character_color": "#00ACC1"})
 	assert(first.get_child_count() == 6)
 	for part: Node in first.get_children():
 		assert(part is Sprite2D)
@@ -29,6 +31,16 @@ func _run() -> void:
 	assert(first.get_node("Body").material == first.get_node("LeftFoot").material)
 	assert(first.get_node("Face").material == null)
 	assert(first.get_node("LeftFoot").flip_h and not first.get_node("RightFoot").flip_h)
+	assert(first.body_shape == &"square" and first.get_node("Body").texture == CharacterSelection.body_texture_for(&"square"))
+	assert(second.body_shape == &"rhombus" and second.get_node("Body").texture == CharacterSelection.body_texture_for(&"rhombus"))
+	for path: NodePath in ShapeCharacter.COLORED_PARTS:
+		var first_part := first.get_node(path) as Sprite2D
+		var second_part := second.get_node(path) as Sprite2D
+		assert(first_part.material == first.get_node("Body").material)
+		assert(second_part.material == second.get_node("Body").material)
+		assert(first_part.material != second_part.material)
+		assert((first_part.material as ShaderMaterial).get_shader_parameter("player_color").is_equal_approx(Color("#EC407A")))
+		assert((second_part.material as ShaderMaterial).get_shader_parameter("player_color").is_equal_approx(Color("#00ACC1")))
 	var face_transform: Transform2D = first.get_node("Face").transform
 	first.get_node("LeftHand").rotation = 0.4
 	assert(first.get_node("RightHand").rotation == 0.0)
@@ -42,6 +54,10 @@ func _run() -> void:
 	var after := viewport.get_texture().get_image()
 	assert(before.get_pixel(80, 45) != after.get_pixel(80, 45), "Tint must change rendered body pixels")
 	assert(before.get_pixel(240, 45) == after.get_pixel(240, 45), "Other instance must keep its color")
+	for point: Vector2i in [Vector2i(25, 90), Vector2i(135, 90), Vector2i(54, 130), Vector2i(106, 130)]:
+		assert(before.get_pixelv(point) != after.get_pixelv(point), "Selected tint must change both rendered hands and feet")
+	for point: Vector2i in [Vector2i(185, 90), Vector2i(295, 90), Vector2i(214, 130), Vector2i(266, 130)]:
+		assert(before.get_pixelv(point) == after.get_pixelv(point), "Changing one player's tint must leave the other hands and feet unchanged")
 	var face := first.get_node("Face") as Sprite2D
 	var mask := face.texture.get_image()
 	mask.convert(Image.FORMAT_RGBA8)
@@ -70,7 +86,7 @@ func _run() -> void:
 	var capture := root.get_texture().get_image()
 	var path := ProjectSettings.globalize_path("res://art/character-feet/runtime-showcase.png")
 	assert(capture.save_png(path) == OK)
-	print("PASS: six independent parts, per-instance materials, mirrored feet, rendered tint changes, unchanged second player and %d opaque face pixels." % checked)
+	print("PASS: selectable body textures, all five colored parts, per-instance materials, rendered tint changes, unchanged second player and %d opaque face pixels." % checked)
 	showcase.queue_free()
 	await process_frame
 	quit(0)

@@ -49,7 +49,7 @@ after(async () => {
 
 test('serves bundled HTML, JS, CSS and session configuration', async () => {
   for (const [path, mime, text] of [
-    ['/', 'text/html', 'Join game'], ['/app.js', 'text/javascript', 'localStorage'],
+    ['/', 'text/html', 'PLAY SHAPES'], ['/app.js', 'text/javascript', 'localStorage'],
     ['/controller_geometry.js', 'text/javascript', 'directionAtPoint'],
     ['/bubbles_gesture.js', 'text/javascript', 'GestureTrace'],
     ['/bubbles-jellyfish.png', 'image/png', null],
@@ -146,7 +146,7 @@ function rawRequest(chunks) {
 }
 
 test('handles fragmented requests and rejects oversized headers', async () => {
-  assert.match(await rawRequest(['GET / HTTP/1.1\r\nHost:', ' localhost\r\n\r\n']), /200 OK[\s\S]*Join the game/);
+  assert.match(await rawRequest(['GET / HTTP/1.1\r\nHost:', ' localhost\r\n\r\n']), /200 OK[\s\S]*PLAY SHAPES/);
   assert.match(await rawRequest(['GET / HTTP/1.1\r\nX: ' + 'a'.repeat(9000)]), /431 Request|^RESET$/);
 });
 

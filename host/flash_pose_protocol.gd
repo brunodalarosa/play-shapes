@@ -116,6 +116,8 @@ func _player_state(player_id: String) -> Dictionary:
 func _public_gameplay_state(state: Dictionary) -> Dictionary:
 	return {
 		"lives": int(state.get("lives", 0)),
+		"character_shape": String(state.get("character_shape", CharacterSelection.FALLBACK_SHAPE)),
+		"character_color": String(state.get("character_color", CharacterSelection.FALLBACK_COLOR)),
 		"eliminated": StringName(state.get("state", &"")) == &"eliminated",
 		"direction": str(state.get("pose_direction", &"")),
 		"charge": clampf(float(state.get("pose_charge", 0.0)), 0.0, 1.0),

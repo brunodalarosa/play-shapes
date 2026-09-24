@@ -102,10 +102,13 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 			_players.clear()
 			_pose_rules = null
 			return _rejected(&"invalid_participants")
+		var selection := CharacterSelection.for_player(source)
 		_players[player_id] = {
 			"player_id": player_id,
 			"name": String(source.get("name", "")),
 			"seat": int(source.get("seat", index + 1)),
+			"character_shape": selection.character_shape,
+			"character_color": selection.character_color,
 			"snapshot_index": index,
 			"state": &"active",
 			"connected": String(source.get("state", "connected")) == "connected",

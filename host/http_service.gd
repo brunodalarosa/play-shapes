@@ -20,6 +20,10 @@ const ASSETS: Dictionary = {
 	"path": "res://web/public/bubbles_gesture.js",
 	"content_type": "text/javascript; charset=utf-8",
 },
+"/character_selection.js": {
+	"path": "res://web/public/character_selection.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
 "/bubbles-jellyfish.png": {
 	"path": "res://assets/runtime/minigames/bubbles_and_jellyfishes/jellyfish/jellyfish_small.png",
 	"content_type": "image/png",
@@ -32,6 +36,26 @@ const ASSETS: Dictionary = {
 },
 "/bubbles-player-body.png": {
 	"path": "res://assets/runtime/shape_characters/bodies/circle.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/shape-square.png": {
+	"path": "res://assets/runtime/shape_characters/bodies/square.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/shape-circle.png": {
+	"path": "res://assets/runtime/shape_characters/bodies/circle.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/shape-squircle.png": {
+	"path": "res://assets/runtime/shape_characters/bodies/squircle.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/shape-rhombus.png": {
+	"path": "res://assets/runtime/shape_characters/bodies/rhombus.png",
 	"content_type": "image/png",
 	"resource_type": "Texture2D",
 },

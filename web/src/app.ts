@@ -1,7 +1,22 @@
 import { attemptImmersive, chargedColor, directionAtPoint, heldDirectionAfterUpdate, type Direction } from "./controller_geometry.js";
 import { GestureTrace, type Point } from "./bubbles_gesture.js";
+import {
+  advanceJoinFlow, bodyAssetPath, CHARACTER_COLORS, CHARACTER_SHAPES, chooseJoinColor,
+  colorOption, createJoinMessage, cycleJoinShape, defaultJoinFlow, FALLBACK_CHARACTER,
+  isCharacterShape, returnToCharacterSelection, type CharacterShape, type JoinFlowState,
+} from "./character_selection.js";
 
 const status = document.querySelector<HTMLElement>("#status")!;
+const selectionScreen = document.querySelector<HTMLElement>("#selection-screen")!;
+const previousShapeButton = document.querySelector<HTMLButtonElement>("#previous-shape")!;
+const nextShapeButton = document.querySelector<HTMLButtonElement>("#next-shape")!;
+const selectionPreview = document.querySelector<HTMLCanvasElement>("#selection-preview")!;
+const namePreview = document.querySelector<HTMLCanvasElement>("#name-preview")!;
+const selectedCharacterLabel = document.querySelector<HTMLElement>("#selected-character-label")!;
+const colorGrid = document.querySelector<HTMLElement>("#color-grid")!;
+const nextButton = document.querySelector<HTMLButtonElement>("#next-button")!;
+const backButton = document.querySelector<HTMLButtonElement>("#back-button")!;
+const nameScreen = document.querySelector<HTMLElement>("#name-screen")!;
 const joinForm = document.querySelector<HTMLFormElement>("#join-form")!;
 const nameInput = document.querySelector<HTMLInputElement>("#player-name")!;
 const joinButton = document.querySelector<HTMLButtonElement>("#join-button")!;
@@ -22,12 +37,12 @@ const bubblesCanvas = document.querySelector<HTMLCanvasElement>("#bubbles-visual
 const bubblesContext = bubblesCanvas.getContext("2d", { alpha: true })!;
 
 const STORAGE = { session: "play-shapes.session-id", token: "play-shapes.reconnect-token", name: "play-shapes.last-name", inputSeq: "play-shapes.input-seq" } as const;
-type PublicPlayer = { player_id: string; name: string; seat: number; state: string };
-type GameplayPlayer = { lives?: number; eliminated?: boolean; direction?: string; charge?: number; held?: boolean };
+type PublicPlayer = { player_id: string; name: string; seat: number; state: string; character_shape?: string; character_color?: string };
+type GameplayPlayer = { lives?: number; eliminated?: boolean; direction?: string; charge?: number; held?: boolean; character_shape?: string; character_color?: string };
 type Presentation = { colors?: Partial<Record<Direction, string>>; minimum_brightness?: number; maximum_brightness?: number; charge_fill_seconds?: number; charge_decay_seconds?: number };
 type BubblesVisualSnapshot = { host_time_msec: number; radius: number; pull: Point; drag_pull: Point; charge_pull: Point; surface_angle: number; spinning: boolean; recovery_white: boolean; burst_progress: number; particle_density: number; charge_glow: number; character_visible: boolean; character_scale: number; character_position: Point; body_rotation: number; face_position: Point; face_blink: boolean; left_hand_position: Point; right_hand_position: Point; left_foot_position: Point; right_foot_position: Point };
 type BubblesVisualTuning = { starting_radius?: number; live_drag_pull_strength?: number; live_drag_response_seconds?: number; charge_wobble_strength?: number; charge_glow_strength?: number; swipe_reaction_seconds?: number; spin_surface_turns_per_second?: number; bubble_reform_seconds?: number; burst_seconds?: number };
-type HostMessage = { type?: string; protocol?: number; connection_id?: number; session_id?: string; resume_status?: string; reconnect_token?: string; player?: PublicPlayer | GameplayPlayer; code?: string; message?: string; phase?: string; available_directions?: string[]; success?: boolean; lives?: number; debug_mode?: boolean; eliminated?: boolean; placement?: number; state?: string; gameplay?: HostMessage; presentation?: Presentation; direction?: string; charge?: number; held?: boolean; score?: number; bubble_radius?: number; burst_radius?: number; visual_jellyfish?: number; visual_cap?: number; seat?: number; left?: boolean; host_time_msec?: number; visual_tuning?: BubblesVisualTuning; visual?: BubblesVisualSnapshot; spin_remaining_msec?: number; cooldown_remaining_msec?: number; invulnerable_remaining_msec?: number; reform_remaining_msec?: number; spin_duration_msec?: number; cooldown_duration_msec?: number; circles_to_charge?: number; rank?: number; event?: string; lost?: number; action?: string; reason?: string };
+type HostMessage = { type?: string; protocol?: number; connection_id?: number; session_id?: string; resume_status?: string; reconnect_token?: string; player?: PublicPlayer | GameplayPlayer; code?: string; message?: string; phase?: string; available_directions?: string[]; success?: boolean; lives?: number; debug_mode?: boolean; eliminated?: boolean; placement?: number; state?: string; gameplay?: HostMessage; presentation?: Presentation; direction?: string; charge?: number; held?: boolean; score?: number; bubble_radius?: number; burst_radius?: number; visual_jellyfish?: number; visual_cap?: number; seat?: number; left?: boolean; character_shape?: string; character_color?: string; host_time_msec?: number; visual_tuning?: BubblesVisualTuning; visual?: BubblesVisualSnapshot; spin_remaining_msec?: number; cooldown_remaining_msec?: number; invulnerable_remaining_msec?: number; reform_remaining_msec?: number; spin_duration_msec?: number; cooldown_duration_msec?: number; circles_to_charge?: number; rank?: number; event?: string; lost?: number; action?: string; reason?: string };
 
 const POSES: ReadonlyArray<{ direction: Direction; icon: string; label: string }> = [
   { direction: "left", icon: "←", label: "Pose left" }, { direction: "right", icon: "→", label: "Pose right" },
@@ -39,6 +54,7 @@ let socket: WebSocket | undefined;
 let retry: ReturnType<typeof setTimeout> | undefined;
 let stopped = false;
 let joined = false;
+let joinFlow: JoinFlowState = defaultJoinFlow();
 let inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
 let held: { direction: Direction; pointerId?: number; button: HTMLButtonElement } | undefined;
 let directions: Direction[] = [];
@@ -58,10 +74,11 @@ let bubblesVisualSnapshot: BubblesVisualSnapshot | undefined;
 let bubblesVisualReceivedAt = 0;
 let bubblesPhoneDragDisplay: Point = [0, 0];
 let bubblesPreviousFrame = performance.now();
+const characterBodies = Object.fromEntries(CHARACTER_SHAPES.map(shape => [shape, new Image()])) as Record<CharacterShape, HTMLImageElement>;
+for (const shape of CHARACTER_SHAPES) characterBodies[shape].src = bodyAssetPath(shape);
 const bubblesArt = {
-  body: new Image(), hand: new Image(), foot: new Image(), face: new Image(), blink: new Image(), jellyfish: new Image(),
+  hand: new Image(), foot: new Image(), face: new Image(), blink: new Image(), jellyfish: new Image(),
 };
-bubblesArt.body.src = "/bubbles-player-body.png";
 bubblesArt.hand.src = "/bubbles-player-hand.png";
 bubblesArt.foot.src = "/bubbles-player-foot.png";
 bubblesArt.face.src = "/bubbles-player-face-neutral.png";
@@ -72,6 +89,37 @@ const bubblesTintCache = new Map<string, HTMLCanvasElement>();
 function stored(key: string): string { try { return localStorage.getItem(key) ?? ""; } catch { return ""; } }
 function store(key: string, value: string): void { try { localStorage.setItem(key, value); } catch { /* Page remains usable. */ } }
 function forgetIdentity(): void { try { localStorage.removeItem(STORAGE.session); localStorage.removeItem(STORAGE.token); localStorage.removeItem(STORAGE.inputSeq); } catch { /* Restricted storage. */ } inputSeq = 0; }
+
+function selectedCharacterName(): string {
+  const shape = joinFlow.shape[0].toUpperCase() + joinFlow.shape.slice(1);
+  const color = colorOption(joinFlow.color)?.name ?? "Blue";
+  return `${shape} · ${color}`;
+}
+
+function refreshSelectionUi(): void {
+  const label = selectedCharacterName();
+  selectedCharacterLabel.textContent = label;
+  selectionPreview.setAttribute("aria-label", `${label} Shape Character`);
+  namePreview.setAttribute("aria-label", `${label} character dancing`);
+  for (const button of Array.from(colorGrid.querySelectorAll<HTMLButtonElement>(".color-button"))) {
+    button.setAttribute("aria-pressed", String(button.dataset.color === joinFlow.color));
+  }
+  renderJoinPreviews(performance.now());
+}
+
+for (const option of CHARACTER_COLORS) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "color-button";
+  button.dataset.color = option.hex;
+  button.style.backgroundColor = option.hex;
+  button.setAttribute("aria-label", `Choose ${option.name}`);
+  button.setAttribute("aria-pressed", "false");
+  button.addEventListener("click", () => { joinFlow = chooseJoinColor(joinFlow, option.hex); refreshSelectionUi(); });
+  colorGrid.append(button);
+}
+refreshSelectionUi();
+
 function setGameplaySurface(active: boolean, mode: "flash" | "bubbles" = "flash"): void {
   const next = active ? mode : null;
   if (activeGame !== next) {
@@ -91,13 +139,35 @@ function updateOrientation(): void {
 }
 
 function showJoin(message: string, focus = false): void {
-  joined = false; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); playerCard.hidden = true; gameCard.hidden = true; bubblesCard.hidden = true; joinForm.hidden = false; joinButton.disabled = false; leaveButton.disabled = false;
-  status.textContent = message; nameInput.value = stored(STORAGE.name); if (focus) queueMicrotask(() => nameInput.focus());
+  joinFlow = returnToCharacterSelection(joinFlow);
+  joined = false; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); playerCard.hidden = true; gameCard.hidden = true; bubblesCard.hidden = true;
+  selectionScreen.hidden = false; nameScreen.hidden = true; joinForm.hidden = true; joinButton.disabled = false; leaveButton.disabled = false;
+  status.textContent = message; status.hidden = !message; nameInput.value = stored(STORAGE.name); refreshSelectionUi();
+  if (focus) queueMicrotask(() => nextButton.focus());
 }
 function showJoined(player: PublicPlayer, state = "Connected"): void {
-  joined = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); joinForm.hidden = true; playerCard.hidden = false; gameCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false;
-  status.textContent = state === "Connected" ? "Joined. Keep this page open while you play." : state;
+  joined = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); selectionScreen.hidden = true; nameScreen.hidden = true; joinForm.hidden = true; playerCard.hidden = false; gameCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false;
+  if (isCharacterShape(player.character_shape)) joinFlow = { ...joinFlow, shape: player.character_shape };
+  const serverColor = colorOption(player.character_color)?.hex;
+  if (serverColor) joinFlow = chooseJoinColor(joinFlow, serverColor);
+  status.textContent = state === "Connected" ? "Joined. Keep this page open while you play." : state; status.hidden = true;
 }
+
+previousShapeButton.addEventListener("click", () => { joinFlow = cycleJoinShape(joinFlow, -1); refreshSelectionUi(); });
+nextShapeButton.addEventListener("click", () => { joinFlow = cycleJoinShape(joinFlow, 1); refreshSelectionUi(); });
+nextButton.addEventListener("click", () => {
+  joinFlow = advanceJoinFlow(joinFlow);
+  selectionScreen.hidden = true; nameScreen.hidden = false; joinForm.hidden = false;
+  if (!nameInput.value) nameInput.value = stored(STORAGE.name);
+  status.hidden = true; status.textContent = ""; refreshSelectionUi();
+  queueMicrotask(() => nameInput.focus());
+});
+backButton.addEventListener("click", () => {
+  joinFlow = returnToCharacterSelection(joinFlow);
+  nameScreen.hidden = true; joinForm.hidden = true; selectionScreen.hidden = false;
+  status.hidden = true; status.textContent = ""; refreshSelectionUi();
+  queueMicrotask(() => nextButton.focus());
+});
 function sendPose(type: "pose_down" | "pose_up", direction: Direction): void { if (!socket || socket.readyState !== WebSocket.OPEN) return; inputSeq += 1; store(STORAGE.inputSeq, String(inputSeq)); socket.send(JSON.stringify({ type, direction, input_seq: inputSeq })); }
 function releaseHeld(send = true): void {
   if (!held) return; const current = held; held = undefined; current.button.classList.remove("is-held"); current.button.setAttribute("aria-pressed", "false");
@@ -251,7 +321,6 @@ function showBubbles(message: HostMessage): void {
   }
 }
 
-const BUBBLES_SEAT_COLORS = ["#5b8df2", "#4ecb8d", "#f6c453", "#9c72e8", "#ef7f45", "#55c7d9", "#e867b5", "#89b34c", "#7f91a8", "#d76464"];
 const BUBBLE_RIM_COLORS = ["#6eeaff", "#a785ff", "#ff8bce", "#ffdf9d", "#8af8c7"];
 
 function clamp(value: number, minimum: number, maximum: number): number { return Math.min(maximum, Math.max(minimum, value)); }
@@ -296,6 +365,47 @@ function drawSprite(context: CanvasRenderingContext2D, image: HTMLImageElement, 
 function drawUntintedSprite(context: CanvasRenderingContext2D, image: HTMLImageElement, x: number, y: number, width: number, height: number): void {
   if (!imageReady(image)) return;
   context.save(); context.translate(x, y); context.drawImage(image, -width / 2, -height / 2, width, height); context.restore();
+}
+type CharacterPose = { bodyRotation: number; facePosition: Point; faceBlink: boolean; leftHandPosition: Point; rightHandPosition: Point; leftFootPosition: Point; rightFootPosition: Point; leftHandRotation: number; rightHandRotation: number };
+function drawCharacter(context: CanvasRenderingContext2D, shape: CharacterShape, tint: string, x: number, y: number, scale: number, pose: CharacterPose): void {
+  context.save(); context.translate(x, y); context.scale(scale, scale);
+  drawSprite(context, bubblesArt.foot, tint, pose.leftFootPosition[0], pose.leftFootPosition[1], 40, 24, true);
+  drawSprite(context, bubblesArt.foot, tint, pose.rightFootPosition[0], pose.rightFootPosition[1], 40, 24);
+  drawSprite(context, bubblesArt.hand, tint, pose.leftHandPosition[0], pose.leftHandPosition[1], 35, 34, true, pose.leftHandRotation);
+  drawSprite(context, bubblesArt.hand, tint, pose.rightHandPosition[0], pose.rightHandPosition[1], 35, 34, false, pose.rightHandRotation);
+  drawSprite(context, characterBodies[shape], tint, 0, 0, 80, 80, false, pose.bodyRotation);
+  const face = pose.faceBlink ? bubblesArt.blink : bubblesArt.face;
+  drawUntintedSprite(context, face, pose.facePosition[0], pose.facePosition[1], pose.faceBlink ? 53 : 50, pose.faceBlink ? 37 : 29);
+  context.restore();
+}
+function renderJoinPreviews(now: number): void {
+  const seconds = now / 1000;
+  for (const canvas of [selectionPreview, namePreview]) {
+    const section = canvas.closest("section");
+    if (section?.hidden) continue;
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) continue;
+    const pixelRatio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+    const width = Math.max(1, Math.round(rect.width * pixelRatio));
+    const height = Math.max(1, Math.round(rect.height * pixelRatio));
+    if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
+    const context = canvas.getContext("2d");
+    if (!context) continue;
+    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    context.clearRect(0, 0, rect.width, rect.height);
+    const dancing = canvas === namePreview;
+    const wave = dancing ? Math.sin(seconds * 4.2) : 0;
+    const pose: CharacterPose = {
+      bodyRotation: dancing ? Math.sin(seconds * 2.7) * 0.09 : 0,
+      facePosition: [0, -5], faceBlink: Math.sin(seconds * 0.9) > 0.985,
+      leftHandPosition: [-52, -4 - wave * 4], rightHandPosition: [52, -4 + wave * 4],
+      leftFootPosition: [-35 - wave * 2, 62], rightFootPosition: [35 + wave * 2, 62],
+      leftHandRotation: wave * 0.22, rightHandRotation: -wave * 0.22,
+    };
+    const scale = Math.min(rect.width / 145, rect.height / 125) * 0.9;
+    drawCharacter(context, joinFlow.shape, joinFlow.color, rect.width / 2,
+      rect.height * 0.46 + (dancing ? Math.sin(seconds * 3.4) * 4 : 0), scale, pose);
+  }
 }
 function drawBubblePath(context: CanvasRenderingContext2D, radius: number, pull: Point, surfaceAngle: number): { points: Point[]; center: Point; along: Point; stretch: number } {
   const length = Math.hypot(pull[0], pull[1]);
@@ -345,24 +455,20 @@ function drawBubbleBurst(context: CanvasRenderingContext2D, radius: number, prog
     else drawArc(context, x, y, 2 + index % 3, 0, Math.PI * 2, `rgba(204,248,255,${0.75 * fade})`, 1.3);
   }
 }
-function drawPhoneCharacter(context: CanvasRenderingContext2D, worldScale: number, seatColor: string, visual: BubblesVisualSnapshot | undefined, hostTime: number): void {
+function drawPhoneCharacter(context: CanvasRenderingContext2D, visual: BubblesVisualSnapshot | undefined, hostTime: number,
+		shape: CharacterShape, selectedColor: string): void {
   const fallbackScale = Math.min(0.55, (bubblesSnapshot?.bubble_radius ?? tuningValue("starting_radius", 48)) * 0.82 / 75);
   const characterScale = (visual?.character_scale ?? fallbackScale) * 0.4;
   const position = visual?.character_position ?? [0, Math.sin(hostTime / 1000 * 2.2) * 4];
-  const bodyRotation = visual?.body_rotation ?? Math.sin(hostTime / 1000 * 1.7) * 0.05;
-  const facePosition = visual?.face_position ?? [0, -5];
-  const leftHand = visual?.left_hand_position ?? [-52, -4]; const rightHand = visual?.right_hand_position ?? [52, -4];
-  const leftFoot = visual?.left_foot_position ?? [-35, 62]; const rightFoot = visual?.right_foot_position ?? [35, 62];
-  const tint = visual?.recovery_white ? "#ffffff" : seatColor;
-  context.save(); context.translate(position[0] * worldScale, position[1] * worldScale); context.scale(characterScale, characterScale);
-  drawSprite(context, bubblesArt.foot, tint, leftFoot[0], leftFoot[1], 40, 24, true);
-  drawSprite(context, bubblesArt.foot, tint, rightFoot[0], rightFoot[1], 40, 24);
-  drawSprite(context, bubblesArt.hand, tint, leftHand[0], leftHand[1], 35, 34, true);
-  drawSprite(context, bubblesArt.hand, tint, rightHand[0], rightHand[1], 35, 34);
-  drawSprite(context, bubblesArt.body, tint, 0, 0, 80, 80, false, bodyRotation);
-  drawUntintedSprite(context, visual?.face_blink ? bubblesArt.blink : bubblesArt.face, facePosition[0], facePosition[1],
-    visual?.face_blink ? 53 : 50, visual?.face_blink ? 37 : 29);
-  context.restore();
+  const pose: CharacterPose = {
+    bodyRotation: visual?.body_rotation ?? Math.sin(hostTime / 1000 * 1.7) * 0.05,
+    facePosition: visual?.face_position ?? [0, -5], faceBlink: visual?.face_blink ?? false,
+    leftHandPosition: visual?.left_hand_position ?? [-52, -4], rightHandPosition: visual?.right_hand_position ?? [52, -4],
+    leftFootPosition: visual?.left_foot_position ?? [-35, 62], rightFootPosition: visual?.right_foot_position ?? [35, 62],
+    leftHandRotation: 0, rightHandRotation: 0,
+  };
+  drawCharacter(context, shape, visual?.recovery_white ? "#ffffff" : selectedColor,
+    position[0], position[1], characterScale, pose);
 }
 function renderBubbles(now: number): void {
   if (bubblesCard.hidden || !bubblesSnapshot) return;
@@ -385,7 +491,8 @@ function renderBubbles(now: number): void {
   const radius = Math.max(1, visual?.radius ?? ((message.bubble_radius ?? startRadius) * reformScale));
   const burstRadius = message.burst_radius ?? message.bubble_radius ?? startRadius;
   const renderedRadius = burstProgress >= 0 && burstProgress < 1 ? (visual?.radius ?? burstRadius) : radius;
-  const seat = Math.max(1, Math.floor(message.seat ?? 1)); const seatColor = BUBBLES_SEAT_COLORS[(seat - 1) % BUBBLES_SEAT_COLORS.length];
+  const bodyShape = isCharacterShape(message.character_shape) ? message.character_shape : FALLBACK_CHARACTER.shape;
+  const selectedColor = colorOption(message.character_color)?.hex ?? FALLBACK_CHARACTER.color;
   const spinTurns = tuningValue("spin_surface_turns_per_second", 1.8);
   const spinning = visual?.spinning ?? (message.phase === "active" && (message.spin_remaining_msec ?? 0) - snapshotElapsed > 0);
   const surfaceAngle = visual ? visual.surface_angle + (spinning ? visualElapsed / 1000 * Math.PI * 2 * spinTurns : 0) : 0;
@@ -455,13 +562,14 @@ function renderBubbles(now: number): void {
     }
   }
   const characterVisible = visual?.character_visible ?? !(burstProgress >= 0 && burstProgress < 1);
-  if (characterVisible) drawPhoneCharacter(context, worldScale, seatColor, visual, tuneTime);
+  if (characterVisible) drawPhoneCharacter(context, visual, tuneTime, bodyShape, selectedColor);
   context.restore();
   bubblesPreviousFrame = now;
 }
 
 function animateBubbles(now: number): void {
   renderBubbles(now);
+  renderJoinPreviews(now);
   requestAnimationFrame(animateBubbles);
 }
 requestAnimationFrame(animateBubbles);
@@ -487,11 +595,12 @@ function rememberIdentity(message: HostMessage): boolean {
 }
 function reconnect(): void {
   if (stopped || retry !== undefined) return; setGameplaySurface(false);
-  if (joined) { playerState.textContent = "Reconnecting"; leaveButton.disabled = true; } else joinForm.hidden = true;
-  status.textContent = "Host disconnected. Reconnecting…"; retry = setTimeout(() => { retry = undefined; void connect(); }, 2000);
+  if (joined) { playerState.textContent = "Reconnecting"; leaveButton.disabled = true; }
+  status.textContent = "Host disconnected. Reconnecting…"; status.hidden = false; retry = setTimeout(() => { retry = undefined; void connect(); }, 2000);
 }
 async function connect(): Promise<void> {
   status.textContent = joined ? "Reconnecting to the host…" : "Connecting to the host…";
+  status.hidden = false;
   try {
     const response = await fetch("/session.json", { cache: "no-store", signal: AbortSignal.timeout(5000) }); if (!response.ok) throw new Error("Session unavailable"); const config: unknown = await response.json();
     if (!config || typeof config !== "object" || !("protocol" in config) || config.protocol !== 1 || !("websocket_port" in config) || !Number.isInteger(config.websocket_port) || Number(config.websocket_port) < 1024 || Number(config.websocket_port) > 65535 || !("session_id" in config) || typeof config.session_id !== "string") throw new Error("Unsupported session");
@@ -501,11 +610,11 @@ async function connect(): Promise<void> {
       let message: HostMessage; try { message = JSON.parse(event.data) as HostMessage; } catch { peer.close(); return; }
       if (message.type === "welcome" && message.protocol === 1 && Number.isInteger(message.connection_id)) {
         clearTimeout(deadline); if (message.resume_status === "resumed" && rememberIdentity(message)) { releaseHeld(false); if (message.gameplay?.type === "bubbles_snapshot") showBubbles(message.gameplay); else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player) showJoined(message.player as PublicPlayer, message.gameplay.message ?? "Waiting for the next game"); else if (message.gameplay) showGame(message.gameplay); return; }
-        if (message.resume_status === "session_restarted") { forgetIdentity(); showJoin("The host started a new session. Join again with your name.", true); }
-        else if (message.resume_status === "expired") { forgetIdentity(); showJoin("Your previous player expired. Join again with your name.", true); } else showJoin("Connected. Enter your name to join.", true);
+        if (message.resume_status === "session_restarted") { forgetIdentity(); showJoin("The host started a new session. Choose your character and name to join again.", true); }
+        else if (message.resume_status === "expired") { forgetIdentity(); showJoin("Your previous player expired. Choose your character and name to join again.", true); } else showJoin("Connected. Choose your character to join.", true);
       } else if (message.type === "join_accepted") { if (!rememberIdentity(message)) peer.close(); }
-      else if (message.type === "join_rejected" || message.type === "error") { joinButton.disabled = false; status.textContent = message.message ?? "The host could not complete that action."; if (!joined) nameInput.focus(); }
-      else if (message.type === "left") { forgetIdentity(); showJoin("You left the lobby. Enter a name to join again.", true); }
+      else if (message.type === "join_rejected" || message.type === "error") { joinButton.disabled = false; status.textContent = message.message ?? "The host could not complete that action."; status.hidden = false; if (!joined) nameInput.focus(); }
+      else if (message.type === "left") { forgetIdentity(); showJoin("You left the lobby. Choose your character and name to join again.", true); }
       else if (message.type === "flash_pose_charge") updateCharge(message);
       else if (["flash_pose_snapshot", "flash_pose_challenge", "flash_pose_result", "flash_pose_results"].includes(message.type ?? "")) showGame(message);
       else if (message.type === "bubbles_trace_result") bubblesLocalCharge = 0;
@@ -518,7 +627,7 @@ async function connect(): Promise<void> {
   } catch { reconnect(); }
 }
 
-joinForm.addEventListener("submit", event => { event.preventDefault(); const name = nameInput.value.trim(); store(STORAGE.name, name); if (!socket || socket.readyState !== WebSocket.OPEN) { status.textContent = "Still connecting. Try again in a moment."; return; } joinButton.disabled = true; status.textContent = "Joining…"; socket.send(JSON.stringify({ type: "join", name })); });
+joinForm.addEventListener("submit", event => { event.preventDefault(); const name = nameInput.value.trim(); store(STORAGE.name, name); if (!socket || socket.readyState !== WebSocket.OPEN) { status.textContent = "Still connecting. Try again in a moment."; status.hidden = false; return; } joinButton.disabled = true; status.textContent = "Joining…"; status.hidden = false; socket.send(JSON.stringify(createJoinMessage(name, joinFlow))); });
 leaveButton.addEventListener("click", () => { if (!socket || socket.readyState !== WebSocket.OPEN) return; leaveButton.disabled = true; status.textContent = "Leaving…"; socket.send(JSON.stringify({ type: "leave" })); });
 addEventListener("orientationchange", updateOrientation); addEventListener("resize", updateOrientation);
 window.addEventListener("pagehide", () => { stopped = true; releaseHeld(false); clearTimeout(retry); retry = undefined; socket?.close(); });

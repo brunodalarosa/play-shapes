@@ -22,7 +22,8 @@ func _init(player_capacity: int = 20, reconnect_grace_seconds: float = 60.0) -> 
 	session_id = _opaque_id()
 
 func join_player(connection_id: int, raw_name: Variant, accepting_new_players: bool,
-		now_msec: int = Time.get_ticks_msec()) -> Dictionary:
+		now_msec: int = Time.get_ticks_msec(), raw_character_shape: Variant = null,
+		raw_character_color: Variant = null) -> Dictionary:
 	expire_players(now_msec)
 	if _player_id_by_connection.has(connection_id):
 		return _rejected(&"already_joined", "This connection already has a player")
@@ -32,6 +33,12 @@ func join_player(connection_id: int, raw_name: Variant, accepting_new_players: b
 	if not name_result.accepted:
 		return name_result
 	var name: String = name_result.name
+	var has_shape := raw_character_shape != null
+	var has_color := raw_character_color != null
+	var selection := CharacterSelection.default_selection() if not has_shape and not has_color \
+		else CharacterSelection.validate_selection(raw_character_shape, raw_character_color)
+	if not selection.accepted:
+		return selection
 	var name_key := name.to_lower()
 	for player: Dictionary in _players_by_id.values():
 		if player.name_key == name_key:
@@ -45,6 +52,8 @@ func join_player(connection_id: int, raw_name: Variant, accepting_new_players: b
 		"player_id": player_id,
 		"name": name,
 		"name_key": name_key,
+		"character_shape": selection.character_shape,
+		"character_color": selection.character_color,
 		"seat": _next_seat,
 		"connection_id": connection_id,
 		"reconnect_token": reconnect_token,
@@ -155,11 +164,14 @@ func _remove_player(player: Dictionary) -> void:
 		_player_id_by_connection.erase(player.connection_id)
 
 func _public_player(player: Dictionary) -> Dictionary:
+	var selection := CharacterSelection.for_player(player)
 	return {
 		"player_id": player.player_id,
 		"name": player.name,
 		"seat": player.seat,
 		"state": "connected" if player.connection_id != DISCONNECTED else "reconnecting",
+		"character_shape": selection.character_shape,
+		"character_color": selection.character_color,
 	}
 
 func _rejected(code: StringName, message: String) -> Dictionary:
