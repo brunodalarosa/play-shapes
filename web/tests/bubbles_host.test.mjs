@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as delay } from 'node:timers/promises';
+import { PNG } from 'pngjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const binary = process.env.GODOT_BIN ?? 'C:/Users/backup pc/Documents/Godot/Godot_v4.7.2-stable_win64_console.exe';
@@ -101,4 +102,23 @@ test('active Bubbles routes authenticated traces, rejects forged input, and rest
     assert.equal(restored.gameplay.type, 'bubbles_snapshot');
     assert.equal(restored.gameplay.score, 8);
   } finally { client.peer.close(); resumed?.peer.close(); }
+});
+
+test('phone Bubbles loads a clean portrait presentation and its bundled art', async () => {
+  const [htmlResponse, cssResponse, backgroundResponse, bodyResponse, handResponse, footResponse, faceResponse, blinkResponse] = await Promise.all([
+    fetch(`http://127.0.0.1:${port}/`), fetch(`http://127.0.0.1:${port}/style.css`),
+    fetch(`http://127.0.0.1:${port}/bubbles-phone-background.png`), fetch(`http://127.0.0.1:${port}/bubbles-player-body.png`),
+    fetch(`http://127.0.0.1:${port}/bubbles-player-hand.png`), fetch(`http://127.0.0.1:${port}/bubbles-player-foot.png`),
+    fetch(`http://127.0.0.1:${port}/bubbles-player-face-neutral.png`), fetch(`http://127.0.0.1:${port}/bubbles-player-face-blink.png`),
+  ]);
+  for (const response of [htmlResponse, cssResponse, backgroundResponse, bodyResponse, handResponse, footResponse, faceResponse, blinkResponse]) assert.equal(response.status, 200);
+  const html = await htmlResponse.text(); const css = await cssResponse.text();
+  assert.match(html, /id="bubbles-visual"/);
+  assert.match(html, /id="bubbles-score"/);
+  assert.doesNotMatch(html, /bubbles-debug|bubbles-status|bubbles-meter|bubbles-state/);
+  assert.match(css, /bubbles-phone-background\.png/);
+  assert.match(css, /inset-block-start: 15%/);
+  const background = PNG.sync.read(Buffer.from(await backgroundResponse.arrayBuffer()));
+  assert.equal(background.width, 1080);
+  assert.equal(background.height, 1920);
 });

@@ -25,6 +25,36 @@ const ASSETS: Dictionary = {
 	"content_type": "image/png",
 	"resource_type": "Texture2D",
 },
+"/bubbles-phone-background.png": {
+	"path": "res://assets/runtime/minigames/bubbles_and_jellyfishes/environment/phone_background_portrait.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/bubbles-player-body.png": {
+	"path": "res://assets/runtime/shape_characters/bodies/circle.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/bubbles-player-hand.png": {
+	"path": "res://assets/runtime/shape_characters/hands/closed.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/bubbles-player-foot.png": {
+	"path": "res://assets/runtime/shape_characters/feet/round.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/bubbles-player-face-neutral.png": {
+	"path": "res://assets/runtime/shape_characters/faces/neutral.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/bubbles-player-face-blink.png": {
+	"path": "res://assets/runtime/shape_characters/faces/blink.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
 "/style.css": {
 	"path": "res://web/public/style.css",
 	"content_type": "text/css; charset=utf-8",

@@ -75,6 +75,17 @@ func _test_swipe_growth_drag_and_wall() -> void:
 	_check(a.collision_radius() == controller.tuning.max_radius, "Collision radius follows visual growth")
 	_check(a.get_node("BubbleVisual").captured_visual_count == controller.tuning.captured_visual_cap, "Visible jellyfish obey cap")
 	_check(a.effective_mass() > b.effective_mass() and a.effective_max_speed() < b.effective_max_speed(), "Larger bubble gains mass and loses speed")
+	var phone_visuals: Array[Dictionary] = []
+	controller.personal_visual_changed.connect(func(id: String, state: Dictionary) -> void:
+		if id == "p0": phone_visuals.append(state))
+	a._on_drag_visual_changed("p0", Vector2.RIGHT, 220)
+	arena.simulate_step(1.0 / 60.0, 270)
+	_check(not phone_visuals.is_empty() and phone_visuals.back().radius == controller.tuning.max_radius
+		and phone_visuals.back().character_scale > 0.0,
+		"Phone receives the shared bubble growth and character appearance")
+	var drag_visual: Dictionary = phone_visuals.back()
+	_check(drag_visual.drag_pull[0] > 0.0 and drag_visual.pull[0] > 0.0,
+		"Phone visual stream follows the same smoothed host drag deformation")
 
 
 func _test_spin_collision_and_pop() -> void:

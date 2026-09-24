@@ -56,6 +56,7 @@ func set_bubbles_controller(controller: BubblesRoundController) -> void:
 	_active_protocol = _bubbles_protocol
 	controller.phase_changed.connect(_on_bubbles_phase_changed)
 	controller.personal_state_changed.connect(_on_bubbles_personal_state_changed)
+	controller.personal_visual_changed.connect(_on_bubbles_personal_visual_changed)
 	controller.feedback_requested.connect(_on_bubbles_feedback)
 	controller.return_to_lobby_requested.connect(_on_bubbles_return_to_lobby)
 	_broadcast_gameplay_snapshots()
@@ -258,6 +259,10 @@ func _on_bubbles_personal_state_changed(player_id: String, _snapshot: Dictionary
 	if _bubbles_protocol != null:
 		_send_to_player(player_id, _bubbles_protocol.snapshot_for(player_id))
 
+func _on_bubbles_personal_visual_changed(player_id: String, visual_state: Dictionary) -> void:
+	if _bubbles_protocol != null:
+		_send_to_player(player_id, {"type": "bubbles_visual", "visual": visual_state})
+
 func _on_bubbles_feedback(player_id: String, kind: StringName, data: Dictionary) -> void:
 	if _bubbles_protocol == null or kind not in [&"captured", &"spin", &"pop"]:
 		return
@@ -291,6 +296,7 @@ func _clear_bubbles_controller() -> void:
 	if is_instance_valid(controller):
 		if controller.phase_changed.is_connected(_on_bubbles_phase_changed): controller.phase_changed.disconnect(_on_bubbles_phase_changed)
 		if controller.personal_state_changed.is_connected(_on_bubbles_personal_state_changed): controller.personal_state_changed.disconnect(_on_bubbles_personal_state_changed)
+		if controller.personal_visual_changed.is_connected(_on_bubbles_personal_visual_changed): controller.personal_visual_changed.disconnect(_on_bubbles_personal_visual_changed)
 		if controller.feedback_requested.is_connected(_on_bubbles_feedback): controller.feedback_requested.disconnect(_on_bubbles_feedback)
 		if controller.return_to_lobby_requested.is_connected(_on_bubbles_return_to_lobby): controller.return_to_lobby_requested.disconnect(_on_bubbles_return_to_lobby)
 	if _active_protocol == _bubbles_protocol:
