@@ -6,6 +6,8 @@ signal phase_changed(phase: StringName, snapshot: Dictionary)
 signal arena_event_requested(kind: StringName, player_id: String, data: Dictionary)
 signal personal_state_changed(player_id: String, snapshot: Dictionary)
 signal feedback_requested(player_id: String, kind: StringName, data: Dictionary)
+signal charge_visual_changed(player_id: String, progress: float)
+signal drag_visual_changed(player_id: String, direction: Vector2, gesture_started_msec: int)
 signal round_results_ready(results: Dictionary)
 signal return_to_lobby_requested
 
@@ -150,7 +152,8 @@ func pop_player(player_id: String, host_time_msec: int) -> Dictionary:
 	return _pop(player_id, host_time_msec, false)
 
 
-func submit_trace(player_id: String, input_seq: Variant, trace: Variant, host_receipt_msec: int) -> Dictionary:
+func submit_trace(player_id: String, input_seq: Variant, trace: Variant, host_receipt_msec: int,
+		gesture_started_msec: int = -1) -> Dictionary:
 	if not _settle_active_event(host_receipt_msec):
 		return _reject(&"wrong_phase_or_time")
 	if not _players.has(player_id):
@@ -160,11 +163,17 @@ func submit_trace(player_id: String, input_seq: Variant, trace: Variant, host_re
 		return _reject(&"player_unavailable")
 	if not _valid_sequence(input_seq) or int(input_seq) <= state.last_input_seq:
 		return _reject(&"stale_or_invalid_sequence")
+	if gesture_started_msec > host_receipt_msec:
+		return _reject(&"invalid_gesture_time")
 	var classified := BubblesGestureClassifier.classify(trace, tuning)
 	if not classified.accepted:
 		return classified
 	state.last_input_seq = int(input_seq)
 	var action: StringName = classified.action
+	if action == &"swipe" and gesture_started_msec >= 0:
+		if host_receipt_msec - gesture_started_msec > roundi(tuning.swipe_max_hold_seconds * 1000.0):
+			personal_state_changed.emit(player_id, personal_snapshot(player_id))
+			return {"accepted": true, "action": &"none", "reason": &"swipe_too_slow"}
 	if action == &"spin":
 		if host_receipt_msec < state.spin_ready_msec:
 			return {"accepted": true, "action": &"none", "reason": &"spin_cooldown"}

@@ -47,6 +47,10 @@ var speed_reduction_per_jellyfish: float = 0.01:
 @export_range(20.0, 1000.0, 5.0, "suffix:px/s")
 var swipe_impulse: float = 280.0:
 	set(value): swipe_impulse = clampf(value, 20.0, 1000.0)
+## Maximum touch hold before a swipe loses its movement impulse. Spin gestures are unaffected. Default: 0.65. Safe range: 0.2-2.
+@export_range(0.2, 2.0, 0.05, "suffix:s")
+var swipe_max_hold_seconds: float = 0.65:
+	set(value): swipe_max_hold_seconds = clampf(value, 0.2, 2.0)
 ## Minimum normalized net swipe distance. Higher requires a longer swipe; lower accepts smaller gestures. Default: 0.07. Safe range: 0.02-0.3.
 @export_range(0.02, 0.3, 0.005)
 var swipe_min_distance: float = 0.07:
@@ -168,6 +172,54 @@ var pufferfish_warning_seconds: float = 0.8:
 	set(value): pufferfish_warning_seconds = clampf(value, 0.0, 3.0)
 
 @export_group("Presentation")
+## Gentle character bob in pixels. Zero holds the idle pose still. Default: 4. Safe range: 0-12.
+@export_range(0.0, 12.0, 0.5, "suffix:px")
+var character_float_pixels: float = 4.0:
+	set(value): character_float_pixels = clampf(value, 0.0, 12.0)
+## Seconds between the average natural eye blinks. Default: 3.4. Safe range: 1.5-7.
+@export_range(1.5, 7.0, 0.1, "suffix:s")
+var character_blink_interval_seconds: float = 3.4:
+	set(value): character_blink_interval_seconds = clampf(value, 1.5, 7.0)
+## Duration of the accepted-swipe push and bubble pull. Default: 0.34. Safe range: 0.12-0.9.
+@export_range(0.12, 0.9, 0.01, "suffix:s")
+var swipe_reaction_seconds: float = 0.34:
+	set(value): swipe_reaction_seconds = clampf(value, 0.12, 0.9)
+## Maximum bubble surface stretch on a swipe. Default: 0.17. Safe range: 0-0.22.
+@export_range(0.0, 0.22, 0.01)
+var swipe_pull_strength: float = 0.17:
+	set(value): swipe_pull_strength = clampf(value, 0.0, 0.22)
+## Character travel on an accepted swipe, in local pixels. Default: 13. Safe range: 0-24.
+@export_range(0.0, 24.0, 1.0, "suffix:px")
+var swipe_character_push_pixels: float = 13.0:
+	set(value): swipe_character_push_pixels = clampf(value, 0.0, 24.0)
+## Bubble stretch from coarse live drag direction. Zero disables held-touch deformation. Default: 0.20. Safe range: 0-0.22.
+@export_range(0.0, 0.22, 0.01)
+var live_drag_pull_strength: float = 0.20:
+	set(value): live_drag_pull_strength = clampf(value, 0.0, 0.22)
+## Seconds for held-touch stretch to follow and settle. Default: 0.08. Safe range: 0.02-0.4.
+@export_range(0.02, 0.4, 0.01, "suffix:s")
+var live_drag_response_seconds: float = 0.08:
+	set(value): live_drag_response_seconds = clampf(value, 0.02, 0.4)
+## Faint inner glow strength while circular charge grows. Default: 0.12. Safe range: 0-0.25.
+@export_range(0.0, 0.25, 0.01)
+var charge_glow_strength: float = 0.12:
+	set(value): charge_glow_strength = clampf(value, 0.0, 0.25)
+## Bubble wobble amplitude while charging spin. Default: 0.07. Safe range: 0-0.15.
+@export_range(0.0, 0.15, 0.01)
+var charge_wobble_strength: float = 0.07:
+	set(value): charge_wobble_strength = clampf(value, 0.0, 0.15)
+## Surface rotation speed during authoritative spin, in revolutions per second. Default: 1.8. Safe range: 0.2-5.
+@export_range(0.2, 5.0, 0.1, "suffix:rev/s")
+var spin_surface_turns_per_second: float = 1.8:
+	set(value): spin_surface_turns_per_second = clampf(value, 0.2, 5.0)
+## Visible curved-fragment burst time after a pop. Default: 0.26. Safe range: 0.1-0.6.
+@export_range(0.1, 0.6, 0.01, "suffix:s")
+var burst_seconds: float = 0.26:
+	set(value): burst_seconds = clampf(value, 0.1, 0.6)
+## Count of decorative spin bubbles and burst motes per player. Default: 10. Safe range: 0-32.
+@export_range(0, 32, 1)
+var decorative_particle_count: int = 10:
+	set(value): decorative_particle_count = clampi(value, 0, 32)
 ## Remaining whole seconds when the final timer pulses begin. Higher starts urgency earlier. Default: 10. Safe range: 1-30.
 @export_range(1, 30, 1, "suffix:s")
 var final_timer_emphasis_seconds: int = 10:

@@ -244,24 +244,45 @@ function animate(now) {
         if (button)
             button.style.backgroundColor = chargedColor(presentation.colors[direction] ?? DEFAULT_COLORS[direction], presentation.minimum_brightness, presentation.maximum_brightness, visualCharge[direction]);
     }
+    if (bubblesPointer && bubblesPointer.motionCount < 48 && activeGame === "bubbles" && socket?.readyState === WebSocket.OPEN) {
+        const changed = bubblesPointer.drag[0] !== bubblesPointer.sentDrag[0] || bubblesPointer.drag[1] !== bubblesPointer.sentDrag[1];
+        if (now - bubblesPointer.lastMotionAt >= (changed ? 70 : 600))
+            sendBubblesMotion(bubblesPointer, now);
+    }
     requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
-function cancelBubblesPointer() {
+function sendBubblesCharge(seq, stage, step = 0) {
+    if (socket?.readyState === WebSocket.OPEN)
+        socket.send(JSON.stringify({ type: "bubbles_charge", input_seq: seq, stage, step }));
+}
+function sendBubblesMotion(pointer, now) {
+    if (pointer.motionCount >= 48 || socket?.readyState !== WebSocket.OPEN)
+        return;
+    socket.send(JSON.stringify({ type: "bubbles_charge", input_seq: pointer.seq, stage: "motion", drag: pointer.drag }));
+    pointer.sentDrag = [...pointer.drag];
+    pointer.lastMotionAt = now;
+    pointer.motionCount += 1;
+}
+function cancelBubblesPointer(sendCancel = true) {
     if (!bubblesPointer)
         return;
-    const id = bubblesPointer.id;
+    const { id, seq } = bubblesPointer;
     bubblesPointer = undefined;
     bubblesLocalCharge = 0;
+    if (sendCancel)
+        sendBubblesCharge(seq, "cancel");
     if (bubblesPad.hasPointerCapture(id))
         bubblesPad.releasePointerCapture(id);
 }
-function sendBubblesTrace(trace) {
+function sendBubblesTrace(trace, gestureSeq) {
     if (activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active" || trace.length < 2 || !socket || socket.readyState !== WebSocket.OPEN)
         return;
-    inputSeq += 1;
-    store(STORAGE.inputSeq, String(inputSeq));
-    socket.send(JSON.stringify({ type: "bubbles_trace", input_seq: inputSeq, trace }));
+    if (gestureSeq === undefined) {
+        inputSeq += 1;
+        store(STORAGE.inputSeq, String(inputSeq));
+    }
+    socket.send(JSON.stringify({ type: "bubbles_trace", input_seq: gestureSeq ?? inputSeq, trace }));
 }
 function vibrate(pattern) { try {
     navigator.vibrate?.(pattern);
@@ -273,7 +294,9 @@ bubblesPad.addEventListener("pointerdown", event => {
     event.preventDefault();
     const trace = new GestureTrace(bubblesPad.getBoundingClientRect());
     trace.add(event.clientX, event.clientY);
-    bubblesPointer = { id: event.pointerId, trace };
+    inputSeq += 1;
+    store(STORAGE.inputSeq, String(inputSeq));
+    bubblesPointer = { id: event.pointerId, trace, seq: inputSeq, step: 0, drag: [0, 0], sentDrag: [0, 0], lastMotionAt: performance.now(), motionCount: 0 };
     try {
         bubblesPad.setPointerCapture(event.pointerId);
     }
@@ -281,6 +304,7 @@ bubblesPad.addEventListener("pointerdown", event => {
         cancelBubblesPointer();
         return;
     }
+    sendBubblesCharge(inputSeq, "start");
     void requestImmersiveMode("bubbles");
 });
 bubblesPad.addEventListener("pointermove", event => {
@@ -290,15 +314,30 @@ bubblesPad.addEventListener("pointermove", event => {
     for (const sample of event.getCoalescedEvents?.() ?? [event])
         bubblesPointer.trace.add(sample.clientX, sample.clientY);
     bubblesLocalCharge = bubblesPointer.trace.preview(bubblesSnapshot?.circles_to_charge ?? 1);
+    const step = Math.min(4, Math.floor(bubblesLocalCharge * 4));
+    if (step > bubblesPointer.step) {
+        bubblesPointer.step = step;
+        sendBubblesCharge(bubblesPointer.seq, "progress", step);
+    }
+    const [dx, dy] = bubblesPointer.trace.displacement();
+    const drag = [Math.max(-4, Math.min(4, Math.round(dx * 10))), Math.max(-4, Math.min(4, Math.round(dy * 10)))];
+    const now = performance.now();
+    bubblesPointer.drag = drag;
+    if ((drag[0] !== bubblesPointer.sentDrag[0] || drag[1] !== bubblesPointer.sentDrag[1]) && now - bubblesPointer.lastMotionAt >= 70)
+        sendBubblesMotion(bubblesPointer, now);
 });
 bubblesPad.addEventListener("pointerup", event => {
     if (bubblesPointer?.id !== event.pointerId)
         return;
     event.preventDefault();
     bubblesPointer.trace.add(event.clientX, event.clientY);
+    const { seq } = bubblesPointer;
     const trace = bubblesPointer.trace.completed();
-    cancelBubblesPointer();
-    sendBubblesTrace(trace);
+    cancelBubblesPointer(false);
+    if (trace.length < 2)
+        sendBubblesCharge(seq, "cancel");
+    else
+        sendBubblesTrace(trace, seq);
 });
 bubblesPad.addEventListener("pointercancel", event => { if (bubblesPointer?.id === event.pointerId)
     cancelBubblesPointer(); });
@@ -536,7 +575,7 @@ async function connect() {
             else if (message.type === "bubbles_trace_result") {
                 bubblesLocalCharge = 0;
                 if (message.action === "none") {
-                    bubblesStatus.textContent = message.reason === "spin_cooldown" ? "Spin is cooling down. Swipes still move you." : "Keep drawing a complete circle to spin.";
+                    bubblesStatus.textContent = message.reason === "spin_cooldown" ? "Spin is cooling down. Swipes still move you." : message.reason === "swipe_too_slow" ? "Release sooner to move. Slow drags still stretch your bubble." : "Keep drawing a complete circle to spin.";
                     bubblesFeedbackUntil = performance.now() + 1800;
                 }
             }

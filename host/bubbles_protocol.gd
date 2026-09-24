@@ -4,8 +4,16 @@ extends RefCounted
 
 const MAX_INPUT_SEQUENCE := 9007199254740991
 const MAX_TRACE_POINTS := 128
+const CHARGE_TIMEOUT_MSEC := 1200
+const CHARGE_STEPS := 4
+const MIN_MOTION_INTERVAL_MSEC := 60
+const MAX_MOTION_UPDATES := 48
 
 var controller: BubblesRoundController
+var _charges: Dictionary = {}
+var _last_charge_seq: Dictionary = {}
+var _gesture_starts: Dictionary = {}
+var _canceled_seq: Dictionary = {}
 
 
 func _init(round_controller: BubblesRoundController = null) -> void:
@@ -17,6 +25,8 @@ func handle_action(player: Dictionary, message: Dictionary, host_receipt_msec: i
 		return _reject(&"game_unavailable")
 	if player.is_empty() or not player.has("player_id"):
 		return _reject(&"not_joined")
+	if message.get("type") == "bubbles_charge":
+		return _handle_charge(String(player.player_id), message, host_receipt_msec)
 	if message.get("type") != "bubbles_trace":
 		return _reject(&"unsupported_message")
 	for key: Variant in message.keys():
@@ -37,10 +47,118 @@ func handle_action(player: Dictionary, message: Dictionary, host_receipt_msec: i
 		for coordinate: Variant in raw:
 			if typeof(coordinate) not in [TYPE_INT, TYPE_FLOAT] or not is_finite(float(coordinate)) or float(coordinate) < 0.0 or float(coordinate) > 1.0:
 				return _reject(&"invalid_trace")
-	var result := controller.submit_trace(String(player.player_id), int(sequence), trace, host_receipt_msec)
+	var player_id := String(player.player_id)
+	var seq := int(sequence)
+	if seq < int(_last_charge_seq.get(player_id, -1)):
+		return _reject(&"stale_gesture")
+	if seq == int(_canceled_seq.get(player_id, -1)):
+		return _reject(&"canceled_gesture")
+	var start: Dictionary = _gesture_starts.get(player_id, {})
+	var started_msec := int(start.time) if not start.is_empty() and int(start.seq) == seq else -1
+	var result := controller.submit_trace(player_id, seq, trace, host_receipt_msec, started_msec)
+	_clear_charge(player_id, seq)
+	if started_msec >= 0:
+		_gesture_starts.erase(player_id)
 	if not result.accepted:
 		return _reject(StringName(result.code))
 	return {"accepted": true, "action": str(result.action), "reason": str(result.get("reason", ""))}
+
+
+## A coarse, authenticated visual cue. Only completed traces reach gameplay rules.
+func _handle_charge(player_id: String, message: Dictionary, now: int) -> Dictionary:
+	if now < 0:
+		return _reject(&"invalid_time")
+	for key: Variant in message.keys():
+		if key not in ["type", "input_seq", "stage", "step", "drag"]:
+			return _reject(&"unauthorized_field")
+	var raw_seq: Variant = message.get("input_seq")
+	if typeof(raw_seq) not in [TYPE_INT, TYPE_FLOAT]:
+		return _reject(&"invalid_sequence")
+	var number := float(raw_seq)
+	if not is_finite(number) or number < 0.0 or number > float(MAX_INPUT_SEQUENCE) or floorf(number) != number:
+		return _reject(&"invalid_sequence")
+	var seq := int(number)
+	var own := controller.personal_snapshot(player_id)
+	if own.is_empty() or own.phase != &"active" or not own.connected or own.left or seq <= int(own.last_input_seq):
+		return _reject(&"stale_or_unavailable")
+	var stage: Variant = message.get("stage")
+	if typeof(stage) != TYPE_STRING or stage not in ["start", "progress", "cancel", "motion"]:
+		return _reject(&"invalid_charge")
+	var step := 0
+	var drag := Vector2.ZERO
+	if stage == "motion":
+		if message.has("step") or not message.has("drag"):
+			return _reject(&"invalid_charge")
+		var raw_drag: Variant = message.drag
+		if not raw_drag is Array or raw_drag.size() != 2:
+			return _reject(&"invalid_drag")
+		for index: int in 2:
+			var coordinate: Variant = raw_drag[index]
+			if typeof(coordinate) not in [TYPE_INT, TYPE_FLOAT]:
+				return _reject(&"invalid_drag")
+			var value := float(coordinate)
+			if not is_finite(value) or floorf(value) != value or absf(value) > 4.0:
+				return _reject(&"invalid_drag")
+			if index == 0: drag.x = value / 4.0
+			else: drag.y = value / 4.0
+	else:
+		if message.has("drag") or not message.has("step"):
+			return _reject(&"invalid_charge")
+		var raw_step: Variant = message.step
+		if typeof(raw_step) not in [TYPE_INT, TYPE_FLOAT]:
+			return _reject(&"invalid_charge")
+		var step_number := float(raw_step)
+		if not is_finite(step_number) or step_number < 0.0 or step_number > float(CHARGE_STEPS) or floorf(step_number) != step_number:
+			return _reject(&"invalid_charge")
+		step = int(step_number)
+	var prior: Dictionary = _charges.get(player_id, {})
+	if not prior.is_empty() and now < int(prior.time):
+		return _reject(&"stale_charge")
+	if not prior.is_empty() and now - int(prior.time) > CHARGE_TIMEOUT_MSEC:
+		_clear_charge(player_id, int(prior.seq))
+		prior = {}
+	if stage == "start":
+		if step != 0 or seq <= int(_last_charge_seq.get(player_id, -1)):
+			return _reject(&"stale_charge")
+		_last_charge_seq[player_id] = seq
+		_charges[player_id] = {"seq": seq, "step": 0, "time": now, "motions": 0, "last_motion": -1}
+		_gesture_starts[player_id] = {"seq": seq, "time": now}
+		controller.charge_visual_changed.emit(player_id, 0.0)
+		controller.drag_visual_changed.emit(player_id, Vector2.ZERO, now)
+	elif prior.is_empty() or seq != int(prior.seq):
+		return _reject(&"stale_charge")
+	elif stage == "cancel":
+		if step != 0:
+			return _reject(&"invalid_charge")
+		_clear_charge(player_id, seq)
+		_gesture_starts.erase(player_id)
+		_canceled_seq[player_id] = seq
+	elif stage == "motion":
+		if int(prior.motions) >= MAX_MOTION_UPDATES or (int(prior.last_motion) >= 0 and now - int(prior.last_motion) < MIN_MOTION_INTERVAL_MSEC):
+			return {"accepted": true}
+		prior.motions = int(prior.motions) + 1
+		prior.last_motion = now
+		prior.time = now
+		_charges[player_id] = prior
+		var started_msec := int(_gesture_starts[player_id].time)
+		var held_too_long := now - started_msec > roundi(controller.tuning.swipe_max_hold_seconds * 1000.0)
+		controller.drag_visual_changed.emit(player_id, Vector2.ZERO if held_too_long else drag, started_msec)
+	elif step <= int(prior.step):
+		return _reject(&"stale_charge")
+	else:
+		prior.step = step
+		prior.time = now
+		_charges[player_id] = prior
+		controller.charge_visual_changed.emit(player_id, float(step) / float(CHARGE_STEPS))
+	return {"accepted": true}
+
+
+func _clear_charge(player_id: String, through_seq: int) -> void:
+	var prior: Dictionary = _charges.get(player_id, {})
+	if not prior.is_empty() and int(prior.seq) <= through_seq:
+		_charges.erase(player_id)
+		controller.charge_visual_changed.emit(player_id, 0.0)
+		controller.drag_visual_changed.emit(player_id, Vector2.ZERO, -1)
 
 
 func snapshot_for(player_id: String) -> Dictionary:
