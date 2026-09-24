@@ -26,10 +26,11 @@ var _connected := true
 var _swipe_at_msec := -1
 var _swipe_direction := Vector2.ZERO
 var _spin_started_msec := -1
-var _spin_release_angle := 0.0
 var _burst_radius := 48.0
 var _charge_progress := 0.0
 var _charge_last_msec := -1
+var _live_drag_target := Vector2.ZERO
+var _live_drag_display := Vector2.ZERO
 var _blink_next_msec := 0
 var _blink_until_msec := -1
 var _blink_index := 0
@@ -58,6 +59,7 @@ func bind_controller(controller: BubblesRoundController) -> void:
 	_controller.arena_event_requested.connect(_on_arena_event)
 	_controller.personal_state_changed.connect(_on_personal_state)
 	_controller.charge_visual_changed.connect(_on_charge_visual_changed)
+	_controller.drag_visual_changed.connect(_on_drag_visual_changed)
 	_controller.phase_changed.connect(_on_phase_changed)
 	apply_authoritative_snapshot(_controller.personal_snapshot(player_id))
 	set_host_phase(_controller.phase_name())
@@ -78,6 +80,7 @@ func apply_authoritative_snapshot(snapshot: Dictionary) -> void:
 		visible = false
 	if not _connected or snapshot.get("phase", &"idle") != &"active":
 		_charge_progress = 0.0
+		_live_drag_target = Vector2.ZERO
 	_refresh_visual(_visual_host_msec)
 
 
@@ -87,6 +90,7 @@ func set_host_phase(phase_name: StringName) -> void:
 	if not _active:
 		velocity = Vector2.ZERO
 		_charge_progress = 0.0
+		_live_drag_target = Vector2.ZERO
 
 
 ## Called once per fixed host step by BubblesPlayerArena; bounds are provided by its scene.
@@ -94,8 +98,11 @@ func simulate_step(delta: float, bounds: Rect2, host_time_msec: int) -> void:
 	if tuning == null or not is_finite(delta) or delta < 0.0 or delta > 0.05 or host_time_msec < 0:
 		return
 	_visual_host_msec = host_time_msec
-	if _charge_progress > 0.0 and host_time_msec - _charge_last_msec > BubblesProtocol.CHARGE_TIMEOUT_MSEC:
+	if (_charge_progress > 0.0 or _live_drag_target.length_squared() > 0.0) and host_time_msec - _charge_last_msec > BubblesProtocol.CHARGE_TIMEOUT_MSEC:
 		_charge_progress = 0.0
+		_live_drag_target = Vector2.ZERO
+	_live_drag_display = _live_drag_display.lerp(_live_drag_target,
+		1.0 - exp(-delta / tuning.live_drag_response_seconds))
 	_refresh_visual(host_time_msec)
 	if not _active or not bounds.has_area():
 		return
@@ -208,9 +215,13 @@ func _refresh_visual(host_time_msec: int) -> void:
 	_animate_character(host_time_msec, burst)
 	var swipe_age := float(host_time_msec - _swipe_at_msec) / 1000.0 if _swipe_at_msec >= 0 else 999.0
 	var pull := _swipe_direction * tuning.swipe_pull_strength * sin(PI * clampf(swipe_age / tuning.swipe_reaction_seconds, 0.0, 1.0))
+	pull += _live_drag_display * tuning.live_drag_pull_strength
+	if _charge_progress > 0.0:
+		var seconds := float(host_time_msec) / 1000.0
+		pull += Vector2(sin(seconds * 13.0), cos(seconds * 17.0)) * tuning.charge_wobble_strength * _charge_progress
 	var surface_angle := float(host_time_msec - _spin_started_msec) / 1000.0 * TAU * tuning.spin_surface_turns_per_second if is_spinning(host_time_msec) and _spin_started_msec >= 0 else 0.0
 	_visual.update_appearance(rendered_radius, mini(_score, tuning.captured_visual_cap), is_spinning(host_time_msec),
-		white_blink, pull, surface_angle, burst, tuning.decorative_particle_count)
+		white_blink, pull, surface_angle, burst, tuning.decorative_particle_count, _charge_progress * tuning.charge_glow_strength)
 	_name_label.position = Vector2(-110.0, -rendered_radius - 42.0)
 
 
@@ -223,25 +234,19 @@ func _animate_character(host_time_msec: int, burst: float) -> void:
 	var swipe_age := float(host_time_msec - _swipe_at_msec) / 1000.0 if _swipe_at_msec >= 0 else 999.0
 	var push := sin(PI * clampf(swipe_age / tuning.swipe_reaction_seconds, 0.0, 1.0))
 	_character.position = Vector2(0.0, bob) + _swipe_direction * push * tuning.swipe_character_push_pixels
-	var turn := 0.0
-	if _charge_progress > 0.0:
-		turn = seconds * TAU * tuning.charge_turns_per_second * (0.5 + _charge_progress * 0.5)
-	elif _spin_started_msec >= 0:
-		var release_age := float(host_time_msec - _spin_started_msec) / 1000.0
-		turn = _spin_release_angle * (1.0 - smoothstep(0.0, tuning.spin_release_seconds, release_age))
 	var body := _character.get_node("Body") as Sprite2D
 	var face := _character.get_node("Face") as Sprite2D
 	var left_hand := _character.get_node("LeftHand") as Sprite2D
 	var right_hand := _character.get_node("RightHand") as Sprite2D
 	var left_foot := _character.get_node("LeftFoot") as Sprite2D
 	var right_foot := _character.get_node("RightFoot") as Sprite2D
-	body.rotation = turn + sin(seconds * 1.7) * 0.05
+	body.rotation = sin(seconds * 1.7) * 0.05
 	face.rotation = 0.0
 	face.position = Vector2(0, -5) + _swipe_direction * push * 3.0
-	left_hand.position = Vector2(-52, -4).rotated(turn) + _swipe_direction * push * 9.0
-	right_hand.position = Vector2(52, -4).rotated(turn) + _swipe_direction * push * 9.0
-	left_foot.position = Vector2(-23, 62).rotated(turn)
-	right_foot.position = Vector2(23, 62).rotated(turn)
+	left_hand.position = Vector2(-52, -4) + _swipe_direction * push * 9.0
+	right_hand.position = Vector2(52, -4) + _swipe_direction * push * 9.0
+	left_foot.position = Vector2(-23, 62)
+	right_foot.position = Vector2(23, 62)
 	if host_time_msec >= _blink_next_msec:
 		_blink_until_msec = host_time_msec + 140
 		_blink_index += 1
@@ -265,7 +270,6 @@ func _on_arena_event(kind: StringName, id: String, data: Dictionary) -> void:
 				_swipe_at_msec = _visual_host_msec
 		&"spin":
 			_spin_started_msec = int(data.get("started_msec", _visual_host_msec))
-			_spin_release_angle = fposmod(float(_spin_started_msec) / 1000.0 * TAU * tuning.charge_turns_per_second * (0.5 + _charge_progress * 0.5), TAU)
 			_charge_progress = 0.0
 		&"pop":
 			_burst_radius = _visual.radius
@@ -273,17 +277,25 @@ func _on_arena_event(kind: StringName, id: String, data: Dictionary) -> void:
 			_visual_host_msec = _pop_at_msec
 			velocity = Vector2.ZERO
 			_charge_progress = 0.0
+			_live_drag_target = Vector2.ZERO
 			_refresh_visual(_pop_at_msec)
 		&"player_left":
 			_active = false
 			visible = false
 			_collider.disabled = true
 			_charge_progress = 0.0
+			_live_drag_target = Vector2.ZERO
 
 
 func _on_charge_visual_changed(id: String, progress: float) -> void:
 	if id == player_id and _active and _connected:
 		_charge_progress = clampf(progress, 0.0, 1.0)
+		_charge_last_msec = _visual_host_msec
+
+
+func _on_drag_visual_changed(id: String, drag: Vector2) -> void:
+	if id == player_id and _active and _connected:
+		_live_drag_target = drag.limit_length(1.0)
 		_charge_last_msec = _visual_host_msec
 
 

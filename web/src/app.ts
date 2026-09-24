@@ -55,7 +55,7 @@ let authoritativeHeld = false;
 let lastAnimationTime = performance.now();
 let fullscreenAttempted = { flash: false, bubbles: false };
 let activeGame: "flash" | "bubbles" | null = null;
-let bubblesPointer: { id: number; trace: GestureTrace; seq: number; step: number } | undefined;
+let bubblesPointer: { id: number; trace: GestureTrace; seq: number; step: number; drag: Point; sentDrag: Point; lastMotionAt: number; motionCount: number } | undefined;
 let bubblesSnapshot: HostMessage | undefined;
 let bubblesSnapshotTime = 0;
 let bubblesLocalCharge = 0;
@@ -155,12 +155,21 @@ function animate(now: number): void {
     const button = poseGrid.querySelector<HTMLElement>(`[data-direction="${direction}"]`);
     if (button) button.style.backgroundColor = chargedColor(presentation.colors[direction] ?? DEFAULT_COLORS[direction], presentation.minimum_brightness, presentation.maximum_brightness, visualCharge[direction]);
   }
+  if (bubblesPointer && bubblesPointer.motionCount < 48 && activeGame === "bubbles" && socket?.readyState === WebSocket.OPEN) {
+    const changed = bubblesPointer.drag[0] !== bubblesPointer.sentDrag[0] || bubblesPointer.drag[1] !== bubblesPointer.sentDrag[1];
+    if (now - bubblesPointer.lastMotionAt >= (changed ? 70 : 600)) sendBubblesMotion(bubblesPointer, now);
+  }
   requestAnimationFrame(animate);
 }
 requestAnimationFrame(animate);
 
 function sendBubblesCharge(seq: number, stage: "start" | "progress" | "cancel", step = 0): void {
   if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "bubbles_charge", input_seq: seq, stage, step }));
+}
+function sendBubblesMotion(pointer: NonNullable<typeof bubblesPointer>, now: number): void {
+  if (pointer.motionCount >= 48 || socket?.readyState !== WebSocket.OPEN) return;
+  socket.send(JSON.stringify({ type: "bubbles_charge", input_seq: pointer.seq, stage: "motion", drag: pointer.drag }));
+  pointer.sentDrag = [...pointer.drag]; pointer.lastMotionAt = now; pointer.motionCount += 1;
 }
 function cancelBubblesPointer(sendCancel = true): void {
   if (!bubblesPointer) return;
@@ -180,7 +189,7 @@ bubblesPad.addEventListener("pointerdown", event => {
   event.preventDefault();
   const trace = new GestureTrace(bubblesPad.getBoundingClientRect()); trace.add(event.clientX, event.clientY);
   inputSeq += 1; store(STORAGE.inputSeq, String(inputSeq));
-  bubblesPointer = { id: event.pointerId, trace, seq: inputSeq, step: 0 };
+  bubblesPointer = { id: event.pointerId, trace, seq: inputSeq, step: 0, drag: [0, 0], sentDrag: [0, 0], lastMotionAt: performance.now(), motionCount: 0 };
   try { bubblesPad.setPointerCapture(event.pointerId); } catch { cancelBubblesPointer(); return; }
   sendBubblesCharge(inputSeq, "start");
   void requestImmersiveMode("bubbles");
@@ -192,6 +201,11 @@ bubblesPad.addEventListener("pointermove", event => {
   bubblesLocalCharge = bubblesPointer.trace.preview(bubblesSnapshot?.circles_to_charge ?? 1);
   const step = Math.min(4, Math.floor(bubblesLocalCharge * 4));
   if (step > bubblesPointer.step) { bubblesPointer.step = step; sendBubblesCharge(bubblesPointer.seq, "progress", step); }
+  const [dx, dy] = bubblesPointer.trace.displacement();
+  const drag: Point = [Math.max(-4, Math.min(4, Math.round(dx * 10))), Math.max(-4, Math.min(4, Math.round(dy * 10)))];
+  const now = performance.now();
+  bubblesPointer.drag = drag;
+  if ((drag[0] !== bubblesPointer.sentDrag[0] || drag[1] !== bubblesPointer.sentDrag[1]) && now - bubblesPointer.lastMotionAt >= 70) sendBubblesMotion(bubblesPointer, now);
 });
 bubblesPad.addEventListener("pointerup", event => {
   if (bubblesPointer?.id !== event.pointerId) return;
@@ -311,7 +325,7 @@ async function connect(): Promise<void> {
       else if (message.type === "left") { forgetIdentity(); showJoin("You left the lobby. Enter a name to join again.", true); }
       else if (message.type === "flash_pose_charge") updateCharge(message);
       else if (["flash_pose_snapshot", "flash_pose_challenge", "flash_pose_result", "flash_pose_results"].includes(message.type ?? "")) showGame(message);
-      else if (message.type === "bubbles_trace_result") { bubblesLocalCharge = 0; if (message.action === "none") { bubblesStatus.textContent = message.reason === "spin_cooldown" ? "Spin is cooling down. Swipes still move you." : "Keep drawing a complete circle to spin."; bubblesFeedbackUntil = performance.now() + 1800; } }
+      else if (message.type === "bubbles_trace_result") { bubblesLocalCharge = 0; if (message.action === "none") { bubblesStatus.textContent = message.reason === "spin_cooldown" ? "Spin is cooling down. Swipes still move you." : message.reason === "swipe_too_slow" ? "Release sooner to move. Slow drags still stretch your bubble." : "Keep drawing a complete circle to spin."; bubblesFeedbackUntil = performance.now() + 1800; } }
       else if (message.type === "bubbles_snapshot" || message.type === "bubbles_feedback") showBubbles(message);
       else if (message.type === "lobby") { releaseHeld(false); setGameplaySurface(false); bubblesCard.hidden = true; bubblesDebug.hidden = true; bubblesSnapshot = undefined; if (message.player) rememberIdentity(message); else if (joined) { gameCard.hidden = true; playerCard.hidden = false; playerState.textContent = "Waiting for the next game"; status.textContent = message.message ?? "Waiting for the next game"; } }
     };

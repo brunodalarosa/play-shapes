@@ -8,6 +8,7 @@ test('completed trace clamps coordinates and requires movement', () => {
   assert.deepEqual(trace.completed(), []);
   trace.add(1100, -30);
   assert.deepEqual(trace.completed(), [[0.5, 0.5], [1, 0]]);
+  assert.deepEqual(trace.displacement(), [0.5, -0.5]);
 });
 
 test('dense circle stays bounded and previews charge without changing action truth', () => {

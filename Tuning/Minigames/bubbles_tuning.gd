@@ -47,6 +47,10 @@ var speed_reduction_per_jellyfish: float = 0.01:
 @export_range(20.0, 1000.0, 5.0, "suffix:px/s")
 var swipe_impulse: float = 280.0:
 	set(value): swipe_impulse = clampf(value, 20.0, 1000.0)
+## Maximum touch hold before a swipe loses its movement impulse. Spin gestures are unaffected. Default: 0.65. Safe range: 0.2-2.
+@export_range(0.2, 2.0, 0.05, "suffix:s")
+var swipe_max_hold_seconds: float = 0.65:
+	set(value): swipe_max_hold_seconds = clampf(value, 0.2, 2.0)
 ## Minimum normalized net swipe distance. Higher requires a longer swipe; lower accepts smaller gestures. Default: 0.07. Safe range: 0.02-0.3.
 @export_range(0.02, 0.3, 0.005)
 var swipe_min_distance: float = 0.07:
@@ -188,14 +192,22 @@ var swipe_pull_strength: float = 0.17:
 @export_range(0.0, 24.0, 1.0, "suffix:px")
 var swipe_character_push_pixels: float = 13.0:
 	set(value): swipe_character_push_pixels = clampf(value, 0.0, 24.0)
-## Character turning speed while charge is active, in revolutions per second. Default: 2.4. Safe range: 0.5-5.
-@export_range(0.5, 5.0, 0.1, "suffix:rev/s")
-var charge_turns_per_second: float = 2.4:
-	set(value): charge_turns_per_second = clampf(value, 0.5, 5.0)
-## Character unwinding time after host-accepted spin activation. Default: 0.22. Safe range: 0.08-0.6.
-@export_range(0.08, 0.6, 0.01, "suffix:s")
-var spin_release_seconds: float = 0.22:
-	set(value): spin_release_seconds = clampf(value, 0.08, 0.6)
+## Bubble stretch from coarse live drag direction. Zero disables held-touch deformation. Default: 0.20. Safe range: 0-0.22.
+@export_range(0.0, 0.22, 0.01)
+var live_drag_pull_strength: float = 0.20:
+	set(value): live_drag_pull_strength = clampf(value, 0.0, 0.22)
+## Seconds for held-touch stretch to follow and settle. Default: 0.08. Safe range: 0.02-0.4.
+@export_range(0.02, 0.4, 0.01, "suffix:s")
+var live_drag_response_seconds: float = 0.08:
+	set(value): live_drag_response_seconds = clampf(value, 0.02, 0.4)
+## Faint inner glow strength while circular charge grows. Default: 0.12. Safe range: 0-0.25.
+@export_range(0.0, 0.25, 0.01)
+var charge_glow_strength: float = 0.12:
+	set(value): charge_glow_strength = clampf(value, 0.0, 0.25)
+## Bubble wobble amplitude while charging spin. Default: 0.07. Safe range: 0-0.15.
+@export_range(0.0, 0.15, 0.01)
+var charge_wobble_strength: float = 0.07:
+	set(value): charge_wobble_strength = clampf(value, 0.0, 0.15)
 ## Surface rotation speed during authoritative spin, in revolutions per second. Default: 1.8. Safe range: 0.2-5.
 @export_range(0.2, 5.0, 0.1, "suffix:rev/s")
 var spin_surface_turns_per_second: float = 1.8:

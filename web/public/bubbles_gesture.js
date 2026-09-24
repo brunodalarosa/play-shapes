@@ -18,6 +18,13 @@ export class GestureTrace {
         }
     }
     completed() { return this.points.length >= 2 ? this.points.map(point => [...point]) : []; }
+    displacement() {
+        if (this.points.length < 2)
+            return [0, 0];
+        const first = this.points[0];
+        const last = this.points.at(-1);
+        return [last[0] - first[0], last[1] - first[1]];
+    }
     preview(circlesToCharge) {
         if (this.points.length < 6)
             return 0;

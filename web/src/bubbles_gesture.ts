@@ -18,6 +18,12 @@ export class GestureTrace {
 
   completed(): Point[] { return this.points.length >= 2 ? this.points.map(point => [...point]) : []; }
 
+  displacement(): Point {
+    if (this.points.length < 2) return [0, 0];
+    const first = this.points[0]; const last = this.points.at(-1)!;
+    return [last[0] - first[0], last[1] - first[1]];
+  }
+
   preview(circlesToCharge: number): number {
     if (this.points.length < 6) return 0;
     const center = this.points.reduce(([x, y], point) => [x + point[0], y + point[1]], [0, 0]).map(value => value / this.points.length);
