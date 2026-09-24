@@ -18,8 +18,8 @@ func _run() -> void:
 	controller.tuning.countdown_seconds = 0.0
 	controller.tuning.round_duration_seconds = 10.0
 	var players := [
-		{"player_id": "p0", "name": "First", "seat": 1, "state": "connected"},
-		{"player_id": "p1", "name": "Second", "seat": 2, "state": "connected"},
+		{"player_id": "p0", "name": "First", "seat": 1, "state": "connected", "character_shape": "squircle", "character_color": "#EC407A"},
+		{"player_id": "p1", "name": "Second", "seat": 2, "state": "connected", "character_shape": "square", "character_color": "#00ACC1"},
 	]
 	_check(controller.start_round(players, 0).accepted, "Round starts")
 	controller.complete_entrance(0)
@@ -92,6 +92,8 @@ func _run() -> void:
 	var snapshot := protocol.snapshot_for("p0")
 	_check(snapshot.type == "bubbles_snapshot" and snapshot.score == 0 and snapshot.visual_jellyfish == 0 and snapshot.seat == 1,
 		"Personal snapshot contains exact score and visual state")
+	_check(snapshot.character_shape == "squircle" and snapshot.character_color == "#EC407A",
+		"Phone Bubbles snapshots keep the authenticated player's host-owned selection")
 	_check(snapshot.host_time_msec >= 0 and snapshot.visual_tuning.live_drag_pull_strength == controller.tuning.live_drag_pull_strength,
 		"Phone receives the shared host clock and configured visual response")
 	_check(not snapshot.debug_mode, "Normal Bubbles snapshots do not claim debug mode")
@@ -110,8 +112,9 @@ func _run() -> void:
 	var debug_controller := _controller()
 	debug_controller.start_round([{"player_id": "debug", "name": "Debug", "seat": 1}], 0, true)
 	var debug_snapshot: Dictionary = Protocol.new(debug_controller).snapshot_for("debug")
-	_check(debug_controller.is_one_player_debug() and debug_snapshot.debug_mode,
-		"One-player debug state reaches the phone snapshot")
+	_check(debug_controller.is_one_player_debug() and debug_snapshot.debug_mode
+		and debug_snapshot.character_shape == "circle" and debug_snapshot.character_color == CharacterSelection.FALLBACK_COLOR,
+		"One-player debug state reaches the phone with the existing-style fallback")
 	_test_timed_swipes()
 	print("Bubbles protocol checks: %d failures" % _failures)
 	quit(0 if _failures == 0 else 1)

@@ -28,6 +28,9 @@ func _test_lifecycle_deadline_and_flash_order() -> void:
 	controller.flash_requested.connect(func(_id: int, _results: Array[Dictionary]) -> void: events.append(&"flash"))
 	var started: Dictionary = controller.start_round(_participants(), 0)
 	_check(started.accepted and started.style == &"swing", "Injected style is selected once for the round")
+	_check(controller.player_snapshot()[0].character_shape == "square"
+		and controller.player_snapshot()[1].character_color == "#00ACC1",
+		"Host round snapshots preserve each registered participant's selected appearance")
 	controller.advance(0)
 	_check(controller.phase_name() == &"dance", "Zero countdown enters dance")
 	controller.advance(100)
@@ -181,8 +184,8 @@ func _controller(countdown: float, duration: float) -> Node:
 
 func _participants() -> Array[Dictionary]:
 	return [
-		{"player_id": "p1", "name": "One", "seat": 1, "state": "connected"},
-		{"player_id": "p2", "name": "Two", "seat": 2, "state": "connected"},
+		{"player_id": "p1", "name": "One", "seat": 1, "state": "connected", "character_shape": "square", "character_color": "#EC407A"},
+		{"player_id": "p2", "name": "Two", "seat": 2, "state": "connected", "character_shape": "rhombus", "character_color": "#00ACC1"},
 	]
 
 

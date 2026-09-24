@@ -89,8 +89,11 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 		var seat: Variant = source.get("seat", index + 1)
 		if typeof(seat) != TYPE_INT or seat < 1:
 			return _reject(&"invalid_participants")
+		var selection := CharacterSelection.for_player(source)
 		fresh[player_id] = {
 			"player_id": player_id, "name": String(source.get("name", "")),
+			"character_shape": selection.character_shape,
+			"character_color": selection.character_color,
 			"seat": seat, "score": 0, "connected": source.get("state", "connected") == "connected",
 			"left": false, "invulnerable_until_msec": -1,
 			"last_pop_msec": -1,
@@ -293,7 +296,11 @@ func _freeze_results() -> void:
 	var ranking: Array[Dictionary] = []
 	for player_id: String in _player_order:
 		var state: Dictionary = _players[player_id]
-		ranking.append({"player_id": player_id, "name": state.name, "seat": state.seat, "score": state.score, "left": state.left})
+		ranking.append({
+			"player_id": player_id, "name": state.name, "seat": state.seat,
+			"character_shape": state.character_shape, "character_color": state.character_color,
+			"score": state.score, "left": state.left,
+		})
 	ranking.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		if a.score != b.score:
 			return a.score > b.score

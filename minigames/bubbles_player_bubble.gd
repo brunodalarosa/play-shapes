@@ -48,11 +48,13 @@ func _ready() -> void:
 	_collider.shape = _collider.shape.duplicate()
 
 
-func configure(id: String, display_name: String, color: Color, selected_tuning: BubblesTuning) -> void:
+func configure(id: String, display_name: String, color: Color, selected_tuning: BubblesTuning,
+		selected_shape: StringName = CharacterSelection.FALLBACK_SHAPE) -> void:
 	assert(not id.is_empty() and selected_tuning != null)
 	player_id = id
 	tuning = selected_tuning
 	_player_color = color
+	_character.body_shape = selected_shape
 	_character.player_color = color
 	_name_label.text = display_name
 	_blink_next_msec = roundi(selected_tuning.character_blink_interval_seconds * 1000.0 * (0.7 + float(abs(id.hash()) % 7) * 0.1))

@@ -12,16 +12,35 @@
 </head>
 <body>
   <main>
-    <p class="brand">PLAY SHAPES</p>
-    <div class="shapes" aria-hidden="true">● ▲ ■</div>
-    <h1>Join the game</h1>
-    <p>Your phone is your Play Shapes controller.</p>
-    <p id="status" class="status" role="status" aria-live="polite">Connecting to the host…</p>
-    <form id="join-form" hidden>
-      <label for="player-name">Your name</label>
-      <input id="player-name" name="player-name" type="text" maxlength="16" autocomplete="nickname" required>
-      <button id="join-button" type="submit">Join game</button>
-    </form>
+    <section id="selection-screen" class="onboarding-screen" aria-labelledby="selection-title">
+      <h1 id="selection-title" class="brand">PLAY SHAPES</h1>
+      <div class="shape-picker">
+        <button id="previous-shape" class="shape-cycle" type="button" aria-label="Previous shape">‹</button>
+        <div class="character-preview-wrap">
+          <canvas id="selection-preview" class="character-preview" role="img" aria-label="Circle shape, Blue"></canvas>
+          <p id="selected-character-label" class="selection-label" aria-live="polite">Circle · Blue</p>
+        </div>
+        <button id="next-shape" class="shape-cycle" type="button" aria-label="Next shape">›</button>
+      </div>
+      <div class="color-choice">
+        <p id="color-choice-label">Choose a color</p>
+        <div id="color-grid" class="color-grid" role="group" aria-labelledby="color-choice-label"></div>
+      </div>
+      <button id="next-button" class="action-button" type="button" aria-controls="name-screen">NEXT</button>
+    </section>
+
+    <section id="name-screen" class="onboarding-screen" aria-labelledby="name-screen-title" hidden>
+      <button id="back-button" class="back-button" type="button" aria-label="Back to character selection">BACK</button>
+      <canvas id="name-preview" class="character-preview dancing-preview" role="img" aria-label="Your selected character dancing"></canvas>
+      <h2 id="name-screen-title" class="name-screen-title">What's your name?</h2>
+      <form id="join-form">
+        <label for="player-name">Your name</label>
+        <input id="player-name" name="player-name" type="text" maxlength="16" autocomplete="nickname" placeholder="Enter your name" required>
+        <button id="join-button" class="action-button" type="submit">ENTER LOBBY</button>
+      </form>
+    </section>
+
+    <p id="status" class="status" role="status" aria-live="polite" hidden></p>
     <section id="player-card" aria-labelledby="player-name-heading" hidden>
       <p class="eyebrow">Joined as</p>
       <h2 id="player-name-heading"></h2>

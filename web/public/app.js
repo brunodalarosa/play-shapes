@@ -1,6 +1,17 @@
 import { attemptImmersive, chargedColor, directionAtPoint, heldDirectionAfterUpdate } from "./controller_geometry.js";
 import { GestureTrace } from "./bubbles_gesture.js";
+import { advanceJoinFlow, bodyAssetPath, CHARACTER_COLORS, CHARACTER_SHAPES, chooseJoinColor, colorOption, createJoinMessage, cycleJoinShape, defaultJoinFlow, FALLBACK_CHARACTER, isCharacterShape, returnToCharacterSelection, } from "./character_selection.js";
 const status = document.querySelector("#status");
+const selectionScreen = document.querySelector("#selection-screen");
+const previousShapeButton = document.querySelector("#previous-shape");
+const nextShapeButton = document.querySelector("#next-shape");
+const selectionPreview = document.querySelector("#selection-preview");
+const namePreview = document.querySelector("#name-preview");
+const selectedCharacterLabel = document.querySelector("#selected-character-label");
+const colorGrid = document.querySelector("#color-grid");
+const nextButton = document.querySelector("#next-button");
+const backButton = document.querySelector("#back-button");
+const nameScreen = document.querySelector("#name-screen");
 const joinForm = document.querySelector("#join-form");
 const nameInput = document.querySelector("#player-name");
 const joinButton = document.querySelector("#join-button");
@@ -29,6 +40,7 @@ let socket;
 let retry;
 let stopped = false;
 let joined = false;
+let joinFlow = defaultJoinFlow();
 let inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
 let held;
 let directions = [];
@@ -48,11 +60,14 @@ let bubblesVisualSnapshot;
 let bubblesVisualReceivedAt = 0;
 let bubblesPhoneDragDisplay = [0, 0];
 let bubblesPreviousFrame = performance.now();
+const characterBodies = Object.fromEntries(CHARACTER_SHAPES.map(shape => [shape, new Image()]));
+for (const shape of CHARACTER_SHAPES)
+    characterBodies[shape].src = bodyAssetPath(shape);
 const bubblesArt = {
-    body: new Image(), hand: new Image(), foot: new Image(), face: new Image(), blink: new Image(), jellyfish: new Image(),
+    hand: new Image(), openHand: new Image(), foot: new Image(), face: new Image(), blink: new Image(), jellyfish: new Image(),
 };
-bubblesArt.body.src = "/bubbles-player-body.png";
 bubblesArt.hand.src = "/bubbles-player-hand.png";
+bubblesArt.openHand.src = "/shape-hand-open.png";
 bubblesArt.foot.src = "/bubbles-player-foot.png";
 bubblesArt.face.src = "/bubbles-player-face-neutral.png";
 bubblesArt.blink.src = "/bubbles-player-face-blink.png";
@@ -74,6 +89,33 @@ function forgetIdentity() { try {
     localStorage.removeItem(STORAGE.inputSeq);
 }
 catch { /* Restricted storage. */ } inputSeq = 0; }
+function selectedCharacterName() {
+    const shape = joinFlow.shape[0].toUpperCase() + joinFlow.shape.slice(1);
+    const color = colorOption(joinFlow.color)?.name ?? "Blue";
+    return `${shape} · ${color}`;
+}
+function refreshSelectionUi() {
+    const label = selectedCharacterName();
+    selectedCharacterLabel.textContent = label;
+    selectionPreview.setAttribute("aria-label", `${label} Shape Character`);
+    namePreview.setAttribute("aria-label", `${label} character dancing`);
+    for (const button of Array.from(colorGrid.querySelectorAll(".color-button"))) {
+        button.setAttribute("aria-pressed", String(button.dataset.color === joinFlow.color));
+    }
+    renderJoinPreviews(performance.now());
+}
+for (const option of CHARACTER_COLORS) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "color-button";
+    button.dataset.color = option.hex;
+    button.style.backgroundColor = option.hex;
+    button.setAttribute("aria-label", `Choose ${option.name}`);
+    button.setAttribute("aria-pressed", "false");
+    button.addEventListener("click", () => { joinFlow = chooseJoinColor(joinFlow, option.hex); refreshSelectionUi(); });
+    colorGrid.append(button);
+}
+refreshSelectionUi();
 function setGameplaySurface(active, mode = "flash") {
     const next = active ? mode : null;
     if (activeGame !== next) {
@@ -103,6 +145,7 @@ function updateOrientation() {
     poseGrid.hidden = activeGame !== "flash" || portrait;
 }
 function showJoin(message, focus = false) {
+    joinFlow = returnToCharacterSelection(joinFlow);
     joined = false;
     bubblesSnapshot = undefined;
     bubblesVisualSnapshot = undefined;
@@ -110,19 +153,25 @@ function showJoin(message, focus = false) {
     playerCard.hidden = true;
     gameCard.hidden = true;
     bubblesCard.hidden = true;
-    joinForm.hidden = false;
+    selectionScreen.hidden = false;
+    nameScreen.hidden = true;
+    joinForm.hidden = true;
     joinButton.disabled = false;
     leaveButton.disabled = false;
     status.textContent = message;
+    status.hidden = !message;
     nameInput.value = stored(STORAGE.name);
+    refreshSelectionUi();
     if (focus)
-        queueMicrotask(() => nameInput.focus());
+        queueMicrotask(() => nextButton.focus());
 }
 function showJoined(player, state = "Connected") {
     joined = true;
     bubblesSnapshot = undefined;
     bubblesVisualSnapshot = undefined;
     setGameplaySurface(false);
+    selectionScreen.hidden = true;
+    nameScreen.hidden = true;
     joinForm.hidden = true;
     playerCard.hidden = false;
     gameCard.hidden = true;
@@ -130,8 +179,38 @@ function showJoined(player, state = "Connected") {
     playerName.textContent = player.name;
     playerState.textContent = state;
     leaveButton.disabled = false;
+    if (isCharacterShape(player.character_shape))
+        joinFlow = { ...joinFlow, shape: player.character_shape };
+    const serverColor = colorOption(player.character_color)?.hex;
+    if (serverColor)
+        joinFlow = chooseJoinColor(joinFlow, serverColor);
     status.textContent = state === "Connected" ? "Joined. Keep this page open while you play." : state;
+    status.hidden = true;
 }
+previousShapeButton.addEventListener("click", () => { joinFlow = cycleJoinShape(joinFlow, -1); refreshSelectionUi(); });
+nextShapeButton.addEventListener("click", () => { joinFlow = cycleJoinShape(joinFlow, 1); refreshSelectionUi(); });
+nextButton.addEventListener("click", () => {
+    joinFlow = advanceJoinFlow(joinFlow);
+    selectionScreen.hidden = true;
+    nameScreen.hidden = false;
+    joinForm.hidden = false;
+    if (!nameInput.value)
+        nameInput.value = stored(STORAGE.name);
+    status.hidden = true;
+    status.textContent = "";
+    refreshSelectionUi();
+    queueMicrotask(() => nameInput.focus());
+});
+backButton.addEventListener("click", () => {
+    joinFlow = returnToCharacterSelection(joinFlow);
+    nameScreen.hidden = true;
+    joinForm.hidden = true;
+    selectionScreen.hidden = false;
+    status.hidden = true;
+    status.textContent = "";
+    refreshSelectionUi();
+    queueMicrotask(() => nextButton.focus());
+});
 function sendPose(type, direction) { if (!socket || socket.readyState !== WebSocket.OPEN)
     return; inputSeq += 1; store(STORAGE.inputSeq, String(inputSeq)); socket.send(JSON.stringify({ type, direction, input_seq: inputSeq })); }
 function releaseHeld(send = true) {
@@ -387,7 +466,6 @@ function showBubbles(message) {
             vibrate([35, 45, 35]);
     }
 }
-const BUBBLES_SEAT_COLORS = ["#5b8df2", "#4ecb8d", "#f6c453", "#9c72e8", "#ef7f45", "#55c7d9", "#e867b5", "#89b34c", "#7f91a8", "#d76464"];
 const BUBBLE_RIM_COLORS = ["#6eeaff", "#a785ff", "#ff8bce", "#ffdf9d", "#8af8c7"];
 function clamp(value, minimum, maximum) { return Math.min(maximum, Math.max(minimum, value)); }
 function tuningValue(key, fallback) {
@@ -446,6 +524,55 @@ function drawUntintedSprite(context, image, x, y, width, height) {
     context.translate(x, y);
     context.drawImage(image, -width / 2, -height / 2, width, height);
     context.restore();
+}
+function drawCharacter(context, shape, tint, x, y, scale, pose, hand = bubblesArt.hand) {
+    context.save();
+    context.translate(x, y);
+    context.scale(scale, scale);
+    drawSprite(context, bubblesArt.foot, tint, pose.leftFootPosition[0], pose.leftFootPosition[1], 40, 24, true);
+    drawSprite(context, bubblesArt.foot, tint, pose.rightFootPosition[0], pose.rightFootPosition[1], 40, 24);
+    drawSprite(context, hand, tint, pose.leftHandPosition[0], pose.leftHandPosition[1], 35, 34, true, pose.leftHandRotation);
+    drawSprite(context, hand, tint, pose.rightHandPosition[0], pose.rightHandPosition[1], 35, 34, false, pose.rightHandRotation);
+    drawSprite(context, characterBodies[shape], tint, 0, 0, 80, 80, false, pose.bodyRotation);
+    const face = pose.faceBlink ? bubblesArt.blink : bubblesArt.face;
+    drawUntintedSprite(context, face, pose.facePosition[0], pose.facePosition[1], pose.faceBlink ? 53 : 50, pose.faceBlink ? 37 : 29);
+    context.restore();
+}
+function renderJoinPreviews(now) {
+    const seconds = now / 1000;
+    for (const canvas of [selectionPreview, namePreview]) {
+        const section = canvas.closest("section");
+        if (section?.hidden)
+            continue;
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0)
+            continue;
+        const pixelRatio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+        const width = Math.max(1, Math.round(rect.width * pixelRatio));
+        const height = Math.max(1, Math.round(rect.height * pixelRatio));
+        if (canvas.width !== width || canvas.height !== height) {
+            canvas.width = width;
+            canvas.height = height;
+        }
+        const context = canvas.getContext("2d");
+        if (!context)
+            continue;
+        context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+        context.clearRect(0, 0, rect.width, rect.height);
+        const dancing = canvas === namePreview;
+        const wave = dancing ? Math.sin(seconds * 4.2) : 0;
+        const handSway = dancing ? wave * 0.07 : 0;
+        const handDrift = dancing ? wave * 2 : 0;
+        const pose = {
+            bodyRotation: dancing ? Math.sin(seconds * 2.7) * 0.09 : 0,
+            facePosition: [0, -5], faceBlink: Math.sin(seconds * 0.9) > 0.985,
+            leftHandPosition: [-48, 22 - handDrift], rightHandPosition: [48, 22 + handDrift],
+            leftFootPosition: [-35 - wave * 2, 62], rightFootPosition: [35 + wave * 2, 62],
+            leftHandRotation: Math.PI + 0.18 + handSway, rightHandRotation: Math.PI - 0.18 + handSway,
+        };
+        const scale = Math.min(rect.width / 145, rect.height / 125) * 0.9;
+        drawCharacter(context, joinFlow.shape, joinFlow.color, rect.width / 2, rect.height * 0.46 + (dancing ? Math.sin(seconds * 3.4) * 4 : 0), scale, pose, bubblesArt.openHand);
+    }
 }
 function drawBubblePath(context, radius, pull, surfaceAngle) {
     const length = Math.hypot(pull[0], pull[1]);
@@ -527,27 +654,18 @@ function drawBubbleBurst(context, radius, progress, density) {
             drawArc(context, x, y, 2 + index % 3, 0, Math.PI * 2, `rgba(204,248,255,${0.75 * fade})`, 1.3);
     }
 }
-function drawPhoneCharacter(context, worldScale, seatColor, visual, hostTime) {
+function drawPhoneCharacter(context, visual, hostTime, shape, selectedColor) {
     const fallbackScale = Math.min(0.55, (bubblesSnapshot?.bubble_radius ?? tuningValue("starting_radius", 48)) * 0.82 / 75);
     const characterScale = (visual?.character_scale ?? fallbackScale) * 0.4;
     const position = visual?.character_position ?? [0, Math.sin(hostTime / 1000 * 2.2) * 4];
-    const bodyRotation = visual?.body_rotation ?? Math.sin(hostTime / 1000 * 1.7) * 0.05;
-    const facePosition = visual?.face_position ?? [0, -5];
-    const leftHand = visual?.left_hand_position ?? [-52, -4];
-    const rightHand = visual?.right_hand_position ?? [52, -4];
-    const leftFoot = visual?.left_foot_position ?? [-35, 62];
-    const rightFoot = visual?.right_foot_position ?? [35, 62];
-    const tint = visual?.recovery_white ? "#ffffff" : seatColor;
-    context.save();
-    context.translate(position[0] * worldScale, position[1] * worldScale);
-    context.scale(characterScale, characterScale);
-    drawSprite(context, bubblesArt.foot, tint, leftFoot[0], leftFoot[1], 40, 24, true);
-    drawSprite(context, bubblesArt.foot, tint, rightFoot[0], rightFoot[1], 40, 24);
-    drawSprite(context, bubblesArt.hand, tint, leftHand[0], leftHand[1], 35, 34, true);
-    drawSprite(context, bubblesArt.hand, tint, rightHand[0], rightHand[1], 35, 34);
-    drawSprite(context, bubblesArt.body, tint, 0, 0, 80, 80, false, bodyRotation);
-    drawUntintedSprite(context, visual?.face_blink ? bubblesArt.blink : bubblesArt.face, facePosition[0], facePosition[1], visual?.face_blink ? 53 : 50, visual?.face_blink ? 37 : 29);
-    context.restore();
+    const pose = {
+        bodyRotation: visual?.body_rotation ?? Math.sin(hostTime / 1000 * 1.7) * 0.05,
+        facePosition: visual?.face_position ?? [0, -5], faceBlink: visual?.face_blink ?? false,
+        leftHandPosition: visual?.left_hand_position ?? [-52, -4], rightHandPosition: visual?.right_hand_position ?? [52, -4],
+        leftFootPosition: visual?.left_foot_position ?? [-35, 62], rightFootPosition: visual?.right_foot_position ?? [35, 62],
+        leftHandRotation: 0, rightHandRotation: 0,
+    };
+    drawCharacter(context, shape, visual?.recovery_white ? "#ffffff" : selectedColor, position[0], position[1], characterScale, pose);
 }
 function renderBubbles(now) {
     if (bubblesCard.hidden || !bubblesSnapshot)
@@ -579,8 +697,8 @@ function renderBubbles(now) {
     const radius = Math.max(1, visual?.radius ?? ((message.bubble_radius ?? startRadius) * reformScale));
     const burstRadius = message.burst_radius ?? message.bubble_radius ?? startRadius;
     const renderedRadius = burstProgress >= 0 && burstProgress < 1 ? (visual?.radius ?? burstRadius) : radius;
-    const seat = Math.max(1, Math.floor(message.seat ?? 1));
-    const seatColor = BUBBLES_SEAT_COLORS[(seat - 1) % BUBBLES_SEAT_COLORS.length];
+    const bodyShape = isCharacterShape(message.character_shape) ? message.character_shape : FALLBACK_CHARACTER.shape;
+    const selectedColor = colorOption(message.character_color)?.hex ?? FALLBACK_CHARACTER.color;
     const spinTurns = tuningValue("spin_surface_turns_per_second", 1.8);
     const spinning = visual?.spinning ?? (message.phase === "active" && (message.spin_remaining_msec ?? 0) - snapshotElapsed > 0);
     const surfaceAngle = visual ? visual.surface_angle + (spinning ? visualElapsed / 1000 * Math.PI * 2 * spinTurns : 0) : 0;
@@ -672,12 +790,13 @@ function renderBubbles(now) {
     }
     const characterVisible = visual?.character_visible ?? !(burstProgress >= 0 && burstProgress < 1);
     if (characterVisible)
-        drawPhoneCharacter(context, worldScale, seatColor, visual, tuneTime);
+        drawPhoneCharacter(context, visual, tuneTime, bodyShape, selectedColor);
     context.restore();
     bubblesPreviousFrame = now;
 }
 function animateBubbles(now) {
     renderBubbles(now);
+    renderJoinPreviews(now);
     requestAnimationFrame(animateBubbles);
 }
 requestAnimationFrame(animateBubbles);
@@ -742,13 +861,13 @@ function reconnect() {
         playerState.textContent = "Reconnecting";
         leaveButton.disabled = true;
     }
-    else
-        joinForm.hidden = true;
     status.textContent = "Host disconnected. Reconnecting…";
+    status.hidden = false;
     retry = setTimeout(() => { retry = undefined; void connect(); }, 2000);
 }
 async function connect() {
     status.textContent = joined ? "Reconnecting to the host…" : "Connecting to the host…";
+    status.hidden = false;
     try {
         const response = await fetch("/session.json", { cache: "no-store", signal: AbortSignal.timeout(5000) });
         if (!response.ok)
@@ -785,14 +904,14 @@ async function connect() {
                 }
                 if (message.resume_status === "session_restarted") {
                     forgetIdentity();
-                    showJoin("The host started a new session. Join again with your name.", true);
+                    showJoin("The host started a new session. Choose your character and name to join again.", true);
                 }
                 else if (message.resume_status === "expired") {
                     forgetIdentity();
-                    showJoin("Your previous player expired. Join again with your name.", true);
+                    showJoin("Your previous player expired. Choose your character and name to join again.", true);
                 }
                 else
-                    showJoin("Connected. Enter your name to join.", true);
+                    showJoin("Connected. Choose your character to join.", true);
             }
             else if (message.type === "join_accepted") {
                 if (!rememberIdentity(message))
@@ -801,12 +920,13 @@ async function connect() {
             else if (message.type === "join_rejected" || message.type === "error") {
                 joinButton.disabled = false;
                 status.textContent = message.message ?? "The host could not complete that action.";
+                status.hidden = false;
                 if (!joined)
                     nameInput.focus();
             }
             else if (message.type === "left") {
                 forgetIdentity();
-                showJoin("You left the lobby. Enter a name to join again.", true);
+                showJoin("You left the lobby. Choose your character and name to join again.", true);
             }
             else if (message.type === "flash_pose_charge")
                 updateCharge(message);
@@ -852,8 +972,9 @@ async function connect() {
 }
 joinForm.addEventListener("submit", event => { event.preventDefault(); const name = nameInput.value.trim(); store(STORAGE.name, name); if (!socket || socket.readyState !== WebSocket.OPEN) {
     status.textContent = "Still connecting. Try again in a moment.";
+    status.hidden = false;
     return;
-} joinButton.disabled = true; status.textContent = "Joining…"; socket.send(JSON.stringify({ type: "join", name })); });
+} joinButton.disabled = true; status.textContent = "Joining…"; status.hidden = false; socket.send(JSON.stringify(createJoinMessage(name, joinFlow))); });
 leaveButton.addEventListener("click", () => { if (!socket || socket.readyState !== WebSocket.OPEN)
     return; leaveButton.disabled = true; status.textContent = "Leaving…"; socket.send(JSON.stringify({ type: "leave" })); });
 addEventListener("orientationchange", updateOrientation);

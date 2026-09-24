@@ -282,7 +282,6 @@ func _add_result_row(entry: Dictionary, count: int) -> void:
 	row.custom_minimum_size.y = clampf((size.y * 0.73) / float(maxi(count, 1)), 45.0, 92.0)
 	row.add_theme_constant_override("separation", 18)
 	_results_list.add_child(row)
-	var color := BubblesPlayerArena.SEAT_COLORS[posmod(int(entry.get("seat", 1)) - 1, BubblesPlayerArena.SEAT_COLORS.size())]
 	var rank := _result_label("#%d" % int(entry.get("rank", 0)), 0.09, 27)
 	var portrait := Control.new()
 	portrait.custom_minimum_size = Vector2(58, 48)
@@ -290,7 +289,7 @@ func _add_result_row(entry: Dictionary, count: int) -> void:
 	portrait.add_child(character)
 	character.position = Vector2(29, 25)
 	character.scale = Vector2.ONE * 0.27
-	character.player_color = color
+	character.apply_selection(CharacterSelection.for_player(entry))
 	var name_label := _result_label(String(entry.get("name", "Player")), 0.7, 27)
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	var count_label := _result_label("%d jellyfish" % int(entry.get("score", 0)), 0.21, 26)

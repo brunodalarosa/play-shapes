@@ -17,6 +17,7 @@ const REQUIRED_BROWSER_PATHS := [
 	"web/public/app.js",
 	"web/public/controller_geometry.js",
 	"web/public/bubbles_gesture.js",
+	"web/public/character_selection.js",
 	"web/public/style.css",
 ]
 const REQUIRED_RUNTIME_PATHS := [
@@ -24,7 +25,14 @@ const REQUIRED_RUNTIME_PATHS := [
 	"web/public/app.js",
 	"web/public/controller_geometry.js",
 	"web/public/bubbles_gesture.js",
+	"web/public/character_selection.js",
 	"web/public/style.css",
+	"characters/character_selection.gd",
+	"assets/runtime/shape_characters/bodies/square.png",
+	"assets/runtime/shape_characters/bodies/circle.png",
+	"assets/runtime/shape_characters/bodies/squircle.png",
+	"assets/runtime/shape_characters/bodies/rhombus.png",
+	"assets/runtime/shape_characters/hands/open.png",
 	"addons/kenyoni/qr_code/qr_code_rect.gd",
 	"scenes/boot.tscn",
 	"scenes/lobby.tscn",

@@ -7,11 +7,6 @@ signal player_collision(first_id: String, second_id: String, spun_id: String)
 
 const BUBBLE_SCENE: PackedScene = preload("res://minigames/bubbles_player_bubble.tscn")
 const PLAYER_RESTITUTION := 0.5
-const SEAT_COLORS: Array[Color] = [
-	Color("5b8df2"), Color("4ecb8d"), Color("f6c453"), Color("9c72e8"), Color("ef7f45"),
-	Color("55c7d9"), Color("e867b5"), Color("89b34c"), Color("7f91a8"), Color("d76464"),
-]
-
 var bounds := Rect2()
 var wall_bounds := Rect2()
 var _controller: BubblesRoundController
@@ -44,8 +39,14 @@ func add_bubble(player_id: String, start_position: Vector2) -> BubblesPlayerBubb
 	var bubble := BUBBLE_SCENE.instantiate() as BubblesPlayerBubble
 	add_child(bubble)
 	bubble.global_position = start_position
-	var seat: int = snapshot.get("seat", 1)
-	bubble.configure(player_id, String(snapshot.get("name", "")), SEAT_COLORS[posmod(seat - 1, SEAT_COLORS.size())], _controller.tuning)
+	var selection := CharacterSelection.for_player(snapshot)
+	bubble.configure(
+		player_id,
+		String(snapshot.get("name", "")),
+		Color(String(selection.character_color)),
+		_controller.tuning,
+		StringName(selection.character_shape)
+	)
 	bubble.bind_controller(_controller)
 	_bubbles[player_id] = bubble
 	_ordered_ids.append(player_id)

@@ -70,6 +70,8 @@ func _test_snapshots_elimination_and_ten_players() -> void:
 	_check(snapshot.type == "flash_pose_snapshot" and snapshot.phase == "genuine_stop_grace" \
 		and snapshot.available_directions == ["left", "right"] and snapshot.player.lives == 2,
 		"Reconnect snapshot is personalized and exposes only current phone state")
+	_check(snapshot.player.character_shape == "circle" and snapshot.player.character_color == "#8D6E63",
+		"Phone reconnect snapshots retain the host-owned selected appearance")
 	_check(snapshot.presentation.colors.left == "#48d16f" \
 		and snapshot.presentation.minimum_brightness == 0.42 \
 		and snapshot.presentation.charge_fill_seconds == controller.tuning.charge_fill_seconds,
@@ -116,8 +118,11 @@ func _controller() -> Node:
 
 func _participants(count: int) -> Array[Dictionary]:
 	var players: Array[Dictionary] = []
+	var shapes: Array[String] = ["square", "circle", "squircle", "rhombus"]
+	var colors: Array[String] = ["#E53935", "#F57C00", "#FBC02D", "#43A047", "#00ACC1", "#1E88E5", "#3949AB", "#8E24AA", "#EC407A", "#8D6E63"]
 	for index: int in count:
-		players.append({"player_id": "p%d" % (index + 1), "name": "Player %d" % (index + 1), "seat": index + 1, "state": "connected"})
+		players.append({"player_id": "p%d" % (index + 1), "name": "Player %d" % (index + 1), "seat": index + 1,
+			"state": "connected", "character_shape": shapes[index % shapes.size()], "character_color": colors[index % colors.size()]})
 	return players
 
 func _check(condition: bool, description: String) -> void:

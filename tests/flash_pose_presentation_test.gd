@@ -30,11 +30,16 @@ func _run() -> void:
 
 	controller.inject_sequences([&"swing"], [&"left"], [0])
 	var started := controller.start_round([
-		{"player_id": "p1", "name": "One", "seat": 1, "state": "connected"},
-		{"player_id": "p2", "name": "Two", "seat": 2, "state": "connected"},
+		{"player_id": "p1", "name": "One", "seat": 1, "state": "connected", "character_shape": "square", "character_color": "#EC407A"},
+		{"player_id": "p2", "name": "Two", "seat": 2, "state": "connected", "character_shape": "rhombus", "character_color": "#00ACC1"},
 	], start_msec)
 	_check(started.accepted, "Presentation fixture starts")
 	_check(presentation._player_animators.size() == 2, "Participating players populate stable seats")
+	var first_character := stage.player_slots()[0].get_node(^"PreviewCharacter") as ShapeCharacter
+	var second_character := stage.player_slots()[1].get_node(^"PreviewCharacter") as ShapeCharacter
+	_check(first_character.body_shape == &"square" and first_character.player_color.is_equal_approx(Color("#EC407A"))
+		and second_character.body_shape == &"rhombus" and second_character.player_color.is_equal_approx(Color("#00ACC1")),
+		"Distinct participant selections reach their own shared-screen character instances")
 	_check((presentation._player_labels[1] as Label).text.contains("One") and (presentation._player_labels[1] as Label).text.contains("♥♥"),
 		"Player status uses a name and non-color life symbols")
 	_check(presentation._music.stream == FlashPoseAudioCatalog.MUSIC_BY_STYLE[&"swing"],
