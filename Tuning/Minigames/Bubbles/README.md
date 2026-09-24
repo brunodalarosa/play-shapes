@@ -62,12 +62,11 @@ Every Inspector tooltip gives the field's purpose, default, safe range, and high
 | Disappear on pop (fraction) | 0.5; 0–1 | Leaves fewer to recollect |
 | Pop invulnerability (seconds) | 2; 0–8 | Gives safer recovery, without collection |
 | Bubble re-form time (seconds) | 0.35; 0.1–1.5 | Makes recovery more visible |
-| Pufferfish warning (on/off) | On; boolean | Enables edge notice |
-| Pufferfish warning time (seconds) | 0.8; 0–3 | Gives more visual notice |
-| Warning bubble spacing (world pixels) | 24; 8–48 | Packs emitted warning bubbles closer |
-| Warning bubble radius (world pixels) | 4.5; 2–10 | Makes the warning bubbles larger |
-| Warning bubble fade (seconds) | 0.7; 0.1–2 | Keeps emitted bubbles visible longer |
-| Warning bubble rise (world pixels/second) | 12; 0–60 | Moves bubbles upward faster |
+| Pufferfish warning (on/off) | On; boolean | Enables the offscreen burst and reveal delay |
+| Pufferfish warning time (seconds) | 0.8; 0–3 | Delays the pufferfish reveal while bubbles drift inward |
+| Telegraph bubble count | 24; 4–64 | Makes the one-shot particle burst denser |
+| Telegraph bubble radius (world pixels) | 4.5; 2–10 | Makes individual burst bubbles larger |
+| Telegraph noise strength | 3; 0–10 | Adds varied acceleration to individual bubble paths |
 | Final timer emphasis threshold (whole seconds) | 10; 1–30 | Starts countdown pulses earlier |
 | Parallax strength (multiplier) | 1; 0–2 | Moves the environment layers farther |
 | Timer pulse strength (multiplier) | 1; 0–2 | Enlarges final countdown beats more |
@@ -76,4 +75,4 @@ Every Inspector tooltip gives the field's purpose, default, safe range, and high
 
 The maximum radius must exceed the starting radius. Starting jellyfish cannot exceed the free cap. High jellyfish spawn rate must be at least low rate; maximum wave duration must be at least minimum; late pufferfish rate must be at least early rate. Inspector setters clamp out-of-range values; the preset validator rejects any non-finite value that remains. Passing checks establishes safe configuration only; phone feel, accessibility, and balance still need human review.
 
-The jellyfish breathing and pufferfish body jiggle affect sprites only. The pufferfish size multiplier scales both its sprite and collision radius from the configured baseline radius. Its warning is a visual-only bubble trail: the cue previews the first 15% of the crossing, emits bubbles while the fish travels through that segment, and then lets those bubbles fade away. The warning toggle suppresses both the preview and emitted bubbles.
+The jellyfish breathing and pufferfish body jiggle affect sprites only. The pufferfish size multiplier scales both its sprite and collision radius from the configured baseline radius. With warnings enabled, a one-shot `GPUParticles2D` burst starts at the offscreen path origin and drifts inward during the configured warning delay. The pufferfish sprite and collider remain disabled until the host warning deadline, when the fish appears at that same origin and begins its existing path. Random per-particle spread, speed, and acceleration add small movement variations to these decorative bubbles, which have no collision. Disabling warnings skips both the burst and delay.

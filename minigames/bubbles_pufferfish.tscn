@@ -15,6 +15,16 @@ monitoring = false
 monitorable = false
 script = ExtResource("1")
 
+[node name="WarningParticles" type="GPUParticles2D" parent="."]
+texture_filter = 4
+emitting = false
+amount = 24
+lifetime = 1.15
+one_shot = true
+explosiveness = 0.9
+local_coords = false
+visibility_rect = Rect2(-500, -500, 1000, 1000)
+
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2")
 

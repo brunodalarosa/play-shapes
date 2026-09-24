@@ -75,14 +75,14 @@ func spawn_fresh_at(world_position: Vector2, at_msec: int, direction: Vector2 = 
 
 
 ## Explicit one-pass path seam; normal paths choose opposing edges with randomized offsets.
-func schedule_puffer_path(start: Vector2, destination: Vector2, warning_position: Vector2, at_msec: int) -> int:
-	if _controller == null or _puffers.size() >= MAX_ACTIVE_PUFFERS or not start.is_finite() or not destination.is_finite() or not warning_position.is_finite() or start.distance_to(destination) < 1.0:
+func schedule_puffer_path(start: Vector2, destination: Vector2, at_msec: int) -> int:
+	if _controller == null or _puffers.size() >= MAX_ACTIVE_PUFFERS or not start.is_finite() or not destination.is_finite() or start.distance_to(destination) < 1.0:
 		return -1
 	var creature := PUFFERFISH_SCENE.instantiate() as BubblesPufferfish
 	add_child(creature)
 	var id := _next_creature_id
 	_next_creature_id += 1
-	creature.configure(id, _tuning, at_msec, start, destination, warning_position)
+	creature.configure(id, _tuning, at_msec, start, destination)
 	_puffers[id] = creature
 	if creature.active:
 		pufferfish_spawned.emit(id)
@@ -276,22 +276,17 @@ func _spawn_random_puffer(at_msec: int) -> void:
 	var last := 0.1 + 0.8 * _controller.next_random_unit()
 	var start := Vector2.ZERO
 	var destination := Vector2.ZERO
-	var warning := Vector2.ZERO
 	match edge:
 		0: # left to right
 			start = Vector2(bounds.position.x - margin, lerpf(bounds.position.y, bounds.end.y, first))
 			destination = Vector2(bounds.end.x + margin, lerpf(bounds.position.y, bounds.end.y, last))
-			warning = Vector2(bounds.position.x + 16.0, start.y)
 		1: # right to left
 			start = Vector2(bounds.end.x + margin, lerpf(bounds.position.y, bounds.end.y, first))
 			destination = Vector2(bounds.position.x - margin, lerpf(bounds.position.y, bounds.end.y, last))
-			warning = Vector2(bounds.end.x - 16.0, start.y)
 		2: # top to bottom
 			start = Vector2(lerpf(bounds.position.x, bounds.end.x, first), bounds.position.y - margin)
 			destination = Vector2(lerpf(bounds.position.x, bounds.end.x, last), bounds.end.y + margin)
-			warning = Vector2(start.x, bounds.position.y + 16.0)
 		3: # bottom to top
 			start = Vector2(lerpf(bounds.position.x, bounds.end.x, first), bounds.end.y + margin)
 			destination = Vector2(lerpf(bounds.position.x, bounds.end.x, last), bounds.position.y - margin)
-			warning = Vector2(start.x, bounds.end.y - 16.0)
-	schedule_puffer_path(start, destination, warning, at_msec)
+	schedule_puffer_path(start, destination, at_msec)

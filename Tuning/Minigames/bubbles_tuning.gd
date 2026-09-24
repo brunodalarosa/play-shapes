@@ -190,26 +190,22 @@ var bubble_reform_seconds: float = 0.35:
 ## Show an edge warning before pufferfish enter. Disabling removes visual notice. Default: enabled.
 @export
 var pufferfish_warning_enabled: bool = true
-## Pufferfish edge warning time, in seconds. Higher gives more notice. Default: 0.8. Safe range: 0-3.
+## Time the offscreen bubble burst precedes the pufferfish reveal, in seconds. Higher gives more notice. Default: 0.8. Safe range: 0-3.
 @export_range(0.0, 3.0, 0.05, "suffix:s")
 var pufferfish_warning_seconds: float = 0.8:
 	set(value): pufferfish_warning_seconds = clampf(value, 0.0, 3.0)
-## Spacing between decorative warning bubbles, in world pixels. Default: 24. Safe range: 8-48.
-@export_range(8.0, 48.0, 1.0, "suffix:px")
-var pufferfish_warning_bubble_spacing: float = 24.0:
-	set(value): pufferfish_warning_bubble_spacing = clampf(value, 8.0, 48.0)
-## Radius of each decorative pufferfish warning bubble, in world pixels. Default: 4.5. Safe range: 2-10.
+## Count of bubbles in the pufferfish's one-shot edge burst. Higher makes the cue denser. Default: 24. Safe range: 4-64.
+@export_range(4, 64, 1)
+var pufferfish_telegraph_bubble_count: int = 24:
+	set(value): pufferfish_telegraph_bubble_count = clampi(value, 4, 64)
+## Radius of each pufferfish telegraph bubble, in world pixels. Higher makes particles more prominent. Default: 4.5. Safe range: 2-10.
 @export_range(2.0, 10.0, 0.5, "suffix:px")
-var pufferfish_warning_bubble_radius: float = 4.5:
-	set(value): pufferfish_warning_bubble_radius = clampf(value, 2.0, 10.0)
-## Time for emitted warning bubbles to fade, in seconds. Default: 0.7. Safe range: 0.1-2.
-@export_range(0.1, 2.0, 0.05, "suffix:s")
-var pufferfish_warning_fade_seconds: float = 0.7:
-	set(value): pufferfish_warning_fade_seconds = clampf(value, 0.1, 2.0)
-## Upward drift of decorative warning bubbles, in world pixels per second. Default: 12. Safe range: 0-60.
-@export_range(0.0, 60.0, 1.0, "suffix:px/s")
-var pufferfish_warning_rise_speed: float = 12.0:
-	set(value): pufferfish_warning_rise_speed = clampf(value, 0.0, 60.0)
+var pufferfish_telegraph_bubble_radius: float = 4.5:
+	set(value): pufferfish_telegraph_bubble_radius = clampf(value, 2.0, 10.0)
+## Strength of randomized bubble drift. Zero disables extra acceleration; higher values create more varied paths. Default: 3.0. Safe range: 0-10.
+@export_range(0.0, 10.0, 0.25)
+var pufferfish_telegraph_noise_strength: float = 3.0:
+	set(value): pufferfish_telegraph_noise_strength = clampf(value, 0.0, 10.0)
 
 @export_group("Presentation")
 ## Gentle character bob in pixels. Zero holds the idle pose still. Default: 4. Safe range: 0-12.

@@ -144,11 +144,22 @@ func _test_puffer_warning_crossing_and_pop() -> void:
 	_check(players.get_bubble("p0").is_spinning(5), "Hazard fixture starts during active spin")
 	var hits: Array[String] = []
 	creatures.pufferfish_hit.connect(func(_id: int, player_id: String) -> void: hits.append(player_id))
-	var id := creatures.schedule_puffer_path(Vector2(-50, 300), Vector2(1050, 300), Vector2(16, 300), 0)
+	var start := Vector2(-50, 300)
+	var id := creatures.schedule_puffer_path(start, Vector2(1050, 300), 0)
 	var puffer := creatures.get_pufferfish(id)
-	_check(not puffer.active and puffer.warning_until_msec == 500, "Enabled edge warning precedes hazard")
+	_check(not puffer.active and puffer.warning_until_msec == 500 and puffer.global_position == start,
+		"Enabled offscreen bubble burst precedes the pufferfish at its path start")
+	_check(puffer._warning_particles.emitting and puffer._warning_particles.one_shot
+		and puffer._warning_particles.amount == controller.tuning.pufferfish_telegraph_bubble_count,
+		"Warning uses a tuned one-shot particle burst")
+	_check(puffer._sprite.visible == false and puffer._collider.disabled,
+		"Pufferfish art and collision stay hidden during its particle warning")
 	creatures.simulate_step(0.0, 499)
-	_check(not puffer.active and controller.personal_snapshot("p0").score == 5, "Warning alone never pops a player")
+	_check(not puffer.active and puffer._collider.disabled and controller.personal_snapshot("p0").score == 5,
+		"Warning alone never activates or pops a player")
+	creatures.simulate_step(0.0, 500)
+	_check(puffer.active and puffer.global_position == start and not puffer._collider.disabled,
+		"Pufferfish appears at its particle origin when the tuned delay ends")
 	for tick: int in 55:
 		creatures.simulate_step(0.05, 500 + tick * 50)
 	_check(hits == ["p0"] and controller.personal_snapshot("p0").score == 0, "Puffer pops spinning bubble once through host rule")
@@ -157,10 +168,11 @@ func _test_puffer_warning_crossing_and_pop() -> void:
 	var no_warning_controller: BubblesRoundController = no_warning.controller
 	var no_warning_creatures: BubblesCreatureArena = no_warning.creatures
 	no_warning_controller.tuning.pufferfish_warning_enabled = false
-	var immediate := no_warning_creatures.schedule_puffer_path(Vector2(-50, 300), Vector2(1050, 300), Vector2(16, 300), 0)
-	_check(no_warning_creatures.get_pufferfish(immediate).active, "Disabled warning activates puffer immediately")
+	var immediate := no_warning_creatures.schedule_puffer_path(Vector2(-50, 300), Vector2(1050, 300), 0)
+	_check(no_warning_creatures.get_pufferfish(immediate).active
+		and not no_warning_creatures.get_pufferfish(immediate)._warning_particles.emitting,
+		"Disabled warning activates puffer immediately without particles")
 	no_warning_creatures.simulate_step(0.05, 50)
-	_check(no_warning_creatures.get_pufferfish(immediate)._warning_bubbles.is_empty(), "Disabled warning emits no decorative bubbles")
 
 
 func _test_creature_visuals_are_decorative() -> void:
@@ -171,7 +183,7 @@ func _test_creature_visuals_are_decorative() -> void:
 	controller.tuning.pufferfish_speed = 120.0
 	controller.tuning.pufferfish_start_spawn_rate = 0.0
 	controller.tuning.pufferfish_max_spawn_rate = 0.0
-	var id := creatures.schedule_puffer_path(Vector2(-50, 80), Vector2(1050, 80), Vector2(16, 80), 0)
+	var id := creatures.schedule_puffer_path(Vector2(-50, 80), Vector2(1050, 80), 0)
 	var puffer := creatures.get_pufferfish(id)
 	var path_start := puffer.start_position
 	var path_end := puffer.end_position
@@ -191,14 +203,21 @@ func _test_creature_visuals_are_decorative() -> void:
 	_check(absf(puffer._sprite.rotation - puffer._base_sprite_rotation) > 0.001
 		and absf(puffer._sprite.scale.y - puffer._base_sprite_scale.y) > 0.001,
 		"Pufferfish body jiggles while swimming")
+	var particle_material := puffer._warning_particles.process_material as ParticleProcessMaterial
 	_check((puffer._collider.shape as CircleShape2D).radius == expected_radius
-		and puffer._warning_bubbles.size() > 0,
-		"Decorative trail emits bubbles without changing the creature collider")
-	_check(puffer.get_child_count() == 2, "Warning particles are drawn without gameplay or collision nodes")
+		and puffer._warning_particles.amount == controller.tuning.pufferfish_telegraph_bubble_count
+		and particle_material != null and particle_material.tangential_accel_min < 0.0
+		and particle_material.tangential_accel_max > 0.0,
+		"Noisy decorative particles leave the creature collider unchanged")
+	var warning_node: Node = puffer._warning_particles
+	_check(puffer.get_child_count() == 3 and warning_node is GPUParticles2D
+		and not (warning_node is CollisionObject2D),
+		"Warning is a 2D particle node without gameplay collision")
 	for tick: int in 45:
 		creatures.simulate_step(0.05, 600 + tick * 50)
-	_check(puffer.active and not puffer.finished and puffer._warning_bubbles.is_empty(),
-		"Warning emission ends after the opening path segment and particles fade away")
+	_check(puffer.active and not puffer.finished and puffer.start_position == path_start
+		and puffer.end_position == path_end,
+		"Pufferfish completes its unchanged opening path while particles remain decorative")
 
 	var jelly_fixture := _setup()
 	var jelly_controller: BubblesRoundController = jelly_fixture.controller
@@ -258,7 +277,7 @@ func _test_scatter_lockout_and_extreme_count() -> void:
 	var protected_hits: Array[String] = []
 	creatures.pufferfish_hit.connect(func(_id: int, id: String) -> void: protected_hits.append(id))
 	var protected_id := creatures.schedule_puffer_path(players.get_bubble("p0").global_position,
-		players.get_bubble("p0").global_position + Vector2(100, 0), players.get_bubble("p0").global_position, 10)
+		players.get_bubble("p0").global_position + Vector2(100, 0), 10)
 	creatures.simulate_step(0.0, 10)
 	_check(creatures.get_pufferfish(protected_id) != null and protected_hits.is_empty(),
 		"Puffer collision respects post-pop invulnerability")

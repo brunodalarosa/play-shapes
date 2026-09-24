@@ -63,14 +63,14 @@ func _capture() -> void:
 	tuning.pufferfish_warning_enabled = true
 	tuning.pufferfish_warning_seconds = 2.0
 	var warning_time := maxi(Time.get_ticks_msec(), stage.controller.last_host_time_msec())
-	stage.creature_arena.schedule_puffer_path(Vector2(-90, 500), Vector2(2010, 500), Vector2(145, 500), warning_time)
+	stage.creature_arena.schedule_puffer_path(Vector2(-90, 500), Vector2(2010, 500), warning_time)
 	await _frames(4)
 	_save("warning-on-hd")
 	tuning.pufferfish_warning_enabled = false
 	for puffer_id: int in stage.creature_arena._puffers.keys():
 		var puffer := stage.creature_arena.get_pufferfish(puffer_id)
 		puffer.visible = false
-	stage.creature_arena.schedule_puffer_path(Vector2(-90, 520), Vector2(2010, 520), Vector2(145, 520), warning_time)
+	stage.creature_arena.schedule_puffer_path(Vector2(-90, 520), Vector2(2010, 520), warning_time)
 	await _frames(3)
 	_save("warning-off-hd")
 	stage.controller.advance(active_time + 57000)
