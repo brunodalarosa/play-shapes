@@ -59,6 +59,11 @@ const ASSETS: Dictionary = {
 	"content_type": "image/png",
 	"resource_type": "Texture2D",
 },
+"/shape-hand-open.png": {
+	"path": "res://assets/runtime/shape_characters/hands/open.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
 "/bubbles-player-hand.png": {
 	"path": "res://assets/runtime/shape_characters/hands/closed.png",
 	"content_type": "image/png",

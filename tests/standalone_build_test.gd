@@ -21,8 +21,9 @@ func _init() -> void:
 		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/sfxs/woosh4.ogg"),
 		"Bubbles scene, music, and sound effects remain in the standalone PCK")
 	_check(Policy.REQUIRED_RUNTIME_PATHS.has("characters/character_selection.gd") \
-		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/shape_characters/bodies/rhombus.png"),
-		"Character selection logic and selectable body assets remain in the standalone PCK")
+		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/shape_characters/bodies/rhombus.png") \
+		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/shape_characters/hands/open.png"),
+		"Character selection logic, selectable bodies, and open preview hands remain in the standalone PCK")
 	_check(Policy.REQUIRED_RUNTIME_PATHS.has("addons/kenyoni/qr_code/qr_code_rect.gd"), "runtime QR addon remains inside the export boundary")
 	_check(Policy.validate_templates("res://tests/missing-release.exe", "res://tests/missing-debug.exe").contains("Manage Export Templates"), "missing-template error is actionable")
 	_check(Policy.validate_export_result(7, "missing.exe", "missing.pck", "synthetic export failure").contains("exit code 7"), "export errors retain the exit code")

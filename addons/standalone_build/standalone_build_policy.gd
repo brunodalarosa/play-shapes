@@ -32,6 +32,7 @@ const REQUIRED_RUNTIME_PATHS := [
 	"assets/runtime/shape_characters/bodies/circle.png",
 	"assets/runtime/shape_characters/bodies/squircle.png",
 	"assets/runtime/shape_characters/bodies/rhombus.png",
+	"assets/runtime/shape_characters/hands/open.png",
 	"addons/kenyoni/qr_code/qr_code_rect.gd",
 	"scenes/boot.tscn",
 	"scenes/lobby.tscn",

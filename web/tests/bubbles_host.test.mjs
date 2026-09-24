@@ -140,12 +140,12 @@ async function verifyPhoneJoinAndAssets() {
   for (const path of [
     '/', '/style.css', '/bubbles-phone-background.png', '/bubbles-player-body.png', '/bubbles-player-hand.png',
     '/bubbles-player-foot.png', '/bubbles-player-face-neutral.png', '/bubbles-player-face-blink.png',
-    '/shape-square.png', '/shape-circle.png', '/shape-squircle.png', '/shape-rhombus.png', '/character_selection.js',
+    '/shape-square.png', '/shape-circle.png', '/shape-squircle.png', '/shape-rhombus.png', '/shape-hand-open.png', '/character_selection.js',
   ]) responses.push(await request(path));
   const [htmlResponse, cssResponse, backgroundResponse, bodyResponse, handResponse, footResponse, faceResponse, blinkResponse,
-    squareResponse, circleResponse, squircleResponse, rhombusResponse, catalogResponse] = responses;
+    squareResponse, circleResponse, squircleResponse, rhombusResponse, openHandResponse, catalogResponse] = responses;
   for (const response of [htmlResponse, cssResponse, backgroundResponse, bodyResponse, handResponse, footResponse, faceResponse, blinkResponse,
-    squareResponse, circleResponse, squircleResponse, rhombusResponse, catalogResponse]) assert.equal(response.status, 200);
+    squareResponse, circleResponse, squircleResponse, rhombusResponse, openHandResponse, catalogResponse]) assert.equal(response.status, 200);
   const html = await htmlResponse.text(); const css = await cssResponse.text();
   assert.match(html, /id="bubbles-visual"/);
   assert.match(html, /id="bubbles-score"/);

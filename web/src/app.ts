@@ -77,9 +77,10 @@ let bubblesPreviousFrame = performance.now();
 const characterBodies = Object.fromEntries(CHARACTER_SHAPES.map(shape => [shape, new Image()])) as Record<CharacterShape, HTMLImageElement>;
 for (const shape of CHARACTER_SHAPES) characterBodies[shape].src = bodyAssetPath(shape);
 const bubblesArt = {
-  hand: new Image(), foot: new Image(), face: new Image(), blink: new Image(), jellyfish: new Image(),
+  hand: new Image(), openHand: new Image(), foot: new Image(), face: new Image(), blink: new Image(), jellyfish: new Image(),
 };
 bubblesArt.hand.src = "/bubbles-player-hand.png";
+bubblesArt.openHand.src = "/shape-hand-open.png";
 bubblesArt.foot.src = "/bubbles-player-foot.png";
 bubblesArt.face.src = "/bubbles-player-face-neutral.png";
 bubblesArt.blink.src = "/bubbles-player-face-blink.png";
@@ -367,12 +368,12 @@ function drawUntintedSprite(context: CanvasRenderingContext2D, image: HTMLImageE
   context.save(); context.translate(x, y); context.drawImage(image, -width / 2, -height / 2, width, height); context.restore();
 }
 type CharacterPose = { bodyRotation: number; facePosition: Point; faceBlink: boolean; leftHandPosition: Point; rightHandPosition: Point; leftFootPosition: Point; rightFootPosition: Point; leftHandRotation: number; rightHandRotation: number };
-function drawCharacter(context: CanvasRenderingContext2D, shape: CharacterShape, tint: string, x: number, y: number, scale: number, pose: CharacterPose): void {
+function drawCharacter(context: CanvasRenderingContext2D, shape: CharacterShape, tint: string, x: number, y: number, scale: number, pose: CharacterPose, hand: HTMLImageElement = bubblesArt.hand): void {
   context.save(); context.translate(x, y); context.scale(scale, scale);
   drawSprite(context, bubblesArt.foot, tint, pose.leftFootPosition[0], pose.leftFootPosition[1], 40, 24, true);
   drawSprite(context, bubblesArt.foot, tint, pose.rightFootPosition[0], pose.rightFootPosition[1], 40, 24);
-  drawSprite(context, bubblesArt.hand, tint, pose.leftHandPosition[0], pose.leftHandPosition[1], 35, 34, true, pose.leftHandRotation);
-  drawSprite(context, bubblesArt.hand, tint, pose.rightHandPosition[0], pose.rightHandPosition[1], 35, 34, false, pose.rightHandRotation);
+  drawSprite(context, hand, tint, pose.leftHandPosition[0], pose.leftHandPosition[1], 35, 34, true, pose.leftHandRotation);
+  drawSprite(context, hand, tint, pose.rightHandPosition[0], pose.rightHandPosition[1], 35, 34, false, pose.rightHandRotation);
   drawSprite(context, characterBodies[shape], tint, 0, 0, 80, 80, false, pose.bodyRotation);
   const face = pose.faceBlink ? bubblesArt.blink : bubblesArt.face;
   drawUntintedSprite(context, face, pose.facePosition[0], pose.facePosition[1], pose.faceBlink ? 53 : 50, pose.faceBlink ? 37 : 29);
@@ -395,16 +396,18 @@ function renderJoinPreviews(now: number): void {
     context.clearRect(0, 0, rect.width, rect.height);
     const dancing = canvas === namePreview;
     const wave = dancing ? Math.sin(seconds * 4.2) : 0;
+    const handSway = dancing ? wave * 0.07 : 0;
+    const handDrift = dancing ? wave * 2 : 0;
     const pose: CharacterPose = {
       bodyRotation: dancing ? Math.sin(seconds * 2.7) * 0.09 : 0,
       facePosition: [0, -5], faceBlink: Math.sin(seconds * 0.9) > 0.985,
-      leftHandPosition: [-52, -4 - wave * 4], rightHandPosition: [52, -4 + wave * 4],
+      leftHandPosition: [-48, 22 - handDrift], rightHandPosition: [48, 22 + handDrift],
       leftFootPosition: [-35 - wave * 2, 62], rightFootPosition: [35 + wave * 2, 62],
-      leftHandRotation: wave * 0.22, rightHandRotation: -wave * 0.22,
+      leftHandRotation: Math.PI + 0.18 + handSway, rightHandRotation: Math.PI - 0.18 + handSway,
     };
     const scale = Math.min(rect.width / 145, rect.height / 125) * 0.9;
     drawCharacter(context, joinFlow.shape, joinFlow.color, rect.width / 2,
-      rect.height * 0.46 + (dancing ? Math.sin(seconds * 3.4) * 4 : 0), scale, pose);
+      rect.height * 0.46 + (dancing ? Math.sin(seconds * 3.4) * 4 : 0), scale, pose, bubblesArt.openHand);
   }
 }
 function drawBubblePath(context: CanvasRenderingContext2D, radius: number, pull: Point, surfaceAngle: number): { points: Point[]; center: Point; along: Point; stretch: number } {
