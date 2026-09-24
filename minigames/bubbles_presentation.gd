@@ -3,7 +3,7 @@ extends Control
 ## Shared screen composition. All scores, phases and outcomes come from the controller.
 
 const WORLD_SIZE := Vector2(1920.0, 1080.0)
-const ARENA_BOUNDS := Rect2(120.0, 160.0, 1680.0, 780.0)
+const NPC_ARENA_BOUNDS := Rect2(120.0, 160.0, 1680.0, 780.0)
 const CHARACTER_SCENE: PackedScene = preload("res://characters/shape_character.tscn")
 const MUSIC: AudioStream = preload("res://assets/runtime/bgm/Beach_music.ogg")
 const SFX: Dictionary = {
@@ -93,7 +93,7 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 		return outcome
 	_started = true
 	_debug_label.visible = controller.is_one_player_debug()
-	player_arena.setup(controller, ARENA_BOUNDS)
+	player_arena.setup(controller, NPC_ARENA_BOUNDS, _viewport_bounds())
 	var ordered: Array[Dictionary] = []
 	for state: Dictionary in controller.player_snapshot().values():
 		ordered.append(state)
@@ -103,7 +103,7 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 	for index: int in ordered.size():
 		var state := ordered[index]
 		var angle := rotation + TAU * float(index) / float(ordered.size())
-		var destination := ARENA_BOUNDS.get_center() + Vector2(cos(angle) * 570.0, sin(angle) * 270.0)
+		var destination := NPC_ARENA_BOUNDS.get_center() + Vector2(cos(angle) * 570.0, sin(angle) * 270.0)
 		var bubble := player_arena.add_bubble(String(state.player_id), destination)
 		if bubble == null:
 			continue
@@ -189,6 +189,12 @@ func _layout_world() -> void:
 	_world.position = (size - WORLD_SIZE * factor) * 0.5
 	for plate: TextureRect in [_far, _mid, _foreground]:
 		plate.pivot_offset = plate.size * 0.5
+	if _started and is_instance_valid(player_arena):
+		player_arena.set_wall_bounds(_viewport_bounds())
+
+
+func _viewport_bounds() -> Rect2:
+	return get_viewport().get_visible_rect()
 
 
 func _on_phase_changed(phase: StringName, _snapshot: Dictionary) -> void:

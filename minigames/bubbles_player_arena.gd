@@ -13,16 +13,25 @@ const SEAT_COLORS: Array[Color] = [
 ]
 
 var bounds := Rect2()
+var wall_bounds := Rect2()
 var _controller: BubblesRoundController
 var _bubbles: Dictionary = {}
 var _ordered_ids: Array[String] = []
 
 
-func setup(controller: BubblesRoundController, arena_bounds: Rect2) -> bool:
+func setup(controller: BubblesRoundController, arena_bounds: Rect2, viewport_bounds: Rect2 = Rect2()) -> bool:
 	if controller == null or not arena_bounds.has_area() or controller.tuning == null:
 		return false
 	_controller = controller
 	bounds = arena_bounds
+	wall_bounds = viewport_bounds if viewport_bounds.has_area() else arena_bounds
+	return true
+
+
+func set_wall_bounds(viewport_bounds: Rect2) -> bool:
+	if not viewport_bounds.has_area():
+		return false
+	wall_bounds = viewport_bounds
 	return true
 
 
@@ -60,7 +69,7 @@ func simulate_step(delta: float, host_time_msec: int) -> bool:
 		return false
 	for player_id: String in _ordered_ids:
 		var bubble: BubblesPlayerBubble = _bubbles[player_id]
-		bubble.simulate_step(delta, bounds, host_time_msec)
+		bubble.simulate_step(delta, wall_bounds, host_time_msec)
 	for first: int in _ordered_ids.size():
 		for second: int in range(first + 1, _ordered_ids.size()):
 			var a: BubblesPlayerBubble = _bubbles[_ordered_ids[first]]
@@ -71,7 +80,7 @@ func simulate_step(delta: float, host_time_msec: int) -> bool:
 	# Pair separation can move a body through the invisible boundary.
 	for player_id: String in _ordered_ids:
 		var bubble: BubblesPlayerBubble = _bubbles[player_id]
-		bubble.simulate_step(0.0, bounds, host_time_msec)
+		bubble.simulate_step(0.0, wall_bounds, host_time_msec)
 	return true
 
 
