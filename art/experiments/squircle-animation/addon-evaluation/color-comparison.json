@@ -1,0 +1,25 @@
+{
+  "reference": "reference-threequarter-35x9-128.png",
+  "addon": "addon-sheet-threequarter-35x9-128.png",
+  "dimensions": [
+    128,
+    128
+  ],
+  "alpha_coverage_reference_pixels": 4252,
+  "alpha_coverage_addon_pixels": 4252,
+  "mean_rgb_abs_diff_opaque": 0.02776474691927433,
+  "max_rgb_abs_diff_opaque": 0.7882323265075684,
+  "mean_alpha_abs_diff_all": 1.014086592476815e-09,
+  "reference_center_rgba": [
+    0.3607843220233917,
+    0.5843137502670288,
+    0.7882353663444519,
+    1.0
+  ],
+  "addon_center_rgba": [
+    0.360792875289917,
+    0.5843067169189453,
+    0.7882487773895264,
+    1.0
+  ]
+}

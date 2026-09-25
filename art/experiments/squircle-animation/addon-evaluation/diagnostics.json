@@ -1,0 +1,70 @@
+{
+  "source_blend_copy": "squircle-addon-test.blend",
+  "source_scene": "PS056 | Squircle Toy Studio",
+  "original_scene_camera": "Camera.ThreeQuarter",
+  "evaluated_camera": "Camera.ThreeQuarter",
+  "evaluated_camera_yaw_elevation_degrees": [
+    35,
+    9
+  ],
+  "approved_model_had_armature_before_test": false,
+  "raw_model_active_type": "EMPTY",
+  "raw_model_action_detection_result": [
+    "CANCELLED"
+  ],
+  "test_armature_created_only_in_copy": "TEST ONLY - Squircle armature",
+  "test_action_name": "addon_compat_idle",
+  "test_armature_direct_child_types": [
+    "EMPTY"
+  ],
+  "test_armature_nested_meshes": [
+    "Body.Squircle",
+    "Face.Plane - neutral artwork",
+    "Foot.L",
+    "Foot.R",
+    "Hand.L",
+    "Hand.R"
+  ],
+  "detached_parts_kept_as_separate_objects": true,
+  "detached_part_count": 6,
+  "action_detection_result": [
+    "FINISHED"
+  ],
+  "detected_action_names": [
+    "addon_compat_idle"
+  ],
+  "addon_dynamic_bounds_for_nested_assembly": [
+    -1.0,
+    -1.0,
+    1.0,
+    1.0
+  ],
+  "addon_generate_result": [
+    "FINISHED"
+  ],
+  "reference_render": "reference-threequarter-35x9-128.png",
+  "addon_sheet": "addon-sheet-threequarter-35x9-128.png",
+  "addon_metadata": "addon-sheet-threequarter-35x9-128_metadata.json",
+  "render_resolution": [
+    128,
+    128
+  ],
+  "cycles_samples": 8,
+  "render_engine": "CYCLES",
+  "manual_yaw_selector_present": false,
+  "available_addon_yaw_controls_degrees": [
+    0,
+    90,
+    180,
+    270
+  ],
+  "metadata_fields_from_addon": [
+    "sprite_sheet",
+    "columns",
+    "rows",
+    "max_sprite_width",
+    "max_sprite_height",
+    "animations[name,row,frame_count,sprite_width,sprite_height]"
+  ],
+  "separate_body_face_hand_foot_layer_controls": false
+}

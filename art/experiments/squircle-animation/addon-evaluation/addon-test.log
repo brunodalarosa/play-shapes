@@ -1,0 +1,114 @@
+00:00.047  reports          | WARNING Unable to open 'C:\Users\backup pc\AppData\Roaming\Blender Foundation\Blender\5.2\config\userpref.blend': Permission denied
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+00:01.266  blend            | Read blend: "C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\addon-evaluation\squircle-addon-test.blend"
+00:01.922  render           | Saved: 'C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\addon-evaluation\reference-threequarter-35x9-128.png'
+00:02.219  render           | Saved: 'C:\Users\BACKUP~1\AppData\Local\Temp\spritesheet_lzs6ghdk\compat_idle_threequarter_front_a0_f0000.png'
+Sprite Sheet Generator v2.1 - Registering...
+✓ Registered!
+ADDON_ERROR: The selected object 'Character.Root - ground anchor' is a 'EMPTY', not an armature. |  | Please select an armature with animations.
+RAW_MODEL_DETECT_RESULT: {'CANCELLED'} ACTIVE_TYPE: EMPTY
+ADDON_INFO: Added 1 new animations to the list.
+
+======================================================================
+SPRITE SHEET GENERATOR v2.1 - ARMATURE ROTATION MODE
+======================================================================
+Active animations: 1
+View angles: ['front (0°)']
+Total rows: 1
+Output: C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\addon-evaluation\addon-sheet-threequarter-35x9-128.png
+
+Sprite size: 128x128px
+
+==================================================
+Animation 1/1: compat_idle_threequarter
+  Frames: 1 [1-1]
+  [1/1] front (0°)
+  Done: 1 frames rendered
+
+==================================================
+CREATING SPRITE SHEET
+  Max sprite: 128x128px
+  Sheet: 128x128px
+  Row 0: compat_idle_threequarter_front (1 frames, 128x128px)
+
+Sprite sheet saved: C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\addon-evaluation\addon-sheet-threequarter-35x9-128.png
+Metadata saved: C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\addon-evaluation\addon-sheet-threequarter-35x9-128_metadata.json
+ADDON_INFO: Sprite sheet saved successfully! |  | File: addon-sheet-threequarter-35x9-128.png | Location: C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\addon-evaluation | Rows: 1 | Size: 128x128px per sprite
+
+Restoring original state...
+Temporary files cleaned up
+Done!
+Sprite Sheet Generator - Unregistering...
+✓ Unregistered!
+DIAGNOSTICS: {
+  "source_blend_copy": "squircle-addon-test.blend",
+  "source_scene": "PS056 | Squircle Toy Studio",
+  "original_scene_camera": "Camera.ThreeQuarter",
+  "evaluated_camera": "Camera.ThreeQuarter",
+  "evaluated_camera_yaw_elevation_degrees": [
+    35,
+    9
+  ],
+  "approved_model_had_armature_before_test": false,
+  "raw_model_active_type": "EMPTY",
+  "raw_model_action_detection_result": [
+    "CANCELLED"
+  ],
+  "test_armature_created_only_in_copy": "TEST ONLY - Squircle armature",
+  "test_action_name": "addon_compat_idle",
+  "test_armature_direct_child_types": [
+    "EMPTY"
+  ],
+  "test_armature_nested_meshes": [
+    "Body.Squircle",
+    "Face.Plane - neutral artwork",
+    "Foot.L",
+    "Foot.R",
+    "Hand.L",
+    "Hand.R"
+  ],
+  "detached_parts_kept_as_separate_objects": true,
+  "detached_part_count": 6,
+  "action_detection_result": [
+    "FINISHED"
+  ],
+  "detected_action_names": [
+    "addon_compat_idle"
+  ],
+  "addon_dynamic_bounds_for_nested_assembly": [
+    -1.0,
+    -1.0,
+    1.0,
+    1.0
+  ],
+  "addon_generate_result": [
+    "FINISHED"
+  ],
+  "reference_render": "reference-threequarter-35x9-128.png",
+  "addon_sheet": "addon-sheet-threequarter-35x9-128.png",
+  "addon_metadata": "addon-sheet-threequarter-35x9-128_metadata.json",
+  "render_resolution": [
+    128,
+    128
+  ],
+  "cycles_samples": 8,
+  "render_engine": "CYCLES",
+  "manual_yaw_selector_present": false,
+  "available_addon_yaw_controls_degrees": [
+    0,
+    90,
+    180,
+    270
+  ],
+  "metadata_fields_from_addon": [
+    "sprite_sheet",
+    "columns",
+    "rows",
+    "max_sprite_width",
+    "max_sprite_height",
+    "animations[name,row,frame_count,sprite_width,sprite_height]"
+  ],
+  "separate_body_face_hand_foot_layer_controls": false
+}
+
+Blender quit

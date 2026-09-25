@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Squircle · Motion study</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#141c29;color:#ecf3ff;font:16px/1.5 system-ui,sans-serif}main{max-width:1120px;margin:auto;padding:40px 24px}h1{font-size:36px;letter-spacing:-1.5px;margin:0}p{color:#b4c5dc;margin:8px 0 24px}header{margin-bottom:26px}.controls{display:flex;flex-wrap:wrap;gap:12px;align-items:end;padding:18px;background:#202d40;border-radius:16px;margin-bottom:24px}label{display:grid;gap:5px;color:#b4c5dc;font-size:13px}select,button{font:inherit;color:#edf5ff;background:#31435c;border:1px solid #55708f;border-radius:8px;padding:8px 12px;cursor:pointer}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #92caff;outline-offset:3px}.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.card{background:#233044;border-radius:18px;padding:16px;text-align:center;overflow:hidden}.card h2{font-size:17px;margin:0}.card p{font-size:13px;margin:2px 0 4px}.card canvas{display:block;margin:auto;width:256px;height:256px;max-width:100%;object-fit:contain}.small .card canvas{width:128px;height:128px;margin:64px auto}.footer{margin:22px 0;display:flex;flex-wrap:wrap;gap:18px}a{color:#a9d6ff}.meta{color:#98b1d0;font-size:13px}#error{color:#ffccbe}#scrub{width:180px}.guide{display:flex;align-items:center;gap:6px}.guide input{accent-color:#80bfff}@media(max-width:800px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:500px){main{padding:20px 12px}.grid{grid-template-columns:1fr}h1{font-size:30px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+<main>
+<header><div class="meta">PLAY SHAPES · PS-057 · OWNER REVIEW</div><h1>Squircle in motion</h1><p>Subtle breath, a playful walk, and a more energetic run.</p></header>
+<div class="controls">
+<button id="play" type="button">Pause</button>
+<label>Player color<select id="color"></select></label>
+<label>Face<select id="face"><option value="auto">Natural blink</option><option value="neutral">Neutral</option><option value="blink">Blink</option></select></label>
+<label>Size<select id="size"><option value="256">256 pixels</option><option value="128">128 pixels</option></select></label>
+<label>Playback<select id="speed"><option value="1">Normal</option><option value="0.5">Half speed</option><option value="0.25">Quarter speed</option></select></label>
+<label class="guide"><input id="ground" type="checkbox">Ground contact guide</label>
+<label>Review time<input id="scrub" type="range" min="0" max="47" step="1" value="0"></label>
+</div>
+<div id="error" role="alert"></div><section class="grid" id="grid" aria-label="Six animation previews"></section>
+<div class="footer"><a href="previews/motion-review-256.gif">Looping review</a><a href="previews/palette-and-blink.png">Ten colors & blink</a><a href="previews/occlusion-proof.png">Hand and face layers</a><a href="previews/sheets.json">Packed sheets</a><a href="export/manifest.json">Original frame index</a></div>
+<p class="meta">Front: 0° / 0° · Three-quarter: 35° / 9° · 24 fps · Idle 2 s, walk 1 s, run ⅔ s.<br>Ground dots move at each clip’s travel speed. Sprites stay in place. Art and motion await your approval.</p>
+</main>
+<script src="review-data.js"></script><script src="review.js"></script>
+</html>

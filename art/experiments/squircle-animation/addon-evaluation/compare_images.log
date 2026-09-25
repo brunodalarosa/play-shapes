@@ -1,0 +1,9 @@
+00:00.047  reports          | WARNING Unable to open 'C:\Users\backup pc\AppData\Roaming\Blender Foundation\Blender\5.2\config\userpref.blend': Permission denied
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+00:01.156  blend            | Read blend: "C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\addon-evaluation\squircle-addon-test.blend"
+  File "C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\addon-evaluation\compare_images.py", line 14
+    idx=np.unravel_index(np.argmax(np.where(mask[:,:,None],rgb_abs,-1)),rgb_abs.shape)\n    out={'reference':ref_name,'addon':addon_name,'dimensions':list(a.size),'alpha_coverage_reference_pixels':int(np.count_nonzero(pa[:,:,3]>.05)),'alpha_coverage_addon_pixels':int(np.count_nonzero(pb[:,:,3]>.05)),'mean_rgb_abs_diff_opaque':float(rgb_abs[mask].mean()) if mask.any() else None,'max_rgb_abs_diff_opaque':float(rgb_abs[mask].max()) if mask.any() else None,'max_diff_pixel_yx_channel':list(idx),'ref_rgba_at_max_diff':pa[idx[0],idx[1],:].tolist(),'addon_rgba_at_max_diff':pb[idx[0],idx[1],:].tolist(),'mean_alpha_abs_diff_all':float(alpha_abs.mean()),'reference_center_rgba':pa[64,64,:].tolist(),'addon_center_rgba':pb[64,64,:].tolist()}
+                                                                                       ^
+SyntaxError: unexpected character after line continuation character
+
+Blender quit

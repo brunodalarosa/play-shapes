@@ -1,0 +1,8 @@
+*.blend1
+*.blend2
+__pycache__/
+recheck/
+render.log
+recheck.log
+probe/
+.cache/
