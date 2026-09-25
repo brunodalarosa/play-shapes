@@ -1,0 +1,77 @@
+{
+  "blender_version": "5.2.2 LTS",
+  "scene": "PS056 | Squircle Toy Studio",
+  "approval": "pending owner review; technical checks are not art approval",
+  "checks": "passed",
+  "independent_colorable_meshes": [
+    "Body.Squircle",
+    "Hand.L",
+    "Hand.R",
+    "Foot.L",
+    "Foot.R"
+  ],
+  "face": {
+    "flat": true,
+    "body_parented": true,
+    "camera_facing_constraint": false,
+    "separate_material": true,
+    "source_pixels_unchanged": true
+  },
+  "feet": {
+    "Foot.L": {
+      "sole_minimum_world_z": 0.0,
+      "pivot": "Foot.L.Contact"
+    },
+    "Foot.R": {
+      "sole_minimum_world_z": 0.0,
+      "pivot": "Foot.R.Contact"
+    }
+  },
+  "textures": {
+    "neutral": {
+      "sha256": "b23b3a839e48eb6395fea5a5901c66d66834e936db0cff250fddc8c2be29b759",
+      "packed": true,
+      "matches_runtime_art": true
+    },
+    "blink": {
+      "sha256": "75af58c52f00a78b98832cb7d509a61423ed464fc93400d2905b874964f0d531",
+      "packed": true,
+      "matches_runtime_art": true
+    }
+  },
+  "cameras": {
+    "Camera.Front": {
+      "orthographic_scale": 4.5,
+      "position": [
+        0.0,
+        -8.0,
+        1.340000033378601
+      ]
+    },
+    "Camera.ThreeQuarter": {
+      "orthographic_scale": 4.5,
+      "position": [
+        4.53211784362793,
+        -6.472535610198975,
+        2.59147572517395
+      ]
+    }
+  },
+  "lights": [
+    "Light.Key - large softbox",
+    "Light.Fill - face readability",
+    "Light.Rim - silhouette"
+  ],
+  "palette_materials": [
+    "Toy | Blue | #1E88E5",
+    "Toy | Brown | #8D6E63",
+    "Toy | Cyan | #00ACC1",
+    "Toy | Golden Yellow | #FBC02D",
+    "Toy | Green | #43A047",
+    "Toy | Indigo | #3949AB",
+    "Toy | Orange | #F57C00",
+    "Toy | Pink | #EC407A",
+    "Toy | Purple | #8E24AA",
+    "Toy | Red | #E53935"
+  ]
+}
