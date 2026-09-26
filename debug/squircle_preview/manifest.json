@@ -1,0 +1,89 @@
+{
+  "schema": "ps058.godot-preview.v1",
+  "source": "art/experiments/squircle-animation/export/manifest.json",
+  "resolution": [
+    256,
+    256
+  ],
+  "shape_id": "squircle",
+  "clips": [
+    {
+      "name": "idle",
+      "view": "front",
+      "frames": 48,
+      "fps": 24,
+      "anchor_px": [
+        128.0,
+        204.231186
+      ],
+      "sheet_columns": 8,
+      "first_frame": 1,
+      "last_frame": 48
+    },
+    {
+      "name": "idle",
+      "view": "three-quarter",
+      "frames": 48,
+      "fps": 24,
+      "anchor_px": [
+        128.0,
+        203.292557
+      ],
+      "sheet_columns": 8,
+      "first_frame": 1,
+      "last_frame": 48
+    },
+    {
+      "name": "walk",
+      "view": "front",
+      "frames": 24,
+      "fps": 24,
+      "anchor_px": [
+        128.0,
+        204.231186
+      ],
+      "sheet_columns": 8,
+      "first_frame": 1,
+      "last_frame": 24
+    },
+    {
+      "name": "walk",
+      "view": "three-quarter",
+      "frames": 24,
+      "fps": 24,
+      "anchor_px": [
+        128.0,
+        203.292557
+      ],
+      "sheet_columns": 8,
+      "first_frame": 1,
+      "last_frame": 24
+    },
+    {
+      "name": "run",
+      "view": "front",
+      "frames": 16,
+      "fps": 24,
+      "anchor_px": [
+        128.0,
+        204.231186
+      ],
+      "sheet_columns": 8,
+      "first_frame": 1,
+      "last_frame": 16
+    },
+    {
+      "name": "run",
+      "view": "three-quarter",
+      "frames": 16,
+      "fps": 24,
+      "anchor_px": [
+        128.0,
+        203.292557
+      ],
+      "sheet_columns": 8,
+      "first_frame": 1,
+      "last_frame": 16
+    }
+  ]
+}

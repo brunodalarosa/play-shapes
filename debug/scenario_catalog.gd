@@ -10,6 +10,11 @@ static func scenarios() -> Array[DebugScenario]:
 			"res://debug/character_animation_system.tscn"
 		),
 		DebugScenario.new(
+			&"squircle_render_preview",
+			"Rendered squircle comparison",
+			"res://debug/squircle_preview/squircle_preview.tscn"
+		),
+		DebugScenario.new(
 			&"one_player_simon",
 			"One-player Flash? Pose!",
 			"res://minigames/dancer_simon_says.tscn",
