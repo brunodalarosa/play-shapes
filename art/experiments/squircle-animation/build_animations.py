@@ -8,6 +8,7 @@ from mathutils import Vector
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 from animation_common import CLIPS, CONTROLS, activate_clip, foot_phase, curves
+from hand_model import rebuild_hands, pose_hands
 
 scene = next(s for s in bpy.data.scenes if s.name.startswith('PS056 |'))
 bpy.context.window.scene = scene
@@ -23,6 +24,7 @@ scene.cycles.seed = 57
 scene.cycles.use_animated_seed = False
 scene.render.use_file_extension = True
 scene.render.image_settings.color_depth = '8'
+rebuild_hands()
 
 data = bpy.data.armatures.new('PS057 | Rigid floating-part controls')
 rig = bpy.data.objects.new('Animation.Controls', data)
@@ -75,12 +77,6 @@ for clip, spec in CLIPS.items():
             body.location.z = .035 * breath
             body.scale = (1 - .008*breath, 1 - .004*breath, 1 + .018*breath)
             body.rotation_euler.y = .018 * math.sin(theta - .4)
-            for side, name in [(-1, 'Hand.L'), (1, 'Hand.R')]:
-                hand = rig.pose.bones[name]
-                wave = theta + side*.65
-                hand.location = (.025*side*math.cos(wave), -.025*math.sin(wave), .055*math.sin(wave))
-                hand.rotation_euler.y += .06*math.sin(wave + .6)
-                hand.rotation_euler.z += .035*math.cos(wave)
         else:
             running = clip == 'run'
             stance = spec['stance']
@@ -99,16 +95,7 @@ for clip, spec in CLIPS.items():
                 foot = rig.pose.bones[name]
                 foot.location = (0, y, (.28 if running else .22)*lift)
                 # Flat soles through stance and swing avoid floor penetration.
-            for side, name in [(-1,'Hand.L'), (1,'Hand.R')]:
-                hand = rig.pose.bones[name]
-                swing = side*math.sin(theta)
-                inward = .28 + 1.05*max(0, -swing)**4 if running else .06
-                hand.location = (-side*inward,
-                                 (.60 if running else .33)*swing - (.25 if running else .04),
-                                 (.36 if running else .08) + (.30 if running else .10)*-swing)
-                hand.rotation_euler.x = -.18*swing
-                hand.rotation_euler.y += (.22 if running else .12)*swing
-                hand.rotation_euler.z += .12*swing
+        pose_hands(rig, clip, theta)
         for name in CONTROLS:
             pb = rig.pose.bones[name]
             for prop in ('location', 'rotation_euler', 'scale'):
@@ -136,7 +123,7 @@ scene.camera = bpy.data.objects['Camera.ThreeQuarter']
 scene.timeline_markers.clear()
 scene.timeline_markers.new('Idle: 1-48 | Walk: 1-24 | Run: 1-16', frame=1)
 rig['How to switch'] = 'Select this rig; Dope Sheet > Action Editor; choose PS057 Idle/Walk/Run. Set end 48/24/16.'
-rig['Rig type'] = 'Five rigid independent bones drive original pivots; geometry is unchanged.'
+rig['Rig type'] = 'Five rigid controls; revised rounded glove hands with palms facing down.'
 for area in bpy.context.screen.areas:
     if area.type == 'PROPERTIES':
         area.spaces.active.context = 'OBJECT'

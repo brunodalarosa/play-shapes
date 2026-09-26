@@ -25,7 +25,7 @@
     {
       "name": "idle fixed-camera containment",
       "passed": true,
-      "detail": 3.2881622314453125
+      "detail": 11.9766845703125
     },
     {
       "name": "idle floating foot-body gap",
@@ -33,9 +33,14 @@
       "detail": 0.20984911918640137
     },
     {
+      "name": "idle palms remain facing ground",
+      "passed": true,
+      "detail": 0.9864183664321899
+    },
+    {
       "name": "walk seam pose",
       "passed": true,
-      "detail": 4.025561139517505e-17
+      "detail": 1.5140622942303238e-17
     },
     {
       "name": "walk no sole penetration",
@@ -55,7 +60,7 @@
     {
       "name": "walk fixed-camera containment",
       "passed": true,
-      "detail": 6.628336429595947
+      "detail": 5.304402828216553
     },
     {
       "name": "walk floating foot-body gap",
@@ -63,9 +68,14 @@
       "detail": 0.0779222846031189
     },
     {
+      "name": "walk palms remain facing ground",
+      "passed": true,
+      "detail": 0.9822521805763245
+    },
+    {
       "name": "run seam pose",
       "passed": true,
-      "detail": 4.025561139517505e-17
+      "detail": 1.5920407760118202e-17
     },
     {
       "name": "run no sole penetration",
@@ -85,12 +95,17 @@
     {
       "name": "run fixed-camera containment",
       "passed": true,
-      "detail": 16.615875244140625
+      "detail": 4.17469596862793
     },
     {
       "name": "run floating foot-body gap",
       "passed": true,
       "detail": 0.1175849437713623
+    },
+    {
+      "name": "run palms remain facing ground",
+      "passed": true,
+      "detail": 0.9775753617286682
     },
     {
       "name": "three independent editable actions",
@@ -124,24 +139,27 @@
       "minimum_sole_z": 0.0,
       "max_planted_sole_error": 0,
       "max_stance_slip_per_quarter_frame_m": 0,
-      "minimum_projected_bound_margin_px": 3.2881622314453125,
-      "minimum_vertical_foot_body_gap_m": 0.20984911918640137
+      "minimum_projected_bound_margin_px": 11.9766845703125,
+      "minimum_vertical_foot_body_gap_m": 0.20984911918640137,
+      "minimum_palm_down_dot": 0.9864183664321899
     },
     "walk": {
-      "max_seam_matrix_error": 4.025561139517505e-17,
+      "max_seam_matrix_error": 1.5140622942303238e-17,
       "minimum_sole_z": 0.0,
       "max_planted_sole_error": 0,
       "max_stance_slip_per_quarter_frame_m": 1.1920928955078125e-07,
-      "minimum_projected_bound_margin_px": 6.628336429595947,
-      "minimum_vertical_foot_body_gap_m": 0.0779222846031189
+      "minimum_projected_bound_margin_px": 5.304402828216553,
+      "minimum_vertical_foot_body_gap_m": 0.0779222846031189,
+      "minimum_palm_down_dot": 0.9822521805763245
     },
     "run": {
-      "max_seam_matrix_error": 4.025561139517505e-17,
+      "max_seam_matrix_error": 1.5920407760118202e-17,
       "minimum_sole_z": 0.0,
       "max_planted_sole_error": 0,
       "max_stance_slip_per_quarter_frame_m": 5.960464477539063e-08,
-      "minimum_projected_bound_margin_px": 16.615875244140625,
-      "minimum_vertical_foot_body_gap_m": 0.1175849437713623
+      "minimum_projected_bound_margin_px": 4.17469596862793,
+      "minimum_vertical_foot_body_gap_m": 0.1175849437713623,
+      "minimum_palm_down_dot": 0.9775753617286682
     }
   },
   "approval": "Technical evidence only; owner animation-feel approval pending.",

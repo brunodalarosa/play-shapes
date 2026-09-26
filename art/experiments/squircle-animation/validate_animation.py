@@ -26,12 +26,15 @@ for clip,spec in CLIPS.items():
     scene.frame_set(spec['frames']+1);bpy.context.view_layer.update()
     seam=max(abs(first[n][r][c]-bpy.data.objects[p].matrix_world[r][c]) for n,p in CONTROLS.items() for r in range(4) for c in range(4))
     check(clip+' seam pose',seam<1e-6,seam)
-    min_z=1e9;planted_z=0;max_slip=0;min_border=1e9;min_foot_body_gap=1e9
+    min_z=1e9;planted_z=0;max_slip=0;min_border=1e9;min_foot_body_gap=1e9;min_palm_down=1.0
     previous={}
     for sub in range(spec['frames']*4+1):
         f=1+sub/4
         scene.frame_set(int(f),subframe=f-int(f));bpy.context.view_layer.update()
         deps=bpy.context.evaluated_depsgraph_get()
+        for hand_name in ('Hand.L','Hand.R'):
+            palm=(bpy.data.objects[hand_name].matrix_world.to_3x3()@Vector((0,-1,0))).normalized()
+            min_palm_down=min(min_palm_down,-palm.z)
         body=bpy.data.objects['Body.Squircle'].evaluated_get(deps)
         body_mesh=body.to_mesh()
         body_bottom=min((body.matrix_world@v.co).z for v in body_mesh.vertices)
@@ -68,10 +71,12 @@ for clip,spec in CLIPS.items():
     check(clip+' stance world travel cancels',max_slip<2e-6,max_slip)
     check(clip+' fixed-camera containment',min_border>0,min_border*256)
     check(clip+' floating foot-body gap',min_foot_body_gap>.04,min_foot_body_gap)
+    check(clip+' palms remain facing ground',min_palm_down>.95,min_palm_down)
     report['clips'][clip]={'max_seam_matrix_error':seam,'minimum_sole_z':min_z,
                            'max_planted_sole_error':planted_z,'max_stance_slip_per_quarter_frame_m':max_slip,
                            'minimum_projected_bound_margin_px':min_border*256,
-                           'minimum_vertical_foot_body_gap_m':min_foot_body_gap}
+                           'minimum_vertical_foot_body_gap_m':min_foot_body_gap,
+                           'minimum_palm_down_dot':min_palm_down}
 check('three independent editable actions', all('PS057 | '+x.title() in bpy.data.actions for x in CLIPS))
 check('five independently controlled parts',len(rig.pose.bones)==5)
 check('packed neutral and blink textures',all(bpy.data.images['PS056 Face - '+x].packed_file for x in ('neutral','blink')))

@@ -126,7 +126,8 @@ for i,(name,color) in enumerate(PALETTE.items()):
     draw.text((x+20,y+205),name,font=font(16),fill='white')
 board.save(OUT/'palette-and-blink.png')
 
-# Explicit hand/face occlusion proof at the most occluded face rectangle.
+# Layer breakdown. Relaxed palm-down hands no longer deliberately cross the face.
+# The earlier crossing stress example remains in the prior review commit.
 best = None
 for key,item in clips.items():
     if not key.startswith('run'):
@@ -144,7 +145,7 @@ d=ImageDraw.Draw(proof)
 for j,(label,img) in enumerate([('Colorable',item['bases'][i]),('Face visibility mask',Image.open(EXPORT/item['spec']['sequence'][i]['face_mask']).convert('RGBA')),('Untinted expression',item['neutral'][i]),('Composite',item['frames'][i])]):
     proof.alpha_composite(img,(j*256,35))
     d.text((j*256+12,9),label,font=font(17),fill='white')
-d.text((12,295),f'{key} / frame {i+1} / face rectangle occluded {loss:.1%}',font=font(15),fill='white')
+d.text((12,295),f'{key} / frame {i+1} / relaxed palm-down hands; independent face layer',font=font(15),fill='white')
 proof.save(OUT/'occlusion-proof.png')
 (OUT/'occlusion-proof.json').write_text(json.dumps({'clip':key,'frame':i+1,'face_rectangle_occlusion_fraction':loss},indent=2)+'\n')
 (HERE/'review-data.js').write_text('window.REVIEW_DATA = '+json.dumps({'manifest':manifest,'palette':PALETTE,'sheets':sheet_index})+';\n')

@@ -9,7 +9,10 @@ experiment. It does not replace production sprites or integrate with Godot.
 - `previews/motion-review-256.gif`: six looping clips together, at 256-pixel canvas size.
 - `previews/motion-review-128.gif`: the same comparison at 128 pixels.
 - `previews/palette-and-blink.png`: all ten canonical colors, neutral and blink.
-- `previews/occlusion-proof.png`: a hand crossing the face, with the separate layers.
+- `previews/hand-detail.png`: the rounded glove silhouette viewed from above.
+- `previews/occlusion-proof.png`: current colorable/mask/face layer breakdown.
+  The earlier deliberate hand-crossing example is retained in commit `7abd586`;
+  the revised relaxed gestures no longer reach across the face.
 - `previews/*-beauty.png`: six unpacked, directly viewable sprite sheets.
 - `previews/frames/{idle,walk,run}/{front,three-quarter}/`: individual composed PNGs.
 - `export/`: original colorable/mask sequences and the authoritative `manifest.json`.
@@ -32,8 +35,11 @@ Front projection hides depth travel, so use the three-quarter view for contact.
 
 Open `squircle-animated.blend` in Blender 5.2.2. Active scene:
 `PS057 | Squircle Animation Studio`. Textures are packed; no add-on or automatic
-script execution is required. The original five mesh parts, face, pivots, material,
-lights, softness setting, and fixed cameras are retained.
+script execution is required. The two hand meshes have been revised to broad,
+rounded gloves with three thick fingers, a thumb and a small rolled cuff, guided
+by the owner's supplied [cartoon-hand reference](https://sketchfab.com/3d-models/cartoon-hand-4e84e54713364931b8b2af5b8d48ce35).
+They use original geometry and the shared player-color material, not the reference
+model or fabric texture. Body, feet, face, pivots, lighting and cameras are retained.
 
 1. Select `Animation.Controls` in the Outliner.
 2. Change an editor to **Dope Sheet**, then choose **Action Editor** from its mode menu.
@@ -54,7 +60,13 @@ keys; it does not regenerate them from the construction script.
 |---|---:|---:|---:|---|
 | Idle | 1–48 | 2 s | 0 | Both soles planted; breathing and offset hand motion |
 | Walk | 1–24 | 1 s | 1.65 m/s | 62.5% stance per foot; alternating steps and gentle bob |
-| Run | 1–16 | ⅔ s | 3.60 m/s | 37.5% stance per foot; flight, body compression and stronger hand gestures |
+| Run | 1–16 | ⅔ s | 3.60 m/s | 37.5% stance per foot; flight, body compression and relaxed hand swings |
+
+Palms face the ground throughout all three clips. Fingers point gently forward,
+with slight outward yaw and loose wrist follow-through rather than raised waves.
+`hand_model.py` defines the new geometry and hand motion; `revise_hands.py` changes
+only hand meshes and hand location/rotation keys in an existing animated file.
+`hand-revision.json` records that all non-hand animation channels stayed identical.
 
 The proposed frame rate and sizes are review choices, not approved production
 requirements. Blinks are independent of the locomotion actions. The page blinks
@@ -161,19 +173,20 @@ file now has a real rigid control armature, so the original armature absence alo
 is not the reason for rejecting the add-on.
 
 `validation.json` measures every action at quarter-frame intervals: loop pose,
-evaluated mesh sole height, floating foot/body gap, planted-foot position after root travel, and camera
+evaluated mesh sole height, floating foot/body gap, palm-down orientation,
+planted-foot position after root travel, and camera
 containment. `export-verification.json` checks a whole fresh export, metadata,
 RGBA files, untrimmed bounds and sheet tile ordering. Same-machine replay is
 stable within **1/255** for colorable RGBA, expression RGBA and mask alpha, not
 byte-identical under GPU rendering. Export canonicalizes unused mask RGB to
 white to avoid Cycles shader-cache variation; use mask alpha for coverage. Minimum
-rendered alpha margin is at least **8 pixels** in the reviewed export.
+rendered alpha margin is recorded in `export-verification.json` for this revision.
 
 The Blender restricted profile reported inability to read user preferences and
 write an optional thumbnail cache; source save, reopen and renders succeeded.
 These are not texture/missing-file errors. No production engine checks are needed:
 `.gdignore` keeps this experiment outside Godot import and production code is unchanged.
 
-Owner review remains required for animation energy, foot rhythm, run hand overlap,
+Owner review remains required for the revised hand shape and relaxed motion,
 small-size readability, palette transfer, timing and the no-baked-shadow choice.
 PS-058 must not treat this as approved art direction until that review is recorded.
