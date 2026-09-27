@@ -11,7 +11,7 @@ func _run() -> void:
 	await process_frame
 	if not _check(host.accepting_new_players, "Lobby enables new joins"):
 		return
-	if not _check(lobby.get_node("%PlayerCount").text == "0 / 20 players", "Empty lobby shows player capacity"):
+	if not _check(lobby.get_node("%PlayerCount").text == "0 / 10 players", "Empty lobby shows player capacity"):
 		return
 
 	var joined: Dictionary = host.player_registry.join_player(90, "Lobby Tester", true, 1000)

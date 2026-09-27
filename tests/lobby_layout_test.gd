@@ -43,20 +43,20 @@ func _run() -> void:
 		"[AUTO] Start action is fixed-width and centered in the player section")
 
 	var host := root.get_node("SessionHost")
-	for index: int in 20:
+	for index: int in 10:
 		var joined: Dictionary = host.player_registry.join_player(
 			1000 + index, "Player %02d" % (index + 1), true, 1000 + index)
 		_check(bool(joined.accepted), "[AUTO] Representative player %d joins" % (index + 1))
 	await process_frame
 	await process_frame
 	var roster := lobby.get_node("%PlayerRoster") as GridContainer
-	_check(roster.columns == 2 and roster.get_child_count() == 20,
-		"[AUTO] Maximum roster uses two readable columns")
+	_check(roster.columns == 1 and roster.get_child_count() == 10,
+		"[AUTO] Maximum roster shows ten readable players")
 	_check(_visible_controls_fit(lobby, FHD_CANVAS_SIZE),
 		"[AUTO] Maximum roster controls fit inside the FHD canvas")
 
 	viewport.queue_free()
-	print("Lobby layout checks passed on the FHD canvas with empty and 20-player states")
+	print("Lobby layout checks passed on the FHD canvas with empty and 10-player states")
 	quit(0)
 
 func _visible_controls_fit(lobby: Control, viewport_size: Vector2i) -> bool:

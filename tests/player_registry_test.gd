@@ -76,6 +76,37 @@ func _run() -> void:
 		return
 
 	var restarted := PlayerRegistry.new()
+	if not _check(restarted.max_players == 10 and PlayerRegistry.new(20).max_players == 10,
+			"Registry fallback and oversized constructor remain capped at ten"):
+		return
+	var full_party := PlayerRegistry.new()
+	var first_full: Dictionary = {}
+	for index: int in 10:
+		var joined := full_party.join_player(100 + index, "Player %d" % index, true, 1000)
+		if not _check(joined.accepted, "Ten distinct players can join"):
+			return
+		if index == 0:
+			first_full = joined
+	if not _check(full_party.player_count() == 10 and full_party.join_player(110, "Eleventh", true, 1000).code == &"full",
+			"Eleventh new player receives the full-lobby response"):
+		return
+	full_party.disconnect_connection(100, 1000)
+	if not _check(full_party.join_player(110, "Eleventh", true, 2000).code == &"full",
+			"Disconnected reservation still occupies the tenth slot"):
+		return
+	var full_resume := full_party.resume_player(111, full_party.session_id, first_full.reconnect_token, 2000)
+	if not _check(full_resume.accepted and full_resume.player.player_id == first_full.player.player_id,
+			"Reserved player resumes into a full lobby"):
+		return
+	full_party.leave_connection(111)
+	if not _check(full_party.join_player(110, "Eleventh", true, 2000).accepted,
+			"Explicit leave immediately frees a slot"):
+		return
+	full_party.disconnect_connection(101, 3000)
+	if not _check(full_party.join_player(112, "Twelfth", true, 62999).code == &"full"
+			and full_party.join_player(112, "Twelfth", true, 63000).accepted,
+			"Reservation expiry frees a slot at the grace boundary"):
+		return
 	if not _check(restarted.session_id != registry.session_id, "A new host registry creates a new session"):
 		return
 	var old_session := restarted.resume_player(30, registry.session_id, second.reconnect_token)

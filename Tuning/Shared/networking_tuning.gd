@@ -21,10 +21,10 @@ var request_timeout_seconds: float = 5.0:
 	set(value): request_timeout_seconds = clampf(value, 0.25, 30.0)
 
 @export_group("Player session")
-## Maximum registered players. Higher allows larger parties; lower keeps the shared display less crowded. Default: 20. Safe range: 1-32.
-@export_range(1, 32, 1, "suffix: players")
-var max_players: int = 20:
-	set(value): max_players = clampi(value, 1, 32)
+## Maximum registered players in one session. Lower values suit smaller parties; ten is the hard maximum. Default: 10. Safe range: 1-10.
+@export_range(1, 10, 1, "suffix: players")
+var max_players: int = 10:
+	set(value): max_players = clampi(value, 1, 10)
 ## Time a disconnected player's seat and name remain reserved, in seconds. Higher is more forgiving; lower frees seats sooner. Default: 60. Safe range: 1-300.
 @export_range(1.0, 300.0, 1.0, "suffix:s")
 var reconnect_grace_seconds: float = 60.0:

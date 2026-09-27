@@ -106,15 +106,20 @@ func _run() -> void:
 	selector.select(1)
 	selector.item_selected.emit(1)
 	var overflow_connections: Array[int] = []
-	for index: int in 10:
+	for index: int in 9:
 		var connection_id := 600 + index
 		var overflow := _join(host, connection_id, "Extra %d" % index)
-		if not _check(overflow.accepted, "Lobby retains its 20-player capacity"):
+		if not _check(overflow.accepted, "Lobby fills to ten registered players"):
 			return
 		overflow_connections.append(connection_id)
 	await process_frame
-	if not _check(start_button.disabled and start_help.text.contains("supports up to 10 players"),
-			"Selected minigame blocks an 11-player launch with an actionable maximum"):
+	if not _check(host.player_registry.player_count() == 10 and not start_button.disabled
+			and host.minigame_availability(&"flash_pose").available
+			and host.minigame_availability(&"bubbles").available,
+			"Full ten-player lobby can launch either normal minigame"):
+		return
+	if not _check(host.player_registry.join_player(700, "Eleventh", true).code == &"full",
+			"Host rejects an eleventh new player"):
 		return
 	for connection_id: int in overflow_connections:
 		host.player_registry.leave_connection(connection_id)

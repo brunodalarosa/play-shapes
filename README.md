@@ -92,9 +92,9 @@ registered. A browser connection by itself does not count as a player.
    switch games or start another round. Existing players and LAN services stay
    connected.
 
-Both minigames support **2–10 registered players** in normal play. The wider
-lobby can hold more players, but players beyond ten cannot currently be
-included in a round.
+The host session holds **at most ten registered players**, matching the **2–10
+registered players** supported by both minigames in normal play. The separate
+transport limit is 32 connections per service.
 
 The minigame works in Safari, but it currently plays best in Chrome. Chrome is
 recommended for the most consistent phone controls and fullscreen/orientation

@@ -8,5 +8,5 @@ http_port = 8080
 websocket_port = 8081
 max_connections = 32
 request_timeout_seconds = 5.0
-max_players = 20
+max_players = 10
 reconnect_grace_seconds = 60.0
