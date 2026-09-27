@@ -16,8 +16,8 @@ var _player_id_by_token: Dictionary = {}
 var _player_id_by_connection: Dictionary = {}
 var _next_seat: int = 1
 
-func _init(player_capacity: int = 20, reconnect_grace_seconds: float = 60.0) -> void:
-	max_players = player_capacity
+func _init(player_capacity: int = 10, reconnect_grace_seconds: float = 60.0) -> void:
+	max_players = clampi(player_capacity, 1, 10)
 	reconnect_grace_msec = roundi(reconnect_grace_seconds * 1000.0)
 	session_id = _opaque_id()
 

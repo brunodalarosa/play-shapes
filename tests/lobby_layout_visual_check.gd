@@ -15,13 +15,13 @@ func _capture() -> void:
 	_save_capture("%s/empty-%s.png" % [OUTPUT_DIR, size_label])
 
 	var host := root.get_node("SessionHost")
-	for index: int in 20:
+	for index: int in 10:
 		var result: Dictionary = host.player_registry.join_player(
 			2000 + index, "Player %02d" % (index + 1), true, 2000 + index)
 		assert(result.accepted)
 	await _wait_for_render()
-	_save_capture("%s/roster-20-%s.png" % [OUTPUT_DIR, size_label])
-	print("[GODOT-RUNTIME] Lobby captures saved at %s for empty and 20-player states" % size_label)
+	_save_capture("%s/roster-10-%s.png" % [OUTPUT_DIR, size_label])
+	print("[GODOT-RUNTIME] Lobby captures saved at %s for empty and 10-player states" % size_label)
 	quit(0)
 
 func _wait_for_render() -> void:

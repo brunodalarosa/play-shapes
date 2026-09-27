@@ -5,7 +5,7 @@ This is the compact implementation manual for the current checkout. It records h
 ## Current status
 
 - Godot 4.7.2 is the authoritative host; phone controllers are bundled HTML/CSS/JavaScript clients over local HTTP and WebSockets.
-- The lobby selects **Flash? Pose!** or **Bubbles and Jellyfishes**. Both support 2–10 registered players; the lobby supports 20.
+- The lobby selects **Flash? Pose!** or **Bubbles and Jellyfishes**. Both support 2–10 registered players, matching the session maximum of ten.
 - F12 provides separate one-real-player debug scenarios for both games. They create no simulated player; Flash? Pose! keeps its debug lives and Bubbles labels the round on the host and phone.
 - The host defaults to a responsive 1920×1080 GL Compatibility presentation.
 - **Project > Tools > Build Standalone Host** creates a portable Windows x86_64 release ZIP. Linux is deliberately deferred.
@@ -51,7 +51,7 @@ Normal play starts with 2–10 registered players. Choose a minigame from the lo
 - `host/http_service.gd` serves a fixed asset allowlist with bounded requests; it never serves a client-selected filesystem path.
 - `host/websocket_service.gd` owns bounded protocol-1 peers/messages and resolves each connection to a host-owned player before forwarding gameplay input.
 - `host/player_registry.gd` owns session/player/token identities, names, validated character shape/color, capacity, reconnect grace, resume, and explicit leave.
-- `scenes/lobby.*` owns the responsive lobby, QR/address controls, roster, temporary minigame dropdown, selected launch, and shared 2–10 player gate. The roster switches to two columns above ten players and fits the supported 20 without page scrolling.
+- `scenes/lobby.*` owns the responsive lobby, QR/address controls, roster, temporary minigame dropdown, selected launch, and shared 2–10 player gate. The current roster fits ten players without page scrolling.
 - `minigames/flash_pose_round_controller.gd` owns phases, timing, targets, two normal-play lives, elimination, withdrawal, and ranking. It delegates pose truth to `host/pose_evaluation_rules.gd`.
 - `minigames/bubbles_round_controller.gd` owns the separate Bubbles instructions/countdown/active/results lifecycle, score and pop state, host-time finish freeze, and snapshots keyed by player ID. `bubbles_gesture_classifier.gd` validates and classifies one completed normalized trace. The shared-screen scene is `minigames/bubbles_and_jellyfishes.tscn`.
 - `minigames/bubbles_player_bubble.tscn` reuses `ShapeCharacter` in a procedural translucent bubble with a per-instance circle collider, capped approved small-jellyfish art, and readable name. `bubbles_player_visual.gd` draws the iridescent rim, live directional drag pull, charge glow/wobble, authoritative spin surface and particles, and pop fragments; `bubbles_player_bubble.gd` animates the audience-facing character from accepted swipe events and keeps the charge cue on the bubble. Visual deformation and burst radius never drive collision. `bubbles_player_arena.gd` creates 1–10 bodies and steps movement, invisible bounds, and player pairs in sorted player-ID order. Call `setup(controller, npc_bounds, optional_wall_bounds)`, then `add_bubble(player_id, position)` from the controller's participant snapshot; call `simulate_step(fixed_delta, host_time_msec)` from the host physics loop (normally 1/60 second, maximum 0.05). `bounds` retains the logical NPC play area; player bubbles use the optional wall bounds. The arena settles the controller clock before movement, so exact-zero results freeze first. Bodies consume only the controller's accepted swipe/spin/pop signals and score snapshots.
@@ -77,7 +77,7 @@ The host owns session state, player identity, deadlines, lives, results, and rec
 Defaults in `Tuning/Shared/Networking/Default.tres`:
 
 - HTTP `8080`; WebSocket `8081`
-- 32 transport connections per service; 20 registered players
+- 32 transport connections per service; at most 10 registered players per session (designer setting may be lower)
 - five-second request/handshake timeout; 60-second reconnect grace
 
 `GET /session.json` returns protocol and WebSocket port. The browser uses the page hostname for `ws://HOST:PORT`. Fixed HTTP routes are `/`, `/app.js`, `/controller_geometry.js`, `/bubbles_gesture.js`, `/character_selection.js`, `/shape-square.png`, `/shape-circle.png`, `/shape-squircle.png`, `/shape-rhombus.png`, `/shape-hand-open.png`, `/bubbles-jellyfish.png`, `/bubbles-phone-background.png`, `/bubbles-player-body.png`, `/bubbles-player-hand.png`, `/bubbles-player-foot.png`, `/bubbles-player-face-neutral.png`, `/bubbles-player-face-blink.png`, `/style.css`, and `/session.json`. Unknown routes return 404; non-GET methods return 405; headers beyond 8192 bytes are rejected with 431 or a TCP reset when unread bytes remain on Windows. Responses close after the final bytes have time to flush, so larger PNGs load completely.

@@ -87,6 +87,14 @@ func _run() -> void:
 		return
 
 	var networking: Resource = NetworkingTuningScript.new()
+	var default_networking: Resource = load("res://Tuning/Shared/Networking/Default.tres")
+	if not _check(networking.max_players == 10 and default_networking.max_players == 10
+			and default_networking.max_connections == 32 and default_networking.reconnect_grace_seconds == 60.0,
+			"Networking defaults preserve ten registered players, 32 connections, and 60-second grace"):
+		return
+	networking.max_players = 20
+	if not _check(networking.max_players == 10, "Designer tuning clamps capacity at ten"):
+		return
 	networking.http_port = 1
 	networking.max_connections = 999
 	if not _check(networking.http_port == 1024 and networking.max_connections == 128, "Networking individual values clamp to safe ranges"):
