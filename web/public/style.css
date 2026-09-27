@@ -76,6 +76,21 @@ html.bubbles-active .bubbles-content { position: absolute; inset-block-start: en
 .visually-hidden { position: absolute !important; inline-size: 1px !important; block-size: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
 html.bubbles-active .footnote { display: none; }
 
+/* Playground controller: a pair of toy controls in the phone's safe area. */
+html.lobby-active, html.lobby-active body { inline-size: 100%; block-size: 100%; overflow: hidden; }
+html.lobby-active body { background: #e8f5e7; }
+html.lobby-active main { inline-size: 100%; max-inline-size: none; block-size: 100dvh; min-block-size: 0; padding: 0; }
+html.lobby-active .footnote, html.lobby-active #status { display: none !important; }
+#lobby-controller { position: fixed; inset: 0; overflow: hidden; touch-action: none; background:
+  radial-gradient(circle at 50% 34%, #fff9dd 0 18%, transparent 50%),
+  linear-gradient(160deg, #d6f4e1, #a9dcce 62%, #7bbcaf); }
+#lobby-stick-zone, #lobby-jump-button { position: absolute; inset-block-end: max(26px, calc(env(safe-area-inset-bottom) + 26px)); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+#lobby-stick-zone { inset-inline-start: max(16px, calc(env(safe-area-inset-left) + 12px)); inline-size: clamp(128px, 38vw, 164px); block-size: clamp(128px, 38vw, 164px); border: 5px solid #f5f0cd; border-radius: 50%; background: radial-gradient(circle, #a0dccc 0 30%, #449c89 100%); box-shadow: 0 8px 0 #297260, 0 13px 20px rgb(20 77 65 / .26), inset 0 3px 12px rgb(255 255 255 / .7); }
+#lobby-jump-button { inset-inline-end: max(18px, calc(env(safe-area-inset-right) + 14px)); inline-size: clamp(104px, 32vw, 142px); block-size: clamp(104px, 32vw, 142px); border: 5px solid #fff3c8; border-radius: 50%; background: #ffca5b; color: #56431e; box-shadow: 0 9px 0 #c67c39, 0 15px 20px rgb(91 59 19 / .23), inset 0 5px 12px rgb(255 255 255 / .65); font-size: clamp(19px, 5vw, 25px); letter-spacing: .06em; }
+#lobby-jump-button.is-held { transform: translateY(6px); box-shadow: 0 3px 0 #c67c39, 0 6px 12px rgb(91 59 19 / .2); }
+#lobby-leave-button { position: absolute; inset-block-start: max(16px, calc(env(safe-area-inset-top) + 10px)); inset-inline-end: max(16px, calc(env(safe-area-inset-right) + 10px)); inline-size: 48px; block-size: 48px; padding: 0; border: 2px solid #e3f6e7; border-radius: 16px; background: #548c79; color: #fff; font-size: 31px; line-height: 1; box-shadow: 0 4px 0 #326557; }
+#lobby-leave-button:focus-visible, #lobby-jump-button:focus-visible { outline: 4px solid #244d9b; outline-offset: 4px; }
+
 .pose-grid[data-count="2"] [data-direction="left"] { clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); --arrow-x: -25vw; }
 .pose-grid[data-count="2"] [data-direction="right"] { clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%); --arrow-x: 25vw; }
 .pose-grid[data-count="3"] [data-direction="left"] { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 100%); --arrow-x: -25vw; --arrow-y: -20vh; }

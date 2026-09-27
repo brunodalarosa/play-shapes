@@ -10,11 +10,14 @@ const EXECUTABLE_NAME := "Play Shapes.exe"
 const PACK_NAME := "Play Shapes.pck"
 const METADATA_NAME := "build-info.json"
 const ZIP_RELATIVE := "builds/standalone/Play-Shapes-windows-x86_64.zip"
-const INCLUDE_FILTER := "web/public/*.html,web/public/*.css,web/public/*.js"
+const INCLUDE_FILTER := "web/public/*.html,web/public/*.css,web/public/*.js,web/public/vendor/*.mjs,debug/squircle_preview/manifest.json"
 const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,assets/Kenney_Shape_Characters/**,assets/runtime/shape_characters/manifest.json,art/**,builds/**,opencode.json,tools/**,tests/**,test-results/**,web/*.json,web/node_modules/**,web/src/**,web/tests/**"
 const REQUIRED_BROWSER_PATHS := [
 	"web/public/index.html",
 	"web/public/app.js",
+	"web/public/lobby_controls.js",
+	"web/public/lobby_input.js",
+	"web/public/vendor/nipplejs.mjs",
 	"web/public/controller_geometry.js",
 	"web/public/bubbles_gesture.js",
 	"web/public/character_selection.js",
@@ -23,11 +26,28 @@ const REQUIRED_BROWSER_PATHS := [
 const REQUIRED_RUNTIME_PATHS := [
 	"web/public/index.html",
 	"web/public/app.js",
+	"web/public/lobby_controls.js",
+	"web/public/lobby_input.js",
+	"web/public/vendor/nipplejs.mjs",
 	"web/public/controller_geometry.js",
 	"web/public/bubbles_gesture.js",
 	"web/public/character_selection.js",
 	"web/public/style.css",
 	"characters/character_selection.gd",
+	"characters/lobby_squircle.tscn",
+	"characters/lobby_squircle.gd",
+	"scenes/lobby_playground_world.gd",
+	"debug/squircle_preview/manifest.json",
+	"debug/squircle_preview/render_tint.gdshader",
+	"debug/squircle_preview/assets/idle-front-colorable.png",
+	"debug/squircle_preview/assets/idle-front-neutral.png",
+	"debug/squircle_preview/assets/idle-front-blink.png",
+	"debug/squircle_preview/assets/walk-three-quarter-colorable.png",
+	"debug/squircle_preview/assets/walk-three-quarter-neutral.png",
+	"debug/squircle_preview/assets/walk-three-quarter-blink.png",
+	"debug/squircle_preview/assets/run-three-quarter-colorable.png",
+	"debug/squircle_preview/assets/run-three-quarter-neutral.png",
+	"debug/squircle_preview/assets/run-three-quarter-blink.png",
 	"assets/runtime/shape_characters/bodies/square.png",
 	"assets/runtime/shape_characters/bodies/circle.png",
 	"assets/runtime/shape_characters/bodies/squircle.png",

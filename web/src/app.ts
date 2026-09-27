@@ -1,5 +1,7 @@
 import { attemptImmersive, chargedColor, directionAtPoint, heldDirectionAfterUpdate, type Direction } from "./controller_geometry.js";
 import { GestureTrace, type Point } from "./bubbles_gesture.js";
+import { LobbyControls } from "./lobby_controls.js";
+import type { LobbyAction } from "./lobby_input.js";
 import {
   advanceJoinFlow, bodyAssetPath, CHARACTER_COLORS, CHARACTER_SHAPES, chooseJoinColor,
   colorOption, createJoinMessage, cycleJoinShape, defaultJoinFlow, FALLBACK_CHARACTER,
@@ -24,6 +26,10 @@ const playerCard = document.querySelector<HTMLElement>("#player-card")!;
 const playerName = document.querySelector<HTMLElement>("#player-name-heading")!;
 const playerState = document.querySelector<HTMLElement>("#player-state")!;
 const leaveButton = document.querySelector<HTMLButtonElement>("#leave-button")!;
+const lobbyController = document.querySelector<HTMLElement>("#lobby-controller")!;
+const lobbyStickZone = document.querySelector<HTMLElement>("#lobby-stick-zone")!;
+const lobbyJumpButton = document.querySelector<HTMLButtonElement>("#lobby-jump-button")!;
+const lobbyLeaveButton = document.querySelector<HTMLButtonElement>("#lobby-leave-button")!;
 const gameCard = document.querySelector<HTMLElement>("#game-card")!;
 const gameHeading = document.querySelector<HTMLElement>("#game-heading")!;
 const gameMessage = document.querySelector<HTMLElement>("#game-message")!;
@@ -86,6 +92,12 @@ bubblesArt.face.src = "/bubbles-player-face-neutral.png";
 bubblesArt.blink.src = "/bubbles-player-face-blink.png";
 bubblesArt.jellyfish.src = "/bubbles-jellyfish.png";
 const bubblesTintCache = new Map<string, HTMLCanvasElement>();
+const lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJumpButton, (action: LobbyAction) => {
+  if (!joined || !socket || socket.readyState !== WebSocket.OPEN || activeGame !== null) return;
+  inputSeq += 1;
+  store(STORAGE.inputSeq, String(inputSeq));
+  socket.send(JSON.stringify({ ...action, input_seq: inputSeq }));
+});
 
 function stored(key: string): string { try { return localStorage.getItem(key) ?? ""; } catch { return ""; } }
 function store(key: string, value: string): void { try { localStorage.setItem(key, value); } catch { /* Page remains usable. */ } }
@@ -140,6 +152,7 @@ function updateOrientation(): void {
 }
 
 function showJoin(message: string, focus = false): void {
+  lobbyControls.deactivate();
   joinFlow = returnToCharacterSelection(joinFlow);
   joined = false; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); playerCard.hidden = true; gameCard.hidden = true; bubblesCard.hidden = true;
   selectionScreen.hidden = false; nameScreen.hidden = true; joinForm.hidden = true; joinButton.disabled = false; leaveButton.disabled = false;
@@ -147,7 +160,7 @@ function showJoin(message: string, focus = false): void {
   if (focus) queueMicrotask(() => nextButton.focus());
 }
 function showJoined(player: PublicPlayer, state = "Connected"): void {
-  joined = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); selectionScreen.hidden = true; nameScreen.hidden = true; joinForm.hidden = true; playerCard.hidden = false; gameCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false;
+  joined = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); selectionScreen.hidden = true; nameScreen.hidden = true; joinForm.hidden = true; playerCard.hidden = true; gameCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false; lobbyLeaveButton.disabled = false; lobbyControls.activate();
   if (isCharacterShape(player.character_shape)) joinFlow = { ...joinFlow, shape: player.character_shape };
   const serverColor = colorOption(player.character_color)?.hex;
   if (serverColor) joinFlow = chooseJoinColor(joinFlow, serverColor);
@@ -307,6 +320,7 @@ bubblesPad.addEventListener("keydown", event => {
 });
 
 function showBubbles(message: HostMessage): void {
+  lobbyControls.deactivate();
   releaseHeld(false);
   bubblesSnapshot = message;
   bubblesSnapshotTime = performance.now();
@@ -578,6 +592,7 @@ function animateBubbles(now: number): void {
 requestAnimationFrame(animateBubbles);
 
 function showGame(message: HostMessage): void {
+  lobbyControls.deactivate();
   bubblesCard.hidden = true; playerCard.hidden = true; gameCard.hidden = false; const phase = message.phase ?? "waiting";
   gameHeading.textContent = phase === "countdown" ? "Get ready!" : phase === "genuine_stop_grace" ? "Hold a pose!" : "Watch the big screen";
   gameMessage.textContent = message.message ?? (phase === "genuine_stop_grace" ? "Music stopped! Hold your pose." : "Keep watching the shared screen.");
@@ -597,7 +612,7 @@ function rememberIdentity(message: HostMessage): boolean {
   store(STORAGE.name, player.name); store(STORAGE.session, message.session_id); store(STORAGE.token, message.reconnect_token); showJoined(player); return true;
 }
 function reconnect(): void {
-  if (stopped || retry !== undefined) return; setGameplaySurface(false);
+  if (stopped || retry !== undefined) return; lobbyControls.deactivate(); setGameplaySurface(false);
   if (joined) { playerState.textContent = "Reconnecting"; leaveButton.disabled = true; }
   status.textContent = "Host disconnected. Reconnecting…"; status.hidden = false; retry = setTimeout(() => { retry = undefined; void connect(); }, 2000);
 }
@@ -623,16 +638,18 @@ async function connect(): Promise<void> {
       else if (message.type === "bubbles_trace_result") bubblesLocalCharge = 0;
       else if (message.type === "bubbles_visual" && message.visual && bubblesSnapshot) { bubblesVisualSnapshot = message.visual; bubblesVisualReceivedAt = performance.now(); }
       else if (message.type === "bubbles_snapshot" || message.type === "bubbles_feedback") showBubbles(message);
-      else if (message.type === "lobby") { releaseHeld(false); setGameplaySurface(false); bubblesCard.hidden = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; if (message.player) rememberIdentity(message); else if (joined) { gameCard.hidden = true; playerCard.hidden = false; playerState.textContent = "Waiting for the next game"; status.textContent = message.message ?? "Waiting for the next game"; } }
+      else if (message.type === "lobby") { releaseHeld(false); setGameplaySurface(false); bubblesCard.hidden = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; if (message.player) rememberIdentity(message); else if (joined) { gameCard.hidden = true; playerCard.hidden = true; lobbyControls.activate(); status.hidden = true; } }
     };
-    peer.onclose = event => { clearTimeout(deadline); releaseHeld(false); if (socket === peer) socket = undefined; if (event.code === 4000) { stopped = true; leaveButton.disabled = true; status.textContent = "This player continued in another tab."; playerState.textContent = "Open in another tab"; return; } reconnect(); };
+    peer.onclose = event => { clearTimeout(deadline); releaseHeld(false); lobbyControls.deactivate(); if (socket === peer) socket = undefined; if (event.code === 4000) { stopped = true; leaveButton.disabled = true; status.textContent = "This player continued in another tab."; playerState.textContent = "Open in another tab"; return; } reconnect(); };
     peer.onerror = () => peer.close();
   } catch { reconnect(); }
 }
 
 joinForm.addEventListener("submit", event => { event.preventDefault(); const name = nameInput.value.trim(); store(STORAGE.name, name); if (!socket || socket.readyState !== WebSocket.OPEN) { status.textContent = "Still connecting. Try again in a moment."; status.hidden = false; return; } joinButton.disabled = true; status.textContent = "Joining…"; status.hidden = false; socket.send(JSON.stringify(createJoinMessage(name, joinFlow))); });
-leaveButton.addEventListener("click", () => { if (!socket || socket.readyState !== WebSocket.OPEN) return; leaveButton.disabled = true; status.textContent = "Leaving…"; socket.send(JSON.stringify({ type: "leave" })); });
+function leaveLobby(): void { if (!socket || socket.readyState !== WebSocket.OPEN) return; lobbyControls.deactivate(); leaveButton.disabled = true; lobbyLeaveButton.disabled = true; status.textContent = "Leaving…"; socket.send(JSON.stringify({ type: "leave" })); }
+leaveButton.addEventListener("click", leaveLobby);
+lobbyLeaveButton.addEventListener("click", leaveLobby);
 addEventListener("orientationchange", updateOrientation); addEventListener("resize", updateOrientation);
-window.addEventListener("pagehide", () => { stopped = true; releaseHeld(false); clearTimeout(retry); retry = undefined; socket?.close(); });
+window.addEventListener("pagehide", () => { stopped = true; releaseHeld(false); lobbyControls.deactivate(); clearTimeout(retry); retry = undefined; socket?.close(); });
 window.addEventListener("pageshow", event => { if (event.persisted) { stopped = false; void connect(); } });
 void connect();

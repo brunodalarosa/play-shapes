@@ -17,6 +17,7 @@ var _next_id: int = 1
 var _flash_pose_protocol: RefCounted
 var _bubbles_protocol: RefCounted
 var _active_protocol: RefCounted
+var _lobby_controller: LobbyPlaygroundWorld
 
 func start(settings: NetworkingTuning, registry: PlayerRegistry,
 		accepting_new_players: Callable) -> Error:
@@ -32,6 +33,14 @@ func stop() -> void:
 		client.tcp.disconnect_from_host()
 	_clients.clear()
 	connection_count_changed.emit(0)
+
+func set_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
+	_lobby_controller = controller
+
+func clear_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
+	if _lobby_controller == controller:
+		_lobby_controller.clear_all_input()
+		_lobby_controller = null
 
 func set_flash_pose_controller(controller: FlashPoseRoundController) -> void:
 	_clear_bubbles_controller()
@@ -134,6 +143,8 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			)
 		if resume.accepted:
 			_close_replaced_connection(resume.replaced_connection_id, connection_id)
+			if _lobby_controller != null:
+				_lobby_controller.reset_sequence(String(resume.player.player_id))
 		var welcome := {
 			"type": "welcome",
 			"protocol": 1,
@@ -175,6 +186,13 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			if result.accepted:
 				peer.send_text(JSON.stringify({"type": "left", "message": "You left the lobby"}))
 			else:
+				_send_rejection(peer, "error", result)
+		"lobby_move", "lobby_jump_release":
+			var player := _registry.player_for_connection(client.connection_id)
+			var result: Dictionary = _lobby_controller.handle_input(player, message, Time.get_ticks_msec()) \
+				if _lobby_controller != null and _active_protocol == null and _accepting_new_players.call() \
+				else {"accepted": false, "code": &"lobby_unavailable", "message": "Lobby controls are not active"}
+			if not result.accepted:
 				_send_rejection(peer, "error", result)
 		"pose_down", "pose_up":
 			var player := _registry.player_for_connection(client.connection_id)

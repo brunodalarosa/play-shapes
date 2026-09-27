@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://brvltjdb6e6uc"]
+[gd_scene load_steps=7 format=3 uid="uid://brvltjdb6e6uc"]
+
+[ext_resource type="Script" path="res://scenes/lobby_playground_world.gd" id="script"]
 
 [ext_resource type="Texture2D" uid="uid://bmpraaalpmgm3" path="res://assets/runtime/lobby_playground/room_background.png" id="1"]
 [ext_resource type="Texture2D" uid="uid://bjv5ntbjjuvqd" path="res://assets/runtime/lobby_playground/shelf_structure.png" id="3"]
@@ -47,6 +49,7 @@ size = Vector2(178, 8)
 
 [node name="LobbyPlaygroundWorld" type="Node2D" unique_id=1715306950]
 editor_description = "1920 x 1080 reference canvas. Keep shelf art and PlatformSurfaces aligned; the project scales this canvas for smaller 16:9 host windows."
+script = ExtResource("script")
 
 [node name="RoomBackground" type="Sprite2D" parent="." unique_id=593009055]
 texture = ExtResource("1")
@@ -281,10 +284,10 @@ shape = SubResource("BottomRedBlockTop")
 one_way_collision = true
 
 [node name="CharactersFrontOfPanels" type="Node2D" parent="." unique_id=1166393284]
-editor_description = "Future character visuals go here, in front of QR board/calendar and behind the foreground. No players are created by this scene."
+editor_description = "Registered Playground characters appear here, in front of panels and behind the foreground."
 
 [node name="FutureCharacterAnchors" type="Node2D" parent="." unique_id=1317649962]
-editor_description = "Editor-only placement guides for ten possible feet positions; no spawning or capacity behavior."
+editor_description = "Seat 1–10 feet positions. Free seats are reused when a player leaves or expires."
 
 [node name="UpperLeftA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=2116312259]
 position = Vector2(218, 400)

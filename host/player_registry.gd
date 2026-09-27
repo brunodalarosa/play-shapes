@@ -14,7 +14,6 @@ var reconnect_grace_msec: int
 var _players_by_id: Dictionary = {}
 var _player_id_by_token: Dictionary = {}
 var _player_id_by_connection: Dictionary = {}
-var _next_seat: int = 1
 
 func _init(player_capacity: int = 10, reconnect_grace_seconds: float = 60.0) -> void:
 	max_players = clampi(player_capacity, 1, 10)
@@ -48,18 +47,23 @@ func join_player(connection_id: int, raw_name: Variant, accepting_new_players: b
 
 	var player_id := _opaque_id()
 	var reconnect_token := _opaque_id(24)
+	var seat := 1
+	var occupied: Dictionary = {}
+	for existing: Dictionary in _players_by_id.values():
+		occupied[int(existing.seat)] = true
+	while occupied.has(seat):
+		seat += 1
 	var player := {
 		"player_id": player_id,
 		"name": name,
 		"name_key": name_key,
 		"character_shape": selection.character_shape,
 		"character_color": selection.character_color,
-		"seat": _next_seat,
+		"seat": seat,
 		"connection_id": connection_id,
 		"reconnect_token": reconnect_token,
 		"disconnected_at_msec": DISCONNECTED,
 	}
-	_next_seat += 1
 	_players_by_id[player_id] = player
 	_player_id_by_token[reconnect_token] = player_id
 	_player_id_by_connection[connection_id] = player_id

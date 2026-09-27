@@ -198,6 +198,14 @@ func send_players_to_lobby() -> void:
 	if websocket != null:
 		websocket.send_lobby_state()
 
+func register_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
+	if websocket != null:
+		websocket.set_lobby_controller(controller)
+
+func unregister_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
+	if websocket != null:
+		websocket.clear_lobby_controller(controller)
+
 func register_flash_pose_controller(controller: FlashPoseRoundController) -> void:
 	if websocket != null:
 		websocket.set_flash_pose_controller(controller)

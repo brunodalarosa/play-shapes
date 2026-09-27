@@ -12,6 +12,18 @@ const ASSETS: Dictionary = {
 	"path": "res://web/public/app.js",
 	"content_type": "text/javascript; charset=utf-8",
 },
+"/lobby_controls.js": {
+	"path": "res://web/public/lobby_controls.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
+"/lobby_input.js": {
+	"path": "res://web/public/lobby_input.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
+"/vendor/nipplejs.mjs": {
+	"path": "res://web/public/vendor/nipplejs.mjs",
+	"content_type": "text/javascript; charset=utf-8",
+},
 "/controller_geometry.js": {
 	"path": "res://web/public/controller_geometry.js",
 	"content_type": "text/javascript; charset=utf-8",

@@ -6,6 +6,7 @@ extends Control
 @onready var minigame_selector: OptionButton = %MinigameSelector
 @onready var start_button: Button = %StartMinigame
 @onready var start_help: Label = %StartHelp
+@onready var world: LobbyPlaygroundWorld = $World
 
 const MINIGAMES := [
 	{"id": &"flash_pose", "name": "Flash? Pose!"},
@@ -15,6 +16,8 @@ const MINIGAMES := [
 func _ready() -> void:
 	SessionHost.set_accepting_new_players(true)
 	SessionHost.players_changed.connect(_on_players_changed)
+	SessionHost.register_lobby_controller(world)
+	world.reconcile(SessionHost.players())
 	_style_controls()
 	address_picker.item_selected.connect(_select_address)
 	for minigame: Dictionary in MINIGAMES:
@@ -28,6 +31,7 @@ func _ready() -> void:
 	_update_start_state()
 
 func _exit_tree() -> void:
+	SessionHost.unregister_lobby_controller(world)
 	SessionHost.set_accepting_new_players(false)
 
 func _refresh_addresses() -> void:
@@ -56,7 +60,8 @@ func _select_address(index: int) -> void:
 	%Instructions.text = "Connect your phone to the same network, then scan."
 	%Copy.disabled = false
 
-func _on_players_changed(_players: Array[Dictionary]) -> void:
+func _on_players_changed(players: Array[Dictionary]) -> void:
+	world.reconcile(players)
 	_update_start_state()
 
 func _on_minigame_selected(_index: int) -> void:
@@ -116,6 +121,7 @@ func _start_minigame() -> void:
 	if not bool(result.accepted):
 		start_help.text = str(result.reason)
 		return
+	world.clear_all_input()
 	start_button.disabled = true
 	var error := get_tree().change_scene_to_file(SessionHost.minigame_scene_path(minigame_id))
 	if error != OK:
