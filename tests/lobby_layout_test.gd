@@ -37,7 +37,12 @@ func _run() -> void:
 				"%s fits the FHD canvas" % name):
 			return
 	var picker := lobby.get_node("%AddressPicker") as OptionButton
+	var instructions := lobby.get_node_or_null("%Instructions") as Label
+	if not _check(instructions != null, "Join instructions resolve from the lobby script"):
+		return
 	if picker.item_count > 0:
+		if not _check(instructions.text.contains("scan"), "Join instructions match the available QR"):
+			return
 		if not _check((lobby.get_node("%JoinQR") as QRCodeRect).data ==
 				(lobby.get_node("%JoinAddress") as Label).text.to_utf8_buffer(),
 				"Displayed join URL supplies the live QR data"):
@@ -51,8 +56,9 @@ func _run() -> void:
 				and (lobby.get_node("%JoinAddress") as Label).text.contains(selected_address),
 				"Refreshing keeps the selected reachable address"):
 			return
-	elif not _check((lobby.get_node("%Copy") as Button).disabled,
-			"No LAN address disables copy"):
+	elif not _check((lobby.get_node("%Copy") as Button).disabled
+			and instructions.text.contains("refresh"),
+			"No LAN address disables copy and explains refresh"):
 		return
 	if not _check((lobby.get_node("%StartMinigame") as Button).disabled,
 			"Start is disabled before players join"):
