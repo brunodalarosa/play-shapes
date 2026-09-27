@@ -19,6 +19,10 @@ static var _live_instances: int = 0
 @export var gravity: float = 1350.0
 ## Reaches the next shelf from the one below at the default gravity.
 @export var jump_impulse: float = 940.0
+## A small rebound when landing on another Playground character.
+@export_range(0.0, 1.0) var player_bounce_factor: float = 0.45
+@export var player_bounce_max_impulse: float = 420.0
+@export var player_bounce_min_fall_speed: float = 160.0
 @export var visual_scale: float = 0.58
 @export var run_threshold: float = 0.72
 @export var fall_reset_y: float = 1160.0
@@ -101,7 +105,7 @@ func clear_input() -> void:
 
 
 func request_jump() -> bool:
-	if not connected or _jump_queued or not is_on_floor():
+	if not connected or _jump_queued or not is_on_floor() or velocity.y < 0.0:
 		return false
 	_jump_queued = true
 	return true
@@ -116,7 +120,14 @@ func _physics_process(delta: float) -> void:
 		_jump_queued = false
 	else:
 		velocity.y += gravity * delta
+	var falling_speed := velocity.y
 	move_and_slide()
+	if falling_speed >= player_bounce_min_fall_speed:
+		for index in get_slide_collision_count():
+			var collision := get_slide_collision(index)
+			if collision.get_collider() is LobbySquircle and collision.get_normal().y < -0.7:
+				velocity.y = -minf(falling_speed * player_bounce_factor, player_bounce_max_impulse)
+				break
 	if position.y > fall_reset_y:
 		position = spawn_point
 		velocity = Vector2.ZERO
@@ -125,7 +136,8 @@ func _physics_process(delta: float) -> void:
 	var view := "front" if action == "idle" else "three-quarter"
 	_change_clip("%s-%s" % [action, view])
 	if absf(velocity.x) > 20.0:
-		var face_left := velocity.x < 0.0
+		# The source three-quarter frames face left before mirroring.
+		var face_left := velocity.x > 0.0
 		_colorable.flip_h = face_left
 		_face.flip_h = face_left
 		_blink.flip_h = face_left

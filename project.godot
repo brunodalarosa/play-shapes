@@ -36,6 +36,7 @@ enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg", "res://addons/sta
 [layer_names]
 
 2d_physics/layer_8="Lobby platforms"
+2d_physics/layer_9="Lobby characters"
 
 [physics]
 

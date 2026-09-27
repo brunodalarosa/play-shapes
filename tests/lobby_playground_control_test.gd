@@ -30,8 +30,8 @@ func _run() -> void:
 		and (first_character.get_node("Colorable") as Sprite2D).texture.resource_path.contains("squircle_preview")
 		and (first_character.get_node("Colorable") as Sprite2D).material.get_shader_parameter("player_color") == Color("#EC407A"),
 		"Lobby-only rendered squircle uses the name and registered tint without changing shape data")
-	_check(first_character.collision_layer == 0 and first_character.collision_mask == 128,
-		"Characters only collide with one-way platforms, not one another")
+	_check(first_character.collision_layer == 256 and first_character.collision_mask == 384,
+		"Characters collide with one-way platforms and one another")
 	for unused: int in 5:
 		await physics_frame
 	_check(first_character.is_on_floor(), "Spawned character lands on the first shelf")
@@ -53,6 +53,11 @@ func _run() -> void:
 	_check(first_character.position.x > first_character.spawn_point.x
 		and second_character.position.x < second_character.spawn_point.x,
 		"The host advances characters in opposite directions independently")
+	_check((first_character.get_node("Face") as Sprite2D).flip_h
+		and not (second_character.get_node("Face") as Sprite2D).flip_h
+		and (first_character.get_node("Colorable") as Sprite2D).flip_h
+		== (first_character.get_node("Face") as Sprite2D).flip_h,
+		"Three-quarter body and face point in the direction of travel")
 	_check(world.handle_input(first_player, {"type": "lobby_jump_release", "input_seq": 2}, now).jumped
 		and not world.handle_input(first_player, {"type": "lobby_jump_release", "input_seq": 3}, now).jumped,
 		"One grounded release queues exactly one jump")

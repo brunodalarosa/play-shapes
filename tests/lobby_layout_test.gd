@@ -27,8 +27,11 @@ func _run() -> void:
 			and lobby.find_child("PlayerSection", true, false) == null,
 			"No old roster panel remains"):
 		return
-	if not _check(lobby.get_node("LiveControls").get_index() > lobby.get_node("World").get_index(),
-			"Live controls remain interactive above future characters"):
+	if not _check(lobby.get_node("World/CharactersFrontOfPanels").z_index
+			> lobby.get_node("LiveControls").z_index
+			and lobby.get_node("World/Foreground").z_index
+			> lobby.get_node("World/CharactersFrontOfPanels").z_index,
+			"Characters draw over lobby controls and under the world foreground"):
 		return
 	for name: String in ["Logo", "JoinQR", "JoinAddress", "AddressPicker", "Refresh",
 			"Copy", "MinigameSelector", "StartMinigame", "StartHelp"]:

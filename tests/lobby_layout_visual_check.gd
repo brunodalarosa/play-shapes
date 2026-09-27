@@ -21,7 +21,12 @@ func _capture() -> void:
 		assert(result.accepted)
 	await _wait_for_render()
 	_save_capture("%s/ready-%s.png" % [OUTPUT_DIR, size_label])
-	print("[GODOT-RUNTIME] Playground lobby captures saved at %s for empty and ready states" % size_label)
+	var character := lobby.get_node("World/CharactersFrontOfPanels").get_child(0) as LobbySquircle
+	character.set_connected(false)
+	character.position = Vector2(960, 420)
+	await _wait_for_render()
+	_save_capture("%s/character-over-qr-%s.png" % [OUTPUT_DIR, size_label])
+	print("[GODOT-RUNTIME] Playground lobby captures saved at %s for empty, ready, and QR overlap states" % size_label)
 	quit(0)
 
 func _wait_for_render() -> void:

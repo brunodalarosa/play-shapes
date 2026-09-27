@@ -24,7 +24,7 @@ script = ExtResource("1")
 [node name="World" parent="." instance=ExtResource("2")]
 
 [node name="LiveControls" type="Control" parent="."]
-editor_description = "FHD reference positions. Input stays above the world's future CharactersFrontOfPanels layer."
+editor_description = "FHD reference positions. Controls stay interactive while characters draw in front of them."
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

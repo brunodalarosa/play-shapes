@@ -284,7 +284,8 @@ shape = SubResource("BottomRedBlockTop")
 one_way_collision = true
 
 [node name="CharactersFrontOfPanels" type="Node2D" parent="." unique_id=1166393284]
-editor_description = "Registered Playground characters appear here, in front of panels and behind the foreground."
+editor_description = "Registered Playground characters draw in front of lobby controls and behind the world foreground."
+z_index = 1
 
 [node name="FutureCharacterAnchors" type="Node2D" parent="." unique_id=1317649962]
 editor_description = "Seat 1–10 feet positions. Free seats are reused when a player leaves or expires."
@@ -320,5 +321,6 @@ position = Vector2(705, 945)
 position = Vector2(1280, 945)
 
 [node name="Foreground" type="Sprite2D" parent="." unique_id=525094680]
+z_index = 2
 texture = ExtResource("4")
 centered = false

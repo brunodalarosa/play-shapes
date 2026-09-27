@@ -7,8 +7,8 @@ radius = 23.0
 height = 96.0
 
 [node name="LobbySquircle" type="CharacterBody2D"]
-collision_layer = 0
-collision_mask = 128
+collision_layer = 256
+collision_mask = 384
 floor_snap_length = 8.0
 script = ExtResource("1")
 
