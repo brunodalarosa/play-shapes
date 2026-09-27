@@ -1,7 +1,16 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/lobby.gd" id="1"]
-[ext_resource type="Script" path="res://addons/kenyoni/qr_code/qr_code_rect.gd" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/lobby_playground_world.tscn" id="2"]
+[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/play_shapes_logo.png" id="3"]
+[ext_resource type="Script" path="res://addons/kenyoni/qr_code/qr_code_rect.gd" id="4"]
+
+[sub_resource type="StyleBoxFlat" id="qr_background"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="LobbyPlayground" type="Control"]
 layout_mode = 3
@@ -12,193 +21,156 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="Background" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-color = Color(0.055, 0.075, 0.12, 1)
+[node name="World" parent="." instance=ExtResource("2")]
 
-[node name="PageMargin" type="MarginContainer" parent="."]
+[node name="LiveControls" type="Control" parent="."]
+editor_description = "FHD reference positions. Input stays above the world's future CharactersFrontOfPanels layer."
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 80
-theme_override_constants/margin_top = 48
-theme_override_constants/margin_right = 80
-theme_override_constants/margin_bottom = 56
+mouse_filter = 2
 
-[node name="Page" type="VBoxContainer" parent="PageMargin"]
-layout_mode = 2
-theme_override_constants/separation = 28
+[node name="Logo" type="TextureRect" parent="LiveControls"]
+layout_mode = 0
+offset_left = 708.0
+offset_top = 164.0
+offset_right = 1212.0
+offset_bottom = 284.0
+mouse_filter = 2
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Title" type="Label" parent="PageMargin/Page"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.65, 0.9, 0.75, 1)
-theme_override_font_sizes/font_size = 44
-text = "PLAY SHAPES"
-horizontal_alignment = 1
-
-[node name="Sections" type="HBoxContainer" parent="PageMargin/Page"]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 40
-
-[node name="JoinSection" type="VBoxContainer" parent="PageMargin/Page/Sections"]
-custom_minimum_size = Vector2(0, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/separation = 8
-
-[node name="Subtitle" type="Label" parent="PageMargin/Page/Sections/JoinSection"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Lobby playground · Phase 1"
-
-[node name="JoinTitle" type="Label" parent="PageMargin/Page/Sections/JoinSection"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Join session"
-
-[node name="JoinBodyCenter" type="CenterContainer" parent="PageMargin/Page/Sections/JoinSection"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="JoinBody" type="VBoxContainer" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter"]
-custom_minimum_size = Vector2(720, 0)
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="QRCenter" type="CenterContainer" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody"]
-layout_mode = 2
-
-[node name="JoinQR" type="TextureRect" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody/QRCenter"]
+[node name="JoinQRBackground" type="Panel" parent="LiveControls"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(260, 260)
-layout_mode = 2
+layout_mode = 0
+offset_left = 854.0
+offset_top = 266.0
+offset_right = 1066.0
+offset_bottom = 432.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("qr_background")
+
+[node name="JoinQR" type="TextureRect" parent="LiveControls"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 860.0
+offset_top = 267.0
+offset_right = 1060.0
+offset_bottom = 431.0
+mouse_filter = 2
 texture_filter = 1
 expand_mode = 1
 stretch_mode = 5
-script = ExtResource("2")
+script = ExtResource("4")
 mode = 4
 auto_module_size = false
-module_size = 8
+module_size = 6
 quiet_zone_size = 4
 
-[node name="Instructions" type="Label" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
+[node name="Instructions" type="Label" parent="LiveControls"]
+layout_mode = 0
+offset_left = 710.0
+offset_top = 433.0
+offset_right = 1210.0
+offset_bottom = 457.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0.2, 0.15, 1)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 19
 text = "Connect your phone to the same network, then scan."
 horizontal_alignment = 1
-autowrap_mode = 2
 
-[node name="JoinAddress" type="Label" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody"]
+[node name="JoinAddress" type="Label" parent="LiveControls"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-horizontal_alignment = 1
-autowrap_mode = 2
-
-[node name="Network" type="HBoxContainer" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody"]
-layout_mode = 2
-alignment = 1
-theme_override_constants/separation = 8
-
-[node name="AddressPicker" type="OptionButton" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody/Network"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 52)
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-tooltip_text = "Choose the PC address on your phone's network. VPN addresses may not work."
-
-[node name="Refresh" type="Button" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody/Network"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 52)
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Refresh"
-
-[node name="Copy" type="Button" parent="PageMargin/Page/Sections/JoinSection/JoinBodyCenter/JoinBody/Network"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(128, 52)
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "Copy link"
-
-[node name="PlayerSection" type="VBoxContainer" parent="PageMargin/Page/Sections"]
-custom_minimum_size = Vector2(0, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_constants/separation = 8
-
-[node name="RosterTitle" type="Label" parent="PageMargin/Page/Sections/PlayerSection"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Players"
-horizontal_alignment = 1
-
-[node name="PlayerCount" type="Label" parent="PageMargin/Page/Sections/PlayerSection"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "0 / 10 players"
-horizontal_alignment = 1
-
-[node name="RosterArea" type="CenterContainer" parent="PageMargin/Page/Sections/PlayerSection"]
-custom_minimum_size = Vector2(0, 300)
-layout_mode = 2
-
-[node name="EmptyRoster" type="Label" parent="PageMargin/Page/Sections/PlayerSection/RosterArea"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 0
-theme_override_font_sizes/font_size = 18
-text = "Waiting for players to join"
+layout_mode = 0
+offset_left = 745.0
+offset_top = 458.0
+offset_right = 1175.0
+offset_bottom = 498.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_shadow_color = Color(0, 0.13, 0.13, 1)
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 21
 horizontal_alignment = 1
 vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="PlayerRoster" type="GridContainer" parent="PageMargin/Page/Sections/PlayerSection/RosterArea"]
+[node name="AddressPicker" type="OptionButton" parent="LiveControls"]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 0
-theme_override_constants/separation = 6
-theme_override_constants/h_separation = 16
-theme_override_constants/v_separation = 2
+layout_mode = 0
+offset_left = 710.0
+offset_top = 499.0
+offset_right = 930.0
+offset_bottom = 537.0
+theme_override_font_sizes/font_size = 17
+tooltip_text = "Choose the PC address on your phone's network. VPN addresses may not work."
 
-[node name="MinigameTitle" type="Label" parent="PageMargin/Page/Sections/PlayerSection"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 20
+[node name="Refresh" type="Button" parent="LiveControls"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 936.0
+offset_top = 499.0
+offset_right = 1060.0
+offset_bottom = 537.0
+theme_override_font_sizes/font_size = 17
+text = "Refresh"
+
+[node name="Copy" type="Button" parent="LiveControls"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 1066.0
+offset_top = 499.0
+offset_right = 1210.0
+offset_bottom = 537.0
+theme_override_font_sizes/font_size = 17
+text = "Copy link"
+
+[node name="MinigameTitle" type="Label" parent="LiveControls"]
+layout_mode = 0
+offset_left = 760.0
+offset_top = 579.0
+offset_right = 1160.0
+offset_bottom = 619.0
+theme_override_colors/font_color = Color(0.04, 0.13, 0.28, 1)
+theme_override_font_sizes/font_size = 30
 text = "Minigame"
 horizontal_alignment = 1
 
-[node name="MinigameSelector" type="OptionButton" parent="PageMargin/Page/Sections/PlayerSection"]
+[node name="MinigameSelector" type="OptionButton" parent="LiveControls"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 52)
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
+layout_mode = 0
+offset_left = 759.0
+offset_top = 625.0
+offset_right = 1161.0
+offset_bottom = 681.0
+theme_override_font_sizes/font_size = 22
 tooltip_text = "Choose which minigame to start for the registered players."
 
-[node name="StartCenter" type="CenterContainer" parent="PageMargin/Page/Sections/PlayerSection"]
-layout_mode = 2
-
-[node name="StartMinigame" type="Button" parent="PageMargin/Page/Sections/PlayerSection/StartCenter"]
+[node name="StartMinigame" type="Button" parent="LiveControls"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(360, 60)
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
+layout_mode = 0
+offset_left = 795.0
+offset_top = 691.0
+offset_right = 1125.0
+offset_bottom = 739.0
+theme_override_font_sizes/font_size = 21
 disabled = true
 text = "Start selected minigame"
 
-[node name="StartHelp" type="Label" parent="PageMargin/Page/Sections/PlayerSection"]
+[node name="StartHelp" type="Label" parent="LiveControls"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
+layout_mode = 0
+offset_left = 735.0
+offset_top = 743.0
+offset_right = 1185.0
+offset_bottom = 783.0
+theme_override_colors/font_color = Color(0.04, 0.13, 0.28, 1)
+theme_override_font_sizes/font_size = 19
 text = "At least 2 registered players are needed"
 horizontal_alignment = 1
+vertical_alignment = 1
 autowrap_mode = 2

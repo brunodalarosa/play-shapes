@@ -15,6 +15,8 @@
 [ext_resource type="Texture2D" uid="uid://ty022jt5b0w2" path="res://assets/runtime/lobby_playground/dino_plushie.png" id="15"]
 [ext_resource type="Texture2D" uid="uid://b5hopjdc4wx56" path="res://assets/runtime/lobby_playground/mushroom.png" id="16"]
 [ext_resource type="Texture2D" uid="uid://cp7oxubhwwmyn" path="res://assets/runtime/lobby_playground/robot_action_figure.png" id="17"]
+[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/green_board_blank.png" id="18"]
+[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/minigame_calendar_blank.png" id="19"]
 
 [sub_resource type="RectangleShape2D" id="FullShelfTop"]
 size = Vector2(1840, 10)
@@ -162,7 +164,19 @@ texture = ExtResource("7")
 centered = false
 
 [node name="PanelBackings" type="Node2D" parent="." unique_id=660800634]
-editor_description = "PS-060 adds the QR board and calendar here, above blocks and behind future characters."
+editor_description = "QR board and calendar backings sit above blocks and behind future characters. Live controls are in lobby.tscn."
+
+[node name="GreenBoard" type="Sprite2D" parent="PanelBackings"]
+position = Vector2(623, 127)
+scale = Vector2(0.45, 0.45)
+texture = ExtResource("18")
+centered = false
+
+[node name="MinigameCalendar" type="Sprite2D" parent="PanelBackings"]
+position = Vector2(646, 520)
+scale = Vector2(0.36, 0.36)
+texture = ExtResource("19")
+centered = false
 
 [node name="PlatformSurfaces" type="Node2D" parent="." unique_id=580875252]
 editor_description = "All surfaces use one-way top rectangles on collision layer 8 (bit 128), with no mask. Future characters should include bit 128 in their mask."

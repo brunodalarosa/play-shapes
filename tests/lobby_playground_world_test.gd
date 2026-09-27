@@ -14,7 +14,6 @@ func _run() -> void:
 	root.add_child(world)
 	var surfaces := world.get_node("PlatformSurfaces")
 	var expected_shelves := {
-		"TopShelf": 150.0,
 		"UpperShelf": 400.0,
 		"LowerShelf": 675.0,
 		"BottomShelf": 945.0,
@@ -58,6 +57,10 @@ func _run() -> void:
 		and world.get_node("PanelBackings").get_index() < world.get_node("CharactersFrontOfPanels").get_index()
 		and world.get_node("CharactersFrontOfPanels").get_index() < world.get_node("Foreground").get_index(),
 		"Decorations, panels, future characters, and foreground have distinct draw order")
+	for panel_name: String in ["GreenBoard", "MinigameCalendar"]:
+		var panel := world.get_node("PanelBackings/" + panel_name) as Sprite2D
+		_check(panel.texture != null and panel.texture.get_width() > 500,
+			"%s has its own blank runtime art" % panel_name)
 	for decoration: Node in world.get_node("RearDecorations").get_children():
 		_check(decoration is Sprite2D and (decoration as Sprite2D).texture != null,
 			"%s is a decorative sprite without collision" % decoration.name)

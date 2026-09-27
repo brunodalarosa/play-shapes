@@ -1,75 +1,65 @@
 extends SceneTree
-## Structural and overflow checks for the two-section host lobby at 16:9.
+## Structural checks for the FHD reference layout used at both 16:9 host sizes.
 
-const FHD_CANVAS_SIZE := Vector2i(1920, 1080)
+const CANVAS := Vector2i(1920, 1080)
 
 func _initialize() -> void:
 	_run.call_deferred()
 
 func _run() -> void:
 	var viewport := SubViewport.new()
-	# canvas_items keeps the 1920x1080 logical canvas when the host window is
-	# resized to 1152x648, so bounds are checked in the effective canvas space.
-	viewport.size = FHD_CANVAS_SIZE
-	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	viewport.size = CANVAS
 	root.add_child(viewport)
 	var lobby := load("res://scenes/lobby.tscn").instantiate() as Control
 	viewport.add_child(lobby)
 	await process_frame
 	await process_frame
-
-	_check(lobby.get_node_or_null("Scroll") == null,
-		"[AUTO] Lobby has no page-level scroll container")
-	var title := lobby.get_node("PageMargin/Page/Title") as Label
-	_check(title.horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER,
-		"[AUTO] PLAY SHAPES remains horizontally centered")
-	_check(title.get_theme_color("font_color").g > title.get_theme_color("font_color").r,
-		"[AUTO] PLAY SHAPES retains its green emphasis")
-	_check(title.get_theme_font_size("font_size") == 44 and title.get_global_rect().position.y >= 48.0,
-		"[AUTO] PLAY SHAPES uses the larger title size and safe top margin")
-	var sections := lobby.get_node("PageMargin/Page/Sections") as HBoxContainer
-	_check(sections.get_child_count() == 2
-		and sections.get_child(0).name == &"JoinSection"
-		and sections.get_child(1).name == &"PlayerSection",
-		"[AUTO] Join and player content are ordered as two horizontal sections")
-	_check(_visible_controls_fit(lobby, FHD_CANVAS_SIZE),
-		"[AUTO] Empty lobby controls fit inside the FHD canvas")
-	var refresh := lobby.get_node("%Refresh") as Button
-	var copy := lobby.get_node("%Copy") as Button
-	var start := lobby.get_node("%StartMinigame") as Button
-	_check(refresh.size.y >= 52.0 and copy.size.y >= 52.0 and start.size.y >= 60.0,
-		"[AUTO] Lobby actions use the taller button treatment")
-	_check(start.size.x == 360.0 and start.get_global_rect().get_center().x > FHD_CANVAS_SIZE.x * 0.5,
-		"[AUTO] Start action is fixed-width and centered in the player section")
-
-	var host := root.get_node("SessionHost")
-	for index: int in 10:
-		var joined: Dictionary = host.player_registry.join_player(
-			1000 + index, "Player %02d" % (index + 1), true, 1000 + index)
-		_check(bool(joined.accepted), "[AUTO] Representative player %d joins" % (index + 1))
-	await process_frame
-	await process_frame
-	var roster := lobby.get_node("%PlayerRoster") as GridContainer
-	_check(roster.columns == 1 and roster.get_child_count() == 10,
-		"[AUTO] Maximum roster shows ten readable players")
-	_check(_visible_controls_fit(lobby, FHD_CANVAS_SIZE),
-		"[AUTO] Maximum roster controls fit inside the FHD canvas")
-
+	var panels := lobby.get_node("World/PanelBackings")
+	if not _check(panels.get_node("GreenBoard") is Sprite2D
+			and panels.get_node("MinigameCalendar") is Sprite2D
+			and panels.get_index() < lobby.get_node("World/CharactersFrontOfPanels").get_index(),
+			"Board and calendar are in front of the world and behind future characters"):
+		return
+	if not _check(lobby.get_node("World/CharactersFrontOfPanels").get_child_count() == 0,
+			"Future character layer remains empty"):
+		return
+	if not _check(lobby.find_child("PlayerRoster", true, false) == null
+			and lobby.find_child("PlayerSection", true, false) == null,
+			"No old roster panel remains"):
+		return
+	if not _check(lobby.get_node("LiveControls").get_index() > lobby.get_node("World").get_index(),
+			"Live controls remain interactive above future characters"):
+		return
+	for name: String in ["Logo", "JoinQR", "JoinAddress", "AddressPicker", "Refresh",
+			"Copy", "MinigameSelector", "StartMinigame", "StartHelp"]:
+		var control := lobby.get_node("LiveControls/" + name) as Control
+		if not _check(Rect2(Vector2.ZERO, Vector2(CANVAS)).encloses(control.get_global_rect()),
+				"%s fits the FHD canvas" % name):
+			return
+	var picker := lobby.get_node("%AddressPicker") as OptionButton
+	if picker.item_count > 0:
+		if not _check((lobby.get_node("%JoinQR") as QRCodeRect).data ==
+				(lobby.get_node("%JoinAddress") as Label).text.to_utf8_buffer(),
+				"Displayed join URL supplies the live QR data"):
+			return
+		if not _check(not (lobby.get_node("%Copy") as Button).disabled,
+				"Detected LAN address keeps copy available"):
+			return
+		var selected_address := picker.get_item_text(picker.selected)
+		(lobby.get_node("%Refresh") as Button).pressed.emit()
+		if not _check(picker.get_item_text(picker.selected) == selected_address
+				and (lobby.get_node("%JoinAddress") as Label).text.contains(selected_address),
+				"Refreshing keeps the selected reachable address"):
+			return
+	elif not _check((lobby.get_node("%Copy") as Button).disabled,
+			"No LAN address disables copy"):
+		return
+	if not _check((lobby.get_node("%StartMinigame") as Button).disabled,
+			"Start is disabled before players join"):
+		return
 	viewport.queue_free()
-	print("Lobby layout checks passed on the FHD canvas with empty and 10-player states")
+	print("Lobby layout checks passed on the FHD reference canvas")
 	quit(0)
-
-func _visible_controls_fit(lobby: Control, viewport_size: Vector2i) -> bool:
-	var viewport_rect := Rect2(Vector2.ZERO, Vector2(viewport_size))
-	for node: Node in lobby.find_children("*", "Control", true, false):
-		var control := node as Control
-		if not control.is_visible_in_tree():
-			continue
-		var rect := control.get_global_rect()
-		if not viewport_rect.encloses(rect):
-			push_error("%s exceeds the viewport: %s" % [control.get_path(), rect])
-			return false
-	return true
 
 func _check(condition: bool, description: String) -> bool:
 	if not condition:
