@@ -1,30 +1,26 @@
-[gd_scene load_steps=28 format=3]
+[gd_scene format=3 uid="uid://brvltjdb6e6uc"]
 
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/room_background.png" id="1"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/hanging_vine.png" id="2"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/shelf_structure.png" id="3"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/foreground.png" id="4"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/house_blue_red_roof.png" id="5"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/arch_green.png" id="6"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/block_red.png" id="7"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/block_yellow.png" id="8"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/block_blue.png" id="9"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/block_green.png" id="10"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/arch_yellow.png" id="11"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/blank_books.png" id="12"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/teddy_bear.png" id="13"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/crayon_mug.png" id="14"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/dino_plushie.png" id="15"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/mushroom.png" id="16"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/robot_action_figure.png" id="17"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/large_happy_plant.png" id="18"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/happy_potted_plant.png" id="19"]
-
-[sub_resource type="RectangleShape2D" id="ShelfTop"]
-size = Vector2(1710, 10)
+[ext_resource type="Texture2D" uid="uid://bmpraaalpmgm3" path="res://assets/runtime/lobby_playground/room_background.png" id="1"]
+[ext_resource type="Texture2D" uid="uid://bjv5ntbjjuvqd" path="res://assets/runtime/lobby_playground/shelf_structure.png" id="3"]
+[ext_resource type="Texture2D" uid="uid://dvlw2cwsenhwe" path="res://assets/runtime/lobby_playground/foreground.png" id="4"]
+[ext_resource type="Texture2D" uid="uid://duv56ep54ep24" path="res://assets/runtime/lobby_playground/house_blue_red_roof.png" id="5"]
+[ext_resource type="Texture2D" uid="uid://rcj4lnxud524" path="res://assets/runtime/lobby_playground/arch_green.png" id="6"]
+[ext_resource type="Texture2D" uid="uid://ceotbxpmlpn5j" path="res://assets/runtime/lobby_playground/block_red.png" id="7"]
+[ext_resource type="Texture2D" uid="uid://d6efao7dsiou" path="res://assets/runtime/lobby_playground/block_yellow.png" id="8"]
+[ext_resource type="Texture2D" uid="uid://bdj6i20glf4x5" path="res://assets/runtime/lobby_playground/block_blue.png" id="9"]
+[ext_resource type="Texture2D" uid="uid://bggeop70mqew1" path="res://assets/runtime/lobby_playground/block_green.png" id="10"]
+[ext_resource type="Texture2D" uid="uid://xfi88wdcuwyh" path="res://assets/runtime/lobby_playground/arch_yellow.png" id="11"]
+[ext_resource type="Texture2D" uid="uid://xcg8q38rs05" path="res://assets/runtime/lobby_playground/teddy_bear.png" id="13"]
+[ext_resource type="Texture2D" uid="uid://dublr5112dixv" path="res://assets/runtime/lobby_playground/crayon_mug.png" id="14"]
+[ext_resource type="Texture2D" uid="uid://ty022jt5b0w2" path="res://assets/runtime/lobby_playground/dino_plushie.png" id="15"]
+[ext_resource type="Texture2D" uid="uid://b5hopjdc4wx56" path="res://assets/runtime/lobby_playground/mushroom.png" id="16"]
+[ext_resource type="Texture2D" uid="uid://cp7oxubhwwmyn" path="res://assets/runtime/lobby_playground/robot_action_figure.png" id="17"]
 
 [sub_resource type="RectangleShape2D" id="FullShelfTop"]
 size = Vector2(1840, 10)
+
+[sub_resource type="RectangleShape2D" id="MiddleBlueBlockTop"]
+size = Vector2(148, 8)
 
 [sub_resource type="RectangleShape2D" id="LeftRedBlockTop"]
 size = Vector2(222, 8)
@@ -32,309 +28,280 @@ size = Vector2(222, 8)
 [sub_resource type="RectangleShape2D" id="RightYellowBlockTop"]
 size = Vector2(208, 8)
 
-[sub_resource type="RectangleShape2D" id="MiddleBlueBlockTop"]
-size = Vector2(148, 8)
-
 [sub_resource type="RectangleShape2D" id="BottomBlueBlockTop"]
 size = Vector2(178, 8)
+
+[sub_resource type="RectangleShape2D" id="BottomMiddleGreenBlockTop"]
+size = Vector2(70, 8)
 
 [sub_resource type="RectangleShape2D" id="BottomArchTop"]
 size = Vector2(192, 8)
 
+[sub_resource type="RectangleShape2D" id="BottomMiddleBlueBlockTop"]
+size = Vector2(96, 8)
+
 [sub_resource type="RectangleShape2D" id="BottomRedBlockTop"]
 size = Vector2(178, 8)
 
-[node name="LobbyPlaygroundWorld" type="Node2D"]
+[node name="LobbyPlaygroundWorld" type="Node2D" unique_id=1715306950]
 editor_description = "1920 x 1080 reference canvas. Keep shelf art and PlatformSurfaces aligned; the project scales this canvas for smaller 16:9 host windows."
 
-[node name="RoomBackground" type="Sprite2D" parent="."]
+[node name="RoomBackground" type="Sprite2D" parent="." unique_id=593009055]
 texture = ExtResource("1")
 centered = false
 
-[node name="WoodenShelves" type="Sprite2D" parent="."]
+[node name="WoodenShelves" type="Sprite2D" parent="." unique_id=898885870]
 texture = ExtResource("3")
 centered = false
 
-[node name="RearDecorations" type="Node2D" parent="."]
+[node name="RearDecorations" type="Node2D" parent="." unique_id=201887107]
 editor_description = "Decorative props sit visually on shelves but have no collision. Adjust each Sprite2D in the Inspector."
 
-[node name="HangingVine" type="Sprite2D" parent="RearDecorations"]
-scale = Vector2(0.56, 1.1)
-texture = ExtResource("2")
-centered = false
-
-[node name="TopLeftBooks" type="Sprite2D" parent="RearDecorations"]
-position = Vector2(221, 24)
-scale = Vector2(0.22, 0.26)
-texture = ExtResource("12")
-centered = false
-
-[node name="TeddyBear" type="Sprite2D" parent="RearDecorations"]
-position = Vector2(485, 17)
+[node name="TeddyBear" type="Sprite2D" parent="RearDecorations" unique_id=634443932]
+position = Vector2(886, 10.000001)
 scale = Vector2(0.35, 0.33)
 texture = ExtResource("13")
 centered = false
 
-[node name="CrayonMug" type="Sprite2D" parent="RearDecorations"]
-position = Vector2(676, 31)
+[node name="CrayonMug" type="Sprite2D" parent="RearDecorations" unique_id=2062212600]
+position = Vector2(309, 259)
 scale = Vector2(0.27, 0.29)
 texture = ExtResource("14")
 centered = false
 
-[node name="TopMiddleBooks" type="Sprite2D" parent="RearDecorations"]
-position = Vector2(816, 24)
-scale = Vector2(0.28, 0.26)
-texture = ExtResource("12")
-centered = false
-
-[node name="DinoPlushie" type="Sprite2D" parent="RearDecorations"]
-position = Vector2(1040, 14)
+[node name="DinoPlushie" type="Sprite2D" parent="RearDecorations" unique_id=369540556]
+position = Vector2(169, 10)
 scale = Vector2(0.35, 0.33)
 texture = ExtResource("15")
 centered = false
 
-[node name="TopMushroom" type="Sprite2D" parent="RearDecorations"]
-position = Vector2(1310, 69)
+[node name="TopMushroom" type="Sprite2D" parent="RearDecorations" unique_id=1187347448]
+position = Vector2(1709, 297)
 scale = Vector2(0.28, 0.26)
 texture = ExtResource("16")
 centered = false
 
-[node name="Robot" type="Sprite2D" parent="RearDecorations"]
-position = Vector2(1478, 31)
+[node name="Robot" type="Sprite2D" parent="RearDecorations" unique_id=237432687]
+position = Vector2(1569, 24)
 scale = Vector2(0.26, 0.32)
 texture = ExtResource("17")
 centered = false
 
-[node name="TopRightPlant" type="Sprite2D" parent="RearDecorations"]
-position = Vector2(1640, 0)
-scale = Vector2(0.33, 0.37)
-texture = ExtResource("18")
-centered = false
-
-[node name="LowerLeftMushroom" type="Sprite2D" parent="RearDecorations"]
-position = Vector2(119, 550)
+[node name="LowerLeftMushroom" type="Sprite2D" parent="RearDecorations" unique_id=1696232380]
+position = Vector2(119.00001, 538)
 scale = Vector2(0.29, 0.34)
 texture = ExtResource("16")
 centered = false
 
-[node name="LowerRightPlant" type="Sprite2D" parent="RearDecorations"]
-position = Vector2(1730, 443)
-scale = Vector2(0.34, 0.52)
-texture = ExtResource("19")
-centered = false
+[node name="BuildingBlocks" type="Node2D" parent="." unique_id=1192452758]
 
-[node name="BuildingBlocks" type="Node2D" parent="."]
-
-[node name="UpperLeftHouse" type="Sprite2D" parent="BuildingBlocks"]
-position = Vector2(322, 235)
+[node name="UpperLeftHouse" type="Sprite2D" parent="BuildingBlocks" unique_id=1534262884]
+position = Vector2(118.000046, 253)
 scale = Vector2(0.42, 0.42)
 texture = ExtResource("5")
 centered = false
 
-[node name="UpperRightBlueStep" type="Sprite2D" parent="BuildingBlocks"]
+[node name="UpperRightBlueStep" type="Sprite2D" parent="BuildingBlocks" unique_id=357018356]
 position = Vector2(1308, 361)
 scale = Vector2(0.42, 0.23)
 texture = ExtResource("9")
 centered = false
 
-[node name="UpperRightGreenBlock" type="Sprite2D" parent="BuildingBlocks"]
-position = Vector2(1460, 281)
-scale = Vector2(0.21, 0.73)
-texture = ExtResource("10")
-centered = false
-
-[node name="UpperRightYellowBlock" type="Sprite2D" parent="BuildingBlocks"]
-position = Vector2(1547, 281)
-scale = Vector2(0.21, 0.73)
-texture = ExtResource("8")
-centered = false
-
-[node name="LowerLeftArch" type="Sprite2D" parent="BuildingBlocks"]
+[node name="LowerLeftArch" type="Sprite2D" parent="BuildingBlocks" unique_id=658722556]
 position = Vector2(215, 533)
 scale = Vector2(0.45, 0.62)
 texture = ExtResource("6")
 centered = false
 
-[node name="LowerLeftRedStep" type="Sprite2D" parent="BuildingBlocks"]
+[node name="LowerLeftRedStep" type="Sprite2D" parent="BuildingBlocks" unique_id=1612111393]
 position = Vector2(350, 596)
 scale = Vector2(0.62, 0.5)
 texture = ExtResource("7")
 centered = false
 
-[node name="LowerRightYellowStep" type="Sprite2D" parent="BuildingBlocks"]
+[node name="LowerRightYellowStep" type="Sprite2D" parent="BuildingBlocks" unique_id=1523874726]
 position = Vector2(1320, 596)
 scale = Vector2(0.58, 0.51)
 texture = ExtResource("8")
 centered = false
 
-[node name="LowerRightHouse" type="Sprite2D" parent="BuildingBlocks"]
-position = Vector2(1565, 535)
+[node name="LowerRightHouse" type="Sprite2D" parent="BuildingBlocks" unique_id=130713156]
+position = Vector2(1697.0001, 518)
 scale = Vector2(0.42, 0.43)
 texture = ExtResource("5")
 centered = false
 
-[node name="BottomLeftBlueStep" type="Sprite2D" parent="BuildingBlocks"]
+[node name="BottomLeftBlueStep" type="Sprite2D" parent="BuildingBlocks" unique_id=1983478385]
 position = Vector2(443, 867)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("9")
 centered = false
 
-[node name="BottomMiddleGreenBlock" type="Sprite2D" parent="BuildingBlocks"]
+[node name="BottomMiddleGreenBlock" type="Sprite2D" parent="BuildingBlocks" unique_id=2012698900]
 position = Vector2(765, 868)
 scale = Vector2(0.2, 0.5)
 texture = ExtResource("10")
 centered = false
 
-[node name="BottomMiddleYellowArch" type="Sprite2D" parent="BuildingBlocks"]
+[node name="BottomMiddleYellowArch" type="Sprite2D" parent="BuildingBlocks" unique_id=1523723489]
 position = Vector2(846, 834)
 scale = Vector2(0.55, 0.48)
 texture = ExtResource("11")
 centered = false
 
-[node name="BottomMiddleBlueBlock" type="Sprite2D" parent="BuildingBlocks"]
+[node name="BottomMiddleBlueBlock" type="Sprite2D" parent="BuildingBlocks" unique_id=238678118]
 position = Vector2(1073, 867)
 scale = Vector2(0.27, 0.5)
 texture = ExtResource("9")
 centered = false
 
-[node name="BottomRightRedStep" type="Sprite2D" parent="BuildingBlocks"]
+[node name="BottomRightRedStep" type="Sprite2D" parent="BuildingBlocks" unique_id=403587846]
 position = Vector2(1560, 866)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("7")
 centered = false
 
-[node name="PanelBackings" type="Node2D" parent="."]
+[node name="PanelBackings" type="Node2D" parent="." unique_id=660800634]
 editor_description = "PS-060 adds the QR board and calendar here, above blocks and behind future characters."
 
-[node name="PlatformSurfaces" type="Node2D" parent="."]
+[node name="PlatformSurfaces" type="Node2D" parent="." unique_id=580875252]
 editor_description = "All surfaces use one-way top rectangles on collision layer 8 (bit 128), with no mask. Future characters should include bit 128 in their mask."
 
-[node name="TopShelf" type="StaticBody2D" parent="PlatformSurfaces"]
+[node name="UpperShelf" type="StaticBody2D" parent="PlatformSurfaces" unique_id=774492155]
 collision_layer = 128
 collision_mask = 0
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/TopShelf"]
-position = Vector2(960, 155)
-shape = SubResource("ShelfTop")
-one_way_collision = true
-
-[node name="UpperShelf" type="StaticBody2D" parent="PlatformSurfaces"]
-collision_layer = 128
-collision_mask = 0
-
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/UpperShelf"]
+[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/UpperShelf" unique_id=1077323979]
 position = Vector2(960, 405)
 shape = SubResource("FullShelfTop")
 one_way_collision = true
 
-[node name="LowerShelf" type="StaticBody2D" parent="PlatformSurfaces"]
+[node name="LowerShelf" type="StaticBody2D" parent="PlatformSurfaces" unique_id=746358840]
 collision_layer = 128
 collision_mask = 0
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/LowerShelf"]
+[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/LowerShelf" unique_id=855471257]
 position = Vector2(960, 680)
 shape = SubResource("FullShelfTop")
 one_way_collision = true
 
-[node name="BottomShelf" type="StaticBody2D" parent="PlatformSurfaces"]
+[node name="BottomShelf" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1149967427]
 collision_layer = 128
 collision_mask = 0
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomShelf"]
+[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomShelf" unique_id=326335805]
 position = Vector2(960, 950)
 shape = SubResource("FullShelfTop")
 one_way_collision = true
 
-[node name="UpperRightBlueStep" type="StaticBody2D" parent="PlatformSurfaces"]
+[node name="UpperRightBlueStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1830860633]
 collision_layer = 128
 collision_mask = 0
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/UpperRightBlueStep"]
+[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/UpperRightBlueStep" unique_id=1901789501]
 position = Vector2(1393, 365)
 shape = SubResource("MiddleBlueBlockTop")
 one_way_collision = true
 
-[node name="LowerLeftRedStep" type="StaticBody2D" parent="PlatformSurfaces"]
+[node name="LowerLeftRedStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=849883032]
 collision_layer = 128
 collision_mask = 0
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/LowerLeftRedStep"]
+[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/LowerLeftRedStep" unique_id=289897698]
 position = Vector2(477, 600)
 shape = SubResource("LeftRedBlockTop")
 one_way_collision = true
 
-[node name="LowerRightYellowStep" type="StaticBody2D" parent="PlatformSurfaces"]
+[node name="LowerRightYellowStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=136273662]
 collision_layer = 128
 collision_mask = 0
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/LowerRightYellowStep"]
+[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/LowerRightYellowStep" unique_id=1352119568]
 position = Vector2(1439, 600)
 shape = SubResource("RightYellowBlockTop")
 one_way_collision = true
 
-[node name="BottomLeftBlueStep" type="StaticBody2D" parent="PlatformSurfaces"]
+[node name="BottomLeftBlueStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1002418720]
 collision_layer = 128
 collision_mask = 0
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomLeftBlueStep"]
+[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomLeftBlueStep" unique_id=924173686]
 position = Vector2(545, 871)
 shape = SubResource("BottomBlueBlockTop")
 one_way_collision = true
 
-[node name="BottomMiddleYellowArch" type="StaticBody2D" parent="PlatformSurfaces"]
+[node name="BottomMiddleGreenBlock" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1764212000]
 collision_layer = 128
 collision_mask = 0
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomMiddleYellowArch"]
+[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomMiddleGreenBlock" unique_id=2141806235]
+position = Vector2(806, 872)
+shape = SubResource("BottomMiddleGreenBlockTop")
+one_way_collision = true
+
+[node name="BottomMiddleYellowArch" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1085676547]
+collision_layer = 128
+collision_mask = 0
+
+[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomMiddleYellowArch" unique_id=306986494]
 position = Vector2(959, 838)
 shape = SubResource("BottomArchTop")
 one_way_collision = true
 
-[node name="BottomRightRedStep" type="StaticBody2D" parent="PlatformSurfaces"]
+[node name="BottomMiddleBlueBlock" type="StaticBody2D" parent="PlatformSurfaces" unique_id=2112623683]
 collision_layer = 128
 collision_mask = 0
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomRightRedStep"]
+[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomMiddleBlueBlock" unique_id=1738861353]
+position = Vector2(1128, 871)
+shape = SubResource("BottomMiddleBlueBlockTop")
+one_way_collision = true
+
+[node name="BottomRightRedStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1967092793]
+collision_layer = 128
+collision_mask = 0
+
+[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomRightRedStep" unique_id=170481355]
 position = Vector2(1662, 870)
 shape = SubResource("BottomRedBlockTop")
 one_way_collision = true
 
-[node name="CharactersFrontOfPanels" type="Node2D" parent="."]
+[node name="CharactersFrontOfPanels" type="Node2D" parent="." unique_id=1166393284]
 editor_description = "Future character visuals go here, in front of QR board/calendar and behind the foreground. No players are created by this scene."
 
-[node name="FutureCharacterAnchors" type="Node2D" parent="."]
+[node name="FutureCharacterAnchors" type="Node2D" parent="." unique_id=1317649962]
 editor_description = "Editor-only placement guides for ten possible feet positions; no spawning or capacity behavior."
 
-[node name="UpperLeftA" type="Marker2D" parent="FutureCharacterAnchors"]
+[node name="UpperLeftA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=2116312259]
 position = Vector2(218, 400)
 
-[node name="UpperLeftB" type="Marker2D" parent="FutureCharacterAnchors"]
+[node name="UpperLeftB" type="Marker2D" parent="FutureCharacterAnchors" unique_id=1913980234]
 position = Vector2(555, 400)
 
-[node name="UpperRightA" type="Marker2D" parent="FutureCharacterAnchors"]
+[node name="UpperRightA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=829782701]
 position = Vector2(1393, 361)
 
-[node name="UpperRightB" type="Marker2D" parent="FutureCharacterAnchors"]
+[node name="UpperRightB" type="Marker2D" parent="FutureCharacterAnchors" unique_id=1603051938]
 position = Vector2(1740, 400)
 
-[node name="LowerLeftA" type="Marker2D" parent="FutureCharacterAnchors"]
+[node name="LowerLeftA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=87197722]
 position = Vector2(180, 675)
 
-[node name="LowerLeftStep" type="Marker2D" parent="FutureCharacterAnchors"]
+[node name="LowerLeftStep" type="Marker2D" parent="FutureCharacterAnchors" unique_id=126896430]
 position = Vector2(477, 596)
 
-[node name="LowerRightStep" type="Marker2D" parent="FutureCharacterAnchors"]
-position = Vector2(1439, 596)
+[node name="LowerRightStep" type="Marker2D" parent="FutureCharacterAnchors" unique_id=345364927]
+position = Vector2(1439, 599)
 
-[node name="LowerRightA" type="Marker2D" parent="FutureCharacterAnchors"]
+[node name="LowerRightA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=763559725]
 position = Vector2(1740, 675)
 
-[node name="BottomLeftA" type="Marker2D" parent="FutureCharacterAnchors"]
+[node name="BottomLeftA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=1583872719]
 position = Vector2(705, 945)
 
-[node name="BottomRightA" type="Marker2D" parent="FutureCharacterAnchors"]
+[node name="BottomRightA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=370337190]
 position = Vector2(1280, 945)
 
-[node name="Foreground" type="Sprite2D" parent="."]
+[node name="Foreground" type="Sprite2D" parent="." unique_id=525094680]
 texture = ExtResource("4")
 centered = false
