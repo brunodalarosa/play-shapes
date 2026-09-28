@@ -1,26 +1,25 @@
 {
-  "source_sha256": "70868ad6a846f342077021953ee2c6a3cb1848864709d03894e1a40b9d2be501",
+  "source_sha256": "b6c88c3059baa5c16b53f338864aec1d5976f43d9fbfa84adb21f3b3321baec1",
   "sheets": {
-    "idle-front-colorable.png": "4ce23895c3c06bdc3c050b6255591aa5860212f3963e553693837d0111c861aa",
+    "idle-front-colorable.png": "0d85a5b8f5c21d7760870a5a26c6a7b4f760e9746c3b1501fbf09c5329687fe8",
     "idle-front-neutral.png": "5193822af890dda5857a76dc41b94829091feac0ef0b17b617123071f8a06be8",
     "idle-front-blink.png": "ba789cf71abf575fa4df795ec11514a3d881f2b7b7215cb6c37e41c7ff2b5a88",
-    "idle-three-quarter-colorable.png": "da97bcba56392834da828e6c41b99e4002576ef5c1064c0f52e2a78dcc51d96d",
+    "idle-three-quarter-colorable.png": "64f3bec8d205c1f9e61daff077dc5a6650ae329102e94e69c93992ea848ba0f9",
     "idle-three-quarter-neutral.png": "e148d0da61bddd7e713d0af24b6407b2f6273b0a7ccc43923442db4f4cfce01b",
     "idle-three-quarter-blink.png": "e839a63babccc4121e9b31957377539ad5b9179eaa0f16615fcf6ceef9a7a855",
-    "walk-front-colorable.png": "37197dd24b76020e412e9febe22837b812688d3c5ed15ca3bf69b20a941f0a35",
+    "walk-front-colorable.png": "87206f9c68ab8e9b4eb93204fd74b463139b64247b7b4b27030876b7117c7bbe",
     "walk-front-neutral.png": "600bf6dd245b4d7e3563a197d4160a6290030e5915ad1756c9d304f311809083",
     "walk-front-blink.png": "ad0545496b0ddb588158e4a27d173d76aa1270a0677c528584c4bb78a229fac6",
-    "walk-three-quarter-colorable.png": "93fd4a0b0fb2ab4366c35247974358f1fe235bf62bb0c026b10480599b777e7c",
+    "walk-three-quarter-colorable.png": "d76282e14977b3bf6935481b4f38816011a6f4ccd97146e7013e96ddc5567420",
     "walk-three-quarter-neutral.png": "ca3ebc498b37d0276086d6dd7e68dd2c6d9b9a458a21dfb87963d187625891cc",
     "walk-three-quarter-blink.png": "f434c762da38a0ad9e08da5b497daae5d66d0596ed62a5500ce990b8ad158702",
-    "run-front-colorable.png": "32e62dd685a4d0a686f4ff3cf2891ffe8fb895543d4631e6bbd8d5ec8ada7bea",
+    "run-front-colorable.png": "48d64a53556b69c5855e508899fd6e32515aa8d5260073a76eead99cae8b102d",
     "run-front-neutral.png": "c94551c7303d15a2aca443d6b0cc27525f86e91b73da26eb534066016469aae1",
     "run-front-blink.png": "fd1824319e3303a9075cab64fe1d9cc8156e330968cea09f3142bfdfbcf0fb71",
-    "run-three-quarter-colorable.png": "3813964ef24874e1aaa9b74a680f025ee18893e7d9f0f647b3605074e5d462e5",
+    "run-three-quarter-colorable.png": "fc0d97f16d65688630eb2d3ac62ca43f991946ad43743969594d6d6961d96ef2",
     "run-three-quarter-neutral.png": "2eea90bf42762e9de75bf82ed4a9a2c872d994750d9c5ee5f065c57ef6e86be1",
     "run-three-quarter-blink.png": "4b5444bf83d070ba8e14bf596755f655ddfa5606fcc1bc552eb065a22d49a864"
   },
-  "runtime_directory": "debug/squircle_preview/assets-ps064",
-  "baseline_runtime_directory": "debug/squircle_preview/assets-before-inward-ps064",
-  "note": "Before is the previous PS064 iteration. Original assets/ remains unchanged for the Playground lobby."
+  "runtime_directory": "assets/runtime/animated_characters/squircle/v1",
+  "note": "Approved Squircle v1 sheets are shared by the Playground lobby and F12 preview."
 }

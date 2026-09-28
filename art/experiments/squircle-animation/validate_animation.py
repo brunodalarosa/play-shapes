@@ -12,7 +12,7 @@ from animation_common import CLIPS, CONTROLS, PARTS, VIEWS, activate_clip
 scene=bpy.data.scenes['PS057 | Squircle Animation Studio']
 bpy.context.window.scene=scene
 report={'source':'squircle-animated.blend','blender':bpy.app.version_string,'checks':[], 'clips':{},
-        'approval':'Technical evidence only; owner animation-feel approval pending.'}
+        'approval':'Technical evidence only; owner approved Squircle v1 poses on 2026-09-27.'}
 
 
 def check(name,condition,detail=None):

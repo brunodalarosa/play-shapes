@@ -27,9 +27,9 @@ func _run() -> void:
 		"Players get distinct seat anchors and one character each")
 	_check(first.player.character_shape == "square" and second.player.character_shape == "rhombus"
 		and first_character.get_node("Nameplate").text == "First"
-		and (first_character.get_node("Colorable") as Sprite2D).texture.resource_path.contains("squircle_preview")
+		and (first_character.get_node("Colorable") as Sprite2D).texture.resource_path == "res://assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png"
 		and (first_character.get_node("Colorable") as Sprite2D).material.get_shader_parameter("player_color") == Color("#EC407A"),
-		"Lobby-only rendered squircle uses the name and registered tint without changing shape data")
+		"Lobby Squircle v1 uses the name and registered tint without changing shape data")
 	_check(first_character.collision_layer == 256 and first_character.collision_mask == 384,
 		"Characters collide with one-way platforms and one another")
 	for unused: int in 5:

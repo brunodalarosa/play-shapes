@@ -1,9 +1,9 @@
 extends Control
-## Local art comparison. Inputs change only this scene's presentation.
+## Local preview of the approved Squircle v1 sheets and the existing 2D character.
 
-const MANIFEST_PATH := "res://debug/squircle_preview/manifest.json"
-const ASSET_ROOT := "res://debug/squircle_preview/assets-ps064/"
-const TINT_SHADER: Shader = preload("res://debug/squircle_preview/render_tint.gdshader")
+const MANIFEST_PATH := "res://assets/runtime/animated_characters/squircle/v1/manifest.json"
+const ASSET_ROOT := "res://assets/runtime/animated_characters/squircle/v1/"
+const TINT_SHADER: Shader = preload("res://assets/runtime/animated_characters/squircle/v1/render_tint.gdshader")
 const CURRENT_CHARACTER: PackedScene = preload("res://characters/shape_character.tscn")
 const ACTIONS := ["idle", "walk", "run"]
 const VIEWS := ["front", "three-quarter"]
@@ -47,15 +47,15 @@ func _load_manifest() -> void:
 		_clips[key] = clip
 
 
-func _sheet(key: String, layer: String, clip: Dictionary, before: bool = false) -> Texture2D:
-	var sheet_key := ("before/" if before else "") + "%s-%s" % [key, layer]
+func _sheet(key: String, layer: String, clip: Dictionary) -> Texture2D:
+	var sheet_key := "%s-%s" % [key, layer]
 	if not _textures.has(sheet_key):
-		var path := "%s%s-%s.png" % ["res://debug/squircle_preview/assets-before-inward-ps064/" if before else ASSET_ROOT, key, layer]
-		var image := Image.new()
-		assert(image.load(path) == OK, "Missing preview sheet: " + path)
-		assert(image.get_width() == 2048)
-		assert(image.get_height() == 256 * ceili(float(clip.frames) / 8.0))
-		_textures[sheet_key] = ImageTexture.create_from_image(image)
+		var path := "%s%s.png" % [ASSET_ROOT, sheet_key]
+		var sheet := ResourceLoader.load(path) as Texture2D
+		assert(sheet != null, "Missing preview sheet: " + path)
+		assert(sheet.get_width() == 2048)
+		assert(sheet.get_height() == 256 * ceili(float(clip.frames) / 8.0))
+		_textures[sheet_key] = sheet
 	return _textures[sheet_key] as Texture2D
 
 
@@ -79,7 +79,7 @@ func _build_ui() -> void:
 	title.add_theme_font_size_override("font_size", 32)
 	column.add_child(title)
 	var subtitle := Label.new()
-	subtitle.text = "PS-064 inward palms · Before = previous iteration · F12 opens the debug launcher."
+	subtitle.text = "Squircle v1 · Approved idle, walk and run · F12 opens the debug launcher."
 	column.add_child(subtitle)
 
 	var controls := HBoxContainer.new()
@@ -112,19 +112,14 @@ func _build_ui() -> void:
 	var stage := HBoxContainer.new()
 	stage.add_theme_constant_override("separation", 24)
 	column.add_child(stage)
-	_add_sample(stage, "After · 256 px", 256, true)
-	_add_sample(stage, "Before · 256 px", 256, true, true)
-	_add_sample(stage, "After · 128 px", 128, true)
-	_add_sample(stage, "Before · 128 px", 128, true, true)
-	var original_stage := HBoxContainer.new()
-	original_stage.add_theme_constant_override("separation", 24)
-	column.add_child(original_stage)
-	_add_sample(original_stage, "Current 2D · 256 px", 256, false)
-	_add_sample(original_stage, "Current 2D · 128 px", 128, false)
+	_add_sample(stage, "Squircle v1 · 256 px", 256, true)
+	_add_sample(stage, "Squircle v1 · 128 px", 128, true)
+	_add_sample(stage, "Current 2D · 256 px", 256, false)
+	_add_sample(stage, "Current 2D · 128 px", 128, false)
 	_info = Label.new()
 	column.add_child(_info)
 	var note := Label.new()
-	note.text = "Comparison canvases are reference sizes; phone display and owner art approval require separate review."
+	note.text = "The Playground lobby uses these v1 sheets. Canvas sizes are art references."
 	column.add_child(note)
 
 
@@ -142,7 +137,7 @@ func _add_picker(parent: HBoxContainer, title: String, names: Array, initial: in
 	group.add_child(picker)
 
 
-func _add_sample(parent: HBoxContainer, title: String, size: int, rendered: bool, before: bool = false) -> void:
+func _add_sample(parent: HBoxContainer, title: String, size: int, rendered: bool) -> void:
 	var group := VBoxContainer.new()
 	group.add_theme_constant_override("separation", 12)
 	parent.add_child(group)
@@ -181,7 +176,7 @@ func _add_sample(parent: HBoxContainer, title: String, size: int, rendered: bool
 		face.region_enabled = true
 		face.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 		root.add_child(face)
-		_samples.append({"rendered": true, "before": before, "base": base, "face": face, "material": material})
+		_samples.append({"rendered": true, "base": base, "face": face, "material": material})
 	else:
 		var current := CURRENT_CHARACTER.instantiate() as ShapeCharacter
 		current.body_shape = &"squircle"
@@ -206,8 +201,8 @@ func _update_selection() -> void:
 		if sample.rendered:
 			var base := sample.base as Sprite2D
 			var face := sample.face as Sprite2D
-			base.texture = _sheet(key, "colorable", clip, true) if sample.before else base_sheet
-			face.texture = _sheet(key, _expression, clip, true) if sample.before else face_sheet
+			base.texture = base_sheet
+			face.texture = face_sheet
 			base.position = -anchor
 			face.position = -anchor
 			(sample.material as ShaderMaterial).set_shader_parameter("player_color", Color(String(_color.hex)))

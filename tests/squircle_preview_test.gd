@@ -14,7 +14,7 @@ func _run() -> void:
 	var preview := scene.instantiate() as Control
 	root.add_child(preview)
 	var source: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://art/experiments/squircle-animation/export/manifest.json"))
-	var imported: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://debug/squircle_preview/manifest.json"))
+	var imported: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://assets/runtime/animated_characters/squircle/v1/manifest.json"))
 	if not _check(imported.clips.size() == 6, "Six clip/view combinations have metadata"):
 		return
 	for record: Dictionary in imported.clips:
@@ -32,11 +32,8 @@ func _run() -> void:
 		preview.call("_update_selection")
 		for layer: String in ["colorable", "neutral", "blink"]:
 			var filename := "%s-%s-%s.png" % [record.name, record.view, layer]
-			if not _check(FileAccess.get_file_as_bytes("res://debug/squircle_preview/assets-ps064/" + filename)
-				== FileAccess.get_file_as_bytes("res://art/experiments/squircle-animation/previews/" + filename), "PS064 cache matches fresh source sheets"):
-				return
-			if not _check(FileAccess.get_file_as_bytes("res://debug/squircle_preview/assets-before-inward-ps064/" + filename)
-				== FileAccess.get_file_as_bytes("res://art/experiments/squircle-animation/before-inward-ps064/previews/" + filename), "Before cache matches preserved previous iteration"):
+			if not _check(FileAccess.get_file_as_bytes("res://assets/runtime/animated_characters/squircle/v1/" + filename)
+				== FileAccess.get_file_as_bytes("res://art/experiments/squircle-animation/previews/" + filename), "Canonical v1 sheet matches the Blender export"):
 				return
 		for frame: int in [0, int(record.frames) - 1]:
 			preview.set("_elapsed", float(frame) / float(record.fps))
@@ -47,11 +44,21 @@ func _run() -> void:
 			if not _check(base.region_rect == face.region_rect and base.region_rect.position == Vector2(frame % 8 * 256, floori(float(frame) / 8.0) * 256)
 				and base.position == -Vector2(float(record.anchor_px[0]), float(record.anchor_px[1])), "Frame tiles and source anchor stay aligned"):
 				return
-			var before: Dictionary = preview.get("_samples")[1]
-			if not _check((before.base as Sprite2D).region_rect == base.region_rect
-				and (before.face as Sprite2D).region_rect == face.region_rect
-				and (before.base as Sprite2D).texture != base.texture, "Before and after use separate sheets on the same frame"):
+			var small: Dictionary = preview.get("_samples")[1]
+			if not _check((small.base as Sprite2D).region_rect == base.region_rect
+				and (small.face as Sprite2D).region_rect == face.region_rect
+				and (small.base as Sprite2D).texture == base.texture, "Both sizes use the same canonical frame"):
 				return
+	var lobby_character := preload("res://characters/lobby_squircle.tscn").instantiate() as LobbySquircle
+	root.add_child(lobby_character)
+	if not _check((lobby_character.get_node("Colorable") as Sprite2D).texture.resource_path
+		== "res://assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png", "Lobby idle uses Squircle v1"):
+		return
+	lobby_character.call("_change_clip", "run-three-quarter")
+	if not _check((lobby_character.get_node("Colorable") as Sprite2D).texture.resource_path
+		== "res://assets/runtime/animated_characters/squircle/v1/run-three-quarter-colorable.png", "Lobby run uses Squircle v1"):
+		return
+	lobby_character.queue_free()
 	for option: Dictionary in CharacterSelection.COLORS:
 		preview.set("_color", option)
 		preview.call("_update_selection")

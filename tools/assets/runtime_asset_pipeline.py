@@ -191,7 +191,11 @@ def _check_forbidden_references(root: Path) -> None:
             continue
         if relative.as_posix().startswith(f"{ARCHIVE_REFERENCE}/"):
             continue
-        if ARCHIVE_REFERENCE in path.read_text(encoding="utf-8"):
+        content = path.read_text(encoding="utf-8")
+        if relative.as_posix() == "addons/standalone_build/standalone_build_policy.gd":
+            # The release preset must exclude this archive; that exclusion is not a runtime reference.
+            content = content.replace(f"{ARCHIVE_REFERENCE}/**", "")
+        if ARCHIVE_REFERENCE in content:
             violations.append(relative.as_posix())
     if violations:
         raise PipelineError("production files reference the source archive: " + ", ".join(violations))

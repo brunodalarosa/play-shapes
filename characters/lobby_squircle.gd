@@ -1,10 +1,10 @@
 class_name LobbySquircle
 extends CharacterBody2D
-## Host-owned Playground body. The rendered layers remain a lobby-only workaround.
+## Host-owned Playground body using the approved Squircle v1 animation sheets.
 
-const MANIFEST_PATH := "res://debug/squircle_preview/manifest.json"
-const ASSET_ROOT := "res://debug/squircle_preview/assets/"
-const TINT_SHADER: Shader = preload("res://debug/squircle_preview/render_tint.gdshader")
+const MANIFEST_PATH := "res://assets/runtime/animated_characters/squircle/v1/manifest.json"
+const ASSET_ROOT := "res://assets/runtime/animated_characters/squircle/v1/"
+const TINT_SHADER: Shader = preload("res://assets/runtime/animated_characters/squircle/v1/render_tint.gdshader")
 const TILE_SIZE := 256
 const INPUT_TIMEOUT_MSEC := 350
 

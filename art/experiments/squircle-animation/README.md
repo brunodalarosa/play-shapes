@@ -1,9 +1,10 @@
-# Squircle animation study — PS-057 / PS-064 hands
+# Squircle v1 model and animation source
 
-**Ready for owner motion review; human approval pending.** The approved PS-056
-static model remains untouched in `../squircle-3d/`. This folder is a separate art
-experiment. The revised sheets appear only in the F12 Godot comparison; the
-Playground lobby keeps its previous PS-057 sheets until a separate adoption decision.
+**Owner-approved Squircle v1.** `squircle-animated.blend` is the canonical editable
+model and idle/walk/run animation source for this shape. The approved render sheets
+and compact manifest live in `assets/runtime/animated_characters/squircle/v1/`;
+the Playground lobby and F12 preview both use those files. The PS-056 static model
+in `../squircle-3d/` remains historical source material.
 
 ## Review first
 
@@ -75,7 +76,7 @@ around the inward axis to retain that facing throughout the stroke. Mesh geometr
 non-hand animation channels, action lengths and wrist travel rhythm are preserved.
 `turn_palms_inward.py` records this one-time correction in `ps064-inward-revision.json`;
 it must only be run on the preserved pre-correction source, never on the corrected file.
-Walk uses a proposed 35% curl; run closes the fists and swings opposite the same-side
+Walk uses the approved 35% curl; run closes the fists and swings opposite the same-side
 foot. Forward/back amplitudes are .018 / .30 / .67 m; run vertical swing amplitude
 is .23 m. These are tunable in `ps064_hands.py`. `revise_ps064.py` applies that recipe
 to the saved source and asserts preservation of non-hand channels, recorded in
@@ -85,11 +86,11 @@ over the current source. The former palms-down requirement is superseded by PS-0
 
 Open the before blend and current blend in separate Blender windows for direct
 comparison. Both use the same action names, lengths and cameras. In Godot, F12 >
-Rendered squircle comparison displays synchronized After/Before at both sizes,
-with the current 2D character below. Owner motion approval remains pending.
+Rendered squircle comparison shows the approved v1 animation at both sizes beside
+the existing 2D character. Historical before/after GIFs remain here for reference.
 
-The proposed frame rate and sizes are review choices, not approved production
-requirements. Blinks are independent of the locomotion actions. The page blinks
+The v1 sheets use 24 fps and 256-pixel source tiles; the 128-pixel display is a
+review scale. Blinks are independent of the locomotion actions. The page blinks
 briefly every 3.7 seconds; the two-second comparison GIF has one demonstration blink.
 
 ## Render / export recipe
@@ -141,12 +142,10 @@ Partial exports must use a separate output directory: their manifest intentional
 contains only those requested frames. Never mix a partial export into `export/`.
 
 To regenerate the walk alternative, export with `--output walk-open-ps064 --clips walk --hand-curl 0`,
-then rerun `review_ps064.py`. It copies only the 18 active review sheets to
-`debug/squircle_preview/assets-ps064/` and writes `ps064-runtime-sync.json` with
-their hashes. It also copies the previous iteration from `before-inward-ps064/previews/`
-to `debug/squircle_preview/assets-before-inward-ps064/` for Before comparisons.
-The old `assets/` folder remains the lobby source; leave it unchanged.
-The shared Godot manifest's timing/anchors are unchanged.
+then rerun `review_ps064.py`. It copies the 18 approved sheets and writes the
+manifest to `assets/runtime/animated_characters/squircle/v1/`, plus
+`ps064-runtime-sync.json` with their hashes. This is the sole runtime sprite set
+for Squircle v1; the lobby and preview share its timing and ground anchors.
 
 To add a future action: duplicate an action in Blender, pose the five controls,
 add its loop-closing key, save, and add its frame count/speed/stance to `CLIPS`
@@ -216,12 +215,9 @@ rendered alpha margin is recorded in `export-verification.json` for this revisio
 
 The Blender restricted profile reported inability to read user preferences and
 write an optional thumbnail cache; source save, reopen and renders succeeded.
-These are not texture/missing-file errors. `.gdignore` keeps this source experiment
-outside Godot import; the dedicated debug cache is checked by
+These are not texture/missing-file errors. `.gdignore` keeps source art and render
+evidence outside Godot import; the curated v1 runtime assets are checked by
 `godot --headless --path . --script res://tests/squircle_preview_test.gd` from the
-implementation root. The preview still uses direct PNG loading for local review;
-standalone export compatibility and physical-phone readability are not established here.
-
-Owner review remains required for the revised hand shape and relaxed motion,
-small-size readability, palette transfer, timing and the no-baked-shadow choice.
-Do not adopt PS-064 in the lobby or other shapes until that review is recorded.
+implementation root. The preview uses direct PNG loading for local review; the
+Playground lobby uses Godot-imported textures. Other shapes still use their current
+art until they receive separately approved 3D models and animations.

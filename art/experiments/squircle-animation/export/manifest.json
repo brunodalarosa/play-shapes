@@ -1,7 +1,7 @@
 {
   "schema": "ps057.sprite-experiment.v1",
   "source": "squircle-animated.blend",
-  "source_sha256": "70868ad6a846f342077021953ee2c6a3cb1848864709d03894e1a40b9d2be501",
+  "source_sha256": "b6c88c3059baa5c16b53f338864aec1d5976f43d9fbfa84adb21f3b3321baec1",
   "blender": "5.2.2 LTS",
   "engine": "Cycles",
   "device": "GPU",

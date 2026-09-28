@@ -1,4 +1,4 @@
-"""Build synchronized review media and publish only the isolated PS064 debug cache.
+"""Build review media and publish the approved Squircle v1 runtime sheets.
 
 Run after export_frames.py and make_previews.py. Optional walk-open-ps064 export
 is generated with --clips walk --hand-curl 0 --output walk-open-ps064.
@@ -11,10 +11,8 @@ HERE = Path(__file__).resolve().parent
 PRE = HERE/'previews'
 BEFORE = HERE/'before-inward-ps064/previews'
 ROOT = HERE.parents[2]
-OUT = ROOT/'debug/squircle_preview/assets-ps064'
-OUT.mkdir(exist_ok=True)
-BEFORE_OUT = ROOT/'debug/squircle_preview/assets-before-inward-ps064'
-BEFORE_OUT.mkdir(exist_ok=True)
+OUT = ROOT/'assets/runtime/animated_characters/squircle/v1'
+OUT.mkdir(parents=True,exist_ok=True)
 manifest = json.loads((HERE/'export/manifest.json').read_text())
 
 timing = [round((i+1)*100/24)*10-round(i*100/24)*10 for i in range(48)]
@@ -71,14 +69,21 @@ for clip in manifest['clips']:
     for layer in ('colorable','neutral','blink'):
         name=f'{clip["name"]}-{clip["view"]}-{layer}.png'
         shutil.copyfile(PRE/name,OUT/name)
-        shutil.copyfile(BEFORE/name,BEFORE_OUT/name)
         hashes[name]=hashlib.sha256((OUT/name).read_bytes()).hexdigest()
+clip_manifest={'schema':'play-shapes.squircle-animation.v1',
+               'source':'art/experiments/squircle-animation/squircle-animated.blend',
+               'source_sha256':manifest['source_sha256'],
+               'resolution':[256,256], 'shape_id':'squircle',
+               'clips':[{'name':clip['name'], 'view':clip['view'], 'frames':clip['frames'],
+                         'fps':clip['fps'], 'anchor_px':clip['anchor_px'],
+                         'sheet_columns':8, 'first_frame':1, 'last_frame':clip['frames']}
+                        for clip in manifest['clips']]}
+(OUT/'manifest.json').write_text(json.dumps(clip_manifest,indent=2)+'\n',encoding='utf-8')
 record={'source_sha256':manifest['source_sha256'],'sheets':hashes,
-        'runtime_directory':'debug/squircle_preview/assets-ps064',
-        'baseline_runtime_directory':'debug/squircle_preview/assets-before-inward-ps064',
-        'note':'Before is the previous PS064 iteration. Original assets/ remains unchanged for the Playground lobby.'}
+        'runtime_directory':'assets/runtime/animated_characters/squircle/v1',
+        'note':'Approved Squircle v1 sheets are shared by the Playground lobby and F12 preview.'}
 (HERE/'ps064-runtime-sync.json').write_text(json.dumps(record,indent=2)+'\n')
-print('PS064: 18 isolated Godot sheets and before/after media updated.')
+print('Squircle v1: 18 Godot sheets, manifest, and review media updated.')
 
 if all((PRE/f'hand-detail-{pose}.png').exists() for pose in ('open','closed')):
     board=Image.new('RGBA',(1024,560),(26,33,47,255))
