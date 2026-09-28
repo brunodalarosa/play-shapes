@@ -36,6 +36,29 @@ const ASSETS: Dictionary = {
 	"path": "res://web/public/character_selection.js",
 	"content_type": "text/javascript; charset=utf-8",
 },
+"/squircle_v1.js": {
+	"path": "res://web/public/squircle_v1.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
+"/squircle-v1/manifest.json": {
+	"path": "res://assets/runtime/animated_characters/squircle/v1/manifest.json",
+	"content_type": "application/json",
+},
+"/squircle-v1/idle-front-colorable.png": {
+	"path": "res://assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/squircle-v1/idle-front-neutral.png": {
+	"path": "res://assets/runtime/animated_characters/squircle/v1/idle-front-neutral.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/squircle-v1/idle-front-blink.png": {
+	"path": "res://assets/runtime/animated_characters/squircle/v1/idle-front-blink.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
 "/bubbles-jellyfish.png": {
 	"path": "res://assets/runtime/minigames/bubbles_and_jellyfishes/jellyfish/jellyfish_small.png",
 	"content_type": "image/png",
@@ -43,56 +66,6 @@ const ASSETS: Dictionary = {
 },
 "/bubbles-phone-background.png": {
 	"path": "res://assets/runtime/minigames/bubbles_and_jellyfishes/environment/phone_background_portrait.png",
-	"content_type": "image/png",
-	"resource_type": "Texture2D",
-},
-"/bubbles-player-body.png": {
-	"path": "res://assets/runtime/shape_characters/bodies/circle.png",
-	"content_type": "image/png",
-	"resource_type": "Texture2D",
-},
-"/shape-square.png": {
-	"path": "res://assets/runtime/shape_characters/bodies/square.png",
-	"content_type": "image/png",
-	"resource_type": "Texture2D",
-},
-"/shape-circle.png": {
-	"path": "res://assets/runtime/shape_characters/bodies/circle.png",
-	"content_type": "image/png",
-	"resource_type": "Texture2D",
-},
-"/shape-squircle.png": {
-	"path": "res://assets/runtime/shape_characters/bodies/squircle.png",
-	"content_type": "image/png",
-	"resource_type": "Texture2D",
-},
-"/shape-rhombus.png": {
-	"path": "res://assets/runtime/shape_characters/bodies/rhombus.png",
-	"content_type": "image/png",
-	"resource_type": "Texture2D",
-},
-"/shape-hand-open.png": {
-	"path": "res://assets/runtime/shape_characters/hands/open.png",
-	"content_type": "image/png",
-	"resource_type": "Texture2D",
-},
-"/bubbles-player-hand.png": {
-	"path": "res://assets/runtime/shape_characters/hands/closed.png",
-	"content_type": "image/png",
-	"resource_type": "Texture2D",
-},
-"/bubbles-player-foot.png": {
-	"path": "res://assets/runtime/shape_characters/feet/round.png",
-	"content_type": "image/png",
-	"resource_type": "Texture2D",
-},
-"/bubbles-player-face-neutral.png": {
-	"path": "res://assets/runtime/shape_characters/faces/neutral.png",
-	"content_type": "image/png",
-	"resource_type": "Texture2D",
-},
-"/bubbles-player-face-blink.png": {
-	"path": "res://assets/runtime/shape_characters/faces/blink.png",
 	"content_type": "image/png",
 	"resource_type": "Texture2D",
 },

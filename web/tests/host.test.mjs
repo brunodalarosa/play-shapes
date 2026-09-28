@@ -54,6 +54,7 @@ test('serves bundled HTML, JS, CSS and session configuration', async () => {
     ['/bubbles_gesture.js', 'text/javascript', 'GestureTrace'],
     ['/lobby_controls.js', 'text/javascript', 'lockX'],
     ['/lobby_input.js', 'text/javascript', 'LobbyInputState'],
+    ['/squircle_v1.js', 'text/javascript', 'SquircleV1Canvas'],
     ['/vendor/nipplejs.mjs', 'text/javascript', 'create'],
     ['/bubbles-jellyfish.png', 'image/png', null],
     ['/style.css', 'text/css', 'focus-visible'], ['/session.json', 'application/json', 'session_id']
@@ -253,7 +254,7 @@ test('host accepts sequenced lobby intent only from its registered connection', 
       type: 'join', name: 'Lobby Input Test', character_shape: 'square', character_color: '#EC407A'
     });
     assert.equal(joined.type, 'join_accepted');
-    assert.equal(joined.player.character_shape, 'square');
+    assert.equal(joined.player.character_shape, 'squircle');
     player.peer.send(JSON.stringify({ type: 'lobby_move', input_seq: 1, horizontal: 0.65 }));
     assert.equal((await request(player.peer, { type: 'lobby_move', input_seq: 1, horizontal: -1 })).code, 'stale_sequence');
     assert.equal((await request(player.peer, { type: 'lobby_move', input_seq: 2, horizontal: 1.5 })).code, 'invalid_movement');

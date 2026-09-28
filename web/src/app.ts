@@ -1,17 +1,16 @@
 import { attemptImmersive } from "./immersive.js";
+import { SquircleV1Canvas } from "./squircle_v1.js";
 import { GestureTrace, type Point } from "./bubbles_gesture.js";
 import { LobbyControls } from "./lobby_controls.js";
 import type { LobbyAction } from "./lobby_input.js";
 import {
-  advanceJoinFlow, bodyAssetPath, CHARACTER_COLORS, CHARACTER_SHAPES, chooseJoinColor,
-  colorOption, createJoinMessage, cycleJoinShape, defaultJoinFlow, FALLBACK_CHARACTER,
-  isCharacterShape, returnToCharacterSelection, type CharacterShape, type JoinFlowState,
+  advanceJoinFlow, CHARACTER_COLORS, chooseJoinColor,
+  colorOption, createJoinMessage, defaultJoinFlow, FALLBACK_CHARACTER,
+  returnToCharacterSelection, type JoinFlowState,
 } from "./character_selection.js";
 
 const status = document.querySelector<HTMLElement>("#status")!;
 const selectionScreen = document.querySelector<HTMLElement>("#selection-screen")!;
-const previousShapeButton = document.querySelector<HTMLButtonElement>("#previous-shape")!;
-const nextShapeButton = document.querySelector<HTMLButtonElement>("#next-shape")!;
 const selectionPreview = document.querySelector<HTMLCanvasElement>("#selection-preview")!;
 const namePreview = document.querySelector<HTMLCanvasElement>("#name-preview")!;
 const selectedCharacterLabel = document.querySelector<HTMLElement>("#selected-character-label")!;
@@ -38,7 +37,7 @@ const bubblesContext = bubblesCanvas.getContext("2d", { alpha: true })!;
 
 const STORAGE = { session: "play-shapes.session-id", token: "play-shapes.reconnect-token", name: "play-shapes.last-name", inputSeq: "play-shapes.input-seq" } as const;
 type PublicPlayer = { player_id: string; name: string; seat: number; state: string; character_shape?: string; character_color?: string };
-type BubblesVisualSnapshot = { host_time_msec: number; radius: number; pull: Point; drag_pull: Point; charge_pull: Point; surface_angle: number; spinning: boolean; recovery_white: boolean; burst_progress: number; particle_density: number; charge_glow: number; character_visible: boolean; character_scale: number; character_position: Point; body_rotation: number; face_position: Point; face_blink: boolean; left_hand_position: Point; right_hand_position: Point; left_foot_position: Point; right_foot_position: Point };
+type BubblesVisualSnapshot = { host_time_msec: number; radius: number; pull: Point; drag_pull: Point; charge_pull: Point; surface_angle: number; spinning: boolean; recovery_white: boolean; burst_progress: number; particle_density: number; charge_glow: number; character_visible: boolean; character_scale: number; character_position: Point; body_rotation: number; face_blink: boolean };
 type BubblesVisualTuning = { starting_radius?: number; live_drag_pull_strength?: number; live_drag_response_seconds?: number; charge_wobble_strength?: number; charge_glow_strength?: number; swipe_reaction_seconds?: number; spin_surface_turns_per_second?: number; bubble_reform_seconds?: number; burst_seconds?: number };
 type HostMessage = { type?: string; protocol?: number; connection_id?: number; session_id?: string; resume_status?: string; reconnect_token?: string; player?: PublicPlayer; code?: string; message?: string; phase?: string; debug_mode?: boolean; state?: string; gameplay?: HostMessage; score?: number; bubble_radius?: number; burst_radius?: number; visual_jellyfish?: number; visual_cap?: number; seat?: number; left?: boolean; character_shape?: string; character_color?: string; host_time_msec?: number; visual_tuning?: BubblesVisualTuning; visual?: BubblesVisualSnapshot; spin_remaining_msec?: number; cooldown_remaining_msec?: number; invulnerable_remaining_msec?: number; reform_remaining_msec?: number; spin_duration_msec?: number; cooldown_duration_msec?: number; circles_to_charge?: number; rank?: number; event?: string; lost?: number; action?: string; reason?: string };
 
@@ -58,18 +57,9 @@ let bubblesVisualSnapshot: BubblesVisualSnapshot | undefined;
 let bubblesVisualReceivedAt = 0;
 let bubblesPhoneDragDisplay: Point = [0, 0];
 let bubblesPreviousFrame = performance.now();
-const characterBodies = Object.fromEntries(CHARACTER_SHAPES.map(shape => [shape, new Image()])) as Record<CharacterShape, HTMLImageElement>;
-for (const shape of CHARACTER_SHAPES) characterBodies[shape].src = bodyAssetPath(shape);
-const bubblesArt = {
-  hand: new Image(), openHand: new Image(), foot: new Image(), face: new Image(), blink: new Image(), jellyfish: new Image(),
-};
-bubblesArt.hand.src = "/bubbles-player-hand.png";
-bubblesArt.openHand.src = "/shape-hand-open.png";
-bubblesArt.foot.src = "/bubbles-player-foot.png";
-bubblesArt.face.src = "/bubbles-player-face-neutral.png";
-bubblesArt.blink.src = "/bubbles-player-face-blink.png";
+const squircleCanvas = new SquircleV1Canvas();
+const bubblesArt = { jellyfish: new Image() };
 bubblesArt.jellyfish.src = "/bubbles-jellyfish.png";
-const bubblesTintCache = new Map<string, HTMLCanvasElement>();
 const lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJumpButton, (action: LobbyAction) => {
   if (!joined || !socket || socket.readyState !== WebSocket.OPEN || activeGame !== null) return;
   inputSeq += 1;
@@ -82,16 +72,15 @@ function store(key: string, value: string): void { try { localStorage.setItem(ke
 function forgetIdentity(): void { try { localStorage.removeItem(STORAGE.session); localStorage.removeItem(STORAGE.token); localStorage.removeItem(STORAGE.inputSeq); } catch { /* Restricted storage. */ } inputSeq = 0; }
 
 function selectedCharacterName(): string {
-  const shape = joinFlow.shape[0].toUpperCase() + joinFlow.shape.slice(1);
   const color = colorOption(joinFlow.color)?.name ?? "Blue";
-  return `${shape} · ${color}`;
+  return `${color} Squircle`;
 }
 
 function refreshSelectionUi(): void {
   const label = selectedCharacterName();
   selectedCharacterLabel.textContent = label;
   selectionPreview.setAttribute("aria-label", `${label} Shape Character`);
-  namePreview.setAttribute("aria-label", `${label} character dancing`);
+  namePreview.setAttribute("aria-label", `${label} character preview`);
   for (const button of Array.from(colorGrid.querySelectorAll<HTMLButtonElement>(".color-button"))) {
     button.setAttribute("aria-pressed", String(button.dataset.color === joinFlow.color));
   }
@@ -133,14 +122,11 @@ function showJoin(message: string, focus = false): void {
 }
 function showJoined(player: PublicPlayer, state = "Connected"): void {
   joined = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); selectionScreen.hidden = true; nameScreen.hidden = true; joinForm.hidden = true; playerCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false; lobbyLeaveButton.disabled = false; lobbyControls.activate();
-  if (isCharacterShape(player.character_shape)) joinFlow = { ...joinFlow, shape: player.character_shape };
   const serverColor = colorOption(player.character_color)?.hex;
   if (serverColor) joinFlow = chooseJoinColor(joinFlow, serverColor);
   status.textContent = state === "Connected" ? "Joined. Keep this page open while you play." : state; status.hidden = true;
 }
 
-previousShapeButton.addEventListener("click", () => { joinFlow = cycleJoinShape(joinFlow, -1); refreshSelectionUi(); });
-nextShapeButton.addEventListener("click", () => { joinFlow = cycleJoinShape(joinFlow, 1); refreshSelectionUi(); });
 nextButton.addEventListener("click", () => {
   joinFlow = advanceJoinFlow(joinFlow);
   selectionScreen.hidden = true; nameScreen.hidden = false; joinForm.hidden = false;
@@ -251,60 +237,9 @@ function tuningValue(key: keyof BubblesVisualTuning, fallback: number): number {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
 function imageReady(image: HTMLImageElement): boolean { return image.complete && image.naturalWidth > 0; }
-function tintedSprite(image: HTMLImageElement, color: string): HTMLCanvasElement | undefined {
-  if (!imageReady(image)) return undefined;
-  const key = `${image.src}|${color}`;
-  const cached = bubblesTintCache.get(key);
-  if (cached) return cached;
-  const source = document.createElement("canvas");
-  source.width = image.naturalWidth; source.height = image.naturalHeight;
-  const sourceContext = source.getContext("2d", { willReadFrequently: true });
-  if (!sourceContext) return undefined;
-  sourceContext.drawImage(image, 0, 0);
-  const pixels = sourceContext.getImageData(0, 0, source.width, source.height);
-  const channels = color.replace("#", "").match(/.{2}/g)?.map(part => Number.parseInt(part, 16) / 255) ?? [0.35, 0.55, 0.95];
-  const maximum = Math.max(...channels);
-  const lift = clamp((0.4 - maximum) / 0.4, 0, 1);
-  const base = channels.map(channel => channel * (1 - lift) + 0.55 * lift);
-  const shadow = base.map(channel => channel * 0.78);
-  const highlight = base.map(channel => channel + (1 - channel) * 0.38);
-  const data = pixels.data;
-  for (let offset = 0; offset < data.length; offset += 4) {
-    const lightness = (data[offset] * 0.2126 + data[offset + 1] * 0.7152 + data[offset + 2] * 0.0722) / 255;
-    const shade = clamp((lightness - 0.53) / 0.2, 0, 1);
-    for (let channel = 0; channel < 3; channel++) data[offset + channel] = (shadow[channel] + (highlight[channel] - shadow[channel]) * shade) * 255;
-  }
-  sourceContext.putImageData(pixels, 0, 0);
-  bubblesTintCache.set(key, source);
-  return source;
-}
-function drawSprite(context: CanvasRenderingContext2D, image: HTMLImageElement, tint: string, x: number, y: number, width: number, height: number, flip = false, rotation = 0): void {
-  const sprite = tintedSprite(image, tint);
-  if (!sprite) return;
-  context.save(); context.translate(x, y); context.rotate(rotation); if (flip) context.scale(-1, 1);
-  context.drawImage(sprite, -width / 2, -height / 2, width, height); context.restore();
-}
-function drawUntintedSprite(context: CanvasRenderingContext2D, image: HTMLImageElement, x: number, y: number, width: number, height: number): void {
-  if (!imageReady(image)) return;
-  context.save(); context.translate(x, y); context.drawImage(image, -width / 2, -height / 2, width, height); context.restore();
-}
-type CharacterPose = { bodyRotation: number; facePosition: Point; faceBlink: boolean; leftHandPosition: Point; rightHandPosition: Point; leftFootPosition: Point; rightFootPosition: Point; leftHandRotation: number; rightHandRotation: number };
-function drawCharacter(context: CanvasRenderingContext2D, shape: CharacterShape, tint: string, x: number, y: number, scale: number, pose: CharacterPose, hand: HTMLImageElement = bubblesArt.hand): void {
-  context.save(); context.translate(x, y); context.scale(scale, scale);
-  drawSprite(context, bubblesArt.foot, tint, pose.leftFootPosition[0], pose.leftFootPosition[1], 40, 24, true);
-  drawSprite(context, bubblesArt.foot, tint, pose.rightFootPosition[0], pose.rightFootPosition[1], 40, 24);
-  drawSprite(context, hand, tint, pose.leftHandPosition[0], pose.leftHandPosition[1], 35, 34, true, pose.leftHandRotation);
-  drawSprite(context, hand, tint, pose.rightHandPosition[0], pose.rightHandPosition[1], 35, 34, false, pose.rightHandRotation);
-  drawSprite(context, characterBodies[shape], tint, 0, 0, 80, 80, false, pose.bodyRotation);
-  const face = pose.faceBlink ? bubblesArt.blink : bubblesArt.face;
-  drawUntintedSprite(context, face, pose.facePosition[0], pose.facePosition[1], pose.faceBlink ? 53 : 50, pose.faceBlink ? 37 : 29);
-  context.restore();
-}
 function renderJoinPreviews(now: number): void {
-  const seconds = now / 1000;
   for (const canvas of [selectionPreview, namePreview]) {
-    const section = canvas.closest("section");
-    if (section?.hidden) continue;
+    if (canvas.closest("section")?.hidden) continue;
     const rect = canvas.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) continue;
     const pixelRatio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
@@ -315,20 +250,8 @@ function renderJoinPreviews(now: number): void {
     if (!context) continue;
     context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     context.clearRect(0, 0, rect.width, rect.height);
-    const dancing = canvas === namePreview;
-    const wave = dancing ? Math.sin(seconds * 4.2) : 0;
-    const handSway = dancing ? wave * 0.07 : 0;
-    const handDrift = dancing ? wave * 2 : 0;
-    const pose: CharacterPose = {
-      bodyRotation: dancing ? Math.sin(seconds * 2.7) * 0.09 : 0,
-      facePosition: [0, -5], faceBlink: Math.sin(seconds * 0.9) > 0.985,
-      leftHandPosition: [-48, 22 - handDrift], rightHandPosition: [48, 22 + handDrift],
-      leftFootPosition: [-35 - wave * 2, 62], rightFootPosition: [35 + wave * 2, 62],
-      leftHandRotation: Math.PI + 0.18 + handSway, rightHandRotation: Math.PI - 0.18 + handSway,
-    };
-    const scale = Math.min(rect.width / 145, rect.height / 125) * 0.9;
-    drawCharacter(context, joinFlow.shape, joinFlow.color, rect.width / 2,
-      rect.height * 0.46 + (dancing ? Math.sin(seconds * 3.4) * 4 : 0), scale, pose, bubblesArt.openHand);
+    const scale = Math.min(rect.width / 256, rect.height / 220) * 0.95;
+    squircleCanvas.draw(context, joinFlow.color, rect.width / 2, rect.height * 0.89, scale, now);
   }
 }
 function drawBubblePath(context: CanvasRenderingContext2D, radius: number, pull: Point, surfaceAngle: number): { points: Point[]; center: Point; along: Point; stretch: number } {
@@ -379,20 +302,13 @@ function drawBubbleBurst(context: CanvasRenderingContext2D, radius: number, prog
     else drawArc(context, x, y, 2 + index % 3, 0, Math.PI * 2, `rgba(204,248,255,${0.75 * fade})`, 1.3);
   }
 }
-function drawPhoneCharacter(context: CanvasRenderingContext2D, visual: BubblesVisualSnapshot | undefined, hostTime: number,
-		shape: CharacterShape, selectedColor: string): void {
-  const fallbackScale = Math.min(0.55, (bubblesSnapshot?.bubble_radius ?? tuningValue("starting_radius", 48)) * 0.82 / 75);
-  const characterScale = (visual?.character_scale ?? fallbackScale) * 0.4;
-  const position = visual?.character_position ?? [0, Math.sin(hostTime / 1000 * 2.2) * 4];
-  const pose: CharacterPose = {
-    bodyRotation: visual?.body_rotation ?? Math.sin(hostTime / 1000 * 1.7) * 0.05,
-    facePosition: visual?.face_position ?? [0, -5], faceBlink: visual?.face_blink ?? false,
-    leftHandPosition: visual?.left_hand_position ?? [-52, -4], rightHandPosition: visual?.right_hand_position ?? [52, -4],
-    leftFootPosition: visual?.left_foot_position ?? [-35, 62], rightFootPosition: visual?.right_foot_position ?? [35, 62],
-    leftHandRotation: 0, rightHandRotation: 0,
-  };
-  drawCharacter(context, shape, visual?.recovery_white ? "#ffffff" : selectedColor,
-    position[0], position[1], characterScale, pose);
+function drawPhoneCharacter(context: CanvasRenderingContext2D, visual: BubblesVisualSnapshot | undefined,
+    hostTime: number, selectedColor: string): void {
+  const fallbackScale = Math.min(0.44, (bubblesSnapshot?.bubble_radius ?? tuningValue("starting_radius", 48)) * 0.82 / 100);
+  const position = visual?.character_position ?? [0, 40 + Math.sin(hostTime / 1000 * 2.2) * 4];
+  squircleCanvas.draw(context, visual?.recovery_white ? "#ffffff" : selectedColor,
+    position[0], position[1], visual?.character_scale ?? fallbackScale, hostTime,
+    visual?.face_blink ?? false, visual?.body_rotation ?? Math.sin(hostTime / 1000 * 1.7) * 0.05);
 }
 function renderBubbles(now: number): void {
   if (bubblesCard.hidden || !bubblesSnapshot) return;
@@ -415,7 +331,6 @@ function renderBubbles(now: number): void {
   const radius = Math.max(1, visual?.radius ?? ((message.bubble_radius ?? startRadius) * reformScale));
   const burstRadius = message.burst_radius ?? message.bubble_radius ?? startRadius;
   const renderedRadius = burstProgress >= 0 && burstProgress < 1 ? (visual?.radius ?? burstRadius) : radius;
-  const bodyShape = isCharacterShape(message.character_shape) ? message.character_shape : FALLBACK_CHARACTER.shape;
   const selectedColor = colorOption(message.character_color)?.hex ?? FALLBACK_CHARACTER.color;
   const spinTurns = tuningValue("spin_surface_turns_per_second", 1.8);
   const spinning = visual?.spinning ?? (message.phase === "active" && (message.spin_remaining_msec ?? 0) - snapshotElapsed > 0);
@@ -486,7 +401,7 @@ function renderBubbles(now: number): void {
     }
   }
   const characterVisible = visual?.character_visible ?? !(burstProgress >= 0 && burstProgress < 1);
-  if (characterVisible) drawPhoneCharacter(context, visual, tuneTime, bodyShape, selectedColor);
+  if (characterVisible) drawPhoneCharacter(context, visual, tuneTime, selectedColor);
   context.restore();
   bubblesPreviousFrame = now;
 }

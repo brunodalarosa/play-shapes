@@ -44,8 +44,7 @@ func add_bubble(player_id: String, start_position: Vector2) -> BubblesPlayerBubb
 		player_id,
 		String(snapshot.get("name", "")),
 		Color(String(selection.character_color)),
-		_controller.tuning,
-		StringName(selection.character_shape)
+		_controller.tuning
 	)
 	bubble.bind_controller(_controller)
 	_bubbles[player_id] = bubble

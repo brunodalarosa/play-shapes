@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://characters/lobby_squircle.gd" id="1"]
+[ext_resource type="PackedScene" path="res://characters/squircle_v1_playback.tscn" id="2"]
 
 [sub_resource type="CapsuleShape2D" id="body"]
 radius = 23.0
@@ -16,20 +17,7 @@ script = ExtResource("1")
 position = Vector2(0, -48)
 shape = SubResource("body")
 
-[node name="Colorable" type="Sprite2D" parent="."]
-centered = false
-region_enabled = true
-texture_filter = 1
-
-[node name="Face" type="Sprite2D" parent="."]
-centered = false
-region_enabled = true
-texture_filter = 1
-
-[node name="Blink" type="Sprite2D" parent="."]
-centered = false
-region_enabled = true
-texture_filter = 1
+[node name="SquircleV1Playback" parent="." instance=ExtResource("2")]
 
 [node name="Nameplate" type="Label" parent="."]
 offset_left = -132.0

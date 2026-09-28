@@ -113,8 +113,8 @@ func _run() -> void:
 	debug_controller.start_round([{"player_id": "debug", "name": "Debug", "seat": 1}], 0, true)
 	var debug_snapshot: Dictionary = Protocol.new(debug_controller).snapshot_for("debug")
 	_check(debug_controller.is_one_player_debug() and debug_snapshot.debug_mode
-		and debug_snapshot.character_shape == "circle" and debug_snapshot.character_color == CharacterSelection.FALLBACK_COLOR,
-		"One-player debug state reaches the phone with the existing-style fallback")
+		and debug_snapshot.character_shape == "squircle" and debug_snapshot.character_color == CharacterSelection.FALLBACK_COLOR,
+		"One-player debug state reaches the phone with the Squircle fallback")
 	_test_timed_swipes()
 	print("Bubbles protocol checks: %d failures" % _failures)
 	quit(0 if _failures == 0 else 1)

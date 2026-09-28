@@ -2,15 +2,7 @@ class_name LobbySquircle
 extends CharacterBody2D
 ## Host-owned Playground body using the approved Squircle v1 animation sheets.
 
-const MANIFEST_PATH := "res://assets/runtime/animated_characters/squircle/v1/manifest.json"
-const ASSET_ROOT := "res://assets/runtime/animated_characters/squircle/v1/"
-const TINT_SHADER: Shader = preload("res://assets/runtime/animated_characters/squircle/v1/render_tint.gdshader")
-const TILE_SIZE := 256
 const INPUT_TIMEOUT_MSEC := 350
-
-static var _clips: Dictionary = {}
-static var _sheets: Dictionary = {}
-static var _live_instances: int = 0
 
 ## Horizontal top speed in world pixels per second.
 @export var move_speed: float = 330.0
@@ -33,34 +25,19 @@ var connected: bool = true
 var _horizontal: float = 0.0
 var _last_input_msec: int = 0
 var _jump_queued: bool = false
-var _elapsed: float = 0.0
 var _blink_elapsed: float = 0.0
-var _clip_key: String = ""
 var _initial_player: Dictionary = {}
 
-@onready var _colorable: Sprite2D = $Colorable
-@onready var _face: Sprite2D = $Face
-@onready var _blink: Sprite2D = $Blink
+@onready var _character: SquircleV1Playback = $SquircleV1Playback
 @onready var _nameplate: Label = $Nameplate
 
 
 func _ready() -> void:
-	_live_instances += 1
-	_load_manifest()
-	var material := ShaderMaterial.new()
-	material.shader = TINT_SHADER
-	_colorable.material = material
-	_change_clip("idle-front")
+	_character.visual_scale = visual_scale
+	_character.play("idle", "front")
 	if not _initial_player.is_empty():
 		_update_player(_initial_player)
 	set_connected(connected)
-
-
-func _exit_tree() -> void:
-	_live_instances -= 1
-	if _live_instances == 0:
-		_sheets.clear()
-		_clips.clear()
 
 
 func configure(player: Dictionary, anchor: Vector2) -> void:
@@ -78,7 +55,7 @@ func configure(player: Dictionary, anchor: Vector2) -> void:
 func _update_player(player: Dictionary) -> void:
 	_nameplate.text = String(player.name)
 	_nameplate.add_theme_font_size_override("font_size", maxi(18, 24 - maxi(0, _nameplate.text.length() - 11)))
-	(_colorable.material as ShaderMaterial).set_shader_parameter("player_color", Color(String(player.character_color)))
+	_character.player_color = Color(String(player.character_color))
 	set_connected(String(player.state) == "connected")
 
 
@@ -134,57 +111,13 @@ func _physics_process(delta: float) -> void:
 		clear_input()
 	var action := "idle" if absf(velocity.x) < 20.0 else "run" if absf(_horizontal) >= run_threshold else "walk"
 	var view := "front" if action == "idle" else "three-quarter"
-	_change_clip("%s-%s" % [action, view])
+	_character.play(action, view)
 	if absf(velocity.x) > 20.0:
 		# The source three-quarter frames face left before mirroring.
 		var face_left := velocity.x > 0.0
-		_colorable.flip_h = face_left
-		_face.flip_h = face_left
-		_blink.flip_h = face_left
+		_character.flip_h = face_left
 
 
 func _process(delta: float) -> void:
-	_elapsed += delta
 	_blink_elapsed = fmod(_blink_elapsed + delta, 4.2)
-	_blink.visible = _blink_elapsed < 0.12
-	_face.visible = not _blink.visible
-	var clip: Dictionary = _clips[_clip_key]
-	var frame := int(_elapsed * float(clip.fps)) % int(clip.frames)
-	var tile := Rect2(frame % int(clip.sheet_columns) * TILE_SIZE,
-		floori(float(frame) / float(clip.sheet_columns)) * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-	for sprite: Sprite2D in [_colorable, _face, _blink]:
-		sprite.region_rect = tile
-
-
-func _change_clip(key: String) -> void:
-	if _clip_key == key:
-		return
-	_clip_key = key
-	_elapsed = 0.0
-	var clip: Dictionary = _clips[key]
-	var anchor := Vector2(float(clip.anchor_px[0]), float(clip.anchor_px[1]))
-	for layer: String in ["colorable", "neutral", "blink"]:
-		var sprite: Sprite2D = _colorable if layer == "colorable" else _face if layer == "neutral" else _blink
-		sprite.texture = _sheet(key, layer)
-		sprite.position = -anchor * visual_scale
-		sprite.scale = Vector2.ONE * visual_scale
-
-
-static func _load_manifest() -> void:
-	if not _clips.is_empty():
-		return
-	var file := FileAccess.open(MANIFEST_PATH, FileAccess.READ)
-	assert(file != null, "Rendered squircle manifest is missing")
-	var data: Dictionary = JSON.parse_string(file.get_as_text())
-	for clip: Dictionary in data.clips:
-		_clips["%s-%s" % [clip.name, clip.view]] = clip
-
-
-static func _sheet(clip_key: String, layer: String) -> Texture2D:
-	var key := "%s-%s" % [clip_key, layer]
-	if not _sheets.has(key):
-		var path := "%s%s.png" % [ASSET_ROOT, key]
-		var texture := ResourceLoader.load(path) as Texture2D
-		assert(texture != null, "Rendered squircle sheet is missing: " + path)
-		_sheets[key] = texture
-	return _sheets[key] as Texture2D
+	_character.face_blink = _blink_elapsed < 0.12

@@ -15,8 +15,8 @@ func _run() -> void:
 	var first := registry.join_player(11, "  Zoë 🎮  ", true, 1000, "square", "#EC407A")
 	if not _check(first.accepted and first.player.name == "Zoë 🎮", "Printable Unicode name is trimmed and accepted"):
 		return
-	if not _check(first.player.character_shape == "square" and first.player.character_color == "#EC407A",
-			"Validated character selection is stored in the public player record"):
+	if not _check(first.player.character_shape == "squircle" and first.player.character_color == "#EC407A",
+			"Legacy body input resolves to Squircle while preserving the selected color"):
 		return
 	if not _check(first.player.player_id != str(11) and first.reconnect_token != first.player.player_id,
 			"Connection, player, and reconnect identities stay separate"):
@@ -24,6 +24,12 @@ func _run() -> void:
 	var invalid_selection := registry.join_player(18, "Bad Shape", true, 1000, "triangle", "#E53935")
 	if not _check(not invalid_selection.accepted and invalid_selection.code == &"invalid_character_selection"
 			and registry.player_count() == 1, "Unknown client shapes cannot create a player record"):
+		return
+	var partial_registry := PlayerRegistry.new()
+	var color_only := partial_registry.join_player(19, "Color Only", true, 1000, null, "#43A047")
+	if not _check(color_only.accepted and color_only.player.character_shape == "squircle"
+			and color_only.player.character_color == "#43A047",
+			"Missing shape resolves to Squircle without replacing a valid selected color"):
 		return
 	var duplicate := registry.join_player(12, "ZOË 🎮", true, 1000)
 	if not _check(not duplicate.accepted and duplicate.message == "Name already in use", "Duplicate matching is case-insensitive"):
@@ -43,7 +49,7 @@ func _run() -> void:
 		return
 	var resumed := registry.resume_player(14, registry.session_id, first.reconnect_token, 60999)
 	if not _check(resumed.accepted and resumed.player.player_id == first.player.player_id and resumed.player.seat == first.player.seat
-			and resumed.player.character_shape == "square" and resumed.player.character_color == "#EC407A",
+			and resumed.player.character_shape == "squircle" and resumed.player.character_color == "#EC407A",
 			"A valid grace-window resume restores the same player, seat, shape, and color"):
 		return
 	var duplicate_resume := registry.resume_player(15, registry.session_id, first.reconnect_token, 61000)
@@ -57,9 +63,9 @@ func _run() -> void:
 	if not _check(invalidated.code == &"expired", "Leave invalidates the reconnect token"):
 		return
 	var reused := registry.join_player(16, "zoë 🎮", true, 61000)
-	if not _check(reused.accepted and reused.player.character_shape == "circle"
+	if not _check(reused.accepted and reused.player.character_shape == "squircle"
 			and reused.player.character_color == CharacterSelection.FALLBACK_COLOR,
-			"Legacy and test joins without a style receive the existing circle-and-blue fallback"):
+			"Legacy and test joins without a style receive the Squircle-and-blue fallback"):
 		return
 
 	var expiring := PlayerRegistry.new(1, 60.0)

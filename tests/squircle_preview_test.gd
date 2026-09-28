@@ -51,11 +51,11 @@ func _run() -> void:
 				return
 	var lobby_character := preload("res://characters/lobby_squircle.tscn").instantiate() as LobbySquircle
 	root.add_child(lobby_character)
-	if not _check((lobby_character.get_node("Colorable") as Sprite2D).texture.resource_path
+	if not _check((lobby_character.get_node("SquircleV1Playback/Colorable") as Sprite2D).texture.resource_path
 		== "res://assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png", "Lobby idle uses Squircle v1"):
 		return
-	lobby_character.call("_change_clip", "run-three-quarter")
-	if not _check((lobby_character.get_node("Colorable") as Sprite2D).texture.resource_path
+	(lobby_character.get_node("SquircleV1Playback") as SquircleV1Playback).play("run", "three-quarter")
+	if not _check((lobby_character.get_node("SquircleV1Playback/Colorable") as Sprite2D).texture.resource_path
 		== "res://assets/runtime/animated_characters/squircle/v1/run-three-quarter-colorable.png", "Lobby run uses Squircle v1"):
 		return
 	lobby_character.queue_free()

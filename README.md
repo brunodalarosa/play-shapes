@@ -48,7 +48,7 @@ tooling; it is not required to launch or play the game.
 4. On each phone, scan the QR code or open the displayed URL. Phones must be
    on the same reachable network as the host; guest Wi-Fi, VPNs, and client
    isolation can prevent connections.
-5. Enter a player name and choose **Join game**.
+5. Choose a Squircle color, select **Next**, enter a player name, then select **Enter Lobby**.
 
 The host uses HTTP port `8080` and WebSocket port `8081` by default. If those
 ports are already in use, stop the other host or change the values in
@@ -60,7 +60,7 @@ The debug flow is for testing Bubbles with one real registered player.
 It does not create simulated players.
 
 1. Start the project and connect exactly one phone to the lobby.
-2. Enter a player name and choose **Join game**.
+2. Choose a Squircle color, enter a player name, and select **Enter Lobby**.
 3. On the PC, press **F12** to open the non-pausing debug launcher.
 4. Choose **One-player Bubbles and Jellyfishes**.
 5. Play from the phone while watching the shared PC display. The PC labels the

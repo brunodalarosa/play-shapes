@@ -123,7 +123,7 @@ func _test_spin_collision_and_pop() -> void:
 	_check(pop.accepted and pop.lost == 5 and a.score() == 0, "Puffer hook asks controller to remove full score")
 	_check(not a.is_spinning(20) and a.is_invulnerable(20), "Pop clears spin and starts i-frames")
 	_check(a.collision_radius() < controller.tuning.starting_radius, "Re-form starts from a small bubble")
-	_check(a.get_node("ShapeCharacter").player_color == Color.WHITE, "Recovery blinks character white")
+	_check(a.get_node("SquircleV1Playback").player_color == Color.WHITE, "Recovery blinks character white")
 	_check(not a.request_jellyfish_collection(21).accepted and not a.request_puffer_pop(21).accepted, "I-frames block collecting and hazards")
 	controller.advance(120)
 	var resumed_arena := Arena.new()
@@ -134,7 +134,7 @@ func _test_spin_collision_and_pop() -> void:
 	arena.simulate_step(0.0, 380)
 	_check(is_equal_approx(a.collision_radius(), controller.tuning.starting_radius), "Bubble re-forms by configured duration")
 	arena.simulate_step(0.0, 2020)
-	_check(not a.is_invulnerable(2020) and a.get_node("ShapeCharacter").player_color != Color.WHITE, "I-frames end and original color returns")
+	_check(not a.is_invulnerable(2020) and a.get_node("SquircleV1Playback").player_color != Color.WHITE, "I-frames end and original color returns")
 	_check(a.request_jellyfish_collection(2021).accepted, "Collection resumes after i-frames")
 
 

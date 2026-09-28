@@ -25,11 +25,11 @@ func _run() -> void:
 		and first_character.spawn_point == Vector2(218, 400)
 		and second_character.spawn_point == Vector2(555, 400),
 		"Players get distinct seat anchors and one character each")
-	_check(first.player.character_shape == "square" and second.player.character_shape == "rhombus"
+	_check(first.player.character_shape == "squircle" and second.player.character_shape == "squircle"
 		and first_character.get_node("Nameplate").text == "First"
-		and (first_character.get_node("Colorable") as Sprite2D).texture.resource_path == "res://assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png"
-		and (first_character.get_node("Colorable") as Sprite2D).material.get_shader_parameter("player_color") == Color("#EC407A"),
-		"Lobby Squircle v1 uses the name and registered tint without changing shape data")
+		and (first_character.get_node("SquircleV1Playback/Colorable") as Sprite2D).texture.resource_path == "res://assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png"
+		and (first_character.get_node("SquircleV1Playback/Colorable") as Sprite2D).material.get_shader_parameter("player_color") == Color("#EC407A"),
+		"Lobby Squircle v1 uses the name and registered tint")
 	_check(first_character.collision_layer == 256 and first_character.collision_mask == 384,
 		"Characters collide with one-way platforms and one another")
 	for unused: int in 5:
@@ -53,10 +53,10 @@ func _run() -> void:
 	_check(first_character.position.x > first_character.spawn_point.x
 		and second_character.position.x < second_character.spawn_point.x,
 		"The host advances characters in opposite directions independently")
-	_check((first_character.get_node("Face") as Sprite2D).flip_h
-		and not (second_character.get_node("Face") as Sprite2D).flip_h
-		and (first_character.get_node("Colorable") as Sprite2D).flip_h
-		== (first_character.get_node("Face") as Sprite2D).flip_h,
+	_check((first_character.get_node("SquircleV1Playback/Face") as Sprite2D).flip_h
+		and not (second_character.get_node("SquircleV1Playback/Face") as Sprite2D).flip_h
+		and (first_character.get_node("SquircleV1Playback/Colorable") as Sprite2D).flip_h
+		== (first_character.get_node("SquircleV1Playback/Face") as Sprite2D).flip_h,
 		"Three-quarter body and face point in the direction of travel")
 	_check(world.handle_input(first_player, {"type": "lobby_jump_release", "input_seq": 2}, now).jumped
 		and not world.handle_input(first_player, {"type": "lobby_jump_release", "input_seq": 3}, now).jumped,

@@ -1,6 +1,6 @@
 class_name CharacterSelection
 extends RefCounted
-## Canonical player-selected body shapes and lobby colors.
+## Canonical player body and lobby colors. Legacy shape inputs normalize to Squircle.
 
 const SHAPES: Array[StringName] = [&"square", &"circle", &"squircle", &"rhombus"]
 const COLORS: Array[Dictionary] = [
@@ -15,7 +15,7 @@ const COLORS: Array[Dictionary] = [
 	{"id": "pink", "name": "Pink", "hex": "#EC407A"},
 	{"id": "brown", "name": "Brown", "hex": "#8D6E63"},
 ]
-const FALLBACK_SHAPE: StringName = &"circle"
+const FALLBACK_SHAPE: StringName = &"squircle"
 const FALLBACK_COLOR := "#598DF2" # Existing unselected-player blue.
 const BODY_TEXTURES: Dictionary = {
 	&"square": preload("res://assets/runtime/shape_characters/bodies/square.png"),
@@ -34,10 +34,8 @@ static func default_selection() -> Dictionary:
 
 
 static func validate_selection(raw_shape: Variant, raw_color: Variant) -> Dictionary:
-	if typeof(raw_shape) not in [TYPE_STRING, TYPE_STRING_NAME]:
-		return _rejected("Choose a character shape")
-	var shape := StringName(String(raw_shape).to_lower())
-	if not SHAPES.has(shape):
+	if raw_shape != null and (typeof(raw_shape) not in [TYPE_STRING, TYPE_STRING_NAME]
+			or not SHAPES.has(StringName(String(raw_shape).to_lower()))):
 		return _rejected("Choose an available character shape")
 	if not raw_color is String:
 		return _rejected("Choose a character color")
@@ -48,7 +46,7 @@ static func validate_selection(raw_shape: Variant, raw_color: Variant) -> Dictio
 		if requested_color == String(option.hex):
 			return {
 				"accepted": true,
-				"character_shape": String(shape),
+				"character_shape": String(FALLBACK_SHAPE),
 				"character_color": String(option.hex),
 			}
 	return _rejected("Choose one of the available character colors")

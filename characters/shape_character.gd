@@ -35,12 +35,10 @@ func _ready() -> void:
 
 
 func apply_selection(selection: Dictionary) -> void:
-	var resolved := CharacterSelection.resolve_selection(
-		selection.get("character_shape"),
-		selection.get("character_color")
-	)
-	body_shape = StringName(resolved.character_shape)
-	player_color = Color(String(resolved.character_color))
+	# This retained debug/asset scene still supports its historical body textures.
+	body_shape = CharacterSelection.normalize_shape(selection.get("character_shape"))
+	var requested_color: Variant = selection.get("character_color", CharacterSelection.FALLBACK_COLOR)
+	player_color = Color(String(requested_color))
 
 
 func _update_body_texture() -> void:

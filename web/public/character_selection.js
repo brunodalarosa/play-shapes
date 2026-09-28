@@ -1,4 +1,4 @@
-export const CHARACTER_SHAPES = ["square", "circle", "squircle", "rhombus"];
+export const CHARACTER_SHAPE = "squircle";
 export const CHARACTER_COLORS = [
     { id: "red", name: "Red", hex: "#E53935" },
     { id: "orange", name: "Orange", hex: "#F57C00" },
@@ -11,12 +11,9 @@ export const CHARACTER_COLORS = [
     { id: "pink", name: "Pink", hex: "#EC407A" },
     { id: "brown", name: "Brown", hex: "#8D6E63" },
 ];
-export const FALLBACK_CHARACTER = { shape: "circle", color: "#598DF2" };
+export const FALLBACK_CHARACTER = { shape: CHARACTER_SHAPE, color: "#598DF2" };
 export function defaultJoinFlow() {
-    return { screen: "selection", shape: FALLBACK_CHARACTER.shape, color: CHARACTER_COLORS.find(option => option.id === "blue").hex };
-}
-export function cycleJoinShape(state, offset) {
-    return { ...state, shape: shapeAtOffset(state.shape, offset) };
+    return { screen: "selection", color: CHARACTER_COLORS.find(option => option.id === "blue").hex };
 }
 export function chooseJoinColor(state, color) {
     return { ...state, color };
@@ -28,21 +25,10 @@ export function returnToCharacterSelection(state) {
     return { ...state, screen: "selection" };
 }
 export function createJoinMessage(name, state) {
-    return { type: "join", name: name.trim(), character_shape: state.shape, character_color: state.color };
-}
-export function isCharacterShape(value) {
-    return typeof value === "string" && CHARACTER_SHAPES.includes(value);
-}
-export function shapeAtOffset(current, offset) {
-    const currentIndex = CHARACTER_SHAPES.indexOf(current);
-    const nextIndex = ((currentIndex + offset) % CHARACTER_SHAPES.length + CHARACTER_SHAPES.length) % CHARACTER_SHAPES.length;
-    return CHARACTER_SHAPES[nextIndex];
+    return { type: "join", name: name.trim(), character_shape: CHARACTER_SHAPE, character_color: state.color };
 }
 export function colorOption(hex) {
     if (typeof hex !== "string")
         return undefined;
     return CHARACTER_COLORS.find(option => option.hex.toUpperCase() === hex.toUpperCase());
-}
-export function bodyAssetPath(shape) {
-    return `/shape-${shape}.png`;
 }

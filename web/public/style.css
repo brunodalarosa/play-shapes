@@ -6,8 +6,7 @@ main { position: relative; display: flex; flex-direction: column; inline-size: m
 .onboarding-screen { inline-size: 100%; min-block-size: 0; flex: 1; }
 #selection-screen { display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 1.8svh, 16px); }
 .brand { margin: 4px 0 0; color: #f0f3f8; font-size: clamp(24px, 7vw, 30px); font-weight: 850; letter-spacing: .08em; }
-.shape-picker { display: grid; grid-template-columns: 54px minmax(0, 1fr) 54px; align-items: center; inline-size: 100%; min-block-size: 0; flex: 1 1 auto; }
-.shape-cycle { display: grid; place-items: center; inline-size: 52px; min-block-size: 52px; padding: 0; border: 2px solid #d3dbe5; border-radius: 16px; background: #273247; color: #fff; font-size: 42px; line-height: 1; }
+.shape-picker { display: grid; place-items: center; inline-size: 100%; min-block-size: 0; flex: 1 1 auto; }
 .character-preview-wrap { display: grid; justify-items: center; align-content: center; min-inline-size: 0; }
 .character-preview { display: block; inline-size: min(100%, 260px); block-size: min(27svh, 220px); margin-inline: auto; }
 .selection-label { margin: 0; color: #fff; font-size: 17px; font-weight: 750; }
@@ -22,7 +21,7 @@ button { inline-size: 100%; border-radius: 10px; font: inherit; font-weight: 800
 #next-button { margin-block-end: 4px; }
 #name-screen { position: relative; display: flex; flex-direction: column; align-items: stretch; block-size: 100%; padding-block-start: 20svh; }
 .back-button { position: absolute; inset-block-start: 0; inset-inline-start: 0; inline-size: 72px; min-block-size: 46px; padding: 8px; border: 0; border-radius: 14px; background: #cf3034; color: #fff; font-size: 14px; letter-spacing: .04em; }
-.dancing-preview { flex: 0 0 auto; inline-size: min(100%, 260px); block-size: min(25svh, 205px); }
+.name-preview { flex: 0 0 auto; inline-size: min(100%, 260px); block-size: min(25svh, 205px); }
 .name-screen-title { margin: 4px 0 8px; color: #f0f3f8; font-size: clamp(23px, 7vw, 30px); }
 form { display: grid; gap: 12px; margin-block-start: auto; padding-block-end: 4px; text-align: start; }
 label { font-weight: 700; }
@@ -75,16 +74,11 @@ html.lobby-active .footnote, html.lobby-active #status { display: none !importan
   .status, #player-card, input, button.secondary { border-color: currentColor; }
 }
 
-@media (prefers-reduced-motion: reduce) { .dancing-preview { animation: none !important; } }
-@media (prefers-reduced-motion: no-preference) {
-  .dancing-preview { animation: character-preview-dance 1.4s ease-in-out infinite alternate; }
-  @keyframes character-preview-dance { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(-7px) rotate(2deg); } }
-}
 @media (max-height: 620px) {
   main { padding-block: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-bottom)); }
   #selection-screen { gap: 5px; }
   .character-preview { block-size: min(23svh, 160px); }
-  .dancing-preview { block-size: min(20svh, 140px); }
+  .name-preview { block-size: min(20svh, 140px); }
   .color-button { min-block-size: 36px; border-radius: 10px; }
   .action-button { min-block-size: 50px; }
 }

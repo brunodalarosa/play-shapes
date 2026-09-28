@@ -2,14 +2,14 @@ class_name BubblesPlayerBubble
 extends CharacterBody2D
 ## One host-simulated player body. Controller events are the only gameplay input.
 
-const CHARACTER_MAX_SCALE := 0.55
-const CHARACTER_OUTER_RADIUS := 75.0
+const CHARACTER_MAX_SCALE := 0.44
+const CHARACTER_OUTER_RADIUS := 100.0
 const BLINK_PERIOD_MSEC := 100
 const PHONE_VISUAL_SEND_INTERVAL_MSEC := 50
 
 @onready var _collider: CollisionShape2D = $CollisionShape2D
 @onready var _visual: BubblesPlayerVisual = $BubbleVisual
-@onready var _character: ShapeCharacter = $ShapeCharacter
+@onready var _character: SquircleV1Playback = $SquircleV1Playback
 @onready var _name_label: Label = $PlayerName
 
 var player_id := ""
@@ -48,13 +48,11 @@ func _ready() -> void:
 	_collider.shape = _collider.shape.duplicate()
 
 
-func configure(id: String, display_name: String, color: Color, selected_tuning: BubblesTuning,
-		selected_shape: StringName = CharacterSelection.FALLBACK_SHAPE) -> void:
+func configure(id: String, display_name: String, color: Color, selected_tuning: BubblesTuning) -> void:
 	assert(not id.is_empty() and selected_tuning != null)
 	player_id = id
 	tuning = selected_tuning
 	_player_color = color
-	_character.body_shape = selected_shape
 	_character.player_color = color
 	_name_label.text = display_name
 	_blink_next_msec = roundi(selected_tuning.character_blink_interval_seconds * 1000.0 * (0.7 + float(abs(id.hash()) % 7) * 0.1))
@@ -224,7 +222,8 @@ func _refresh_visual(host_time_msec: int) -> void:
 	(_collider.shape as CircleShape2D).radius = maxf(1.0, bubble_radius() * reform_scale)
 	var white_blink := is_invulnerable(host_time_msec) and (host_time_msec / BLINK_PERIOD_MSEC) % 2 == 0
 	_character.player_color = Color.WHITE if white_blink else _player_color
-	_character.scale = Vector2.ONE * minf(CHARACTER_MAX_SCALE, bubble_radius() * 0.82 / CHARACTER_OUTER_RADIUS)
+	_character.visual_scale = minf(CHARACTER_MAX_SCALE, bubble_radius() * 0.82 / CHARACTER_OUTER_RADIUS)
+	_character.set_playback_time_msec(host_time_msec)
 	_animate_character(host_time_msec, burst)
 	var swipe_age := float(host_time_msec - _swipe_at_msec) / 1000.0 if _swipe_at_msec >= 0 else 999.0
 	_swipe_pull = _swipe_direction * tuning.swipe_pull_strength * sin(PI * clampf(swipe_age / tuning.swipe_reaction_seconds, 0.0, 1.0))
@@ -241,12 +240,6 @@ func _refresh_visual(host_time_msec: int) -> void:
 
 
 func _phone_visual_state(host_time_msec: int) -> Dictionary:
-	var body := _character.get_node("Body") as Sprite2D
-	var face := _character.get_node("Face") as Sprite2D
-	var left_hand := _character.get_node("LeftHand") as Sprite2D
-	var right_hand := _character.get_node("RightHand") as Sprite2D
-	var left_foot := _character.get_node("LeftFoot") as Sprite2D
-	var right_foot := _character.get_node("RightFoot") as Sprite2D
 	return {
 		"host_time_msec": host_time_msec,
 		"radius": _visual.radius,
@@ -260,15 +253,10 @@ func _phone_visual_state(host_time_msec: int) -> Dictionary:
 		"particle_density": _visual.particle_density,
 		"charge_glow": _visual.charge_glow,
 		"character_visible": _character.visible,
-		"character_scale": _character.scale.x,
+		"character_scale": _character.visual_scale,
 		"character_position": [_character.position.x, _character.position.y],
-		"body_rotation": body.rotation,
-		"face_position": [face.position.x, face.position.y],
-		"face_blink": face.texture == CharacterExpression.FACES[&"blink"],
-		"left_hand_position": [left_hand.position.x, left_hand.position.y],
-		"right_hand_position": [right_hand.position.x, right_hand.position.y],
-		"left_foot_position": [left_foot.position.x + left_foot.offset.x, left_foot.position.y + left_foot.offset.y],
-		"right_foot_position": [right_foot.position.x + right_foot.offset.x, right_foot.position.y + right_foot.offset.y],
+		"body_rotation": _character.rotation,
+		"face_blink": _character.face_blink,
 	}
 
 
@@ -280,25 +268,13 @@ func _animate_character(host_time_msec: int, burst: float) -> void:
 	var bob := sin(seconds * 2.2 + float(abs(player_id.hash()) % 10)) * tuning.character_float_pixels
 	var swipe_age := float(host_time_msec - _swipe_at_msec) / 1000.0 if _swipe_at_msec >= 0 else 999.0
 	var push := sin(PI * clampf(swipe_age / tuning.swipe_reaction_seconds, 0.0, 1.0))
-	_character.position = Vector2(0.0, bob) + _swipe_direction * push * tuning.swipe_character_push_pixels
-	var body := _character.get_node("Body") as Sprite2D
-	var face := _character.get_node("Face") as Sprite2D
-	var left_hand := _character.get_node("LeftHand") as Sprite2D
-	var right_hand := _character.get_node("RightHand") as Sprite2D
-	var left_foot := _character.get_node("LeftFoot") as Sprite2D
-	var right_foot := _character.get_node("RightFoot") as Sprite2D
-	body.rotation = sin(seconds * 1.7) * 0.05
-	face.rotation = 0.0
-	face.position = Vector2(0, -5) + _swipe_direction * push * 3.0
-	left_hand.position = Vector2(-52, -4) + _swipe_direction * push * 9.0
-	right_hand.position = Vector2(52, -4) + _swipe_direction * push * 9.0
-	left_foot.position = Vector2(-23, 62)
-	right_foot.position = Vector2(23, 62)
+	_character.position = Vector2(0.0, 40.0 + bob) + _swipe_direction * push * tuning.swipe_character_push_pixels
+	_character.rotation = sin(seconds * 1.7) * 0.05
 	if host_time_msec >= _blink_next_msec:
 		_blink_until_msec = host_time_msec + 140
 		_blink_index += 1
 		_blink_next_msec = host_time_msec + roundi(tuning.character_blink_interval_seconds * 1000.0 * (0.72 + float(_blink_index % 5) * 0.14))
-	face.texture = CharacterExpression.FACES[&"blink"] if host_time_msec < _blink_until_msec else CharacterExpression.FACES[&"neutral"]
+	_character.face_blink = host_time_msec < _blink_until_msec
 
 
 func _on_arena_event(kind: StringName, id: String, data: Dictionary) -> void:
