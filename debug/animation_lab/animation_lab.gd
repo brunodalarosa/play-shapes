@@ -1,10 +1,9 @@
 extends Control
-## Local preview of the approved Squircle v1 sheets and the existing 2D character.
+## Focused desktop review of approved Squircle v1 motion at both reference sizes.
 
 const MANIFEST_PATH := "res://assets/runtime/animated_characters/squircle/v1/manifest.json"
 const ASSET_ROOT := "res://assets/runtime/animated_characters/squircle/v1/"
 const RENDERED_SAMPLE: Script = preload("res://debug/squircle_preview/rendered_sample.gd")
-const CURRENT_CHARACTER: PackedScene = preload("res://characters/shape_character.tscn")
 const ACTIONS := ["idle", "walk", "run"]
 const VIEWS := ["front", "three-quarter"]
 const EXPRESSIONS := ["neutral", "blink"]
@@ -12,7 +11,7 @@ const EXPRESSIONS := ["neutral", "blink"]
 var _clips: Dictionary = {}
 var _textures: Dictionary = {}
 var _loaded_clip: String = ""
-var _samples: Array[Dictionary] = []
+var _samples: Array[SquircleRenderedSample] = []
 var _action: String = "idle"
 var _view: String = "front"
 var _expression: String = "neutral"
@@ -36,15 +35,14 @@ func _process(delta: float) -> void:
 
 
 func _load_manifest() -> void:
-	var file := FileAccess.open(MANIFEST_PATH, FileAccess.READ)
-	assert(file != null, "PS-058 preview metadata is missing")
-	var data: Dictionary = JSON.parse_string(file.get_as_text())
+	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(MANIFEST_PATH))
+	assert(data.get("schema") == "play-shapes.squircle-animation.v1")
 	assert(data.get("shape_id") == "squircle")
 	assert(int(data.resolution[0]) == 256 and int(data.resolution[1]) == 256)
 	for clip: Dictionary in data.clips:
-		var key := "%s-%s" % [clip.name, clip.view]
 		assert(int(clip.first_frame) == 1 and int(clip.last_frame) == int(clip.frames))
-		_clips[key] = clip
+		_clips["%s-%s" % [clip.name, clip.view]] = clip
+	assert(_clips.size() == ACTIONS.size() * VIEWS.size())
 
 
 func _sheet(key: String, layer: String, clip: Dictionary) -> Texture2D:
@@ -52,9 +50,9 @@ func _sheet(key: String, layer: String, clip: Dictionary) -> Texture2D:
 	if not _textures.has(sheet_key):
 		var path := "%s%s.png" % [ASSET_ROOT, sheet_key]
 		var sheet := ResourceLoader.load(path) as Texture2D
-		assert(sheet != null, "Missing preview sheet: " + path)
-		assert(sheet.get_width() == 2048)
-		assert(sheet.get_height() == 256 * ceili(float(clip.frames) / 8.0))
+		assert(sheet != null, "Missing Squircle v1 sheet: " + path)
+		assert(sheet.get_width() == int(clip.sheet_columns) * 256)
+		assert(sheet.get_height() == ceili(float(clip.frames) / float(clip.sheet_columns)) * 256)
 		_textures[sheet_key] = sheet
 	return _textures[sheet_key] as Texture2D
 
@@ -72,14 +70,17 @@ func _build_ui() -> void:
 		margin.add_theme_constant_override("margin_" + side, 32)
 	add_child(margin)
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 22)
+	column.add_theme_constant_override("separation", 24)
 	margin.add_child(column)
+
 	var title := Label.new()
-	title.text = "RENDERED SQUIRCLE · GODOT ART PREVIEW"
-	title.add_theme_font_size_override("font_size", 32)
+	title.text = "ANIMATION LAB"
+	title.add_theme_font_size_override("font_size", 36)
+	title.add_theme_color_override("font_color", Color("ffd166"))
 	column.add_child(title)
 	var subtitle := Label.new()
-	subtitle.text = "Squircle v1 · Approved idle, walk and run · F12 opens the debug launcher."
+	subtitle.text = "Squircle v1 · Approved rendered motion"
+	subtitle.add_theme_font_size_override("font_size", 19)
 	column.add_child(subtitle)
 
 	var controls := HBoxContainer.new()
@@ -87,11 +88,9 @@ func _build_ui() -> void:
 	column.add_child(controls)
 	_add_picker(controls, "Action", ACTIONS, 0, func(index: int) -> void:
 		_action = ACTIONS[index]
-		_elapsed = 0.0
 		_update_selection())
 	_add_picker(controls, "View", VIEWS, 0, func(index: int) -> void:
 		_view = VIEWS[index]
-		_elapsed = 0.0
 		_update_selection())
 	var color_names: Array[String] = []
 	for option: Dictionary in CharacterSelection.COLORS:
@@ -104,22 +103,20 @@ func _build_ui() -> void:
 		_update_selection())
 	_play_button = Button.new()
 	_play_button.text = "Pause"
-	_play_button.pressed.connect(func() -> void:
-		_playing = not _playing
-		_play_button.text = "Pause" if _playing else "Play")
+	_play_button.pressed.connect(_toggle_play)
 	controls.add_child(_play_button)
 
 	var stage := HBoxContainer.new()
-	stage.add_theme_constant_override("separation", 24)
+	stage.add_theme_constant_override("separation", 40)
 	column.add_child(stage)
-	_add_sample(stage, "Squircle v1 · 256 px", 256, true)
-	_add_sample(stage, "Squircle v1 · 128 px", 128, true)
-	_add_sample(stage, "Current 2D · 256 px", 256, false)
-	_add_sample(stage, "Current 2D · 128 px", 128, false)
+	_add_sample(stage, "256 px · full reference", 256)
+	_add_sample(stage, "128 px · small reference", 128)
+
 	_info = Label.new()
+	_info.add_theme_font_size_override("font_size", 19)
 	column.add_child(_info)
 	var note := Label.new()
-	note.text = "The Playground lobby uses these v1 sheets. Canvas sizes are art references."
+	note.text = "Each change starts at frame 1. Pause holds the current frame; Play resumes it. F12 opens the debug launcher."
 	column.add_child(note)
 
 
@@ -137,12 +134,13 @@ func _add_picker(parent: HBoxContainer, title: String, names: Array, initial: in
 	group.add_child(picker)
 
 
-func _add_sample(parent: HBoxContainer, title: String, size: int, rendered: bool) -> void:
+func _add_sample(parent: HBoxContainer, title: String, size: int) -> void:
 	var group := VBoxContainer.new()
 	group.add_theme_constant_override("separation", 12)
 	parent.add_child(group)
 	var label := Label.new()
 	label.text = title
+	label.add_theme_font_size_override("font_size", 19)
 	group.add_child(label)
 	var canvas := Control.new()
 	canvas.custom_minimum_size = Vector2(size, size)
@@ -150,51 +148,34 @@ func _add_sample(parent: HBoxContainer, title: String, size: int, rendered: bool
 	group.add_child(canvas)
 	var backdrop := ColorRect.new()
 	backdrop.color = Color("405170")
-	backdrop.custom_minimum_size = Vector2(size, size)
+	backdrop.size = Vector2(size, size)
 	canvas.add_child(backdrop)
 	var floor := ColorRect.new()
 	floor.color = Color("92a6a0")
 	floor.position = Vector2(0, 204.0 * size / 256.0)
 	floor.size = Vector2(size, 1)
 	canvas.add_child(floor)
-	var scale_factor := float(size) / 256.0
-	if rendered:
-		var root := RENDERED_SAMPLE.new() as SquircleRenderedSample
-		root.position = Vector2(size / 2.0, 204.0 * scale_factor)
-		root.scale = Vector2.ONE * scale_factor
-		canvas.add_child(root)
-		_samples.append({"rendered": true, "root": root, "base": root.base, "face": root.face,
-			"material": root.tint_material})
-	else:
-		var current := CURRENT_CHARACTER.instantiate() as ShapeCharacter
-		current.body_shape = &"squircle"
-		current.position = Vector2(size / 2.0, 140.0 * scale_factor)
-		current.scale = Vector2.ONE * scale_factor
-		canvas.add_child(current)
-		for hand_name: String in ["LeftHand", "RightHand"]:
-			(current.get_node(hand_name) as Sprite2D).texture = preload("res://assets/runtime/shape_characters/hands/open.png")
-		_samples.append({"rendered": false, "character": current})
+	var sample := RENDERED_SAMPLE.new() as SquircleRenderedSample
+	sample.position = Vector2(size / 2.0, 204.0 * size / 256.0)
+	sample.scale = Vector2.ONE * float(size) / 256.0
+	canvas.add_child(sample)
+	_samples.append(sample)
 
 
 func _update_selection() -> void:
+	_elapsed = 0.0
 	var key := "%s-%s" % [_action, _view]
 	var clip: Dictionary = _clips[key]
 	if _loaded_clip != key:
 		_textures.clear()
 		_loaded_clip = key
+	var base := _sheet(key, "colorable", clip)
+	var face := _sheet(key, _expression, clip)
+	for sample: SquircleRenderedSample in _samples:
+		sample.configure(clip, base, face, Color(String(_color.hex)))
 	var anchor := Vector2(float(clip.anchor_px[0]), float(clip.anchor_px[1]))
-	var base_sheet := _sheet(key, "colorable", clip)
-	var face_sheet := _sheet(key, _expression, clip)
-	for sample: Dictionary in _samples:
-		if sample.rendered:
-			(sample.root as SquircleRenderedSample).configure(clip, base_sheet, face_sheet,
-				Color(String(_color.hex)))
-		else:
-			var current := sample.character as ShapeCharacter
-			current.player_color = Color(String(_color.hex))
-			(current.get_node("Face") as Sprite2D).texture = load("res://assets/runtime/shape_characters/faces/%s.png" % _expression)
-	_info.text = "%s · %s · %s (%s) · %d frames at %d fps · anchor (%.2f, %.2f)" % [
-		_action.capitalize(), _view.capitalize(), _color.name, _color.id,
+	_info.text = "%s · %s · %s · %s  |  %d frames · %d fps · anchor (%.2f, %.2f)" % [
+		_action.capitalize(), _view.capitalize(), _color.name, _expression.capitalize(),
 		clip.frames, clip.fps, anchor.x, anchor.y]
 	_update_frame()
 
@@ -204,6 +185,10 @@ func _update_frame() -> void:
 		return
 	var clip: Dictionary = _clips["%s-%s" % [_action, _view]]
 	var frame := int(_elapsed * float(clip.fps)) % int(clip.frames)
-	for sample: Dictionary in _samples:
-		if sample.rendered:
-			(sample.root as SquircleRenderedSample).show_frame(frame)
+	for sample: SquircleRenderedSample in _samples:
+		sample.show_frame(frame)
+
+
+func _toggle_play() -> void:
+	_playing = not _playing
+	_play_button.text = "Pause" if _playing else "Play"
