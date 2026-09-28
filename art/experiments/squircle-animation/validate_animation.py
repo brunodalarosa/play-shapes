@@ -26,19 +26,39 @@ for clip,spec in CLIPS.items():
     scene.frame_set(spec['frames']+1);bpy.context.view_layer.update()
     seam=max(abs(first[n][r][c]-bpy.data.objects[p].matrix_world[r][c]) for n,p in CONTROLS.items() for r in range(4) for c in range(4))
     check(clip+' seam pose',seam<1e-6,seam)
-    min_z=1e9;planted_z=0;max_slip=0;min_border=1e9;min_foot_body_gap=1e9;min_palm_down=1.0
+    min_z=1e9;planted_z=0;max_slip=0;min_border=1e9;min_foot_body_gap=1e9
+    min_fingers_down=1.0; hand_y=[]; hand_min_z=1e9; min_hand_body_gap=1e9
+    min_palm_inward=1.0; min_palm_toward_body=1.0
     previous={}
     for sub in range(spec['frames']*4+1):
         f=1+sub/4
         scene.frame_set(int(f),subframe=f-int(f));bpy.context.view_layer.update()
         deps=bpy.context.evaluated_depsgraph_get()
         for hand_name in ('Hand.L','Hand.R'):
+            fingers=(bpy.data.objects[hand_name].matrix_world.to_3x3()@Vector((0,0,1))).normalized()
+            min_fingers_down=min(min_fingers_down,-fingers.z)
             palm=(bpy.data.objects[hand_name].matrix_world.to_3x3()@Vector((0,-1,0))).normalized()
-            min_palm_down=min(min_palm_down,-palm.z)
+            inward=Vector((1 if hand_name=='Hand.L' else -1,0,0))
+            to_body=(bpy.data.objects['Body.Squircle'].matrix_world.translation-bpy.data.objects[hand_name].matrix_world.translation).normalized()
+            min_palm_inward=min(min_palm_inward,palm.dot(inward))
+            min_palm_toward_body=min(min_palm_toward_body,palm.dot(to_body))
+            hand=bpy.data.objects[hand_name].evaluated_get(deps)
+            mesh=hand.to_mesh()
+            points=[hand.matrix_world@v.co for v in mesh.vertices]
+            hand_min_z=min(hand_min_z,min(p.z for p in points))
+            hand.to_mesh_clear()
+            if hand_name=='Hand.L':hand_y.append(hand.matrix_world.translation.y)
         body=bpy.data.objects['Body.Squircle'].evaluated_get(deps)
         body_mesh=body.to_mesh()
         body_bottom=min((body.matrix_world@v.co).z for v in body_mesh.vertices)
+        body_half_width=max(abs((body.matrix_world@v.co).x) for v in body_mesh.vertices)
         body.to_mesh_clear()
+        for hand_name in ('Hand.L','Hand.R'):
+            hand=bpy.data.objects[hand_name].evaluated_get(deps)
+            mesh=hand.to_mesh()
+            inner=min(abs((hand.matrix_world@v.co).x) for v in mesh.vertices)
+            min_hand_body_gap=min(min_hand_body_gap,inner-body_half_width)
+            hand.to_mesh_clear()
         for name,offset in [('Foot.L',0),('Foot.R',.5)]:
             foot=bpy.data.objects[name].evaluated_get(deps)
             mesh=foot.to_mesh()
@@ -71,12 +91,24 @@ for clip,spec in CLIPS.items():
     check(clip+' stance world travel cancels',max_slip<2e-6,max_slip)
     check(clip+' fixed-camera containment',min_border>0,min_border*256)
     check(clip+' floating foot-body gap',min_foot_body_gap>.04,min_foot_body_gap)
-    check(clip+' palms remain facing ground',min_palm_down>.95,min_palm_down)
+    if clip=='idle':check('idle fingertips hang down',min_fingers_down>.95,min_fingers_down)
+    check(clip+' palms face inward throughout loop',min_palm_inward>.3,min_palm_inward)
+    check(clip+' palms point toward body throughout loop',min_palm_toward_body>.3,min_palm_toward_body)
+    check(clip+' hand floor clearance',hand_min_z>.05,hand_min_z)
+    check(clip+' hand body clearance in X',min_hand_body_gap>0,min_hand_body_gap)
+    expected={'idle':0.0,'walk':.35,'run':1.0}[clip]
+    check(clip+' saved hand shape', all(abs(bpy.data.objects[n].data.shape_keys.key_blocks['Closed fist'].value-expected)<1e-6 for n in ('Hand.L','Hand.R')))
     report['clips'][clip]={'max_seam_matrix_error':seam,'minimum_sole_z':min_z,
                            'max_planted_sole_error':planted_z,'max_stance_slip_per_quarter_frame_m':max_slip,
                            'minimum_projected_bound_margin_px':min_border*256,
                            'minimum_vertical_foot_body_gap_m':min_foot_body_gap,
-                           'minimum_palm_down_dot':min_palm_down}
+                           'minimum_fingers_down_dot':min_fingers_down,
+                           'minimum_palm_inward_dot':min_palm_inward,
+                           'minimum_palm_toward_body_dot':min_palm_toward_body,
+                           'hand_y_travel_m':max(hand_y)-min(hand_y),
+                           'minimum_hand_floor_clearance_m':hand_min_z,
+                           'minimum_hand_body_x_gap_m':min_hand_body_gap}
+check('run hand swing exceeds walk and previous run',report['clips']['run']['hand_y_travel_m']>1.2 and report['clips']['run']['hand_y_travel_m']>2*report['clips']['walk']['hand_y_travel_m'])
 check('three independent editable actions', all('PS057 | '+x.title() in bpy.data.actions for x in CLIPS))
 check('five independently controlled parts',len(rig.pose.bones)==5)
 check('packed neutral and blink textures',all(bpy.data.images['PS056 Face - '+x].packed_file for x in ('neutral','blink')))

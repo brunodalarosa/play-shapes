@@ -1,15 +1,20 @@
-# Squircle animation study — PS-057
+# Squircle animation study — PS-057 / PS-064 hands
 
 **Ready for owner motion review; human approval pending.** The approved PS-056
 static model remains untouched in `../squircle-3d/`. This folder is a separate art
-experiment. It does not replace production sprites or integrate with Godot.
+experiment. The revised sheets appear only in the F12 Godot comparison; the
+Playground lobby keeps its previous PS-057 sheets until a separate adoption decision.
 
 ## Review first
 
+- `previews/before-after-{256,128}.gif`: synchronized old/new idle and run in both views.
+- `previews/walk-options-{256,128}.gif`: previous walk, relaxed open, proposed 35% curl, run fist.
+- `before-inward-ps064/squircle-animated.blend`: preserved previous PS-064 iteration, used for Before comparisons.
+- `before-ps064/squircle-animated.blend`: historical PS-057 source before the glove revision.
 - `previews/motion-review-256.gif`: six looping clips together, at 256-pixel canvas size.
 - `previews/motion-review-128.gif`: the same comparison at 128 pixels.
 - `previews/palette-and-blink.png`: all ten canonical colors, neutral and blink.
-- `previews/hand-detail.png`: the rounded glove silhouette viewed from above.
+- `previews/hand-detail-open.png` and `hand-detail-closed.png`: current glove silhouettes.
 - `previews/occlusion-proof.png`: current colorable/mask/face layer breakdown.
   The earlier deliberate hand-crossing example is retained in commit `7abd586`;
   the revised relaxed gestures no longer reach across the face.
@@ -35,11 +40,12 @@ Front projection hides depth travel, so use the three-quarter view for contact.
 
 Open `squircle-animated.blend` in Blender 5.2.2. Active scene:
 `PS057 | Squircle Animation Studio`. Textures are packed; no add-on or automatic
-script execution is required. The two hand meshes have been revised to broad,
-rounded gloves with three thick fingers, a thumb and a small rolled cuff, guided
-by the owner's supplied [cartoon-hand reference](https://sketchfab.com/3d-models/cartoon-hand-4e84e54713364931b8b2af5b8d48ce35).
-They use original geometry and the shared player-color material, not the reference
-model or fabric texture. Body, feet, face, pivots, lighting and cameras are retained.
+script execution is required. PS-064 uses original rounded toy-glove geometry,
+guided by the four images in the parent vault's `Management/Task references/PS-064/`.
+Three fingers fold against the palm and the thumb crosses them to form a fist.
+Both hands have native `Closed fist` shape keys, driven by the rig's keyed
+`Hand curl` property: idle 0, walk .35, run 1. Body, feet, face, pivots, lighting,
+cameras and all non-hand animation channels are retained.
 
 1. Select `Animation.Controls` in the Outliner.
 2. Change an editor to **Dope Sheet**, then choose **Action Editor** from its mode menu.
@@ -60,13 +66,27 @@ keys; it does not regenerate them from the construction script.
 |---|---:|---:|---:|---|
 | Idle | 1–48 | 2 s | 0 | Both soles planted; breathing and offset hand motion |
 | Walk | 1–24 | 1 s | 1.65 m/s | 62.5% stance per foot; alternating steps and gentle bob |
-| Run | 1–16 | ⅔ s | 3.60 m/s | 37.5% stance per foot; flight, body compression and relaxed hand swings |
+| Run | 1–16 | ⅔ s | 3.60 m/s | 37.5% stance per foot; flight, body compression and swinging fists |
 
-Palms face the ground throughout all three clips. Fingers point gently forward,
-with slight outward yaw and loose wrist follow-through rather than raised waves.
-`hand_model.py` defines the new geometry and hand motion; `revise_hands.py` changes
-only hand meshes and hand location/rotation keys in an existing animated file.
-`hand-revision.json` records that all non-hand animation channels stayed identical.
+Idle fingers hang down with inward-facing palms and phase-offset wrist drift.
+The owner-reference correction lowers all wrist positions by 0.14 m and mirrors
+wrist yaw/roll so the actual palm normals point inward. Running rotation swings
+around the inward axis to retain that facing throughout the stroke. Mesh geometry,
+non-hand animation channels, action lengths and wrist travel rhythm are preserved.
+`turn_palms_inward.py` records this one-time correction in `ps064-inward-revision.json`;
+it must only be run on the preserved pre-correction source, never on the corrected file.
+Walk uses a proposed 35% curl; run closes the fists and swings opposite the same-side
+foot. Forward/back amplitudes are .018 / .30 / .67 m; run vertical swing amplitude
+is .23 m. These are tunable in `ps064_hands.py`. `revise_ps064.py` applies that recipe
+to the saved source and asserts preservation of non-hand channels, recorded in
+`ps064-revision.json`. Export reads the saved actions and native shape keys.
+`hand_model.py` and `revise_hands.py` are historical PS-057 recipes; do not run them
+over the current source. The former palms-down requirement is superseded by PS-064.
+
+Open the before blend and current blend in separate Blender windows for direct
+comparison. Both use the same action names, lengths and cameras. In Godot, F12 >
+Rendered squircle comparison displays synchronized After/Before at both sizes,
+with the current 2D character below. Owner motion approval remains pending.
 
 The proposed frame rate and sizes are review choices, not approved production
 requirements. Blinks are independent of the locomotion actions. The page blinks
@@ -82,6 +102,8 @@ $blender = 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe'
 $python = 'C:\Users\backup pc\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
 & $blender --background 'squircle-animated.blend' --python-exit-code 1 --python 'export_frames.py'
 & $python make_previews.py
+& $blender --background 'squircle-animated.blend' --python-exit-code 1 --python 'render_hand_detail.py'
+& $python review_ps064.py
 & $blender --background 'squircle-animated.blend' --python-exit-code 1 --python 'validate_animation.py'
 ```
 
@@ -117,6 +139,14 @@ For a fresh-source replay:
 For a small diagnostic, use `--output probe --clips run --views three-quarter --frames 1 5 9 13`.
 Partial exports must use a separate output directory: their manifest intentionally
 contains only those requested frames. Never mix a partial export into `export/`.
+
+To regenerate the walk alternative, export with `--output walk-open-ps064 --clips walk --hand-curl 0`,
+then rerun `review_ps064.py`. It copies only the 18 active review sheets to
+`debug/squircle_preview/assets-ps064/` and writes `ps064-runtime-sync.json` with
+their hashes. It also copies the previous iteration from `before-inward-ps064/previews/`
+to `debug/squircle_preview/assets-before-inward-ps064/` for Before comparisons.
+The old `assets/` folder remains the lobby source; leave it unchanged.
+The shared Godot manifest's timing/anchors are unchanged.
 
 To add a future action: duplicate an action in Blender, pose the five controls,
 add its loop-closing key, save, and add its frame count/speed/stance to `CLIPS`
@@ -173,9 +203,11 @@ file now has a real rigid control armature, so the original armature absence alo
 is not the reason for rejecting the add-on.
 
 `validation.json` measures every action at quarter-frame intervals: loop pose,
-evaluated mesh sole height, floating foot/body gap, palm-down orientation,
+evaluated mesh sole height, floating foot/body gap, hanging idle orientation,
 planted-foot position after root travel, and camera
-containment. `export-verification.json` checks a whole fresh export, metadata,
+containment, hand/body and floor clearance, action-driven curl and swing range.
+Actual evaluated mesh palm normals are checked toward the body throughout every loop.
+`export-verification.json` checks a whole fresh export, metadata,
 RGBA files, untrimmed bounds and sheet tile ordering. Same-machine replay is
 stable within **1/255** for colorable RGBA, expression RGBA and mask alpha, not
 byte-identical under GPU rendering. Export canonicalizes unused mask RGB to
@@ -184,9 +216,12 @@ rendered alpha margin is recorded in `export-verification.json` for this revisio
 
 The Blender restricted profile reported inability to read user preferences and
 write an optional thumbnail cache; source save, reopen and renders succeeded.
-These are not texture/missing-file errors. No production engine checks are needed:
-`.gdignore` keeps this experiment outside Godot import and production code is unchanged.
+These are not texture/missing-file errors. `.gdignore` keeps this source experiment
+outside Godot import; the dedicated debug cache is checked by
+`godot --headless --path . --script res://tests/squircle_preview_test.gd` from the
+implementation root. The preview still uses direct PNG loading for local review;
+standalone export compatibility and physical-phone readability are not established here.
 
 Owner review remains required for the revised hand shape and relaxed motion,
 small-size readability, palette transfer, timing and the no-baked-shadow choice.
-PS-058 must not treat this as approved art direction until that review is recorded.
+Do not adopt PS-064 in the lobby or other shapes until that review is recorded.

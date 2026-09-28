@@ -24,7 +24,10 @@ parser.add_argument('--output', default='export')
 parser.add_argument('--clips', nargs='+', choices=list(CLIPS), default=list(CLIPS))
 parser.add_argument('--views', nargs='+', choices=list(VIEWS), default=list(VIEWS))
 parser.add_argument('--frames', nargs='+', type=int)
+parser.add_argument('--hand-curl', type=float, choices=[0.0, .35, 1.0], help='Review-only override; requires a separate output folder')
 args = parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+if args.output == 'export' and (args.frames or args.clips != list(CLIPS) or args.views != list(VIEWS) or args.hand_curl is not None):
+    parser.error('Partial exports and hand variants require --output to a separate folder')
 out = HERE / args.output
 out.mkdir(parents=True, exist_ok=True)
 scene = bpy.data.scenes['PS057 | Squircle Animation Studio']
@@ -113,6 +116,8 @@ manifest = {
                'face-mask': 'Visibility of entire opaque face plane; toy meshes are holdouts'},
     'face_mapping': 'Pixel-space top-left, top-right, bottom-left; affine UV; source RGBA applied through mask alpha',
     'clips': []}
+manifest['hand_revision'] = 'PS064'
+manifest['hand_curl_override'] = args.hand_curl
 (out/'expressions').mkdir(exist_ok=True)
 for expression in ('neutral', 'blink'):
     bpy.data.images['PS056 Face - '+expression].save_render(str(out/'expressions'/f'{expression}.png'), scene=scene)
@@ -130,6 +135,9 @@ for clip in args.clips:
             if not 1 <= frame <= spec['frames']:
                 raise ValueError(f'{clip}: frame out of export range: {frame}')
             scene.frame_set(frame)
+            if args.hand_curl is not None:
+                rig['Hand curl'] = args.hand_curl
+                rig.update_tag()
             bpy.context.view_layer.update()
             rel = Path(clip) / view
             base_path = rel / 'colorable' / f'{frame:04d}.png'

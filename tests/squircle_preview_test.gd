@@ -30,6 +30,14 @@ func _run() -> void:
 		preview.set("_action", String(record.name))
 		preview.set("_view", String(record.view))
 		preview.call("_update_selection")
+		for layer: String in ["colorable", "neutral", "blink"]:
+			var filename := "%s-%s-%s.png" % [record.name, record.view, layer]
+			if not _check(FileAccess.get_file_as_bytes("res://debug/squircle_preview/assets-ps064/" + filename)
+				== FileAccess.get_file_as_bytes("res://art/experiments/squircle-animation/previews/" + filename), "PS064 cache matches fresh source sheets"):
+				return
+			if not _check(FileAccess.get_file_as_bytes("res://debug/squircle_preview/assets-before-inward-ps064/" + filename)
+				== FileAccess.get_file_as_bytes("res://art/experiments/squircle-animation/before-inward-ps064/previews/" + filename), "Before cache matches preserved previous iteration"):
+				return
 		for frame: int in [0, int(record.frames) - 1]:
 			preview.set("_elapsed", float(frame) / float(record.fps))
 			preview.call("_update_frame")
@@ -38,6 +46,11 @@ func _run() -> void:
 			var face := first.face as Sprite2D
 			if not _check(base.region_rect == face.region_rect and base.region_rect.position == Vector2(frame % 8 * 256, floori(float(frame) / 8.0) * 256)
 				and base.position == -Vector2(float(record.anchor_px[0]), float(record.anchor_px[1])), "Frame tiles and source anchor stay aligned"):
+				return
+			var before: Dictionary = preview.get("_samples")[1]
+			if not _check((before.base as Sprite2D).region_rect == base.region_rect
+				and (before.face as Sprite2D).region_rect == face.region_rect
+				and (before.base as Sprite2D).texture != base.texture, "Before and after use separate sheets on the same frame"):
 				return
 	for option: Dictionary in CharacterSelection.COLORS:
 		preview.set("_color", option)
