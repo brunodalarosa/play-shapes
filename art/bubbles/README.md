@@ -13,7 +13,7 @@ PS-036 / PS-037 / PS-038, prepared 2026-09-22. Runtime art is under
 
 These are static art studies, not screenshots of implemented Bubbles gameplay.
 Bubble circles, names, timer and warning chevrons are review graphics. Existing
-Shape Character art is used for scale. Each bubble shows five jellyfish as a
+Squircle v1 art is used for scale. Each bubble shows five jellyfish as a
 sample cap, not an approved tuning decision. The phone panel is a composition
 study; it does not prove browser or physical-device readability.
 
@@ -33,9 +33,7 @@ Each sprite is trimmed and padded by eight pixels. This cleanup is specific to
 opaque paper props, and must not be applied to translucent bubbles or VFX.
 
 To regenerate, keep the original source files at the same path in the parent
-design vault. First run `python tools/assets/prepare_bubbles_review_inputs.py`
-(Pillow required) for pixel-identical RGBA working copies of existing player art;
-this avoids GIMP's indexed-PNG alpha display issue. Through GIMP's Python
+design vault. Through GIMP's Python
 console/MCP, set `PLAY_SHAPES_ROOT` to the
 absolute implementation checkout, then execute the files in this order:
 

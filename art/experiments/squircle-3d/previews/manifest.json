@@ -1,0 +1,143 @@
+{
+  "source": "squircle-toy.blend",
+  "engine": "Cycles",
+  "samples": 192,
+  "color_management": "AgX",
+  "outputs": [
+    {
+      "file": "blue-three-quarter-768.png",
+      "view": "three-quarter",
+      "palette": "Blue",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "blue-front-768.png",
+      "view": "front",
+      "palette": "Blue",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "brown-three-quarter-768.png",
+      "view": "three-quarter",
+      "palette": "Brown",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "cyan-three-quarter-768.png",
+      "view": "three-quarter",
+      "palette": "Cyan",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "golden-yellow-three-quarter-768.png",
+      "view": "three-quarter",
+      "palette": "Golden Yellow",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "golden-yellow-front-768.png",
+      "view": "front",
+      "palette": "Golden Yellow",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "green-three-quarter-768.png",
+      "view": "three-quarter",
+      "palette": "Green",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "indigo-three-quarter-768.png",
+      "view": "three-quarter",
+      "palette": "Indigo",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "orange-three-quarter-768.png",
+      "view": "three-quarter",
+      "palette": "Orange",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "pink-three-quarter-768.png",
+      "view": "three-quarter",
+      "palette": "Pink",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "purple-three-quarter-768.png",
+      "view": "three-quarter",
+      "palette": "Purple",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "red-three-quarter-768.png",
+      "view": "three-quarter",
+      "palette": "Red",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "red-front-768.png",
+      "view": "front",
+      "palette": "Red",
+      "layer": "beauty",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "blue-colorable-only-768.png",
+      "view": "three-quarter",
+      "palette": "Blue",
+      "layer": "colorable-only",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    },
+    {
+      "file": "blue-contact-shadow-768.png",
+      "view": "three-quarter",
+      "palette": "Blue",
+      "layer": "beauty-with-optional-shadow",
+      "width": 768,
+      "height": 768,
+      "transparent": true
+    }
+  ]
+}

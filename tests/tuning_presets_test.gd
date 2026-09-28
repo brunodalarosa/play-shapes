@@ -1,7 +1,6 @@
 extends SceneTree
 
 const TUNING_ROOT := "res://Tuning"
-const SimonTuningScript := preload("res://Tuning/Minigames/simon_says_tuning.gd")
 const BubblesTuningScript := preload("res://Tuning/Minigames/bubbles_tuning.gd")
 const NetworkingTuningScript := preload("res://Tuning/Shared/networking_tuning.gd")
 const ActivePresetsScript := preload("res://Tuning/active_presets.gd")
@@ -10,20 +9,6 @@ func _initialize() -> void:
 	_run.call_deferred()
 
 func _run() -> void:
-	if not _check_tooltip_contract("res://Tuning/Minigames/simon_says_tuning.gd", [
-		"countdown_seconds", "round_duration_seconds", "stop_interval_min_seconds",
-		"stop_interval_max_seconds", "stop_interval_reduction_seconds",
-		"down_unlock_seconds", "up_unlock_seconds",
-		"charge_fill_seconds", "charge_decay_seconds", "pose_reveal_delay_seconds",
-		"pose_grace_seconds", "dance_beats_per_second",
-		"body_bounce", "body_jiggle_degrees", "body_sway", "visual_follow_speed",
-		"secondary_motion_strength", "lead_emphasis", "reaction_seconds", "result_cycle_seconds",
-		"pose_flow_hold_seconds",
-		"controller_left_color", "controller_right_color", "controller_down_color", "controller_up_color",
-		"controller_minimum_brightness", "controller_maximum_brightness",
-		"auto_hold_seconds", "auto_release_seconds",
-	]):
-		return
 	if not _check_tooltip_contract("res://Tuning/Shared/networking_tuning.gd", [
 		"http_port", "websocket_port", "max_connections", "request_timeout_seconds",
 		"max_players", "reconnect_grace_seconds",
@@ -44,11 +29,11 @@ func _run() -> void:
 		"final_timer_emphasis_seconds",
 	]):
 		return
-	if not _check_tooltip_contract("res://Tuning/active_presets.gd", ["simon_says", "bubbles", "networking"]):
+	if not _check_tooltip_contract("res://Tuning/active_presets.gd", ["bubbles", "networking"]):
 		return
 
 	var preset_paths := _find_presets(TUNING_ROOT)
-	if not _check(preset_paths.has("res://Tuning/Active Presets.tres") and preset_paths.has("res://Tuning/Minigames/SimonSays/Default.tres") and preset_paths.has("res://Tuning/Minigames/Bubbles/Default.tres") and preset_paths.has("res://Tuning/Shared/Networking/Default.tres"), "Default presets and Active Presets are discovered"):
+	if not _check(preset_paths.has("res://Tuning/Active Presets.tres") and preset_paths.has("res://Tuning/Minigames/Bubbles/Default.tres") and preset_paths.has("res://Tuning/Shared/Networking/Default.tres"), "Default presets and Active Presets are discovered"):
 		return
 	for path: String in preset_paths:
 		var preset: Resource = load(path)
@@ -60,33 +45,15 @@ func _run() -> void:
 		if not _check(errors.is_empty(), "Preset is valid: %s — %s" % [path, "; ".join(errors)]):
 			return
 
-	var simon: Resource = SimonTuningScript.new()
-	simon.charge_fill_seconds = -5.0
-	simon.body_bounce = 99.0
-	if not _check(simon.charge_fill_seconds == 0.1 and simon.body_bounce == 16.0, "Simon Says individual values clamp to safe ranges"):
-		return
-	simon.charge_decay_seconds = 1.0
-	simon.pose_reveal_delay_seconds = 99.0
-	simon.pose_grace_seconds = -1.0
-	if not _check(simon.pose_reveal_delay_seconds == 0.5 and simon.pose_grace_seconds == 0.2,
-		"Pose reveal and grace values clamp to documented safe ranges"):
-		return
-	simon.stop_interval_min_seconds = 9.0
-	simon.stop_interval_max_seconds = 3.0
-	if not _check(simon.validation_errors()[0].contains("Minimum stop interval"),
-		"Simon Says invalid round timing reports an actionable message"):
-		return
-	simon.stop_interval_min_seconds = 3.0
-	simon.auto_release_seconds = 0.1
-	if not _check(simon.validation_errors()[0].contains("Auto release"), "Simon Says invalid combinations report an actionable message"):
-		return
-	simon.auto_release_seconds = 2.0
-	simon.controller_minimum_brightness = 0.8
-	simon.controller_maximum_brightness = 0.6
-	if not _check(simon.validation_errors()[0].contains("idle brightness"), "Phone brightness ordering validates cleanly"):
-		return
-
 	var networking: Resource = NetworkingTuningScript.new()
+	var default_networking: Resource = load("res://Tuning/Shared/Networking/Default.tres")
+	if not _check(networking.max_players == 10 and default_networking.max_players == 10
+			and default_networking.max_connections == 32 and default_networking.reconnect_grace_seconds == 60.0,
+			"Networking defaults preserve ten registered players, 32 connections, and 60-second grace"):
+		return
+	networking.max_players = 20
+	if not _check(networking.max_players == 10, "Designer tuning clamps capacity at ten"):
+		return
 	networking.http_port = 1
 	networking.max_connections = 999
 	if not _check(networking.http_port == 1024 and networking.max_connections == 128, "Networking individual values clamp to safe ranges"):
@@ -123,7 +90,7 @@ func _run() -> void:
 		return
 
 	var active: Resource = ActivePresetsScript.new()
-	if not _check(active.validation_errors().size() == 3, "Active selector rejects missing preset references"):
+	if not _check(active.validation_errors().size() == 2, "Active selector rejects missing preset references"):
 		return
 	print("Tuning preset checks passed (%d committed assets)" % preset_paths.size())
 	quit(0)

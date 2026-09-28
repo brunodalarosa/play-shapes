@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://minigames/bubbles_player_bubble.gd" id="1"]
 [ext_resource type="Script" path="res://minigames/bubbles_player_visual.gd" id="2"]
-[ext_resource type="PackedScene" path="res://characters/shape_character.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://characters/squircle_v1_playback.tscn" id="3"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 48.0
@@ -20,8 +20,7 @@ texture_filter = 4
 texture_repeat = 1
 script = ExtResource("2")
 
-[node name="ShapeCharacter" parent="." instance=ExtResource("3")]
-scale = Vector2(0.55, 0.55)
+[node name="SquircleV1Playback" parent="." instance=ExtResource("3")]
 
 [node name="PlayerName" type="Label" parent="."]
 offset_left = -110.0

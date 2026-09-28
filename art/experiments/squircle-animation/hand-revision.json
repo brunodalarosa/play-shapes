@@ -1,0 +1,15 @@
+{
+  "non_hand_animation_channels_unchanged": true,
+  "source_reference": "https://sketchfab.com/3d-models/cartoon-hand-4e84e54713364931b8b2af5b8d48ce35",
+  "reference_basis": "Owner supplied image; new geometry, no downloaded model or texture.",
+  "changed": [
+    "Hand.L mesh",
+    "Hand.R mesh",
+    "Hand.L/R location and rotation keys"
+  ],
+  "palm_normal_local": [
+    0,
+    -1,
+    0
+  ]
+}

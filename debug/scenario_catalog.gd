@@ -5,16 +5,9 @@ extends RefCounted
 static func scenarios() -> Array[DebugScenario]:
 	return [
 		DebugScenario.new(
-			&"animation_lab",
-			"Milestone 1 character animation",
-			"res://debug/character_animation_system.tscn"
-		),
-		DebugScenario.new(
-			&"one_player_simon",
-			"One-player Flash? Pose!",
-			"res://minigames/dancer_simon_says.tscn",
-			"one_registered_player",
-			&"flash_pose"
+			&"squircle_animation_lab",
+			"Animation Lab",
+			"res://debug/animation_lab/animation_lab.tscn"
 		),
 		DebugScenario.new(
 			&"one_player_bubbles",

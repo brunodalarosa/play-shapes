@@ -4,11 +4,8 @@ extends Node
 signal connection_count_changed(count: int)
 signal players_changed(players: Array[Dictionary])
 
-const FLASH_POSE_SCENE_PATH := "res://minigames/dancer_simon_says.tscn"
-const FLASH_POSE_MAX_PLAYERS := 10
 const BUBBLES_SCENE_PATH := "res://minigames/bubbles_and_jellyfishes.tscn"
 const BUBBLES_MAX_PLAYERS := 10
-const MINIGAME_FLASH_POSE := &"flash_pose"
 const MINIGAME_BUBBLES := &"bubbles"
 
 @export var active_presets: ActivePresets = preload("res://Tuning/Active Presets.tres")
@@ -87,8 +84,6 @@ func players() -> Array[Dictionary]:
 
 func minigame_scene_path(minigame_id: StringName) -> String:
 	match minigame_id:
-		MINIGAME_FLASH_POSE:
-			return FLASH_POSE_SCENE_PATH
 		MINIGAME_BUBBLES:
 			return BUBBLES_SCENE_PATH
 	return ""
@@ -97,8 +92,6 @@ func minigame_scene_path(minigame_id: StringName) -> String:
 func minigame_availability(minigame_id: StringName, allow_one_player_debug := false) -> Dictionary:
 	var maximum_players := 0
 	match minigame_id:
-		MINIGAME_FLASH_POSE:
-			maximum_players = FLASH_POSE_MAX_PLAYERS
 		MINIGAME_BUBBLES:
 			maximum_players = BUBBLES_MAX_PLAYERS
 		_:
@@ -125,8 +118,6 @@ func minigame_availability(minigame_id: StringName, allow_one_player_debug := fa
 
 func minigame_display_name(minigame_id: StringName) -> String:
 	match minigame_id:
-		MINIGAME_FLASH_POSE:
-			return "Flash? Pose!"
 		MINIGAME_BUBBLES:
 			return "Bubbles and Jellyfishes"
 	return "Minigame"
@@ -161,34 +152,16 @@ func clear_minigame_launch(minigame_id: StringName = &"") -> void:
 		_pending_minigame_launch = {}
 
 
-# Keep the existing Flash? Pose! entry points while both games share one gate
-# and one launch snapshot contract.
-func flash_pose_availability(allow_one_player_debug := false) -> Dictionary:
-	return minigame_availability(MINIGAME_FLASH_POSE, allow_one_player_debug)
-
-
 func bubbles_availability(allow_one_player_debug := false) -> Dictionary:
 	return minigame_availability(MINIGAME_BUBBLES, allow_one_player_debug)
-
-
-func prepare_flash_pose_launch(allow_one_player_debug := false) -> Dictionary:
-	return prepare_minigame_launch(MINIGAME_FLASH_POSE, allow_one_player_debug)
 
 
 func prepare_bubbles_launch(allow_one_player_debug := false) -> Dictionary:
 	return prepare_minigame_launch(MINIGAME_BUBBLES, allow_one_player_debug)
 
 
-func consume_flash_pose_launch() -> Dictionary:
-	return consume_minigame_launch(MINIGAME_FLASH_POSE)
-
-
 func consume_bubbles_launch() -> Dictionary:
 	return consume_minigame_launch(MINIGAME_BUBBLES)
-
-
-func clear_flash_pose_launch() -> void:
-	clear_minigame_launch(MINIGAME_FLASH_POSE)
 
 
 func clear_bubbles_launch() -> void:
@@ -198,13 +171,13 @@ func send_players_to_lobby() -> void:
 	if websocket != null:
 		websocket.send_lobby_state()
 
-func register_flash_pose_controller(controller: FlashPoseRoundController) -> void:
+func register_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
 	if websocket != null:
-		websocket.set_flash_pose_controller(controller)
+		websocket.set_lobby_controller(controller)
 
-func unregister_flash_pose_controller(controller: FlashPoseRoundController) -> void:
+func unregister_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
 	if websocket != null:
-		websocket.clear_flash_pose_controller(controller)
+		websocket.clear_lobby_controller(controller)
 
 func register_bubbles_controller(controller: BubblesRoundController) -> void:
 	if websocket != null:

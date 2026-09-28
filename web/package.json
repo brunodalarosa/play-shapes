@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node scripts/copy_vendor.mjs",
     "check": "tsc --noEmit",
     "test": "node --test tests/*.test.mjs"
   },
@@ -11,5 +11,8 @@
     "jsqr": "1.4.0",
     "pngjs": "7.0.0",
     "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "nipplejs": "1.0.4"
   }
 }

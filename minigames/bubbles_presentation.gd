@@ -4,7 +4,7 @@ extends Control
 
 const WORLD_SIZE := Vector2(1920.0, 1080.0)
 const NPC_ARENA_BOUNDS := Rect2(120.0, 160.0, 1680.0, 780.0)
-const CHARACTER_SCENE: PackedScene = preload("res://characters/shape_character.tscn")
+const CHARACTER_SCENE: PackedScene = preload("res://characters/squircle_v1_playback.tscn")
 const MUSIC: AudioStream = preload("res://assets/runtime/bgm/Beach_music.ogg")
 const SFX: Dictionary = {
 	&"collect": preload("res://assets/runtime/sfxs/drawKnife2.ogg"),
@@ -285,11 +285,11 @@ func _add_result_row(entry: Dictionary, count: int) -> void:
 	var rank := _result_label("#%d" % int(entry.get("rank", 0)), 0.09, 27)
 	var portrait := Control.new()
 	portrait.custom_minimum_size = Vector2(58, 48)
-	var character := CHARACTER_SCENE.instantiate() as ShapeCharacter
+	var character := CHARACTER_SCENE.instantiate() as SquircleV1Playback
 	portrait.add_child(character)
-	character.position = Vector2(29, 25)
-	character.scale = Vector2.ONE * 0.27
-	character.apply_selection(CharacterSelection.for_player(entry))
+	character.position = Vector2(29, 45)
+	character.visual_scale = 0.25
+	character.player_color = Color(String(CharacterSelection.for_player(entry).character_color))
 	var name_label := _result_label(String(entry.get("name", "Player")), 0.7, 27)
 	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	var count_label := _result_label("%d jellyfish" % int(entry.get("score", 0)), 0.21, 26)

@@ -1,0 +1,16 @@
+{
+  "sprite_sheet": "addon-sheet-threequarter-35x9-128.png",
+  "columns": 1,
+  "rows": 1,
+  "max_sprite_width": 128,
+  "max_sprite_height": 128,
+  "animations": [
+    {
+      "name": "compat_idle_threequarter_front",
+      "row": 0,
+      "frame_count": 1,
+      "sprite_width": 128,
+      "sprite_height": 128
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+00:00.047  reports          | WARNING Unable to open 'C:\Users\backup pc\AppData\Roaming\Blender Foundation\Blender\5.2\config\userpref.blend': Permission denied
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+00:01.187  blend            | Read blend: "C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-3d\squircle-toy.blend"
+00:01.250  image.write      | ERROR OpenImageIO write failed: Could not open file "\.thumbnails\large\blender_55316_479168255ccf1da07cfa8aeffe30d39d.png.png"
+Info: Saved as "squircle-animated.blend"
+PS057_SAVED C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\squircle-animated.blend
+
+Blender quit

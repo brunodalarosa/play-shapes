@@ -1,17 +1,16 @@
 # Play Shapes tuning guide
 
-Start with `Active Presets.tres`. It is the project-level selector and shows the active Simon Says, Bubbles, and shared Networking assets in one Inspector. Save a selection and relaunch the relevant scene; there is intentionally no runtime tuning UI.
+Start with `Active Presets.tres`. It is the project-level selector and shows the active Bubbles and shared Networking assets in one Inspector. Save a selection and relaunch the relevant scene; there is intentionally no runtime tuning UI.
 
 ## Find, compare, and reset values
 
-- Simon Says: `Minigames/SimonSays/Default.tres` is the umbrella profile for the gameplay/timing, animation/motion, and debug-preview values currently implemented. Visual feedback, audio/haptics, and phone-controller fields will be added only when those systems exist.
 - Bubbles and jellyfishes: `Minigames/Bubbles/Default.tres` is the provisional umbrella profile for round rules, gesture recognition, and values later arena tasks will consume. See [its field guide](Minigames/Bubbles/README.md). Select a named copy in `Active Presets.tres` and relaunch before comparing feel.
 - Networking/session: `Shared/Networking/Default.tres` owns host-only listener, capacity, timeout, and reconnect behavior.
 - Default recovery: assign the appropriate `Default.tres` back into `Active Presets.tres`, save, and relaunch.
 - Named comparison: duplicate `Default.tres` beside it, use a descriptive name such as `Generous.tres` or `Experimental_2026-09-14.tres`, change one logical group, assign it through `Active Presets.tres`, and commit it. Every committed `.tres` below `Tuning/` is validated.
 - Experiment record: copy `Experiments/EXPERIMENT_TEMPLATE.md`; record the preset, hypothesis, conditions, observations, and human decision separately from the asset.
 
-Hover an Inspector property for its purpose, units, default, safe range, and higher/lower guidance. Range metadata and clamping protect individual fields. Automated validation handles related-field rules, including distinct listener ports, player capacity versus connection capacity, and enough automatic-release time for a full pose unwind.
+Hover an Inspector property for its purpose, units, default, safe range, and higher/lower guidance. Range metadata and clamping protect individual fields. Automated validation handles related-field rules, including distinct listener ports and player capacity versus connection capacity.
 
 ## Shared category map
 

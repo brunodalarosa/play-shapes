@@ -1,15 +1,16 @@
-import { attemptImmersive, chargedColor, directionAtPoint, heldDirectionAfterUpdate, type Direction } from "./controller_geometry.js";
+import { attemptImmersive } from "./immersive.js";
+import { SquircleV1Canvas } from "./squircle_v1.js";
 import { GestureTrace, type Point } from "./bubbles_gesture.js";
+import { LobbyControls } from "./lobby_controls.js";
+import type { LobbyAction } from "./lobby_input.js";
 import {
-  advanceJoinFlow, bodyAssetPath, CHARACTER_COLORS, CHARACTER_SHAPES, chooseJoinColor,
-  colorOption, createJoinMessage, cycleJoinShape, defaultJoinFlow, FALLBACK_CHARACTER,
-  isCharacterShape, returnToCharacterSelection, type CharacterShape, type JoinFlowState,
+  advanceJoinFlow, CHARACTER_COLORS, chooseJoinColor,
+  colorOption, createJoinMessage, defaultJoinFlow, FALLBACK_CHARACTER,
+  returnToCharacterSelection, type JoinFlowState,
 } from "./character_selection.js";
 
 const status = document.querySelector<HTMLElement>("#status")!;
 const selectionScreen = document.querySelector<HTMLElement>("#selection-screen")!;
-const previousShapeButton = document.querySelector<HTMLButtonElement>("#previous-shape")!;
-const nextShapeButton = document.querySelector<HTMLButtonElement>("#next-shape")!;
 const selectionPreview = document.querySelector<HTMLCanvasElement>("#selection-preview")!;
 const namePreview = document.querySelector<HTMLCanvasElement>("#name-preview")!;
 const selectedCharacterLabel = document.querySelector<HTMLElement>("#selected-character-label")!;
@@ -24,12 +25,10 @@ const playerCard = document.querySelector<HTMLElement>("#player-card")!;
 const playerName = document.querySelector<HTMLElement>("#player-name-heading")!;
 const playerState = document.querySelector<HTMLElement>("#player-state")!;
 const leaveButton = document.querySelector<HTMLButtonElement>("#leave-button")!;
-const gameCard = document.querySelector<HTMLElement>("#game-card")!;
-const gameHeading = document.querySelector<HTMLElement>("#game-heading")!;
-const gameMessage = document.querySelector<HTMLElement>("#game-message")!;
-const lives = document.querySelector<HTMLElement>("#lives")!;
-const poseGrid = document.querySelector<HTMLElement>("#pose-grid")!;
-const rotateState = document.querySelector<HTMLElement>("#rotate-state")!;
+const lobbyController = document.querySelector<HTMLElement>("#lobby-controller")!;
+const lobbyStickZone = document.querySelector<HTMLElement>("#lobby-stick-zone")!;
+const lobbyJumpButton = document.querySelector<HTMLButtonElement>("#lobby-jump-button")!;
+const lobbyLeaveButton = document.querySelector<HTMLButtonElement>("#lobby-leave-button")!;
 const bubblesCard = document.querySelector<HTMLElement>("#bubbles-card")!;
 const bubblesPad = document.querySelector<HTMLElement>("#bubbles-pad")!;
 const bubblesScore = document.querySelector<HTMLElement>("#bubbles-score")!;
@@ -38,17 +37,9 @@ const bubblesContext = bubblesCanvas.getContext("2d", { alpha: true })!;
 
 const STORAGE = { session: "play-shapes.session-id", token: "play-shapes.reconnect-token", name: "play-shapes.last-name", inputSeq: "play-shapes.input-seq" } as const;
 type PublicPlayer = { player_id: string; name: string; seat: number; state: string; character_shape?: string; character_color?: string };
-type GameplayPlayer = { lives?: number; eliminated?: boolean; direction?: string; charge?: number; held?: boolean; character_shape?: string; character_color?: string };
-type Presentation = { colors?: Partial<Record<Direction, string>>; minimum_brightness?: number; maximum_brightness?: number; charge_fill_seconds?: number; charge_decay_seconds?: number };
-type BubblesVisualSnapshot = { host_time_msec: number; radius: number; pull: Point; drag_pull: Point; charge_pull: Point; surface_angle: number; spinning: boolean; recovery_white: boolean; burst_progress: number; particle_density: number; charge_glow: number; character_visible: boolean; character_scale: number; character_position: Point; body_rotation: number; face_position: Point; face_blink: boolean; left_hand_position: Point; right_hand_position: Point; left_foot_position: Point; right_foot_position: Point };
+type BubblesVisualSnapshot = { host_time_msec: number; radius: number; pull: Point; drag_pull: Point; charge_pull: Point; surface_angle: number; spinning: boolean; recovery_white: boolean; burst_progress: number; particle_density: number; charge_glow: number; character_visible: boolean; character_scale: number; character_position: Point; body_rotation: number; face_blink: boolean };
 type BubblesVisualTuning = { starting_radius?: number; live_drag_pull_strength?: number; live_drag_response_seconds?: number; charge_wobble_strength?: number; charge_glow_strength?: number; swipe_reaction_seconds?: number; spin_surface_turns_per_second?: number; bubble_reform_seconds?: number; burst_seconds?: number };
-type HostMessage = { type?: string; protocol?: number; connection_id?: number; session_id?: string; resume_status?: string; reconnect_token?: string; player?: PublicPlayer | GameplayPlayer; code?: string; message?: string; phase?: string; available_directions?: string[]; success?: boolean; lives?: number; debug_mode?: boolean; eliminated?: boolean; placement?: number; state?: string; gameplay?: HostMessage; presentation?: Presentation; direction?: string; charge?: number; held?: boolean; score?: number; bubble_radius?: number; burst_radius?: number; visual_jellyfish?: number; visual_cap?: number; seat?: number; left?: boolean; character_shape?: string; character_color?: string; host_time_msec?: number; visual_tuning?: BubblesVisualTuning; visual?: BubblesVisualSnapshot; spin_remaining_msec?: number; cooldown_remaining_msec?: number; invulnerable_remaining_msec?: number; reform_remaining_msec?: number; spin_duration_msec?: number; cooldown_duration_msec?: number; circles_to_charge?: number; rank?: number; event?: string; lost?: number; action?: string; reason?: string };
-
-const POSES: ReadonlyArray<{ direction: Direction; icon: string; label: string }> = [
-  { direction: "left", icon: "←", label: "Pose left" }, { direction: "right", icon: "→", label: "Pose right" },
-  { direction: "down", icon: "↓", label: "Pose down" }, { direction: "up", icon: "↑", label: "Pose up" },
-];
-const DEFAULT_COLORS: Record<Direction, string> = { left: "#48d16f", right: "#f04f55", down: "#f4c542", up: "#3489eb" };
+type HostMessage = { type?: string; protocol?: number; connection_id?: number; session_id?: string; resume_status?: string; reconnect_token?: string; player?: PublicPlayer; code?: string; message?: string; phase?: string; debug_mode?: boolean; state?: string; gameplay?: HostMessage; score?: number; bubble_radius?: number; burst_radius?: number; visual_jellyfish?: number; visual_cap?: number; seat?: number; left?: boolean; character_shape?: string; character_color?: string; host_time_msec?: number; visual_tuning?: BubblesVisualTuning; visual?: BubblesVisualSnapshot; spin_remaining_msec?: number; cooldown_remaining_msec?: number; invulnerable_remaining_msec?: number; reform_remaining_msec?: number; spin_duration_msec?: number; cooldown_duration_msec?: number; circles_to_charge?: number; rank?: number; event?: string; lost?: number; action?: string; reason?: string };
 
 let socket: WebSocket | undefined;
 let retry: ReturnType<typeof setTimeout> | undefined;
@@ -56,16 +47,8 @@ let stopped = false;
 let joined = false;
 let joinFlow: JoinFlowState = defaultJoinFlow();
 let inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
-let held: { direction: Direction; pointerId?: number; button: HTMLButtonElement } | undefined;
-let directions: Direction[] = [];
-let presentation = { colors: DEFAULT_COLORS, minimum_brightness: 0.42, maximum_brightness: 1, charge_fill_seconds: 1, charge_decay_seconds: 0.28 };
-let visualCharge: Record<Direction, number> = { left: 0, right: 0, down: 0, up: 0 };
-let authoritativeDirection: Direction | undefined;
-let authoritativeCharge = 0;
-let authoritativeHeld = false;
-let lastAnimationTime = performance.now();
-let fullscreenAttempted = { flash: false, bubbles: false };
-let activeGame: "flash" | "bubbles" | null = null;
+let fullscreenAttempted = false;
+let activeGame: "bubbles" | null = null;
 let bubblesPointer: { id: number; trace: GestureTrace; seq: number; step: number; drag: Point; sentDrag: Point; lastMotionAt: number; motionCount: number } | undefined;
 let bubblesSnapshot: HostMessage | undefined;
 let bubblesSnapshotTime = 0;
@@ -74,34 +57,30 @@ let bubblesVisualSnapshot: BubblesVisualSnapshot | undefined;
 let bubblesVisualReceivedAt = 0;
 let bubblesPhoneDragDisplay: Point = [0, 0];
 let bubblesPreviousFrame = performance.now();
-const characterBodies = Object.fromEntries(CHARACTER_SHAPES.map(shape => [shape, new Image()])) as Record<CharacterShape, HTMLImageElement>;
-for (const shape of CHARACTER_SHAPES) characterBodies[shape].src = bodyAssetPath(shape);
-const bubblesArt = {
-  hand: new Image(), openHand: new Image(), foot: new Image(), face: new Image(), blink: new Image(), jellyfish: new Image(),
-};
-bubblesArt.hand.src = "/bubbles-player-hand.png";
-bubblesArt.openHand.src = "/shape-hand-open.png";
-bubblesArt.foot.src = "/bubbles-player-foot.png";
-bubblesArt.face.src = "/bubbles-player-face-neutral.png";
-bubblesArt.blink.src = "/bubbles-player-face-blink.png";
+const squircleCanvas = new SquircleV1Canvas();
+const bubblesArt = { jellyfish: new Image() };
 bubblesArt.jellyfish.src = "/bubbles-jellyfish.png";
-const bubblesTintCache = new Map<string, HTMLCanvasElement>();
+const lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJumpButton, (action: LobbyAction) => {
+  if (!joined || !socket || socket.readyState !== WebSocket.OPEN || activeGame !== null) return;
+  inputSeq += 1;
+  store(STORAGE.inputSeq, String(inputSeq));
+  socket.send(JSON.stringify({ ...action, input_seq: inputSeq }));
+});
 
 function stored(key: string): string { try { return localStorage.getItem(key) ?? ""; } catch { return ""; } }
 function store(key: string, value: string): void { try { localStorage.setItem(key, value); } catch { /* Page remains usable. */ } }
 function forgetIdentity(): void { try { localStorage.removeItem(STORAGE.session); localStorage.removeItem(STORAGE.token); localStorage.removeItem(STORAGE.inputSeq); } catch { /* Restricted storage. */ } inputSeq = 0; }
 
 function selectedCharacterName(): string {
-  const shape = joinFlow.shape[0].toUpperCase() + joinFlow.shape.slice(1);
   const color = colorOption(joinFlow.color)?.name ?? "Blue";
-  return `${shape} · ${color}`;
+  return `${color} Squircle`;
 }
 
 function refreshSelectionUi(): void {
   const label = selectedCharacterName();
   selectedCharacterLabel.textContent = label;
   selectionPreview.setAttribute("aria-label", `${label} Shape Character`);
-  namePreview.setAttribute("aria-label", `${label} character dancing`);
+  namePreview.setAttribute("aria-label", `${label} character preview`);
   for (const button of Array.from(colorGrid.querySelectorAll<HTMLButtonElement>(".color-button"))) {
     button.setAttribute("aria-pressed", String(button.dataset.color === joinFlow.color));
   }
@@ -121,41 +100,33 @@ for (const option of CHARACTER_COLORS) {
 }
 refreshSelectionUi();
 
-function setGameplaySurface(active: boolean, mode: "flash" | "bubbles" = "flash"): void {
-  const next = active ? mode : null;
+function setGameplaySurface(active: boolean): void {
+  const next = active ? "bubbles" : null;
   if (activeGame !== next) {
     cancelBubblesPointer();
     if (next === null) { try { screen.orientation?.unlock?.(); } catch { /* Unsupported orientation API. */ } }
-    else if (document.fullscreenElement) { try { const orientation = screen.orientation as ScreenOrientation & { lock?: (value: string) => Promise<void> }; void Promise.resolve(orientation?.lock?.(next === "flash" ? "landscape" : "portrait")).catch(() => {}); } catch { /* Lock denied. */ } }
+    else if (document.fullscreenElement) { try { const orientation = screen.orientation as ScreenOrientation & { lock?: (value: string) => Promise<void> }; void Promise.resolve(orientation?.lock?.("portrait")).catch(() => {}); } catch { /* Lock denied. */ } }
     activeGame = next;
   }
   document.documentElement.classList.toggle("gameplay-active", active);
   document.documentElement.classList.toggle("bubbles-active", next === "bubbles");
-  updateOrientation();
-}
-function updateOrientation(): void {
-  const portrait = matchMedia("(orientation: portrait)").matches;
-  rotateState.hidden = !(activeGame === "flash" && portrait);
-  poseGrid.hidden = activeGame !== "flash" || portrait;
 }
 
 function showJoin(message: string, focus = false): void {
+  lobbyControls.deactivate();
   joinFlow = returnToCharacterSelection(joinFlow);
-  joined = false; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); playerCard.hidden = true; gameCard.hidden = true; bubblesCard.hidden = true;
+  joined = false; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); playerCard.hidden = true; bubblesCard.hidden = true;
   selectionScreen.hidden = false; nameScreen.hidden = true; joinForm.hidden = true; joinButton.disabled = false; leaveButton.disabled = false;
   status.textContent = message; status.hidden = !message; nameInput.value = stored(STORAGE.name); refreshSelectionUi();
   if (focus) queueMicrotask(() => nextButton.focus());
 }
 function showJoined(player: PublicPlayer, state = "Connected"): void {
-  joined = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); selectionScreen.hidden = true; nameScreen.hidden = true; joinForm.hidden = true; playerCard.hidden = false; gameCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false;
-  if (isCharacterShape(player.character_shape)) joinFlow = { ...joinFlow, shape: player.character_shape };
+  joined = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); selectionScreen.hidden = true; nameScreen.hidden = true; joinForm.hidden = true; playerCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false; lobbyLeaveButton.disabled = false; lobbyControls.activate();
   const serverColor = colorOption(player.character_color)?.hex;
   if (serverColor) joinFlow = chooseJoinColor(joinFlow, serverColor);
   status.textContent = state === "Connected" ? "Joined. Keep this page open while you play." : state; status.hidden = true;
 }
 
-previousShapeButton.addEventListener("click", () => { joinFlow = cycleJoinShape(joinFlow, -1); refreshSelectionUi(); });
-nextShapeButton.addEventListener("click", () => { joinFlow = cycleJoinShape(joinFlow, 1); refreshSelectionUi(); });
 nextButton.addEventListener("click", () => {
   joinFlow = advanceJoinFlow(joinFlow);
   selectionScreen.hidden = true; nameScreen.hidden = false; joinForm.hidden = false;
@@ -169,77 +140,13 @@ backButton.addEventListener("click", () => {
   status.hidden = true; status.textContent = ""; refreshSelectionUi();
   queueMicrotask(() => nextButton.focus());
 });
-function sendPose(type: "pose_down" | "pose_up", direction: Direction): void { if (!socket || socket.readyState !== WebSocket.OPEN) return; inputSeq += 1; store(STORAGE.inputSeq, String(inputSeq)); socket.send(JSON.stringify({ type, direction, input_seq: inputSeq })); }
-function releaseHeld(send = true): void {
-  if (!held) return; const current = held; held = undefined; current.button.classList.remove("is-held"); current.button.setAttribute("aria-pressed", "false");
-  if (current.pointerId !== undefined && poseGrid.hasPointerCapture(current.pointerId)) poseGrid.releasePointerCapture(current.pointerId);
-  if (send) sendPose("pose_up", current.direction);
-}
-function beginHold(direction: Direction, button: HTMLButtonElement, pointerId?: number): void {
-  if (held?.direction === direction) return; releaseHeld(); held = { direction, button, ...(pointerId === undefined ? {} : { pointerId }) };
-  if (pointerId !== undefined) poseGrid.setPointerCapture(pointerId); button.classList.add("is-held"); button.setAttribute("aria-pressed", "true");
-  visualCharge[direction] = 0; authoritativeDirection = direction; authoritativeCharge = 0; authoritativeHeld = true; sendPose("pose_down", direction); void requestImmersiveMode("flash");
-}
-function readPresentation(value?: Presentation): void {
-  if (!value) return;
-  presentation = { colors: { ...DEFAULT_COLORS, ...(value.colors ?? {}) }, minimum_brightness: Number(value.minimum_brightness ?? presentation.minimum_brightness), maximum_brightness: Number(value.maximum_brightness ?? presentation.maximum_brightness), charge_fill_seconds: Math.max(0.1, Number(value.charge_fill_seconds ?? presentation.charge_fill_seconds)), charge_decay_seconds: Math.max(0.05, Number(value.charge_decay_seconds ?? presentation.charge_decay_seconds)) };
-}
-
-function renderControls(available: string[]): void {
-  const desired = POSES.filter(item => available.includes(item.direction)).map(item => item.direction);
-  if (held && heldDirectionAfterUpdate(held.direction, desired) === undefined) releaseHeld(); directions = desired;
-  const existing = Array.from(poseGrid.querySelectorAll<HTMLButtonElement>(".pose-button"), button => button.dataset.direction);
-  if (existing.length === desired.length && existing.every((value, index) => value === desired[index])) return;
-  poseGrid.replaceChildren(); poseGrid.dataset.count = String(desired.length);
-  for (const pose of POSES.filter(item => desired.includes(item.direction))) {
-    const button = document.createElement("button"); button.type = "button"; button.className = "pose-button"; button.dataset.direction = pose.direction;
-    button.setAttribute("aria-label", pose.label); button.setAttribute("aria-pressed", held?.direction === pose.direction ? "true" : "false"); button.innerHTML = `<span class="icon" aria-hidden="true">${pose.icon}</span>`;
-    if (held?.direction === pose.direction) { held.button = button; button.classList.add("is-held"); }
-    button.addEventListener("keydown", event => { if ((event.key !== " " && event.key !== "Enter") || event.repeat || held) return; event.preventDefault(); beginHold(pose.direction, button); });
-    button.addEventListener("keyup", event => { if ((event.key === " " || event.key === "Enter") && held?.button === button) { event.preventDefault(); releaseHeld(); } });
-    button.addEventListener("blur", () => { if (held?.button === button && held.pointerId === undefined) releaseHeld(); }); poseGrid.append(button);
-  }
-}
-
-poseGrid.addEventListener("pointerdown", event => {
-  event.preventDefault(); if (event.button !== 0 && event.pointerType === "mouse") return;
-  const rect = poseGrid.getBoundingClientRect(); const direction = directionAtPoint(directions.length, event.clientX - rect.left, event.clientY - rect.top, rect.width, rect.height);
-  const button = poseGrid.querySelector<HTMLButtonElement>(`[data-direction="${direction}"]`); if (button) beginHold(direction, button, event.pointerId);
-});
-poseGrid.addEventListener("pointerup", event => { event.preventDefault(); if (held?.pointerId === event.pointerId) releaseHeld(); });
-poseGrid.addEventListener("pointercancel", event => { if (held?.pointerId === event.pointerId) releaseHeld(); });
-poseGrid.addEventListener("lostpointercapture", event => { if (held?.pointerId === event.pointerId) releaseHeld(); });
-poseGrid.addEventListener("contextmenu", event => event.preventDefault()); poseGrid.addEventListener("selectstart", event => event.preventDefault());
-
-async function requestImmersiveMode(mode: "flash" | "bubbles"): Promise<void> {
-  if (fullscreenAttempted[mode]) return; fullscreenAttempted[mode] = true;
+async function requestImmersiveMode(): Promise<void> {
+  if (fullscreenAttempted) return; fullscreenAttempted = true;
   const root = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void };
   const orientation = screen.orientation as ScreenOrientation & { lock?: (value: string) => Promise<void> };
   const fullscreen = root.requestFullscreen ? () => root.requestFullscreen({ navigationUI: "hide" }) : root.webkitRequestFullscreen?.bind(root);
-  await attemptImmersive(fullscreen, orientation?.lock ? () => orientation.lock!(mode === "flash" ? "landscape" : "portrait") : undefined);
+  await attemptImmersive(fullscreen, orientation?.lock ? () => orientation.lock!("portrait") : undefined);
 }
-function updateCharge(message: HostMessage | GameplayPlayer): void {
-  authoritativeDirection = POSES.some(item => item.direction === message.direction) ? message.direction as Direction : undefined;
-  authoritativeCharge = Math.min(1, Math.max(0, Number(message.charge ?? 0))); authoritativeHeld = message.held === true;
-}
-function animate(now: number): void {
-  const delta = Math.min(0.1, Math.max(0, (now - lastAnimationTime) / 1000)); lastAnimationTime = now;
-  for (const direction of directions) {
-    const locallyHeld = held?.direction === direction; const hostDirection = authoritativeDirection === direction; let target = hostDirection ? authoritativeCharge : 0;
-    if (locallyHeld && authoritativeHeld) target = Math.max(target, visualCharge[direction] + delta / presentation.charge_fill_seconds);
-    const rate = (locallyHeld || (hostDirection && authoritativeHeld)) ? 1 / presentation.charge_fill_seconds : 1 / presentation.charge_decay_seconds;
-    const step = rate * delta; visualCharge[direction] += Math.max(-step, Math.min(step, target - visualCharge[direction]));
-    const button = poseGrid.querySelector<HTMLElement>(`[data-direction="${direction}"]`);
-    if (button) button.style.backgroundColor = chargedColor(presentation.colors[direction] ?? DEFAULT_COLORS[direction], presentation.minimum_brightness, presentation.maximum_brightness, visualCharge[direction]);
-  }
-  if (bubblesPointer && bubblesPointer.motionCount < 48 && activeGame === "bubbles" && socket?.readyState === WebSocket.OPEN) {
-    const changed = bubblesPointer.drag[0] !== bubblesPointer.sentDrag[0] || bubblesPointer.drag[1] !== bubblesPointer.sentDrag[1];
-    if (now - bubblesPointer.lastMotionAt >= (changed ? 70 : 600)) sendBubblesMotion(bubblesPointer, now);
-  }
-  requestAnimationFrame(animate);
-}
-requestAnimationFrame(animate);
-
 function sendBubblesCharge(seq: number, stage: "start" | "progress" | "cancel", step = 0): void {
   if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "bubbles_charge", input_seq: seq, stage, step }));
 }
@@ -271,7 +178,7 @@ bubblesPad.addEventListener("pointerdown", event => {
   bubblesPointer = { id: event.pointerId, trace, seq: inputSeq, step: 0, drag: [0, 0], sentDrag: [0, 0], lastMotionAt: performance.now(), motionCount: 0 };
   try { bubblesPad.setPointerCapture(event.pointerId); } catch { cancelBubblesPointer(); return; }
   sendBubblesCharge(inputSeq, "start");
-  void requestImmersiveMode("bubbles");
+  void requestImmersiveMode();
 });
 bubblesPad.addEventListener("pointermove", event => {
   if (bubblesPointer?.id !== event.pointerId) return;
@@ -298,22 +205,22 @@ bubblesPad.addEventListener("contextmenu", event => event.preventDefault());
 bubblesPad.addEventListener("keydown", event => {
   if (event.repeat || activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active") return;
   const directions: Record<string, Point> = { ArrowLeft: [0.1, 0.5], ArrowRight: [0.9, 0.5], ArrowUp: [0.5, 0.1], ArrowDown: [0.5, 0.9] };
-  if (directions[event.key]) { event.preventDefault(); sendBubblesTrace([[0.5, 0.5], directions[event.key]]); void requestImmersiveMode("bubbles"); }
+  if (directions[event.key]) { event.preventDefault(); sendBubblesTrace([[0.5, 0.5], directions[event.key]]); void requestImmersiveMode(); }
   else if (event.key === " " || event.key === "Enter") {
     event.preventDefault(); const circles = Math.max(1, Math.min(3, bubblesSnapshot?.circles_to_charge ?? 1));
     const trace: Point[] = Array.from({ length: 97 }, (_, index) => [0.5 + 0.22 * Math.cos(index / 96 * Math.PI * 2 * circles), 0.5 + 0.22 * Math.sin(index / 96 * Math.PI * 2 * circles)]);
-    sendBubblesTrace(trace); void requestImmersiveMode("bubbles");
+    sendBubblesTrace(trace); void requestImmersiveMode();
   }
 });
 
 function showBubbles(message: HostMessage): void {
-  releaseHeld(false);
+  lobbyControls.deactivate();
   bubblesSnapshot = message;
   bubblesSnapshotTime = performance.now();
-  gameCard.hidden = true; playerCard.hidden = true; bubblesCard.hidden = false;
+  playerCard.hidden = true; bubblesCard.hidden = false;
   const phase = message.phase ?? "waiting";
   const active = phase === "results" || (["instructions", "countdown", "active"].includes(phase) && message.left !== true);
-  setGameplaySurface(active, "bubbles");
+  setGameplaySurface(active);
   bubblesScore.textContent = String(Math.max(0, Math.floor(message.score ?? 0)));
   if (message.type === "bubbles_feedback") {
     if (message.event === "captured") vibrate(18);
@@ -330,60 +237,9 @@ function tuningValue(key: keyof BubblesVisualTuning, fallback: number): number {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
 function imageReady(image: HTMLImageElement): boolean { return image.complete && image.naturalWidth > 0; }
-function tintedSprite(image: HTMLImageElement, color: string): HTMLCanvasElement | undefined {
-  if (!imageReady(image)) return undefined;
-  const key = `${image.src}|${color}`;
-  const cached = bubblesTintCache.get(key);
-  if (cached) return cached;
-  const source = document.createElement("canvas");
-  source.width = image.naturalWidth; source.height = image.naturalHeight;
-  const sourceContext = source.getContext("2d", { willReadFrequently: true });
-  if (!sourceContext) return undefined;
-  sourceContext.drawImage(image, 0, 0);
-  const pixels = sourceContext.getImageData(0, 0, source.width, source.height);
-  const channels = color.replace("#", "").match(/.{2}/g)?.map(part => Number.parseInt(part, 16) / 255) ?? [0.35, 0.55, 0.95];
-  const maximum = Math.max(...channels);
-  const lift = clamp((0.4 - maximum) / 0.4, 0, 1);
-  const base = channels.map(channel => channel * (1 - lift) + 0.55 * lift);
-  const shadow = base.map(channel => channel * 0.78);
-  const highlight = base.map(channel => channel + (1 - channel) * 0.38);
-  const data = pixels.data;
-  for (let offset = 0; offset < data.length; offset += 4) {
-    const lightness = (data[offset] * 0.2126 + data[offset + 1] * 0.7152 + data[offset + 2] * 0.0722) / 255;
-    const shade = clamp((lightness - 0.53) / 0.2, 0, 1);
-    for (let channel = 0; channel < 3; channel++) data[offset + channel] = (shadow[channel] + (highlight[channel] - shadow[channel]) * shade) * 255;
-  }
-  sourceContext.putImageData(pixels, 0, 0);
-  bubblesTintCache.set(key, source);
-  return source;
-}
-function drawSprite(context: CanvasRenderingContext2D, image: HTMLImageElement, tint: string, x: number, y: number, width: number, height: number, flip = false, rotation = 0): void {
-  const sprite = tintedSprite(image, tint);
-  if (!sprite) return;
-  context.save(); context.translate(x, y); context.rotate(rotation); if (flip) context.scale(-1, 1);
-  context.drawImage(sprite, -width / 2, -height / 2, width, height); context.restore();
-}
-function drawUntintedSprite(context: CanvasRenderingContext2D, image: HTMLImageElement, x: number, y: number, width: number, height: number): void {
-  if (!imageReady(image)) return;
-  context.save(); context.translate(x, y); context.drawImage(image, -width / 2, -height / 2, width, height); context.restore();
-}
-type CharacterPose = { bodyRotation: number; facePosition: Point; faceBlink: boolean; leftHandPosition: Point; rightHandPosition: Point; leftFootPosition: Point; rightFootPosition: Point; leftHandRotation: number; rightHandRotation: number };
-function drawCharacter(context: CanvasRenderingContext2D, shape: CharacterShape, tint: string, x: number, y: number, scale: number, pose: CharacterPose, hand: HTMLImageElement = bubblesArt.hand): void {
-  context.save(); context.translate(x, y); context.scale(scale, scale);
-  drawSprite(context, bubblesArt.foot, tint, pose.leftFootPosition[0], pose.leftFootPosition[1], 40, 24, true);
-  drawSprite(context, bubblesArt.foot, tint, pose.rightFootPosition[0], pose.rightFootPosition[1], 40, 24);
-  drawSprite(context, hand, tint, pose.leftHandPosition[0], pose.leftHandPosition[1], 35, 34, true, pose.leftHandRotation);
-  drawSprite(context, hand, tint, pose.rightHandPosition[0], pose.rightHandPosition[1], 35, 34, false, pose.rightHandRotation);
-  drawSprite(context, characterBodies[shape], tint, 0, 0, 80, 80, false, pose.bodyRotation);
-  const face = pose.faceBlink ? bubblesArt.blink : bubblesArt.face;
-  drawUntintedSprite(context, face, pose.facePosition[0], pose.facePosition[1], pose.faceBlink ? 53 : 50, pose.faceBlink ? 37 : 29);
-  context.restore();
-}
 function renderJoinPreviews(now: number): void {
-  const seconds = now / 1000;
   for (const canvas of [selectionPreview, namePreview]) {
-    const section = canvas.closest("section");
-    if (section?.hidden) continue;
+    if (canvas.closest("section")?.hidden) continue;
     const rect = canvas.getBoundingClientRect();
     if (rect.width <= 0 || rect.height <= 0) continue;
     const pixelRatio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
@@ -394,20 +250,8 @@ function renderJoinPreviews(now: number): void {
     if (!context) continue;
     context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     context.clearRect(0, 0, rect.width, rect.height);
-    const dancing = canvas === namePreview;
-    const wave = dancing ? Math.sin(seconds * 4.2) : 0;
-    const handSway = dancing ? wave * 0.07 : 0;
-    const handDrift = dancing ? wave * 2 : 0;
-    const pose: CharacterPose = {
-      bodyRotation: dancing ? Math.sin(seconds * 2.7) * 0.09 : 0,
-      facePosition: [0, -5], faceBlink: Math.sin(seconds * 0.9) > 0.985,
-      leftHandPosition: [-48, 22 - handDrift], rightHandPosition: [48, 22 + handDrift],
-      leftFootPosition: [-35 - wave * 2, 62], rightFootPosition: [35 + wave * 2, 62],
-      leftHandRotation: Math.PI + 0.18 + handSway, rightHandRotation: Math.PI - 0.18 + handSway,
-    };
-    const scale = Math.min(rect.width / 145, rect.height / 125) * 0.9;
-    drawCharacter(context, joinFlow.shape, joinFlow.color, rect.width / 2,
-      rect.height * 0.46 + (dancing ? Math.sin(seconds * 3.4) * 4 : 0), scale, pose, bubblesArt.openHand);
+    const scale = Math.min(rect.width / 256, rect.height / 220) * 0.95;
+    squircleCanvas.draw(context, joinFlow.color, rect.width / 2, rect.height * 0.89, scale, now);
   }
 }
 function drawBubblePath(context: CanvasRenderingContext2D, radius: number, pull: Point, surfaceAngle: number): { points: Point[]; center: Point; along: Point; stretch: number } {
@@ -458,20 +302,13 @@ function drawBubbleBurst(context: CanvasRenderingContext2D, radius: number, prog
     else drawArc(context, x, y, 2 + index % 3, 0, Math.PI * 2, `rgba(204,248,255,${0.75 * fade})`, 1.3);
   }
 }
-function drawPhoneCharacter(context: CanvasRenderingContext2D, visual: BubblesVisualSnapshot | undefined, hostTime: number,
-		shape: CharacterShape, selectedColor: string): void {
-  const fallbackScale = Math.min(0.55, (bubblesSnapshot?.bubble_radius ?? tuningValue("starting_radius", 48)) * 0.82 / 75);
-  const characterScale = (visual?.character_scale ?? fallbackScale) * 0.4;
-  const position = visual?.character_position ?? [0, Math.sin(hostTime / 1000 * 2.2) * 4];
-  const pose: CharacterPose = {
-    bodyRotation: visual?.body_rotation ?? Math.sin(hostTime / 1000 * 1.7) * 0.05,
-    facePosition: visual?.face_position ?? [0, -5], faceBlink: visual?.face_blink ?? false,
-    leftHandPosition: visual?.left_hand_position ?? [-52, -4], rightHandPosition: visual?.right_hand_position ?? [52, -4],
-    leftFootPosition: visual?.left_foot_position ?? [-35, 62], rightFootPosition: visual?.right_foot_position ?? [35, 62],
-    leftHandRotation: 0, rightHandRotation: 0,
-  };
-  drawCharacter(context, shape, visual?.recovery_white ? "#ffffff" : selectedColor,
-    position[0], position[1], characterScale, pose);
+function drawPhoneCharacter(context: CanvasRenderingContext2D, visual: BubblesVisualSnapshot | undefined,
+    hostTime: number, selectedColor: string): void {
+  const fallbackScale = Math.min(0.44, (bubblesSnapshot?.bubble_radius ?? tuningValue("starting_radius", 48)) * 0.82 / 100);
+  const position = visual?.character_position ?? [0, 40 + Math.sin(hostTime / 1000 * 2.2) * 4];
+  squircleCanvas.draw(context, visual?.recovery_white ? "#ffffff" : selectedColor,
+    position[0], position[1], visual?.character_scale ?? fallbackScale, hostTime,
+    visual?.face_blink ?? false, visual?.body_rotation ?? Math.sin(hostTime / 1000 * 1.7) * 0.05);
 }
 function renderBubbles(now: number): void {
   if (bubblesCard.hidden || !bubblesSnapshot) return;
@@ -494,7 +331,6 @@ function renderBubbles(now: number): void {
   const radius = Math.max(1, visual?.radius ?? ((message.bubble_radius ?? startRadius) * reformScale));
   const burstRadius = message.burst_radius ?? message.bubble_radius ?? startRadius;
   const renderedRadius = burstProgress >= 0 && burstProgress < 1 ? (visual?.radius ?? burstRadius) : radius;
-  const bodyShape = isCharacterShape(message.character_shape) ? message.character_shape : FALLBACK_CHARACTER.shape;
   const selectedColor = colorOption(message.character_color)?.hex ?? FALLBACK_CHARACTER.color;
   const spinTurns = tuningValue("spin_surface_turns_per_second", 1.8);
   const spinning = visual?.spinning ?? (message.phase === "active" && (message.spin_remaining_msec ?? 0) - snapshotElapsed > 0);
@@ -565,7 +401,7 @@ function renderBubbles(now: number): void {
     }
   }
   const characterVisible = visual?.character_visible ?? !(burstProgress >= 0 && burstProgress < 1);
-  if (characterVisible) drawPhoneCharacter(context, visual, tuneTime, bodyShape, selectedColor);
+  if (characterVisible) drawPhoneCharacter(context, visual, tuneTime, selectedColor);
   context.restore();
   bubblesPreviousFrame = now;
 }
@@ -577,27 +413,13 @@ function animateBubbles(now: number): void {
 }
 requestAnimationFrame(animateBubbles);
 
-function showGame(message: HostMessage): void {
-  bubblesCard.hidden = true; playerCard.hidden = true; gameCard.hidden = false; const phase = message.phase ?? "waiting";
-  gameHeading.textContent = phase === "countdown" ? "Get ready!" : phase === "genuine_stop_grace" ? "Hold a pose!" : "Watch the big screen";
-  gameMessage.textContent = message.message ?? (phase === "genuine_stop_grace" ? "Music stopped! Hold your pose." : "Keep watching the shared screen.");
-  const player = message.player as GameplayPlayer | undefined; const lifeCount = message.lives ?? player?.lives;
-  if (message.debug_mode === true) lives.textContent = "Lives: DEBUG"; else if (Number.isInteger(lifeCount)) lives.textContent = `Lives: ${"♥".repeat(Math.max(0, lifeCount!))}${"♡".repeat(Math.max(0, 2 - lifeCount!))}`;
-  const eliminated = message.eliminated === true || player?.eliminated === true; readPresentation(message.presentation); if (player) updateCharge(player);
-  if (eliminated) { releaseHeld(); setGameplaySurface(false); gameHeading.textContent = "You've been eliminated :("; gameMessage.textContent = "Keep watching the big screen for the results."; poseGrid.replaceChildren(); }
-  else if (message.type === "flash_pose_result") gameHeading.textContent = message.success ? "Pose locked!" : "Keep dancing!";
-  else if (["countdown", "dance", "genuine_stop_grace", "resolve", "flash_wait"].includes(phase) || message.type === "flash_pose_challenge") { renderControls(message.available_directions ?? directions); setGameplaySurface(true); }
-  else if (message.type === "flash_pose_results") { releaseHeld(); setGameplaySurface(false); gameHeading.textContent = message.placement ? `You placed #${message.placement}` : "Round complete"; gameMessage.textContent = "Check the big screen for the final results."; poseGrid.replaceChildren(); }
-  else { releaseHeld(); setGameplaySurface(false); poseGrid.replaceChildren(); }
-}
-
 function rememberIdentity(message: HostMessage): boolean {
   const player = message.player as PublicPlayer | undefined;
   if (!player || typeof player.name !== "string" || typeof message.session_id !== "string" || typeof message.reconnect_token !== "string") return false;
   store(STORAGE.name, player.name); store(STORAGE.session, message.session_id); store(STORAGE.token, message.reconnect_token); showJoined(player); return true;
 }
 function reconnect(): void {
-  if (stopped || retry !== undefined) return; setGameplaySurface(false);
+  if (stopped || retry !== undefined) return; lobbyControls.deactivate(); setGameplaySurface(false);
   if (joined) { playerState.textContent = "Reconnecting"; leaveButton.disabled = true; }
   status.textContent = "Host disconnected. Reconnecting…"; status.hidden = false; retry = setTimeout(() => { retry = undefined; void connect(); }, 2000);
 }
@@ -612,27 +434,26 @@ async function connect(): Promise<void> {
     peer.onmessage = (event: MessageEvent<string>) => {
       let message: HostMessage; try { message = JSON.parse(event.data) as HostMessage; } catch { peer.close(); return; }
       if (message.type === "welcome" && message.protocol === 1 && Number.isInteger(message.connection_id)) {
-        clearTimeout(deadline); if (message.resume_status === "resumed" && rememberIdentity(message)) { releaseHeld(false); if (message.gameplay?.type === "bubbles_snapshot") showBubbles(message.gameplay); else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player) showJoined(message.player as PublicPlayer, message.gameplay.message ?? "Waiting for the next game"); else if (message.gameplay) showGame(message.gameplay); return; }
+        clearTimeout(deadline); if (message.resume_status === "resumed" && rememberIdentity(message)) { if (message.gameplay?.type === "bubbles_snapshot") showBubbles(message.gameplay); else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player) showJoined(message.player as PublicPlayer, message.gameplay.message ?? "Waiting for the next game"); return; }
         if (message.resume_status === "session_restarted") { forgetIdentity(); showJoin("The host started a new session. Choose your character and name to join again.", true); }
         else if (message.resume_status === "expired") { forgetIdentity(); showJoin("Your previous player expired. Choose your character and name to join again.", true); } else showJoin("Connected. Choose your character to join.", true);
       } else if (message.type === "join_accepted") { if (!rememberIdentity(message)) peer.close(); }
       else if (message.type === "join_rejected" || message.type === "error") { joinButton.disabled = false; status.textContent = message.message ?? "The host could not complete that action."; status.hidden = false; if (!joined) nameInput.focus(); }
       else if (message.type === "left") { forgetIdentity(); showJoin("You left the lobby. Choose your character and name to join again.", true); }
-      else if (message.type === "flash_pose_charge") updateCharge(message);
-      else if (["flash_pose_snapshot", "flash_pose_challenge", "flash_pose_result", "flash_pose_results"].includes(message.type ?? "")) showGame(message);
       else if (message.type === "bubbles_trace_result") bubblesLocalCharge = 0;
       else if (message.type === "bubbles_visual" && message.visual && bubblesSnapshot) { bubblesVisualSnapshot = message.visual; bubblesVisualReceivedAt = performance.now(); }
       else if (message.type === "bubbles_snapshot" || message.type === "bubbles_feedback") showBubbles(message);
-      else if (message.type === "lobby") { releaseHeld(false); setGameplaySurface(false); bubblesCard.hidden = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; if (message.player) rememberIdentity(message); else if (joined) { gameCard.hidden = true; playerCard.hidden = false; playerState.textContent = "Waiting for the next game"; status.textContent = message.message ?? "Waiting for the next game"; } }
+      else if (message.type === "lobby") { setGameplaySurface(false); bubblesCard.hidden = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; if (message.player) rememberIdentity(message); else if (joined) { playerCard.hidden = true; lobbyControls.activate(); status.hidden = true; } }
     };
-    peer.onclose = event => { clearTimeout(deadline); releaseHeld(false); if (socket === peer) socket = undefined; if (event.code === 4000) { stopped = true; leaveButton.disabled = true; status.textContent = "This player continued in another tab."; playerState.textContent = "Open in another tab"; return; } reconnect(); };
+    peer.onclose = event => { clearTimeout(deadline); lobbyControls.deactivate(); if (socket === peer) socket = undefined; if (event.code === 4000) { stopped = true; leaveButton.disabled = true; status.textContent = "This player continued in another tab."; playerState.textContent = "Open in another tab"; return; } reconnect(); };
     peer.onerror = () => peer.close();
   } catch { reconnect(); }
 }
 
 joinForm.addEventListener("submit", event => { event.preventDefault(); const name = nameInput.value.trim(); store(STORAGE.name, name); if (!socket || socket.readyState !== WebSocket.OPEN) { status.textContent = "Still connecting. Try again in a moment."; status.hidden = false; return; } joinButton.disabled = true; status.textContent = "Joining…"; status.hidden = false; socket.send(JSON.stringify(createJoinMessage(name, joinFlow))); });
-leaveButton.addEventListener("click", () => { if (!socket || socket.readyState !== WebSocket.OPEN) return; leaveButton.disabled = true; status.textContent = "Leaving…"; socket.send(JSON.stringify({ type: "leave" })); });
-addEventListener("orientationchange", updateOrientation); addEventListener("resize", updateOrientation);
-window.addEventListener("pagehide", () => { stopped = true; releaseHeld(false); clearTimeout(retry); retry = undefined; socket?.close(); });
+function leaveLobby(): void { if (!socket || socket.readyState !== WebSocket.OPEN) return; lobbyControls.deactivate(); leaveButton.disabled = true; lobbyLeaveButton.disabled = true; status.textContent = "Leaving…"; socket.send(JSON.stringify({ type: "leave" })); }
+leaveButton.addEventListener("click", leaveLobby);
+lobbyLeaveButton.addEventListener("click", leaveLobby);
+window.addEventListener("pagehide", () => { stopped = true; lobbyControls.deactivate(); clearTimeout(retry); retry = undefined; socket?.close(); });
 window.addEventListener("pageshow", event => { if (event.persisted) { stopped = false; void connect(); } });
 void connect();

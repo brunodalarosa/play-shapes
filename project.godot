@@ -33,6 +33,11 @@ window/stretch/aspect="expand"
 
 enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg", "res://addons/standalone_build/plugin.cfg")
 
+[layer_names]
+
+2d_physics/layer_8="Lobby platforms"
+2d_physics/layer_9="Lobby characters"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

@@ -1,0 +1,28 @@
+00:00.047  reports          | WARNING Unable to open 'C:\Users\backup pc\AppData\Roaming\Blender Foundation\Blender\5.2\config\userpref.blend': Permission denied
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+00:01.172  blend            | Read blend: "C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\addon-evaluation\squircle-addon-test.blend"
+SCENE PS056 | Squircle Toy Studio camera Camera.ThreeQuarter
+OBJECT Body.Pivot TYPE EMPTY PARENT Character.Root - ground anchor LOC (0.0, 0.0, 1.62)
+OBJECT Body.Squircle TYPE MESH PARENT Body.Pivot LOC (0.0, 0.0, 0.0)
+OBJECT Camera TYPE CAMERA PARENT None LOC (7.3589, -6.9258, 4.9583)
+OBJECT Camera.Front TYPE CAMERA PARENT None LOC (0.0, -8.0, 1.34)
+OBJECT Camera.ThreeQuarter TYPE CAMERA PARENT None LOC (4.5321, -6.4725, 2.5915)
+OBJECT Character.Root - ground anchor TYPE EMPTY PARENT None LOC (0.0, 0.0, 0.0)
+OBJECT Cube TYPE MESH PARENT None LOC (0.0, 0.0, 0.0)
+OBJECT Face.Plane - neutral artwork TYPE MESH PARENT Body.Pivot LOC (0.0, -0.665, 0.015)
+OBJECT Foot.L TYPE MESH PARENT Foot.L.Contact LOC (0.0, 0.0, 0.0)
+OBJECT Foot.L.Contact TYPE EMPTY PARENT Character.Root - ground anchor LOC (-0.49, -0.13, 0.0)
+OBJECT Foot.R TYPE MESH PARENT Foot.R.Contact LOC (0.0, 0.0, 0.0)
+OBJECT Foot.R.Contact TYPE EMPTY PARENT Character.Root - ground anchor LOC (0.49, -0.13, 0.0)
+OBJECT Ground.Contact - Z equals 0 TYPE EMPTY PARENT None LOC (0.0, 0.0, 0.0)
+OBJECT Ground.ShadowCatcher - optional TYPE MESH PARENT None LOC (0.0, 0.0, -0.003)
+OBJECT Hand.L TYPE MESH PARENT Hand.L.Wrist LOC (0.0, 0.0, 0.0)
+OBJECT Hand.L.Wrist TYPE EMPTY PARENT Character.Root - ground anchor LOC (-1.68, 0.08, 0.92)
+OBJECT Hand.R TYPE MESH PARENT Hand.R.Wrist LOC (0.0, 0.0, 0.0)
+OBJECT Hand.R.Wrist TYPE EMPTY PARENT Character.Root - ground anchor LOC (1.68, 0.08, 0.92)
+OBJECT Light TYPE LIGHT PARENT None LOC (4.0762, 1.0055, 5.9039)
+OBJECT Light.Fill - face readability TYPE LIGHT PARENT None LOC (3.5, -3.0, 3.2)
+OBJECT Light.Key - large softbox TYPE LIGHT PARENT None LOC (-3.5, -4.5, 6.0)
+OBJECT Light.Rim - silhouette TYPE LIGHT PARENT None LOC (2.0, 3.0, 4.5)
+
+Blender quit

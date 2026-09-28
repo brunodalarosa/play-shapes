@@ -1,0 +1,3 @@
+# Preserve the exact evaluated third-party bytes and their recorded SHA-256.
+sprite_sheet_generator_V2.py -text
+LICENSE-upstream-GPL-3.0 -text

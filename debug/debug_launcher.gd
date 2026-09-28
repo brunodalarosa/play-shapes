@@ -97,36 +97,41 @@ func _build_ui() -> void:
 
 	_panel = PanelContainer.new()
 	_panel.set_anchors_preset(Control.PRESET_CENTER)
-	_panel.position = Vector2(-230, -190)
-	_panel.custom_minimum_size = Vector2(460, 380)
+	_panel.position = Vector2(-270, -265)
+	_panel.custom_minimum_size = Vector2(540, 530)
 	_panel.visible = false
 	var panel_style := StyleBoxFlat.new()
-	panel_style.bg_color = Color("171b25")
-	panel_style.border_color = Color("596273")
-	panel_style.set_border_width_all(2)
-	panel_style.set_corner_radius_all(10)
+	panel_style.bg_color = Color("fff8e8")
+	panel_style.border_color = Color("c48b50")
+	panel_style.set_border_width_all(5)
+	panel_style.set_corner_radius_all(24)
+	panel_style.shadow_color = Color(0.08, 0.12, 0.2, 0.5)
+	panel_style.shadow_size = 12
 	_panel.add_theme_stylebox_override("panel", panel_style)
 	add_child(_panel)
 
 	var margin := MarginContainer.new()
-	margin.add_theme_constant_override("margin_left", 24)
-	margin.add_theme_constant_override("margin_top", 20)
-	margin.add_theme_constant_override("margin_right", 24)
-	margin.add_theme_constant_override("margin_bottom", 20)
+	margin.add_theme_constant_override("margin_left", 28)
+	margin.add_theme_constant_override("margin_top", 26)
+	margin.add_theme_constant_override("margin_right", 28)
+	margin.add_theme_constant_override("margin_bottom", 26)
 	_panel.add_child(margin)
 
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 12)
+	column.add_theme_constant_override("separation", 14)
 	margin.add_child(column)
 
 	var title := Label.new()
-	title.text = "Gameplay debug launcher"
-	title.add_theme_font_size_override("font_size", 24)
+	title.text = "Play Shapes · Debug"
+	title.add_theme_font_size_override("font_size", 28)
+	title.add_theme_color_override("font_color", Color("133253"))
 	column.add_child(title)
 
 	var hint := Label.new()
 	hint.text = "F12 closes this overlay. The game and LAN session keep running."
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint.add_theme_color_override("font_color", Color("34516b"))
+	hint.add_theme_font_size_override("font_size", 17)
 	column.add_child(hint)
 
 	_scenario_list = VBoxContainer.new()
@@ -138,11 +143,13 @@ func _build_ui() -> void:
 
 	_restart_button = Button.new()
 	_restart_button.text = "Restart current debug scenario"
+	_style_action(_restart_button, Color("087b70"))
 	_restart_button.pressed.connect(restart_scenario)
 	column.add_child(_restart_button)
 
 	var lobby_button := Button.new()
 	lobby_button.text = "Return to lobby"
+	_style_action(lobby_button, Color("1d4367"))
 	lobby_button.pressed.connect(return_to_lobby)
 	column.add_child(lobby_button)
 
@@ -157,9 +164,26 @@ func _refresh_actions() -> void:
 		button.text = scenario.display_name if bool(state.available) else "%s — Unavailable" % scenario.display_name
 		button.disabled = not bool(state.available)
 		button.tooltip_text = str(state.reason)
+		_style_action(button, Color("1d4367"))
 		button.pressed.connect(launch.bind(scenario.id))
 		_scenario_list.add_child(button)
 	_restart_button.disabled = active_scenario == null
+
+func _style_action(button: Button, fill: Color) -> void:
+	button.custom_minimum_size.y = 46.0
+	button.add_theme_font_size_override("font_size", 18)
+	button.add_theme_color_override("font_color", Color.WHITE)
+	button.add_theme_color_override("font_hover_color", Color.WHITE)
+	button.add_theme_color_override("font_disabled_color", Color("eef1ec"))
+	for state: String in ["normal", "hover", "pressed", "disabled"]:
+		var style := StyleBoxFlat.new()
+		style.bg_color = Color("9aa9a8") if state == "disabled" else fill.lightened(0.13 if state == "hover" else 0.0)
+		style.border_color = Color("c8d9cf") if state == "disabled" else Color("88d7c5")
+		style.set_border_width_all(2)
+		style.set_corner_radius_all(12)
+		style.content_margin_left = 12
+		style.content_margin_right = 12
+		button.add_theme_stylebox_override(state, style)
 
 func _update_marker() -> void:
 	_marker.visible = active_scenario != null

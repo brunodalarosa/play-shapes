@@ -83,7 +83,7 @@ test('active Bubbles routes authenticated traces, rejects forged input, and rest
     assert.equal(rejectedSelection.code, 'invalid_character_selection');
     client.send({ type: 'join', name: 'Protocol Tester', character_shape: 'rhombus', character_color: '#EC407A' });
     const joined = await client.next(message => message.type === 'join_accepted');
-    assert.equal(joined.player.character_shape, 'rhombus');
+    assert.equal(joined.player.character_shape, 'squircle');
     assert.equal(joined.player.character_color, '#EC407A');
     const snapshot = await client.next(message => message.type === 'bubbles_snapshot' && message.score === 8);
     assert.equal(snapshot.visual_jellyfish, 8);
@@ -114,7 +114,7 @@ test('active Bubbles routes authenticated traces, rejects forged input, and rest
     client.send({ type: 'bubbles_trace', input_seq: 2, trace: fullTrace });
     assert.equal((await client.next(message => message.type === 'bubbles_trace_result')).action, 'swipe');
     client.send({ type: 'pose_down', direction: 'left', input_seq: 2 });
-    assert.equal((await client.next(message => message.type === 'error')).code, 'game_unavailable');
+    assert.equal((await client.next(message => message.type === 'error')).code, 'unsupported_message');
     client.peer.close();
     resumed = await connect();
     resumed.send({ type: 'hello', protocol: 1, session_id: joined.session_id, reconnect_token: joined.reconnect_token });
@@ -122,8 +122,8 @@ test('active Bubbles routes authenticated traces, rejects forged input, and rest
     assert.equal(restored.resume_status, 'resumed');
     assert.equal(restored.gameplay.type, 'bubbles_snapshot');
     assert.equal(restored.gameplay.score, 8);
-    assert.equal(restored.player.character_shape, 'rhombus');
-    assert.equal(restored.gameplay.character_shape, 'rhombus');
+    assert.equal(restored.player.character_shape, 'squircle');
+    assert.equal(restored.gameplay.character_shape, 'squircle');
     assert.equal(restored.gameplay.character_color, '#EC407A');
     } finally { client.peer.close(); resumed?.peer.close(); }
   } finally {
@@ -136,23 +136,22 @@ async function verifyPhoneJoinAndAssets() {
     try { return await fetch(`http://127.0.0.1:${port}${path}`); }
     catch (error) { throw new Error(`Could not request ${path}; host exit=${host?.exitCode}; output=${output}`, { cause: error }); }
   };
+  const paths = [
+    '/', '/style.css', '/bubbles-phone-background.png', '/character_selection.js', '/squircle_v1.js',
+    '/squircle-v1/manifest.json', '/squircle-v1/idle-front-colorable.png',
+    '/squircle-v1/idle-front-neutral.png', '/squircle-v1/idle-front-blink.png',
+  ];
   const responses = [];
-  for (const path of [
-    '/', '/style.css', '/bubbles-phone-background.png', '/bubbles-player-body.png', '/bubbles-player-hand.png',
-    '/bubbles-player-foot.png', '/bubbles-player-face-neutral.png', '/bubbles-player-face-blink.png',
-    '/shape-square.png', '/shape-circle.png', '/shape-squircle.png', '/shape-rhombus.png', '/shape-hand-open.png', '/character_selection.js',
-  ]) responses.push(await request(path));
-  const [htmlResponse, cssResponse, backgroundResponse, bodyResponse, handResponse, footResponse, faceResponse, blinkResponse,
-    squareResponse, circleResponse, squircleResponse, rhombusResponse, openHandResponse, catalogResponse] = responses;
-  for (const response of [htmlResponse, cssResponse, backgroundResponse, bodyResponse, handResponse, footResponse, faceResponse, blinkResponse,
-    squareResponse, circleResponse, squircleResponse, rhombusResponse, openHandResponse, catalogResponse]) assert.equal(response.status, 200);
+  for (const path of paths) responses.push(await request(path));
+  for (const response of responses) assert.equal(response.status, 200);
+  const [htmlResponse, cssResponse, backgroundResponse, catalogResponse, rendererResponse, manifestResponse, ...sheets] = responses;
   const html = await htmlResponse.text(); const css = await cssResponse.text();
   assert.match(html, /id="bubbles-visual"/);
   assert.match(html, /id="bubbles-score"/);
   assert.match(html, /id="selection-screen"/);
   assert.match(html, /id="name-screen"/);
-  assert.match(html, /aria-label="Previous shape"/);
-  assert.match(html, /aria-label="Next shape"/);
+  assert.doesNotMatch(html, /previous-shape|next-shape|shape-cycle/);
+  assert.match(html, /Blue Squircle/);
   assert.match(html, /placeholder="Enter your name"/);
   assert.match(html, /ENTER LOBBY/);
   assert.doesNotMatch(html, /bubbles-debug|bubbles-status|bubbles-meter|bubbles-state/);
@@ -160,12 +159,17 @@ async function verifyPhoneJoinAndAssets() {
   assert.match(css, /inset-block-start: 15%/);
   assert.match(css, /grid-template-columns: repeat\(5, minmax\(0, 1fr\)\)/);
   assert.match(css, /env\(safe-area-inset-top\)/);
-  assert.match(await catalogResponse.text(), /shapeAtOffset/);
+  assert.match(await catalogResponse.text(), /character_shape: CHARACTER_SHAPE/);
+  assert.match(await rendererResponse.text(), /manifest\.json/);
+  const manifest = await manifestResponse.json();
+  assert.equal(manifest.shape_id, 'squircle');
+  assert.equal(manifest.clips.find(clip => clip.name === 'idle' && clip.view === 'front').frames, 48);
   const background = PNG.sync.read(Buffer.from(await backgroundResponse.arrayBuffer()));
   assert.equal(background.width, 1080);
   assert.equal(background.height, 1920);
-  for (const response of [squareResponse, circleResponse, squircleResponse, rhombusResponse]) {
-    const body = PNG.sync.read(Buffer.from(await response.arrayBuffer()));
-    assert.ok(body.width > 0 && body.height > 0);
+  for (const response of sheets) {
+    const sheet = PNG.sync.read(Buffer.from(await response.arrayBuffer()));
+    assert.equal(sheet.width, 2048);
+    assert.equal(sheet.height, 1536);
   }
 }

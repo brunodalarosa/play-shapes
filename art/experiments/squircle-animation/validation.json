@@ -1,0 +1,252 @@
+{
+  "source": "squircle-animated.blend",
+  "blender": "5.2.2 LTS",
+  "checks": [
+    {
+      "name": "idle seam pose",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "idle no sole penetration",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "idle planted soles",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "idle stance world travel cancels",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "idle fixed-camera containment",
+      "passed": true,
+      "detail": 15.54484748840332
+    },
+    {
+      "name": "idle floating foot-body gap",
+      "passed": true,
+      "detail": 0.20984911918640137
+    },
+    {
+      "name": "idle fingertips hang down",
+      "passed": true,
+      "detail": 0.9793368577957153
+    },
+    {
+      "name": "idle palms face inward throughout loop",
+      "passed": true,
+      "detail": 0.8333069682121277
+    },
+    {
+      "name": "idle palms point toward body throughout loop",
+      "passed": true,
+      "detail": 0.6960635539144278
+    },
+    {
+      "name": "idle hand floor clearance",
+      "passed": true,
+      "detail": 0.25152674317359924
+    },
+    {
+      "name": "idle hand body clearance in X",
+      "passed": true,
+      "detail": 0.3082345724105835
+    },
+    {
+      "name": "idle saved hand shape",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "walk seam pose",
+      "passed": true,
+      "detail": 1.5140622942303238e-17
+    },
+    {
+      "name": "walk no sole penetration",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "walk planted soles",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "walk stance world travel cancels",
+      "passed": true,
+      "detail": 1.1920928955078125e-07
+    },
+    {
+      "name": "walk fixed-camera containment",
+      "passed": true,
+      "detail": 13.483452796936035
+    },
+    {
+      "name": "walk floating foot-body gap",
+      "passed": true,
+      "detail": 0.0779222846031189
+    },
+    {
+      "name": "walk palms face inward throughout loop",
+      "passed": true,
+      "detail": 0.8250158429145813
+    },
+    {
+      "name": "walk palms point toward body throughout loop",
+      "passed": true,
+      "detail": 0.6425467263907194
+    },
+    {
+      "name": "walk hand floor clearance",
+      "passed": true,
+      "detail": 0.3199325501918793
+    },
+    {
+      "name": "walk hand body clearance in X",
+      "passed": true,
+      "detail": 0.1818023920059204
+    },
+    {
+      "name": "walk saved hand shape",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "run seam pose",
+      "passed": true,
+      "detail": 1.5920407760118202e-17
+    },
+    {
+      "name": "run no sole penetration",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "run planted soles",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "run stance world travel cancels",
+      "passed": true,
+      "detail": 5.960464477539063e-08
+    },
+    {
+      "name": "run fixed-camera containment",
+      "passed": true,
+      "detail": 9.80002212524414
+    },
+    {
+      "name": "run floating foot-body gap",
+      "passed": true,
+      "detail": 0.1175849437713623
+    },
+    {
+      "name": "run palms face inward throughout loop",
+      "passed": true,
+      "detail": 0.8096184134483337
+    },
+    {
+      "name": "run palms point toward body throughout loop",
+      "passed": true,
+      "detail": 0.36325597763061523
+    },
+    {
+      "name": "run hand floor clearance",
+      "passed": true,
+      "detail": 0.43540552258491516
+    },
+    {
+      "name": "run hand body clearance in X",
+      "passed": true,
+      "detail": 0.11176002025604248
+    },
+    {
+      "name": "run saved hand shape",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "run hand swing exceeds walk and previous run",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "three independent editable actions",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "five independently controlled parts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "packed neutral and blink textures",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "root fixed at ground origin",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "optional shadow disabled",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "clips": {
+    "idle": {
+      "max_seam_matrix_error": 0.0,
+      "minimum_sole_z": 0.0,
+      "max_planted_sole_error": 0,
+      "max_stance_slip_per_quarter_frame_m": 0,
+      "minimum_projected_bound_margin_px": 15.54484748840332,
+      "minimum_vertical_foot_body_gap_m": 0.20984911918640137,
+      "minimum_fingers_down_dot": 0.9793368577957153,
+      "minimum_palm_inward_dot": 0.8333069682121277,
+      "minimum_palm_toward_body_dot": 0.6960635539144278,
+      "hand_y_travel_m": 0.03592304140329361,
+      "minimum_hand_floor_clearance_m": 0.25152674317359924,
+      "minimum_hand_body_x_gap_m": 0.3082345724105835
+    },
+    "walk": {
+      "max_seam_matrix_error": 1.5140622942303238e-17,
+      "minimum_sole_z": 0.0,
+      "max_planted_sole_error": 0,
+      "max_stance_slip_per_quarter_frame_m": 1.1920928955078125e-07,
+      "minimum_projected_bound_margin_px": 13.483452796936035,
+      "minimum_vertical_foot_body_gap_m": 0.0779222846031189,
+      "minimum_fingers_down_dot": 0.9459502100944519,
+      "minimum_palm_inward_dot": 0.8250158429145813,
+      "minimum_palm_toward_body_dot": 0.6425467263907194,
+      "hand_y_travel_m": 0.594866931438446,
+      "minimum_hand_floor_clearance_m": 0.3199325501918793,
+      "minimum_hand_body_x_gap_m": 0.1818023920059204
+    },
+    "run": {
+      "max_seam_matrix_error": 1.5920407760118202e-17,
+      "minimum_sole_z": 0.0,
+      "max_planted_sole_error": 0,
+      "max_stance_slip_per_quarter_frame_m": 5.960464477539063e-08,
+      "minimum_projected_bound_margin_px": 9.80002212524414,
+      "minimum_vertical_foot_body_gap_m": 0.1175849437713623,
+      "minimum_fingers_down_dot": 0.5594501495361328,
+      "minimum_palm_inward_dot": 0.8096184134483337,
+      "minimum_palm_toward_body_dot": 0.36325597763061523,
+      "hand_y_travel_m": 1.340000033378601,
+      "minimum_hand_floor_clearance_m": 0.43540552258491516,
+      "minimum_hand_body_x_gap_m": 0.11176002025604248
+    }
+  },
+  "approval": "Technical evidence only; owner approved Squircle v1 poses on 2026-09-27.",
+  "passed": true
+}

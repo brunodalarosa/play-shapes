@@ -1,0 +1,6 @@
+00:00.047  reports          | WARNING Unable to open 'C:\Users\backup pc\AppData\Roaming\Blender Foundation\Blender\5.2\config\userpref.blend': Permission denied
+Blender 5.2.2 LTS (hash d13f752e3b9c built 2026-09-15 01:37:04)
+00:01.297  blend            | Read blend: "C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\squircle-animated.blend"
+00:02.984  render           | Saved: 'C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\previews\hand-detail.png'
+
+Blender quit

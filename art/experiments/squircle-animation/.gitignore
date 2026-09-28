@@ -1,0 +1,12 @@
+*.blend1
+*.blend2
+__pycache__/
+recheck/
+render.log
+recheck.log
+probe/
+.cache/
+probe-ps064/
+probe-ps064-candidate/
+probe-ps064-mirrored/
+ps064-*.log

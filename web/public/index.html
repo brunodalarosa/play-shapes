@@ -15,12 +15,10 @@
     <section id="selection-screen" class="onboarding-screen" aria-labelledby="selection-title">
       <h1 id="selection-title" class="brand">PLAY SHAPES</h1>
       <div class="shape-picker">
-        <button id="previous-shape" class="shape-cycle" type="button" aria-label="Previous shape">‹</button>
         <div class="character-preview-wrap">
-          <canvas id="selection-preview" class="character-preview" role="img" aria-label="Circle shape, Blue"></canvas>
-          <p id="selected-character-label" class="selection-label" aria-live="polite">Circle · Blue</p>
+          <canvas id="selection-preview" class="character-preview" role="img" aria-label="Blue Squircle character"></canvas>
+          <p id="selected-character-label" class="selection-label" aria-live="polite">Blue Squircle</p>
         </div>
-        <button id="next-shape" class="shape-cycle" type="button" aria-label="Next shape">›</button>
       </div>
       <div class="color-choice">
         <p id="color-choice-label">Choose a color</p>
@@ -31,7 +29,7 @@
 
     <section id="name-screen" class="onboarding-screen" aria-labelledby="name-screen-title" hidden>
       <button id="back-button" class="back-button" type="button" aria-label="Back to character selection">BACK</button>
-      <canvas id="name-preview" class="character-preview dancing-preview" role="img" aria-label="Your selected character dancing"></canvas>
+      <canvas id="name-preview" class="character-preview name-preview" role="img" aria-label="Your Squircle character"></canvas>
       <h2 id="name-screen-title" class="name-screen-title">What's your name?</h2>
       <form id="join-form">
         <label for="player-name">Your name</label>
@@ -41,19 +39,16 @@
     </section>
 
     <p id="status" class="status" role="status" aria-live="polite" hidden></p>
+    <section id="lobby-controller" aria-label="Playground controls" hidden>
+      <button id="lobby-leave-button" type="button" aria-label="Leave playground">×</button>
+      <div id="lobby-stick-zone" role="group" aria-label="Move left or right"></div>
+      <button id="lobby-jump-button" type="button" aria-label="Jump">JUMP</button>
+    </section>
     <section id="player-card" aria-labelledby="player-name-heading" hidden>
       <p class="eyebrow">Joined as</p>
       <h2 id="player-name-heading"></h2>
       <p id="player-state">Connected</p>
       <button id="leave-button" class="secondary" type="button">Leave / Change player</button>
-    </section>
-    <section id="game-card" aria-labelledby="game-heading" hidden>
-      <p class="eyebrow">Flash? Pose!</p>
-      <h2 id="game-heading">Watch the big screen</h2>
-      <p id="game-message">Get ready to pose when the music stops.</p>
-      <p id="lives" class="lives" aria-live="polite"></p>
-      <div id="pose-grid" class="pose-grid" aria-label="Pose controls"></div>
-      <div id="rotate-state" class="rotate-state" role="status" hidden>Rotate your phone</div>
     </section>
     <section id="bubbles-card" aria-labelledby="bubbles-heading" hidden>
       <h2 id="bubbles-heading">Bubbles and Jellyfishes</h2>

@@ -50,8 +50,12 @@ after(async () => {
 test('serves bundled HTML, JS, CSS and session configuration', async () => {
   for (const [path, mime, text] of [
     ['/', 'text/html', 'PLAY SHAPES'], ['/app.js', 'text/javascript', 'localStorage'],
-    ['/controller_geometry.js', 'text/javascript', 'directionAtPoint'],
+    ['/immersive.js', 'text/javascript', 'attemptImmersive'],
     ['/bubbles_gesture.js', 'text/javascript', 'GestureTrace'],
+    ['/lobby_controls.js', 'text/javascript', 'lockX'],
+    ['/lobby_input.js', 'text/javascript', 'LobbyInputState'],
+    ['/squircle_v1.js', 'text/javascript', 'SquircleV1Canvas'],
+    ['/vendor/nipplejs.mjs', 'text/javascript', 'create'],
     ['/bubbles-jellyfish.png', 'image/png', null],
     ['/style.css', 'text/css', 'focus-visible'], ['/session.json', 'application/json', 'session_id']
   ]) {
@@ -73,28 +77,6 @@ test('phone join form has labels, live feedback, and explicit change-player acti
   assert.match(html, /maxlength="16"/);
 });
 
-test('Flash Pose controller exposes accessible hold controls and cancellation handling', async () => {
-  const html = await (await fetch(base)).text();
-  const css = await (await fetch(base + '/style.css')).text();
-  const js = await (await fetch(base + '/app.js')).text();
-  assert.match(html, /id="pose-grid"[^>]*aria-label="Pose controls"/);
-  assert.match(html, /id="lives"[^>]*aria-live="polite"/);
-  assert.match(css, /touch-action:\s*none/);
-  assert.match(css, /html\.gameplay-active[^}]*overflow:\s*hidden/s);
-  assert.match(css, /\.pose-grid\[data-count="3"\]/);
-  assert.match(css, /\.pose-grid\[data-count="4"\]/);
-  assert.match(css, /\.pose-button, \.pose-button \*\s*\{[^}]*-webkit-user-select:\s*none/s);
-  assert.match(css, /\.pose-button, \.pose-button \*\s*\{[^}]*-webkit-touch-callout:\s*none/s);
-  for (const expected of ['Pose left', 'Pose right', 'Pose down', 'Pose up', 'pointercancel', 'lostpointercapture']) {
-    assert.ok(js.includes(expected), `compiled controller should include ${expected}`);
-  }
-  assert.match(js, /selectstart[^\n]+preventDefault/);
-  assert.ok(js.includes('Lives: DEBUG'));
-  assert.ok(js.includes("You've been eliminated :(") );
-  assert.ok(js.includes('requestFullscreen'));
-  assert.ok(js.includes('flash_pose_charge'));
-});
-
 test('Bubbles controller keeps a clean portrait screen and accessible touch controls', async () => {
   const html = await (await fetch(base)).text();
   const css = await (await fetch(base + '/style.css')).text();
@@ -112,6 +94,19 @@ test('Bubbles controller keeps a clean portrait screen and accessible touch cont
   for (const expected of ['bubbles_trace', 'pointercancel', 'lostpointercapture', 'bubbles_trace_result', 'bubbles_snapshot', 'bubbles_visual', 'portrait', 'navigator.vibrate']) {
     assert.ok(js.includes(expected), `compiled controller should include ${expected}`);
   }
+});
+
+test('Playground controller is locally bundled, portrait safe, and touch-accessible', async () => {
+  const html = await (await fetch(base)).text();
+  const css = await (await fetch(base + '/style.css')).text();
+  const controls = await (await fetch(base + '/lobby_controls.js')).text();
+  assert.match(html, /id="lobby-stick-zone"[^>]*aria-label="Move left or right"/);
+  assert.match(html, /id="lobby-jump-button"[^>]*aria-label="Jump"/);
+  assert.match(css, /#lobby-stick-zone, #lobby-jump-button[^}]*safe-area-inset-bottom/);
+  assert.match(controls, /vendor\/nipplejs\.mjs/);
+  assert.match(controls, /lockX: true/);
+  assert.match(controls, /pointercancel/);
+  assert.match(controls, /lostpointercapture/);
 });
 
 test('lobby QR texture decodes to the exact join URL', () => {
@@ -247,6 +242,33 @@ test('joins, rejects duplicate names, resumes, leaves, and invalidates identity'
     resumed?.peer?.close();
     afterLeave?.peer?.close();
   }
+});
+
+test('host accepts sequenced lobby intent only from its registered connection', async () => {
+  const player = await connect(JSON.stringify({ type: 'hello', protocol: 1 }));
+  const stranger = await connect(JSON.stringify({ type: 'hello', protocol: 1 }));
+  let resumed;
+  try {
+    assert.equal((await request(stranger.peer, { type: 'lobby_move', input_seq: 1, horizontal: 1 })).code, 'not_joined');
+    const joined = await request(player.peer, {
+      type: 'join', name: 'Lobby Input Test', character_shape: 'square', character_color: '#EC407A'
+    });
+    assert.equal(joined.type, 'join_accepted');
+    assert.equal(joined.player.character_shape, 'squircle');
+    player.peer.send(JSON.stringify({ type: 'lobby_move', input_seq: 1, horizontal: 0.65 }));
+    assert.equal((await request(player.peer, { type: 'lobby_move', input_seq: 1, horizontal: -1 })).code, 'stale_sequence');
+    assert.equal((await request(player.peer, { type: 'lobby_move', input_seq: 2, horizontal: 1.5 })).code, 'invalid_movement');
+    player.peer.send(JSON.stringify({ type: 'lobby_jump_release', input_seq: 2 }));
+    assert.equal((await request(player.peer, { type: 'lobby_jump_release', input_seq: 2 })).code, 'stale_sequence');
+    resumed = await connect(JSON.stringify({
+      type: 'hello', protocol: 1, session_id: joined.session_id, reconnect_token: joined.reconnect_token
+    }));
+    assert.equal(resumed.welcome.player.player_id, joined.player.player_id);
+    resumed.peer.send(JSON.stringify({ type: 'lobby_move', input_seq: 1, horizontal: -0.3 }));
+    assert.equal((await request(resumed.peer, { type: 'lobby_move', input_seq: 1, horizontal: 1 })).code, 'stale_sequence');
+    await request(resumed.peer, { type: 'leave' });
+    assert.equal((await request(resumed.peer, { type: 'lobby_move', input_seq: 3, horizontal: 1 })).code, 'not_joined');
+  } finally { player.peer.close(); stranger.peer.close(); resumed?.peer.close(); }
 });
 
 test('returns actionable protocol errors after the handshake', async () => {

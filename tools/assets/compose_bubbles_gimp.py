@@ -20,10 +20,12 @@ def canvas(width, height, color=None):
 
 def place(image, relative, x, y, width=None, opacity=100, angle=0, white=False):
     path = OUT/relative
-    if relative.startswith('../../shape_characters/'):
-        path = ROOT/'test-results/ps-036-038/gimp-shapes'/relative.removeprefix('../../shape_characters/')
+    if relative.startswith('@squircle/'):
+        path = ROOT/'assets/runtime/animated_characters/squircle/v1'/relative.removeprefix('@squircle/')
     layer = Gimp.file_load_layer(Gimp.RunMode.NONINTERACTIVE, image, Gio.File.new_for_path(str(path)))
     image.insert_layer(layer, None, 0)
+    if relative.startswith('@squircle/'):
+        layer.resize(256, 256, 0, 0)
     if white:
         w, h = layer.get_width(), layer.get_height()
         rect = Gegl.Rectangle.new(0,0,w,h)
@@ -64,16 +66,11 @@ def ellipse(image, x, y, w, h, color, opacity=100, ring=0):
     return layer
 
 
-def shape_character(image,cx,cy,scale=1.0):
-    # Existing production artwork, unchanged, for a representative player.
-    base = '../../shape_characters/'
-    for part,x,y,width in [
-        ('bodies/circle.png',-25,-25,50),
-        ('faces/neutral.png',-16,-15,32),
-        ('hands/open.png',-40,7,16),('hands/open.png',25,7,16),
-        ('feet/round.png',-26,29,22),('feet/round.png',5,29,22),
-    ]:
-        place(image,base+part,cx+round(x*scale),cy+round(y*scale),round(width*scale))
+def squircle_character(image,cx,cy,scale=1.0):
+    # Current production Squircle v1 art, sampled at the first idle frame.
+    for layer in ('colorable', 'neutral'):
+        place(image,'@squircle/idle-front-'+layer+'.png',
+              cx-round(35*scale),cy-round(50*scale),round(70*scale))
 
 
 def build_overlays():
@@ -133,7 +130,7 @@ def arena_review():
         diameter = [164,190,220,185,210][i%5]
         ellipse(image,cx-diameter//2,cy-diameter//2,diameter,diameter,color,13)
         ellipse(image,cx-diameter//2,cy-diameter//2,diameter,diameter,color,100,3)
-        shape_character(image,cx,cy)
+        squircle_character(image,cx,cy)
         for j in range(5):
             a = math.radians(30+j*65)
             px,py = cx+int(math.cos(a)*diameter*.29)-10,cy+int(math.sin(a)*diameter*.29)-13
@@ -170,7 +167,7 @@ def size_review():
     label(image,'Portrait phone study / five visible collectibles',930,90,19,'#132d42')
     ellipse(image,997,230,320,320,'#18536d')
     ellipse(image,997,230,320,320,'#7cd5f0',100,4)
-    shape_character(image,1157,380,1.4)
+    squircle_character(image,1157,380,1.4)
     label(image,'5',1144,160,42,'#132d42')
     for i in range(5):
         a=math.radians(20+i*70)
