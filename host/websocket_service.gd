@@ -5,7 +5,6 @@ extends Node
 signal connection_count_changed(count: int)
 
 const MAX_PACKET_BYTES := 8192 # One bounded 128-point Bubbles trace plus protocol envelope.
-const FlashPoseProtocolScript = preload("res://host/flash_pose_protocol.gd")
 const BubblesProtocolScript = preload("res://host/bubbles_protocol.gd")
 
 var _server: TCPServer = TCPServer.new()
@@ -14,7 +13,6 @@ var _settings: NetworkingTuning
 var _registry: PlayerRegistry
 var _accepting_new_players: Callable
 var _next_id: int = 1
-var _flash_pose_protocol: RefCounted
 var _bubbles_protocol: RefCounted
 var _active_protocol: RefCounted
 var _lobby_controller: LobbyPlaygroundWorld
@@ -42,24 +40,7 @@ func clear_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
 		_lobby_controller.clear_all_input()
 		_lobby_controller = null
 
-func set_flash_pose_controller(controller: FlashPoseRoundController) -> void:
-	_clear_bubbles_controller()
-	_clear_flash_pose_controller()
-	_flash_pose_protocol = FlashPoseProtocolScript.new(controller)
-	_active_protocol = _flash_pose_protocol
-	controller.phase_changed.connect(_on_flash_pose_phase_changed)
-	controller.genuine_stop_started.connect(_on_flash_pose_challenge)
-	controller.semantic_animation_updated.connect(_on_semantic_state_changed)
-	controller.pose_evaluation_resolved.connect(_on_flash_pose_results)
-	controller.round_results_ready.connect(_on_flash_pose_round_results)
-	controller.return_to_lobby_requested.connect(_on_flash_pose_return_to_lobby)
-
-func clear_flash_pose_controller(controller: FlashPoseRoundController) -> void:
-	if _flash_pose_protocol != null and _flash_pose_protocol.controller == controller:
-		_clear_flash_pose_controller()
-
 func set_bubbles_controller(controller: BubblesRoundController) -> void:
-	_clear_flash_pose_controller()
 	_clear_bubbles_controller()
 	_bubbles_protocol = BubblesProtocolScript.new(controller)
 	_active_protocol = _bubbles_protocol
@@ -194,12 +175,6 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 				else {"accepted": false, "code": &"lobby_unavailable", "message": "Lobby controls are not active"}
 			if not result.accepted:
 				_send_rejection(peer, "error", result)
-		"pose_down", "pose_up":
-			var player := _registry.player_for_connection(client.connection_id)
-			var result: Dictionary = _active_protocol.handle_action(player, message, Time.get_ticks_msec()) \
-				if _active_protocol == _flash_pose_protocol and _flash_pose_protocol != null else {"accepted": false, "code": &"game_unavailable", "message": "Flash? Pose! is not active"}
-			if not result.accepted:
-				_send_rejection(peer, "error", result)
 		"bubbles_trace", "bubbles_charge":
 			var player := _registry.player_for_connection(client.connection_id)
 			var result: Dictionary = _active_protocol.handle_action(player, message, Time.get_ticks_msec()) \
@@ -242,37 +217,6 @@ func _broadcast_gameplay_snapshots() -> void:
 		if not player.is_empty():
 			_send_gameplay_snapshot(client.peer, String(player.player_id))
 
-func _on_flash_pose_phase_changed(phase: StringName, _snapshot: Dictionary) -> void:
-	# Resolve and flash are covered by the personalized result message. Sending a
-	# generic snapshot immediately afterward would erase that feedback on phones.
-	if phase not in [&"resolve", &"flash_wait"]:
-		_broadcast_gameplay_snapshots()
-
-func _on_flash_pose_challenge(_stop_id: int, _direction: StringName, _available: Array[StringName]) -> void:
-	var message: Dictionary = _flash_pose_protocol.challenge_message()
-	for player: Dictionary in _flash_pose_protocol.controller.player_snapshot():
-		_send_to_player(String(player.player_id), message)
-
-func _on_semantic_state_changed(player_id: String, state: Dictionary) -> void:
-	if _flash_pose_protocol == null:
-		return
-	var message: Dictionary = _flash_pose_protocol.charge_update_for(player_id, state)
-	if not message.is_empty():
-		_send_to_player(player_id, message)
-
-func _on_flash_pose_results(stop_id: int, results: Array[Dictionary]) -> void:
-	for result: Dictionary in results:
-		var player_id := String(result.player_id)
-		_send_to_player(player_id, _flash_pose_protocol.result_for(player_id, stop_id, results))
-
-func _on_flash_pose_round_results(results: Dictionary) -> void:
-	for player: Dictionary in _flash_pose_protocol.controller.player_snapshot():
-		var player_id := String(player.player_id)
-		_send_to_player(player_id, _flash_pose_protocol.results_message(player_id, results))
-
-func _on_flash_pose_return_to_lobby() -> void:
-	send_lobby_state()
-
 func _on_bubbles_phase_changed(_phase: StringName, _snapshot: Dictionary) -> void:
 	_broadcast_gameplay_snapshots()
 
@@ -294,21 +238,6 @@ func _on_bubbles_feedback(player_id: String, kind: StringName, data: Dictionary)
 
 func _on_bubbles_return_to_lobby() -> void:
 	send_lobby_state()
-
-func _clear_flash_pose_controller() -> void:
-	if _flash_pose_protocol == null:
-		return
-	var controller: FlashPoseRoundController = _flash_pose_protocol.controller
-	if is_instance_valid(controller):
-		if controller.phase_changed.is_connected(_on_flash_pose_phase_changed): controller.phase_changed.disconnect(_on_flash_pose_phase_changed)
-		if controller.genuine_stop_started.is_connected(_on_flash_pose_challenge): controller.genuine_stop_started.disconnect(_on_flash_pose_challenge)
-		if controller.semantic_animation_updated.is_connected(_on_semantic_state_changed): controller.semantic_animation_updated.disconnect(_on_semantic_state_changed)
-		if controller.pose_evaluation_resolved.is_connected(_on_flash_pose_results): controller.pose_evaluation_resolved.disconnect(_on_flash_pose_results)
-		if controller.round_results_ready.is_connected(_on_flash_pose_round_results): controller.round_results_ready.disconnect(_on_flash_pose_round_results)
-		if controller.return_to_lobby_requested.is_connected(_on_flash_pose_return_to_lobby): controller.return_to_lobby_requested.disconnect(_on_flash_pose_return_to_lobby)
-	if _active_protocol == _flash_pose_protocol:
-		_active_protocol = null
-	_flash_pose_protocol = null
 
 func _clear_bubbles_controller() -> void:
 	if _bubbles_protocol == null:

@@ -30,25 +30,12 @@ input { inline-size: 100%; min-block-size: 54px; border: 2px solid #768496; bord
 .status { margin: 4px 0; color: #d7deea; font-size: 13px; line-height: 1.35; }
 h2 { font-size: clamp(28px, 8vw, 38px); margin-block: 8px 16px; overflow-wrap: anywhere; }
 p { line-height: 1.6; }
-#player-card, #game-card, #bubbles-card { padding: 18px; border: 1px solid #587567; border-radius: 12px; background: #172820; }
+#player-card, #bubbles-card { padding: 18px; border: 1px solid #587567; border-radius: 12px; background: #172820; }
 .secondary { min-block-size: 48px; border: 2px solid #a6e6bf; background: transparent; color: #d8f7e4; padding: 12px 18px; }
 input:focus-visible, button:focus-visible { outline: 3px solid #ffd166; outline-offset: 3px; }
 button:disabled { cursor: wait; opacity: .65; }
 #player-card { margin-block-start: 20px; }
-#game-card { margin-block-start: 20px; }
 #bubbles-card { margin-block-start: 20px; }
-.lives { min-block-size: 1.6em; font-size: 20px; font-weight: 800; }
-.pose-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(10px, 3vw, 16px); margin-block-start: 18px; touch-action: none; user-select: none; }
-.pose-button, .pose-button * { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-.pose-button { aspect-ratio: 1; min-block-size: 112px; display: grid; place-content: center; gap: 4px; border: 3px solid transparent; color: #101521; font-size: clamp(18px, 5vw, 24px); touch-action: none; -webkit-tap-highlight-color: transparent; }
-.pose-button .icon { font-size: clamp(34px, 12vw, 54px); line-height: 1; }
-.pose-button[data-direction="left"] { background: #79d6ff; }
-.pose-button[data-direction="right"] { background: #ff9ccf; }
-.pose-button[data-direction="down"] { background: #ffd166; }
-.pose-button[data-direction="up"] { background: #a6e6bf; }
-.pose-button.is-held { border-color: #fff; box-shadow: 0 0 0 4px #0e131f, 0 0 0 7px #ffd166; transform: scale(.96); }
-.pose-button:disabled { cursor: not-allowed; opacity: .42; }
-.rotate-state { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left)); background: #0e131f; color: #fff; font-size: clamp(28px, 8vw, 56px); font-weight: 850; text-align: center; }
 .eyebrow { margin: 0; color: #b8c1cf; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
 #player-state { font-weight: 700; }
 .footnote { margin-block: 4px 0; color: #b8c1cf; font-size: 12px; }
@@ -56,13 +43,6 @@ button:disabled { cursor: wait; opacity: .65; }
 
 html.gameplay-active, html.gameplay-active body { inline-size: 100%; block-size: 100%; min-block-size: 100%; overflow: hidden; position: fixed; inset: 0; }
 html.gameplay-active body { display: block; padding: 0; touch-action: none; }
-html.gameplay-active main, html.gameplay-active #game-card { inline-size: 100%; max-inline-size: none; block-size: 100%; padding: 0; margin: 0; border: 0; border-radius: 0; background: #000; }
-html.gameplay-active:not(.bubbles-active) main > :not(#game-card), html.gameplay-active #game-card > :not(.pose-grid):not(.rotate-state) { position: absolute !important; inline-size: 1px !important; block-size: 1px !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; clip-path: inset(50%) !important; white-space: nowrap !important; }
-html.gameplay-active .pose-grid { position: fixed; inset: 0; inline-size: 100%; block-size: 100%; margin: 0; display: block; overflow: hidden; background: #000; touch-action: none; }
-html.gameplay-active .pose-button { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; min-block-size: 0; aspect-ratio: auto; padding: 0; border: 1px solid rgb(255 255 255 / .7); border-radius: 0; display: grid; place-items: center; color: #fff; text-shadow: 0 2px 5px rgb(0 0 0 / .8); transition: background-color 80ms linear, filter 80ms linear; -webkit-tap-highlight-color: transparent; }
-html.gameplay-active .pose-button .icon { font-size: clamp(64px, 17vmin, 144px); line-height: 1; transform: translate(var(--arrow-x, 0), var(--arrow-y, 0)); }
-html.gameplay-active .pose-button.is-held { border-color: #fff; box-shadow: inset 0 0 0 4px rgb(255 255 255 / .85); transform: none; }
-html.gameplay-active .pose-button:focus-visible { z-index: 2; outline: 5px solid #fff; outline-offset: -8px; }
 
 html.bubbles-active main, html.bubbles-active #bubbles-card { inline-size: 100%; max-inline-size: none; block-size: 100%; padding: 0; margin: 0; border: 0; border-radius: 0; background: #113850; }
 html.bubbles-active main > :not(#bubbles-card), html.bubbles-active #bubbles-heading { position: absolute !important; inline-size: 1px !important; block-size: 1px !important; overflow: hidden !important; clip-path: inset(50%) !important; white-space: nowrap !important; }
@@ -91,22 +71,11 @@ html.lobby-active .footnote, html.lobby-active #status { display: none !importan
 #lobby-leave-button { position: absolute; inset-block-start: max(16px, calc(env(safe-area-inset-top) + 10px)); inset-inline-end: max(16px, calc(env(safe-area-inset-right) + 10px)); inline-size: 48px; block-size: 48px; padding: 0; border: 2px solid #e3f6e7; border-radius: 16px; background: #548c79; color: #fff; font-size: 31px; line-height: 1; box-shadow: 0 4px 0 #326557; }
 #lobby-leave-button:focus-visible, #lobby-jump-button:focus-visible { outline: 4px solid #244d9b; outline-offset: 4px; }
 
-.pose-grid[data-count="2"] [data-direction="left"] { clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); --arrow-x: -25vw; }
-.pose-grid[data-count="2"] [data-direction="right"] { clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%); --arrow-x: 25vw; }
-.pose-grid[data-count="3"] [data-direction="left"] { clip-path: polygon(0 0, 50% 0, 50% 50%, 0 100%); --arrow-x: -25vw; --arrow-y: -20vh; }
-.pose-grid[data-count="3"] [data-direction="right"] { clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 50%); --arrow-x: 25vw; --arrow-y: -20vh; }
-.pose-grid[data-count="3"] [data-direction="down"] { clip-path: polygon(0 100%, 50% 50%, 100% 100%); --arrow-y: 30vh; }
-.pose-grid[data-count="4"] [data-direction="up"] { clip-path: polygon(0 0, 100% 0, 50% 50%); --arrow-y: -25vh; }
-.pose-grid[data-count="4"] [data-direction="right"] { clip-path: polygon(100% 0, 100% 100%, 50% 50%); --arrow-x: 25vw; }
-.pose-grid[data-count="4"] [data-direction="down"] { clip-path: polygon(100% 100%, 0 100%, 50% 50%); --arrow-y: 25vh; }
-.pose-grid[data-count="4"] [data-direction="left"] { clip-path: polygon(0 100%, 0 0, 50% 50%); --arrow-x: -25vw; }
-
 @media (prefers-contrast: more) {
-  .status, #player-card, #game-card, input, button.secondary { border-color: currentColor; }
-  .pose-button { border-color: #fff; }
+  .status, #player-card, input, button.secondary { border-color: currentColor; }
 }
 
-@media (prefers-reduced-motion: reduce) { .pose-button { transition: none !important; } .dancing-preview { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .dancing-preview { animation: none !important; } }
 @media (prefers-reduced-motion: no-preference) {
   .dancing-preview { animation: character-preview-dance 1.4s ease-in-out infinite alternate; }
   @keyframes character-preview-dance { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(-7px) rotate(2deg); } }
@@ -118,5 +87,4 @@ html.lobby-active .footnote, html.lobby-active #status { display: none !importan
   .dancing-preview { block-size: min(20svh, 140px); }
   .color-button { min-block-size: 36px; border-radius: 10px; }
   .action-button { min-block-size: 50px; }
-  .pose-button { min-block-size: 92px; }
 }

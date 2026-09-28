@@ -4,9 +4,8 @@ Play Shapes is a local-network multiplayer party game. The Godot application
 runs the authoritative host on a PC, while players use their phones as web
 controllers.
 
-The lobby can start **001 — Flash? Pose!** (the Dancer Simon Says prototype)
-or **002 — Bubbles and Jellyfishes**. The shared PC display shows the round;
-phones switch to the selected minigame's controls.
+The lobby starts **002 — Bubbles and Jellyfishes**. The shared PC display shows
+the round; phones provide portrait touch controls.
 
 ## Requirements
 
@@ -55,15 +54,15 @@ The host uses HTTP port `8080` and WebSocket port `8081` by default. If those
 ports are already in use, stop the other host or change the values in
 `Tuning/Shared/Networking/Default.tres` before restarting Godot.
 
-## Test the minigames with the debug flow
+## Test Bubbles with the debug flow
 
-The debug flow is for testing either minigame with one real registered player.
+The debug flow is for testing Bubbles with one real registered player.
 It does not create simulated players.
 
 1. Start the project and connect exactly one phone to the lobby.
 2. Enter a player name and choose **Join game**.
 3. On the PC, press **F12** to open the non-pausing debug launcher.
-4. Choose **One-player Flash? Pose!** or **One-player Bubbles and Jellyfishes**.
+4. Choose **One-player Bubbles and Jellyfishes**.
 5. Play from the phone while watching the shared PC display. The PC labels the
    selected debug scenario; Bubbles also shows a one-player debug badge on the
    phone and shared screen.
@@ -72,7 +71,7 @@ It does not create simulated players.
 7. Use **Return to lobby** when finished. This keeps the host services alive
    and reopens the lobby for new joins.
 
-Each one-player entry is available only when exactly one real player is
+The one-player entry is available only when exactly one real player is
 registered. A browser connection by itself does not count as a player.
 
 ## Play with 2 or more players
@@ -82,18 +81,17 @@ registered. A browser connection by itself does not count as a player.
 2. Each player enters a name and chooses **Join game**.
 3. On the shared PC display, wait until at least two players appear in the
    roster.
-4. Choose **Flash? Pose!** or **Bubbles and Jellyfishes** from the minigame
+4. Choose **Bubbles and Jellyfishes** from the minigame
    dropdown, then choose **Start selected minigame**. New-player admission
    closes for the round.
-5. For Flash? Pose!, players respond to the pose prompts when the music stops.
-   For Bubbles, swipe to move and draw a circle, then release to spin; the
+5. Swipe to move and draw a circle, then release to spin; the
    phone controller uses portrait orientation.
 6. At the results screen, use **Return to lobby** on the shared PC display to
-   switch games or start another round. Existing players and LAN services stay
+   start another round. Existing players and LAN services stay
    connected.
 
 The host session holds **at most ten registered players**, matching the **2–10
-registered players** supported by both minigames in normal play. The separate
+registered players** supported by Bubbles in normal play. The separate
 transport limit is 32 connections per service.
 
 The minigame works in Safari, but it currently plays best in Chrome. Chrome is
@@ -118,16 +116,15 @@ The generated files in `web/public/` are the files Godot serves to phones.
 
 - This is an early local-network prototype, not an internet-hosted service.
   The host PC and phones must be able to reach one another on the same LAN.
-- Flash? Pose! and Bubbles are currently limited to 2–10 players in normal
-  play and one real player in their explicit debug flows. There is no
+- Bubbles is currently limited to 2–10 players in normal
+  play and one real player in its explicit debug flow. There is no
   matchmaking, queue, or remote multiplayer service.
 - Reconnecting players keep their registered seat during the configured
-  reconnect grace period, but a disconnected phone's held pose is cleared and
-  the player must press again after reconnecting.
+  reconnect grace period, but an unfinished touch gesture is cleared and
+  the player must start a new gesture after reconnecting.
 - Safari is supported, but Chrome is the preferred browser. Phone-specific
   layout, orientation, and touch behavior still need broader device coverage.
-- The recorded iPhone/Android and human-play check covers Flash? Pose!. Bubbles
-  still needs its owner-led two-phone and game-feel review. No validation here
+- Bubbles still needs its owner-led two-phone and game-feel review. No validation here
   guarantees every phone, browser, Wi-Fi configuration, or accessibility
   setup. See `DEVELOPMENT.md` for evidence and troubleshooting notes.
 

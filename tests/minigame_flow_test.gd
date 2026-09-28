@@ -1,9 +1,8 @@
 extends SceneTree
-## Exercises lobby selection, normal/debug launch, teardown, and both directions of game switching.
+## Exercises the remaining minigame's normal/debug launch, reconnect, and teardown.
 
 const LOBBY_PATH := "res://scenes/lobby.tscn"
 const BUBBLES_PATH := "res://minigames/bubbles_and_jellyfishes.tscn"
-const FLASH_POSE_PATH := "res://minigames/dancer_simon_says.tscn"
 
 
 func _initialize() -> void:
@@ -27,7 +26,6 @@ func _run() -> void:
 			"Bubbles jellyfish HTTP route uses the PNG content type"):
 		return
 	var host_id := host.get_instance_id()
-	host.active_presets.simon_says.countdown_seconds = 0.0
 	host.active_presets.bubbles.instructions_seconds = 0.0
 	host.active_presets.bubbles.countdown_seconds = 0.0
 	host.active_presets.bubbles.round_duration_seconds = 10.0
@@ -38,11 +36,15 @@ func _run() -> void:
 	var selector := current_scene.get_node("%MinigameSelector") as OptionButton
 	var start_button := current_scene.get_node("%StartMinigame") as Button
 	var start_help := current_scene.get_node("%StartHelp") as Label
-	if not _check(selector.item_count == 2 and selector.get_item_text(1) == "Bubbles and Jellyfishes",
-			"Lobby offers Flash? Pose! and Bubbles and Jellyfishes"):
+	if not _check(selector.item_count == 1 and selector.get_item_text(0) == "Bubbles and Jellyfishes",
+			"Lobby offers only Bubbles and Jellyfishes"):
 		return
-	selector.select(1)
-	selector.item_selected.emit(1)
+	if not _check(host.minigame_scene_path(&"flash_pose").is_empty()
+			and not host.prepare_minigame_launch(&"flash_pose").accepted,
+			"Retired game cannot launch through the host"):
+		return
+	selector.select(0)
+	selector.item_selected.emit(0)
 	if not _check(start_button.disabled and start_help.text.contains("At least 2"),
 			"Selected Bubbles blocks launch at zero players with actionable copy"):
 		return
@@ -103,8 +105,8 @@ func _run() -> void:
 	selector = current_scene.get_node("%MinigameSelector") as OptionButton
 	start_button = current_scene.get_node("%StartMinigame") as Button
 	start_help = current_scene.get_node("%StartHelp") as Label
-	selector.select(1)
-	selector.item_selected.emit(1)
+	selector.select(0)
+	selector.item_selected.emit(0)
 	var overflow_connections: Array[int] = []
 	for index: int in 9:
 		var connection_id := 600 + index
@@ -114,9 +116,8 @@ func _run() -> void:
 		overflow_connections.append(connection_id)
 	await process_frame
 	if not _check(host.player_registry.player_count() == 10 and not start_button.disabled
-			and host.minigame_availability(&"flash_pose").available
 			and host.minigame_availability(&"bubbles").available,
-			"Full ten-player lobby can launch either normal minigame"):
+			"Full ten-player lobby can launch Bubbles"):
 		return
 	if not _check(host.player_registry.join_player(700, "Eleventh", true).code == &"full",
 			"Host rejects an eleventh new player"):
@@ -141,8 +142,8 @@ func _run() -> void:
 			"The selected Bubbles round starts with the registered roster snapshot"):
 		return
 	if not _check(host.websocket._active_protocol == host.websocket._bubbles_protocol
-			and host.websocket._flash_pose_protocol == null and not host.accepting_new_players,
-			"Bubbles launch disables joins and excludes Flash? Pose! routing"):
+			and not host.accepting_new_players,
+			"Bubbles launch disables joins and owns gameplay routing"):
 		return
 	host.player_registry.disconnect_connection(501)
 	await process_frame
@@ -185,54 +186,19 @@ func _run() -> void:
 
 	selector = current_scene.get_node("%MinigameSelector") as OptionButton
 	start_button = current_scene.get_node("%StartMinigame") as Button
-	var third := _join(host, 504, "Third")
+	var fourth := _join(host, 505, "Fourth")
 	await process_frame
 	selector.select(0)
 	selector.item_selected.emit(0)
-	if not _check(third.accepted and not start_button.disabled, "Flash? Pose! remains selectable after Bubbles"):
-		return
-	start_button.pressed.emit()
-	await scene_changed
-	await process_frame
-	var flash_controller := current_scene.get_node("RoundController") as FlashPoseRoundController
-	if not _check(current_scene.scene_file_path == FLASH_POSE_PATH
-			and flash_controller.player_snapshot().size() == 2
-			and host.websocket._active_protocol == host.websocket._flash_pose_protocol
-			and host.websocket._bubbles_protocol == null,
-			"The selected Flash? Pose! round replaces Bubbles routing"):
-		return
-	flash_controller.advance(Time.get_ticks_msec())
-	host.player_registry.leave_connection(504)
-	await process_frame
-	var flash_return := current_scene.find_child("ReturnToLobby", true, false) as Button
-	if not _check(flash_controller.phase_name() == &"results_wait" and flash_return != null
-			and flash_return.visible,
-			"Flash? Pose! keeps its explicit-leave results and host return"):
-		return
-	flash_return.pressed.emit()
-	await scene_changed
-	await process_frame
-	if not _check(current_scene.scene_file_path == LOBBY_PATH and host.websocket._active_protocol == null
-			and host.websocket._flash_pose_protocol == null and host.running,
-			"Flash? Pose! return clears its protocol and preserves LAN services"):
-		return
-
-	selector = current_scene.get_node("%MinigameSelector") as OptionButton
-	start_button = current_scene.get_node("%StartMinigame") as Button
-	var fourth := _join(host, 505, "Fourth")
-	await process_frame
-	selector.select(1)
-	selector.item_selected.emit(1)
-	if not _check(fourth.accepted and not start_button.disabled, "Bubbles can be selected again after Flash? Pose!"):
+	if not _check(fourth.accepted and not start_button.disabled, "Bubbles can start again after returning to the lobby"):
 		return
 	start_button.pressed.emit()
 	await scene_changed
 	await process_frame
 	bubble_controller = current_scene.get_node("RoundController") as BubblesRoundController
 	if not _check(current_scene.scene_file_path == BUBBLES_PATH
-			and host.websocket._active_protocol == host.websocket._bubbles_protocol
-			and host.websocket._flash_pose_protocol == null,
-			"Switching back to Bubbles leaves exactly one protocol active"):
+			and host.websocket._active_protocol == host.websocket._bubbles_protocol,
+			"Repeated Bubbles launch leaves exactly one protocol active"):
 		return
 	for frame: int in 180:
 		if bubble_controller.phase_name() == &"active":
@@ -255,7 +221,7 @@ func _run() -> void:
 		return
 
 	host.stop()
-	print("[GODOT-RUNTIME] Complete minigame selection and switching flow checks passed")
+	print("[GODOT-RUNTIME] Bubbles selection and repeated flow checks passed")
 	quit(0)
 
 

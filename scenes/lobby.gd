@@ -9,7 +9,6 @@ extends Control
 @onready var world: LobbyPlaygroundWorld = $World
 
 const MINIGAMES := [
-	{"id": &"flash_pose", "name": "Flash? Pose!"},
 	{"id": &"bubbles", "name": "Bubbles and Jellyfishes"},
 ]
 
@@ -69,7 +68,7 @@ func _on_minigame_selected(_index: int) -> void:
 
 func _selected_minigame_id() -> StringName:
 	if minigame_selector.selected < 0:
-		return SessionHost.MINIGAME_FLASH_POSE
+		return SessionHost.MINIGAME_BUBBLES
 	return StringName(minigame_selector.get_item_metadata(minigame_selector.selected))
 
 func _update_start_state() -> void:

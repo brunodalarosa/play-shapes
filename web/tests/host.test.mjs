@@ -50,7 +50,7 @@ after(async () => {
 test('serves bundled HTML, JS, CSS and session configuration', async () => {
   for (const [path, mime, text] of [
     ['/', 'text/html', 'PLAY SHAPES'], ['/app.js', 'text/javascript', 'localStorage'],
-    ['/controller_geometry.js', 'text/javascript', 'directionAtPoint'],
+    ['/immersive.js', 'text/javascript', 'attemptImmersive'],
     ['/bubbles_gesture.js', 'text/javascript', 'GestureTrace'],
     ['/lobby_controls.js', 'text/javascript', 'lockX'],
     ['/lobby_input.js', 'text/javascript', 'LobbyInputState'],
@@ -74,28 +74,6 @@ test('phone join form has labels, live feedback, and explicit change-player acti
   assert.match(html, /id="status"[^>]*role="status"[^>]*aria-live="polite"/);
   assert.match(html, />Leave \/ Change player<\/button>/);
   assert.match(html, /maxlength="16"/);
-});
-
-test('Flash Pose controller exposes accessible hold controls and cancellation handling', async () => {
-  const html = await (await fetch(base)).text();
-  const css = await (await fetch(base + '/style.css')).text();
-  const js = await (await fetch(base + '/app.js')).text();
-  assert.match(html, /id="pose-grid"[^>]*aria-label="Pose controls"/);
-  assert.match(html, /id="lives"[^>]*aria-live="polite"/);
-  assert.match(css, /touch-action:\s*none/);
-  assert.match(css, /html\.gameplay-active[^}]*overflow:\s*hidden/s);
-  assert.match(css, /\.pose-grid\[data-count="3"\]/);
-  assert.match(css, /\.pose-grid\[data-count="4"\]/);
-  assert.match(css, /\.pose-button, \.pose-button \*\s*\{[^}]*-webkit-user-select:\s*none/s);
-  assert.match(css, /\.pose-button, \.pose-button \*\s*\{[^}]*-webkit-touch-callout:\s*none/s);
-  for (const expected of ['Pose left', 'Pose right', 'Pose down', 'Pose up', 'pointercancel', 'lostpointercapture']) {
-    assert.ok(js.includes(expected), `compiled controller should include ${expected}`);
-  }
-  assert.match(js, /selectstart[^\n]+preventDefault/);
-  assert.ok(js.includes('Lives: DEBUG'));
-  assert.ok(js.includes("You've been eliminated :(") );
-  assert.ok(js.includes('requestFullscreen'));
-  assert.ok(js.includes('flash_pose_charge'));
 });
 
 test('Bubbles controller keeps a clean portrait screen and accessible touch controls', async () => {

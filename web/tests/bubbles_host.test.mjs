@@ -114,7 +114,7 @@ test('active Bubbles routes authenticated traces, rejects forged input, and rest
     client.send({ type: 'bubbles_trace', input_seq: 2, trace: fullTrace });
     assert.equal((await client.next(message => message.type === 'bubbles_trace_result')).action, 'swipe');
     client.send({ type: 'pose_down', direction: 'left', input_seq: 2 });
-    assert.equal((await client.next(message => message.type === 'error')).code, 'game_unavailable');
+    assert.equal((await client.next(message => message.type === 'error')).code, 'unsupported_message');
     client.peer.close();
     resumed = await connect();
     resumed.send({ type: 'hello', protocol: 1, session_id: joined.session_id, reconnect_token: joined.reconnect_token });

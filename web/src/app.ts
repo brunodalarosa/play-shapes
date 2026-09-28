@@ -1,4 +1,4 @@
-import { attemptImmersive, chargedColor, directionAtPoint, heldDirectionAfterUpdate, type Direction } from "./controller_geometry.js";
+import { attemptImmersive } from "./immersive.js";
 import { GestureTrace, type Point } from "./bubbles_gesture.js";
 import { LobbyControls } from "./lobby_controls.js";
 import type { LobbyAction } from "./lobby_input.js";
@@ -30,12 +30,6 @@ const lobbyController = document.querySelector<HTMLElement>("#lobby-controller")
 const lobbyStickZone = document.querySelector<HTMLElement>("#lobby-stick-zone")!;
 const lobbyJumpButton = document.querySelector<HTMLButtonElement>("#lobby-jump-button")!;
 const lobbyLeaveButton = document.querySelector<HTMLButtonElement>("#lobby-leave-button")!;
-const gameCard = document.querySelector<HTMLElement>("#game-card")!;
-const gameHeading = document.querySelector<HTMLElement>("#game-heading")!;
-const gameMessage = document.querySelector<HTMLElement>("#game-message")!;
-const lives = document.querySelector<HTMLElement>("#lives")!;
-const poseGrid = document.querySelector<HTMLElement>("#pose-grid")!;
-const rotateState = document.querySelector<HTMLElement>("#rotate-state")!;
 const bubblesCard = document.querySelector<HTMLElement>("#bubbles-card")!;
 const bubblesPad = document.querySelector<HTMLElement>("#bubbles-pad")!;
 const bubblesScore = document.querySelector<HTMLElement>("#bubbles-score")!;
@@ -44,17 +38,9 @@ const bubblesContext = bubblesCanvas.getContext("2d", { alpha: true })!;
 
 const STORAGE = { session: "play-shapes.session-id", token: "play-shapes.reconnect-token", name: "play-shapes.last-name", inputSeq: "play-shapes.input-seq" } as const;
 type PublicPlayer = { player_id: string; name: string; seat: number; state: string; character_shape?: string; character_color?: string };
-type GameplayPlayer = { lives?: number; eliminated?: boolean; direction?: string; charge?: number; held?: boolean; character_shape?: string; character_color?: string };
-type Presentation = { colors?: Partial<Record<Direction, string>>; minimum_brightness?: number; maximum_brightness?: number; charge_fill_seconds?: number; charge_decay_seconds?: number };
 type BubblesVisualSnapshot = { host_time_msec: number; radius: number; pull: Point; drag_pull: Point; charge_pull: Point; surface_angle: number; spinning: boolean; recovery_white: boolean; burst_progress: number; particle_density: number; charge_glow: number; character_visible: boolean; character_scale: number; character_position: Point; body_rotation: number; face_position: Point; face_blink: boolean; left_hand_position: Point; right_hand_position: Point; left_foot_position: Point; right_foot_position: Point };
 type BubblesVisualTuning = { starting_radius?: number; live_drag_pull_strength?: number; live_drag_response_seconds?: number; charge_wobble_strength?: number; charge_glow_strength?: number; swipe_reaction_seconds?: number; spin_surface_turns_per_second?: number; bubble_reform_seconds?: number; burst_seconds?: number };
-type HostMessage = { type?: string; protocol?: number; connection_id?: number; session_id?: string; resume_status?: string; reconnect_token?: string; player?: PublicPlayer | GameplayPlayer; code?: string; message?: string; phase?: string; available_directions?: string[]; success?: boolean; lives?: number; debug_mode?: boolean; eliminated?: boolean; placement?: number; state?: string; gameplay?: HostMessage; presentation?: Presentation; direction?: string; charge?: number; held?: boolean; score?: number; bubble_radius?: number; burst_radius?: number; visual_jellyfish?: number; visual_cap?: number; seat?: number; left?: boolean; character_shape?: string; character_color?: string; host_time_msec?: number; visual_tuning?: BubblesVisualTuning; visual?: BubblesVisualSnapshot; spin_remaining_msec?: number; cooldown_remaining_msec?: number; invulnerable_remaining_msec?: number; reform_remaining_msec?: number; spin_duration_msec?: number; cooldown_duration_msec?: number; circles_to_charge?: number; rank?: number; event?: string; lost?: number; action?: string; reason?: string };
-
-const POSES: ReadonlyArray<{ direction: Direction; icon: string; label: string }> = [
-  { direction: "left", icon: "←", label: "Pose left" }, { direction: "right", icon: "→", label: "Pose right" },
-  { direction: "down", icon: "↓", label: "Pose down" }, { direction: "up", icon: "↑", label: "Pose up" },
-];
-const DEFAULT_COLORS: Record<Direction, string> = { left: "#48d16f", right: "#f04f55", down: "#f4c542", up: "#3489eb" };
+type HostMessage = { type?: string; protocol?: number; connection_id?: number; session_id?: string; resume_status?: string; reconnect_token?: string; player?: PublicPlayer; code?: string; message?: string; phase?: string; debug_mode?: boolean; state?: string; gameplay?: HostMessage; score?: number; bubble_radius?: number; burst_radius?: number; visual_jellyfish?: number; visual_cap?: number; seat?: number; left?: boolean; character_shape?: string; character_color?: string; host_time_msec?: number; visual_tuning?: BubblesVisualTuning; visual?: BubblesVisualSnapshot; spin_remaining_msec?: number; cooldown_remaining_msec?: number; invulnerable_remaining_msec?: number; reform_remaining_msec?: number; spin_duration_msec?: number; cooldown_duration_msec?: number; circles_to_charge?: number; rank?: number; event?: string; lost?: number; action?: string; reason?: string };
 
 let socket: WebSocket | undefined;
 let retry: ReturnType<typeof setTimeout> | undefined;
@@ -62,16 +48,8 @@ let stopped = false;
 let joined = false;
 let joinFlow: JoinFlowState = defaultJoinFlow();
 let inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
-let held: { direction: Direction; pointerId?: number; button: HTMLButtonElement } | undefined;
-let directions: Direction[] = [];
-let presentation = { colors: DEFAULT_COLORS, minimum_brightness: 0.42, maximum_brightness: 1, charge_fill_seconds: 1, charge_decay_seconds: 0.28 };
-let visualCharge: Record<Direction, number> = { left: 0, right: 0, down: 0, up: 0 };
-let authoritativeDirection: Direction | undefined;
-let authoritativeCharge = 0;
-let authoritativeHeld = false;
-let lastAnimationTime = performance.now();
-let fullscreenAttempted = { flash: false, bubbles: false };
-let activeGame: "flash" | "bubbles" | null = null;
+let fullscreenAttempted = false;
+let activeGame: "bubbles" | null = null;
 let bubblesPointer: { id: number; trace: GestureTrace; seq: number; step: number; drag: Point; sentDrag: Point; lastMotionAt: number; motionCount: number } | undefined;
 let bubblesSnapshot: HostMessage | undefined;
 let bubblesSnapshotTime = 0;
@@ -133,34 +111,28 @@ for (const option of CHARACTER_COLORS) {
 }
 refreshSelectionUi();
 
-function setGameplaySurface(active: boolean, mode: "flash" | "bubbles" = "flash"): void {
-  const next = active ? mode : null;
+function setGameplaySurface(active: boolean): void {
+  const next = active ? "bubbles" : null;
   if (activeGame !== next) {
     cancelBubblesPointer();
     if (next === null) { try { screen.orientation?.unlock?.(); } catch { /* Unsupported orientation API. */ } }
-    else if (document.fullscreenElement) { try { const orientation = screen.orientation as ScreenOrientation & { lock?: (value: string) => Promise<void> }; void Promise.resolve(orientation?.lock?.(next === "flash" ? "landscape" : "portrait")).catch(() => {}); } catch { /* Lock denied. */ } }
+    else if (document.fullscreenElement) { try { const orientation = screen.orientation as ScreenOrientation & { lock?: (value: string) => Promise<void> }; void Promise.resolve(orientation?.lock?.("portrait")).catch(() => {}); } catch { /* Lock denied. */ } }
     activeGame = next;
   }
   document.documentElement.classList.toggle("gameplay-active", active);
   document.documentElement.classList.toggle("bubbles-active", next === "bubbles");
-  updateOrientation();
-}
-function updateOrientation(): void {
-  const portrait = matchMedia("(orientation: portrait)").matches;
-  rotateState.hidden = !(activeGame === "flash" && portrait);
-  poseGrid.hidden = activeGame !== "flash" || portrait;
 }
 
 function showJoin(message: string, focus = false): void {
   lobbyControls.deactivate();
   joinFlow = returnToCharacterSelection(joinFlow);
-  joined = false; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); playerCard.hidden = true; gameCard.hidden = true; bubblesCard.hidden = true;
+  joined = false; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); playerCard.hidden = true; bubblesCard.hidden = true;
   selectionScreen.hidden = false; nameScreen.hidden = true; joinForm.hidden = true; joinButton.disabled = false; leaveButton.disabled = false;
   status.textContent = message; status.hidden = !message; nameInput.value = stored(STORAGE.name); refreshSelectionUi();
   if (focus) queueMicrotask(() => nextButton.focus());
 }
 function showJoined(player: PublicPlayer, state = "Connected"): void {
-  joined = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); selectionScreen.hidden = true; nameScreen.hidden = true; joinForm.hidden = true; playerCard.hidden = true; gameCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false; lobbyLeaveButton.disabled = false; lobbyControls.activate();
+  joined = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); selectionScreen.hidden = true; nameScreen.hidden = true; joinForm.hidden = true; playerCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false; lobbyLeaveButton.disabled = false; lobbyControls.activate();
   if (isCharacterShape(player.character_shape)) joinFlow = { ...joinFlow, shape: player.character_shape };
   const serverColor = colorOption(player.character_color)?.hex;
   if (serverColor) joinFlow = chooseJoinColor(joinFlow, serverColor);
@@ -182,77 +154,13 @@ backButton.addEventListener("click", () => {
   status.hidden = true; status.textContent = ""; refreshSelectionUi();
   queueMicrotask(() => nextButton.focus());
 });
-function sendPose(type: "pose_down" | "pose_up", direction: Direction): void { if (!socket || socket.readyState !== WebSocket.OPEN) return; inputSeq += 1; store(STORAGE.inputSeq, String(inputSeq)); socket.send(JSON.stringify({ type, direction, input_seq: inputSeq })); }
-function releaseHeld(send = true): void {
-  if (!held) return; const current = held; held = undefined; current.button.classList.remove("is-held"); current.button.setAttribute("aria-pressed", "false");
-  if (current.pointerId !== undefined && poseGrid.hasPointerCapture(current.pointerId)) poseGrid.releasePointerCapture(current.pointerId);
-  if (send) sendPose("pose_up", current.direction);
-}
-function beginHold(direction: Direction, button: HTMLButtonElement, pointerId?: number): void {
-  if (held?.direction === direction) return; releaseHeld(); held = { direction, button, ...(pointerId === undefined ? {} : { pointerId }) };
-  if (pointerId !== undefined) poseGrid.setPointerCapture(pointerId); button.classList.add("is-held"); button.setAttribute("aria-pressed", "true");
-  visualCharge[direction] = 0; authoritativeDirection = direction; authoritativeCharge = 0; authoritativeHeld = true; sendPose("pose_down", direction); void requestImmersiveMode("flash");
-}
-function readPresentation(value?: Presentation): void {
-  if (!value) return;
-  presentation = { colors: { ...DEFAULT_COLORS, ...(value.colors ?? {}) }, minimum_brightness: Number(value.minimum_brightness ?? presentation.minimum_brightness), maximum_brightness: Number(value.maximum_brightness ?? presentation.maximum_brightness), charge_fill_seconds: Math.max(0.1, Number(value.charge_fill_seconds ?? presentation.charge_fill_seconds)), charge_decay_seconds: Math.max(0.05, Number(value.charge_decay_seconds ?? presentation.charge_decay_seconds)) };
-}
-
-function renderControls(available: string[]): void {
-  const desired = POSES.filter(item => available.includes(item.direction)).map(item => item.direction);
-  if (held && heldDirectionAfterUpdate(held.direction, desired) === undefined) releaseHeld(); directions = desired;
-  const existing = Array.from(poseGrid.querySelectorAll<HTMLButtonElement>(".pose-button"), button => button.dataset.direction);
-  if (existing.length === desired.length && existing.every((value, index) => value === desired[index])) return;
-  poseGrid.replaceChildren(); poseGrid.dataset.count = String(desired.length);
-  for (const pose of POSES.filter(item => desired.includes(item.direction))) {
-    const button = document.createElement("button"); button.type = "button"; button.className = "pose-button"; button.dataset.direction = pose.direction;
-    button.setAttribute("aria-label", pose.label); button.setAttribute("aria-pressed", held?.direction === pose.direction ? "true" : "false"); button.innerHTML = `<span class="icon" aria-hidden="true">${pose.icon}</span>`;
-    if (held?.direction === pose.direction) { held.button = button; button.classList.add("is-held"); }
-    button.addEventListener("keydown", event => { if ((event.key !== " " && event.key !== "Enter") || event.repeat || held) return; event.preventDefault(); beginHold(pose.direction, button); });
-    button.addEventListener("keyup", event => { if ((event.key === " " || event.key === "Enter") && held?.button === button) { event.preventDefault(); releaseHeld(); } });
-    button.addEventListener("blur", () => { if (held?.button === button && held.pointerId === undefined) releaseHeld(); }); poseGrid.append(button);
-  }
-}
-
-poseGrid.addEventListener("pointerdown", event => {
-  event.preventDefault(); if (event.button !== 0 && event.pointerType === "mouse") return;
-  const rect = poseGrid.getBoundingClientRect(); const direction = directionAtPoint(directions.length, event.clientX - rect.left, event.clientY - rect.top, rect.width, rect.height);
-  const button = poseGrid.querySelector<HTMLButtonElement>(`[data-direction="${direction}"]`); if (button) beginHold(direction, button, event.pointerId);
-});
-poseGrid.addEventListener("pointerup", event => { event.preventDefault(); if (held?.pointerId === event.pointerId) releaseHeld(); });
-poseGrid.addEventListener("pointercancel", event => { if (held?.pointerId === event.pointerId) releaseHeld(); });
-poseGrid.addEventListener("lostpointercapture", event => { if (held?.pointerId === event.pointerId) releaseHeld(); });
-poseGrid.addEventListener("contextmenu", event => event.preventDefault()); poseGrid.addEventListener("selectstart", event => event.preventDefault());
-
-async function requestImmersiveMode(mode: "flash" | "bubbles"): Promise<void> {
-  if (fullscreenAttempted[mode]) return; fullscreenAttempted[mode] = true;
+async function requestImmersiveMode(): Promise<void> {
+  if (fullscreenAttempted) return; fullscreenAttempted = true;
   const root = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void };
   const orientation = screen.orientation as ScreenOrientation & { lock?: (value: string) => Promise<void> };
   const fullscreen = root.requestFullscreen ? () => root.requestFullscreen({ navigationUI: "hide" }) : root.webkitRequestFullscreen?.bind(root);
-  await attemptImmersive(fullscreen, orientation?.lock ? () => orientation.lock!(mode === "flash" ? "landscape" : "portrait") : undefined);
+  await attemptImmersive(fullscreen, orientation?.lock ? () => orientation.lock!("portrait") : undefined);
 }
-function updateCharge(message: HostMessage | GameplayPlayer): void {
-  authoritativeDirection = POSES.some(item => item.direction === message.direction) ? message.direction as Direction : undefined;
-  authoritativeCharge = Math.min(1, Math.max(0, Number(message.charge ?? 0))); authoritativeHeld = message.held === true;
-}
-function animate(now: number): void {
-  const delta = Math.min(0.1, Math.max(0, (now - lastAnimationTime) / 1000)); lastAnimationTime = now;
-  for (const direction of directions) {
-    const locallyHeld = held?.direction === direction; const hostDirection = authoritativeDirection === direction; let target = hostDirection ? authoritativeCharge : 0;
-    if (locallyHeld && authoritativeHeld) target = Math.max(target, visualCharge[direction] + delta / presentation.charge_fill_seconds);
-    const rate = (locallyHeld || (hostDirection && authoritativeHeld)) ? 1 / presentation.charge_fill_seconds : 1 / presentation.charge_decay_seconds;
-    const step = rate * delta; visualCharge[direction] += Math.max(-step, Math.min(step, target - visualCharge[direction]));
-    const button = poseGrid.querySelector<HTMLElement>(`[data-direction="${direction}"]`);
-    if (button) button.style.backgroundColor = chargedColor(presentation.colors[direction] ?? DEFAULT_COLORS[direction], presentation.minimum_brightness, presentation.maximum_brightness, visualCharge[direction]);
-  }
-  if (bubblesPointer && bubblesPointer.motionCount < 48 && activeGame === "bubbles" && socket?.readyState === WebSocket.OPEN) {
-    const changed = bubblesPointer.drag[0] !== bubblesPointer.sentDrag[0] || bubblesPointer.drag[1] !== bubblesPointer.sentDrag[1];
-    if (now - bubblesPointer.lastMotionAt >= (changed ? 70 : 600)) sendBubblesMotion(bubblesPointer, now);
-  }
-  requestAnimationFrame(animate);
-}
-requestAnimationFrame(animate);
-
 function sendBubblesCharge(seq: number, stage: "start" | "progress" | "cancel", step = 0): void {
   if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "bubbles_charge", input_seq: seq, stage, step }));
 }
@@ -284,7 +192,7 @@ bubblesPad.addEventListener("pointerdown", event => {
   bubblesPointer = { id: event.pointerId, trace, seq: inputSeq, step: 0, drag: [0, 0], sentDrag: [0, 0], lastMotionAt: performance.now(), motionCount: 0 };
   try { bubblesPad.setPointerCapture(event.pointerId); } catch { cancelBubblesPointer(); return; }
   sendBubblesCharge(inputSeq, "start");
-  void requestImmersiveMode("bubbles");
+  void requestImmersiveMode();
 });
 bubblesPad.addEventListener("pointermove", event => {
   if (bubblesPointer?.id !== event.pointerId) return;
@@ -311,23 +219,22 @@ bubblesPad.addEventListener("contextmenu", event => event.preventDefault());
 bubblesPad.addEventListener("keydown", event => {
   if (event.repeat || activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active") return;
   const directions: Record<string, Point> = { ArrowLeft: [0.1, 0.5], ArrowRight: [0.9, 0.5], ArrowUp: [0.5, 0.1], ArrowDown: [0.5, 0.9] };
-  if (directions[event.key]) { event.preventDefault(); sendBubblesTrace([[0.5, 0.5], directions[event.key]]); void requestImmersiveMode("bubbles"); }
+  if (directions[event.key]) { event.preventDefault(); sendBubblesTrace([[0.5, 0.5], directions[event.key]]); void requestImmersiveMode(); }
   else if (event.key === " " || event.key === "Enter") {
     event.preventDefault(); const circles = Math.max(1, Math.min(3, bubblesSnapshot?.circles_to_charge ?? 1));
     const trace: Point[] = Array.from({ length: 97 }, (_, index) => [0.5 + 0.22 * Math.cos(index / 96 * Math.PI * 2 * circles), 0.5 + 0.22 * Math.sin(index / 96 * Math.PI * 2 * circles)]);
-    sendBubblesTrace(trace); void requestImmersiveMode("bubbles");
+    sendBubblesTrace(trace); void requestImmersiveMode();
   }
 });
 
 function showBubbles(message: HostMessage): void {
   lobbyControls.deactivate();
-  releaseHeld(false);
   bubblesSnapshot = message;
   bubblesSnapshotTime = performance.now();
-  gameCard.hidden = true; playerCard.hidden = true; bubblesCard.hidden = false;
+  playerCard.hidden = true; bubblesCard.hidden = false;
   const phase = message.phase ?? "waiting";
   const active = phase === "results" || (["instructions", "countdown", "active"].includes(phase) && message.left !== true);
-  setGameplaySurface(active, "bubbles");
+  setGameplaySurface(active);
   bubblesScore.textContent = String(Math.max(0, Math.floor(message.score ?? 0)));
   if (message.type === "bubbles_feedback") {
     if (message.event === "captured") vibrate(18);
@@ -591,21 +498,6 @@ function animateBubbles(now: number): void {
 }
 requestAnimationFrame(animateBubbles);
 
-function showGame(message: HostMessage): void {
-  lobbyControls.deactivate();
-  bubblesCard.hidden = true; playerCard.hidden = true; gameCard.hidden = false; const phase = message.phase ?? "waiting";
-  gameHeading.textContent = phase === "countdown" ? "Get ready!" : phase === "genuine_stop_grace" ? "Hold a pose!" : "Watch the big screen";
-  gameMessage.textContent = message.message ?? (phase === "genuine_stop_grace" ? "Music stopped! Hold your pose." : "Keep watching the shared screen.");
-  const player = message.player as GameplayPlayer | undefined; const lifeCount = message.lives ?? player?.lives;
-  if (message.debug_mode === true) lives.textContent = "Lives: DEBUG"; else if (Number.isInteger(lifeCount)) lives.textContent = `Lives: ${"♥".repeat(Math.max(0, lifeCount!))}${"♡".repeat(Math.max(0, 2 - lifeCount!))}`;
-  const eliminated = message.eliminated === true || player?.eliminated === true; readPresentation(message.presentation); if (player) updateCharge(player);
-  if (eliminated) { releaseHeld(); setGameplaySurface(false); gameHeading.textContent = "You've been eliminated :("; gameMessage.textContent = "Keep watching the big screen for the results."; poseGrid.replaceChildren(); }
-  else if (message.type === "flash_pose_result") gameHeading.textContent = message.success ? "Pose locked!" : "Keep dancing!";
-  else if (["countdown", "dance", "genuine_stop_grace", "resolve", "flash_wait"].includes(phase) || message.type === "flash_pose_challenge") { renderControls(message.available_directions ?? directions); setGameplaySurface(true); }
-  else if (message.type === "flash_pose_results") { releaseHeld(); setGameplaySurface(false); gameHeading.textContent = message.placement ? `You placed #${message.placement}` : "Round complete"; gameMessage.textContent = "Check the big screen for the final results."; poseGrid.replaceChildren(); }
-  else { releaseHeld(); setGameplaySurface(false); poseGrid.replaceChildren(); }
-}
-
 function rememberIdentity(message: HostMessage): boolean {
   const player = message.player as PublicPlayer | undefined;
   if (!player || typeof player.name !== "string" || typeof message.session_id !== "string" || typeof message.reconnect_token !== "string") return false;
@@ -627,20 +519,18 @@ async function connect(): Promise<void> {
     peer.onmessage = (event: MessageEvent<string>) => {
       let message: HostMessage; try { message = JSON.parse(event.data) as HostMessage; } catch { peer.close(); return; }
       if (message.type === "welcome" && message.protocol === 1 && Number.isInteger(message.connection_id)) {
-        clearTimeout(deadline); if (message.resume_status === "resumed" && rememberIdentity(message)) { releaseHeld(false); if (message.gameplay?.type === "bubbles_snapshot") showBubbles(message.gameplay); else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player) showJoined(message.player as PublicPlayer, message.gameplay.message ?? "Waiting for the next game"); else if (message.gameplay) showGame(message.gameplay); return; }
+        clearTimeout(deadline); if (message.resume_status === "resumed" && rememberIdentity(message)) { if (message.gameplay?.type === "bubbles_snapshot") showBubbles(message.gameplay); else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player) showJoined(message.player as PublicPlayer, message.gameplay.message ?? "Waiting for the next game"); return; }
         if (message.resume_status === "session_restarted") { forgetIdentity(); showJoin("The host started a new session. Choose your character and name to join again.", true); }
         else if (message.resume_status === "expired") { forgetIdentity(); showJoin("Your previous player expired. Choose your character and name to join again.", true); } else showJoin("Connected. Choose your character to join.", true);
       } else if (message.type === "join_accepted") { if (!rememberIdentity(message)) peer.close(); }
       else if (message.type === "join_rejected" || message.type === "error") { joinButton.disabled = false; status.textContent = message.message ?? "The host could not complete that action."; status.hidden = false; if (!joined) nameInput.focus(); }
       else if (message.type === "left") { forgetIdentity(); showJoin("You left the lobby. Choose your character and name to join again.", true); }
-      else if (message.type === "flash_pose_charge") updateCharge(message);
-      else if (["flash_pose_snapshot", "flash_pose_challenge", "flash_pose_result", "flash_pose_results"].includes(message.type ?? "")) showGame(message);
       else if (message.type === "bubbles_trace_result") bubblesLocalCharge = 0;
       else if (message.type === "bubbles_visual" && message.visual && bubblesSnapshot) { bubblesVisualSnapshot = message.visual; bubblesVisualReceivedAt = performance.now(); }
       else if (message.type === "bubbles_snapshot" || message.type === "bubbles_feedback") showBubbles(message);
-      else if (message.type === "lobby") { releaseHeld(false); setGameplaySurface(false); bubblesCard.hidden = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; if (message.player) rememberIdentity(message); else if (joined) { gameCard.hidden = true; playerCard.hidden = true; lobbyControls.activate(); status.hidden = true; } }
+      else if (message.type === "lobby") { setGameplaySurface(false); bubblesCard.hidden = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; if (message.player) rememberIdentity(message); else if (joined) { playerCard.hidden = true; lobbyControls.activate(); status.hidden = true; } }
     };
-    peer.onclose = event => { clearTimeout(deadline); releaseHeld(false); lobbyControls.deactivate(); if (socket === peer) socket = undefined; if (event.code === 4000) { stopped = true; leaveButton.disabled = true; status.textContent = "This player continued in another tab."; playerState.textContent = "Open in another tab"; return; } reconnect(); };
+    peer.onclose = event => { clearTimeout(deadline); lobbyControls.deactivate(); if (socket === peer) socket = undefined; if (event.code === 4000) { stopped = true; leaveButton.disabled = true; status.textContent = "This player continued in another tab."; playerState.textContent = "Open in another tab"; return; } reconnect(); };
     peer.onerror = () => peer.close();
   } catch { reconnect(); }
 }
@@ -649,7 +539,6 @@ joinForm.addEventListener("submit", event => { event.preventDefault(); const nam
 function leaveLobby(): void { if (!socket || socket.readyState !== WebSocket.OPEN) return; lobbyControls.deactivate(); leaveButton.disabled = true; lobbyLeaveButton.disabled = true; status.textContent = "Leaving…"; socket.send(JSON.stringify({ type: "leave" })); }
 leaveButton.addEventListener("click", leaveLobby);
 lobbyLeaveButton.addEventListener("click", leaveLobby);
-addEventListener("orientationchange", updateOrientation); addEventListener("resize", updateOrientation);
-window.addEventListener("pagehide", () => { stopped = true; releaseHeld(false); lobbyControls.deactivate(); clearTimeout(retry); retry = undefined; socket?.close(); });
+window.addEventListener("pagehide", () => { stopped = true; lobbyControls.deactivate(); clearTimeout(retry); retry = undefined; socket?.close(); });
 window.addEventListener("pageshow", event => { if (event.persisted) { stopped = false; void connect(); } });
 void connect();

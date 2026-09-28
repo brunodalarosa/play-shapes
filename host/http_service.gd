@@ -24,8 +24,8 @@ const ASSETS: Dictionary = {
 	"path": "res://web/public/vendor/nipplejs.mjs",
 	"content_type": "text/javascript; charset=utf-8",
 },
-"/controller_geometry.js": {
-	"path": "res://web/public/controller_geometry.js",
+"/immersive.js": {
+	"path": "res://web/public/immersive.js",
 	"content_type": "text/javascript; charset=utf-8",
 },
 "/bubbles_gesture.js": {
