@@ -3,7 +3,7 @@ extends Control
 
 const MANIFEST_PATH := "res://assets/runtime/animated_characters/squircle/v1/manifest.json"
 const ASSET_ROOT := "res://assets/runtime/animated_characters/squircle/v1/"
-const RENDERED_SAMPLE: Script = preload("res://debug/squircle_preview/rendered_sample.gd")
+const RENDERED_SAMPLE: Script = preload("res://debug/animation_lab/rendered_sample.gd")
 const ACTIONS := ["idle", "walk", "run"]
 const VIEWS := ["front", "three-quarter"]
 const EXPRESSIONS := ["neutral", "blink"]

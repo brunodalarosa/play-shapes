@@ -119,14 +119,7 @@ separation; a production layered sprite exporter is PS-057 work.
 & 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background 'squircle-toy.blend' --python 'render_previews.py'
 ```
 
-Source references at experimental base `8c1f850`: runtime Shape Character
-`bodies/squircle.png`, `hands/open.png`, `hands/closed.png`, `feet/round.png`,
-and `faces/neutral.png` / `faces/blink.png`, all under
-`assets/runtime/shape_characters/`. The copied face pixels are unchanged.
-Assembly reference: `characters/shape_character.tscn`; palette:
-`characters/character_selection.gd`; color/face separation reference:
-`characters/player_tint.gdshader`. The dimensional geometry was constructed for
-this experiment. No Rayman art was copied or traced.
+The original 2D Shape Character pack and assembly were historical modeling references at experimental base `8c1f850`; they were retired after Squircle v1 replaced the runtime character. The packed neutral and blink face images remain in this Blender source, with local copies under `textures/`. The current color palette remains in `characters/character_selection.gd`. No Rayman art was copied or traced.
 
 Owner chose relaxed open hands. Rounded fingers and simple rounded feet are the
 first interpretation; 128/256-pixel canvas sizes and the shadow treatment remain

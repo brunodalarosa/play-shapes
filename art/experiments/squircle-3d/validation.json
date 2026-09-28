@@ -30,13 +30,11 @@
   "textures": {
     "neutral": {
       "sha256": "b23b3a839e48eb6395fea5a5901c66d66834e936db0cff250fddc8c2be29b759",
-      "packed": true,
-      "matches_runtime_art": true
+      "packed": true
     },
     "blink": {
       "sha256": "75af58c52f00a78b98832cb7d509a61423ed464fc93400d2905b874964f0d531",
-      "packed": true,
-      "matches_runtime_art": true
+      "packed": true
     }
   },
   "cameras": {

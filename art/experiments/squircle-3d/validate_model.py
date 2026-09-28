@@ -33,11 +33,10 @@ textures = {}
 for name in ('neutral', 'blink'):
     packed = bpy.data.images['PS056 Face - ' + name]
     assert packed.packed_file
-    expected = HERE.parents[2] / 'assets/runtime/shape_characters/faces' / (name + '.png')
     copied = HERE / 'textures' / (name + '.png')
     digest = hashlib.sha256(copied.read_bytes()).hexdigest()
-    assert digest == hashlib.sha256(expected.read_bytes()).hexdigest()
-    textures[name] = {'sha256': digest, 'packed': True, 'matches_runtime_art': True}
+    assert digest == hashlib.sha256(bytes(packed.packed_file.data)).hexdigest()
+    textures[name] = {'sha256': digest, 'packed': True}
 report = {
     'blender_version': bpy.app.version_string,
     'scene': scene.name,

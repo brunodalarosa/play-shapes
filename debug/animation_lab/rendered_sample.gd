@@ -1,6 +1,6 @@
 class_name SquircleRenderedSample
 extends Node2D
-## The two aligned Squircle v1 layers used by the debug comparison and Animation Lab.
+## The two aligned Squircle v1 layers used by Animation Lab.
 
 const TILE_SIZE := 256
 const TINT_SHADER: Shader = preload("res://assets/runtime/animated_characters/squircle/v1/render_tint.gdshader")

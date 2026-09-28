@@ -19,6 +19,9 @@ func _run() -> void:
 		return
 	if not _check(animation_lab.availability({}).available, "Implemented animation lab is available"):
 		return
+	if not _check(launcher.scenario_for_id(&"squircle_render_preview") == null,
+		"Retired comparison is not registered"):
+		return
 	if not _check(launcher.scenario_for_id(&"one_player_simon") == null,
 			"Retired game has no debug scenario"):
 		return

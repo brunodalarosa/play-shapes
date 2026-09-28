@@ -85,9 +85,7 @@ to the saved source and asserts preservation of non-hand channels, recorded in
 over the current source. The former palms-down requirement is superseded by PS-064.
 
 Open the before blend and current blend in separate Blender windows for direct
-comparison. Both use the same action names, lengths and cameras. In Godot, F12 >
-Rendered squircle comparison shows the approved v1 animation at both sizes beside
-the existing 2D character. Historical before/after GIFs remain here for reference.
+comparison. Both use the same action names, lengths and cameras. In Godot, F12 > Animation Lab shows the approved v1 animation at both sizes. Historical before/after GIFs remain here for reference.
 
 The v1 sheets use 24 fps and 256-pixel source tiles; the 128-pixel display is a
 review scale. Blinks are independent of the locomotion actions. The page blinks
@@ -184,8 +182,8 @@ the base at runtime; it never loads ten color-specific animation sets.
 Limits: tint is a stylized transfer in display RGB, not a physically exact render
 of ten materials. It does not reproduce color-dependent interreflection or
 re-tonemap each palette color through AgX. Body shading/geometry and expressions
-remain separable, but the current production `player_tint.gdshader` is tuned for
-different 2D art and must **not** be applied unchanged. Face edges have normal
+remain separable; runtime tint uses the Squircle v1 shader in
+`assets/runtime/animated_characters/squircle/v1/`. Face edges have normal
 8-bit/mask/texture filtering approximation; no perspective camera, extreme side
 view, changed expression-plane size, or production Godot compositor is validated.
 PNG output is straight alpha; composite expressions with ordinary source-over.
@@ -217,7 +215,5 @@ The Blender restricted profile reported inability to read user preferences and
 write an optional thumbnail cache; source save, reopen and renders succeeded.
 These are not texture/missing-file errors. `.gdignore` keeps source art and render
 evidence outside Godot import; the curated v1 runtime assets are checked by
-`godot --headless --path . --script res://tests/squircle_preview_test.gd` from the
-implementation root. The preview uses direct PNG loading for local review; the
-Playground lobby uses Godot-imported textures. Other shapes still use their current
-art until they receive separately approved 3D models and animations.
+`godot --headless --path . --script res://tests/squircle_animation_lab_test.gd` from the
+implementation root. The Animation Lab and Playground lobby use the approved runtime sheets.

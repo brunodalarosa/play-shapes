@@ -5,11 +5,6 @@ extends RefCounted
 static func scenarios() -> Array[DebugScenario]:
 	return [
 		DebugScenario.new(
-			&"squircle_render_preview",
-			"Rendered squircle comparison",
-			"res://debug/squircle_preview/squircle_preview.tscn"
-		),
-		DebugScenario.new(
 			&"squircle_animation_lab",
 			"Animation Lab",
 			"res://debug/animation_lab/animation_lab.tscn"

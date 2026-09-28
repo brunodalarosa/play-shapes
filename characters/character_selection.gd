@@ -17,12 +17,6 @@ const COLORS: Array[Dictionary] = [
 ]
 const FALLBACK_SHAPE: StringName = &"squircle"
 const FALLBACK_COLOR := "#598DF2" # Existing unselected-player blue.
-const BODY_TEXTURES: Dictionary = {
-	&"square": preload("res://assets/runtime/shape_characters/bodies/square.png"),
-	&"circle": preload("res://assets/runtime/shape_characters/bodies/circle.png"),
-	&"squircle": preload("res://assets/runtime/shape_characters/bodies/squircle.png"),
-	&"rhombus": preload("res://assets/runtime/shape_characters/bodies/rhombus.png"),
-}
 
 
 static func default_selection() -> Dictionary:
@@ -72,10 +66,6 @@ static func normalize_shape(raw_shape: Variant) -> StringName:
 		if SHAPES.has(shape):
 			return shape
 	return FALLBACK_SHAPE
-
-
-static func body_texture_for(raw_shape: Variant) -> Texture2D:
-	return BODY_TEXTURES[normalize_shape(raw_shape)] as Texture2D
 
 
 static func _rejected(message: String) -> Dictionary:

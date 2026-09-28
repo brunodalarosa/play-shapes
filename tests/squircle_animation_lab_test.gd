@@ -12,8 +12,8 @@ func _run() -> void:
 	if not _check(scenario != null and scenario.display_name == "Animation Lab"
 		and scenario.availability({}).available, "Animation Lab has its own F12 entry"):
 		return
-	if not _check(launcher.scenario_for_id(&"squircle_render_preview") != null,
-		"Rendered comparison remains available"):
+	if not _check(launcher.scenario_for_id(&"squircle_render_preview") == null,
+		"Retired comparison is absent"):
 		return
 	var lab := (load(scenario.scene_path) as PackedScene).instantiate() as Control
 	root.add_child(lab)
@@ -75,19 +75,11 @@ func _run() -> void:
 	if not _check(lab.get("_elapsed") == 0.75 and lab.get("_playing"),
 		"Play resumes from the held frame"):
 		return
-	if not _check(not _contains_legacy_character(lab), "Lab contains no legacy ShapeCharacter"):
+	if not _check(lab.find_children("*", "ShapeCharacter", true, false).is_empty(),
+		"Lab contains only Squircle v1 samples"):
 		return
 	print("Animation Lab checks passed")
 	quit(0)
-
-
-func _contains_legacy_character(node: Node) -> bool:
-	if node is ShapeCharacter:
-		return true
-	for child: Node in node.get_children():
-		if _contains_legacy_character(child):
-			return true
-	return false
 
 
 func _check(condition: bool, description: String) -> bool:

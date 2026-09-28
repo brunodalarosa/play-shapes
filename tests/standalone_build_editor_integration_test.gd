@@ -8,7 +8,9 @@ const FORBIDDEN_PACK_PATHS := [
 	"web/package.json",
 	"web/package-lock.json",
 	"web/tsconfig.json",
-	"assets/runtime/shape_characters/manifest.json",
+	"assets/runtime/shape_characters/bodies/squircle.png",
+	"characters/shape_character.tscn",
+	"debug/squircle_preview/squircle_preview.tscn",
 ]
 
 var _plugin: EditorPlugin
