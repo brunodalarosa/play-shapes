@@ -20,25 +20,29 @@ testing the TypeScript browser client. The repository includes the compiled
 browser files, so Godot can serve a cloned checkout without an internet
 connection or a separate web server.
 
-The Godot MCP/OpenCode integration in this repository is optional developer
+The vendored Godot MCP addon is disabled by default and is optional developer
 tooling; it is not required to launch or play the game.
 
 ## First-time setup
 
 1. Clone the repository.
-2. Open the `play-shapes` folder in Godot. This folder is the Godot project
+2. Open the cloned folder in Godot. This folder is the Godot project
    root and contains `project.godot`.
 3. Confirm that Godot is using the **GL Compatibility** renderer.
 4. If you want to rebuild or test the web client, install the dependencies:
 
    ```powershell
    cd web
-   npm install
+   npm ci
    cd ..
    ```
 
    The browser client is served by Godot from `web/public/`; do not start a
    second web server for normal play.
+
+The committed runtime assets are sufficient to run, edit, and test the game.
+Source-art regeneration is documented in
+`art/bubbles/README.md` and requires owner-provided originals.
 
 ## Start a local session
 
@@ -101,6 +105,10 @@ behavior.
 ## Browser client development
 
 After changing TypeScript in `web/src/`, rebuild the committed browser files:
+
+Host-backed browser tests require a `godot` executable on PATH. If Godot has a
+different name or is not on PATH, set `GODOT_BIN` to its executable path before
+running the commands below.
 
 ```powershell
 cd web

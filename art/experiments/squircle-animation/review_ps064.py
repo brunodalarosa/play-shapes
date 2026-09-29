@@ -22,7 +22,7 @@ def frame(folder, action, view, tick):
     return Image.open(folder/'frames'/action/view/f'{tick%count+1:04d}.png').convert('RGBA')
 
 def animate(name, size, sources):
-    font = ImageFont.truetype('C:/Windows/Fonts/segoeui.ttf',12 if size==128 else 16)
+    font = ImageFont.truetype('DejaVuSans.ttf',12 if size==128 else 16)
     boards=[]
     for tick in range(48):
         board=Image.new('RGBA',(4*(size+20)+20,2*(size+40)+65),(26,33,47,255))
@@ -88,7 +88,7 @@ print('Squircle v1: 18 Godot sheets, manifest, and review media updated.')
 if all((PRE/f'hand-detail-{pose}.png').exists() for pose in ('open','closed')):
     board=Image.new('RGBA',(1024,560),(26,33,47,255))
     draw=ImageDraw.Draw(board)
-    font=ImageFont.truetype('C:/Windows/Fonts/segoeui.ttf',20)
+    font=ImageFont.truetype('DejaVuSans.ttf',20)
     for i,pose in enumerate(('open','closed')):
         board.alpha_composite(Image.open(PRE/f'hand-detail-{pose}.png').convert('RGBA'),(i*512,40))
         draw.text((i*512+20,12),f'PS064 / {pose} / original toy glove',font=font,fill='white')

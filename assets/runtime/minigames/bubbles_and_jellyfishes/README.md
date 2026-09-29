@@ -41,7 +41,7 @@ or treat the decorative reefs as collision boundaries.
 
 - Supplied and selected for extraction by project owner Bruno Cesar Dalla Rosa
   on 2026-09-22; described by the owner as generative-AI artwork.
-- Acquisition location: parent design vault, `Minigames/002/Generated Mockups/`.
+- Original source sheets are owner-provided and are not required for runtime use.
 - Sources: `bubbles-paper-ghibli-master-sprite-sheet.png` and
   `bubbles-paper-craft-far-background-fhd.png`; acquisition date 2026-09-22.
 - Art direction and generation prompts are recorded alongside those source files

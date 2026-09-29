@@ -116,7 +116,7 @@ separation; a production layered sprite exporter is PS-057 work.
   requires Python with Pillow.
 
 ```powershell
-& 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background 'squircle-toy.blend' --python 'render_previews.py'
+& blender --background 'squircle-toy.blend' --python 'render_previews.py'
 ```
 
 The original 2D Shape Character pack and assembly were historical modeling references at experimental base `8c1f850`; they were retired after Squircle v1 replaced the runtime character. The packed neutral and blink face images remain in this Blender source, with local copies under `textures/`. The current color palette remains in `characters/character_selection.gd`. No Rayman art was copied or traced.

@@ -3,8 +3,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 HERE = Path(__file__).resolve().parent / 'previews'
-FONT = 'C:/Windows/Fonts/segoeui.ttf'
-BOLD = 'C:/Windows/Fonts/segoeuib.ttf'
+FONT = 'DejaVuSans.ttf'
+BOLD = 'DejaVuSans-Bold.ttf'
 BG, PANEL, INK, MUTED = '#171d2a', '#222c3c', '#f3f5fa', '#aebdd2'
 
 

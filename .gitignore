@@ -7,3 +7,6 @@ test-results/*
 !test-results/.gdignore
 __pycache__/
 builds/
+opencode.json
+*.local.json
+*.log

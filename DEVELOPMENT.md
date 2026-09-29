@@ -12,34 +12,20 @@ This is the compact implementation manual for the current checkout. It records h
 - **Project > Tools > Build Standalone Host** creates a portable Windows x86_64 release ZIP. Linux is deliberately deferred.
 - Bubbles still needs the owner's two-phone and game-feel review; automated evidence does not establish device, browser, network, accessibility, or feel approval.
 
-## Documentation boundaries
+## Documentation
 
-The parent `Play Shapes/` directory is the Markdown planning and game-design vault. This nested `play-shapes/` directory is the Git repository and Godot project root. Do not move material between those layers merely for convenience.
-
-Canonical sources:
-
-- Repository execution rules: [AGENTS.md](AGENTS.md)
-- Human + AI workflow: [Workflow](../Project/Workflow.md)
-- Task types, lifecycle, frontmatter, and gates: [Task System](../Project/Task%20System.md)
-- Product context: [Project Overview](../Project/Project%20Overview.md)
-- Durable choices: [Decision Log](../Decisions/Decision%20Log.md)
-- Current tasks: [Task board](../Management/Task%20board.md)
-- Task-specific scope and evidence: notes under `../Management/Tasks/`
-- Player setup and use: [README.md](README.md)
-- Tuning workflow: [Tuning/README.md](Tuning/README.md)
-
-Completed task notes are immutable historical records. Their old terminology or then-current limitations must not be treated as active instructions. Current work does not create exploration or validation tasks; it uses `asset-import` for new development media, includes human validation in the implementation flow, and waits for explicit human approval before remote publication. Refer to the canonical sources above instead of duplicating those rules here.
+This repository contains the Godot project, browser client, bundled runtime assets, tests, and tooling. See [README.md](README.md) for setup, [AGENTS.md](AGENTS.md) for contributor guidance, and [Tuning/README.md](Tuning/README.md) for tuning.
 
 ## Project location and running
 
-Run Git, Godot, browser build, and tests from this `play-shapes/` repository, not from the parent vault. `project.godot` must remain at its root.
+Run Git, Godot, browser build, and tests from this repository root. `project.godot` must remain at its root.
 
 ```powershell
 godot --version
 godot --path .
 ```
 
-Use **F5** for the complete boot/lobby flow. Use **F6** only when an individual scene is designed for direct execution. The user shim is `C:\Users\backup pc\.local\bin\godot.cmd`; see `AGENTS.md` for the installed GUI path and optional MCP/OpenCode setup.
+Use **F5** for the complete boot/lobby flow. Use **F6** only when an individual scene is designed for direct execution. Use `GODOT_BIN` when Godot is not on PATH.
 
 In the lobby, choose a reachable Wi-Fi/Ethernet IPv4 address, then scan the QR or type the displayed URL on a phone on the same LAN. Discovery runs at launch and on Refresh; it prefers common `192.168.*` addresses but is not default-route detection. Loopback, link-local, and IPv6 addresses are excluded. VPNs, multiple adapters, guest Wi-Fi, and client isolation can require a manual choice or prevent access.
 
@@ -53,7 +39,7 @@ Normal play starts with 2–10 registered players. Choose a minigame from the lo
 - `host/websocket_service.gd` owns bounded protocol-1 peers/messages and resolves each connection to a host-owned player before forwarding gameplay input.
 - `host/player_registry.gd` owns session/player/token identities, names, validated character shape/color, capacity, reconnect grace, resume, and explicit leave.
 - `scenes/lobby.*` places live QR/address controls and minigame selection/start on the Playground's board and calendar. There is no visible roster; `SessionHost.players_changed` still refreshes the shared 2–10 player launch gate. The FHD control positions and `PanelBackings` sprite transforms are the main UI tuning points; Godot's `canvas_items` stretch scales them to the 1152×648 host size.
-- `scenes/lobby_playground_world.tscn` is the reusable 1920×1080 toy-shelf world. It imports selected layers, props, blank QR board/calendar, and a separate logo under `assets/runtime/lobby_playground/` from the parent vault's `Generated artifacts/Lobby_02_asset_pack/`. `PanelBackings` sits behind `CharactersFrontOfPanels`; characters draw over the live QR and other lobby controls, while `Foreground` draws over characters. `scenes/lobby_playground_world.gd` reconciles registered players to ten seat-indexed `FutureCharacterAnchors`. `characters/lobby_squircle.tscn` owns host-side platform and player collision, a modest landing bounce, and a readable nameplate. Its script exposes speed, acceleration, gravity, jump impulse, player bounce settings, visual scale, run threshold, and fall-reset height in the Inspector. One-way shelves and block tops use physics layer 8 (bit 128); characters use layer 9 (bit 256) and mask both layers.
+- `scenes/lobby_playground_world.tscn` is the reusable 1920×1080 toy-shelf world. It imports selected layers, props, blank QR board/calendar, and a separate logo under `assets/runtime/lobby_playground/`. `PanelBackings` sits behind `CharactersFrontOfPanels`; characters draw over the live QR and other lobby controls, while `Foreground` draws over characters. `scenes/lobby_playground_world.gd` reconciles registered players to ten seat-indexed `FutureCharacterAnchors`. `characters/lobby_squircle.tscn` owns host-side platform and player collision, a modest landing bounce, and a readable nameplate. Its script exposes speed, acceleration, gravity, jump impulse, player bounce settings, visual scale, run threshold, and fall-reset height in the Inspector. One-way shelves and block tops use physics layer 8 (bit 128); characters use layer 9 (bit 256) and mask both layers.
 - `minigames/bubbles_round_controller.gd` owns the separate Bubbles instructions/countdown/active/results lifecycle, score and pop state, host-time finish freeze, and snapshots keyed by player ID. `bubbles_gesture_classifier.gd` validates and classifies one completed normalized trace. The shared-screen scene is `minigames/bubbles_and_jellyfishes.tscn`.
 - `minigames/bubbles_player_bubble.tscn` reuses `SquircleV1Playback` in a procedural translucent bubble with a per-instance circle collider, capped approved small-jellyfish art, and readable name. `bubbles_player_visual.gd` draws the iridescent rim, live directional drag pull, charge glow/wobble, authoritative spin surface and particles, and pop fragments; `bubbles_player_bubble.gd` animates the audience-facing character from accepted swipe events and keeps the charge cue on the bubble. Visual deformation and burst radius never drive collision. `bubbles_player_arena.gd` creates 1–10 bodies and steps movement, invisible bounds, and player pairs in sorted player-ID order. Call `setup(controller, npc_bounds, optional_wall_bounds)`, then `add_bubble(player_id, position)` from the controller's participant snapshot; call `simulate_step(fixed_delta, host_time_msec)` from the host physics loop (normally 1/60 second, maximum 0.05). `bounds` retains the logical NPC play area; player bubbles use the optional wall bounds. The arena settles the controller clock before movement, so exact-zero results freeze first. Bodies consume only the controller's accepted swipe/spin/pop signals and score snapshots.
 - `BubblesPresentation` derives player-bubble wall bounds from the visible viewport rectangle at launch and on resize. Wall padding uses each bubble's transformed radius so its visible edge meets the viewport edge; NPC boundary behavior remains separate.
@@ -180,39 +166,3 @@ For a local desktop-browser phone preview, run `godot --headless --path . --scri
 - Editor/runtime checks do not prove a package. Smoke the exported executable without Godot or Node, including lobby, HTTP routes, WebSocket, and a browser connection.
 - Preserve `web/public/`, the Kenyoni QR addon, external-PCK output, and the curated runtime/source-archive boundary in export changes.
 - A phone reload creates a new transport connection but may resume the same player during grace. Duplicate active-token resume gives the newest tab ownership and closes the old connection.
-
-## Historical implementation index
-
-These are historical context, not active instructions. The linked note owns detailed scope, findings, evidence, and outcome.
-
-| Task | Date | Result |
-|---|---|---|
-| [PS-004](../Management/Tasks/Done/PS-004%20-%20Define%20the%20Game-Feel%20Tuning%20Strategy.md) | 2026-09-14 | Approved the editor-first tuning and preset model. |
-| [PS-005](../Management/Tasks/Done/PS-005%20-%20Define%20Multi-Phone%20and%20Agent%20Validation%20Strategy.md) | 2026-09-15 | Defined evidence labels and the MVP two-phone matrix. |
-| [PS-006](../Management/Tasks/Done/PS-006%20-%20Implement%20Player%20Join%20and%20Host-Owned%20Registry.md) | 2026-09-14 | Added host-owned identity, join, resume, leave, and roster. |
-| [PS-007](../Management/Tasks/Done/PS-007%20-%20Define%20the%20Gameplay%20Debug%20Suite.md) | 2026-09-13 | Approved the minimal F12 host scenario launcher. |
-| [PS-009](../Management/Tasks/Done/PS-009%20-%20Create%20and%20Import%20Character%20Feet%20Assets.md) | 2026-09-13 | Added approved feet and the six-part character setup. |
-| [PS-010](../Management/Tasks/Done/PS-010%20-%20Explore%20Character%20Animation%20Strategy.md) | 2026-09-13 | Selected hybrid detached-sprite animation. |
-| [PS-011](../Management/Tasks/Done/PS-011%20-%20Implement%20Hybrid%20Character%20Animation%20Lab.md) | 2026-09-13 | Proved and visually approved the animation lab. |
-| [PS-012](../Management/Tasks/Done/PS-012%20-%20Implement%20Milestone%201%20Character%20Animation%20System.md) | 2026-09-15 | Promoted semantic animation to production. |
-| [PS-013](../Management/Tasks/Done/PS-013%20-%20Implement%20Pose%20Charge%20and%20Evaluation%20Rules.md) | 2026-09-17 | Added authoritative charge, deadlines, and evaluation. |
-| [PS-014](../Management/Tasks/Done/PS-014%20-%20Implement%20Minimal%20Gameplay%20Debug%20Launcher.md) | 2026-09-13 | Implemented the persistent F12 launcher. |
-| [PS-015](../Management/Tasks/Done/PS-015%20-%20Implement%20Shared%20Tuning%20Asset%20and%20Preset%20Workflow.md) | 2026-09-14 | Added active presets, validation, and guidance. |
-| [PS-016](../Management/Tasks/Done/PS-016%20-%20Create%20Wireframe%20for%20001%20-%20Dancer%20Simon%20Says.md) | 2026-09-15 | Recorded shared-screen and phone wireframes. |
-| [PS-017](../Management/Tasks/Done/PS-017%20-%20Find%20Better%20Environment%20Assets%20for%20001%20-%20Dancer%20Simon%20Says.md) | 2026-09-16 | Selected the Milestone 1 environment set. |
-| [PS-018](../Management/Tasks/Done/PS-018%20-%20Create%20the%20001%20-%20Dancer%20Simon%20Says%20Minigame%20Scene.md) | 2026-09-17 | Added the editor-authored lead and ten-seat stage. |
-| [PS-019](../Management/Tasks/Done/PS-019%20-%20Plan%20the%20001%20-%20Dancer%20Simon%20Says%20Minigame%20Implementation.md) | 2026-09-16 | Fixed the bounded implementation sequence and policies. |
-| [PS-020](../Management/Tasks/Done/PS-020%20-%20Find%20Music%20and%20SFX%20for%20001%20-%20Dancer%20Simon%20Says.md) | 2026-09-16 | Selected music and flash candidates. |
-| [PS-021](../Management/Tasks/Done/PS-021%20-%20Implement%20Curated%20Runtime%20Asset%20Pipeline.md) | 2026-09-16 | Added the manifest-owned runtime art boundary. |
-| [PS-023](../Management/Tasks/Done/PS-023%20-%20Prepare%20Flash%20Pose%20Runtime%20Music%20and%20SFX.md) | 2026-09-17 | Added the runtime audio catalog and metadata. |
-| [PS-024](../Management/Tasks/Done/PS-024%20-%20Implement%20Flash%20Pose%20Host%20Round%20Controller.md) | 2026-09-17 | Implemented authoritative round phases. |
-| [PS-025](../Management/Tasks/Done/PS-025%20-%20Implement%20Flash%20Pose%20Phone%20Protocol%20and%20Controller.md) | 2026-09-17 | Added validated pose packets and phone states. |
-| [PS-026](../Management/Tasks/Done/PS-026%20-%20Implement%20Flash%20Pose%20Shared%20Screen%20Feedback%20and%20Results.md) | 2026-09-17 | Added presentation, audio, flash, and results. |
-| [PS-027](../Management/Tasks/Done/PS-027%20-%20Integrate%20Flash%20Pose%20Lobby%20and%20Debug%20Flow.md) | 2026-09-18 | Integrated normal/debug launch and return. |
-| [PS-028](../Management/Tasks/Done/PS-028%20-%20Validate%20Flash%20Pose%20Technical%20Loop.md) | 2026-09-18 | Recorded owner verification of the integrated loop. |
-| [PS-029](../Management/Tasks/Done/PS-029%20-%20Validate%20Flash%20Pose%20on%20Two%20Phones%20and%20in%20Human%20Play.md) | 2026-09-18 | Recorded working Android and iPhone play. |
-| [PS-030](../Management/Tasks/Done/PS-030%20-%20Rework%20Flash%20Pose%20Phone%20Controller%20Layout.md) | 2026-09-18 | Added 2/3/4-region landscape controls and fixed module serving. |
-| [PS-031](../Management/Tasks/Done/PS-031%20-%20Set%20FHD%20Host%20Resolution%20and%20Rework%20Lobby%20Layout.md) | 2026-09-19 | Set FHD defaults and a non-scrolling lobby. |
-| [PS-032](../Management/Tasks/Done/PS-032%20-%20Clarify%20Results%20Labels%20and%20Return%20Button.md) | 2026-09-19 | Added `WINNERS`/`LOSERS` and clearer return. |
-| [PS-033](../Management/Tasks/Done/PS-033%20-%20Design%20Standalone%20Windows%20and%20Linux%20Build%20Workflow.md) | 2026-09-19 | Chose Windows ZIP first and deferred Linux. |
-| [PS-034](../Management/Tasks/Done/PS-034%20-%20Implement%20One-Click%20Windows%20Standalone%20Build%20Workflow.md) | 2026-09-19 | Implemented and smoke-tested the Windows package. |
