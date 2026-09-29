@@ -47,14 +47,19 @@ func start(use_local_config := true) -> bool:
 	startup_error = network.error if not network.error.is_empty() else network.validation_error()
 	if not startup_error.is_empty():
 		return false
-	var error := http.start(settings, player_registry.session_id, network)
+	var tls := ControllerTLS.new()
+	var error := tls.prepare(network)
+	if error != OK:
+		startup_error = tls.error
+		return false
+	error = http.start(settings, player_registry.session_id, network, tls.options)
 	if error != OK:
 		startup_error = http.startup_error
 		if startup_error.is_empty():
 			startup_error = "Could not start HTTP service: %s" % error_string(error)
 		http.stop()
 		return false
-	error = websocket.start(settings, player_registry, func() -> bool: return accepting_new_players, network)
+	error = websocket.start(settings, player_registry, func() -> bool: return accepting_new_players, network, tls.options)
 	if error != OK:
 		http.stop()
 		startup_error = "Could not listen for WebSocket on port %d: %s" % [network.websocket_port, error_string(error)]

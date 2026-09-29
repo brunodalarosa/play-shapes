@@ -10,6 +10,7 @@ const BubblesProtocolScript = preload("res://host/bubbles_protocol.gd")
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []
 var _settings: NetworkingTuning
+var _tls_options: TLSOptions
 var _network: ControllerNetworkConfig
 var _registry: PlayerRegistry
 var _accepting_new_players: Callable
@@ -20,7 +21,8 @@ var _lobby_controller: LobbyPlaygroundWorld
 var _readiness: PreMinigameReadiness
 
 func start(settings: NetworkingTuning, registry: PlayerRegistry,
-		accepting_new_players: Callable, network: ControllerNetworkConfig = null) -> Error:
+		accepting_new_players: Callable, network: ControllerNetworkConfig = null, tls_options: TLSOptions = null) -> Error:
+	_tls_options = tls_options
 	_settings = settings
 	_network = network if network != null else ControllerNetworkConfig.new(settings)
 	_registry = registry
@@ -31,7 +33,7 @@ func stop() -> void:
 	_server.stop()
 	for client: Dictionary in _clients:
 		_disconnect_player(client)
-		client.tcp.disconnect_from_host()
+		client.connection.close()
 	_clients.clear()
 	connection_count_changed.emit(0)
 
@@ -101,12 +103,10 @@ func _process(_delta: float) -> void:
 		peer.outbound_buffer_size = 4096
 		peer.max_queued_packets = 8
 		peer.heartbeat_interval = 5.0
-		if peer.accept_stream(tcp) != OK:
-			tcp.disconnect_from_host()
-			continue
 		_clients.append({
 			"peer": peer,
-			"tcp": tcp,
+			"connection": ControllerStream.new(tcp, _tls_options),
+			"stream_accepted": false,
 			"welcomed": false,
 			"connection_id": 0,
 			"created": Time.get_ticks_msec(),
@@ -115,6 +115,18 @@ func _process(_delta: float) -> void:
 	for index: int in range(_clients.size() - 1, -1, -1):
 		var client: Dictionary = _clients[index]
 		var peer: WebSocketPeer = client.peer
+		if not client.stream_accepted:
+			var connection: ControllerStream = client.connection
+			var ready := connection.poll_ready()
+			if connection.failed or Time.get_ticks_msec() - client.created > _settings.request_timeout_seconds * 1000:
+				_drop(index)
+				continue
+			if not ready:
+				continue
+			if peer.accept_stream(connection.stream) != OK:
+				_drop(index)
+				continue
+			client.stream_accepted = true
 		peer.poll()
 		if peer.get_ready_state() == WebSocketPeer.STATE_CLOSED or (
 				not client.welcomed and Time.get_ticks_msec() - client.created > _settings.request_timeout_seconds * 1000):
@@ -314,7 +326,7 @@ func _close_replaced_connection(old_connection_id: int, new_connection_id: int) 
 func _drop(index: int) -> void:
 	var client: Dictionary = _clients[index]
 	_disconnect_player(client)
-	client.tcp.disconnect_from_host()
+	client.connection.close()
 	_clients.remove_at(index)
 	_emit_count()
 

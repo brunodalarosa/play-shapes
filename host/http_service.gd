@@ -81,12 +81,14 @@ const ASSETS: Dictionary = {
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []
 var _settings: NetworkingTuning
+var _tls_options: TLSOptions
 var _network: ControllerNetworkConfig
 var _bodies: Dictionary = {}
 var _session_id: String
 var startup_error: String = ""
 
-func start(settings: NetworkingTuning, session_id: String, network: ControllerNetworkConfig = null) -> Error:
+func start(settings: NetworkingTuning, session_id: String, network: ControllerNetworkConfig = null, tls_options: TLSOptions = null) -> Error:
+	_tls_options = tls_options
 	_settings = settings
 	_network = network if network != null else ControllerNetworkConfig.new(settings)
 	_session_id = session_id
@@ -132,7 +134,7 @@ func _load_asset(route: String, asset: Dictionary) -> Error:
 func stop() -> void:
 	_server.stop()
 	for client: Dictionary in _clients:
-		client.peer.disconnect_from_host()
+		client.connection.close()
 	_clients.clear()
 
 func _process(_delta: float) -> void:
@@ -146,15 +148,18 @@ func _process(_delta: float) -> void:
 		if _clients.size() >= _settings.max_connections:
 			peer.disconnect_from_host()
 		else:
-			_clients.append({"peer": peer, "input": PackedByteArray(),
+			_clients.append({"connection": ControllerStream.new(peer, _tls_options), "input": PackedByteArray(),
 				"output": PackedByteArray(), "sent": 0, "created": Time.get_ticks_msec(), "finished": -1})
 	for index: int in range(_clients.size() - 1, -1, -1):
 		var client: Dictionary = _clients[index]
-		var peer: StreamPeerTCP = client.peer
-		peer.poll()
-		if peer.get_status() != StreamPeerTCP.STATUS_CONNECTED or Time.get_ticks_msec() - client.created > _settings.request_timeout_seconds * 1000:
+		var connection: ControllerStream = client.connection
+		var ready := connection.poll_ready()
+		if connection.failed or Time.get_ticks_msec() - client.created > _settings.request_timeout_seconds * 1000:
 			_drop(index)
 			continue
+		if not ready:
+			continue
+		var peer: StreamPeer = connection.stream
 		if client.finished >= 0:
 			if Time.get_ticks_msec() - client.finished >= 100:
 				_drop(index)
@@ -184,7 +189,7 @@ func _process(_delta: float) -> void:
 				client.finished = Time.get_ticks_msec() # Let TCP flush before closing a larger asset response.
 
 func _drop(index: int) -> void:
-	_clients[index].peer.disconnect_from_host()
+	_clients[index].connection.close()
 	_clients.remove_at(index)
 
 func _route(request: String) -> PackedByteArray:
