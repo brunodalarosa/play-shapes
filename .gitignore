@@ -16,3 +16,6 @@ local/
 *.crt
 *.p12
 *.pfx
+*.cer
+*.der
+*.pem.tmp
