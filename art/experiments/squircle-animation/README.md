@@ -42,7 +42,7 @@ Front projection hides depth travel, so use the three-quarter view for contact.
 Open `squircle-animated.blend` in Blender 5.2.2. Active scene:
 `PS057 | Squircle Animation Studio`. Textures are packed; no add-on or automatic
 script execution is required. PS-064 uses original rounded toy-glove geometry,
-guided by the four images in the parent vault's `Management/Task references/PS-064/`.
+guided by owner reference images that are not included in this repository.
 Three fingers fold against the palm and the thumb crosses them to form a fist.
 Both hands have native `Closed fist` shape keys, driven by the rig's keyed
 `Hand curl` property: idle 0, walk .35, run 1. Body, feet, face, pivots, lighting,
@@ -97,8 +97,8 @@ Run from this folder. Blender needs its bundled Python only; packing/checking ne
 ordinary Python with Pillow and NumPy. The Codex workspace Python already has both.
 
 ```powershell
-$blender = 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe'
-$python = 'C:\Users\backup pc\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe'
+$blender = 'blender'
+$python = 'python'
 & $blender --background 'squircle-animated.blend' --python-exit-code 1 --python 'export_frames.py'
 & $python make_previews.py
 & $blender --background 'squircle-animated.blend' --python-exit-code 1 --python 'render_hand_detail.py'

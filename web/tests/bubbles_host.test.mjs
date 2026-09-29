@@ -6,7 +6,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { PNG } from 'pngjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
-const binary = process.env.GODOT_BIN ?? 'C:/Users/backup pc/Documents/Godot/Godot_v4.7.2-stable_win64_console.exe';
+const binary = process.env.GODOT_BIN || 'godot';
 const port = 8090;
 let host;
 let output = '';

@@ -1,17 +1,26 @@
 """Validate exported PNGs and Godot import settings; requires Pillow.
 
-Read-only validation. Run from any working directory with the parent source
-vault available. The independent export-pack check uses verify_bubbles_pack.gd.
+Read-only validation. Source comparison requires owner-provided files.
+The independent export-pack check uses verify_bubbles_pack.gd.
 """
 from hashlib import sha256
 import json
 from pathlib import Path
-from PIL import Image
+import argparse
 
 ROOT = Path(__file__).resolve().parents[2]
 RUNTIME = ROOT / 'assets/runtime/minigames/bubbles_and_jellyfishes'
-SOURCE = ROOT.parent / 'Minigames/002/Generated Mockups'
+parser = argparse.ArgumentParser(description='Validate Bubbles runtime art against owner-provided source files.')
+parser.add_argument('--source-dir', type=Path, required=True, help='directory containing the original Bubbles sprite sheet and background')
+SOURCE = parser.parse_args().source_dir
 manifest = json.loads((ROOT/'art/bubbles/extraction_manifest.json').read_text())
+for name in manifest['source_sha256']:
+    if not (SOURCE / name).is_file():
+        parser.error(f'missing {SOURCE / name}; request the source art from the owner and pass --source-dir PATH')
+try:
+    from PIL import Image
+except ImportError as error:
+    parser.error('Pillow is required for source-art validation; install it with python -m pip install Pillow')
 entries = manifest['assets']
 assert len(entries) == 18
 assert len({e['path'] for e in entries}) == len(entries)

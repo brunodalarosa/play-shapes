@@ -33,8 +33,8 @@ The direct reference and one-cell add-on outputs both retained the same alpha co
 From PowerShell, rerun the bounded comparison with Blender 5.2.2:
 
 ```powershell
-$folder = 'C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes\art\experiments\squircle-animation\addon-evaluation'
-& 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background (Join-Path $folder 'squircle-addon-test.blend') --python (Join-Path $folder 'run_addon_test.py') *> (Join-Path $folder 'addon-test.log')
+$folder = (Resolve-Path .).Path
+& blender --background (Join-Path $folder 'squircle-addon-test.blend') --python (Join-Path $folder 'run_addon_test.py') *> (Join-Path $folder 'addon-test.log')
 ```
 
 The run used 128×128, 8 Cycles samples, a single sampled frame, and only the add-on's 0° view. It completed successfully. Blender logged a restricted-profile warning that it could not read the user preferences file; the script does not depend on those preferences. It also logged the expected raw-model armature rejection before the wrapped copy test.

@@ -1,7 +1,7 @@
-"""Run inside GIMP 3 via MCP after setting PLAY_SHAPES_ROOT.
+"""Run inside GIMP 3 after setting PLAY_SHAPES_ROOT and BUBBLES_SOURCE_DIR.
 
 Uses GIMP/GEGL for source reads, sprite extraction, alpha cleanup and PNG export.
-Original artwork is never modified. Source files live in the parent design vault.
+Original artwork is never modified. Source files must be provided separately.
 """
 from collections import deque
 from hashlib import sha256
@@ -10,7 +10,13 @@ from pathlib import Path
 from gi.repository import Gimp, Gegl, Gio
 
 ROOT = Path(PLAY_SHAPES_ROOT)
-SOURCE = ROOT.parent / 'Minigames/002/Generated Mockups'
+try:
+    SOURCE = Path(BUBBLES_SOURCE_DIR)
+except NameError as error:
+    raise RuntimeError('Set BUBBLES_SOURCE_DIR to the owner-provided source-art directory before extraction.') from error
+for filename in ('bubbles-paper-ghibli-master-sprite-sheet.png', 'bubbles-paper-craft-far-background-fhd.png'):
+    if not (SOURCE / filename).is_file():
+        raise FileNotFoundError(f'Missing source art: {SOURCE / filename}. Request the source files from the owner and set BUBBLES_SOURCE_DIR.')
 OUT = ROOT / 'assets/runtime/minigames/bubbles_and_jellyfishes'
 ART = ROOT / 'art/bubbles'
 SHEET = 'bubbles-paper-ghibli-master-sprite-sheet.png'

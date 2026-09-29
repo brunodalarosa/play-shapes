@@ -32,10 +32,12 @@ detached AI speckles. Visible RGB paper texture remains identical to the source.
 Each sprite is trimmed and padded by eight pixels. This cleanup is specific to
 opaque paper props, and must not be applied to translucent bubbles or VFX.
 
-To regenerate, keep the original source files at the same path in the parent
-design vault. Through GIMP's Python
-console/MCP, set `PLAY_SHAPES_ROOT` to the
-absolute implementation checkout, then execute the files in this order:
+Normal play and development use the committed files in `assets/runtime/`; no
+source-art directory is needed. Regeneration and source comparison require the
+original sprite sheet and far background, which the owner must provide with
+sharing terms established. Do not add those source files to this repository.
+In GIMP 3's Python console, set `PLAY_SHAPES_ROOT` to this checkout and
+`BUBBLES_SOURCE_DIR` to the directory containing those two files, then execute:
 
 ```python
 exec(compile(open(PLAY_SHAPES_ROOT + '/tools/assets/extract_bubbles_gimp.py', encoding='utf-8').read(), 'extract_bubbles_gimp.py', 'exec'))
@@ -54,7 +56,7 @@ this asset set and its review files; source images are never saved over.
 From the implementation root:
 
 ```powershell
-python tools/assets/validate_bubbles_art.py
+python tools/assets/validate_bubbles_art.py --source-dir PATH_TO_OWNER_ART
 godot --headless --editor --path . --import
 godot --headless --path . --export-pack "Play Shapes Windows Release" test-results/ps-036-038/bubbles.pck
 ```

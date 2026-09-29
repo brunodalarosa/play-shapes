@@ -17,7 +17,10 @@ PANEL = (37,48,65,255)
 
 
 def font(size):
-    return ImageFont.truetype('C:/Windows/Fonts/segoeui.ttf', size)
+    try:
+        return ImageFont.truetype('DejaVuSans.ttf', size)
+    except OSError:
+        return ImageFont.load_default()
 
 
 def tint(source, hex_color):

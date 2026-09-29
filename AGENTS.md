@@ -1,146 +1,25 @@
-# AGENTS.md
+# Contributor guidance
 
-### Version control workflow
-Every change in this implementation repository is made on a new local task branch and committed locally as the
-work progresses. Implementation tasks carry the machine-readable
-`human_approval: pending` gate in their task frontmatter. Until the human has
-performed post-coding validation and explicitly approved the change, do not
-push the branch or open/update a pull request. After approval, set the gate to
-`human_approval: approved`, then push and open the pull request to `main` for
-human review and manual merge. Planning-only changes follow the same local
-branch and commit rule and also wait for explicit approval before remote
-publication.
+This directory is the Godot project root. Work on a new local branch and commit implementation changes locally. Do not push or open a pull request until the project owner approves publication.
 
-The parent design and management repository is owner-managed: the owner manually handles every branch, commit, push, and pull request there. Agents may edit its task/design notes when requested, but must leave those management-layer changes uncommitted and unpublished. This does not change the implementation-repository workflow above.
+## Architecture and coding
 
-## Project
+- Godot is the authoritative PC host. Phones are TypeScript/HTML/CSS browser clients over HTTP and WebSockets. Clients send input and choices; only the host changes game state.
+- Use typed GDScript where practical, small reusable scenes, composition, signals for loose coupling, and Control/Container nodes for UI. Avoid fixed viewport dimensions and duplicate behavior. Explain complex code in comments.
+- Preserve the bundled runtime assets and `web/public/` output. Rebuild the browser bundle after changing `web/src/`.
+- Minigame numbers are stable identifiers. 001 was retired; 002 is the first approved game. Never reuse or renumber IDs.
+- A Shape Character is a player-owned geometric character with floating hands and feet. Keep poses and expressions readable, including natural blinking and context-appropriate gestures.
 
-- Local-network multiplayer party game built with Godot
-- This directory is the Godot project root. `project.godot` must remain here.
-- The project currently targets Godot 4.7 and the GL Compatibility renderer.
-- Use Godot 4.4 or newer because the installed Godot MCP requires it.
+## Visual direction
 
-## Architecture
+Play Shapes is a playful imagined world of living toys and crafts. Draw from toys, school supplies, papercraft, plushies, colorful foods and plants, action figures, blocks, and pencil drawings. Favor stylized, recognizable forms over photorealism. Apply this to UI, environments, characters, effects, shaders, and animation.
 
-- Godot runs the authoritative game on the host PC.
-- Smartphones are browser clients.
-- Browser client uses TypeScript/HTML/CSS.
-- Communication uses WebSockets.
+## Setup and verification
 
-## Godot game development guidelines
+- Use Godot 4.7.2 or newer with the GL Compatibility renderer. Run `godot --version` and `godot --path .` from this repository root. Set `GODOT_BIN` to a Godot executable when it is not on PATH.
+- Run relevant Godot scripts with `godot --headless --path . --script tests/<name>.gd` and check output for parse or runtime errors.
+- For browser work, run `npm install`, `npm run check`, `npm run build`, and `npm test` in `web/`.
+- Keep changes scoped. Update `DEVELOPMENT.md` when current setup, architecture, protocols, or verification steps change.
+- The vendored `addons/godot_mcp/` editor integration is optional. Enable it in Godot's Plugin settings only when needed; configure your own local MCP client separately. Do not change the third-party addon unless the task calls for it.
 
-- Use GDScript unless there is a strong reason not to.
-- Prefer typed GDScript.
-- Prefer composition over deep inheritance.
-- Keep scenes small and reusable.
-- UI should primarily use Control and Container nodes.
-- Do not hard-code viewport dimensions.
-- Use signals for loosely coupled systems.
-- Code should be human readable. Add comments explaining particularly complex parts of the code.
-- Characters should feel alive: include natural blinking, varied facial expressions,
-  and context-appropriate hand shapes/gestures instead of relying on one static
-  face or hand sprite. Preserve pose readability and the intended emotion.
-
-## Networking
-
-The PC is authoritative.
-
-Clients may send:
-- UI actions
-- player choices
-- controller input
-
-Clients must never directly modify authoritative game state.
-
-## Local Godot setup
-
-- `godot` is available from PowerShell and cmd through the user-level shim at `C:\Users\backup pc\.local\bin\godot.cmd`.
-- The shim invokes `C:\Users\backup pc\Documents\Godot\Godot_v4.7.2-stable_win64_console.exe`.
-- The GUI editor is `C:\Users\backup pc\Documents\Godot\Godot_v4.7.2-stable_win64.exe`.
-- Check the installed editor with `godot --version`.
-- Run commands from this project root. When PATH inheritance is uncertain, use the absolute executable paths above.
-
-## Godot MCP setup
-
-- hybridindie's `godot-editor-mcp` 2026.09.02 is installed as an isolated `uv` tool.
-- The server executable is `C:\Users\backup pc\.local\bin\godot-editor-mcp.exe`.
-- The official editor addon is vendored at `addons/godot_mcp/`.
-- The addon is enabled in `project.godot` as `res://addons/godot_mcp/plugin.cfg`.
-- The addon connects to the local bridge at `ws://127.0.0.1:9080` and reconnects automatically.
-- Do not edit files inside `addons/godot_mcp/` unless the task explicitly requires changing or upgrading the third-party addon.
-
-## OpenCode integration
-
-- Project-local MCP configuration lives in `opencode.json` under the server name `godot`.
-- OpenCode executes `C:\Users\backup pc\.local\bin\godot-editor-mcp.exe` using stdio transport.
-- The configuration supplies these environment variables:
-  - `GODOT_MCP_GODOT_BIN=C:\Users\backup pc\Documents\Godot\Godot_v4.7.2-stable_win64.exe`
-  - `GODOT_MCP_PROJECT_DIR=C:\Users\backup pc\Documents\Codex\Play Shapes\play-shapes`
-- Start OpenCode from this directory so it discovers `opencode.json`.
-- Only one MCP server process can own the editor bridge at a time. If port 9080 is already occupied, stop the stale MCP process before retrying; do not start competing stdio and HTTP servers.
-
-## Using the MCP tools
-
-1. Open this project in Godot and keep the editor running.
-2. Start OpenCode from this project root. It launches the `godot` MCP server automatically.
-3. Begin with the always-available core and inspection tools. Use `godot_get_server_info` or `godot_list_toolsets` to inspect capabilities and connection state.
-4. Enable only the additional toolset needed for the current task, such as `scene_edit`, `scripts`, `runtime`, or `testing`.
-5. Prefer read-only inspection before mutation. Use `dry_run` where supported, and supply explicit confirmation only for an intended destructive MCP operation.
-6. Save scenes/resources through Godot after MCP edits and validate scripts for parse errors.
-
-## Verification and troubleshooting
-
-- Confirm Godot resolution: `godot --version`.
-- Confirm OpenCode discovery: `opencode mcp list`. The expected status is `godot connected` while OpenCode owns the server.
-- Confirm configuration resolution when needed: `opencode debug config`.
-- If the MCP reports that the bridge is disconnected, confirm that Godot is open, the Godot MCP plugin is enabled, and no stale process owns port 9080. The addon should then reconnect automatically.
-- A headless editor-load check can be run with:
-  `godot --headless --editor --path . --quit-after 10`
-- Treat an exit code of zero and absence of addon/script parse errors as the relevant result. Forced early shutdown may emit resource-cleanup warnings that do not indicate a project-load failure.
-
-## Change discipline
-
-- Keep changes scoped to the requested feature and preserve unrelated project settings.
-- Prefer small, readable GDScript components over a single large script.
-- Keep scenes and resources editor-loadable, and verify meaningful changes in Godot when possible.
-- Do not reinstall or move Godot, replace the MCP configuration, or upgrade the addon/package unless explicitly requested.
-
-## Before completing a task
-
-1. Check scripts for parse errors.
-2. Run relevant tests.
-3. Inspect the Godot output for errors.
-4. Update `DEVELOPMENT.md` only when the change adds or alters current operational knowledge: commands, paths, architecture boundaries, protocols, build/verification steps, caveats, or recurring failure modes. Keep task-specific narrative and evidence in the active task note, link to its completed historical record, and remove superseded guidance instead of appending another chronology. Keep the manual concise enough for both frontier and local limited models.
-### Local agent access
-You have access to a local OpenCode instance through the terminal using the command: run-local-opencode
-
-When working on software tasks, consider delegating isolated, low-risk subtasks to OpenCode before doing them yourself.
-
-Good delegation candidates:
-- writing simple boilerplate
-- generating unit tests
-- explaining unfamiliar code
-- searching a repository for patterns
-- implementing small self-contained functions
-- mechanical refactors
-- documentation
-- formatting / cleanup
-
-Do NOT delegate:
-- architecture decisions
-- security-sensitive changes
-- complex debugging
-- tasks requiring broad project context
-- final code review
-- integration decisions
-
-You remain responsible for the final result.
-
-When delegation is worthwhile:
-1. formulate a concise task for OpenCode
-2. run it through the local terminal
-3. inspect its result
-4. incorporate or reject it
-5. verify the final work yourself
-
-Avoid delegating when the overhead of preparing context would exceed the work saved.
+See [README.md](README.md) for clone and play instructions and [DEVELOPMENT.md](DEVELOPMENT.md) for implementation details.
