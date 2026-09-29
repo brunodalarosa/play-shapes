@@ -23,12 +23,35 @@ func _ready() -> void:
 	if host != null and host.readiness != null:
 		configure(host.readiness.minigame_id, host.readiness.snapshot_for(""))
 		host.readiness_changed.connect(set_snapshot)
+		host.readiness_launch_requested.connect(_on_launch_requested)
+		host.readiness_canceled.connect(_on_canceled)
 
 
 func _exit_tree() -> void:
 	var host := get_node_or_null("/root/SessionHost")
 	if host != null and host.readiness_changed.is_connected(set_snapshot):
 		host.readiness_changed.disconnect(set_snapshot)
+	if host != null and host.readiness_launch_requested.is_connected(_on_launch_requested):
+		host.readiness_launch_requested.disconnect(_on_launch_requested)
+	if host != null and host.readiness_canceled.is_connected(_on_canceled):
+		host.readiness_canceled.disconnect(_on_canceled)
+
+
+func _on_launch_requested(minigame_id: StringName) -> void:
+	var host := get_node_or_null("/root/SessionHost")
+	if host == null:
+		return
+	var error := get_tree().change_scene_to_file(host.minigame_scene_path(minigame_id))
+	if error != OK:
+		push_error("Could not open the selected minigame: %d" % error)
+		host.clear_minigame_launch(minigame_id)
+		_on_canceled()
+
+
+func _on_canceled() -> void:
+	var host := get_node_or_null("/root/SessionHost")
+	if get_tree().change_scene_to_file("res://scenes/lobby.tscn") == OK and host != null:
+		host.send_players_to_lobby()
 
 
 func configure(minigame_id: StringName, snapshot: Dictionary) -> void:

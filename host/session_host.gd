@@ -150,7 +150,8 @@ func begin_pre_minigame(minigame_id: StringName) -> Dictionary:
 	var availability := minigame_availability(minigame_id)
 	if not bool(availability.available):
 		return {"accepted": false, "reason": availability.reason}
-	readiness = PreMinigameReadiness.new(minigame_id, players())
+	readiness = PreMinigameReadiness.new(minigame_id, players(),
+		func() -> bool: return bool(minigame_availability(minigame_id).available))
 	readiness.changed.connect(_on_readiness_changed)
 	readiness.launch_requested.connect(_on_readiness_launch)
 	readiness.canceled.connect(_on_readiness_canceled)

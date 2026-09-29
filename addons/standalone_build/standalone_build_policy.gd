@@ -70,6 +70,7 @@ const REQUIRED_RUNTIME_PATHS := [
 	"scenes/bubbles_pre_minigame_content.tres",
 	"assets/runtime/pre_minigame/bubbles_preview.png",
 	"host/bubbles_protocol.gd",
+	"host/pre_minigame_readiness.gd",
 	"minigames/bubbles_and_jellyfishes.tscn",
 	"minigames/bubbles_round_controller.gd",
 	"minigames/bubbles_player_arena.gd",

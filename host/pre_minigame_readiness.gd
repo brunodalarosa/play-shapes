@@ -11,10 +11,12 @@ var active := true
 var transitioning := false
 var _participants: Array[Dictionary] = []
 var _ready_by_id: Dictionary = {}
+var _eligible: Callable
 
 
-func _init(selected_minigame: StringName, players: Array[Dictionary]) -> void:
+func _init(selected_minigame: StringName, players: Array[Dictionary], eligible: Callable = Callable()) -> void:
 	minigame_id = selected_minigame
+	_eligible = eligible
 	for player: Dictionary in players:
 		_add(player)
 
@@ -53,10 +55,7 @@ func set_ready(player: Dictionary, ready: bool) -> Dictionary:
 		return {"accepted": true}
 	_ready_by_id[player_id] = ready
 	changed.emit(snapshot_for(""))
-	if ready and not _participants.is_empty() and _all_ready():
-		transitioning = true
-		active = false
-		launch_requested.emit(minigame_id, _participants.duplicate(true))
+	_maybe_launch()
 	return {"accepted": true}
 
 
@@ -67,15 +66,15 @@ func sync_players(current: Array[Dictionary]) -> void:
 	for player: Dictionary in current:
 		by_id[String(player.player_id)] = player
 	var changed_state := false
-	for index: int in _participants.size():
+	for index: int in range(_participants.size() - 1, -1, -1):
 		var old: Dictionary = _participants[index]
 		var player_id := String(old.player_id)
 		if not by_id.has(player_id):
-			# An expired/explicitly left player remains in the selected round until
-			# cancellation; it cannot silently make the round all-ready.
-			if bool(_ready_by_id[player_id]):
-				_ready_by_id[player_id] = false
-				changed_state = true
+			# Disconnect retains the player during grace. Once the registry expires
+			# its identity, it can no longer ready and must leave the round.
+			_ready_by_id.erase(player_id)
+			_participants.remove_at(index)
+			changed_state = true
 			continue
 		var updated: Dictionary = by_id[player_id]
 		if old.get("state") != updated.get("state"):
@@ -84,6 +83,7 @@ func sync_players(current: Array[Dictionary]) -> void:
 		_participants[index] = updated.duplicate(true)
 	if changed_state:
 		changed.emit(snapshot_for(""))
+		_maybe_launch()
 
 
 func cancel() -> void:
@@ -96,6 +96,7 @@ func cancel() -> void:
 func _add(player: Dictionary) -> void:
 	var player_id := String(player.player_id)
 	_participants.append(player.duplicate(true))
+	_participants.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.seat) < int(b.seat))
 	_ready_by_id[player_id] = false
 
 
@@ -104,3 +105,13 @@ func _all_ready() -> bool:
 		if not bool(_ready_by_id[player_id]):
 			return false
 	return true
+
+
+func _maybe_launch() -> void:
+	if not active or transitioning or _participants.is_empty() or not _all_ready():
+		return
+	if _eligible.is_valid() and not bool(_eligible.call()):
+		return
+	transitioning = true
+	active = false
+	launch_requested.emit(minigame_id, _participants.duplicate(true))

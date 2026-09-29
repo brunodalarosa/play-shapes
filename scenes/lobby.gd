@@ -116,15 +116,15 @@ func _rounded_style(fill: Color, border: Color, radius: int) -> StyleBoxFlat:
 
 func _start_minigame() -> void:
 	var minigame_id := _selected_minigame_id()
-	var result := SessionHost.prepare_minigame_launch(minigame_id)
+	var result := SessionHost.begin_pre_minigame(minigame_id)
 	if not bool(result.accepted):
 		start_help.text = str(result.reason)
 		return
 	world.clear_all_input()
 	start_button.disabled = true
-	var error := get_tree().change_scene_to_file(SessionHost.minigame_scene_path(minigame_id))
+	var error := get_tree().change_scene_to_file("res://scenes/pre_minigame_screen.tscn")
 	if error != OK:
-		SessionHost.clear_minigame_launch(minigame_id)
+		SessionHost.cancel_pre_minigame()
 		SessionHost.set_accepting_new_players(true)
 		start_help.text = "Could not open %s (error %d)." % [SessionHost.minigame_display_name(minigame_id), error]
 		_update_start_state()

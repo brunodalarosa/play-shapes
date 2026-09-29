@@ -135,6 +135,27 @@ func _run() -> void:
 	start_button.pressed.emit()
 	await scene_changed
 	await process_frame
+	if not _check(current_scene.scene_file_path == "res://scenes/pre_minigame_screen.tscn"
+			and host.readiness != null and host.websocket._active_protocol == host.readiness,
+			"Normal Bubbles opens host-owned ready-up before gameplay"):
+		return
+	host.cancel_pre_minigame()
+	await scene_changed
+	await process_frame
+	if not _check(current_scene.scene_file_path == LOBBY_PATH and host.readiness == null
+			and host.accepting_new_players and host.player_registry.player_count() == 2,
+			"Host cancel returns to joining lobby with both players intact"):
+		return
+	(current_scene.get_node("%StartMinigame") as Button).pressed.emit()
+	await scene_changed
+	await process_frame
+	host.readiness.set_ready(first.player, true)
+	if not _check(current_scene.scene_file_path == "res://scenes/pre_minigame_screen.tscn",
+			"One ready player cannot start gameplay"):
+		return
+	host.readiness.set_ready(second.player, true)
+	await scene_changed
+	await process_frame
 	bubble_controller = current_scene.get_node("RoundController") as BubblesRoundController
 	if not _check(current_scene.scene_file_path == BUBBLES_PATH
 			and bubble_controller.phase_name() == &"instructions"
@@ -161,6 +182,7 @@ func _run() -> void:
 			String(second.player.player_id)).left),
 			"Explicit phone leave is observed by the active Bubbles controller"):
 		return
+	(current_scene as BubblesPresentation)._entrance_tween.kill()
 	for frame: int in 180:
 		if bubble_controller.phase_name() == &"active":
 			break
@@ -195,11 +217,19 @@ func _run() -> void:
 	start_button.pressed.emit()
 	await scene_changed
 	await process_frame
+	if not _check(current_scene.scene_file_path == "res://scenes/pre_minigame_screen.tscn",
+			"Second normal launch also visits ready-up"):
+		return
+	host.readiness.set_ready(first.player, true)
+	host.readiness.set_ready(fourth.player, true)
+	await scene_changed
+	await process_frame
 	bubble_controller = current_scene.get_node("RoundController") as BubblesRoundController
 	if not _check(current_scene.scene_file_path == BUBBLES_PATH
 			and host.websocket._active_protocol == host.websocket._bubbles_protocol,
 			"Repeated Bubbles launch leaves exactly one protocol active"):
 		return
+	(current_scene as BubblesPresentation)._entrance_tween.kill()
 	for frame: int in 180:
 		if bubble_controller.phase_name() == &"active":
 			break

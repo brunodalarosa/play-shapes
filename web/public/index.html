@@ -50,6 +50,10 @@
       <p id="player-state">Connected</p>
       <button id="leave-button" class="secondary" type="button">Leave / Change player</button>
     </section>
+    <section id="ready-card" aria-label="Ready up" hidden>
+      <p id="ready-state" aria-live="polite">Not ready</p>
+      <button id="ready-button" type="button" aria-pressed="false" aria-label="Ready up">READY</button>
+    </section>
     <section id="bubbles-card" aria-labelledby="bubbles-heading" hidden>
       <h2 id="bubbles-heading">Bubbles and Jellyfishes</h2>
       <div id="bubbles-pad" role="button" tabindex="0" aria-label="Bubbles controller. Swipe to move, or draw circles and release to spin. Arrow keys move; Space spins." aria-describedby="bubbles-help">

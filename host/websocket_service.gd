@@ -153,6 +153,9 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 				_readiness.set_ready(resume.player, false)
 			if _lobby_controller != null:
 				_lobby_controller.reset_sequence(String(resume.player.player_id))
+		if not resume.accepted and _readiness != null and not bool(client.preexisting_onboarding):
+			peer.close(1008, "Ready-up is closed to new phones")
+			return
 		var welcome := {
 			"type": "welcome",
 			"protocol": 1,
@@ -218,6 +221,8 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 				if _readiness != null and ready_value is bool else {"accepted": false, "code": &"invalid_ready", "message": "Invalid ready action"}
 			if not result.accepted:
 				_send_rejection(peer, "error", result)
+			elif _readiness != null:
+				_send_gameplay_snapshot(peer, String(player.player_id))
 		"bubbles_trace", "bubbles_charge":
 			var player := _registry.player_for_connection(client.connection_id)
 			var result: Dictionary = _active_protocol.handle_action(player, message, Time.get_ticks_msec()) \

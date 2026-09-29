@@ -19,7 +19,7 @@ Every Inspector tooltip gives the field's purpose, default, safe range, and high
 | Spin surface speed (revolutions/second) | 1.8; 0.2–5 | Rotates the bubble rim faster during authoritative spin |
 | Burst (seconds) | 0.26; 0.1–0.6 | Lets curved fragments and motes remain visible longer |
 | Decorative particles (count) | 10; 0–32 | Adds spin bubbles and burst motes per player |
-| Instruction time (seconds) | 3; 0–15 | Allows more reading and entrance time |
+| Character entrance (seconds; legacy `instructions_seconds` field) | 3; 0–15 | Lengthens the character entrance after the shared booklet |
 | Countdown (seconds) | 3; 0–10 | Gives more preparation |
 | Round duration (seconds) | 90; 10–300 | Allows more collecting |
 | Starting bubble radius (world pixels) | 48; 16–160 | Begins with more reach and risk |

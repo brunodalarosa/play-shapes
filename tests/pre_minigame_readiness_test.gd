@@ -55,6 +55,14 @@ func _run() -> void:
 	var empty := PreMinigameReadiness.new(&"bubbles", [])
 	_check(empty.status_players().is_empty() and not empty.set_ready({}, true).accepted,
 		"Empty roster cannot launch")
+	var expiring := PreMinigameReadiness.new(&"bubbles", registry.public_players(),
+		func() -> bool: return registry.player_count() >= 2)
+	registry.disconnect_connection(4, 1000)
+	expiring.sync_players(registry.public_players())
+	_check(expiring.status_players().size() == 3, "Disconnect retains a round participant during grace")
+	registry.expire_players(61000)
+	expiring.sync_players(registry.public_players())
+	_check(expiring.status_players().size() == 2, "Expired identity leaves the selected round")
 	print("Pre-minigame readiness checks: %d failures" % failures)
 	quit(0 if failures == 0 else 1)
 

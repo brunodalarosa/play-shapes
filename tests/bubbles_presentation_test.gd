@@ -51,7 +51,7 @@ func _run() -> void:
 	_check(view._far.texture != null and view._mid.texture != null and view._foreground.texture != null, "Three approved environment layers load")
 	_check(view._music.stream is AudioStreamOggVorbis and (view._music.stream as AudioStreamOggVorbis).loop, "Selected BGM loops")
 	_check(is_equal_approx(view._music.volume_db, -14.0) and is_equal_approx((view._audio_players[&"pop"][0] as AudioStreamPlayer).volume_db, -7.0), "Scene applies selected audio gains")
-	_check(view._instructions.visible, "Instruction card appears")
+	_check(view.get_node_or_null("Hud/InstructionCard") == null, "Gameplay has no instruction card")
 	_check(not view.controller.complete_entrance(now - 1).accepted, "Entrance cannot move time backward")
 	_check(view.controller.complete_entrance(now).accepted, "Entrance can enter countdown")
 	root.size = Vector2i(1920, 1080)
