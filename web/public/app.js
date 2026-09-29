@@ -1,4 +1,5 @@
 import { attemptImmersive } from "./immersive.js";
+import { controllerSocketUrl } from "./network_config.js";
 import { SquircleV1Canvas } from "./squircle_v1.js";
 import { GestureTrace } from "./bubbles_gesture.js";
 import { LobbyControls } from "./lobby_controls.js";
@@ -638,11 +639,10 @@ async function connect() {
         if (!response.ok)
             throw new Error("Session unavailable");
         const config = await response.json();
-        if (!config || typeof config !== "object" || !("protocol" in config) || config.protocol !== 1 || !("websocket_port" in config) || !Number.isInteger(config.websocket_port) || Number(config.websocket_port) < 1024 || Number(config.websocket_port) > 65535 || !("session_id" in config) || typeof config.session_id !== "string")
-            throw new Error("Unsupported session");
+        const socketUrl = controllerSocketUrl(config, location.href);
         if (stopped)
             return;
-        const peer = new WebSocket(`ws://${location.hostname}:${config.websocket_port}`);
+        const peer = new WebSocket(socketUrl);
         socket = peer;
         const deadline = setTimeout(() => peer.close(), 7000);
         peer.onopen = () => peer.send(JSON.stringify({ type: "hello", protocol: 1, ...(stored(STORAGE.token) ? { reconnect_token: stored(STORAGE.token), session_id: stored(STORAGE.session) } : {}) }));

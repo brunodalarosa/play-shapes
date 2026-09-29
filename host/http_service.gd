@@ -4,6 +4,10 @@ extends Node
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
 const ASSETS: Dictionary = {
+"/network_config.js": {
+	"path": "res://web/public/network_config.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
 "/": {
 	"path": "res://web/public/index.html",
 	"content_type": "text/html; charset=utf-8",
@@ -77,12 +81,14 @@ const ASSETS: Dictionary = {
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []
 var _settings: NetworkingTuning
+var _network: ControllerNetworkConfig
 var _bodies: Dictionary = {}
 var _session_id: String
 var startup_error: String = ""
 
-func start(settings: NetworkingTuning, session_id: String) -> Error:
+func start(settings: NetworkingTuning, session_id: String, network: ControllerNetworkConfig = null) -> Error:
 	_settings = settings
+	_network = network if network != null else ControllerNetworkConfig.new(settings)
 	_session_id = session_id
 	startup_error = ""
 	_bodies.clear()
@@ -91,10 +97,10 @@ func start(settings: NetworkingTuning, session_id: String) -> Error:
 		var error := _load_asset(route, asset)
 		if error != OK:
 			return error
-	var listen_error := _server.listen(settings.http_port, "*")
+	var listen_error := _server.listen(_network.http_port, _network.bind_address)
 	if listen_error != OK:
 		startup_error = "Could not listen for HTTP on port %d: %s" % [
-			settings.http_port, error_string(listen_error),
+			_network.http_port, error_string(listen_error),
 		]
 	return listen_error
 
@@ -189,11 +195,7 @@ func _route(request: String) -> PackedByteArray:
 		return _response("405 Method Not Allowed", "text/plain", "GET only".to_utf8_buffer())
 	var route := parts[1].get_slice("?", 0)
 	if route == "/session.json":
-		return _response("200 OK", "application/json", JSON.stringify({
-			"protocol": 1,
-			"websocket_port": _settings.websocket_port,
-			"session_id": _session_id,
-		}).to_utf8_buffer())
+		return _response("200 OK", "application/json", JSON.stringify(_network.public_session(_session_id)).to_utf8_buffer())
 	if not ASSETS.has(route):
 		return _response("404 Not Found", "text/plain", "Not found".to_utf8_buffer())
 	return _response("200 OK", ASSETS[route].content_type, _bodies[route])

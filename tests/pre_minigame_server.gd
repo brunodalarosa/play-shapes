@@ -13,7 +13,7 @@ func _start() -> void:
 	host.settings = NetworkingTuning.new()
 	host.settings.http_port = 18100
 	host.settings.websocket_port = 18101
-	if not host.start():
+	if not host.start(false):
 		push_error("Ready fixture could not start")
 		quit(1)
 		return

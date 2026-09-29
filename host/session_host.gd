@@ -13,6 +13,7 @@ const MINIGAME_BUBBLES := &"bubbles"
 
 @export var active_presets: ActivePresets = preload("res://Tuning/Active Presets.tres")
 var settings: NetworkingTuning
+var network: ControllerNetworkConfig
 var running: bool = false
 var startup_error: String = ""
 var http: HttpService
@@ -36,24 +37,31 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	player_registry.expire_players()
 
-func start() -> bool:
+func start(use_local_config := true) -> bool:
 	if running:
 		return true
-	var error := http.start(settings, player_registry.session_id)
+	network = ControllerNetworkConfig.new(settings)
+	var path := ControllerNetworkConfig.local_path()
+	if use_local_config and not path.is_empty() and (OS.has_environment("PLAY_SHAPES_NETWORK_CONFIG") or FileAccess.file_exists(path)):
+		network.load_local(path)
+	startup_error = network.error if not network.error.is_empty() else network.validation_error()
+	if not startup_error.is_empty():
+		return false
+	var error := http.start(settings, player_registry.session_id, network)
 	if error != OK:
 		startup_error = http.startup_error
 		if startup_error.is_empty():
 			startup_error = "Could not start HTTP service: %s" % error_string(error)
 		http.stop()
 		return false
-	error = websocket.start(settings, player_registry, func() -> bool: return accepting_new_players)
+	error = websocket.start(settings, player_registry, func() -> bool: return accepting_new_players, network)
 	if error != OK:
 		http.stop()
-		startup_error = "Could not listen for WebSocket on port %d: %s" % [settings.websocket_port, error_string(error)]
+		startup_error = "Could not listen for WebSocket on port %d: %s" % [network.websocket_port, error_string(error)]
 		return false
 	running = true
 	startup_error = ""
-	print("Play Shapes ready: HTTP %d / WebSocket %d" % [settings.http_port, settings.websocket_port])
+	print("Play Shapes ready: %s %d / %s %d" % [network.http_scheme(), network.http_port, network.websocket_scheme(), network.websocket_port])
 	return true
 
 func addresses() -> PackedStringArray:
@@ -78,7 +86,7 @@ func stop() -> void:
 	running = false
 
 func join_url(address: String) -> String:
-	return "http://%s:%d" % [address, settings.http_port]
+	return (network if network != null else ControllerNetworkConfig.new(settings)).join_url(address)
 
 func set_accepting_new_players(accepting: bool) -> void:
 	accepting_new_players = accepting

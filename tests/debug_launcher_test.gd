@@ -10,7 +10,7 @@ func _run() -> void:
 	host.settings = NetworkingTuning.new()
 	host.settings.http_port = 18080
 	host.settings.websocket_port = 18081
-	if not _check(host.start(), "Test LAN services start"):
+	if not _check(host.start(false), "Test LAN services start"):
 		return
 	var original_host_id := host.get_instance_id()
 	var animation_lab: DebugScenario = launcher.scenario_for_id(&"squircle_animation_lab")

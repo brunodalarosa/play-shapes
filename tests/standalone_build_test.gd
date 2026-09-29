@@ -14,7 +14,7 @@ func _init() -> void:
 	_check(Policy.validate_owned_paths(ProjectSettings.globalize_path("res://")).is_empty(), "owned build paths stay below builds/standalone")
 	_check(Policy.STAGING_RELATIVE == "builds/standalone/windows-x86_64", "staging path is stable")
 	_check(Policy.ZIP_RELATIVE == "builds/standalone/Play-Shapes-windows-x86_64.zip", "ZIP path is stable")
-	_check(Policy.REQUIRED_BROWSER_PATHS.size() == 10 and Policy.REQUIRED_BROWSER_PATHS.has("web/public/bubbles_gesture.js") \
+	_check(Policy.REQUIRED_BROWSER_PATHS.size() == 11 and Policy.REQUIRED_BROWSER_PATHS.has("web/public/bubbles_gesture.js") \
 		and Policy.REQUIRED_BROWSER_PATHS.has("web/public/character_selection.js") \
 		and Policy.REQUIRED_BROWSER_PATHS.has("web/public/squircle_v1.js") \
 		and Policy.REQUIRED_BROWSER_PATHS.has("web/public/vendor/nipplejs.mjs"), "every browser module is required in the PCK")

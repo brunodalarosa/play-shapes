@@ -10,6 +10,7 @@ const BubblesProtocolScript = preload("res://host/bubbles_protocol.gd")
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []
 var _settings: NetworkingTuning
+var _network: ControllerNetworkConfig
 var _registry: PlayerRegistry
 var _accepting_new_players: Callable
 var _next_id: int = 1
@@ -19,11 +20,12 @@ var _lobby_controller: LobbyPlaygroundWorld
 var _readiness: PreMinigameReadiness
 
 func start(settings: NetworkingTuning, registry: PlayerRegistry,
-		accepting_new_players: Callable) -> Error:
+		accepting_new_players: Callable, network: ControllerNetworkConfig = null) -> Error:
 	_settings = settings
+	_network = network if network != null else ControllerNetworkConfig.new(settings)
 	_registry = registry
 	_accepting_new_players = accepting_new_players
-	return _server.listen(settings.websocket_port, "*")
+	return _server.listen(_network.websocket_port, _network.bind_address)
 
 func stop() -> void:
 	_server.stop()

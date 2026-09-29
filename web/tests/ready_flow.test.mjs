@@ -42,7 +42,7 @@ async function hello(client, identity = {}) {
 }
 
 test('host ready-up accepts prior onboarding, resets reconnect, and launches Bubbles once', { timeout: 30000 }, async () => {
-  const server = spawn(binary, ['--headless', '--path', root, '--script', 'tests/pre_minigame_server.gd'], { windowsHide: true });
+  const server = spawn(binary, ['--headless', '--path', root, '--script', 'tests/pre_minigame_server.gd'], { windowsHide: true, env: { ...process.env, PLAY_SHAPES_NETWORK_CONFIG: "" } });
   let output = '';
   server.stdout.on('data', data => { output += data; });
   server.stderr.on('data', data => { output += data; });

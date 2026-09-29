@@ -15,6 +15,7 @@ const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,art/**,b
 const REQUIRED_BROWSER_PATHS := [
 	"web/public/index.html",
 	"web/public/app.js",
+	"web/public/network_config.js",
 	"web/public/lobby_controls.js",
 	"web/public/lobby_input.js",
 	"web/public/vendor/nipplejs.mjs",
@@ -27,6 +28,7 @@ const REQUIRED_BROWSER_PATHS := [
 const REQUIRED_RUNTIME_PATHS := [
 	"web/public/index.html",
 	"web/public/app.js",
+	"web/public/network_config.js",
 	"web/public/lobby_controls.js",
 	"web/public/lobby_input.js",
 	"web/public/vendor/nipplejs.mjs",
