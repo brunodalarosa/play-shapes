@@ -41,7 +41,7 @@ func _capture() -> void:
 	var now := Time.get_ticks_msec()
 	stage.start_round(roster, now)
 	await _frames(4)
-	_save("instructions-fhd")
+	_save("entrance-fhd")
 	var entrance_time := maxi(now, stage.controller.last_host_time_msec())
 	stage.controller.complete_entrance(entrance_time)
 	stage.controller.advance(entrance_time)

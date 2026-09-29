@@ -55,6 +55,16 @@ html.bubbles-active .bubbles-content { position: absolute; inset-block-start: en
 .visually-hidden { position: absolute !important; inline-size: 1px !important; block-size: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
 html.bubbles-active .footnote { display: none; }
 
+/* One large, host-confirmed ready control. */
+html.ready-active, html.ready-active body { inline-size: 100%; block-size: 100%; overflow: hidden; }
+html.ready-active body { background: #e5c69c; }
+html.ready-active main { inline-size: 100%; max-inline-size: none; min-block-size: 100dvh; padding: max(22px, env(safe-area-inset-top)) max(22px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(22px, env(safe-area-inset-left)); }
+html.ready-active main > :not(#ready-card) { display: none !important; }
+#ready-card { flex: 1; display: grid; align-content: center; justify-items: center; gap: 25px; }
+#ready-state { margin: 0; color: #27463c; font-size: clamp(25px, 7vw, 37px); font-weight: 800; }
+#ready-button { inline-size: min(100%, 420px); min-block-size: min(46svh, 380px); border: 8px solid #f5eab9; border-radius: 38px; background: #83d5ad; color: #123d2c; box-shadow: 0 15px 0 #3d8265, 0 24px 30px rgb(45 69 53 / .24), inset 0 7px 18px rgb(255 255 255 / .5); font-size: clamp(44px, 15vw, 74px); letter-spacing: .04em; touch-action: manipulation; }
+#ready-button[aria-pressed="true"] { background: #f4bc82; color: #503619; box-shadow: 0 15px 0 #b67b4f, 0 24px 30px rgb(80 54 25 / .24), inset 0 7px 18px rgb(255 255 255 / .5); }
+
 /* Playground controller: a pair of toy controls in the phone's safe area. */
 html.lobby-active, html.lobby-active body { inline-size: 100%; block-size: 100%; overflow: hidden; }
 html.lobby-active body { background: #e8f5e7; }

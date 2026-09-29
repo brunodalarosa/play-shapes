@@ -22,6 +22,11 @@ func _init() -> void:
 		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/bgm/Beach_music.ogg") \
 		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/sfxs/woosh4.ogg"),
 		"Bubbles scene, music, and sound effects remain in the standalone PCK")
+	_check(Policy.REQUIRED_RUNTIME_PATHS.has("host/pre_minigame_readiness.gd") \
+		and Policy.REQUIRED_RUNTIME_PATHS.has("scenes/pre_minigame_screen.tscn") \
+		and Policy.REQUIRED_RUNTIME_PATHS.has("scenes/bubbles_pre_minigame_content.tres") \
+		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/pre_minigame/bubbles_preview.png"),
+		"Ready screen, content, and gameplay preview remain in the standalone PCK")
 	_check(Policy.REQUIRED_RUNTIME_PATHS.has("characters/character_selection.gd") \
 		and Policy.REQUIRED_RUNTIME_PATHS.has("characters/squircle_v1_playback.tscn") \
 		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png"),

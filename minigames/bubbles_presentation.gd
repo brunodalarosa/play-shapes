@@ -25,7 +25,6 @@ const SFX: Dictionary = {
 @onready var _foreground: TextureRect = $Foreground
 @onready var _timer: Label = $Hud/Timer
 @onready var _cue: Label = $Hud/CenterCue
-@onready var _instructions: PanelContainer = $Hud/InstructionCard
 @onready var _results: ColorRect = $Hud/Results
 @onready var _results_list: VBoxContainer = $Hud/Results/ResultsList
 @onready var _return_button: Button = $Hud/Results/ReturnToLobby
@@ -52,7 +51,6 @@ func _ready() -> void:
 	_far.pivot_offset = _far.size * 0.5
 	_mid.pivot_offset = _mid.size * 0.5
 	_foreground.pivot_offset = _foreground.size * 0.5
-	_style_instruction_card()
 	_setup_audio()
 	controller.phase_changed.connect(_on_phase_changed)
 	controller.feedback_requested.connect(_on_feedback)
@@ -111,9 +109,8 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 		bubble.position = Vector2(-160.0 if from_left else WORLD_SIZE.x + 160.0, destination.y)
 		if _entrance_tween == null:
 			_entrance_tween = create_tween().set_parallel(true)
-		_entrance_tween.tween_property(bubble, "position", destination, maxf(0.5, controller.tuning.instructions_seconds * 0.7)).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		_entrance_tween.tween_property(bubble, "position", destination, maxf(0.5, controller.tuning.instructions_seconds)).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	creature_arena.setup(controller, player_arena)
-	_instructions.visible = true
 	_apply_audio_gains()
 	_play_music()
 	set_process(true)
@@ -200,12 +197,10 @@ func _viewport_bounds() -> Rect2:
 func _on_phase_changed(phase: StringName, _snapshot: Dictionary) -> void:
 	match phase:
 		&"countdown":
-			_instructions.visible = false
 			_cue.visible = true
 			_last_countdown_second = -1
 			_countdown_end_msec = controller.last_host_time_msec() + roundi(controller.tuning.countdown_seconds * 1000.0)
 		&"active":
-			_instructions.visible = false
 			_cue.text = "GO"
 			_cue.visible = true
 			_pulse(_cue, 1.25)
@@ -334,15 +329,6 @@ func _on_registry_players_changed(players: Array[Dictionary]) -> void:
 	if _started:
 		controller.observe_registry(players, Time.get_ticks_msec())
 
-
-func _style_instruction_card() -> void:
-	var panel := StyleBoxFlat.new()
-	panel.bg_color = Color(0.035, 0.14, 0.22, 0.93)
-	panel.border_color = Color(0.7, 0.94, 0.96, 0.95)
-	panel.set_border_width_all(3)
-	panel.set_corner_radius_all(20)
-	panel.set_content_margin_all(24)
-	_instructions.add_theme_stylebox_override("panel", panel)
 
 
 func _setup_audio() -> void:

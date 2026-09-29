@@ -3,7 +3,7 @@ extends Resource
 ## Provisional Bubbles and jellyfishes values. Save a named preset and relaunch to compare feel.
 
 @export_group("Round lifecycle")
-## Minimum instruction and entrance time, in seconds. Higher allows more reading; lower starts sooner. Default: 3. Safe range: 0-15.
+## Character entrance time after the shared booklet. Higher lengthens the entrance; lower reaches countdown sooner. Default: 3. Safe range: 0-15.
 @export_range(0.0, 15.0, 0.25, "suffix:s")
 var instructions_seconds: float = 3.0:
 	set(value): instructions_seconds = clampf(value, 0.0, 15.0)

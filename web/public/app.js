@@ -16,6 +16,9 @@ const joinForm = document.querySelector("#join-form");
 const nameInput = document.querySelector("#player-name");
 const joinButton = document.querySelector("#join-button");
 const playerCard = document.querySelector("#player-card");
+const readyCard = document.querySelector("#ready-card");
+const readyState = document.querySelector("#ready-state");
+const readyButton = document.querySelector("#ready-button");
 const playerName = document.querySelector("#player-name-heading");
 const playerState = document.querySelector("#player-state");
 const leaveButton = document.querySelector("#leave-button");
@@ -33,6 +36,7 @@ let socket;
 let retry;
 let stopped = false;
 let joined = false;
+let isReady = false;
 let joinFlow = defaultJoinFlow();
 let inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
 let fullscreenAttempted = false;
@@ -121,6 +125,8 @@ function setGameplaySurface(active) {
 }
 function showJoin(message, focus = false) {
     lobbyControls.deactivate();
+    readyCard.hidden = true;
+    document.documentElement.classList.remove("ready-active");
     joinFlow = returnToCharacterSelection(joinFlow);
     joined = false;
     bubblesSnapshot = undefined;
@@ -141,6 +147,8 @@ function showJoin(message, focus = false) {
         queueMicrotask(() => nextButton.focus());
 }
 function showJoined(player, state = "Connected") {
+    readyCard.hidden = true;
+    document.documentElement.classList.remove("ready-active");
     joined = true;
     bubblesSnapshot = undefined;
     bubblesVisualSnapshot = undefined;
@@ -161,6 +169,30 @@ function showJoined(player, state = "Connected") {
     status.textContent = state === "Connected" ? "Joined. Keep this page open while you play." : state;
     status.hidden = true;
 }
+function showReady(message) {
+    lobbyControls.deactivate();
+    setGameplaySurface(false);
+    selectionScreen.hidden = true;
+    nameScreen.hidden = true;
+    joinForm.hidden = true;
+    playerCard.hidden = true;
+    bubblesCard.hidden = true;
+    readyCard.hidden = false;
+    document.documentElement.classList.add("ready-active");
+    isReady = message.ready === true;
+    readyState.textContent = isReady ? "Ready!" : "Not ready";
+    readyButton.textContent = isReady ? "CANCEL" : "READY";
+    readyButton.setAttribute("aria-pressed", String(isReady));
+    readyButton.setAttribute("aria-label", isReady ? "Cancel ready status" : "Ready up");
+    readyButton.disabled = false;
+    status.hidden = true;
+}
+readyButton.addEventListener("click", () => {
+    if (!socket || socket.readyState !== WebSocket.OPEN)
+        return;
+    readyButton.disabled = true;
+    socket.send(JSON.stringify({ type: "pre_minigame_ready", ready: !isReady }));
+});
 nextButton.addEventListener("click", () => {
     joinFlow = advanceJoinFlow(joinFlow);
     selectionScreen.hidden = true;
@@ -305,6 +337,8 @@ bubblesPad.addEventListener("keydown", event => {
 });
 function showBubbles(message) {
     lobbyControls.deactivate();
+    readyCard.hidden = true;
+    document.documentElement.classList.remove("ready-active");
     bubblesSnapshot = message;
     bubblesSnapshotTime = performance.now();
     playerCard.hidden = true;
@@ -584,6 +618,10 @@ function reconnect() {
         return;
     lobbyControls.deactivate();
     setGameplaySurface(false);
+    if (!readyCard.hidden) {
+        readyButton.disabled = true;
+        readyState.textContent = "Reconnecting…";
+    }
     if (joined) {
         playerState.textContent = "Reconnecting";
         leaveButton.disabled = true;
@@ -622,6 +660,8 @@ async function connect() {
                 if (message.resume_status === "resumed" && rememberIdentity(message)) {
                     if (message.gameplay?.type === "bubbles_snapshot")
                         showBubbles(message.gameplay);
+                    else if (message.gameplay?.type === "pre_minigame_snapshot")
+                        showReady(message.gameplay);
                     else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player)
                         showJoined(message.player, message.gameplay.message ?? "Waiting for the next game");
                     return;
@@ -643,8 +683,11 @@ async function connect() {
             }
             else if (message.type === "join_rejected" || message.type === "error") {
                 joinButton.disabled = false;
+                readyButton.disabled = false;
                 status.textContent = message.message ?? "The host could not complete that action.";
                 status.hidden = false;
+                if (!readyCard.hidden)
+                    readyState.textContent = status.textContent;
                 if (!joined)
                     nameInput.focus();
             }
@@ -660,8 +703,12 @@ async function connect() {
             }
             else if (message.type === "bubbles_snapshot" || message.type === "bubbles_feedback")
                 showBubbles(message);
+            else if (message.type === "pre_minigame_snapshot")
+                showReady(message);
             else if (message.type === "lobby") {
                 setGameplaySurface(false);
+                readyCard.hidden = true;
+                document.documentElement.classList.remove("ready-active");
                 bubblesCard.hidden = true;
                 bubblesSnapshot = undefined;
                 bubblesVisualSnapshot = undefined;

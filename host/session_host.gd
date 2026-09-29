@@ -3,6 +3,9 @@ extends Node
 
 signal connection_count_changed(count: int)
 signal players_changed(players: Array[Dictionary])
+signal readiness_changed(snapshot: Dictionary)
+signal readiness_launch_requested(minigame_id: StringName)
+signal readiness_canceled
 
 const BUBBLES_SCENE_PATH := "res://minigames/bubbles_and_jellyfishes.tscn"
 const BUBBLES_MAX_PLAYERS := 10
@@ -17,6 +20,7 @@ var websocket: WebsocketService
 var player_registry: PlayerRegistry
 var accepting_new_players: bool = false
 var _pending_minigame_launch: Dictionary = {}
+var readiness: PreMinigameReadiness
 
 func _ready() -> void:
 	settings = active_presets.networking
@@ -139,6 +143,50 @@ func prepare_minigame_launch(minigame_id: StringName, allow_one_player_debug := 
 	set_accepting_new_players(false)
 	return {"accepted": true}
 
+
+func begin_pre_minigame(minigame_id: StringName) -> Dictionary:
+	if readiness != null and readiness.active:
+		return {"accepted": false, "reason": "Ready-up is already active"}
+	var availability := minigame_availability(minigame_id)
+	if not bool(availability.available):
+		return {"accepted": false, "reason": availability.reason}
+	readiness = PreMinigameReadiness.new(minigame_id, players(),
+		func() -> bool: return bool(minigame_availability(minigame_id).available))
+	readiness.changed.connect(_on_readiness_changed)
+	readiness.launch_requested.connect(_on_readiness_launch)
+	readiness.canceled.connect(_on_readiness_canceled)
+	set_accepting_new_players(false)
+	websocket.begin_pre_minigame(readiness)
+	readiness_changed.emit(readiness.snapshot_for(""))
+	return {"accepted": true}
+
+
+func cancel_pre_minigame() -> void:
+	if readiness != null:
+		readiness.cancel()
+
+
+func _on_readiness_changed(snapshot: Dictionary) -> void:
+	readiness_changed.emit(snapshot)
+
+
+func _on_readiness_launch(minigame_id: StringName, participants: Array[Dictionary]) -> void:
+	# Close the onboarding window before another socket packet can be handled.
+	websocket.end_pre_minigame()
+	readiness = null
+	_pending_minigame_launch = {
+		"minigame_id": minigame_id,
+		"participants": participants,
+		"allow_one_player_debug": false,
+	}
+	readiness_launch_requested.emit(minigame_id)
+
+
+func _on_readiness_canceled() -> void:
+	websocket.end_pre_minigame()
+	readiness = null
+	readiness_canceled.emit()
+
 func consume_minigame_launch(minigame_id: StringName) -> Dictionary:
 	if StringName(_pending_minigame_launch.get("minigame_id", &"")) != minigame_id:
 		return {}
@@ -189,6 +237,8 @@ func unregister_bubbles_controller(controller: BubblesRoundController) -> void:
 
 func _on_players_changed() -> void:
 	var public_players := player_registry.public_players()
+	if readiness != null:
+		readiness.sync_players(public_players)
 	players_changed.emit(public_players)
 	var launcher := get_node_or_null("/root/DebugLauncher")
 	if launcher != null:

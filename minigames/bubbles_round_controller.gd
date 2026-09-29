@@ -104,13 +104,15 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 	_player_order = order
 	_debug_one_player = allow_one_player_debug and participants.size() == 1
 	_last_host_msec = host_time_msec
-	_instruction_deadline_msec = host_time_msec + roundi(tuning.instructions_seconds * 1000.0)
+	# The shared pre-minigame booklet now owns instructions. This phase only waits
+	# for the character entrance acknowledgment, including on the F12 path.
+	_instruction_deadline_msec = host_time_msec
 	_transition(Phase.INSTRUCTIONS)
 	set_process(true)
 	return {"accepted": true, "players": player_snapshot()}
 
 
-## Presentation acknowledges that entrances finished; the minimum instruction time still applies.
+## Presentation acknowledges that the character entrance finished.
 func complete_entrance(host_time_msec: int) -> Dictionary:
 	if not _valid_time(host_time_msec) or phase != Phase.INSTRUCTIONS or host_time_msec < _instruction_deadline_msec:
 		return _reject(&"entrance_not_ready")
