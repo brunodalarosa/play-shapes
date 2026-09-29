@@ -16,6 +16,7 @@ var _next_id: int = 1
 var _bubbles_protocol: RefCounted
 var _active_protocol: RefCounted
 var _lobby_controller: LobbyPlaygroundWorld
+var _readiness: PreMinigameReadiness
 
 func start(settings: NetworkingTuning, registry: PlayerRegistry,
 		accepting_new_players: Callable) -> Error:
@@ -39,6 +40,29 @@ func clear_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
 	if _lobby_controller == controller:
 		_lobby_controller.clear_all_input()
 		_lobby_controller = null
+
+
+func begin_pre_minigame(phase: PreMinigameReadiness) -> void:
+	_readiness = phase
+	_active_protocol = phase
+	for client: Dictionary in _clients:
+		client.preexisting_onboarding = _registry.player_for_connection(int(client.connection_id)).is_empty()
+	phase.changed.connect(_on_readiness_changed)
+	_broadcast_gameplay_snapshots()
+
+
+func end_pre_minigame() -> void:
+	if _readiness != null and _readiness.changed.is_connected(_on_readiness_changed):
+		_readiness.changed.disconnect(_on_readiness_changed)
+	if _active_protocol == _readiness:
+		_active_protocol = null
+	_readiness = null
+	for client: Dictionary in _clients:
+		client.preexisting_onboarding = false
+
+
+func _on_readiness_changed(_snapshot: Dictionary) -> void:
+	_broadcast_gameplay_snapshots()
 
 func set_bubbles_controller(controller: BubblesRoundController) -> void:
 	_clear_bubbles_controller()
@@ -84,6 +108,7 @@ func _process(_delta: float) -> void:
 			"welcomed": false,
 			"connection_id": 0,
 			"created": Time.get_ticks_msec(),
+			"preexisting_onboarding": false,
 		})
 	for index: int in range(_clients.size() - 1, -1, -1):
 		var client: Dictionary = _clients[index]
@@ -124,6 +149,8 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			)
 		if resume.accepted:
 			_close_replaced_connection(resume.replaced_connection_id, connection_id)
+			if _readiness != null:
+				_readiness.set_ready(resume.player, false)
 			if _lobby_controller != null:
 				_lobby_controller.reset_sequence(String(resume.player.player_id))
 		var welcome := {
@@ -145,10 +172,12 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 
 	match message.get("type"):
 		"join":
+			var may_join: bool = _accepting_new_players.call() or (
+				_readiness != null and _readiness.active and bool(client.preexisting_onboarding))
 			var result := _registry.join_player(
 				client.connection_id,
 				message.get("name"),
-				_accepting_new_players.call(),
+				may_join,
 				Time.get_ticks_msec(),
 				message.get("character_shape"),
 				message.get("character_color")
@@ -160,9 +189,16 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 					"player": result.player,
 					"reconnect_token": result.reconnect_token,
 				}))
+				if _readiness != null:
+					client.preexisting_onboarding = false
+					_readiness.add_joined(result.player)
+					_send_gameplay_snapshot(peer, String(result.player.player_id))
 			else:
 				_send_rejection(peer, "join_rejected", result)
 		"leave":
+			if _readiness != null:
+				_send_rejection(peer, "error", {"code": &"ready_unavailable", "message": "Leave is unavailable during ready-up"})
+				return
 			var result := _registry.leave_connection(client.connection_id)
 			if result.accepted:
 				peer.send_text(JSON.stringify({"type": "left", "message": "You left the lobby"}))
@@ -173,6 +209,13 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			var result: Dictionary = _lobby_controller.handle_input(player, message, Time.get_ticks_msec()) \
 				if _lobby_controller != null and _active_protocol == null and _accepting_new_players.call() \
 				else {"accepted": false, "code": &"lobby_unavailable", "message": "Lobby controls are not active"}
+			if not result.accepted:
+				_send_rejection(peer, "error", result)
+		"pre_minigame_ready":
+			var player := _registry.player_for_connection(client.connection_id)
+			var ready_value: Variant = message.get("ready")
+			var result: Dictionary = _readiness.set_ready(player, ready_value) \
+				if _readiness != null and ready_value is bool else {"accepted": false, "code": &"invalid_ready", "message": "Invalid ready action"}
 			if not result.accepted:
 				_send_rejection(peer, "error", result)
 		"bubbles_trace", "bubbles_charge":
