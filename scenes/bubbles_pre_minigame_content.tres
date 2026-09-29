@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PreMinigameContent" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/pre_minigame_content.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/runtime/pre_minigame/bubbles_preview.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+title = "Bubbles and jellyfishes"
+preview = ExtResource("2")
+controls = "Swipe and release to nudge your bubble. Draw circles, then lift to spin."
+win_condition = "Catch the most jellyfishes before time runs out. Pufferfish pop your catch!"
+hints = "Big bubbles catch more but are easier to pop. Spin for a stronger shove."
