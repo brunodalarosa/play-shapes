@@ -54,7 +54,7 @@ No mDNS/Bonjour stack existed in the audit. Adding a daemon/service or a second 
 
 ## F12 lab checklist
 
-The lab is added by PS-076; use its phone **Request Motion Permission** action after joining as Player 1 (registry seat 1).
+Launch the host, join the first phone normally, press **F12** on the host, then choose **Gyroscope and Accelerometer Lab**. Opening the lab before joining also works. Player 1 means registry seat 1; the host displays its pinned identity. Tap **Request Motion Permission** on that phone. Use **Recenter pose**, **Reset calibration**, and optional **Smoothing (seconds)** on the host. F12 provides restart; **Return to lobby** stops the stream and restores normal controls. If the original identity expires, **Bind current Player 1** explicitly selects its replacement; another phone never silently takes over.
 
 - QR opens the exact controller; HTTPS is warning-free, session metadata selects WSS, and no mixed-content failure occurs.
 - Grant motion/orientation permission from the button. Verify supported/denied/error/no-events states, both API permissions if exposed, and nullable readings. Ordinary non-motion controls must still work after denial.

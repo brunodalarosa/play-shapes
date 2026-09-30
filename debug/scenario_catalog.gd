@@ -4,6 +4,7 @@ extends RefCounted
 
 static func scenarios() -> Array[DebugScenario]:
 	return [
+		DebugScenario.new(&"motion_lab", "Gyroscope and Accelerometer Lab", "res://debug/motion_lab/motion_lab.tscn"),
 		DebugScenario.new(
 			&"squircle_animation_lab",
 			"Animation Lab",

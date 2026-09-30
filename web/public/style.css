@@ -92,3 +92,7 @@ html.lobby-active .footnote, html.lobby-active #status { display: none !importan
   .color-button { min-block-size: 36px; border-radius: 10px; }
   .action-button { min-block-size: 50px; }
 }
+
+#motion-lab { text-align: left; color: #173c52; }
+#motion-lab h2 { font-size: 25px; }
+#motion-readings { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; background: #fff9e9; border: 2px solid #b5ceb9; border-radius: 16px; padding: 14px; }

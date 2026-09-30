@@ -15,6 +15,9 @@ func _initialize() -> void:
 	message.sample.orientation[0] = INF
 	assert(not channel.handle({"player_id": "one"}, message, 1100))
 	message.sample.orientation[0] = 0
+	message.sample.erase("motion_age_msec")
+	message.sample.extra = null
+	assert(not channel.handle({"player_id": "one"}, message, 1100))
 	channel.reconnect()
 	assert(not channel.handle({"player_id": "one"}, message, 1200))
 	assert(channel.latest.is_empty())

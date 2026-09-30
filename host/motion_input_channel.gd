@@ -12,6 +12,7 @@ var latest: Dictionary = {}
 var diagnostics: Dictionary = {}
 var received_at := -1
 var sample_count := 0
+var transmitted_hz := 0.0
 var first_received_at := -1
 var _last_sequence := -1
 var _last_status_at := -1000
@@ -27,6 +28,7 @@ func reconnect() -> void:
 	received_at = -1
 	first_received_at = -1
 	sample_count = 0
+	transmitted_hz = 0.0
 	_last_sequence = -1
 	_last_status_at = -1000
 	changed.emit()
@@ -37,6 +39,7 @@ func end() -> void:
 	latest.clear()
 	diagnostics.clear()
 	received_at = -1
+	transmitted_hz = 0.0
 	changed.emit()
 
 func subscription() -> Dictionary:
@@ -49,10 +52,11 @@ func handle(player: Dictionary, message: Dictionary, now: int) -> bool:
 	if target_player_id.is_empty() or player.get("player_id") != target_player_id or message.get("subscription_id") != subscription_id or message.has("player_id"):
 		return false
 	if message.get("type") == "motion_status":
-		if now - _last_status_at < 200 or not _valid_diagnostics(message.get("diagnostics")):
+		if now - _last_status_at < 200 or not _valid_diagnostics(message.get("diagnostics")) or not _number(message.get("transmitted_hz", 0), 10000) or message.get("transmitted_hz", 0) < 0:
 			return false
 		_last_status_at = now
 		diagnostics = message.diagnostics.duplicate(true)
+		transmitted_hz = float(message.get("transmitted_hz", 0))
 		if diagnostics.state != "live":
 			latest.clear()
 			received_at = -1
@@ -92,6 +96,8 @@ static func _valid_sample(sample: Dictionary) -> bool:
 		if not _axes(sample.get(field), 1e6):
 			return false
 	for field: String in ["interval_msec", "orientation_age_msec", "motion_age_msec"]:
+		if not sample.has(field):
+			return false
 		if sample.get(field) != null and (not _number(sample.get(field), 1e9) or sample[field] < 0):
 			return false
 	for field: String in ["orientation_hz", "motion_hz"]:

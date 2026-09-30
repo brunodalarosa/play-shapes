@@ -4,6 +4,10 @@ extends Node
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
 const ASSETS: Dictionary = {
+"/motion_lab.js": {
+	"path": "res://web/public/motion_lab.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
 "/motion_input.js": {
 	"path": "res://web/public/motion_input.js",
 	"content_type": "text/javascript; charset=utf-8",

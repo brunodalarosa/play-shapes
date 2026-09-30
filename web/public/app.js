@@ -1,4 +1,5 @@
 import { attemptImmersive } from "./immersive.js";
+import { MotionLabController } from "./motion_lab.js";
 import { controllerSocketUrl } from "./network_config.js";
 import { SquircleV1Canvas } from "./squircle_v1.js";
 import { GestureTrace } from "./bubbles_gesture.js";
@@ -32,6 +33,9 @@ const bubblesPad = document.querySelector("#bubbles-pad");
 const bubblesScore = document.querySelector("#bubbles-score");
 const bubblesCanvas = document.querySelector("#bubbles-visual");
 const bubblesContext = bubblesCanvas.getContext("2d", { alpha: true });
+const motionPanel = document.querySelector("#motion-lab");
+const motionButton = document.querySelector("#motion-permission");
+const motionReadings = document.querySelector("#motion-readings");
 const STORAGE = { session: "play-shapes.session-id", token: "play-shapes.reconnect-token", name: "play-shapes.last-name", inputSeq: "play-shapes.input-seq" };
 let socket;
 let retry;
@@ -60,6 +64,7 @@ const lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJu
     store(STORAGE.inputSeq, String(inputSeq));
     socket.send(JSON.stringify({ ...action, input_seq: inputSeq }));
 });
+const motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);
 function stored(key) { try {
     return localStorage.getItem(key) ?? "";
 }
@@ -125,6 +130,7 @@ function setGameplaySurface(active) {
     document.documentElement.classList.toggle("bubbles-active", next === "bubbles");
 }
 function showJoin(message, focus = false) {
+    motionLab.stop();
     lobbyControls.deactivate();
     readyCard.hidden = true;
     document.documentElement.classList.remove("ready-active");
@@ -148,6 +154,7 @@ function showJoin(message, focus = false) {
         queueMicrotask(() => nextButton.focus());
 }
 function showJoined(player, state = "Connected") {
+    motionLab.stop();
     readyCard.hidden = true;
     document.documentElement.classList.remove("ready-active");
     joined = true;
@@ -171,6 +178,7 @@ function showJoined(player, state = "Connected") {
     status.hidden = true;
 }
 function showReady(message) {
+    motionLab.stop();
     lobbyControls.deactivate();
     setGameplaySurface(false);
     selectionScreen.hidden = true;
@@ -337,6 +345,7 @@ bubblesPad.addEventListener("keydown", event => {
     }
 });
 function showBubbles(message) {
+    motionLab.stop();
     lobbyControls.deactivate();
     readyCard.hidden = true;
     document.documentElement.classList.remove("ready-active");
@@ -615,6 +624,7 @@ function rememberIdentity(message) {
     return true;
 }
 function reconnect() {
+    motionLab.disconnect();
     if (stopped || retry !== undefined)
         return;
     lobbyControls.deactivate();
@@ -705,7 +715,21 @@ async function connect() {
                 showBubbles(message);
             else if (message.type === "pre_minigame_snapshot")
                 showReady(message);
+            else if (message.type === "motion_lab" && joined && typeof message.subscription_id === "string" && typeof message.send_hz === "number") {
+                lobbyControls.deactivate();
+                setGameplaySurface(false);
+                document.documentElement.classList.remove("ready-active");
+                selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = readyCard.hidden = bubblesCard.hidden = true;
+                status.hidden = true;
+                motionLab.begin({ subscription_id: message.subscription_id, send_hz: message.send_hz, stale_msec: message.stale_msec ?? 1000 });
+            }
+            else if (message.type === "motion_stop") {
+                motionLab.stop();
+                if (joined)
+                    lobbyControls.activate();
+            }
             else if (message.type === "lobby") {
+                motionLab.stop();
                 setGameplaySurface(false);
                 readyCard.hidden = true;
                 document.documentElement.classList.remove("ready-active");

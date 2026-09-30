@@ -24,7 +24,7 @@ var motion_channel := MotionInputChannel.new()
 func begin_motion(player_id: String) -> void:
 	end_motion()
 	motion_channel.begin(player_id)
-	_send_to_player(player_id, motion_channel.subscription())
+	_send_to_player.call_deferred(player_id, motion_channel.subscription())
 
 func end_motion() -> void:
 	if not motion_channel.target_player_id.is_empty():
