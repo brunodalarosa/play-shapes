@@ -1,4 +1,5 @@
-import { attemptImmersive } from "./immersive.js";
+import { attemptImmersive, protectControllerSurface, bindControllerLifecycle } from "./immersive.js";
+import { PwaOnboarding, isStandalone } from "./pwa.js";
 import { MotionLabController } from "./motion_lab.js";
 import { controllerSocketUrl } from "./network_config.js";
 import { SquircleV1Canvas } from "./squircle_v1.js";
@@ -56,7 +57,6 @@ let joined = false;
 let isReady = false;
 let joinFlow: JoinFlowState = defaultJoinFlow();
 let inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
-let fullscreenAttempted = false;
 let activeGame: "bubbles" | null = null;
 let bubblesPointer: { id: number; trace: GestureTrace; seq: number; step: number; drag: Point; sentDrag: Point; lastMotionAt: number; motionCount: number } | undefined;
 let bubblesSnapshot: HostMessage | undefined;
@@ -77,6 +77,15 @@ const lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJu
 });
 
 const motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);
+const pwa = new PwaOnboarding(
+  document.querySelector<HTMLElement>("#app-screen")!,
+  document.querySelector<HTMLButtonElement>("#install-button")!,
+  document.querySelector<HTMLElement>("#install-guidance")!,
+  document.querySelector<HTMLButtonElement>("#browser-button")!,
+  () => { selectionScreen.hidden = false; nextButton.focus(); void requestImmersiveMode(); },
+);
+for (const surface of [lobbyController, bubblesPad, readyCard]) protectControllerSurface(surface);
+bindControllerLifecycle(() => cancelBubblesPointer());
 
 function stored(key: string): string { try { return localStorage.getItem(key) ?? ""; } catch { return ""; } }
 function store(key: string, value: string): void { try { localStorage.setItem(key, value); } catch { /* Page remains usable. */ } }
@@ -129,11 +138,12 @@ function showJoin(message: string, focus = false): void {
   readyCard.hidden = true; document.documentElement.classList.remove("ready-active");
   joinFlow = returnToCharacterSelection(joinFlow);
   joined = false; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); playerCard.hidden = true; bubblesCard.hidden = true;
-  selectionScreen.hidden = false; nameScreen.hidden = true; joinForm.hidden = true; joinButton.disabled = false; leaveButton.disabled = false;
+  selectionScreen.hidden = pwa.visible || pwa.show(); nameScreen.hidden = true; joinForm.hidden = true; joinButton.disabled = false; leaveButton.disabled = false;
   status.textContent = message; status.hidden = !message; nameInput.value = stored(STORAGE.name); refreshSelectionUi();
-  if (focus) queueMicrotask(() => nextButton.focus());
+  if (focus && !pwa.visible) queueMicrotask(() => nextButton.focus());
 }
 function showJoined(player: PublicPlayer, state = "Connected"): void {
+  pwa.hide();
   motionLab.stop();
   readyCard.hidden = true; document.documentElement.classList.remove("ready-active");
   joined = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); selectionScreen.hidden = true; nameScreen.hidden = true; joinForm.hidden = true; playerCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false; lobbyLeaveButton.disabled = false; lobbyControls.activate();
@@ -163,6 +173,7 @@ readyButton.addEventListener("click", () => {
 });
 
 nextButton.addEventListener("click", () => {
+  if (pwa.visible) return;
   joinFlow = advanceJoinFlow(joinFlow);
   selectionScreen.hidden = true; nameScreen.hidden = false; joinForm.hidden = false;
   if (!nameInput.value) nameInput.value = stored(STORAGE.name);
@@ -176,7 +187,7 @@ backButton.addEventListener("click", () => {
   queueMicrotask(() => nextButton.focus());
 });
 async function requestImmersiveMode(): Promise<void> {
-  if (fullscreenAttempted) return; fullscreenAttempted = true;
+  if (isStandalone(window, navigator) || document.fullscreenElement) return;
   const root = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void };
   const orientation = screen.orientation as ScreenOrientation & { lock?: (value: string) => Promise<void> };
   const fullscreen = root.requestFullscreen ? () => root.requestFullscreen({ navigationUI: "hide" }) : root.webkitRequestFullscreen?.bind(root);
@@ -213,7 +224,6 @@ bubblesPad.addEventListener("pointerdown", event => {
   bubblesPointer = { id: event.pointerId, trace, seq: inputSeq, step: 0, drag: [0, 0], sentDrag: [0, 0], lastMotionAt: performance.now(), motionCount: 0 };
   try { bubblesPad.setPointerCapture(event.pointerId); } catch { cancelBubblesPointer(); return; }
   sendBubblesCharge(inputSeq, "start");
-  void requestImmersiveMode();
 });
 bubblesPad.addEventListener("pointermove", event => {
   if (bubblesPointer?.id !== event.pointerId) return;
@@ -240,11 +250,11 @@ bubblesPad.addEventListener("contextmenu", event => event.preventDefault());
 bubblesPad.addEventListener("keydown", event => {
   if (event.repeat || activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active") return;
   const directions: Record<string, Point> = { ArrowLeft: [0.1, 0.5], ArrowRight: [0.9, 0.5], ArrowUp: [0.5, 0.1], ArrowDown: [0.5, 0.9] };
-  if (directions[event.key]) { event.preventDefault(); sendBubblesTrace([[0.5, 0.5], directions[event.key]]); void requestImmersiveMode(); }
+  if (directions[event.key]) { event.preventDefault(); sendBubblesTrace([[0.5, 0.5], directions[event.key]]); }
   else if (event.key === " " || event.key === "Enter") {
     event.preventDefault(); const circles = Math.max(1, Math.min(3, bubblesSnapshot?.circles_to_charge ?? 1));
     const trace: Point[] = Array.from({ length: 97 }, (_, index) => [0.5 + 0.22 * Math.cos(index / 96 * Math.PI * 2 * circles), 0.5 + 0.22 * Math.sin(index / 96 * Math.PI * 2 * circles)]);
-    sendBubblesTrace(trace); void requestImmersiveMode();
+    sendBubblesTrace(trace);
   }
 });
 
@@ -475,7 +485,7 @@ async function connect(): Promise<void> {
       if (message.type === "welcome" && message.protocol === 1 && Number.isInteger(message.connection_id)) {
         clearTimeout(deadline); if (message.resume_status === "resumed" && rememberIdentity(message)) { if (message.gameplay?.type === "bubbles_snapshot") showBubbles(message.gameplay); else if (message.gameplay?.type === "pre_minigame_snapshot") showReady(message.gameplay); else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player) showJoined(message.player as PublicPlayer, message.gameplay.message ?? "Waiting for the next game"); return; }
         if (message.resume_status === "session_restarted") { forgetIdentity(); showJoin("The host started a new session. Choose your character and name to join again.", true); }
-        else if (message.resume_status === "expired") { forgetIdentity(); showJoin("Your previous player expired. Choose your character and name to join again.", true); } else showJoin("Connected. Choose your character to join.", true);
+        else if (message.resume_status === "expired") { forgetIdentity(); showJoin("Your previous player expired. Choose your character and name to join again.", true); } else showJoin(isStandalone(window, navigator) && !stored(STORAGE.token) ? "Choose your character to join. If already playing in a browser, leave that controller first." : "Connected. Choose your character to join.", true);
       } else if (message.type === "join_accepted") { if (!rememberIdentity(message)) peer.close(); }
       else if (message.type === "join_rejected" || message.type === "error") { joinButton.disabled = false; readyButton.disabled = false; status.textContent = message.message ?? "The host could not complete that action."; status.hidden = false; if (!readyCard.hidden) readyState.textContent = status.textContent; if (!joined) nameInput.focus(); }
       else if (message.type === "left") { forgetIdentity(); showJoin("You left the lobby. Choose your character and name to join again.", true); }
@@ -491,12 +501,25 @@ async function connect(): Promise<void> {
       else if (message.type === "motion_stop") { motionLab.stop(); if (joined) lobbyControls.activate(); }
       else if (message.type === "lobby") { motionLab.stop(); setGameplaySurface(false); readyCard.hidden = true; document.documentElement.classList.remove("ready-active"); bubblesCard.hidden = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; if (message.player) rememberIdentity(message); else if (joined) { playerCard.hidden = true; lobbyControls.activate(); status.hidden = true; } }
     };
-    peer.onclose = event => { clearTimeout(deadline); lobbyControls.deactivate(); if (socket === peer) socket = undefined; if (event.code === 4000) { stopped = true; leaveButton.disabled = true; status.textContent = "This player continued in another tab."; playerState.textContent = "Open in another tab"; return; } reconnect(); };
+    peer.onclose = event => {
+      clearTimeout(deadline); lobbyControls.deactivate(); motionLab.disconnect(); setGameplaySurface(false);
+      if (socket === peer) socket = undefined;
+      if (event.code === 4000) {
+        stopped = true; leaveButton.disabled = true;
+        readyCard.hidden = bubblesCard.hidden = true;
+        document.documentElement.classList.remove("ready-active");
+        status.textContent = "This player continued in another window. Reload to switch back.";
+        status.hidden = false;
+        playerState.textContent = "Open in another window";
+        return;
+      }
+      reconnect();
+    };
     peer.onerror = () => peer.close();
   } catch { reconnect(); }
 }
 
-joinForm.addEventListener("submit", event => { event.preventDefault(); const name = nameInput.value.trim(); store(STORAGE.name, name); if (!socket || socket.readyState !== WebSocket.OPEN) { status.textContent = "Still connecting. Try again in a moment."; status.hidden = false; return; } joinButton.disabled = true; status.textContent = "Joining…"; status.hidden = false; socket.send(JSON.stringify(createJoinMessage(name, joinFlow))); });
+joinForm.addEventListener("submit", event => { event.preventDefault(); if (pwa.visible) return; const name = nameInput.value.trim(); store(STORAGE.name, name); if (!socket || socket.readyState !== WebSocket.OPEN) { status.textContent = "Still connecting. Try again in a moment."; status.hidden = false; return; } joinButton.disabled = true; status.textContent = "Joining…"; status.hidden = false; socket.send(JSON.stringify(createJoinMessage(name, joinFlow))); });
 function leaveLobby(): void { if (!socket || socket.readyState !== WebSocket.OPEN) return; lobbyControls.deactivate(); leaveButton.disabled = true; lobbyLeaveButton.disabled = true; status.textContent = "Leaving…"; socket.send(JSON.stringify({ type: "leave" })); }
 leaveButton.addEventListener("click", leaveLobby);
 lobbyLeaveButton.addEventListener("click", leaveLobby);

@@ -75,7 +75,7 @@ function connectSocket() {
 }
 
 test('verified HTTPS serves assets and WSS joins then resumes a registered player', async () => {
-  for (const path of ['/', '/app.js', '/network_config.js', '/squircle-v1/idle-front-colorable.png']) {
+  for (const path of ['/', '/app.js', '/pwa.js', '/manifest.webmanifest', '/app-icon-180.png', '/app-icon-192.png', '/app-icon-512.png', '/network_config.js', '/squircle-v1/idle-front-colorable.png']) {
     const response = await get(path); assert.equal(response.status, 200); assert.ok(response.body.length > 0);
   }
   const config = JSON.parse((await get('/session.json')).body); assert.equal(config.websocket_scheme, 'wss');

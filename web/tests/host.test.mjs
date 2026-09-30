@@ -51,6 +51,9 @@ test('serves bundled HTML, JS, CSS and session configuration', async () => {
   for (const [path, mime, text] of [
     ['/', 'text/html', 'PLAY SHAPES'], ['/app.js', 'text/javascript', 'localStorage'],
     ['/immersive.js', 'text/javascript', 'attemptImmersive'],
+    ['/pwa.js', 'text/javascript', 'PwaOnboarding'],
+    ['/manifest.webmanifest', 'application/manifest+json', 'standalone'],
+    ...[180, 192, 512].map(size => [`/app-icon-${size}.png`, 'image/png', null]),
     ['/bubbles_gesture.js', 'text/javascript', 'GestureTrace'],
     ['/lobby_controls.js', 'text/javascript', 'lockX'],
     ['/lobby_input.js', 'text/javascript', 'LobbyInputState'],
@@ -62,11 +65,28 @@ test('serves bundled HTML, JS, CSS and session configuration', async () => {
     try {
       const response = await fetch(base + path);
       assert.equal(response.status, 200);
+      assert.equal(response.headers.get('cache-control'), 'no-store');
       assert.ok(response.headers.get('content-type').startsWith(mime));
       if (text) assert.ok((await response.text()).includes(text));
       else await response.arrayBuffer();
     } catch (error) { throw new Error(`Failed to serve ${path}`, { cause: error }); }
   }
+});
+
+test('manifest has stable origin-local identity and correctly sized bundled icons', async () => {
+  const manifest = await (await fetch(base + '/manifest.webmanifest')).json();
+  assert.equal(manifest.id, '/'); assert.equal(manifest.start_url, '/'); assert.equal(manifest.scope, '/');
+  assert.equal(manifest.display, 'standalone'); assert.equal(manifest.orientation, 'portrait');
+  for (const size of [180, 192, 512]) {
+    const response = await fetch(`${base}/app-icon-${size}.png`);
+    const image = PNG.sync.read(Buffer.from(await response.arrayBuffer()));
+    assert.equal(image.width, size); assert.equal(image.height, size);
+    if (size !== 180) assert.ok(manifest.icons.some(icon => icon.src === `/app-icon-${size}.png` && icon.sizes === `${size}x${size}`));
+  }
+  const html = await (await fetch(base)).text();
+  assert.match(html, /rel="manifest" href="\/manifest.webmanifest"/);
+  assert.match(html, /rel="apple-touch-icon" href="\/app-icon-180.png"/);
+  assert.doesNotMatch(html, /user-scalable=no|maximum-scale=1/);
 });
 
 test('phone join form has labels, live feedback, and explicit change-player action', async () => {

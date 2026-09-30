@@ -10,7 +10,7 @@ const EXECUTABLE_NAME := "Play Shapes.exe"
 const PACK_NAME := "Play Shapes.pck"
 const METADATA_NAME := "build-info.json"
 const ZIP_RELATIVE := "builds/standalone/Play-Shapes-windows-x86_64.zip"
-const INCLUDE_FILTER := "web/public/*.html,web/public/*.css,web/public/*.js,web/public/vendor/*.mjs,assets/runtime/animated_characters/squircle/v1/manifest.json"
+const INCLUDE_FILTER := "web/public/*.html,web/public/*.webmanifest,web/public/*.css,web/public/*.js,web/public/vendor/*.mjs,assets/runtime/animated_characters/squircle/v1/manifest.json"
 const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,local/**,*.local.json,*.pem,*.key,*.crt,*.cer,*.der,*.p12,*.pfx,art/**,builds/**,opencode.json,tools/**,tests/**,test-results/**,web/*.json,web/node_modules/**,web/src/**,web/tests/**"
 const REQUIRED_BROWSER_PATHS := [
 	"web/public/index.html",
@@ -22,6 +22,11 @@ const REQUIRED_BROWSER_PATHS := [
 	"web/public/lobby_input.js",
 	"web/public/vendor/nipplejs.mjs",
 	"web/public/immersive.js",
+	"web/public/pwa.js",
+	"web/public/manifest.webmanifest",
+	"web/public/app-icon-180.png",
+	"web/public/app-icon-192.png",
+	"web/public/app-icon-512.png",
 	"web/public/bubbles_gesture.js",
 	"web/public/character_selection.js",
 	"web/public/squircle_v1.js",
@@ -46,6 +51,11 @@ const REQUIRED_RUNTIME_PATHS := [
 	"web/public/lobby_input.js",
 	"web/public/vendor/nipplejs.mjs",
 	"web/public/immersive.js",
+	"web/public/pwa.js",
+	"web/public/manifest.webmanifest",
+	"web/public/app-icon-180.png",
+	"web/public/app-icon-192.png",
+	"web/public/app-icon-512.png",
 	"web/public/bubbles_gesture.js",
 	"web/public/character_selection.js",
 	"web/public/squircle_v1.js",

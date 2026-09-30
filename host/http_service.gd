@@ -4,6 +4,30 @@ extends Node
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
 const ASSETS: Dictionary = {
+"/pwa.js": {
+	"path": "res://web/public/pwa.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
+"/manifest.webmanifest": {
+	"path": "res://web/public/manifest.webmanifest",
+	"content_type": "application/manifest+json",
+},
+"/app-icon-180.png": {
+	"path": "res://web/public/app-icon-180.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/app-icon-192.png": {
+	"path": "res://web/public/app-icon-192.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/app-icon-512.png": {
+	"path": "res://web/public/app-icon-512.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+
 "/motion_lab.js": {
 	"path": "res://web/public/motion_lab.js",
 	"content_type": "text/javascript; charset=utf-8",
