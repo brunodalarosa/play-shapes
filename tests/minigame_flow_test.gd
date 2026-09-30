@@ -15,7 +15,7 @@ func _run() -> void:
 	host.settings = NetworkingTuning.new()
 	host.settings.http_port = 18088
 	host.settings.websocket_port = 18089
-	if not _check(host.start(), "Persistent host services start"):
+	if not _check(host.start(false), "Persistent host services start"):
 		return
 	var jellyfish_png: PackedByteArray = host.http._bodies["/bubbles-jellyfish.png"]
 	if not _check(jellyfish_png.size() > 8 and jellyfish_png.slice(0, 8) == PackedByteArray([137, 80, 78, 71, 13, 10, 26, 10]),

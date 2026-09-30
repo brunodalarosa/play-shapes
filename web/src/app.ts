@@ -1,4 +1,7 @@
-import { attemptImmersive } from "./immersive.js";
+import { attemptImmersive, protectControllerSurface, bindControllerLifecycle } from "./immersive.js";
+import { PwaOnboarding, isStandalone } from "./pwa.js";
+import { MotionLabController } from "./motion_lab.js";
+import { controllerSocketUrl } from "./network_config.js";
 import { SquircleV1Canvas } from "./squircle_v1.js";
 import { GestureTrace, type Point } from "./bubbles_gesture.js";
 import { LobbyControls } from "./lobby_controls.js";
@@ -10,6 +13,31 @@ import {
 } from "./character_selection.js";
 
 const status = document.querySelector<HTMLElement>("#status")!;
+const connectionError = document.querySelector<HTMLElement>("#connection-error")!;
+const connectionErrors: { text: string; at: string; repeats: number }[] = [];
+
+// Development diagnostics stay outside gameplay's hidden status/onboarding layout.
+// Report endpoints and error text only; never dump protocol messages or stored tokens.
+function reportConnectionFailure(stage: string, endpoint: string, error: unknown): void {
+  const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+  const text = `Step: ${stage}\nEndpoint: ${endpoint}\n${detail}`;
+  const last = connectionErrors.at(-1);
+  if (last?.text === text) last.repeats++;
+  else {
+    connectionErrors.push({ text, at: new Date().toISOString(), repeats: 1 });
+    if (connectionErrors.length > 6) connectionErrors.shift();
+  }
+  connectionError.textContent = `CONTROLLER ERROR LOG (development)\nBrowser: ${navigator.userAgent}\nConnection failures retry every 2 seconds.\n\n` + connectionErrors.map(entry =>
+    `[${entry.at}]${entry.repeats > 1 ? ` (repeated ${entry.repeats} times)` : ""}\n${entry.text}`).join("\n\n");
+  connectionError.hidden = false;
+}
+window.addEventListener("error", event => {
+  reportConnectionFailure("Browser JavaScript error", new URL(location.href).origin,
+    `${event.error instanceof Error ? `${event.error.name}: ${event.error.message}` : event.message}\nSource: ${event.filename}:${event.lineno}:${event.colno}`);
+});
+window.addEventListener("unhandledrejection", event => {
+  reportConnectionFailure("Unhandled browser promise rejection", new URL(location.href).origin, event.reason);
+});
 const selectionScreen = document.querySelector<HTMLElement>("#selection-screen")!;
 const selectionPreview = document.querySelector<HTMLCanvasElement>("#selection-preview")!;
 const namePreview = document.querySelector<HTMLCanvasElement>("#name-preview")!;
@@ -38,11 +66,14 @@ const bubblesScore = document.querySelector<HTMLElement>("#bubbles-score")!;
 const bubblesCanvas = document.querySelector<HTMLCanvasElement>("#bubbles-visual")!;
 const bubblesContext = bubblesCanvas.getContext("2d", { alpha: true })!;
 
+const motionPanel = document.querySelector<HTMLElement>("#motion-lab")!;
+const motionButton = document.querySelector<HTMLButtonElement>("#motion-permission")!;
+const motionReadings = document.querySelector<HTMLElement>("#motion-readings")!;
 const STORAGE = { session: "play-shapes.session-id", token: "play-shapes.reconnect-token", name: "play-shapes.last-name", inputSeq: "play-shapes.input-seq" } as const;
 type PublicPlayer = { player_id: string; name: string; seat: number; state: string; character_shape?: string; character_color?: string };
 type BubblesVisualSnapshot = { host_time_msec: number; radius: number; pull: Point; drag_pull: Point; charge_pull: Point; surface_angle: number; spinning: boolean; recovery_white: boolean; burst_progress: number; particle_density: number; charge_glow: number; character_visible: boolean; character_scale: number; character_position: Point; body_rotation: number; face_blink: boolean };
 type BubblesVisualTuning = { starting_radius?: number; live_drag_pull_strength?: number; live_drag_response_seconds?: number; charge_wobble_strength?: number; charge_glow_strength?: number; swipe_reaction_seconds?: number; spin_surface_turns_per_second?: number; bubble_reform_seconds?: number; burst_seconds?: number };
-type HostMessage = { type?: string; protocol?: number; connection_id?: number; session_id?: string; resume_status?: string; reconnect_token?: string; player?: PublicPlayer; code?: string; message?: string; phase?: string; debug_mode?: boolean; state?: string; gameplay?: HostMessage; ready?: boolean; score?: number; bubble_radius?: number; burst_radius?: number; visual_jellyfish?: number; visual_cap?: number; seat?: number; left?: boolean; character_shape?: string; character_color?: string; host_time_msec?: number; visual_tuning?: BubblesVisualTuning; visual?: BubblesVisualSnapshot; spin_remaining_msec?: number; cooldown_remaining_msec?: number; invulnerable_remaining_msec?: number; reform_remaining_msec?: number; spin_duration_msec?: number; cooldown_duration_msec?: number; circles_to_charge?: number; rank?: number; event?: string; lost?: number; action?: string; reason?: string };
+type HostMessage = { subscription_id?: string; send_hz?: number; stale_msec?: number; type?: string; protocol?: number; connection_id?: number; session_id?: string; resume_status?: string; reconnect_token?: string; player?: PublicPlayer; code?: string; message?: string; phase?: string; debug_mode?: boolean; state?: string; gameplay?: HostMessage; ready?: boolean; score?: number; bubble_radius?: number; burst_radius?: number; visual_jellyfish?: number; visual_cap?: number; seat?: number; left?: boolean; character_shape?: string; character_color?: string; host_time_msec?: number; visual_tuning?: BubblesVisualTuning; visual?: BubblesVisualSnapshot; spin_remaining_msec?: number; cooldown_remaining_msec?: number; invulnerable_remaining_msec?: number; reform_remaining_msec?: number; spin_duration_msec?: number; cooldown_duration_msec?: number; circles_to_charge?: number; rank?: number; event?: string; lost?: number; action?: string; reason?: string };
 
 let socket: WebSocket | undefined;
 let retry: ReturnType<typeof setTimeout> | undefined;
@@ -51,7 +82,6 @@ let joined = false;
 let isReady = false;
 let joinFlow: JoinFlowState = defaultJoinFlow();
 let inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
-let fullscreenAttempted = false;
 let activeGame: "bubbles" | null = null;
 let bubblesPointer: { id: number; trace: GestureTrace; seq: number; step: number; drag: Point; sentDrag: Point; lastMotionAt: number; motionCount: number } | undefined;
 let bubblesSnapshot: HostMessage | undefined;
@@ -70,6 +100,17 @@ const lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJu
   store(STORAGE.inputSeq, String(inputSeq));
   socket.send(JSON.stringify({ ...action, input_seq: inputSeq }));
 });
+
+const motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);
+const pwa = new PwaOnboarding(
+  document.querySelector<HTMLElement>("#app-screen")!,
+  document.querySelector<HTMLButtonElement>("#install-button")!,
+  document.querySelector<HTMLElement>("#install-guidance")!,
+  document.querySelector<HTMLButtonElement>("#browser-button")!,
+  () => { selectionScreen.hidden = false; nextButton.focus(); void requestImmersiveMode(); },
+);
+for (const surface of [lobbyController, bubblesPad, readyCard]) protectControllerSurface(surface);
+bindControllerLifecycle(() => cancelBubblesPointer());
 
 function stored(key: string): string { try { return localStorage.getItem(key) ?? ""; } catch { return ""; } }
 function store(key: string, value: string): void { try { localStorage.setItem(key, value); } catch { /* Page remains usable. */ } }
@@ -117,15 +158,18 @@ function setGameplaySurface(active: boolean): void {
 }
 
 function showJoin(message: string, focus = false): void {
+  motionLab.stop();
   lobbyControls.deactivate();
   readyCard.hidden = true; document.documentElement.classList.remove("ready-active");
   joinFlow = returnToCharacterSelection(joinFlow);
   joined = false; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); playerCard.hidden = true; bubblesCard.hidden = true;
-  selectionScreen.hidden = false; nameScreen.hidden = true; joinForm.hidden = true; joinButton.disabled = false; leaveButton.disabled = false;
+  selectionScreen.hidden = pwa.visible || pwa.show(); nameScreen.hidden = true; joinForm.hidden = true; joinButton.disabled = false; leaveButton.disabled = false;
   status.textContent = message; status.hidden = !message; nameInput.value = stored(STORAGE.name); refreshSelectionUi();
-  if (focus) queueMicrotask(() => nextButton.focus());
+  if (focus && !pwa.visible) queueMicrotask(() => nextButton.focus());
 }
 function showJoined(player: PublicPlayer, state = "Connected"): void {
+  pwa.hide();
+  motionLab.stop();
   readyCard.hidden = true; document.documentElement.classList.remove("ready-active");
   joined = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; setGameplaySurface(false); selectionScreen.hidden = true; nameScreen.hidden = true; joinForm.hidden = true; playerCard.hidden = true; bubblesCard.hidden = true; playerName.textContent = player.name; playerState.textContent = state; leaveButton.disabled = false; lobbyLeaveButton.disabled = false; lobbyControls.activate();
   const serverColor = colorOption(player.character_color)?.hex;
@@ -134,6 +178,7 @@ function showJoined(player: PublicPlayer, state = "Connected"): void {
 }
 
 function showReady(message: HostMessage): void {
+  motionLab.stop();
   lobbyControls.deactivate(); setGameplaySurface(false);
   selectionScreen.hidden = true; nameScreen.hidden = true; joinForm.hidden = true;
   playerCard.hidden = true; bubblesCard.hidden = true; readyCard.hidden = false;
@@ -153,6 +198,7 @@ readyButton.addEventListener("click", () => {
 });
 
 nextButton.addEventListener("click", () => {
+  if (pwa.visible) return;
   joinFlow = advanceJoinFlow(joinFlow);
   selectionScreen.hidden = true; nameScreen.hidden = false; joinForm.hidden = false;
   if (!nameInput.value) nameInput.value = stored(STORAGE.name);
@@ -166,7 +212,7 @@ backButton.addEventListener("click", () => {
   queueMicrotask(() => nextButton.focus());
 });
 async function requestImmersiveMode(): Promise<void> {
-  if (fullscreenAttempted) return; fullscreenAttempted = true;
+  if (isStandalone(window, navigator) || document.fullscreenElement) return;
   const root = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void };
   const orientation = screen.orientation as ScreenOrientation & { lock?: (value: string) => Promise<void> };
   const fullscreen = root.requestFullscreen ? () => root.requestFullscreen({ navigationUI: "hide" }) : root.webkitRequestFullscreen?.bind(root);
@@ -203,7 +249,6 @@ bubblesPad.addEventListener("pointerdown", event => {
   bubblesPointer = { id: event.pointerId, trace, seq: inputSeq, step: 0, drag: [0, 0], sentDrag: [0, 0], lastMotionAt: performance.now(), motionCount: 0 };
   try { bubblesPad.setPointerCapture(event.pointerId); } catch { cancelBubblesPointer(); return; }
   sendBubblesCharge(inputSeq, "start");
-  void requestImmersiveMode();
 });
 bubblesPad.addEventListener("pointermove", event => {
   if (bubblesPointer?.id !== event.pointerId) return;
@@ -230,15 +275,16 @@ bubblesPad.addEventListener("contextmenu", event => event.preventDefault());
 bubblesPad.addEventListener("keydown", event => {
   if (event.repeat || activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active") return;
   const directions: Record<string, Point> = { ArrowLeft: [0.1, 0.5], ArrowRight: [0.9, 0.5], ArrowUp: [0.5, 0.1], ArrowDown: [0.5, 0.9] };
-  if (directions[event.key]) { event.preventDefault(); sendBubblesTrace([[0.5, 0.5], directions[event.key]]); void requestImmersiveMode(); }
+  if (directions[event.key]) { event.preventDefault(); sendBubblesTrace([[0.5, 0.5], directions[event.key]]); }
   else if (event.key === " " || event.key === "Enter") {
     event.preventDefault(); const circles = Math.max(1, Math.min(3, bubblesSnapshot?.circles_to_charge ?? 1));
     const trace: Point[] = Array.from({ length: 97 }, (_, index) => [0.5 + 0.22 * Math.cos(index / 96 * Math.PI * 2 * circles), 0.5 + 0.22 * Math.sin(index / 96 * Math.PI * 2 * circles)]);
-    sendBubblesTrace(trace); void requestImmersiveMode();
+    sendBubblesTrace(trace);
   }
 });
 
 function showBubbles(message: HostMessage): void {
+  motionLab.stop();
   lobbyControls.deactivate();
   readyCard.hidden = true; document.documentElement.classList.remove("ready-active");
   bubblesSnapshot = message;
@@ -445,6 +491,7 @@ function rememberIdentity(message: HostMessage): boolean {
   store(STORAGE.name, player.name); store(STORAGE.session, message.session_id); store(STORAGE.token, message.reconnect_token); showJoined(player); return true;
 }
 function reconnect(): void {
+  motionLab.disconnect();
   if (stopped || retry !== undefined) return; lobbyControls.deactivate(); setGameplaySurface(false);
   if (!readyCard.hidden) { readyButton.disabled = true; readyState.textContent = "Reconnecting…"; }
   if (joined) { playerState.textContent = "Reconnecting"; leaveButton.disabled = true; }
@@ -453,32 +500,80 @@ function reconnect(): void {
 async function connect(): Promise<void> {
   status.textContent = joined ? "Reconnecting to the host…" : "Connecting to the host…";
   status.hidden = false;
+  let stage = "Fetch session configuration";
+  let endpoint = new URL("/session.json", location.href).href;
   try {
-    const response = await fetch("/session.json", { cache: "no-store", signal: AbortSignal.timeout(5000) }); if (!response.ok) throw new Error("Session unavailable"); const config: unknown = await response.json();
-    if (!config || typeof config !== "object" || !("protocol" in config) || config.protocol !== 1 || !("websocket_port" in config) || !Number.isInteger(config.websocket_port) || Number(config.websocket_port) < 1024 || Number(config.websocket_port) > 65535 || !("session_id" in config) || typeof config.session_id !== "string") throw new Error("Unsupported session");
-    if (stopped) return; const peer = new WebSocket(`ws://${location.hostname}:${config.websocket_port}`); socket = peer; const deadline = setTimeout(() => peer.close(), 7000);
-    peer.onopen = () => peer.send(JSON.stringify({ type: "hello", protocol: 1, ...(stored(STORAGE.token) ? { reconnect_token: stored(STORAGE.token), session_id: stored(STORAGE.session) } : {}) }));
+    const response = await fetch("/session.json", { cache: "no-store", signal: AbortSignal.timeout(5000) });
+    if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
+    stage = "Parse session configuration JSON";
+    const config: unknown = await response.json();
+    stage = "Validate session transport configuration";
+    const socketUrl = controllerSocketUrl(config, location.href);
+    stage = "Open WebSocket"; endpoint = socketUrl;
+    if (stopped) return; const peer = new WebSocket(socketUrl); socket = peer;
+    let socketFailure = "";
+    const deadline = setTimeout(() => {
+      socketFailure = "No host welcome received within 7000 ms.";
+      reportConnectionFailure(stage, endpoint, socketFailure);
+      peer.close();
+    }, 7000);
+    peer.onopen = () => {
+      stage = "Wait for host welcome";
+      peer.send(JSON.stringify({ type: "hello", protocol: 1, ...(stored(STORAGE.token) ? { reconnect_token: stored(STORAGE.token), session_id: stored(STORAGE.session) } : {}) }));
+    };
     peer.onmessage = (event: MessageEvent<string>) => {
-      let message: HostMessage; try { message = JSON.parse(event.data) as HostMessage; } catch { peer.close(); return; }
+      let message: HostMessage; try { message = JSON.parse(event.data) as HostMessage; } catch (error) {
+        // Parser messages can quote the payload, including a welcome's resume token.
+        socketFailure = `Invalid JSON received from host (${error instanceof Error ? error.name : "parse error"}).`;
+        reportConnectionFailure("Parse host message JSON", endpoint, socketFailure);
+        peer.close(); return;
+      }
       if (message.type === "welcome" && message.protocol === 1 && Number.isInteger(message.connection_id)) {
+        stage = "Connected WebSocket";
+        connectionError.hidden = true; connectionError.textContent = "";
         clearTimeout(deadline); if (message.resume_status === "resumed" && rememberIdentity(message)) { if (message.gameplay?.type === "bubbles_snapshot") showBubbles(message.gameplay); else if (message.gameplay?.type === "pre_minigame_snapshot") showReady(message.gameplay); else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player) showJoined(message.player as PublicPlayer, message.gameplay.message ?? "Waiting for the next game"); return; }
         if (message.resume_status === "session_restarted") { forgetIdentity(); showJoin("The host started a new session. Choose your character and name to join again.", true); }
-        else if (message.resume_status === "expired") { forgetIdentity(); showJoin("Your previous player expired. Choose your character and name to join again.", true); } else showJoin("Connected. Choose your character to join.", true);
+        else if (message.resume_status === "expired") { forgetIdentity(); showJoin("Your previous player expired. Choose your character and name to join again.", true); } else showJoin(isStandalone(window, navigator) && !stored(STORAGE.token) ? "Choose your character to join. If already playing in a browser, leave that controller first." : "Connected. Choose your character to join.", true);
       } else if (message.type === "join_accepted") { if (!rememberIdentity(message)) peer.close(); }
-      else if (message.type === "join_rejected" || message.type === "error") { joinButton.disabled = false; readyButton.disabled = false; status.textContent = message.message ?? "The host could not complete that action."; status.hidden = false; if (!readyCard.hidden) readyState.textContent = status.textContent; if (!joined) nameInput.focus(); }
+      else if (message.type === "join_rejected" || message.type === "error") { joinButton.disabled = false; readyButton.disabled = false; status.textContent = message.message ?? "The host could not complete that action."; status.hidden = false; if (message.type === "error") reportConnectionFailure("Host protocol error", endpoint, `${message.code ?? "unknown"}: ${status.textContent}`); if (!readyCard.hidden) readyState.textContent = status.textContent; if (!joined) nameInput.focus(); }
       else if (message.type === "left") { forgetIdentity(); showJoin("You left the lobby. Choose your character and name to join again.", true); }
       else if (message.type === "bubbles_trace_result") bubblesLocalCharge = 0;
       else if (message.type === "bubbles_visual" && message.visual && bubblesSnapshot) { bubblesVisualSnapshot = message.visual; bubblesVisualReceivedAt = performance.now(); }
       else if (message.type === "bubbles_snapshot" || message.type === "bubbles_feedback") showBubbles(message);
       else if (message.type === "pre_minigame_snapshot") showReady(message);
-      else if (message.type === "lobby") { setGameplaySurface(false); readyCard.hidden = true; document.documentElement.classList.remove("ready-active"); bubblesCard.hidden = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; if (message.player) rememberIdentity(message); else if (joined) { playerCard.hidden = true; lobbyControls.activate(); status.hidden = true; } }
+      else if (message.type === "motion_lab" && joined && typeof message.subscription_id === "string" && typeof message.send_hz === "number") {
+        lobbyControls.deactivate(); setGameplaySurface(false); document.documentElement.classList.remove("ready-active");
+        selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = readyCard.hidden = bubblesCard.hidden = true;
+        status.hidden = true; motionLab.begin({ subscription_id: message.subscription_id, send_hz: message.send_hz, stale_msec: message.stale_msec ?? 1000 });
+      }
+      else if (message.type === "motion_stop") { motionLab.stop(); if (joined) lobbyControls.activate(); }
+      else if (message.type === "lobby") { motionLab.stop(); setGameplaySurface(false); readyCard.hidden = true; document.documentElement.classList.remove("ready-active"); bubblesCard.hidden = true; bubblesSnapshot = undefined; bubblesVisualSnapshot = undefined; if (message.player) rememberIdentity(message); else if (joined) { playerCard.hidden = true; lobbyControls.activate(); status.hidden = true; } }
     };
-    peer.onclose = event => { clearTimeout(deadline); lobbyControls.deactivate(); if (socket === peer) socket = undefined; if (event.code === 4000) { stopped = true; leaveButton.disabled = true; status.textContent = "This player continued in another tab."; playerState.textContent = "Open in another tab"; return; } reconnect(); };
-    peer.onerror = () => peer.close();
-  } catch { reconnect(); }
+    peer.onclose = event => {
+      clearTimeout(deadline); lobbyControls.deactivate(); motionLab.disconnect(); setGameplaySurface(false);
+      if (socket === peer) socket = undefined;
+      if (event.code === 4000) {
+        stopped = true; leaveButton.disabled = true;
+        readyCard.hidden = bubblesCard.hidden = true;
+        document.documentElement.classList.remove("ready-active");
+        status.textContent = "This player continued in another window. Reload to switch back.";
+        status.hidden = false;
+        playerState.textContent = "Open in another window";
+        return;
+      }
+      if (!stopped) reportConnectionFailure(stage, endpoint,
+        `${socketFailure ? socketFailure + "\n" : ""}WebSocket closed: code=${event.code}, reason=${event.reason || "(not provided)"}, wasClean=${event.wasClean}.`);
+      reconnect();
+    };
+    peer.onerror = event => {
+      socketFailure = `WebSocket ${event.type || "error"} event. Browser did not expose the underlying network/TLS reason.`;
+      reportConnectionFailure(stage, endpoint, socketFailure);
+      peer.close();
+    };
+  } catch (error) { if (!stopped) reportConnectionFailure(stage, endpoint, error); reconnect(); }
 }
 
-joinForm.addEventListener("submit", event => { event.preventDefault(); const name = nameInput.value.trim(); store(STORAGE.name, name); if (!socket || socket.readyState !== WebSocket.OPEN) { status.textContent = "Still connecting. Try again in a moment."; status.hidden = false; return; } joinButton.disabled = true; status.textContent = "Joining…"; status.hidden = false; socket.send(JSON.stringify(createJoinMessage(name, joinFlow))); });
+joinForm.addEventListener("submit", event => { event.preventDefault(); if (pwa.visible) return; const name = nameInput.value.trim(); store(STORAGE.name, name); if (!socket || socket.readyState !== WebSocket.OPEN) { status.textContent = "Still connecting. Try again in a moment."; status.hidden = false; return; } joinButton.disabled = true; status.textContent = "Joining…"; status.hidden = false; socket.send(JSON.stringify(createJoinMessage(name, joinFlow))); });
 function leaveLobby(): void { if (!socket || socket.readyState !== WebSocket.OPEN) return; lobbyControls.deactivate(); leaveButton.disabled = true; lobbyLeaveButton.disabled = true; status.textContent = "Leaving…"; socket.send(JSON.stringify({ type: "leave" })); }
 leaveButton.addEventListener("click", leaveLobby);
 lobbyLeaveButton.addEventListener("click", leaveLobby);

@@ -1,0 +1,16 @@
+{
+  "id": "/",
+  "name": "Play Shapes",
+  "short_name": "Play Shapes",
+  "description": "Your controller for the Play Shapes party game.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#d6f4e1",
+  "theme_color": "#d6f4e1",
+  "icons": [
+    { "src": "/app-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

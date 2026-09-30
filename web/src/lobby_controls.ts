@@ -1,5 +1,6 @@
 import nipplejs from "./vendor/nipplejs.mjs";
 import { LobbyInputState, type LobbyAction } from "./lobby_input.js";
+import { bindControllerLifecycle } from "./immersive.js";
 
 export class LobbyControls {
   private readonly input: LobbyInputState;
@@ -16,12 +17,15 @@ export class LobbyControls {
     this.input = new LobbyInputState(send);
     this.repeat = setInterval(() => this.input.repeatMove(), 100);
     jumpButton.addEventListener("pointerdown", event => {
-      if (!this.input.active) return;
+      if (!this.input.active || this.input.jumpPointer !== undefined || (event.pointerType === "mouse" && event.button !== 0)) return;
+      event.preventDefault();
       this.input.pressJump(event.pointerId);
-      jumpButton.setPointerCapture(event.pointerId);
+      try { jumpButton.setPointerCapture(event.pointerId); } catch { this.input.releaseJump(event.pointerId, true); return; }
       jumpButton.classList.add("is-held");
     });
     jumpButton.addEventListener("pointerup", event => {
+      if (event.pointerId !== this.input.jumpPointer) return;
+      event.preventDefault();
       this.input.releaseJump(event.pointerId);
       jumpButton.classList.remove("is-held");
     });
@@ -34,7 +38,10 @@ export class LobbyControls {
     jumpButton.addEventListener("click", event => {
       if (event.detail === 0) this.input.keyboardJump();
     });
-    addEventListener("blur", () => this.cancelTouches());
+    bindControllerLifecycle(() => {
+      this.cancelTouches();
+      if (this.input.active && !document.hidden && document.hasFocus()) this.createJoystick();
+    });
     addEventListener("focus", () => { if (this.input.active) this.createJoystick(); });
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) this.cancelTouches();

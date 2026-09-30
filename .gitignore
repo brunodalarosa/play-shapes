@@ -10,3 +10,12 @@ builds/
 opencode.json
 *.local.json
 *.log
+local/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.cer
+*.der
+*.pem.tmp

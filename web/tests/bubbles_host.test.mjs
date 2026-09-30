@@ -14,7 +14,7 @@ let output = '';
 async function startPreview() {
   await assert.rejects(fetch(`http://127.0.0.1:${port}`, { signal: AbortSignal.timeout(500) }));
   host = spawn(binary, ['--headless', '--path', root, '--script', 'tests/bubbles_phone_preview.gd'], {
-    windowsHide: true, env: { ...process.env, BUBBLES_PREVIEW_PORT: String(port) }
+    windowsHide: true, env: { ...process.env, BUBBLES_PREVIEW_PORT: String(port), PLAY_SHAPES_NETWORK_CONFIG: "off" }
   });
   host.stdout.on('data', data => { output += data; });
   host.stderr.on('data', data => { output += data; });

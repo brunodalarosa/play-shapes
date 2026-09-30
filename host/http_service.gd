@@ -4,6 +4,42 @@ extends Node
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
 const ASSETS: Dictionary = {
+"/pwa.js": {
+	"path": "res://web/public/pwa.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
+"/manifest.webmanifest": {
+	"path": "res://web/public/manifest.webmanifest",
+	"content_type": "application/manifest+json",
+},
+"/app-icon-180.png": {
+	"path": "res://web/public/app-icon-180.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/app-icon-192.png": {
+	"path": "res://web/public/app-icon-192.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+"/app-icon-512.png": {
+	"path": "res://web/public/app-icon-512.png",
+	"content_type": "image/png",
+	"resource_type": "Texture2D",
+},
+
+"/motion_lab.js": {
+	"path": "res://web/public/motion_lab.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
+"/motion_input.js": {
+	"path": "res://web/public/motion_input.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
+"/network_config.js": {
+	"path": "res://web/public/network_config.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
 "/": {
 	"path": "res://web/public/index.html",
 	"content_type": "text/html; charset=utf-8",
@@ -77,12 +113,16 @@ const ASSETS: Dictionary = {
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []
 var _settings: NetworkingTuning
+var _tls_options: TLSOptions
+var _network: ControllerNetworkConfig
 var _bodies: Dictionary = {}
 var _session_id: String
 var startup_error: String = ""
 
-func start(settings: NetworkingTuning, session_id: String) -> Error:
+func start(settings: NetworkingTuning, session_id: String, network: ControllerNetworkConfig = null, tls_options: TLSOptions = null) -> Error:
+	_tls_options = tls_options
 	_settings = settings
+	_network = network if network != null else ControllerNetworkConfig.new(settings)
 	_session_id = session_id
 	startup_error = ""
 	_bodies.clear()
@@ -91,10 +131,10 @@ func start(settings: NetworkingTuning, session_id: String) -> Error:
 		var error := _load_asset(route, asset)
 		if error != OK:
 			return error
-	var listen_error := _server.listen(settings.http_port, "*")
+	var listen_error := _server.listen(_network.http_port, _network.bind_address)
 	if listen_error != OK:
 		startup_error = "Could not listen for HTTP on port %d: %s" % [
-			settings.http_port, error_string(listen_error),
+			_network.http_port, error_string(listen_error),
 		]
 	return listen_error
 
@@ -126,7 +166,7 @@ func _load_asset(route: String, asset: Dictionary) -> Error:
 func stop() -> void:
 	_server.stop()
 	for client: Dictionary in _clients:
-		client.peer.disconnect_from_host()
+		client.connection.close()
 	_clients.clear()
 
 func _process(_delta: float) -> void:
@@ -140,15 +180,18 @@ func _process(_delta: float) -> void:
 		if _clients.size() >= _settings.max_connections:
 			peer.disconnect_from_host()
 		else:
-			_clients.append({"peer": peer, "input": PackedByteArray(),
+			_clients.append({"connection": ControllerStream.new(peer, _tls_options), "input": PackedByteArray(),
 				"output": PackedByteArray(), "sent": 0, "created": Time.get_ticks_msec(), "finished": -1})
 	for index: int in range(_clients.size() - 1, -1, -1):
 		var client: Dictionary = _clients[index]
-		var peer: StreamPeerTCP = client.peer
-		peer.poll()
-		if peer.get_status() != StreamPeerTCP.STATUS_CONNECTED or Time.get_ticks_msec() - client.created > _settings.request_timeout_seconds * 1000:
+		var connection: ControllerStream = client.connection
+		var ready := connection.poll_ready()
+		if connection.failed or Time.get_ticks_msec() - client.created > _settings.request_timeout_seconds * 1000:
 			_drop(index)
 			continue
+		if not ready:
+			continue
+		var peer: StreamPeer = connection.stream
 		if client.finished >= 0:
 			if Time.get_ticks_msec() - client.finished >= 100:
 				_drop(index)
@@ -178,7 +221,7 @@ func _process(_delta: float) -> void:
 				client.finished = Time.get_ticks_msec() # Let TCP flush before closing a larger asset response.
 
 func _drop(index: int) -> void:
-	_clients[index].peer.disconnect_from_host()
+	_clients[index].connection.close()
 	_clients.remove_at(index)
 
 func _route(request: String) -> PackedByteArray:
@@ -189,11 +232,7 @@ func _route(request: String) -> PackedByteArray:
 		return _response("405 Method Not Allowed", "text/plain", "GET only".to_utf8_buffer())
 	var route := parts[1].get_slice("?", 0)
 	if route == "/session.json":
-		return _response("200 OK", "application/json", JSON.stringify({
-			"protocol": 1,
-			"websocket_port": _settings.websocket_port,
-			"session_id": _session_id,
-		}).to_utf8_buffer())
+		return _response("200 OK", "application/json", JSON.stringify(_network.public_session(_session_id)).to_utf8_buffer())
 	if not ASSETS.has(route):
 		return _response("404 Not Found", "text/plain", "Not found".to_utf8_buffer())
 	return _response("200 OK", ASSETS[route].content_type, _bodies[route])

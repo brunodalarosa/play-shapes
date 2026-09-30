@@ -1,6 +1,5 @@
 :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #0e131f; color: #f0f3f8; }
 * { box-sizing: border-box; }
-html, body { overscroll-behavior: none; }
 body { margin: 0; min-block-size: 100svh; }
 main { position: relative; display: flex; flex-direction: column; inline-size: min(100%, 440px); min-block-size: 100svh; margin-inline: auto; padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left)); text-align: center; }
 .onboarding-screen { inline-size: 100%; min-block-size: 0; flex: 1; }
@@ -17,6 +16,12 @@ main { position: relative; display: flex; flex-direction: column; inline-size: m
 .color-button[aria-pressed="true"] { outline: 3px solid #fff; outline-offset: 2px; border-color: #101827; }
 .color-button[aria-pressed="true"]::after { content: "✓"; color: #fff; font-size: clamp(19px, 6vw, 27px); font-weight: 900; line-height: 1; text-shadow: 0 2px 4px #101827, 0 0 3px #101827; }
 button { inline-size: 100%; border-radius: 10px; font: inherit; font-weight: 800; cursor: pointer; }
+button { touch-action: manipulation; }
+#app-screen { display: grid; align-content: center; justify-items: center; gap: 16px; }
+.app-icon { border-radius: 28px; box-shadow: 0 8px 0 #328b71; }
+#app-title { margin: 8px 0 0; font-size: clamp(26px, 7vw, 34px); }
+#app-screen p { margin: 0; }
+#install-guidance { padding: 16px; border-radius: 18px; background: #233d34; text-align: start; }
 .action-button { min-block-size: 58px; padding: 12px 18px; border: 0; border-radius: 16px; background: #a6e6bf; color: #0e2418; font-size: 19px; letter-spacing: .05em; }
 #next-button { margin-block-end: 4px; }
 #name-screen { position: relative; display: flex; flex-direction: column; align-items: stretch; block-size: 100%; padding-block-start: 20svh; }
@@ -39,6 +44,7 @@ button:disabled { cursor: wait; opacity: .65; }
 #player-state { font-weight: 700; }
 .footnote { margin-block: 4px 0; color: #b8c1cf; font-size: 12px; }
 [hidden] { display: none !important; }
+#connection-error { position: fixed; z-index: 1000; inset-block-start: max(8px, env(safe-area-inset-top)); inset-inline: max(8px, env(safe-area-inset-left)) max(8px, env(safe-area-inset-right)); max-block-size: 45dvh; margin: 0; padding: 12px; overflow: auto; border: 2px solid #ff928a; border-radius: 8px; background: #351515; color: #fff; font: 13px/1.5 monospace; white-space: pre-wrap; overflow-wrap: anywhere; text-align: start; user-select: text; -webkit-user-select: text; touch-action: pan-y; }
 
 html.gameplay-active, html.gameplay-active body { inline-size: 100%; block-size: 100%; min-block-size: 100%; overflow: hidden; position: fixed; inset: 0; }
 html.gameplay-active body { display: block; padding: 0; touch-action: none; }
@@ -73,6 +79,13 @@ html.lobby-active .footnote, html.lobby-active #status { display: none !importan
 #lobby-controller { position: fixed; inset: 0; overflow: hidden; touch-action: none; background:
   radial-gradient(circle at 50% 34%, #fff9dd 0 18%, transparent 50%),
   linear-gradient(160deg, #d6f4e1, #a9dcce 62%, #7bbcaf); }
+
+/* Size play surfaces to Safari's visible viewport; onboarding remains scrollable. */
+html:is(.gameplay-active, .lobby-active, .ready-active), html:is(.gameplay-active, .lobby-active, .ready-active) body { overscroll-behavior: none; }
+#lobby-controller, html.bubbles-active #bubbles-pad { block-size: var(--controller-height, 100dvh); inset-block-end: auto; }
+html.ready-active main { min-block-size: var(--controller-height, 100dvh); }
+#lobby-controller, #bubbles-pad, #ready-card { user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+#ready-card { touch-action: none; }
 #lobby-stick-zone, #lobby-jump-button { position: absolute; inset-block-end: max(26px, calc(env(safe-area-inset-bottom) + 26px)); touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
 #lobby-stick-zone { inset-inline-start: max(16px, calc(env(safe-area-inset-left) + 12px)); inline-size: clamp(128px, 38vw, 164px); block-size: clamp(128px, 38vw, 164px); border: 5px solid #f5f0cd; border-radius: 50%; background: radial-gradient(circle, #a0dccc 0 30%, #449c89 100%); box-shadow: 0 8px 0 #297260, 0 13px 20px rgb(20 77 65 / .26), inset 0 3px 12px rgb(255 255 255 / .7); }
 #lobby-jump-button { inset-inline-end: max(18px, calc(env(safe-area-inset-right) + 14px)); inline-size: clamp(104px, 32vw, 142px); block-size: clamp(104px, 32vw, 142px); border: 5px solid #fff3c8; border-radius: 50%; background: #ffca5b; color: #56431e; box-shadow: 0 9px 0 #c67c39, 0 15px 20px rgb(91 59 19 / .23), inset 0 5px 12px rgb(255 255 255 / .65); font-size: clamp(19px, 5vw, 25px); letter-spacing: .06em; }
@@ -92,3 +105,7 @@ html.lobby-active .footnote, html.lobby-active #status { display: none !importan
   .color-button { min-block-size: 36px; border-radius: 10px; }
   .action-button { min-block-size: 50px; }
 }
+
+#motion-lab { text-align: left; color: #173c52; }
+#motion-lab h2 { font-size: 25px; }
+#motion-readings { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; background: #fff9e9; border: 2px solid #b5ceb9; border-radius: 16px; padding: 14px; }

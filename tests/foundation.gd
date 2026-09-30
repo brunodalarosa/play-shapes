@@ -12,17 +12,17 @@ func _run() -> void:
 	var blocker := TCPServer.new()
 	if not _check(blocker.listen(18081) == OK, "Test port 18081 is already occupied"):
 		return
-	if not _check(not host.start(), "Busy WebSocket port must fail startup"):
+	if not _check(not host.start(false), "Busy WebSocket port must fail startup"):
 		return
 	var probe := TCPServer.new()
 	if not _check(probe.listen(18080) == OK, "Failed startup must release HTTP port"):
 		return
 	probe.stop()
 	blocker.stop()
-	if not _check(host.start(), "Retry must start both services"):
+	if not _check(host.start(false), "Retry must start both services"):
 		return
 	host.stop()
-	if not _check(host.start(), "Stopped host must restart"):
+	if not _check(host.start(false), "Stopped host must restart"):
 		return
 	var lobby: Control = load("res://scenes/lobby.tscn").instantiate()
 	root.add_child(lobby)
