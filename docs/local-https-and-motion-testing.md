@@ -44,7 +44,7 @@ node tools/local_https.mjs untrust
 
 Restart Godot after setup/regeneration/disable. Disable sets TLS false; it preserves files and existing trust. Untrust explicitly removes only this isolated development root from host stores. On iPhone remove the specific profile in General > VPN & Device Management; on Android remove this root from user credentials. Do not clear unrelated certificates. Keep the CA until all devices have removed its trust if you intend to delete its local files.
 
-Standalone: put `local/network.json` and its referenced leaf material beside the exported executable (CA private keys should stay on the provisioning workstation). The default Resources remain portable and secret-free. `PLAY_SHAPES_NETWORK_CONFIG` can select another JSON path. An empty environment value intentionally runs HTTP defaults for tests; clear that override for normal testing.
+Standalone: put `local/network.json` and its referenced leaf material beside the exported executable (CA private keys should stay on the provisioning workstation). The default Resources remain portable and secret-free. `PLAY_SHAPES_NETWORK_CONFIG` can select another JSON path. The environment value `off` intentionally runs HTTP defaults for tests; clear that override for normal testing.
 
 ## Discovery decision for controlled testing
 

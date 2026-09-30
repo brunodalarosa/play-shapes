@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { request } from 'node:https';
+import { createSecureContext } from 'node:tls';
 import { createConnection } from 'node:net';
 import { randomBytes, createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -12,6 +13,7 @@ const root = fileURLToPath(new URL('../../', import.meta.url));
 const binary = process.env.GODOT_BIN || 'godot';
 let host, ca, log = '';
 before(async () => {
+  for (let attempt = 0; attempt < 5; attempt++) {
   await new Promise((resolve, reject) => {
     const process = spawn(binary, ['--headless', '--path', root, '--script', 'tests/controller_tls_test.gd'], { windowsHide: true });
     let output = '';
@@ -19,6 +21,11 @@ before(async () => {
     process.on('error', reject); process.on('exit', code => code === 0 && output.includes('Controller TLS credential checks passed') ? resolve() : reject(new Error(output)));
   });
   ca = readFileSync(root + 'test-results/tls/certificate.pem');
+  // Godot test-only self-signed serial generation can produce ASN.1 padding
+  // rejected by OpenSSL. Validate before hosting; production tooling uses mkcert.
+  try { createSecureContext({ cert: ca, key: readFileSync(root + 'test-results/tls/key.pem') }); break; }
+  catch (error) { if (attempt === 4) throw error; }
+  }
   host = spawn(binary, ['--headless', '--path', root], { windowsHide: true, env: { ...process.env, PLAY_SHAPES_NETWORK_CONFIG: root + 'test-results/tls/network.json' } });
   host.stdout.on('data', data => log += data); host.stderr.on('data', data => log += data);
   for (let index = 0; index < 100; index++) { if (log.includes('Play Shapes ready: https')) return; await delay(100); }

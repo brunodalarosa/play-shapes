@@ -18,7 +18,7 @@ before(async () => {
   // Refuse to test a different running session by accident.
   await assert.rejects(fetch(base, { signal: AbortSignal.timeout(500) }));
   await new Promise((resolve, reject) => {
-    const check = spawn(binary, ['--headless', '--path', root, '--script', 'tests/foundation.gd'], { windowsHide: true, env: { ...process.env, PLAY_SHAPES_NETWORK_CONFIG: "" } });
+    const check = spawn(binary, ['--headless', '--path', root, '--script', 'tests/foundation.gd'], { windowsHide: true, env: { ...process.env, PLAY_SHAPES_NETWORK_CONFIG: "off" } });
     let log = '';
     const timeout = setTimeout(() => { check.kill(); reject(new Error('Foundation check timed out')); }, 15000);
     check.stdout.on('data', data => { log += data; });
@@ -30,7 +30,7 @@ before(async () => {
       else resolve();
     });
   });
-  host = spawn(binary, ['--headless', '--path', root], { windowsHide: true, env: { ...process.env, PLAY_SHAPES_NETWORK_CONFIG: "" } });
+  host = spawn(binary, ['--headless', '--path', root], { windowsHide: true, env: { ...process.env, PLAY_SHAPES_NETWORK_CONFIG: "off" } });
   host.stdout.on('data', data => { output += data; });
   host.stderr.on('data', data => { output += data; });
   host.on('error', error => { output += error.message; });

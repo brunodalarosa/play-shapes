@@ -17,7 +17,7 @@ func _boot() -> void:
 		if port >= 1024 and port < 65535:
 			session.settings.http_port = port
 			session.settings.websocket_port = port + 1
-	if not session.start():
+	if not session.start(false):
 		push_error(session.startup_error)
 		quit(1)
 		return

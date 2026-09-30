@@ -19,6 +19,17 @@ var _bubbles_protocol: RefCounted
 var _active_protocol: RefCounted
 var _lobby_controller: LobbyPlaygroundWorld
 var _readiness: PreMinigameReadiness
+var motion_channel := MotionInputChannel.new()
+
+func begin_motion(player_id: String) -> void:
+	end_motion()
+	motion_channel.begin(player_id)
+	_send_to_player(player_id, motion_channel.subscription())
+
+func end_motion() -> void:
+	if not motion_channel.target_player_id.is_empty():
+		_send_to_player(motion_channel.target_player_id, {"type": "motion_stop"})
+	motion_channel.end()
 
 func start(settings: NetworkingTuning, registry: PlayerRegistry,
 		accepting_new_players: Callable, network: ControllerNetworkConfig = null, tls_options: TLSOptions = null) -> Error:
@@ -30,6 +41,7 @@ func start(settings: NetworkingTuning, registry: PlayerRegistry,
 	return _server.listen(_network.websocket_port, _network.bind_address)
 
 func stop() -> void:
+	end_motion()
 	_server.stop()
 	for client: Dictionary in _clients:
 		_disconnect_player(client)
@@ -181,13 +193,20 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			"reconnect_token": resume.get("reconnect_token"),
 		}
 		if resume.accepted:
+			if resume.player.player_id == motion_channel.target_player_id:
+				motion_channel.reconnect()
 			welcome.gameplay = _active_protocol.snapshot_for(String(resume.player.player_id)) \
 				if _active_protocol != null else {"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}
 		peer.send_text(JSON.stringify(welcome))
+		if resume.accepted and resume.player.player_id == motion_channel.target_player_id:
+			peer.send_text(JSON.stringify(motion_channel.subscription()))
 		_emit_count()
 		return
 
 	match message.get("type"):
+		"motion_status", "motion_sample":
+			# Identity is resolved from the current socket, never a phone-authored ID.
+			motion_channel.handle(_registry.player_for_connection(client.connection_id), message, Time.get_ticks_msec())
 		"join":
 			var may_join: bool = _accepting_new_players.call() or (
 				_readiness != null and _readiness.active and bool(client.preexisting_onboarding))
@@ -332,6 +351,8 @@ func _drop(index: int) -> void:
 
 func _disconnect_player(client: Dictionary) -> void:
 	if client.welcomed:
+		if _registry.player_for_connection(client.connection_id).get("player_id") == motion_channel.target_player_id:
+			motion_channel.reconnect()
 		_registry.disconnect_connection(client.connection_id)
 
 func _emit_count() -> void:
