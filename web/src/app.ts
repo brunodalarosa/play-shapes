@@ -13,6 +13,31 @@ import {
 } from "./character_selection.js";
 
 const status = document.querySelector<HTMLElement>("#status")!;
+const connectionError = document.querySelector<HTMLElement>("#connection-error")!;
+const connectionErrors: { text: string; at: string; repeats: number }[] = [];
+
+// Development diagnostics stay outside gameplay's hidden status/onboarding layout.
+// Report endpoints and error text only; never dump protocol messages or stored tokens.
+function reportConnectionFailure(stage: string, endpoint: string, error: unknown): void {
+  const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+  const text = `Step: ${stage}\nEndpoint: ${endpoint}\n${detail}`;
+  const last = connectionErrors.at(-1);
+  if (last?.text === text) last.repeats++;
+  else {
+    connectionErrors.push({ text, at: new Date().toISOString(), repeats: 1 });
+    if (connectionErrors.length > 6) connectionErrors.shift();
+  }
+  connectionError.textContent = `CONTROLLER ERROR LOG (development)\nBrowser: ${navigator.userAgent}\nConnection failures retry every 2 seconds.\n\n` + connectionErrors.map(entry =>
+    `[${entry.at}]${entry.repeats > 1 ? ` (repeated ${entry.repeats} times)` : ""}\n${entry.text}`).join("\n\n");
+  connectionError.hidden = false;
+}
+window.addEventListener("error", event => {
+  reportConnectionFailure("Browser JavaScript error", new URL(location.href).origin,
+    `${event.error instanceof Error ? `${event.error.name}: ${event.error.message}` : event.message}\nSource: ${event.filename}:${event.lineno}:${event.colno}`);
+});
+window.addEventListener("unhandledrejection", event => {
+  reportConnectionFailure("Unhandled browser promise rejection", new URL(location.href).origin, event.reason);
+});
 const selectionScreen = document.querySelector<HTMLElement>("#selection-screen")!;
 const selectionPreview = document.querySelector<HTMLCanvasElement>("#selection-preview")!;
 const namePreview = document.querySelector<HTMLCanvasElement>("#name-preview")!;
@@ -475,19 +500,42 @@ function reconnect(): void {
 async function connect(): Promise<void> {
   status.textContent = joined ? "Reconnecting to the host…" : "Connecting to the host…";
   status.hidden = false;
+  let stage = "Fetch session configuration";
+  let endpoint = new URL("/session.json", location.href).href;
   try {
-    const response = await fetch("/session.json", { cache: "no-store", signal: AbortSignal.timeout(5000) }); if (!response.ok) throw new Error("Session unavailable"); const config: unknown = await response.json();
+    const response = await fetch("/session.json", { cache: "no-store", signal: AbortSignal.timeout(5000) });
+    if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
+    stage = "Parse session configuration JSON";
+    const config: unknown = await response.json();
+    stage = "Validate session transport configuration";
     const socketUrl = controllerSocketUrl(config, location.href);
-    if (stopped) return; const peer = new WebSocket(socketUrl); socket = peer; const deadline = setTimeout(() => peer.close(), 7000);
-    peer.onopen = () => peer.send(JSON.stringify({ type: "hello", protocol: 1, ...(stored(STORAGE.token) ? { reconnect_token: stored(STORAGE.token), session_id: stored(STORAGE.session) } : {}) }));
+    stage = "Open WebSocket"; endpoint = socketUrl;
+    if (stopped) return; const peer = new WebSocket(socketUrl); socket = peer;
+    let socketFailure = "";
+    const deadline = setTimeout(() => {
+      socketFailure = "No host welcome received within 7000 ms.";
+      reportConnectionFailure(stage, endpoint, socketFailure);
+      peer.close();
+    }, 7000);
+    peer.onopen = () => {
+      stage = "Wait for host welcome";
+      peer.send(JSON.stringify({ type: "hello", protocol: 1, ...(stored(STORAGE.token) ? { reconnect_token: stored(STORAGE.token), session_id: stored(STORAGE.session) } : {}) }));
+    };
     peer.onmessage = (event: MessageEvent<string>) => {
-      let message: HostMessage; try { message = JSON.parse(event.data) as HostMessage; } catch { peer.close(); return; }
+      let message: HostMessage; try { message = JSON.parse(event.data) as HostMessage; } catch (error) {
+        // Parser messages can quote the payload, including a welcome's resume token.
+        socketFailure = `Invalid JSON received from host (${error instanceof Error ? error.name : "parse error"}).`;
+        reportConnectionFailure("Parse host message JSON", endpoint, socketFailure);
+        peer.close(); return;
+      }
       if (message.type === "welcome" && message.protocol === 1 && Number.isInteger(message.connection_id)) {
+        stage = "Connected WebSocket";
+        connectionError.hidden = true; connectionError.textContent = "";
         clearTimeout(deadline); if (message.resume_status === "resumed" && rememberIdentity(message)) { if (message.gameplay?.type === "bubbles_snapshot") showBubbles(message.gameplay); else if (message.gameplay?.type === "pre_minigame_snapshot") showReady(message.gameplay); else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player) showJoined(message.player as PublicPlayer, message.gameplay.message ?? "Waiting for the next game"); return; }
         if (message.resume_status === "session_restarted") { forgetIdentity(); showJoin("The host started a new session. Choose your character and name to join again.", true); }
         else if (message.resume_status === "expired") { forgetIdentity(); showJoin("Your previous player expired. Choose your character and name to join again.", true); } else showJoin(isStandalone(window, navigator) && !stored(STORAGE.token) ? "Choose your character to join. If already playing in a browser, leave that controller first." : "Connected. Choose your character to join.", true);
       } else if (message.type === "join_accepted") { if (!rememberIdentity(message)) peer.close(); }
-      else if (message.type === "join_rejected" || message.type === "error") { joinButton.disabled = false; readyButton.disabled = false; status.textContent = message.message ?? "The host could not complete that action."; status.hidden = false; if (!readyCard.hidden) readyState.textContent = status.textContent; if (!joined) nameInput.focus(); }
+      else if (message.type === "join_rejected" || message.type === "error") { joinButton.disabled = false; readyButton.disabled = false; status.textContent = message.message ?? "The host could not complete that action."; status.hidden = false; if (message.type === "error") reportConnectionFailure("Host protocol error", endpoint, `${message.code ?? "unknown"}: ${status.textContent}`); if (!readyCard.hidden) readyState.textContent = status.textContent; if (!joined) nameInput.focus(); }
       else if (message.type === "left") { forgetIdentity(); showJoin("You left the lobby. Choose your character and name to join again.", true); }
       else if (message.type === "bubbles_trace_result") bubblesLocalCharge = 0;
       else if (message.type === "bubbles_visual" && message.visual && bubblesSnapshot) { bubblesVisualSnapshot = message.visual; bubblesVisualReceivedAt = performance.now(); }
@@ -513,10 +561,16 @@ async function connect(): Promise<void> {
         playerState.textContent = "Open in another window";
         return;
       }
+      if (!stopped) reportConnectionFailure(stage, endpoint,
+        `${socketFailure ? socketFailure + "\n" : ""}WebSocket closed: code=${event.code}, reason=${event.reason || "(not provided)"}, wasClean=${event.wasClean}.`);
       reconnect();
     };
-    peer.onerror = () => peer.close();
-  } catch { reconnect(); }
+    peer.onerror = event => {
+      socketFailure = `WebSocket ${event.type || "error"} event. Browser did not expose the underlying network/TLS reason.`;
+      reportConnectionFailure(stage, endpoint, socketFailure);
+      peer.close();
+    };
+  } catch (error) { if (!stopped) reportConnectionFailure(stage, endpoint, error); reconnect(); }
 }
 
 joinForm.addEventListener("submit", event => { event.preventDefault(); if (pwa.visible) return; const name = nameInput.value.trim(); store(STORAGE.name, name); if (!socket || socket.readyState !== WebSocket.OPEN) { status.textContent = "Still connecting. Try again in a moment."; status.hidden = false; return; } joinButton.disabled = true; status.textContent = "Joining…"; status.hidden = false; socket.send(JSON.stringify(createJoinMessage(name, joinFlow))); });

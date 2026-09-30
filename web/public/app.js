@@ -7,6 +7,30 @@ import { GestureTrace } from "./bubbles_gesture.js";
 import { LobbyControls } from "./lobby_controls.js";
 import { advanceJoinFlow, CHARACTER_COLORS, chooseJoinColor, colorOption, createJoinMessage, defaultJoinFlow, FALLBACK_CHARACTER, returnToCharacterSelection, } from "./character_selection.js";
 const status = document.querySelector("#status");
+const connectionError = document.querySelector("#connection-error");
+const connectionErrors = [];
+// Development diagnostics stay outside gameplay's hidden status/onboarding layout.
+// Report endpoints and error text only; never dump protocol messages or stored tokens.
+function reportConnectionFailure(stage, endpoint, error) {
+    const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+    const text = `Step: ${stage}\nEndpoint: ${endpoint}\n${detail}`;
+    const last = connectionErrors.at(-1);
+    if (last?.text === text)
+        last.repeats++;
+    else {
+        connectionErrors.push({ text, at: new Date().toISOString(), repeats: 1 });
+        if (connectionErrors.length > 6)
+            connectionErrors.shift();
+    }
+    connectionError.textContent = `CONTROLLER ERROR LOG (development)\nBrowser: ${navigator.userAgent}\nConnection failures retry every 2 seconds.\n\n` + connectionErrors.map(entry => `[${entry.at}]${entry.repeats > 1 ? ` (repeated ${entry.repeats} times)` : ""}\n${entry.text}`).join("\n\n");
+    connectionError.hidden = false;
+}
+window.addEventListener("error", event => {
+    reportConnectionFailure("Browser JavaScript error", new URL(location.href).origin, `${event.error instanceof Error ? `${event.error.name}: ${event.error.message}` : event.message}\nSource: ${event.filename}:${event.lineno}:${event.colno}`);
+});
+window.addEventListener("unhandledrejection", event => {
+    reportConnectionFailure("Unhandled browser promise rejection", new URL(location.href).origin, event.reason);
+});
 const selectionScreen = document.querySelector("#selection-screen");
 const selectionPreview = document.querySelector("#selection-preview");
 const namePreview = document.querySelector("#name-preview");
@@ -647,28 +671,48 @@ function reconnect() {
 async function connect() {
     status.textContent = joined ? "Reconnecting to the host…" : "Connecting to the host…";
     status.hidden = false;
+    let stage = "Fetch session configuration";
+    let endpoint = new URL("/session.json", location.href).href;
     try {
         const response = await fetch("/session.json", { cache: "no-store", signal: AbortSignal.timeout(5000) });
         if (!response.ok)
-            throw new Error("Session unavailable");
+            throw new Error(`HTTP ${response.status} ${response.statusText}`);
+        stage = "Parse session configuration JSON";
         const config = await response.json();
+        stage = "Validate session transport configuration";
         const socketUrl = controllerSocketUrl(config, location.href);
+        stage = "Open WebSocket";
+        endpoint = socketUrl;
         if (stopped)
             return;
         const peer = new WebSocket(socketUrl);
         socket = peer;
-        const deadline = setTimeout(() => peer.close(), 7000);
-        peer.onopen = () => peer.send(JSON.stringify({ type: "hello", protocol: 1, ...(stored(STORAGE.token) ? { reconnect_token: stored(STORAGE.token), session_id: stored(STORAGE.session) } : {}) }));
+        let socketFailure = "";
+        const deadline = setTimeout(() => {
+            socketFailure = "No host welcome received within 7000 ms.";
+            reportConnectionFailure(stage, endpoint, socketFailure);
+            peer.close();
+        }, 7000);
+        peer.onopen = () => {
+            stage = "Wait for host welcome";
+            peer.send(JSON.stringify({ type: "hello", protocol: 1, ...(stored(STORAGE.token) ? { reconnect_token: stored(STORAGE.token), session_id: stored(STORAGE.session) } : {}) }));
+        };
         peer.onmessage = (event) => {
             let message;
             try {
                 message = JSON.parse(event.data);
             }
-            catch {
+            catch (error) {
+                // Parser messages can quote the payload, including a welcome's resume token.
+                socketFailure = `Invalid JSON received from host (${error instanceof Error ? error.name : "parse error"}).`;
+                reportConnectionFailure("Parse host message JSON", endpoint, socketFailure);
                 peer.close();
                 return;
             }
             if (message.type === "welcome" && message.protocol === 1 && Number.isInteger(message.connection_id)) {
+                stage = "Connected WebSocket";
+                connectionError.hidden = true;
+                connectionError.textContent = "";
                 clearTimeout(deadline);
                 if (message.resume_status === "resumed" && rememberIdentity(message)) {
                     if (message.gameplay?.type === "bubbles_snapshot")
@@ -699,6 +743,8 @@ async function connect() {
                 readyButton.disabled = false;
                 status.textContent = message.message ?? "The host could not complete that action.";
                 status.hidden = false;
+                if (message.type === "error")
+                    reportConnectionFailure("Host protocol error", endpoint, `${message.code ?? "unknown"}: ${status.textContent}`);
                 if (!readyCard.hidden)
                     readyState.textContent = status.textContent;
                 if (!joined)
@@ -765,11 +811,19 @@ async function connect() {
                 playerState.textContent = "Open in another window";
                 return;
             }
+            if (!stopped)
+                reportConnectionFailure(stage, endpoint, `${socketFailure ? socketFailure + "\n" : ""}WebSocket closed: code=${event.code}, reason=${event.reason || "(not provided)"}, wasClean=${event.wasClean}.`);
             reconnect();
         };
-        peer.onerror = () => peer.close();
+        peer.onerror = event => {
+            socketFailure = `WebSocket ${event.type || "error"} event. Browser did not expose the underlying network/TLS reason.`;
+            reportConnectionFailure(stage, endpoint, socketFailure);
+            peer.close();
+        };
     }
-    catch {
+    catch (error) {
+        if (!stopped)
+            reportConnectionFailure(stage, endpoint, error);
         reconnect();
     }
 }

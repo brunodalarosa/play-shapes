@@ -18,7 +18,7 @@ class Element extends EventTarget {
   releasePointerCapture(id) { this.captures.delete(id); }
 }
 let run = 0;
-async function withController({ standalone = false, identity = false } = {}, verify) {
+async function withController({ standalone = false, identity = false, failure = null } = {}, verify) {
   const elements = new Map();
   const el = selector => { if (!elements.has(selector)) elements.set(selector, new Element()); return elements.get(selector); };
   const root = new Element(); let fullscreen = 0;
@@ -34,15 +34,20 @@ async function withController({ standalone = false, identity = false } = {}, ver
     static OPEN = 1; readyState = 1; bufferedAmount = 0;
     constructor(url) { this.url = url; sockets.push(this); }
     send(data) { messages.push({ ...JSON.parse(data), sentAt: performance.now() }); }
-    close() { this.readyState = 3; this.onclose?.({ code: 1000 }); }
+    close() { this.readyState = 3; this.onclose?.({ code: 1000, reason: '', wasClean: true }); }
   }
   const globals = { document, window, navigator: { userAgent: 'Android', platform: 'Linux', maxTouchPoints: 1 },
     screen: { orientation: { unlock() {} } }, location: { href: 'http://localhost:8080/', protocol: 'http:', hostname: 'localhost' },
     localStorage: memory, WebSocket: Socket, Image: class { complete = false; naturalWidth = 0; }, requestAnimationFrame() {},
     addEventListener: window.addEventListener.bind(window),
-    fetch: async path => ({ ok: true, json: async () => path === '/session.json'
-      ? { protocol: 1, session_id: 'session', http_scheme: 'http', websocket_scheme: 'ws', websocket_port: 8081 }
-      : { resolution: [256, 256], clips: [] } }) };
+    fetch: async path => {
+      if (path === '/session.json' && failure === 'fetch') throw new TypeError('Load failed');
+      return { ok: !(path === '/session.json' && failure === 'http'), status: 503, statusText: 'Service Unavailable', json: async () => {
+        if (path !== '/session.json') return { resolution: [256, 256], clips: [] };
+        if (failure === 'json') throw new SyntaxError('Unexpected token < in JSON');
+        return { protocol: 1, session_id: 'session', http_scheme: 'http', websocket_scheme: failure === 'config' ? 'wss' : 'ws', websocket_port: 8081 };
+      } };
+    } };
   const saved = new Map(Object.keys(globals).map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
   for (const [key, value] of Object.entries(globals)) Object.defineProperty(globalThis, key, { configurable: true, writable: true, value });
   try {
@@ -51,10 +56,13 @@ async function withController({ standalone = false, identity = false } = {}, ver
     source = source.replace(/from "(\.\/[^\"]+)"/g, (match, path) => `from "${path === './lobby_controls.js' ? stub : new URL('../public/' + path.slice(2), import.meta.url).href}"`);
     await import('data:text/javascript;base64,' + Buffer.from(source + `\n// fixture ${++run}`).toString('base64'));
     await new Promise(resolve => setImmediate(resolve));
-    const peer = sockets[0]; assert.ok(peer); peer.onopen();
+    const peer = sockets[0]; if (!failure) assert.ok(peer); peer?.onopen();
     const receive = message => peer.onmessage({ data: JSON.stringify(message) });
     const player = { player_id: 'one', name: 'Tester', seat: 1, state: 'connected' };
-    await verify({ el, document, window, receive, player, messages, close: code => { peer.readyState = 3; peer.onclose({ code }); }, fullscreen: () => fullscreen });
+    await verify({ el, document, window, receive, player, messages,
+      error: () => peer.onerror(new Event('error')),
+      close: (code, reason = '', wasClean = false) => { peer.readyState = 3; peer.onclose({ code, reason, wasClean }); },
+      fullscreen: () => fullscreen });
   } finally {
     window.dispatchEvent(new Event('pagehide'));
     for (const [key, descriptor] of saved) descriptor ? Object.defineProperty(globalThis, key, descriptor) : delete globalThis[key];
@@ -74,6 +82,65 @@ test('actual app offers installation before registration and dismisses without r
     el('#join-form').dispatchEvent(new Event('submit', { cancelable: true }));
     assert.equal(messages.filter(m => m.type === 'join').length, 1);
     receive({ type: 'left' }); assert.equal(el('#app-screen').hidden, true);
+  });
+});
+
+test('session failures retain exact step, endpoint and browser error through reconnect status', async () => {
+  for (const [failure, step, detail] of [
+    ['fetch', 'Fetch session configuration', 'TypeError: Load failed'],
+    ['http', 'Fetch session configuration', 'HTTP 503 Service Unavailable'],
+    ['json', 'Parse session configuration JSON', 'SyntaxError: Unexpected token < in JSON'],
+    ['config', 'Validate session transport configuration', 'Invalid or mixed-content controller configuration'],
+  ]) await withController({ failure, identity: true }, async ({ el }) => {
+    const panel = el('#connection-error');
+    assert.equal(panel.hidden, false); assert.ok(panel.textContent.includes(step)); assert.ok(panel.textContent.includes(detail));
+    assert.match(panel.textContent, /Endpoint: http:\/\/localhost:8080\/session.json/);
+    assert.match(panel.textContent, /Browser: Android/);
+    assert.match(el('#status').textContent, /Reconnecting/);
+    assert.doesNotMatch(panel.textContent, /reconnect-token|session-id|"token"/);
+  });
+});
+
+test('WebSocket failures show close details and clear only after a successful welcome', async () => {
+  await withController({}, async ({ el, error, close, receive }) => {
+    error();
+    assert.equal(el('#connection-error').hidden, false);
+    assert.match(el('#connection-error').textContent, /Open WebSocket|Wait for host welcome/);
+    assert.match(el('#connection-error').textContent, /underlying network\/TLS reason/);
+    close(1006, '', false);
+    assert.match(el('#connection-error').textContent, /code=1006, reason=\(not provided\), wasClean=false/);
+    assert.match(el('#connection-error').textContent, /ws:\/\/localhost:8081/);
+    receive({ type: 'welcome', protocol: 1, connection_id: 1, resume_status: 'join_required' });
+    assert.equal(el('#connection-error').hidden, true); assert.equal(el('#connection-error').textContent, '');
+  });
+});
+
+test('host protocol errors stay visible independently of hidden gameplay status', async () => {
+  await withController({ standalone: true, identity: true }, async ({ el, receive, player }) => {
+    receive({ type: 'welcome', protocol: 1, connection_id: 1, resume_status: 'resumed', player, session_id: 'session', reconnect_token: 'token' });
+    receive({ type: 'bubbles_snapshot', phase: 'active' });
+    receive({ type: 'error', code: 'invalid_input', message: 'Input sequence must increase' });
+    assert.equal(el('#connection-error').hidden, false);
+    assert.match(el('#connection-error').textContent, /Host protocol error/);
+    assert.match(el('#connection-error').textContent, /invalid_input: Input sequence must increase/);
+  });
+});
+
+test('phone log groups repeats, stays bounded, and surfaces uncaught browser failures', async () => {
+  await withController({}, async ({ el, receive, window }) => {
+    receive({ type: 'welcome', protocol: 1, connection_id: 1, resume_status: 'join_required' });
+    for (let i = 0; i < 2; i++) receive({ type: 'error', code: 'example', message: 'Same failure' });
+    assert.match(el('#connection-error').textContent, /repeated 2 times/);
+    for (let i = 0; i < 8; i++) receive({ type: 'error', code: 'example', message: `Different failure ${i}` });
+    assert.equal((el('#connection-error').textContent.match(/Step:/g) ?? []).length, 6);
+    assert.doesNotMatch(el('#connection-error').textContent, /Different failure 0|Different failure 1|Same failure/);
+    window.dispatchEvent(Object.assign(new Event('error'), { error: new TypeError('Example runtime failure'), filename: 'app.js', lineno: 23, colno: 7 }));
+    assert.match(el('#connection-error').textContent, /Browser JavaScript error/);
+    assert.match(el('#connection-error').textContent, /TypeError: Example runtime failure/);
+    assert.match(el('#connection-error').textContent, /Source: app.js:23:7/);
+    window.dispatchEvent(Object.assign(new Event('unhandledrejection'), { reason: new Error('Example asynchronous failure') }));
+    assert.match(el('#connection-error').textContent, /Unhandled browser promise rejection/);
+    assert.match(el('#connection-error').textContent, /Error: Example asynchronous failure/);
   });
 });
 

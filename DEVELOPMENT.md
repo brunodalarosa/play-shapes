@@ -119,6 +119,8 @@ The editor polls a separate headless export process. Cancel terminates that owne
 
 ## Verification
 
+During this early development phase, controller connection/protocol errors appear in a selectable red panel with the failing step, endpoint, error text, browser version and WebSocket close details. It remains visible across retries and clears on successful welcome, including on Safari and standalone app layouts. Browser-hidden TLS causes remain explicitly unknown. Restart the host after rebuilding browser output so its startup-cached assets refresh; reload/relaunch the controller. See [development error reporting](docs/controller-app-and-touch.md#development-error-reporting).
+
 Keep evidence labels separate: `[AUTO]`, `[EDITOR]`, `[GODOT-RUNTIME]`, `[DESKTOP-BROWSER]`, `[PHYSICAL-PHONE]`, `[EXPORTED-BUILD]`, and `[HUMAN-PLAY]`. One never implies another. Render captures establish technical composition, not couch-distance readability, accessibility, comfort, or creative approval.
 
 Close any interactive host before integration tests; the browser suite refuses to run over an existing host. It uses `18080`/`18081` for startup lifecycle checks. `GODOT_BIN` can override the executable used by `web/tests/host.test.mjs`.

@@ -44,6 +44,7 @@ button:disabled { cursor: wait; opacity: .65; }
 #player-state { font-weight: 700; }
 .footnote { margin-block: 4px 0; color: #b8c1cf; font-size: 12px; }
 [hidden] { display: none !important; }
+#connection-error { position: fixed; z-index: 1000; inset-block-start: max(8px, env(safe-area-inset-top)); inset-inline: max(8px, env(safe-area-inset-left)) max(8px, env(safe-area-inset-right)); max-block-size: 45dvh; margin: 0; padding: 12px; overflow: auto; border: 2px solid #ff928a; border-radius: 8px; background: #351515; color: #fff; font: 13px/1.5 monospace; white-space: pre-wrap; overflow-wrap: anywhere; text-align: start; user-select: text; -webkit-user-select: text; touch-action: pan-y; }
 
 html.gameplay-active, html.gameplay-active body { inline-size: 100%; block-size: 100%; min-block-size: 100%; overflow: hidden; position: fixed; inset: 0; }
 html.gameplay-active body { display: block; padding: 0; touch-action: none; }
