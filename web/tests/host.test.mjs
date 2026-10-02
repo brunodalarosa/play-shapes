@@ -55,8 +55,11 @@ test('serves bundled HTML, JS, CSS and session configuration', async () => {
     ['/manifest.webmanifest', 'application/manifest+json', 'standalone'],
     ...[180, 192, 512].map(size => [`/app-icon-${size}.png`, 'image/png', null]),
     ['/bubbles_gesture.js', 'text/javascript', 'GestureTrace'],
-    ['/lobby_controls.js', 'text/javascript', 'lockX'],
-    ['/lobby_input.js', 'text/javascript', 'LobbyInputState'],
+    ['/lobby_controls.js', 'text/javascript', 'PlatformControls'],
+    ['/lobby_input.js', 'text/javascript', 'createLobbyContext'],
+    ['/platform_controls.js', 'text/javascript', 'PlatformControls'],
+    ['/platform_input.js', 'text/javascript', 'PlatformInputState'],
+    ['/platform_input_settings.json', 'application/json', 'x-right-y-up'],
     ['/squircle_v1.js', 'text/javascript', 'SquircleV1Canvas'],
     ['/vendor/nipplejs.mjs', 'text/javascript', 'create'],
     ['/bubbles-jellyfish.png', 'image/png', null],
@@ -119,12 +122,16 @@ test('Bubbles controller keeps a clean portrait screen and accessible touch cont
 test('Playground controller is locally bundled, portrait safe, and touch-accessible', async () => {
   const html = await (await fetch(base)).text();
   const css = await (await fetch(base + '/style.css')).text();
-  const controls = await (await fetch(base + '/lobby_controls.js')).text();
-  assert.match(html, /id="lobby-stick-zone"[^>]*aria-label="Move left or right"/);
+  const adapter = await (await fetch(base + '/lobby_controls.js')).text();
+  const controls = await (await fetch(base + '/platform_controls.js')).text();
+  assert.match(html, /id="lobby-stick-zone"[^>]*aria-label="Movement and stance joystick"/);
   assert.match(html, /id="lobby-jump-button"[^>]*aria-label="Jump"/);
   assert.match(css, /#lobby-stick-zone, #lobby-jump-button[^}]*safe-area-inset-bottom/);
   assert.match(controls, /vendor\/nipplejs\.mjs/);
-  assert.match(controls, /lockX: true/);
+  assert.match(adapter, /createLobbyContext/);
+  assert.doesNotMatch(controls, /lock[XY]: true/);
+  assert.match(controls, /event\.data\.vector\.y/);
+  assert.match(controls, /"FALL"/);
   assert.match(controls, /pointercancel/);
   assert.match(controls, /lostpointercapture/);
 });
@@ -275,11 +282,13 @@ test('host accepts sequenced lobby intent only from its registered connection', 
     });
     assert.equal(joined.type, 'join_accepted');
     assert.equal(joined.player.character_shape, 'squircle');
-    player.peer.send(JSON.stringify({ type: 'lobby_move', input_seq: 1, horizontal: 0.65 }));
+    player.peer.send(JSON.stringify({ type: 'lobby_move', input_seq: 1, horizontal: 0.65, vertical: 0.3, stance: 'move' }));
     assert.equal((await request(player.peer, { type: 'lobby_move', input_seq: 1, horizontal: -1 })).code, 'stale_sequence');
     assert.equal((await request(player.peer, { type: 'lobby_move', input_seq: 2, horizontal: 1.5 })).code, 'invalid_movement');
-    player.peer.send(JSON.stringify({ type: 'lobby_jump_release', input_seq: 2 }));
+    player.peer.send(JSON.stringify({ type: 'lobby_jump_release', input_seq: 2, action: 'jump', horizontal: 0.65, vertical: 0.3, stance: 'move' }));
     assert.equal((await request(player.peer, { type: 'lobby_jump_release', input_seq: 2 })).code, 'stale_sequence');
+    // Browser handoff is explicit; host drop support is still pending and has no jump fallback.
+    assert.equal((await request(player.peer, { type: 'lobby_fall_release', input_seq: 3, action: 'fall', horizontal: 0, vertical: -1, stance: 'crouch' })).code, 'unsupported_message');
     resumed = await connect(JSON.stringify({
       type: 'hello', protocol: 1, session_id: joined.session_id, reconnect_token: joined.reconnect_token
     }));

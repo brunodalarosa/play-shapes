@@ -1,41 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { LobbyInputState } from "../public/lobby_input.js";
+import { PlatformInputState } from "../public/platform_input.js";
+import { createLobbyContext } from "../public/lobby_input.js";
 
-test("stick and jump use separate touches; jump fires on release only", () => {
-  const actions = [];
-  const input = new LobbyInputState(action => actions.push(action));
+test("Playground adapter keeps ordinary movement/jump and hands off explicit fall without a jump fallback", () => {
+  const sent = [];
+  const context = createLobbyContext(value => sent.push(value));
+  const input = new PlatformInputState(context.send);
   input.activate();
-  input.move(-0.7);
-  input.pressJump(42);
-  assert.deepEqual(actions, [{ type: "lobby_move", horizontal: -0.7 }]);
-  input.repeatMove();
-  input.releaseJump(43);
-  assert.equal(actions.filter(action => action.type === "lobby_jump_release").length, 0);
-  input.releaseJump(42);
-  assert.equal(actions.filter(action => action.type === "lobby_jump_release").length, 1);
-  assert.equal(input.horizontal, -0.7);
-  input.endStick();
-  assert.deepEqual(actions.at(-1), { type: "lobby_move", horizontal: 0 });
-});
-
-test("cancel, inactive controls, and nonfinite stick input cannot produce a jump or movement", () => {
-  const actions = [];
-  const input = new LobbyInputState(action => actions.push(action));
-  input.move(1);
-  input.pressJump(4);
-  input.releaseJump(4);
-  assert.equal(actions.length, 0);
-  input.activate();
-  input.move(Number.NaN);
-  input.move(3);
-  input.pressJump(7);
-  input.releaseJump(7, true);
-  input.deactivate();
-  input.repeatMove();
-  input.releaseJump(7);
-  assert.deepEqual(actions, [
-    { type: "lobby_move", horizontal: 1 },
-    { type: "lobby_move", horizontal: 0 },
+  input.updateAxes(-0.7, 0.4); input.refresh();
+  input.pressAction(1); input.releaseAction(1);
+  input.updateAxes(0, -1);
+  input.pressAction(2); input.releaseAction(2); input.endStick();
+  assert.deepEqual(sent, [
+    { type: "lobby_move", horizontal: -0.7, vertical: 0.4, stance: "move" },
+    { type: "lobby_jump_release", action: "jump", horizontal: -0.7, vertical: 0.4, stance: "move" },
+    { type: "lobby_fall_release", action: "fall", horizontal: 0, vertical: -1, stance: "crouch" },
+    { type: "lobby_move", horizontal: 0, vertical: 0, stance: "neutral" },
   ]);
 });

@@ -56,6 +56,18 @@ const ASSETS: Dictionary = {
 	"path": "res://web/public/lobby_input.js",
 	"content_type": "text/javascript; charset=utf-8",
 },
+"/platform_input.js": {
+	"path": "res://web/public/platform_input.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
+"/platform_controls.js": {
+	"path": "res://web/public/platform_controls.js",
+	"content_type": "text/javascript; charset=utf-8",
+},
+"/platform_input_settings.json": {
+	"path": "res://web/public/platform_input_settings.json",
+	"content_type": "application/json",
+},
 "/vendor/nipplejs.mjs": {
 	"path": "res://web/public/vendor/nipplejs.mjs",
 	"content_type": "text/javascript; charset=utf-8",

@@ -21,17 +21,25 @@ export function protectControllerSurface(surface) {
     }
 }
 export function bindControllerLifecycle(cancel, target = window, page = document) {
-    const resize = () => {
-        page.documentElement.style.setProperty("--controller-height", `${target.visualViewport?.height ?? target.innerHeight}px`);
-        cancel();
+    const bindings = [];
+    const listen = (surface, name, handler) => {
+        surface.addEventListener(name, handler);
+        bindings.push(() => surface.removeEventListener(name, handler));
     };
-    target.addEventListener("blur", cancel);
-    target.addEventListener("pagehide", cancel);
-    page.addEventListener("visibilitychange", () => { if (page.hidden)
-        cancel(); });
-    target.addEventListener("resize", resize);
-    target.addEventListener("orientationchange", resize);
-    target.visualViewport?.addEventListener("resize", resize);
-    page.addEventListener("fullscreenchange", resize);
+    const resize = (event) => {
+        page.documentElement.style.setProperty("--controller-height", `${target.visualViewport?.height ?? target.innerHeight}px`);
+        cancel(event);
+    };
+    listen(target, "blur", cancel);
+    listen(target, "pagehide", cancel);
+    listen(page, "visibilitychange", event => { if (page.hidden)
+        cancel(event); });
+    listen(target, "resize", resize);
+    listen(target, "orientationchange", resize);
+    if (target.visualViewport)
+        listen(target.visualViewport, "resize", resize);
+    listen(page, "fullscreenchange", resize);
     resize();
+    return () => { for (const unbind of bindings)
+        unbind(); };
 }

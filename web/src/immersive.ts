@@ -17,17 +17,23 @@ export function protectControllerSurface(surface: HTMLElement): void {
   }
 }
 
-export function bindControllerLifecycle(cancel: () => void, target: Window = window, page: Document = document): void {
-  const resize = (): void => {
-    page.documentElement.style.setProperty("--controller-height", `${target.visualViewport?.height ?? target.innerHeight}px`);
-    cancel();
+export function bindControllerLifecycle(cancel: (event?: Event) => void, target: Window = window, page: Document = document): () => void {
+  const bindings: Array<() => void> = [];
+  const listen = (surface: EventTarget, name: string, handler: (event: Event) => void): void => {
+    surface.addEventListener(name, handler);
+    bindings.push(() => surface.removeEventListener(name, handler));
   };
-  target.addEventListener("blur", cancel);
-  target.addEventListener("pagehide", cancel);
-  page.addEventListener("visibilitychange", () => { if (page.hidden) cancel(); });
-  target.addEventListener("resize", resize);
-  target.addEventListener("orientationchange", resize);
-  target.visualViewport?.addEventListener("resize", resize);
-  page.addEventListener("fullscreenchange", resize);
+  const resize = (event?: Event): void => {
+    page.documentElement.style.setProperty("--controller-height", `${target.visualViewport?.height ?? target.innerHeight}px`);
+    cancel(event);
+  };
+  listen(target, "blur", cancel);
+  listen(target, "pagehide", cancel);
+  listen(page, "visibilitychange", event => { if (page.hidden) cancel(event); });
+  listen(target, "resize", resize);
+  listen(target, "orientationchange", resize);
+  if (target.visualViewport) listen(target.visualViewport, "resize", resize);
+  listen(page, "fullscreenchange", resize);
   resize();
+  return () => { for (const unbind of bindings) unbind(); };
 }
