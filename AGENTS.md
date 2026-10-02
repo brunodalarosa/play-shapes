@@ -35,6 +35,7 @@ If planning shows the task itself should change, stop and say so. Do not reshape
 ### 3. Implement
 
 - Small, well defined commits. Do not commit a state known to be broken.
+- Never add tool or assistant trailers to a commit message: no `Co-Authored-By` line for a tool and no session link.
 - Tests land in the commit with the behavior they cover.
 - Stay inside the approved plan. Surface what turns up outside it; do not fix it silently.
 - Comment the why where the code cannot say it, in a line or two. Do not narrate what the code does, and do not describe the change ("switched to X because Y"): that belongs in the commit message.
@@ -49,7 +50,7 @@ If planning shows the task itself should change, stop and say so. Do not reshape
 
 The phase 4 report is the pull request body, in the shape of [.github/pull_request_template.md](.github/pull_request_template.md). Publication still waits for the owner's approval, as above.
 
-A pull request is history, read later by someone who was not there. Write what is true of the change: no first person, no account of the session, no reference to a chat or a review. The title says what changed, not the branch name. The implementation plan is not committed; what survives of it is the body's decisions and what it left out.
+A pull request is history, read later by someone who was not there. Write what is true of the change: no first person, no account of the session, no reference to a chat or a review. The title says what changed, not the branch name. Never add a tool or assistant attribution line, such as "Generated with …", to the title or body. The implementation plan is not committed; what survives of it is the body's decisions and what it left out.
 
 ## Architecture and coding
 
