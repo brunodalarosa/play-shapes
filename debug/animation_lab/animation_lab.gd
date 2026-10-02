@@ -2,24 +2,22 @@ extends Control
 ## Focused desktop review of approved Squircle v1 motion at both reference sizes.
 
 const MANIFEST_PATH := "res://assets/runtime/animated_characters/squircle/v1/manifest.json"
-const ASSET_ROOT := "res://assets/runtime/animated_characters/squircle/v1/"
-const RENDERED_SAMPLE: Script = preload("res://debug/animation_lab/rendered_sample.gd")
-const ACTIONS := ["idle", "walk", "run"]
 const VIEWS := ["front", "three-quarter"]
-const EXPRESSIONS := ["neutral", "blink"]
+const EXPRESSIONS := ["auto", "neutral", "blink"]
 
 var _clips: Dictionary = {}
-var _textures: Dictionary = {}
-var _loaded_clip: String = ""
-var _samples: Array[SquircleRenderedSample] = []
+var _samples: Array[SquircleV1Playback] = []
+var _actions: Array[String] = []
 var _action: String = "idle"
 var _view: String = "front"
-var _expression: String = "neutral"
+var _expression: String = "auto"
 var _color: Dictionary = CharacterSelection.COLORS[5]
 var _elapsed: float = 0.0
 var _playing: bool = true
 var _info: Label
 var _play_button: Button
+var _speed := 1.0
+var _blink_elapsed := 0.0
 
 
 func _ready() -> void:
@@ -31,7 +29,10 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if _playing:
 		_elapsed += delta
-	_update_frame()
+		_blink_elapsed += delta * _speed
+		for sample: SquircleV1Playback in _samples:
+			sample.advance_playback(delta * _speed)
+	_update_expression()
 
 
 func _load_manifest() -> void:
@@ -42,19 +43,9 @@ func _load_manifest() -> void:
 	for clip: Dictionary in data.clips:
 		assert(int(clip.first_frame) == 1 and int(clip.last_frame) == int(clip.frames))
 		_clips["%s-%s" % [clip.name, clip.view]] = clip
-	assert(_clips.size() == ACTIONS.size() * VIEWS.size())
-
-
-func _sheet(key: String, layer: String, clip: Dictionary) -> Texture2D:
-	var sheet_key := "%s-%s" % [key, layer]
-	if not _textures.has(sheet_key):
-		var path := "%s%s.png" % [ASSET_ROOT, sheet_key]
-		var sheet := ResourceLoader.load(path) as Texture2D
-		assert(sheet != null, "Missing Squircle v1 sheet: " + path)
-		assert(sheet.get_width() == int(clip.sheet_columns) * 256)
-		assert(sheet.get_height() == ceili(float(clip.frames) / float(clip.sheet_columns)) * 256)
-		_textures[sheet_key] = sheet
-	return _textures[sheet_key] as Texture2D
+		if not _actions.has(String(clip.name)):
+			_actions.append(String(clip.name))
+	assert(_clips.size() == _actions.size() * VIEWS.size())
 
 
 func _build_ui() -> void:
@@ -83,11 +74,12 @@ func _build_ui() -> void:
 	subtitle.add_theme_font_size_override("font_size", 19)
 	column.add_child(subtitle)
 
-	var controls := HBoxContainer.new()
-	controls.add_theme_constant_override("separation", 18)
+	var controls := HFlowContainer.new()
+	controls.add_theme_constant_override("h_separation", 18)
+	controls.add_theme_constant_override("v_separation", 12)
 	column.add_child(controls)
-	_add_picker(controls, "Action", ACTIONS, 0, func(index: int) -> void:
-		_action = ACTIONS[index]
+	_add_picker(controls, "Action", _actions, 0, func(index: int) -> void:
+		_action = _actions[index]
 		_update_selection())
 	_add_picker(controls, "View", VIEWS, 0, func(index: int) -> void:
 		_view = VIEWS[index]
@@ -105,22 +97,34 @@ func _build_ui() -> void:
 	_play_button.text = "Pause"
 	_play_button.pressed.connect(_toggle_play)
 	controls.add_child(_play_button)
+	var release := Button.new()
+	release.text = "Release to idle"
+	release.pressed.connect(func() -> void: _request_action("idle"))
+	controls.add_child(release)
+	var enter := Button.new()
+	enter.text = "Enter selected pose"
+	enter.pressed.connect(func() -> void: _request_action(_action))
+	controls.add_child(enter)
+	_add_picker(controls, "Speed", ["Normal", "Half", "Quarter"], 0, func(index: int) -> void:
+		_speed = [1.0, 0.5, 0.25][index])
 
 	var stage := HBoxContainer.new()
 	stage.add_theme_constant_override("separation", 40)
 	column.add_child(stage)
 	_add_sample(stage, "256 px · full reference", 256)
 	_add_sample(stage, "128 px · small reference", 128)
+	_add_sample(stage, "Lobby scale · 0.58", 148.48)
 
 	_info = Label.new()
 	_info.add_theme_font_size_override("font_size", 19)
 	column.add_child(_info)
 	var note := Label.new()
-	note.text = "Each change starts at frame 1. Pause holds the current frame; Play resumes it. F12 opens the debug launcher."
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	note.text = "Actions transition through neutral. Held poses stay held. Release / Enter also works during entry. Pause and speed affect motion and natural blinking."
 	column.add_child(note)
 
 
-func _add_picker(parent: HBoxContainer, title: String, names: Array, initial: int, changed: Callable) -> void:
+func _add_picker(parent: Container, title: String, names: Array, initial: int, changed: Callable) -> void:
 	var group := VBoxContainer.new()
 	parent.add_child(group)
 	var label := Label.new()
@@ -134,7 +138,7 @@ func _add_picker(parent: HBoxContainer, title: String, names: Array, initial: in
 	group.add_child(picker)
 
 
-func _add_sample(parent: HBoxContainer, title: String, size: int) -> void:
+func _add_sample(parent: HBoxContainer, title: String, size: float) -> void:
 	var group := VBoxContainer.new()
 	group.add_theme_constant_override("separation", 12)
 	parent.add_child(group)
@@ -155,10 +159,11 @@ func _add_sample(parent: HBoxContainer, title: String, size: int) -> void:
 	floor.position = Vector2(0, 204.0 * size / 256.0)
 	floor.size = Vector2(size, 1)
 	canvas.add_child(floor)
-	var sample := RENDERED_SAMPLE.new() as SquircleRenderedSample
+	var sample := SquircleV1Playback.new()
 	sample.position = Vector2(size / 2.0, 204.0 * size / 256.0)
 	sample.scale = Vector2.ONE * float(size) / 256.0
 	canvas.add_child(sample)
+	sample.set_process(false)
 	_samples.append(sample)
 
 
@@ -166,27 +171,35 @@ func _update_selection() -> void:
 	_elapsed = 0.0
 	var key := "%s-%s" % [_action, _view]
 	var clip: Dictionary = _clips[key]
-	if _loaded_clip != key:
-		_textures.clear()
-		_loaded_clip = key
-	var base := _sheet(key, "colorable", clip)
-	var face := _sheet(key, _expression, clip)
-	for sample: SquircleRenderedSample in _samples:
-		sample.configure(clip, base, face, Color(String(_color.hex)))
+	for sample: SquircleV1Playback in _samples:
+		sample.player_color = Color(String(_color.hex))
+		sample.play(_action, _view)
+		sample.advance_playback(0.0)
 	var anchor := Vector2(float(clip.anchor_px[0]), float(clip.anchor_px[1]))
 	_info.text = "%s · %s · %s · %s  |  %d frames · %d fps · anchor (%.2f, %.2f)" % [
 		_action.capitalize(), _view.capitalize(), _color.name, _expression.capitalize(),
 		clip.frames, clip.fps, anchor.x, anchor.y]
-	_update_frame()
+	_update_expression()
 
 
 func _update_frame() -> void:
 	if _samples.is_empty():
 		return
-	var clip: Dictionary = _clips["%s-%s" % [_action, _view]]
-	var frame := int(_elapsed * float(clip.fps)) % int(clip.frames)
-	for sample: SquircleRenderedSample in _samples:
-		sample.show_frame(frame)
+	for sample: SquircleV1Playback in _samples:
+		sample.seek_clip(_action, _view, _elapsed * 1000.0)
+	_update_expression()
+
+
+func _request_action(action: String) -> void:
+	for sample: SquircleV1Playback in _samples:
+		sample.play(action, _view)
+
+
+func _update_expression() -> void:
+	var blink_time := fmod(_blink_elapsed, 3.7)
+	var blinking := _expression == "blink" or (_expression == "auto" and blink_time > 2.84 and blink_time < 2.98)
+	for sample: SquircleV1Playback in _samples:
+		sample.face_blink = blinking
 
 
 func _toggle_play() -> void:

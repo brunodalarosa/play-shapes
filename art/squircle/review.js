@@ -4,6 +4,9 @@ const {manifest,palette}=window.REVIEW_DATA;
 const ui=Object.fromEntries(['play','color','face','size','speed','ground','scrub','grid','error'].map(id=>[id,document.getElementById(id)]));
 for(const [name,hex] of Object.entries(palette))ui.color.add(new Option(name,hex,name==='Blue',name==='Blue'));
 const load=src=>new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>reject(new Error(`Could not load ${src}`));img.src=src;});
+// Review cycle: enter, sustain, reverse release, then wait at neutral.
+const reviewFrame=(clip,tick)=>clip.playback==='held'?
+  (tick<36?Math.min(tick,clip.frames-1):Math.max(0,clip.frames-1-(tick-36))):tick%clip.frames;
 let playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;
 let time=0,last=0;
 ui.play.textContent=playing?'Pause':'Play';
@@ -41,7 +44,7 @@ async function start(){
   for(const clip of sorted){
     const key=`${clip.name}-${clip.view}`;
     const element=document.createElement('article');element.className='card';
-    const heading=document.createElement('h2');heading.textContent=clip.name[0].toUpperCase()+clip.name.slice(1);
+    const heading=document.createElement('h2');heading.textContent=(clip.name[0].toUpperCase()+clip.name.slice(1)).replaceAll('_',' ');
     const caption=document.createElement('p');caption.textContent=clip.view==='front'?'Front':'Three-quarter';
     const canvas=document.createElement('canvas');canvas.width=canvas.height=256;canvas.setAttribute('aria-label',heading.textContent+' '+caption.textContent+' animated character');
     const sheetLink=document.createElement('a');sheetLink.href=`previews/${key}-beauty.png`;sheetLink.textContent='View sprite sheet';sheetLink.className='meta';
@@ -54,7 +57,7 @@ async function start(){
     if(playing)ui.scrub.value=Math.floor(time*24)%48;
     const blinkTime=time%3.7,expression=ui.face.value==='auto'?(blinkTime>2.84&&blinkTime<2.98?'blink':'neutral'):ui.face.value;
     for(const card of cards){
-      const {ctx,clip}=card,frame=Math.floor(time*24)%clip.frames,record=clip.sequence[frame];
+      const {ctx,clip}=card,frame=reviewFrame(clip,Math.floor(time*24)%48),record=clip.sequence[frame];
       if(card.color!==ui.color.value){card.colored=tinted(card.base,ui.color.value);card.color=ui.color.value;}
       ctx.clearRect(0,0,256,256);if(ui.ground.checked)ground(ctx,clip,record);
       const sx=frame%8*256,sy=Math.floor(frame/8)*256;

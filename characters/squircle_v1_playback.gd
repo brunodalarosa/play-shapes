@@ -40,6 +40,8 @@ var _blink: Sprite2D
 var _clip_key := "idle-front"
 var _elapsed_msec := 0.0
 var _external_time_msec := -1
+var _pending_clip_key := ""
+var _releasing := false
 var _tile_size := Vector2i(256, 256)
 
 
@@ -66,11 +68,29 @@ func _exit_tree() -> void:
 
 
 func _process(delta: float) -> void:
-	if _external_time_msec < 0:
-		_elapsed_msec += delta * 1000.0
+	advance_playback(delta)
+
+
+## Also used by the paused/slow-motion lab. Held entries clamp; release reverses
+## the current progress, so a short tap or re-press never jumps to an endpoint.
+func advance_playback(delta: float) -> void:
 	var clip: Dictionary = _clips[_clip_key]
-	var time_msec := float(_external_time_msec) if _external_time_msec >= 0 else _elapsed_msec
-	var frame := int(floor(time_msec * float(clip.fps) / 1000.0)) % int(clip.frames)
+	if clip.get("playback", "loop") == "held":
+		var duration := float(int(clip.frames) - 1) * 1000.0 / float(clip.fps)
+		_elapsed_msec = clampf(_elapsed_msec + delta * 1000.0 * (-1.0 if _releasing else 1.0), 0.0, duration)
+		if _releasing and _elapsed_msec <= 0.0:
+			var next := _pending_clip_key
+			_releasing = false
+			_pending_clip_key = ""
+			_start_clip(next)
+			clip = _clips[_clip_key]
+	elif _external_time_msec < 0:
+		_elapsed_msec += delta * 1000.0
+	var time_msec := _elapsed_msec
+	if clip.get("playback", "loop") != "held" and _external_time_msec >= 0:
+		time_msec = float(_external_time_msec)
+	var frame := int(floor(time_msec * float(clip.fps) / 1000.0 + 0.00001))
+	frame = mini(frame, int(clip.frames) - 1) if clip.get("playback", "loop") == "held" else frame % int(clip.frames)
 	var columns := int(clip.sheet_columns)
 	var tile := Rect2(frame % columns * _tile_size.x,
 		floori(float(frame) / float(columns)) * _tile_size.y, _tile_size.x, _tile_size.y)
@@ -80,12 +100,37 @@ func _process(delta: float) -> void:
 
 func play(action: String = "idle", view: String = "front") -> void:
 	var key := "%s-%s" % [action, view]
-	if key == _clip_key or not _clips.has(key):
+	if not _clips.has(key):
 		return
+	if key == _clip_key:
+		_releasing = false
+		_pending_clip_key = ""
+		return
+	if _clips[_clip_key].get("playback", "loop") == "held" and _elapsed_msec > 0.0:
+		_pending_clip_key = key
+		_releasing = true
+		return
+	_start_clip(key)
+
+
+func _start_clip(key: String) -> void:
 	_clip_key = key
 	_elapsed_msec = 0.0
 	if _colorable != null:
 		_apply_clip()
+
+
+## Deterministic frame inspection, separate from normal play/release behavior.
+func seek_clip(action: String, view: String, time_msec: float) -> void:
+	var key := "%s-%s" % [action, view]
+	if not _clips.has(key):
+		return
+	_external_time_msec = -1
+	_releasing = false
+	_pending_clip_key = ""
+	_start_clip(key)
+	_elapsed_msec = maxf(0.0, float(time_msec))
+	advance_playback(0.0)
 
 
 func set_playback_time_msec(value: int) -> void:

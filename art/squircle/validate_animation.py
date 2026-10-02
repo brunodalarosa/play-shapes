@@ -8,7 +8,7 @@ from bpy_extras.object_utils import world_to_camera_view
 
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
-from animation_common import CLIPS, CONTROLS, PARTS, VIEWS, activate_clip
+from animation_common import CLIPS, CONTROLS, PARTS, VIEWS, activate_clip, action_name
 scene=bpy.data.scenes['PS057 | Squircle Animation Studio']
 bpy.context.window.scene=scene
 report={'source':'squircle-animated.blend','blender':bpy.app.version_string,'checks':[], 'clips':{},
@@ -30,9 +30,25 @@ for clip,spec in CLIPS.items():
     rig=activate_clip(scene,clip)
     scene.frame_set(1);bpy.context.view_layer.update()
     first={n:bpy.data.objects[p].matrix_world.copy() for n,p in CONTROLS.items()}
-    scene.frame_set(spec['frames']+1);bpy.context.view_layer.update()
-    seam=max(abs(first[n][r][c]-bpy.data.objects[p].matrix_world[r][c]) for n,p in CONTROLS.items() for r in range(4) for c in range(4))
-    check(clip+' seam pose',seam<1e-6,seam)
+    held = spec.get('playback') == 'held'
+    scene.frame_set(spec['frames'] if held else spec['frames']+1);bpy.context.view_layer.update()
+    end={n:bpy.data.objects[p].matrix_world.copy() for n,p in CONTROLS.items()}
+    if held:
+        scene.frame_set(spec['frames']+240);bpy.context.view_layer.update()
+    seam=max(abs((end if held else first)[n][r][c]-bpy.data.objects[p].matrix_world[r][c]) for n,p in CONTROLS.items() for r in range(4) for c in range(4))
+    check(clip+(' sustained hold' if held else ' seam pose'),seam<1e-6,seam)
+    if held:
+        check(clip+' both feet fixed through entry',all(max(abs(first[n][r][c]-end[n][r][c]) for r in range(4) for c in range(4))<1e-6 for n in ('Foot.L','Foot.R')))
+        if clip=='look_up':
+            check('look up raises both hands above body',all(end[n].translation.z>end['Body'].translation.z+1 for n in ('Hand.L','Hand.R')))
+            check('look up tilts face upward', (end['Body'].to_3x3()@Vector((0,-1,0))).z>.1)
+        else:
+            check('crouch lowers body and brings both hands inward',end['Body'].translation.z<first['Body'].translation.z-.15 and all(abs(end[n].translation.x)<abs(first[n].translation.x)-.15 for n in ('Hand.L','Hand.R')))
+        idle=activate_clip(scene,'idle')
+        neutral_error=max(abs(first[n][r][c]-bpy.data.objects[p].matrix_world[r][c]) for n,p in CONTROLS.items() for r in range(4) for c in range(4))
+        check(clip+' neutral entry/reverse exit matches idle',neutral_error<1e-6,neutral_error)
+        rig=activate_clip(scene,clip)
+        check(clip+' no cyclic reset',not any(m.type=='CYCLES' for l in rig.animation_data.action.layers for s in l.strips for b in s.channelbags for c in b.fcurves for m in c.modifiers))
     min_z=1e9;planted_z=0;max_slip=0;min_border=1e9;min_foot_body_gap=1e9
     hand_y=[]; hand_min_z=1e9; min_hand_body_gap=1e9; min_hand_foot_gap=1e9
     previous={}
@@ -109,7 +125,7 @@ for clip,spec in CLIPS.items():
                            'minimum_hand_floor_clearance_m':hand_min_z,
                            'minimum_hand_body_x_gap_m':min_hand_body_gap}
 check('run hand swing exceeds walk',report['clips']['run']['hand_y_travel_m']>1.2 and report['clips']['run']['hand_y_travel_m']>2*report['clips']['walk']['hand_y_travel_m'])
-check('three independent editable actions', all('PS057 | '+x.title() in bpy.data.actions for x in CLIPS))
+check('all independent editable actions', all(action_name(x) in bpy.data.actions for x in CLIPS))
 check('five independently controlled parts',len(rig.pose.bones)==5)
 check('packed neutral and blink textures',all(bpy.data.images['PS056 Face - '+x].packed_file for x in ('neutral','blink')))
 check('root fixed at ground origin',bpy.data.objects['Character.Root - ground anchor'].location.length<1e-8)

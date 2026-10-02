@@ -148,12 +148,147 @@
       "detail": 0.20379364490509033
     },
     {
+      "name": "look_up sustained hold",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "look_up both feet fixed through entry",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "look up raises both hands above body",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "look up tilts face upward",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "look_up neutral entry/reverse exit matches idle",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "look_up no cyclic reset",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "look_up no sole penetration",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "look_up planted soles",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "look_up stance world travel cancels",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "look_up fixed-camera containment",
+      "passed": true,
+      "detail": 11.383341789245605
+    },
+    {
+      "name": "look_up floating foot-body gap",
+      "passed": true,
+      "detail": 0.20616745948791504
+    },
+    {
+      "name": "look_up sphere foot clearance (conservative AABB)",
+      "passed": true,
+      "detail": 0.5966631077467712
+    },
+    {
+      "name": "look_up hand floor clearance",
+      "passed": true,
+      "detail": 0.6395466923713684
+    },
+    {
+      "name": "look_up hand body clearance in X",
+      "passed": true,
+      "detail": 0.1294008493423462
+    },
+    {
+      "name": "crouch sustained hold",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "crouch both feet fixed through entry",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "crouch lowers body and brings both hands inward",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "crouch neutral entry/reverse exit matches idle",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "crouch no cyclic reset",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "crouch no sole penetration",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "crouch planted soles",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "crouch stance world travel cancels",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "crouch fixed-camera containment",
+      "passed": true,
+      "detail": 11.383341789245605
+    },
+    {
+      "name": "crouch floating foot-body gap",
+      "passed": true,
+      "detail": 0.0700000524520874
+    },
+    {
+      "name": "crouch sphere foot clearance (conservative AABB)",
+      "passed": true,
+      "detail": 0.5966631077467712
+    },
+    {
+      "name": "crouch hand floor clearance",
+      "passed": true,
+      "detail": 0.6395466923713684
+    },
+    {
+      "name": "crouch hand body clearance in X",
+      "passed": true,
+      "detail": 0.08002209663391113
+    },
+    {
       "name": "run hand swing exceeds walk",
       "passed": true,
       "detail": null
     },
     {
-      "name": "three independent editable actions",
+      "name": "all independent editable actions",
       "passed": true,
       "detail": null
     },
@@ -214,6 +349,30 @@
       "hand_y_travel_m": 1.340000033378601,
       "minimum_hand_floor_clearance_m": 0.6000704169273376,
       "minimum_hand_body_x_gap_m": 0.20379364490509033
+    },
+    "look_up": {
+      "max_seam_matrix_error": 0.0,
+      "minimum_sole_z": 0.0,
+      "max_planted_sole_error": 0,
+      "max_stance_slip_per_quarter_frame_m": 0,
+      "minimum_projected_bound_margin_px": 11.383341789245605,
+      "minimum_vertical_foot_body_gap_m": 0.20616745948791504,
+      "minimum_hand_foot_aabb_gap_m": 0.5966631077467712,
+      "hand_y_travel_m": 0.16313108056783676,
+      "minimum_hand_floor_clearance_m": 0.6395466923713684,
+      "minimum_hand_body_x_gap_m": 0.1294008493423462
+    },
+    "crouch": {
+      "max_seam_matrix_error": 0.0,
+      "minimum_sole_z": 0.0,
+      "max_planted_sole_error": 0,
+      "max_stance_slip_per_quarter_frame_m": 0,
+      "minimum_projected_bound_margin_px": 11.383341789245605,
+      "minimum_vertical_foot_body_gap_m": 0.0700000524520874,
+      "minimum_hand_foot_aabb_gap_m": 0.5966631077467712,
+      "hand_y_travel_m": 0.10313107818365097,
+      "minimum_hand_floor_clearance_m": 0.6395466923713684,
+      "minimum_hand_body_x_gap_m": 0.08002209663391113
     }
   },
   "approval": "Technical evidence only; physical-phone and owner motion review are separate.",
