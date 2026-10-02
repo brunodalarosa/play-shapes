@@ -1,0 +1,221 @@
+{
+  "source": "squircle-animated.blend",
+  "blender": "5.2.2 LTS",
+  "checks": [
+    {
+      "name": "Hand.L smooth spherical mesh",
+      "passed": true,
+      "detail": 0.6000011780132462
+    },
+    {
+      "name": "Hand.R smooth spherical mesh",
+      "passed": true,
+      "detail": 0.6000011780132462
+    },
+    {
+      "name": "idle seam pose",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "idle no sole penetration",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "idle planted soles",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "idle stance world travel cancels",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "idle fixed-camera containment",
+      "passed": true,
+      "detail": 11.383341789245605
+    },
+    {
+      "name": "idle floating foot-body gap",
+      "passed": true,
+      "detail": 0.20984911918640137
+    },
+    {
+      "name": "idle sphere foot clearance (conservative AABB)",
+      "passed": true,
+      "detail": 0.5884389215673345
+    },
+    {
+      "name": "idle hand floor clearance",
+      "passed": true,
+      "detail": 0.6355121731758118
+    },
+    {
+      "name": "idle hand body clearance in X",
+      "passed": true,
+      "detail": 0.25992727279663086
+    },
+    {
+      "name": "walk seam pose",
+      "passed": true,
+      "detail": 1.5140622942303238e-17
+    },
+    {
+      "name": "walk no sole penetration",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "walk planted soles",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "walk stance world travel cancels",
+      "passed": true,
+      "detail": 1.1920928955078125e-07
+    },
+    {
+      "name": "walk fixed-camera containment",
+      "passed": true,
+      "detail": 10.765421867370605
+    },
+    {
+      "name": "walk floating foot-body gap",
+      "passed": true,
+      "detail": 0.0779222846031189
+    },
+    {
+      "name": "walk sphere foot clearance (conservative AABB)",
+      "passed": true,
+      "detail": 0.46195089764065606
+    },
+    {
+      "name": "walk hand floor clearance",
+      "passed": true,
+      "detail": 0.6056167483329773
+    },
+    {
+      "name": "walk hand body clearance in X",
+      "passed": true,
+      "detail": 0.2222064733505249
+    },
+    {
+      "name": "run seam pose",
+      "passed": true,
+      "detail": 1.5920407760118202e-17
+    },
+    {
+      "name": "run no sole penetration",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "run planted soles",
+      "passed": true,
+      "detail": 0
+    },
+    {
+      "name": "run stance world travel cancels",
+      "passed": true,
+      "detail": 5.960464477539063e-08
+    },
+    {
+      "name": "run fixed-camera containment",
+      "passed": true,
+      "detail": 6.8227081298828125
+    },
+    {
+      "name": "run floating foot-body gap",
+      "passed": true,
+      "detail": 0.1175849437713623
+    },
+    {
+      "name": "run sphere foot clearance (conservative AABB)",
+      "passed": true,
+      "detail": 0.47736314912293015
+    },
+    {
+      "name": "run hand floor clearance",
+      "passed": true,
+      "detail": 0.6000704169273376
+    },
+    {
+      "name": "run hand body clearance in X",
+      "passed": true,
+      "detail": 0.20379364490509033
+    },
+    {
+      "name": "run hand swing exceeds walk",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "three independent editable actions",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "five independently controlled parts",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "packed neutral and blink textures",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "root fixed at ground origin",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "optional shadow disabled",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "clips": {
+    "idle": {
+      "max_seam_matrix_error": 0.0,
+      "minimum_sole_z": 0.0,
+      "max_planted_sole_error": 0,
+      "max_stance_slip_per_quarter_frame_m": 0,
+      "minimum_projected_bound_margin_px": 11.383341789245605,
+      "minimum_vertical_foot_body_gap_m": 0.20984911918640137,
+      "minimum_hand_foot_aabb_gap_m": 0.5884389215673345,
+      "hand_y_travel_m": 0.03592304140329361,
+      "minimum_hand_floor_clearance_m": 0.6355121731758118,
+      "minimum_hand_body_x_gap_m": 0.25992727279663086
+    },
+    "walk": {
+      "max_seam_matrix_error": 1.5140622942303238e-17,
+      "minimum_sole_z": 0.0,
+      "max_planted_sole_error": 0,
+      "max_stance_slip_per_quarter_frame_m": 1.1920928955078125e-07,
+      "minimum_projected_bound_margin_px": 10.765421867370605,
+      "minimum_vertical_foot_body_gap_m": 0.0779222846031189,
+      "minimum_hand_foot_aabb_gap_m": 0.46195089764065606,
+      "hand_y_travel_m": 0.594866931438446,
+      "minimum_hand_floor_clearance_m": 0.6056167483329773,
+      "minimum_hand_body_x_gap_m": 0.2222064733505249
+    },
+    "run": {
+      "max_seam_matrix_error": 1.5920407760118202e-17,
+      "minimum_sole_z": 0.0,
+      "max_planted_sole_error": 0,
+      "max_stance_slip_per_quarter_frame_m": 5.960464477539063e-08,
+      "minimum_projected_bound_margin_px": 6.8227081298828125,
+      "minimum_vertical_foot_body_gap_m": 0.1175849437713623,
+      "minimum_hand_foot_aabb_gap_m": 0.47736314912293015,
+      "hand_y_travel_m": 1.340000033378601,
+      "minimum_hand_floor_clearance_m": 0.6000704169273376,
+      "minimum_hand_body_x_gap_m": 0.20379364490509033
+    }
+  },
+  "approval": "Technical evidence only; physical-phone and owner motion review are separate.",
+  "passed": true
+}

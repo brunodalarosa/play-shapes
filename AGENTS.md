@@ -14,6 +14,8 @@ This directory is the Godot project root. Work on a new local branch and commit 
 
 Play Shapes is a playful imagined world of living toys and crafts. Draw from toys, school supplies, papercraft, plushies, colorful foods and plants, action figures, blocks, and pencil drawings. Favor stylized, recognizable forms over photorealism. Apply this to UI, environments, characters, effects, shaders, and animation.
 
+The canonical editable Squircle source and current export tools live in `art/squircle/`. Keep only current source and useful pipeline/review resources there. Prior versions, backups, variant experiments and version comparisons are temporary artifacts: use ignored `scratch/` or `comparisons/` directories and do not commit them or obsolete one-time construction scripts.
+
 ## Setup and verification
 
 - Use Godot 4.7.2 or newer with the GL Compatibility renderer. Run `godot --version` and `godot --path .` from this repository root. Set `GODOT_BIN` to a Godot executable when it is not on PATH.
