@@ -12,7 +12,21 @@ from animation_common import CLIPS, CONTROLS, PARTS, VIEWS, activate_clip
 scene=bpy.data.scenes['PS057 | Squircle Animation Studio']
 bpy.context.window.scene=scene
 report={'source':'squircle-animated.blend','blender':bpy.app.version_string,'checks':[], 'clips':{},
-        'approval':'Technical evidence only; owner approved Squircle v1 poses on 2026-09-27.'}
+        'approval':'Technical evidence only; PS079 owner proportion and motion approval pending.'}
+SPHERES = scene.get('Hand model') == 'PS079 spheres'
+if SPHERES:
+    for name in ('Hand.L','Hand.R'):
+        hand = bpy.data.objects[name]
+        radii = [v.co.length for v in hand.data.vertices]
+        check_name = name + ' smooth sphere without glove dependencies'
+        report['checks'].append({'name':check_name,'passed':bool(
+            max(radii)-min(radii)<1e-6 and abs(max(radii)-scene['Hand diameter m']/2)<1e-6
+            and not hand.data.shape_keys and not hand.modifiers
+            and all(p.use_smooth for p in hand.data.polygons)), 'detail':max(radii)*2})
+    report['checks'].append({'name':'No obsolete curl property or channels', 'passed':bool(
+        'Hand curl' not in bpy.data.objects['Animation.Controls']
+        and all(f.data_path != '["Hand curl"]' for a in bpy.data.actions for l in a.layers
+                for s in l.strips for bag in s.channelbags for f in bag.fcurves)), 'detail':None})
 
 
 def check(name,condition,detail=None):
@@ -28,7 +42,7 @@ for clip,spec in CLIPS.items():
     check(clip+' seam pose',seam<1e-6,seam)
     min_z=1e9;planted_z=0;max_slip=0;min_border=1e9;min_foot_body_gap=1e9
     min_fingers_down=1.0; hand_y=[]; hand_min_z=1e9; min_hand_body_gap=1e9
-    min_palm_inward=1.0; min_palm_toward_body=1.0
+    min_palm_inward=1.0; min_palm_toward_body=1.0; min_hand_foot_gap=1e9
     previous={}
     for sub in range(spec['frames']*4+1):
         f=1+sub/4
@@ -64,6 +78,14 @@ for clip,spec in CLIPS.items():
             mesh=foot.to_mesh()
             sole=min((foot.matrix_world@v.co).z for v in mesh.vertices)
             foot_top=max((foot.matrix_world@v.co).z for v in mesh.vertices)
+            if SPHERES:
+                points=[foot.matrix_world@v.co for v in mesh.vertices]
+                lo=Vector([min(p[i] for p in points) for i in range(3)])
+                hi=Vector([max(p[i] for p in points) for i in range(3)])
+                for hand_name in ('Hand.L','Hand.R'):
+                    center=bpy.data.objects[hand_name].matrix_world.translation
+                    closest=Vector([max(lo[i],min(hi[i],center[i])) for i in range(3)])
+                    min_hand_foot_gap=min(min_hand_foot_gap,(center-closest).length-scene['Hand diameter m']/2)
             min_foot_body_gap=min(min_foot_body_gap,body_bottom-foot_top)
             foot.to_mesh_clear()
             min_z=min(min_z,sole)
@@ -91,13 +113,17 @@ for clip,spec in CLIPS.items():
     check(clip+' stance world travel cancels',max_slip<2e-6,max_slip)
     check(clip+' fixed-camera containment',min_border>0,min_border*256)
     check(clip+' floating foot-body gap',min_foot_body_gap>.04,min_foot_body_gap)
-    if clip=='idle':check('idle fingertips hang down',min_fingers_down>.95,min_fingers_down)
-    check(clip+' palms face inward throughout loop',min_palm_inward>.3,min_palm_inward)
-    check(clip+' palms point toward body throughout loop',min_palm_toward_body>.3,min_palm_toward_body)
+    if not SPHERES:
+        if clip=='idle':check('idle fingertips hang down',min_fingers_down>.95,min_fingers_down)
+        check(clip+' palms face inward throughout loop',min_palm_inward>.3,min_palm_inward)
+        check(clip+' palms point toward body throughout loop',min_palm_toward_body>.3,min_palm_toward_body)
+    else:
+        check(clip+' sphere foot clearance (conservative AABB)',min_hand_foot_gap>0,min_hand_foot_gap)
     check(clip+' hand floor clearance',hand_min_z>.05,hand_min_z)
     check(clip+' hand body clearance in X',min_hand_body_gap>0,min_hand_body_gap)
     expected={'idle':0.0,'walk':.35,'run':1.0}[clip]
-    check(clip+' saved hand shape', all(abs(bpy.data.objects[n].data.shape_keys.key_blocks['Closed fist'].value-expected)<1e-6 for n in ('Hand.L','Hand.R')))
+    if not SPHERES:
+        check(clip+' saved hand shape', all(abs(bpy.data.objects[n].data.shape_keys.key_blocks['Closed fist'].value-expected)<1e-6 for n in ('Hand.L','Hand.R')))
     report['clips'][clip]={'max_seam_matrix_error':seam,'minimum_sole_z':min_z,
                            'max_planted_sole_error':planted_z,'max_stance_slip_per_quarter_frame_m':max_slip,
                            'minimum_projected_bound_margin_px':min_border*256,
@@ -108,6 +134,10 @@ for clip,spec in CLIPS.items():
                            'hand_y_travel_m':max(hand_y)-min(hand_y),
                            'minimum_hand_floor_clearance_m':hand_min_z,
                            'minimum_hand_body_x_gap_m':min_hand_body_gap}
+    if SPHERES:
+        report['clips'][clip]['minimum_hand_foot_aabb_gap_m']=min_hand_foot_gap
+        for obsolete in ('minimum_fingers_down_dot','minimum_palm_inward_dot','minimum_palm_toward_body_dot'):
+            report['clips'][clip].pop(obsolete)
 check('run hand swing exceeds walk and previous run',report['clips']['run']['hand_y_travel_m']>1.2 and report['clips']['run']['hand_y_travel_m']>2*report['clips']['walk']['hand_y_travel_m'])
 check('three independent editable actions', all('PS057 | '+x.title() in bpy.data.actions for x in CLIPS))
 check('five independently controlled parts',len(rig.pose.bones)==5)

@@ -26,6 +26,8 @@ parser.add_argument('--views', nargs='+', choices=list(VIEWS), default=list(VIEW
 parser.add_argument('--frames', nargs='+', type=int)
 parser.add_argument('--hand-curl', type=float, choices=[0.0, .35, 1.0], help='Review-only override; requires a separate output folder')
 args = parser.parse_args(sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else [])
+if args.hand_curl is not None and 'Hand curl' not in bpy.data.objects['Animation.Controls']:
+    parser.error('Spherical hands have no curl variants; export the saved source without --hand-curl')
 if args.output == 'export' and (args.frames or args.clips != list(CLIPS) or args.views != list(VIEWS) or args.hand_curl is not None):
     parser.error('Partial exports and hand variants require --output to a separate folder')
 out = HERE / args.output

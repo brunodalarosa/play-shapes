@@ -4,12 +4,16 @@ Run after export_frames.py and make_previews.py. Optional walk-open-ps064 export
 is generated with --clips walk --hand-curl 0 --output walk-open-ps064.
 """
 from pathlib import Path
-import json, hashlib, shutil
+import json, hashlib, shutil, argparse
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 HERE = Path(__file__).resolve().parent
 PRE = HERE/'previews'
-BEFORE = HERE/'before-inward-ps064/previews'
+parser = argparse.ArgumentParser()
+parser.add_argument('--task', choices=['PS-064', 'PS-079'], default='PS-064')
+args = parser.parse_args()
+SPHERES = args.task == 'PS-079'
+BEFORE = HERE/('before-ps079/previews' if SPHERES else 'before-inward-ps064/previews')
 ROOT = HERE.parents[2]
 OUT = ROOT/'assets/runtime/animated_characters/squircle/v1'
 OUT.mkdir(parents=True,exist_ok=True)
@@ -25,9 +29,9 @@ def animate(name, size, sources):
     font = ImageFont.truetype('DejaVuSans.ttf',12 if size==128 else 16)
     boards=[]
     for tick in range(48):
-        board=Image.new('RGBA',(4*(size+20)+20,2*(size+40)+65),(26,33,47,255))
+        board=Image.new('RGBA',(len(sources)*(size+20)+20,2*(size+40)+65),(26,33,47,255))
         draw=ImageDraw.Draw(board)
-        draw.text((20,12),f'PS-064 / {name} / {size} px canvases / approval pending',font=font,fill='white')
+        draw.text((20,12),f'{args.task} / {name} / {size} px canvases / approval pending',font=font,fill='white')
         for row, view in enumerate(('front','three-quarter')):
             for col,(label,read_frame) in enumerate(sources):
                 x,y=20+col*(size+20),48+row*(size+40)
@@ -38,11 +42,11 @@ def animate(name, size, sources):
     boards[5].save(PRE/f'{name}-{size}.png')
 
 for size in (256,128):
-    animate('before-after',size,[(f'{era} {action}',lambda v,t,p=p,a=action:frame(p,a,v,t))
-        for action in ('idle','run') for era,p in [('Before',BEFORE),('After',PRE)]])
+    animate('ps079-before-after' if SPHERES else 'before-after',size,[(f'{era} {action}',lambda v,t,p=p,a=action:frame(p,a,v,t))
+        for action in (('idle','walk','run') if SPHERES else ('idle','run')) for era,p in [('Before',BEFORE),('After',PRE)]])
 
 alternative=HERE/'walk-open-ps064'
-if (alternative/'manifest.json').exists():
+if not SPHERES and (alternative/'manifest.json').exists():
     alt=json.loads((alternative/'manifest.json').read_text())
     cache={}
     tex=Image.open(alternative/'expressions/neutral.png').convert('RGBA')
@@ -81,11 +85,11 @@ clip_manifest={'schema':'play-shapes.squircle-animation.v1',
 (OUT/'manifest.json').write_text(json.dumps(clip_manifest,indent=2)+'\n',encoding='utf-8')
 record={'source_sha256':manifest['source_sha256'],'sheets':hashes,
         'runtime_directory':'assets/runtime/animated_characters/squircle/v1',
-        'note':'Approved Squircle v1 sheets are shared by the Playground lobby and F12 preview.'}
-(HERE/'ps064-runtime-sync.json').write_text(json.dumps(record,indent=2)+'\n')
+        'note':args.task + ' sheets shared by Playground, Bubbles and F12; owner review pending.'}
+(HERE/('ps079-runtime-sync.json' if SPHERES else 'ps064-runtime-sync.json')).write_text(json.dumps(record,indent=2)+'\n')
 print('Squircle v1: 18 Godot sheets, manifest, and review media updated.')
 
-if all((PRE/f'hand-detail-{pose}.png').exists() for pose in ('open','closed')):
+if not SPHERES and all((PRE/f'hand-detail-{pose}.png').exists() for pose in ('open','closed')):
     board=Image.new('RGBA',(1024,560),(26,33,47,255))
     draw=ImageDraw.Draw(board)
     font=ImageFont.truetype('DejaVuSans.ttf',20)

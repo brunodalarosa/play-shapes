@@ -5,11 +5,11 @@
   "byte_identical_png_files": 2,
   "max_consumed_channel_difference_8bit": 1,
   "max_unused_mask_rgb_difference_8bit": 0,
-  "minimum_rendered_alpha_margin_px": 15,
+  "minimum_rendered_alpha_margin_px": 13,
   "straight_alpha_edge_evidence": {
     "sample": "idle/front/colorable/0001.png",
-    "edge_rgb_mean_8bit": 121.31547619047619,
-    "edge_alpha_mean_8bit": 7.314285714285714
+    "edge_rgb_mean_8bit": 125.84391534391534,
+    "edge_alpha_mean_8bit": 7.261904761904762
   },
   "clips": 6,
   "animation_frames": 176,

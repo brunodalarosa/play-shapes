@@ -3,6 +3,21 @@
   "blender": "5.2.2 LTS",
   "checks": [
     {
+      "name": "Hand.L smooth sphere without glove dependencies",
+      "passed": true,
+      "detail": 0.6000011780132462
+    },
+    {
+      "name": "Hand.R smooth sphere without glove dependencies",
+      "passed": true,
+      "detail": 0.6000011780132462
+    },
+    {
+      "name": "No obsolete curl property or channels",
+      "passed": true,
+      "detail": null
+    },
+    {
       "name": "idle seam pose",
       "passed": true,
       "detail": 0.0
@@ -25,7 +40,7 @@
     {
       "name": "idle fixed-camera containment",
       "passed": true,
-      "detail": 15.54484748840332
+      "detail": 11.383341789245605
     },
     {
       "name": "idle floating foot-body gap",
@@ -33,34 +48,19 @@
       "detail": 0.20984911918640137
     },
     {
-      "name": "idle fingertips hang down",
+      "name": "idle sphere foot clearance (conservative AABB)",
       "passed": true,
-      "detail": 0.9793368577957153
-    },
-    {
-      "name": "idle palms face inward throughout loop",
-      "passed": true,
-      "detail": 0.8333069682121277
-    },
-    {
-      "name": "idle palms point toward body throughout loop",
-      "passed": true,
-      "detail": 0.6960635539144278
+      "detail": 0.5884389215673345
     },
     {
       "name": "idle hand floor clearance",
       "passed": true,
-      "detail": 0.25152674317359924
+      "detail": 0.6355121731758118
     },
     {
       "name": "idle hand body clearance in X",
       "passed": true,
-      "detail": 0.3082345724105835
-    },
-    {
-      "name": "idle saved hand shape",
-      "passed": true,
-      "detail": null
+      "detail": 0.25992727279663086
     },
     {
       "name": "walk seam pose",
@@ -85,7 +85,7 @@
     {
       "name": "walk fixed-camera containment",
       "passed": true,
-      "detail": 13.483452796936035
+      "detail": 10.765421867370605
     },
     {
       "name": "walk floating foot-body gap",
@@ -93,29 +93,19 @@
       "detail": 0.0779222846031189
     },
     {
-      "name": "walk palms face inward throughout loop",
+      "name": "walk sphere foot clearance (conservative AABB)",
       "passed": true,
-      "detail": 0.8250158429145813
-    },
-    {
-      "name": "walk palms point toward body throughout loop",
-      "passed": true,
-      "detail": 0.6425467263907194
+      "detail": 0.46195089764065606
     },
     {
       "name": "walk hand floor clearance",
       "passed": true,
-      "detail": 0.3199325501918793
+      "detail": 0.6056167483329773
     },
     {
       "name": "walk hand body clearance in X",
       "passed": true,
-      "detail": 0.1818023920059204
-    },
-    {
-      "name": "walk saved hand shape",
-      "passed": true,
-      "detail": null
+      "detail": 0.2222064733505249
     },
     {
       "name": "run seam pose",
@@ -140,7 +130,7 @@
     {
       "name": "run fixed-camera containment",
       "passed": true,
-      "detail": 9.80002212524414
+      "detail": 6.8227081298828125
     },
     {
       "name": "run floating foot-body gap",
@@ -148,29 +138,19 @@
       "detail": 0.1175849437713623
     },
     {
-      "name": "run palms face inward throughout loop",
+      "name": "run sphere foot clearance (conservative AABB)",
       "passed": true,
-      "detail": 0.8096184134483337
-    },
-    {
-      "name": "run palms point toward body throughout loop",
-      "passed": true,
-      "detail": 0.36325597763061523
+      "detail": 0.47736314912293015
     },
     {
       "name": "run hand floor clearance",
       "passed": true,
-      "detail": 0.43540552258491516
+      "detail": 0.6000704169273376
     },
     {
       "name": "run hand body clearance in X",
       "passed": true,
-      "detail": 0.11176002025604248
-    },
-    {
-      "name": "run saved hand shape",
-      "passed": true,
-      "detail": null
+      "detail": 0.20379364490509033
     },
     {
       "name": "run hand swing exceeds walk and previous run",
@@ -209,44 +189,38 @@
       "minimum_sole_z": 0.0,
       "max_planted_sole_error": 0,
       "max_stance_slip_per_quarter_frame_m": 0,
-      "minimum_projected_bound_margin_px": 15.54484748840332,
+      "minimum_projected_bound_margin_px": 11.383341789245605,
       "minimum_vertical_foot_body_gap_m": 0.20984911918640137,
-      "minimum_fingers_down_dot": 0.9793368577957153,
-      "minimum_palm_inward_dot": 0.8333069682121277,
-      "minimum_palm_toward_body_dot": 0.6960635539144278,
       "hand_y_travel_m": 0.03592304140329361,
-      "minimum_hand_floor_clearance_m": 0.25152674317359924,
-      "minimum_hand_body_x_gap_m": 0.3082345724105835
+      "minimum_hand_floor_clearance_m": 0.6355121731758118,
+      "minimum_hand_body_x_gap_m": 0.25992727279663086,
+      "minimum_hand_foot_aabb_gap_m": 0.5884389215673345
     },
     "walk": {
       "max_seam_matrix_error": 1.5140622942303238e-17,
       "minimum_sole_z": 0.0,
       "max_planted_sole_error": 0,
       "max_stance_slip_per_quarter_frame_m": 1.1920928955078125e-07,
-      "minimum_projected_bound_margin_px": 13.483452796936035,
+      "minimum_projected_bound_margin_px": 10.765421867370605,
       "minimum_vertical_foot_body_gap_m": 0.0779222846031189,
-      "minimum_fingers_down_dot": 0.9459502100944519,
-      "minimum_palm_inward_dot": 0.8250158429145813,
-      "minimum_palm_toward_body_dot": 0.6425467263907194,
       "hand_y_travel_m": 0.594866931438446,
-      "minimum_hand_floor_clearance_m": 0.3199325501918793,
-      "minimum_hand_body_x_gap_m": 0.1818023920059204
+      "minimum_hand_floor_clearance_m": 0.6056167483329773,
+      "minimum_hand_body_x_gap_m": 0.2222064733505249,
+      "minimum_hand_foot_aabb_gap_m": 0.46195089764065606
     },
     "run": {
       "max_seam_matrix_error": 1.5920407760118202e-17,
       "minimum_sole_z": 0.0,
       "max_planted_sole_error": 0,
       "max_stance_slip_per_quarter_frame_m": 5.960464477539063e-08,
-      "minimum_projected_bound_margin_px": 9.80002212524414,
+      "minimum_projected_bound_margin_px": 6.8227081298828125,
       "minimum_vertical_foot_body_gap_m": 0.1175849437713623,
-      "minimum_fingers_down_dot": 0.5594501495361328,
-      "minimum_palm_inward_dot": 0.8096184134483337,
-      "minimum_palm_toward_body_dot": 0.36325597763061523,
       "hand_y_travel_m": 1.340000033378601,
-      "minimum_hand_floor_clearance_m": 0.43540552258491516,
-      "minimum_hand_body_x_gap_m": 0.11176002025604248
+      "minimum_hand_floor_clearance_m": 0.6000704169273376,
+      "minimum_hand_body_x_gap_m": 0.20379364490509033,
+      "minimum_hand_foot_aabb_gap_m": 0.47736314912293015
     }
   },
-  "approval": "Technical evidence only; owner approved Squircle v1 poses on 2026-09-27.",
+  "approval": "Technical evidence only; PS079 owner proportion and motion approval pending.",
   "passed": true
 }
