@@ -1,9 +1,0 @@
-{
-  "source_before": "before-inward-ps064/squircle-animated.blend",
-  "reference": "Management/Task references/PS-064/05-inward-palms-owner-target.png",
-  "rotation_correction": "Inward wrist yaw/roll; run angular swing around world X",
-  "wrist_height_offset_m": -0.14,
-  "all_other_animation_channels_unchanged": true,
-  "geometry_unchanged": true,
-  "approval": "approved"
-}

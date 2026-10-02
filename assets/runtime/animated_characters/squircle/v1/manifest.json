@@ -1,7 +1,7 @@
 {
   "schema": "play-shapes.squircle-animation.v1",
-  "source": "art/experiments/squircle-animation/squircle-animated.blend",
-  "source_sha256": "a5024765ed43c30b0de2e83f8245bc12f2c34af3de5179d4d0e0851655522ac9",
+  "source": "art/squircle/squircle-animated.blend",
+  "source_sha256": "6d5d1973545d1e307d8ab0f2e8653b315249ebe0fab1f3d53a3cb2ea91dd3c4d",
   "resolution": [
     256,
     256
