@@ -1,0 +1,1 @@
+Shape character: A player owned character. Their bodies are geometrical shapes with floating hands and feet.

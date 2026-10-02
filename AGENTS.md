@@ -12,7 +12,7 @@ This directory is the Godot project root. Work on a new local branch and commit 
 
 ## Visual direction
 
-Play Shapes is a playful imagined world of living toys and crafts. Draw from toys, school supplies, papercraft, plushies, colorful foods and plants, action figures, blocks, and pencil drawings. Favor stylized, recognizable forms over photorealism. Apply this to UI, environments, characters, effects, shaders, and animation.
+Read [[play-shapes/game-design-documents/Art direction|Art direction]]. Apply this to UI, environments, characters, effects, shaders, and animation.
 
 The canonical editable Squircle source and current export tools live in `art/squircle/`. Keep only current source and useful pipeline/review resources there. Prior versions, backups, variant experiments and version comparisons are temporary artifacts: use ignored `scratch/` or `comparisons/` directories and do not commit them or obsolete one-time construction scripts.
 
