@@ -82,7 +82,7 @@ func _ready() -> void:
 	session_host.register_bubbles_controller(controller)
 
 
-## PS-046 will call this after choosing Bubbles and registering the active protocol.
+## The host calls this after choosing Bubbles and registering the active protocol.
 func start_round(participants: Array, host_time_msec: int, allow_one_player_debug := false) -> Dictionary:
 	if _started:
 		return {"accepted": false, "code": &"round_already_started"}

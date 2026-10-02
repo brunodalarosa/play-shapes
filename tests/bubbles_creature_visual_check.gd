@@ -4,7 +4,7 @@ extends SceneTree
 const Controller = preload("res://minigames/bubbles_round_controller.gd")
 const PlayerArena = preload("res://minigames/bubbles_player_arena.gd")
 const CreatureArena = preload("res://minigames/bubbles_creature_arena.gd")
-const OUTPUT := "res://test-results/ps-043"
+const OUTPUT := "res://test-results/bubbles-creatures"
 
 
 func _initialize() -> void:
@@ -75,7 +75,7 @@ func _capture() -> void:
 	await _frames(5)
 	if not _save("released-blink"):
 		return
-	print("Saved PS-043 creature renderer captures")
+	print("Saved Bubbles creature renderer captures")
 	quit(0)
 
 

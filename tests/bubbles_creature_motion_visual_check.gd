@@ -4,7 +4,7 @@ extends SceneTree
 const Controller = preload("res://minigames/bubbles_round_controller.gd")
 const PlayerArena = preload("res://minigames/bubbles_player_arena.gd")
 const CreatureArena = preload("res://minigames/bubbles_creature_arena.gd")
-const OUTPUT := "res://test-results/ps-052"
+const OUTPUT := "res://test-results/bubbles-telegraphs"
 
 
 func _initialize() -> void:
@@ -57,7 +57,7 @@ func _capture() -> void:
 	var large_jelly_id: int = creatures._create_jellyfish(Vector2(740, 430), Vector2.ZERO, now, false, 0)
 	var puffer_id: int = creatures.schedule_puffer_path(Vector2(-60, 520), Vector2(1340, 520), now)
 	if small_jelly_id < 0 or large_jelly_id < 0 or puffer_id < 0:
-		push_error("Could not create PS-052 visual fixtures")
+		push_error("Could not create Bubbles telegraph visual fixtures")
 		quit(1)
 		return
 	await _frames(36)
@@ -110,7 +110,7 @@ func _capture() -> void:
 	await _frames(5)
 	if not _save("pufferfish-warning-off"):
 		return
-	print("Saved PS-052 creature telegraph review captures")
+	print("Saved Bubbles creature telegraph review captures")
 	quit(0)
 
 

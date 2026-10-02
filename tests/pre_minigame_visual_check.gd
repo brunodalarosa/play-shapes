@@ -2,7 +2,7 @@ extends SceneTree
 ## Technical composition captures; generated files remain outside the runtime bundle.
 
 const SCENE: PackedScene = preload("res://scenes/pre_minigame_screen.tscn")
-const OUTPUT := "res://test-results/ps-070"
+const OUTPUT := "res://test-results/pre-minigame"
 
 
 func _initialize() -> void:
@@ -33,5 +33,5 @@ func _capture() -> void:
 				return
 			screen.queue_free()
 			await process_frame
-	print("Saved PS-070 tabletop captures")
+	print("Saved pre-minigame tabletop captures")
 	quit(0)

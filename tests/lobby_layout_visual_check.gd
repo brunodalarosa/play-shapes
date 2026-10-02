@@ -1,7 +1,7 @@
 extends SceneTree
 ## Saves the Playground lobby before and after players unlock minigame launch.
 
-const OUTPUT_DIR := "res://test-results/ps-060"
+const OUTPUT_DIR := "res://test-results/lobby-layout"
 
 func _initialize() -> void:
 	_capture.call_deferred()

@@ -1,5 +1,5 @@
 extends SceneTree
-## Focused PS-065 manifest, scene, and playback checks.
+## Focused Squircle Animation Lab manifest, scene, and playback checks.
 
 
 func _initialize() -> void:

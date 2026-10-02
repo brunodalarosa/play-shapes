@@ -1,10 +1,10 @@
 extends SceneTree
-## Representative isolated renders for PS-050 visual review.
+## Representative isolated renders for Bubbles animation review.
 
 const Controller = preload("res://minigames/bubbles_round_controller.gd")
 const Arena = preload("res://minigames/bubbles_player_arena.gd")
 const Protocol = preload("res://host/bubbles_protocol.gd")
-const OUTPUT := "res://test-results/ps-050"
+const OUTPUT := "res://test-results/bubbles-animation"
 
 
 func _initialize() -> void:
@@ -72,7 +72,7 @@ func _capture() -> void:
 		push_error("Missing bubble")
 		quit(1)
 		return
-	print("Saved PS-050 isolated animation captures")
+	print("Saved Bubbles isolated animation captures")
 	quit(0)
 
 

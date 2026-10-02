@@ -1,6 +1,6 @@
 # Bubbles and Jellyfishes art
 
-Static paper-craft assets extracted in GIMP for PS-036, PS-037 and PS-038.
+Static paper-craft environment, jellyfish, and pufferfish assets extracted in GIMP.
 The minigame scene, motion, collisions and phone renderer are separate work.
 
 ## Inventory and use
@@ -64,5 +64,5 @@ under the game design. The sand strip is excluded to avoid a visible arena floor
 ## Review and reproducibility
 
 [Art review, regeneration and verification](../../../../art/bubbles/README.md)
-contains the previews and evidence. Source originals stay in the design vault;
+contains the previews and evidence. Source originals are owner-provided;
 review images, XCF and manifest stay under `art/`, outside runtime exports.

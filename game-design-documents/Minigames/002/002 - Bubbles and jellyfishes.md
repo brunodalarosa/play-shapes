@@ -114,16 +114,16 @@ Confirmed by the project owner on 2026-09-22:
 * The first implementation uses one continuous background music track and sound effects for collection, bubble pop and re-forming, spin charge and activation, player collision/shove, countdown, and final seconds.
 * The pufferfish warning is visual only. White blinking remains the sole added visual treatment for post-pop invulnerability and released-jellyfish collection lockout; no lock icon or transparency change is added.
 * Optional haptic feedback may reinforce collection, the local player's bubble pop, and spin activation where supported, but vibration is never required feedback. No screen shake is used.
-* Wireframe imagery is placeholder-only. Runtime art needs dedicated asset-import tasks for layered underwater environment art, jellyfish art, and pufferfish art.
+* Wireframe imagery is placeholder-only. Runtime art uses separately prepared layered underwater environment, jellyfish, and pufferfish assets.
 * The environment uses several layers with gentle parallax. The bubble is a scalable code/shader-built translucent circle. Static creature art receives procedural motion, and pop/re-form effects and UI graphics are code-built.
-* BGM and the complete SFX set are supplied through separate human-owned asset-import tasks.
+* The owner supplies BGM and the complete SFX set for import into the runtime.
 * Phone orientation is minigame-specific. This minigame requests portrait and restores the appropriate orientation when transitioning away.
 * The lobby uses a temporary minigame-selection dropdown. Return preserves the registered lobby, and F12 provides a separate one-player debug scenario. Better minigame menus and automatic sequencing are deferred.
 
 ## Deferred decisions
 
 * Final numeric tuning values remain provisional until human playtesting.
-* Final environment, jellyfish, pufferfish, BGM, and SFX selections belong to their human-owned asset-import tasks.
+* The owner chooses the final environment, jellyfish, pufferfish, BGM, and SFX assets.
 * A polished minigame selection menu, automatic playlist, and random minigame selection are later design work.
 * Optional haptics remain best-effort because browser/device support differs.
 
