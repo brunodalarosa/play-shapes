@@ -69,21 +69,21 @@ func handle_input(player: Dictionary, message: Dictionary, now_msec: int) -> Dic
 	if is_nan(sequence) or is_inf(sequence) or sequence < 1.0 or sequence > MAX_SEQUENCE \
 			or floor(sequence) != sequence or sequence <= float(_last_sequence.get(player_id, 0)):
 		return _rejected("stale_sequence")
-	var kind := String(message.get("type", ""))
-	if kind == "lobby_move":
-		var raw_horizontal: Variant = message.get("horizontal")
-		if typeof(raw_horizontal) not in [TYPE_INT, TYPE_FLOAT]:
-			return _rejected("invalid_movement")
-		var horizontal := float(raw_horizontal)
-		if is_nan(horizontal) or is_inf(horizontal) or horizontal < -1.0 or horizontal > 1.0:
-			return _rejected("invalid_movement")
-		_last_sequence[player_id] = int(sequence)
-		character.set_horizontal(horizontal, now_msec)
-		return {"accepted": true}
-	if kind == "lobby_jump_release":
-		_last_sequence[player_id] = int(sequence)
-		return {"accepted": true, "jumped": character.request_jump()}
-	return _rejected("unsupported_message")
+	var kind: Variant = message.get("type", "")
+	if kind not in ["lobby_move", "lobby_jump_release", "lobby_fall_release"]:
+		return _rejected("unsupported_message")
+	var action := "jump" if kind == "lobby_jump_release" else "fall" if kind == "lobby_fall_release" else ""
+	var snapshot := PlatformInput.validate(message, action)
+	if not snapshot.accepted:
+		return _rejected(snapshot.code)
+	_last_sequence[player_id] = int(sequence)
+	# Releases carry their own latest axes; apply atomically before host eligibility.
+	character.motor.set_input(snapshot.axes, snapshot.stance, now_msec)
+	if action == "jump":
+		return {"accepted": true, "jumped": character.motor.request_jump()}
+	if action == "fall":
+		return {"accepted": true, "dropped": character.motor.request_fall()}
+	return {"accepted": true}
 
 
 func _rejected(code: String) -> Dictionary:

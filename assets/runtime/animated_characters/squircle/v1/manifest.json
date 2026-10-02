@@ -1,7 +1,7 @@
 {
   "schema": "play-shapes.squircle-animation.v1",
   "source": "art/squircle/squircle-animated.blend",
-  "source_sha256": "6d5d1973545d1e307d8ab0f2e8653b315249ebe0fab1f3d53a3cb2ea91dd3c4d",
+  "source_sha256": "97d13b850b7c02d5999b6ff653a5e477197c37009f45974b40c7d2e78bc251e0",
   "resolution": [
     256,
     256
@@ -19,7 +19,8 @@
       ],
       "sheet_columns": 8,
       "first_frame": 1,
-      "last_frame": 48
+      "last_frame": 48,
+      "playback": "loop"
     },
     {
       "name": "idle",
@@ -32,7 +33,8 @@
       ],
       "sheet_columns": 8,
       "first_frame": 1,
-      "last_frame": 48
+      "last_frame": 48,
+      "playback": "loop"
     },
     {
       "name": "walk",
@@ -45,7 +47,8 @@
       ],
       "sheet_columns": 8,
       "first_frame": 1,
-      "last_frame": 24
+      "last_frame": 24,
+      "playback": "loop"
     },
     {
       "name": "walk",
@@ -58,7 +61,8 @@
       ],
       "sheet_columns": 8,
       "first_frame": 1,
-      "last_frame": 24
+      "last_frame": 24,
+      "playback": "loop"
     },
     {
       "name": "run",
@@ -71,7 +75,8 @@
       ],
       "sheet_columns": 8,
       "first_frame": 1,
-      "last_frame": 16
+      "last_frame": 16,
+      "playback": "loop"
     },
     {
       "name": "run",
@@ -84,7 +89,64 @@
       ],
       "sheet_columns": 8,
       "first_frame": 1,
-      "last_frame": 16
+      "last_frame": 16,
+      "playback": "loop"
+    },
+    {
+      "name": "look_up",
+      "view": "front",
+      "frames": 9,
+      "fps": 24,
+      "anchor_px": [
+        128.0,
+        204.231186
+      ],
+      "sheet_columns": 8,
+      "first_frame": 1,
+      "last_frame": 9,
+      "playback": "held"
+    },
+    {
+      "name": "look_up",
+      "view": "three-quarter",
+      "frames": 9,
+      "fps": 24,
+      "anchor_px": [
+        128.0,
+        203.292557
+      ],
+      "sheet_columns": 8,
+      "first_frame": 1,
+      "last_frame": 9,
+      "playback": "held"
+    },
+    {
+      "name": "crouch",
+      "view": "front",
+      "frames": 9,
+      "fps": 24,
+      "anchor_px": [
+        128.0,
+        204.231186
+      ],
+      "sheet_columns": 8,
+      "first_frame": 1,
+      "last_frame": 9,
+      "playback": "held"
+    },
+    {
+      "name": "crouch",
+      "view": "three-quarter",
+      "frames": 9,
+      "fps": 24,
+      "anchor_px": [
+        128.0,
+        203.292557
+      ],
+      "sheet_columns": 8,
+      "first_frame": 1,
+      "last_frame": 9,
+      "playback": "held"
     }
   ]
 }

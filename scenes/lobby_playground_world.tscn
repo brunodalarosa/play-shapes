@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://brvltjdb6e6uc"]
+[gd_scene load_steps=29 format=3 uid="uid://brvltjdb6e6uc"]
 
 [ext_resource type="Script" path="res://scenes/lobby_playground_world.gd" id="script"]
+[ext_resource type="Script" path="res://components/platform_surface.gd" id="surface"]
 
 [ext_resource type="Texture2D" uid="uid://bmpraaalpmgm3" path="res://assets/runtime/lobby_playground/room_background.png" id="1"]
 [ext_resource type="Texture2D" uid="uid://bjv5ntbjjuvqd" path="res://assets/runtime/lobby_playground/shelf_structure.png" id="3"]
@@ -182,11 +183,12 @@ texture = ExtResource("19")
 centered = false
 
 [node name="PlatformSurfaces" type="Node2D" parent="." unique_id=580875252]
-editor_description = "All surfaces use one-way top rectangles on collision layer 8 (bit 128), with no mask. Future characters should include bit 128 in their mask."
+editor_description = "Select any surface and set Drop Rule to Open or Closed. This affects deliberate FALL only; one-way tops and art stay independent. Platform layer 8 (128)."
 
 [node name="UpperShelf" type="StaticBody2D" parent="PlatformSurfaces" unique_id=774492155]
 collision_layer = 128
 collision_mask = 0
+script = ExtResource("surface")
 
 [node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/UpperShelf" unique_id=1077323979]
 position = Vector2(960, 405)
@@ -196,6 +198,7 @@ one_way_collision = true
 [node name="LowerShelf" type="StaticBody2D" parent="PlatformSurfaces" unique_id=746358840]
 collision_layer = 128
 collision_mask = 0
+script = ExtResource("surface")
 
 [node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/LowerShelf" unique_id=855471257]
 position = Vector2(960, 680)
@@ -205,6 +208,8 @@ one_way_collision = true
 [node name="BottomShelf" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1149967427]
 collision_layer = 128
 collision_mask = 0
+script = ExtResource("surface")
+drop_rule = 1
 
 [node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomShelf" unique_id=326335805]
 position = Vector2(960, 950)
@@ -214,6 +219,7 @@ one_way_collision = true
 [node name="UpperRightBlueStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1830860633]
 collision_layer = 128
 collision_mask = 0
+script = ExtResource("surface")
 
 [node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/UpperRightBlueStep" unique_id=1901789501]
 position = Vector2(1393, 365)
@@ -223,6 +229,7 @@ one_way_collision = true
 [node name="LowerLeftRedStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=849883032]
 collision_layer = 128
 collision_mask = 0
+script = ExtResource("surface")
 
 [node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/LowerLeftRedStep" unique_id=289897698]
 position = Vector2(477, 600)
@@ -232,6 +239,7 @@ one_way_collision = true
 [node name="LowerRightYellowStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=136273662]
 collision_layer = 128
 collision_mask = 0
+script = ExtResource("surface")
 
 [node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/LowerRightYellowStep" unique_id=1352119568]
 position = Vector2(1439, 600)
@@ -241,6 +249,7 @@ one_way_collision = true
 [node name="BottomLeftBlueStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1002418720]
 collision_layer = 128
 collision_mask = 0
+script = ExtResource("surface")
 
 [node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomLeftBlueStep" unique_id=924173686]
 position = Vector2(545, 871)
@@ -250,6 +259,7 @@ one_way_collision = true
 [node name="BottomMiddleGreenBlock" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1764212000]
 collision_layer = 128
 collision_mask = 0
+script = ExtResource("surface")
 
 [node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomMiddleGreenBlock" unique_id=2141806235]
 position = Vector2(806, 872)
@@ -259,6 +269,7 @@ one_way_collision = true
 [node name="BottomMiddleYellowArch" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1085676547]
 collision_layer = 128
 collision_mask = 0
+script = ExtResource("surface")
 
 [node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomMiddleYellowArch" unique_id=306986494]
 position = Vector2(959, 838)
@@ -268,6 +279,7 @@ one_way_collision = true
 [node name="BottomMiddleBlueBlock" type="StaticBody2D" parent="PlatformSurfaces" unique_id=2112623683]
 collision_layer = 128
 collision_mask = 0
+script = ExtResource("surface")
 
 [node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomMiddleBlueBlock" unique_id=1738861353]
 position = Vector2(1128, 871)
@@ -277,6 +289,7 @@ one_way_collision = true
 [node name="BottomRightRedStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1967092793]
 collision_layer = 128
 collision_mask = 0
+script = ExtResource("surface")
 
 [node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomRightRedStep" unique_id=170481355]
 position = Vector2(1662, 870)
@@ -288,7 +301,7 @@ editor_description = "Registered Playground characters draw in front of lobby co
 z_index = 1
 
 [node name="FutureCharacterAnchors" type="Node2D" parent="." unique_id=1317649962]
-editor_description = "Seat 1–10 feet positions. Free seats are reused when a player leaves or expires."
+editor_description = "Seat 1â€“10 feet positions. Free seats are reused when a player leaves or expires."
 
 [node name="UpperLeftA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=2116312259]
 position = Vector2(218, 400)

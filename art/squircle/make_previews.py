@@ -4,6 +4,7 @@ import json
 import math
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from atomic_outputs import save_image
 
 HERE = Path(__file__).resolve().parent
 EXPORT = HERE / 'export'
@@ -74,28 +75,36 @@ for clip in manifest['clips']:
         blinks.append(blink)
     clips[key] = {'spec':clip,'frames':frames,'bases':bases,'neutral':neutrals,'blink':blinks}
     for layer, images in [('beauty',frames),('colorable',bases),('face-mask',masks),('neutral',neutrals),('blink',blinks)]:
-        sheet(images).save(OUT/f'{key}-{layer}.png')
+        save_image(sheet(images), OUT/f'{key}-{layer}.png')
     duration = [round((i+1)*1000/24)-round(i*1000/24) for i in range(len(frames))]
-    frames[0].save(OUT/f'{key}.png',save_all=True,append_images=frames[1:],duration=duration,loop=0,disposal=0,blend=0)
+    save_image(frames[0], OUT/f'{key}.png',save_all=True,append_images=frames[1:],duration=duration,loop=0,disposal=0,blend=0)
     sheet_index.append({'clip':clip['name'],'view':clip['view'],'columns':8,'tile':[256,256],
                         'frames':len(frames),'fps':24,'anchor_px':clip['anchor_px'],
                         'files':{layer:f'{key}-{layer}.png' for layer in ['beauty','colorable','face-mask','neutral','blink']},
                         'rects':[{'frame':i+1,'x':i%8*256,'y':i//8*256,'w':256,'h':256} for i in range(len(frames))]})
 (OUT/'sheets.json').write_text(json.dumps(sheet_index,indent=2)+'\n')
 
-# A 2-second, six-panel loop. Two sizes are supplied as real pixels, not screenshots.
+# Entry, sustained hold and reverse release for held clips; locomotion loops normally.
+actions = list(dict.fromkeys(c['name'] for c in manifest['clips']))
+def review_frame(spec, tick):
+    if spec.get('playback') != 'held':
+        return tick % spec['frames']
+    end = spec['frames'] - 1
+    return min(tick, end) if tick < 36 else max(0, end - (tick - 36))
+
+# Two sizes are supplied as real pixels, not screenshots.
 for size in (128,256):
     gap, header = 24, 64
-    width, height = 3*(size+gap)+gap, 2*(size+44)+header+gap
+    width, height = len(actions)*(size+gap)+gap, 2*(size+44)+header+gap
     boards = []
     for tick in range(48):
         board = Image.new('RGBA',(width,height),BG)
         draw = ImageDraw.Draw(board)
         draw.text((gap,14),f'SQUIRCLE / MOTION STUDY  ·  {size} px',font=font(20),fill='white')
         for row, view in enumerate(('front','three-quarter')):
-            for col, action in enumerate(('idle','walk','run')):
+            for col, action in enumerate(actions):
                 item = clips[action+'-'+view]
-                frame = tick % len(item['frames'])
+                frame = review_frame(item['spec'], tick)
                 x,y = gap+col*(size+gap), header+row*(size+44)
                 draw.rounded_rectangle((x,y,x+size,y+size),radius=12,fill=PANEL)
                 sprite = item['frames'][frame]
@@ -103,12 +112,12 @@ for size in (128,256):
                 if tick in (35,36,37):
                     sprite = Image.alpha_composite(item['bases'][frame],item['blink'][frame])
                 board.alpha_composite(sprite.resize((size,size),Image.Resampling.LANCZOS),(x,y))
-                draw.text((x,y+size+6),action.title()+' / '+('front' if row==0 else '35°'),font=font(14),fill=(202,217,239))
+                draw.text((x,y+size+6),action.replace('_',' ').title()+' / '+('front' if row==0 else '35°'),font=font(14),fill=(202,217,239))
         boards.append(board.convert('RGB'))
     durations = [round((i+1)*100/24)*10-round(i*100/24)*10 for i in range(48)]
-    boards[0].save(OUT/f'motion-review-{size}.gif',save_all=True,append_images=boards[1:],duration=durations,loop=0,optimize=False)
+    save_image(boards[0], OUT/f'motion-review-{size}.gif',save_all=True,append_images=boards[1:],duration=durations,loop=0,optimize=False)
     if size==256:
-        boards[4].save(OUT/'review-sheet.png')
+        save_image(boards[16], OUT/'review-sheet.png')
 
 # All ten colors from one base frame, each in neutral and blink expressions.
 board = Image.new('RGBA',(1000,570),BG)
@@ -124,7 +133,7 @@ for i,(name,color) in enumerate(PALETTE.items()):
         result=Image.alpha_composite(base,item[expression][sample]).resize((128,128),Image.Resampling.LANCZOS)
         board.alpha_composite(result,(x+36,y+j*86))
     draw.text((x+20,y+205),name,font=font(16),fill='white')
-board.save(OUT/'palette-and-blink.png')
+save_image(board, OUT/'palette-and-blink.png')
 
 # Current layer breakdown at the largest measured face-rectangle occlusion.
 best = None
@@ -145,7 +154,7 @@ for j,(label,img) in enumerate([('Colorable',item['bases'][i]),('Face visibility
     proof.alpha_composite(img,(j*256,35))
     d.text((j*256+12,9),label,font=font(17),fill='white')
 d.text((12,295),f'{key} / frame {i+1} / saved hands; independent face layer',font=font(15),fill='white')
-proof.save(OUT/'occlusion-proof.png')
+save_image(proof, OUT/'occlusion-proof.png')
 (OUT/'occlusion-proof.json').write_text(json.dumps({'clip':key,'frame':i+1,'face_rectangle_occlusion_fraction':loss},indent=2)+'\n')
 (HERE/'review-data.js').write_text('window.REVIEW_DATA = '+json.dumps({'manifest':manifest,'palette':PALETTE,'sheets':sheet_index})+';\n')
 print(json.dumps({'clips':len(clips),'raw_frames':sum(len(c['frames']) for c in clips.values()),'occlusion_proof':best}))

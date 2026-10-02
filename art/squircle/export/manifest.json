@@ -1,7 +1,7 @@
 {
   "schema": "play-shapes.squircle-source.v1",
   "source": "squircle-animated.blend",
-  "source_sha256": "6d5d1973545d1e307d8ab0f2e8653b315249ebe0fab1f3d53a3cb2ea91dd3c4d",
+  "source_sha256": "97d13b850b7c02d5999b6ff653a5e477197c37009f45974b40c7d2e78bc251e0",
   "blender": "5.2.2 LTS",
   "engine": "Cycles",
   "device": "GPU",
@@ -8233,6 +8233,1742 @@
                 201.355007
               ],
               "planted": false
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "look_up",
+      "view": "front",
+      "frames": 9,
+      "fps": 24,
+      "speed": 0.0,
+      "stance": 1.0,
+      "playback": "held",
+      "duration_seconds": 0.375,
+      "camera": "Camera.Front",
+      "yaw_degrees": 0,
+      "elevation_degrees": 0,
+      "orthographic_scale": 4.5,
+      "anchor_px": [
+        128.0,
+        204.231186
+      ],
+      "sequence": [
+        {
+          "frame": 1,
+          "time_seconds": 0.0,
+          "colorable": "look_up/front/colorable/0001.png",
+          "face_mask": "look_up/front/face-mask/0001.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 2,
+          "time_seconds": 0.041666666666666664,
+          "colorable": "look_up/front/colorable/0002.png",
+          "face_mask": "look_up/front/face-mask/0002.png",
+          "face_corners_px": [
+            [
+              92.292801,
+              90.562286
+            ],
+            [
+              163.402161,
+              90.063828
+            ],
+            [
+              92.581894,
+              131.80455
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 3,
+          "time_seconds": 0.08333333333333333,
+          "colorable": "look_up/front/colorable/0003.png",
+          "face_mask": "look_up/front/face-mask/0003.png",
+          "face_corners_px": [
+            [
+              92.287613,
+              89.821838
+            ],
+            [
+              163.396973,
+              89.32338
+            ],
+            [
+              92.576607,
+              131.049934
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 4,
+          "time_seconds": 0.125,
+          "colorable": "look_up/front/colorable/0004.png",
+          "face_mask": "look_up/front/face-mask/0004.png",
+          "face_corners_px": [
+            [
+              92.28038,
+              88.79007
+            ],
+            [
+              163.38974,
+              88.291626
+            ],
+            [
+              92.569038,
+              129.970627
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 5,
+          "time_seconds": 0.16666666666666666,
+          "colorable": "look_up/front/colorable/0005.png",
+          "face_mask": "look_up/front/face-mask/0005.png",
+          "face_corners_px": [
+            [
+              92.272247,
+              87.62999
+            ],
+            [
+              163.381607,
+              87.131531
+            ],
+            [
+              92.560249,
+              128.716469
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 6,
+          "time_seconds": 0.20833333333333334,
+          "colorable": "look_up/front/colorable/0006.png",
+          "face_mask": "look_up/front/face-mask/0006.png",
+          "face_corners_px": [
+            [
+              92.26429,
+              86.495239
+            ],
+            [
+              163.373657,
+              85.996796
+            ],
+            [
+              92.551338,
+              127.44548
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 7,
+          "time_seconds": 0.25,
+          "colorable": "look_up/front/colorable/0007.png",
+          "face_mask": "look_up/front/face-mask/0007.png",
+          "face_corners_px": [
+            [
+              92.257507,
+              85.526978
+            ],
+            [
+              163.366867,
+              85.028519
+            ],
+            [
+              92.54348,
+              126.324005
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 8,
+          "time_seconds": 0.2916666666666667,
+          "colorable": "look_up/front/colorable/0008.png",
+          "face_mask": "look_up/front/face-mask/0008.png",
+          "face_corners_px": [
+            [
+              92.252792,
+              84.854691
+            ],
+            [
+              163.362152,
+              84.356247
+            ],
+            [
+              92.537872,
+              125.524109
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 9,
+          "time_seconds": 0.3333333333333333,
+          "colorable": "look_up/front/colorable/0009.png",
+          "face_mask": "look_up/front/face-mask/0009.png",
+          "face_corners_px": [
+            [
+              92.25103,
+              84.602493
+            ],
+            [
+              163.360382,
+              84.104034
+            ],
+            [
+              92.535736,
+              125.219345
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "look_up",
+      "view": "three-quarter",
+      "frames": 9,
+      "fps": 24,
+      "speed": 0.0,
+      "stance": 1.0,
+      "playback": "held",
+      "duration_seconds": 0.375,
+      "camera": "Camera.ThreeQuarter",
+      "yaw_degrees": 35,
+      "elevation_degrees": 9,
+      "orthographic_scale": 4.5,
+      "anchor_px": [
+        128.0,
+        203.292557
+      ],
+      "sequence": [
+        {
+          "frame": 1,
+          "time_seconds": 0.0,
+          "colorable": "look_up/three-quarter/colorable/0001.png",
+          "face_mask": "look_up/three-quarter/face-mask/0001.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 2,
+          "time_seconds": 0.041666666666666664,
+          "colorable": "look_up/three-quarter/colorable/0002.png",
+          "face_mask": "look_up/three-quarter/face-mask/0002.png",
+          "face_corners_px": [
+            [
+              77.144333,
+              92.646271
+            ],
+            [
+              135.393707,
+              98.534378
+            ],
+            [
+              77.203735,
+              133.446342
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 3,
+          "time_seconds": 0.08333333333333333,
+          "colorable": "look_up/three-quarter/colorable/0003.png",
+          "face_mask": "look_up/three-quarter/face-mask/0003.png",
+          "face_corners_px": [
+            [
+              77.391037,
+              91.858414
+            ],
+            [
+              135.640411,
+              97.746521
+            ],
+            [
+              76.982712,
+              132.748955
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 4,
+          "time_seconds": 0.125,
+          "colorable": "look_up/three-quarter/colorable/0004.png",
+          "face_mask": "look_up/three-quarter/face-mask/0004.png",
+          "face_corners_px": [
+            [
+              77.754135,
+              90.756256
+            ],
+            [
+              136.00351,
+              96.644363
+            ],
+            [
+              76.684853,
+              131.747414
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 5,
+          "time_seconds": 0.16666666666666666,
+          "colorable": "look_up/three-quarter/colorable/0005.png",
+          "face_mask": "look_up/three-quarter/face-mask/0005.png",
+          "face_corners_px": [
+            [
+              78.190651,
+              89.510712
+            ],
+            [
+              136.440033,
+              95.398819
+            ],
+            [
+              76.364738,
+              130.57782
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 6,
+          "time_seconds": 0.20833333333333334,
+          "colorable": "look_up/three-quarter/colorable/0006.png",
+          "face_mask": "look_up/three-quarter/face-mask/0006.png",
+          "face_corners_px": [
+            [
+              78.648407,
+              88.285492
+            ],
+            [
+              136.897781,
+              94.173615
+            ],
+            [
+              76.067749,
+              129.386398
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 7,
+          "time_seconds": 0.25,
+          "colorable": "look_up/three-quarter/colorable/0007.png",
+          "face_mask": "look_up/three-quarter/face-mask/0007.png",
+          "face_corners_px": [
+            [
+              79.064705,
+              87.234283
+            ],
+            [
+              137.314072,
+              93.122406
+            ],
+            [
+              75.827782,
+              128.330208
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 8,
+          "time_seconds": 0.2916666666666667,
+          "colorable": "look_up/three-quarter/colorable/0008.png",
+          "face_mask": "look_up/three-quarter/face-mask/0008.png",
+          "face_corners_px": [
+            [
+              79.368523,
+              86.501129
+            ],
+            [
+              137.617889,
+              92.389267
+            ],
+            [
+              75.668907,
+              127.574127
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 9,
+          "time_seconds": 0.3333333333333333,
+          "colorable": "look_up/three-quarter/colorable/0009.png",
+          "face_mask": "look_up/three-quarter/face-mask/0009.png",
+          "face_corners_px": [
+            [
+              79.485764,
+              86.225357
+            ],
+            [
+              137.735138,
+              92.113464
+            ],
+            [
+              75.611015,
+              127.285461
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "crouch",
+      "view": "front",
+      "frames": 9,
+      "fps": 24,
+      "speed": 0.0,
+      "stance": 1.0,
+      "playback": "held",
+      "duration_seconds": 0.375,
+      "camera": "Camera.Front",
+      "yaw_degrees": 0,
+      "elevation_degrees": 0,
+      "orthographic_scale": 4.5,
+      "anchor_px": [
+        128.0,
+        204.231186
+      ],
+      "sequence": [
+        {
+          "frame": 1,
+          "time_seconds": 0.0,
+          "colorable": "crouch/front/colorable/0001.png",
+          "face_mask": "crouch/front/face-mask/0001.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 2,
+          "time_seconds": 0.041666666666666664,
+          "colorable": "crouch/front/colorable/0002.png",
+          "face_mask": "crouch/front/face-mask/0002.png",
+          "face_corners_px": [
+            [
+              92.301178,
+              91.225739
+            ],
+            [
+              163.41069,
+              90.748703
+            ],
+            [
+              92.577858,
+              132.469261
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 3,
+          "time_seconds": 0.08333333333333333,
+          "colorable": "crouch/front/colorable/0003.png",
+          "face_mask": "crouch/front/face-mask/0003.png",
+          "face_corners_px": [
+            [
+              92.318054,
+              92.2285
+            ],
+            [
+              163.427917,
+              91.807938
+            ],
+            [
+              92.561981,
+              133.472229
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 4,
+          "time_seconds": 0.125,
+          "colorable": "crouch/front/colorable/0004.png",
+          "face_mask": "crouch/front/face-mask/0004.png",
+          "face_corners_px": [
+            [
+              92.341949,
+              93.64624
+            ],
+            [
+              163.45224,
+              93.305496
+            ],
+            [
+              92.539581,
+              134.890213
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 5,
+          "time_seconds": 0.16666666666666666,
+          "colorable": "crouch/front/colorable/0005.png",
+          "face_mask": "crouch/front/face-mask/0005.png",
+          "face_corners_px": [
+            [
+              92.369392,
+              95.271484
+            ],
+            [
+              163.480072,
+              95.022263
+            ],
+            [
+              92.513947,
+              136.515678
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 6,
+          "time_seconds": 0.20833333333333334,
+          "colorable": "crouch/front/colorable/0006.png",
+          "face_mask": "crouch/front/face-mask/0006.png",
+          "face_corners_px": [
+            [
+              92.396904,
+              96.896759
+            ],
+            [
+              163.507843,
+              96.739044
+            ],
+            [
+              92.488373,
+              138.141098
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 7,
+          "time_seconds": 0.25,
+          "colorable": "crouch/front/colorable/0007.png",
+          "face_mask": "crouch/front/face-mask/0007.png",
+          "face_corners_px": [
+            [
+              92.420944,
+              98.314575
+            ],
+            [
+              163.532013,
+              98.236694
+            ],
+            [
+              92.466118,
+              139.558998
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 8,
+          "time_seconds": 0.2916666666666667,
+          "colorable": "crouch/front/colorable/0008.png",
+          "face_mask": "crouch/front/face-mask/0008.png",
+          "face_corners_px": [
+            [
+              92.437981,
+              99.317444
+            ],
+            [
+              163.549088,
+              99.296036
+            ],
+            [
+              92.450401,
+              140.56189
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 9,
+          "time_seconds": 0.3333333333333333,
+          "colorable": "crouch/front/colorable/0009.png",
+          "face_mask": "crouch/front/face-mask/0009.png",
+          "face_corners_px": [
+            [
+              92.444443,
+              99.697845
+            ],
+            [
+              163.555557,
+              99.697845
+            ],
+            [
+              92.444443,
+              140.942299
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "crouch",
+      "view": "three-quarter",
+      "frames": 9,
+      "fps": 24,
+      "speed": 0.0,
+      "stance": 1.0,
+      "playback": "held",
+      "duration_seconds": 0.375,
+      "camera": "Camera.ThreeQuarter",
+      "yaw_degrees": 35,
+      "elevation_degrees": 9,
+      "orthographic_scale": 4.5,
+      "anchor_px": [
+        128.0,
+        203.292557
+      ],
+      "sequence": [
+        {
+          "frame": 1,
+          "time_seconds": 0.0,
+          "colorable": "crouch/three-quarter/colorable/0001.png",
+          "face_mask": "crouch/three-quarter/face-mask/0001.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 2,
+          "time_seconds": 0.041666666666666664,
+          "colorable": "crouch/three-quarter/colorable/0002.png",
+          "face_mask": "crouch/three-quarter/face-mask/0002.png",
+          "face_corners_px": [
+            [
+              77.058212,
+              93.32309
+            ],
+            [
+              135.307709,
+              99.232376
+            ],
+            [
+              77.284851,
+              134.083641
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 3,
+          "time_seconds": 0.08333333333333333,
+          "colorable": "crouch/three-quarter/colorable/0003.png",
+          "face_mask": "crouch/three-quarter/face-mask/0003.png",
+          "face_corners_px": [
+            [
+              77.072029,
+              94.315002
+            ],
+            [
+              135.321823,
+              100.280106
+            ],
+            [
+              77.271851,
+              135.072838
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 4,
+          "time_seconds": 0.125,
+          "colorable": "crouch/three-quarter/colorable/0004.png",
+          "face_mask": "crouch/three-quarter/face-mask/0004.png",
+          "face_corners_px": [
+            [
+              77.091614,
+              95.717438
+            ],
+            [
+              135.341736,
+              101.761414
+            ],
+            [
+              77.253494,
+              136.471352
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 5,
+          "time_seconds": 0.16666666666666666,
+          "colorable": "crouch/three-quarter/colorable/0005.png",
+          "face_mask": "crouch/three-quarter/face-mask/0005.png",
+          "face_corners_px": [
+            [
+              77.11409,
+              97.325134
+            ],
+            [
+              135.364532,
+              103.459534
+            ],
+            [
+              77.232498,
+              138.074509
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 6,
+          "time_seconds": 0.20833333333333334,
+          "colorable": "crouch/three-quarter/colorable/0006.png",
+          "face_mask": "crouch/three-quarter/face-mask/0006.png",
+          "face_corners_px": [
+            [
+              77.13662,
+              98.932861
+            ],
+            [
+              135.387283,
+              105.157669
+            ],
+            [
+              77.211548,
+              139.67762
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 7,
+          "time_seconds": 0.25,
+          "colorable": "crouch/three-quarter/colorable/0007.png",
+          "face_mask": "crouch/three-quarter/face-mask/0007.png",
+          "face_corners_px": [
+            [
+              77.156311,
+              100.335388
+            ],
+            [
+              135.407089,
+              106.639053
+            ],
+            [
+              77.193321,
+              141.076065
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 8,
+          "time_seconds": 0.2916666666666667,
+          "colorable": "crouch/three-quarter/colorable/0008.png",
+          "face_mask": "crouch/three-quarter/face-mask/0008.png",
+          "face_corners_px": [
+            [
+              77.170265,
+              101.327438
+            ],
+            [
+              135.421066,
+              107.68689
+            ],
+            [
+              77.18045,
+              142.065201
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 9,
+          "time_seconds": 0.3333333333333333,
+          "colorable": "crouch/three-quarter/colorable/0009.png",
+          "face_mask": "crouch/three-quarter/face-mask/0009.png",
+          "face_corners_px": [
+            [
+              77.175568,
+              101.703735
+            ],
+            [
+              135.426376,
+              108.08432
+            ],
+            [
+              77.175568,
+              142.440392
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
             }
           }
         }

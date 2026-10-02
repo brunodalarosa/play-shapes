@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "axisConvention": "x-right-y-up",
+  "deadZone": 0.16,
+  "deadZoneHysteresis": 0.04,
+  "verticalEnterDegrees": 20,
+  "verticalExitDegrees": 28,
+  "moveIntervalMsec": 45,
+  "refreshIntervalMsec": 100
+}

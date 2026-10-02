@@ -1,7 +1,7 @@
 # Squircle canonical source
 
 `squircle-animated.blend` is the current editable Squircle v1 model and saved
-idle/walk/run source. This folder contains current authoring, export and review
+idle/walk/run and look-up/crouch source. This folder contains current authoring, export and review
 resources. Temporary variants and version comparisons belong in ignored
 `scratch/` or `comparisons/`; do not commit them.
 
@@ -19,11 +19,13 @@ existing rig/export contract stays stable:
 
 - Scene: `PS057 | Squircle Animation Studio`.
 - Select `Animation.Controls`; choose `PS057 | Idle`, `PS057 | Walk` or
-  `PS057 | Run` in Dope Sheet > Action Editor.
+  `PS057 | Run`, or `PS080 | Look Up` / `PS080 | Crouch` in Dope Sheet > Action Editor.
 - Timeline ends: 48, 24 or 16, all at 24 fps. Space plays; Numpad 0 shows the camera.
 - Pose Mode edits the five independent body/hand/foot controls. The face follows
-  the body. Actions have fake users, linear interpolation and cyclic modifiers.
-  Key N+1 repeats key 1 and is never exported.
+  the body. All actions have fake users and linear interpolation. Locomotion has
+  cyclic modifiers; key N+1 repeats key 1 and is never exported. Held stances have
+  constant extrapolation and no cycles: frames 1–9 enter, frame 9 sustains, and
+  reverse playback releases. Feet stay identical to idle frame 1 throughout.
 
 Both hands are smooth UV spheres, 48 segments by 32 rings, centered on their wrist
 pivots. Their diameter is **0.60 m**, compared with **2.00 m body width** and
@@ -40,6 +42,31 @@ property `Hand diameter m`. Save and regenerate the complete export below.
 | Idle | 1–48 | 2 s | 0 | Both soles planted |
 | Walk | 1–24 | 1 s | 1.65 m/s | 62.5% stance per foot |
 | Run | 1–16 | 2/3 s | 3.60 m/s | 37.5% stance, flight and opposing hand swing |
+| Look up | 1–9 | 1/3 s entry/release, indefinite hold | 0 | Both soles planted |
+| Crouch | 1–9 | 1/3 s entry/release, indefinite hold | 0 | Both soles planted |
+
+### Held-pose tuning and playback
+
+Frame 1 of each stance matches idle frame 1. Nine samples cover eight intervals
+at 24 fps; smoothstep spacing eases entry and reverse release. Edit the `Body`,
+`Hand.L` and `Hand.R` pose bones in the new actions. Scene custom properties
+prefixed `PS080` describe the current values and timing; they are notes, not drivers.
+`animation_common.py` defines the exported frame counts, FPS and `playback: held`.
+Keep action range, frame count and timing in agreement after edits.
+
+- Look up: body X rotation −10°; wrist centers (±1.43, −0.12, 2.83) m.
+- Crouch: body Z offset −0.16 m; wrist centers (±1.38, −0.06, 1.30) m.
+  The depth retains a floating gap above the original feet without resizing the body.
+- Both keep the original mesh, spherical hands, materials and fixed 4.5 camera scale.
+
+`SquircleV1Playback.play("look_up", view)` and `play("crouch", view)` enter and
+hold the final frame. Repeated requests do not restart entry. Request `idle` to
+reverse from current progress; selecting another action first releases to neutral,
+then enters it. Re-requesting the current stance during release reverses direction
+without jumping. `advance_playback(delta)` supports paused/slow review;
+`seek_clip(action, view, milliseconds)` supports deterministic frame inspection.
+The existing external absolute clock remains available for looping locomotion.
+Tint and face/blink controls remain independent. Input selection is PS-082 scope.
 
 ## Export and synchronize
 
@@ -56,8 +83,10 @@ Run from this folder, using Blender and Python with Pillow/NumPy:
 `export/` holds the raw colorable/mask sequences, expressions and frame manifest.
 `make_previews.py` packs sheets, independent neutral/blink faces, motion loops,
 palette and layer reviews, and `review-data.js`. `sync_runtime.py` checks the saved
-source hash and complete six-clip frame sequence, then copies the 18 current
+source hash and complete action/view frame sequences, then copies the 30 current
 runtime sheets and writes the runtime manifest and `runtime-sync.json`.
+Packing and synchronization replace generated images atomically, so a failed
+write leaves the previous asset intact and Windows preview readers can stay open.
 
 For an independent reproducibility check:
 
@@ -81,13 +110,18 @@ godot --path .
 
 Phones receive the same canonical idle-front sheets through the host HTTP routes.
 There is no extra phone animation copy. F12 > Animation Lab reviews clips, colors,
-expressions and both sizes.
+expressions and 256/128 pixel references plus the actual 0.58 lobby scale. Its
+action list comes from the manifest and it uses shared game playback. Select a
+stance, pause or slow it, release to idle, re-enter, or switch to the other stance
+during entry/hold/release. Natural blinking remains active while a pose is held.
 
 ## Review the current design
 
 Serve this folder with `python -m http.server 8057 --bind 127.0.0.1`, then open
 `http://127.0.0.1:8057/review.html`. The review supports palette, expression, size,
-pause, time, slow motion and ground-contact controls. Useful current outputs are
+pause, time, slow motion and ground-contact controls. Held poses show entry,
+hold through review tick 36, reverse release, then neutral in each 48-tick review.
+Useful current outputs are
 `previews/motion-review-{256,128}.gif`, `review-sheet.png`, `palette-and-blink.png`,
 `hand-detail-sphere.png` and `occlusion-proof.png`.
 

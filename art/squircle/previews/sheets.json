@@ -1374,5 +1374,353 @@
         "h": 256
       }
     ]
+  },
+  {
+    "clip": "look_up",
+    "view": "front",
+    "columns": 8,
+    "tile": [
+      256,
+      256
+    ],
+    "frames": 9,
+    "fps": 24,
+    "anchor_px": [
+      128.0,
+      204.231186
+    ],
+    "files": {
+      "beauty": "look_up-front-beauty.png",
+      "colorable": "look_up-front-colorable.png",
+      "face-mask": "look_up-front-face-mask.png",
+      "neutral": "look_up-front-neutral.png",
+      "blink": "look_up-front-blink.png"
+    },
+    "rects": [
+      {
+        "frame": 1,
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 2,
+        "x": 256,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 3,
+        "x": 512,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 4,
+        "x": 768,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 5,
+        "x": 1024,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 6,
+        "x": 1280,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 7,
+        "x": 1536,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 8,
+        "x": 1792,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 9,
+        "x": 0,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      }
+    ]
+  },
+  {
+    "clip": "look_up",
+    "view": "three-quarter",
+    "columns": 8,
+    "tile": [
+      256,
+      256
+    ],
+    "frames": 9,
+    "fps": 24,
+    "anchor_px": [
+      128.0,
+      203.292557
+    ],
+    "files": {
+      "beauty": "look_up-three-quarter-beauty.png",
+      "colorable": "look_up-three-quarter-colorable.png",
+      "face-mask": "look_up-three-quarter-face-mask.png",
+      "neutral": "look_up-three-quarter-neutral.png",
+      "blink": "look_up-three-quarter-blink.png"
+    },
+    "rects": [
+      {
+        "frame": 1,
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 2,
+        "x": 256,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 3,
+        "x": 512,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 4,
+        "x": 768,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 5,
+        "x": 1024,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 6,
+        "x": 1280,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 7,
+        "x": 1536,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 8,
+        "x": 1792,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 9,
+        "x": 0,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      }
+    ]
+  },
+  {
+    "clip": "crouch",
+    "view": "front",
+    "columns": 8,
+    "tile": [
+      256,
+      256
+    ],
+    "frames": 9,
+    "fps": 24,
+    "anchor_px": [
+      128.0,
+      204.231186
+    ],
+    "files": {
+      "beauty": "crouch-front-beauty.png",
+      "colorable": "crouch-front-colorable.png",
+      "face-mask": "crouch-front-face-mask.png",
+      "neutral": "crouch-front-neutral.png",
+      "blink": "crouch-front-blink.png"
+    },
+    "rects": [
+      {
+        "frame": 1,
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 2,
+        "x": 256,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 3,
+        "x": 512,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 4,
+        "x": 768,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 5,
+        "x": 1024,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 6,
+        "x": 1280,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 7,
+        "x": 1536,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 8,
+        "x": 1792,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 9,
+        "x": 0,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      }
+    ]
+  },
+  {
+    "clip": "crouch",
+    "view": "three-quarter",
+    "columns": 8,
+    "tile": [
+      256,
+      256
+    ],
+    "frames": 9,
+    "fps": 24,
+    "anchor_px": [
+      128.0,
+      203.292557
+    ],
+    "files": {
+      "beauty": "crouch-three-quarter-beauty.png",
+      "colorable": "crouch-three-quarter-colorable.png",
+      "face-mask": "crouch-three-quarter-face-mask.png",
+      "neutral": "crouch-three-quarter-neutral.png",
+      "blink": "crouch-three-quarter-blink.png"
+    },
+    "rects": [
+      {
+        "frame": 1,
+        "x": 0,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 2,
+        "x": 256,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 3,
+        "x": 512,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 4,
+        "x": 768,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 5,
+        "x": 1024,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 6,
+        "x": 1280,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 7,
+        "x": 1536,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 8,
+        "x": 1792,
+        "y": 0,
+        "w": 256,
+        "h": 256
+      },
+      {
+        "frame": 9,
+        "x": 0,
+        "y": 256,
+        "w": 256,
+        "h": 256
+      }
+    ]
   }
 ]

@@ -45,6 +45,7 @@ for file in files:
         assert margin>0,f'Clipped alpha at {file}'
 assert max_diff<=1, f'Replay differs by {max_diff} / 255'
 assert unused_mask_rgb_diff==0, 'Canonical mask RGB changed'
+held_face_loss = 0.0
 for clip in a['clips']:
     assert [f['frame'] for f in clip['sequence']]==list(range(1,clip['frames']+1))
     sheet=Image.open(HERE/'previews'/f'{clip["name"]}-{clip["view"]}-colorable.png').convert('RGBA')
@@ -52,6 +53,12 @@ for clip in a['clips']:
         tile=sheet.crop((i%8*256,i//8*256,i%8*256+256,i//8*256+256))
         raw=Image.open(original/frame['colorable']).convert('RGBA')
         assert np.array_equal(np.asarray(tile),np.asarray(raw)),'Packed frame order differs'
+        if clip.get('playback') == 'held':
+            p0,p1,p2 = np.asarray(frame['face_corners_px'])
+            area = abs(np.linalg.det(np.column_stack((p1-p0,p2-p0))))
+            mask = np.asarray(Image.open(original/frame['face_mask']).convert('RGBA'))[:,:,3]/255
+            held_face_loss = max(held_face_loss, 1-mask.sum()/area)
+            assert 1-mask.sum()/area < .01, 'Held pose obscures the face plane'
 report={'passed':True,'metadata_identical':True,'fresh_reopen_export_files':len(files),
         'byte_identical_png_files':exact,'max_consumed_channel_difference_8bit':max_diff,
         'max_unused_mask_rgb_difference_8bit':unused_mask_rgb_diff,
@@ -59,6 +66,7 @@ report={'passed':True,'metadata_identical':True,'fresh_reopen_export_files':len(
         'straight_alpha_edge_evidence':edge_evidence,
         'clips':len(a['clips']),'animation_frames':sum(c['frames'] for c in a['clips']),
         'packed_colorable_tiles_match_raw':True,
+        'maximum_held_face_rectangle_occlusion_fraction':held_face_loss,
         'scope':'Same machine, Blender version, seed and render settings; owner motion approval separate.'}
 (HERE/'export-verification.json').write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report,indent=2))

@@ -1,0 +1,76 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://components/platform_motor.gd" id="motor"]
+[ext_resource type="Script" path="res://components/platform_surface.gd" id="surface"]
+[sub_resource type="RectangleShape2D" id="top"]
+size = Vector2(520, 10)
+[sub_resource type="CapsuleShape2D" id="body"]
+radius = 23.0
+height = 96.0
+
+[node name="PlatformReuse" type="Node2D"]
+
+[node name="OpenTop" type="StaticBody2D" parent="."]
+position = Vector2(300, 245)
+collision_layer = 128
+collision_mask = 0
+script = ExtResource("surface")
+[node name="LandingTop" type="CollisionShape2D" parent="OpenTop"]
+shape = SubResource("top")
+one_way_collision = true
+[node name="Paper" type="Polygon2D" parent="OpenTop"]
+polygon = PackedVector2Array(-260, -5, 260, -5, 260, 5, -260, 5)
+color = Color(0.3, 0.75, 0.5, 1)
+
+[node name="OpenLower" type="StaticBody2D" parent="."]
+position = Vector2(300, 395)
+collision_layer = 128
+collision_mask = 0
+script = ExtResource("surface")
+[node name="LandingTop" type="CollisionShape2D" parent="OpenLower"]
+shape = SubResource("top")
+one_way_collision = true
+[node name="Paper" type="Polygon2D" parent="OpenLower"]
+polygon = PackedVector2Array(-260, -5, 260, -5, 260, 5, -260, 5)
+color = Color(0.3, 0.75, 0.5, 1)
+
+[node name="ClosedGround" type="StaticBody2D" parent="."]
+position = Vector2(300, 545)
+collision_layer = 128
+collision_mask = 0
+script = ExtResource("surface")
+drop_rule = 1
+[node name="LandingTop" type="CollisionShape2D" parent="ClosedGround"]
+shape = SubResource("top")
+one_way_collision = true
+[node name="Paper" type="Polygon2D" parent="ClosedGround"]
+polygon = PackedVector2Array(-260, -5, 260, -5, 260, 5, -260, 5)
+color = Color(0.85, 0.65, 0.3, 1)
+
+[node name="Body" type="CharacterBody2D" parent="."]
+position = Vector2(180, 240)
+collision_layer = 256
+collision_mask = 384
+floor_snap_length = 8.0
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Body"]
+position = Vector2(0, -48)
+shape = SubResource("body")
+[node name="Toy" type="Polygon2D" parent="Body"]
+polygon = PackedVector2Array(-23, 0, -23, -96, 23, -96, 23, 0)
+color = Color(0.3, 0.5, 0.9, 1)
+[node name="PlatformMotor" type="Node" parent="Body"]
+script = ExtResource("motor")
+
+[node name="OtherBody" type="CharacterBody2D" parent="."]
+position = Vector2(400, 240)
+collision_layer = 256
+collision_mask = 384
+floor_snap_length = 8.0
+[node name="CollisionShape2D" type="CollisionShape2D" parent="OtherBody"]
+position = Vector2(0, -48)
+shape = SubResource("body")
+[node name="Toy" type="Polygon2D" parent="OtherBody"]
+polygon = PackedVector2Array(-23, 0, -23, -96, 23, -96, 23, 0)
+color = Color(0.9, 0.3, 0.5, 1)
+[node name="PlatformMotor" type="Node" parent="OtherBody"]
+script = ExtResource("motor")
