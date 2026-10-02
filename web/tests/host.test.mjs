@@ -287,13 +287,17 @@ test('host accepts sequenced lobby intent only from its registered connection', 
     assert.equal((await request(player.peer, { type: 'lobby_move', input_seq: 2, horizontal: 1.5 })).code, 'invalid_movement');
     player.peer.send(JSON.stringify({ type: 'lobby_jump_release', input_seq: 2, action: 'jump', horizontal: 0.65, vertical: 0.3, stance: 'move' }));
     assert.equal((await request(player.peer, { type: 'lobby_jump_release', input_seq: 2 })).code, 'stale_sequence');
-    // Browser handoff is explicit; host drop support is still pending and has no jump fallback.
-    assert.equal((await request(player.peer, { type: 'lobby_fall_release', input_seq: 3, action: 'fall', horizontal: 0, vertical: -1, stance: 'crouch' })).code, 'unsupported_message');
+    // A valid attempt consumes the sequence even when the host rejects physical eligibility.
+    player.peer.send(JSON.stringify({ type: 'lobby_fall_release', input_seq: 3, action: 'fall', horizontal: 0, vertical: -1, stance: 'crouch', player_id: 'forged-player' }));
+    assert.equal((await request(player.peer, { type: 'lobby_fall_release', input_seq: 3, action: 'fall', horizontal: 0, vertical: -1, stance: 'crouch' })).code, 'stale_sequence');
+    assert.equal((await request(player.peer, { type: 'lobby_fall_release', input_seq: 4, action: 'jump', horizontal: 0, vertical: -1, stance: 'crouch' })).code, 'invalid_action');
+    assert.equal((await request(player.peer, { type: 'lobby_move', input_seq: 4, horizontal: 0, vertical: 1.1, stance: 'look_up' })).code, 'invalid_movement');
+    assert.equal((await request(player.peer, { type: 'lobby_move', input_seq: 4, horizontal: 0.7, vertical: 0.7, stance: 'crouch' })).code, 'invalid_stance');
     resumed = await connect(JSON.stringify({
       type: 'hello', protocol: 1, session_id: joined.session_id, reconnect_token: joined.reconnect_token
     }));
     assert.equal(resumed.welcome.player.player_id, joined.player.player_id);
-    resumed.peer.send(JSON.stringify({ type: 'lobby_move', input_seq: 1, horizontal: -0.3 }));
+    resumed.peer.send(JSON.stringify({ type: 'lobby_move', input_seq: 1, horizontal: -0.3, vertical: 0, stance: 'move' }));
     assert.equal((await request(resumed.peer, { type: 'lobby_move', input_seq: 1, horizontal: 1 })).code, 'stale_sequence');
     await request(resumed.peer, { type: 'leave' });
     assert.equal((await request(resumed.peer, { type: 'lobby_move', input_seq: 3, horizontal: 1 })).code, 'not_joined');

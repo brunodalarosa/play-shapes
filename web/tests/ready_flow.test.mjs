@@ -67,6 +67,11 @@ test('host ready-up accepts prior onboarding, resets reconnect, and launches Bub
     await first.next(message => message.type === 'pre_minigame_snapshot');
     await second.next(message => message.type === 'pre_minigame_snapshot');
 
+    for (const type of ['lobby_move', 'lobby_jump_release', 'lobby_fall_release']) {
+      first.send({ type, input_seq: 1, horizontal: 0, vertical: -1, stance: 'crouch', action: 'fall' });
+      assert.equal((await first.next(message => message.type === 'error')).code, 'lobby_unavailable');
+    }
+
     pending.send({ type: 'pre_minigame_ready', ready: true, player_id: firstJoin.player.player_id });
     assert.equal((await pending.next(message => message.type === 'error')).code, 'ready_unavailable');
     const late = phone(); clients.push(late);
@@ -104,6 +109,8 @@ test('host ready-up accepts prior onboarding, resets reconnect, and launches Bub
     resumed.send({ type: 'pre_minigame_ready', ready: true });
     const gameplay = await resumed.next(message => message.type === 'bubbles_snapshot', 10000);
     assert.equal(gameplay.phase, 'instructions');
+    resumed.send({ type: 'lobby_fall_release', input_seq: 2, horizontal: 0, vertical: -1, stance: 'crouch', action: 'fall' });
+    assert.equal((await resumed.next(message => message.type === 'error')).code, 'lobby_unavailable');
     assert.equal(gameplay.player_id, undefined);
     assert.equal(secondJoin.player.seat, 2);
     assert.equal(lateJoin.player.seat, 3);

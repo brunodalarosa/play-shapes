@@ -13,7 +13,8 @@ func _run() -> void:
 	var world := WORLD.instantiate() as LobbyPlaygroundWorld
 	root.add_child(world)
 	var registry := PlayerRegistry.new(10, 60.0)
-	registry.players_changed.connect(func() -> void: world.reconcile(registry.public_players()))
+	var refresh := func() -> void: world.reconcile(registry.public_players())
+	registry.players_changed.connect(refresh)
 	var now := Time.get_ticks_msec()
 	var first := registry.join_player(100, "First", true, now, "square", "#EC407A")
 	var second := registry.join_player(101, "Second", true, now, "rhombus", "#00ACC1")
@@ -37,13 +38,20 @@ func _run() -> void:
 	_check(first_character.is_on_floor(), "Spawned character lands on the first shelf")
 	var first_player := registry.player_for_connection(100)
 	var second_player := registry.player_for_connection(101)
-	_check(not world.handle_input({}, {"type": "lobby_move", "input_seq": 1, "horizontal": 1.0}, now).accepted,
+	_check(not world.handle_input({}, {"type": "lobby_move", "input_seq": 1, "horizontal": 1.0, "vertical": 0.0, "stance": "move"}, now).accepted,
 		"Unregistered input is rejected")
 	_check(not world.handle_input(first_player, {"type": "lobby_move", "input_seq": 1, "horizontal": 2.0}, now).accepted
 		and not world.handle_input(first_player, {"type": "lobby_move", "input_seq": 1, "horizontal": "1"}, now).accepted,
 		"Out-of-range and nonnumeric movement are rejected")
-	_check(world.handle_input(first_player, {"type": "lobby_move", "input_seq": 1, "horizontal": 0.7}, now).accepted
-		and world.handle_input(second_player, {"type": "lobby_move", "input_seq": 1, "horizontal": -0.5}, now).accepted,
+	_check(world.handle_input(first_player, {"type": "lobby_move", "input_seq": 1, "horizontal": 0.0, "vertical": 1.0, "stance": "look_up"}, now).accepted,
+		"Vertical intent reaches the host motor")
+	await physics_frame
+	await physics_frame
+	_check(first_character.motor.presentation_action() == "look_up"
+		and first_character.get_node("SquircleV1Playback").get("_clip_key") == "look_up-front", "Grounded up uses the approved held pose")
+	world.reset_sequence(first_id)
+	_check(world.handle_input(first_player, {"type": "lobby_move", "input_seq": 1, "horizontal": 0.7, "vertical": 0.0, "stance": "move"}, now).accepted
+		and world.handle_input(second_player, {"type": "lobby_move", "input_seq": 1, "horizontal": -0.5, "vertical": 0.0, "stance": "move"}, now).accepted,
 		"Separate players can hold independent analog movement")
 	_check(not world.handle_input(first_player, {"type": "lobby_move", "input_seq": 1, "horizontal": -1.0}, now).accepted
 		and not world.handle_input(first_player, {"type": "lobby_move", "input_seq": 0, "horizontal": -1.0}, now).accepted,
@@ -58,15 +66,15 @@ func _run() -> void:
 		and (first_character.get_node("SquircleV1Playback/Colorable") as Sprite2D).flip_h
 		== (first_character.get_node("SquircleV1Playback/Face") as Sprite2D).flip_h,
 		"Three-quarter body and face point in the direction of travel")
-	_check(world.handle_input(first_player, {"type": "lobby_jump_release", "input_seq": 2}, now).jumped
-		and not world.handle_input(first_player, {"type": "lobby_jump_release", "input_seq": 3}, now).jumped,
+	_check(world.handle_input(first_player, {"type": "lobby_jump_release", "input_seq": 2, "horizontal": 0.0, "vertical": 0.0, "stance": "neutral", "action": "jump"}, now).jumped
+		and not world.handle_input(first_player, {"type": "lobby_jump_release", "input_seq": 3, "horizontal": 0.0, "vertical": 0.0, "stance": "neutral", "action": "jump"}, now).jumped,
 		"One grounded release queues exactly one jump")
 	await physics_frame
 	_check(first_character.velocity.y < 0.0 and not world.handle_input(first_player,
-		{"type": "lobby_jump_release", "input_seq": 4}, now).jumped,
+		{"type": "lobby_jump_release", "input_seq": 4, "horizontal": 0.0, "vertical": 0.0, "stance": "neutral", "action": "jump"}, now).jumped,
 		"Airborne release cannot queue another jump")
 	world.clear_all_input()
-	_check(first_character._horizontal == 0.0 and second_character._horizontal == 0.0,
+	_check(first_character.motor.axes == Vector2.ZERO and second_character.motor.axes == Vector2.ZERO,
 		"State transitions clear every held stick")
 	registry.disconnect_connection(100, now)
 	_check(world.character_for(first_id) == first_character and not first_character.connected
@@ -84,7 +92,7 @@ func _run() -> void:
 	_check(replacement.accepted and replacement.player.seat == 2
 		and world.character_for(String(replacement.player.player_id)).spawn_point == Vector2(555, 400),
 		"A released seat reuses its anchor without overlapping an occupied seat")
-	first_character.position.y = first_character.fall_reset_y + 10.0
+	first_character.position.y = first_character.motor.fall_reset_y + 10.0
 	await physics_frame
 	await physics_frame
 	_check(first_character.position.distance_to(first_character.spawn_point) < 3.0,
@@ -93,6 +101,7 @@ func _run() -> void:
 	registry.expire_players(now + 60000)
 	await process_frame
 	_check(world.character_for(first_id) == null, "Expired reservation removes its character")
+	registry.players_changed.disconnect(refresh)
 	world.queue_free()
 	await process_frame
 	print("Lobby playground control checks: %d failures" % _failures)

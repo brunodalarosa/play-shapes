@@ -240,7 +240,7 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 				peer.send_text(JSON.stringify({"type": "left", "message": "You left the lobby"}))
 			else:
 				_send_rejection(peer, "error", result)
-		"lobby_move", "lobby_jump_release":
+		"lobby_move", "lobby_jump_release", "lobby_fall_release":
 			var player := _registry.player_for_connection(client.connection_id)
 			var result: Dictionary = _lobby_controller.handle_input(player, message, Time.get_ticks_msec()) \
 				if _lobby_controller != null and _active_protocol == null and _accepting_new_players.call() \
