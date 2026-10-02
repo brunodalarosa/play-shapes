@@ -2,4 +2,4 @@ When players first connect to the game they join the session's Lobby playground.
 
 In the center of the lobby there's a "billboard" with the QR code for people to join.
 
-The session supports a maximum of ten registered players. The visual Playground Lobby is composed for those ten characters across multiple walkable shelf levels. The host-owned player registry still governs joining and reconnection; see [[Decision Log]] and [[PS-061 - Set Session Player Limit to Ten]].
+The session supports a maximum of ten registered players. The visual Playground Lobby is composed for those ten characters across multiple walkable shelf levels. The host-owned player registry still governs joining and reconnection. See [the player registry](../../host/player_registry.gd) for joining, reconnection, and capacity enforcement.

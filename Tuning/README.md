@@ -4,7 +4,7 @@ Start with `Active Presets.tres`. It is the project-level selector and shows the
 
 ## Find, compare, and reset values
 
-- Bubbles and jellyfishes: `Minigames/Bubbles/Default.tres` is the provisional umbrella profile for round rules, gesture recognition, and values later arena tasks will consume. See [its field guide](Minigames/Bubbles/README.md). Select a named copy in `Active Presets.tres` and relaunch before comparing feel.
+- Bubbles and jellyfishes: `Minigames/Bubbles/Default.tres` is the provisional umbrella profile for round rules, gesture recognition, and values used by the arena systems. See [its field guide](Minigames/Bubbles/README.md). Select a named copy in `Active Presets.tres` and relaunch before comparing feel.
 - Networking/session: `Shared/Networking/Default.tres` owns host-only listener, capacity, timeout, and reconnect behavior.
 - Default recovery: assign the appropriate `Default.tres` back into `Active Presets.tres`, save, and relaunch.
 - Named comparison: duplicate `Default.tres` beside it, use a descriptive name such as `Generous.tres` or `Experimental_2026-09-14.tres`, change one logical group, assign it through `Active Presets.tres`, and commit it. Every committed `.tres` below `Tuning/` is validated.

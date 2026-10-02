@@ -1,8 +1,8 @@
 extends SceneTree
-## Local renderer captures for PS-045; saved under ignored test-results.
+## Local Bubbles presentation captures; saved under ignored test-results.
 
 const SCENE: PackedScene = preload("res://minigames/bubbles_and_jellyfishes.tscn")
-const OUTPUT := "res://test-results/ps-045"
+const OUTPUT := "res://test-results/bubbles-presentation"
 
 
 func _initialize() -> void:
@@ -118,7 +118,7 @@ func _capture() -> void:
 	_save("two-players-max-bubble-hd")
 	pair.queue_free()
 	await _frames(2)
-	print("Saved PS-045 presentation captures")
+	print("Saved Bubbles presentation captures")
 	quit(0)
 
 

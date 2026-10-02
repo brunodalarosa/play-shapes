@@ -12,7 +12,7 @@ This directory is the Godot project root. Work on a new local branch and commit 
 
 ## Visual direction
 
-Read [[play-shapes/game-design-documents/Art direction|Art direction]]. Apply this to UI, environments, characters, effects, shaders, and animation.
+Read game-design-documents/Art Direction.md and apply this to UI, environments, characters, effects, shaders, and animation.
 
 The canonical editable Squircle source and current export tools live in `art/squircle/`. Keep only current source and useful pipeline/review resources there. Prior versions, backups, variant experiments and version comparisons are temporary artifacts: use ignored `scratch/` or `comparisons/` directories and do not commit them or obsolete one-time construction scripts.
 

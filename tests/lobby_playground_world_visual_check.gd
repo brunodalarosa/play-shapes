@@ -1,7 +1,7 @@
 extends SceneTree
 ## Captures the isolated empty world at the active host resolution for visual review.
 
-const OUTPUT_DIR := "res://test-results/ps-059"
+const OUTPUT_DIR := "res://test-results/lobby-playground-world"
 
 func _initialize() -> void:
 	_capture.call_deferred()

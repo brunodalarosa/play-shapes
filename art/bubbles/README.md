@@ -1,6 +1,6 @@
 # Bubbles static-art review
 
-PS-036 / PS-037 / PS-038, prepared 2026-09-22. Runtime art is under
+Environment, jellyfish, and pufferfish art, prepared 2026-09-22. Runtime art is under
 [`assets/runtime/minigames/bubbles_and_jellyfishes/`](../../assets/runtime/minigames/bubbles_and_jellyfishes/README.md).
 
 ## Review images
@@ -58,7 +58,7 @@ From the implementation root:
 ```powershell
 python tools/assets/validate_bubbles_art.py --source-dir PATH_TO_OWNER_ART
 godot --headless --editor --path . --import
-godot --headless --path . --export-pack "Play Shapes Windows Release" test-results/ps-036-038/bubbles.pck
+godot --headless --path . --export-pack "Play Shapes Windows Release" test-results/bubbles-art/bubbles.pck
 ```
 
 The Python validator requires Pillow. It verifies all 18 PNGs, source and export
@@ -83,6 +83,6 @@ Recorded results on Godot 4.7.2:
   white silhouettes and rotated hazards. The owner explicitly approved all three
   art sets on 2026-09-22.
 
-Ignored logs and PCK are under `test-results/ps-036-038/`. This verifies pack
+Ignored logs and PCK are under `test-results/bubbles-art/`. This verifies pack
 contents, not a playable Bubbles standalone build; the minigame is not implemented
-by these tasks.
+by this art pipeline.

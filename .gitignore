@@ -1,5 +1,6 @@
 # Godot 4+ specific ignores
 .godot/
+.obsidian/
 /android/
 web/node_modules/
 web/.npm-cache/
@@ -7,6 +8,7 @@ test-results/*
 !test-results/.gdignore
 __pycache__/
 builds/
+BRUNO_GIT_IGNORE/
 opencode.json
 *.local.json
 *.log

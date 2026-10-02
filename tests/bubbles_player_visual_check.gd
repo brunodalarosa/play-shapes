@@ -3,7 +3,7 @@ extends SceneTree
 
 const Controller = preload("res://minigames/bubbles_round_controller.gd")
 const Arena = preload("res://minigames/bubbles_player_arena.gd")
-const OUTPUT := "res://test-results/ps-042"
+const OUTPUT := "res://test-results/bubbles-player"
 
 
 func _initialize() -> void:
@@ -52,7 +52,7 @@ func _capture() -> void:
 	await _frames(5)
 	if not _save("ten-players"):
 		return
-	print("Saved PS-042 player-bubble renderer captures")
+	print("Saved player-bubble renderer captures")
 	quit(0)
 
 
