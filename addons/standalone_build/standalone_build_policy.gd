@@ -10,9 +10,12 @@ const EXECUTABLE_NAME := "Play Shapes.exe"
 const PACK_NAME := "Play Shapes.pck"
 const METADATA_NAME := "build-info.json"
 const ZIP_RELATIVE := "builds/standalone/Play-Shapes-windows-x86_64.zip"
-const INCLUDE_FILTER := "web/public/*.html,web/public/*.webmanifest,web/public/*.css,web/public/*.js,web/public/vendor/*.mjs,assets/runtime/animated_characters/squircle/v1/manifest.json"
-const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,local/**,*.local.json,*.pem,*.key,*.crt,*.cer,*.der,*.p12,*.pfx,art/**,builds/**,opencode.json,tools/**,tests/**,test-results/**,web/*.json,web/node_modules/**,web/src/**,web/tests/**"
+const INCLUDE_FILTER := "web/public/*.html,web/public/*.webmanifest,web/public/*.css,web/public/*.js,web/public/platform_input_settings.json,web/public/vendor/*.mjs,assets/runtime/animated_characters/squircle/v1/manifest.json"
+const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,local/**,*.local.json,*.pem,*.key,*.crt,*.cer,*.der,*.p12,*.pfx,art/**,builds/**,opencode.json,tools/**,tests/**,test-results/**,web/package.json,web/package-lock.json,web/tsconfig.json,web/node_modules/**,web/src/**,web/tests/**"
 const REQUIRED_BROWSER_PATHS := [
+	"web/public/platform_controls.js",
+	"web/public/platform_input.js",
+	"web/public/platform_input_settings.json",
 	"web/public/index.html",
 	"web/public/app.js",
 	"web/public/network_config.js",
@@ -33,6 +36,9 @@ const REQUIRED_BROWSER_PATHS := [
 	"web/public/style.css",
 ]
 const REQUIRED_RUNTIME_PATHS := [
+	"web/public/platform_controls.js",
+	"web/public/platform_input.js",
+	"web/public/platform_input_settings.json",
 	"debug/motion_lab/motion_lab.tscn",
 	"debug/motion_lab/motion_lab.gd",
 	"debug/motion_lab/motion_plot.gd",

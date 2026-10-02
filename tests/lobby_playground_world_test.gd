@@ -30,6 +30,8 @@ func _run() -> void:
 		var platform := body as StaticBody2D
 		_check(platform != null and platform.collision_layer == PLATFORM_LAYER
 			and platform.collision_mask == 0, "%s uses the reserved platform layer" % body.name)
+		_check(platform is PlatformSurface and platform.drop_rule == (PlatformSurface.DropRule.CLOSED if body.name == "BottomShelf" else PlatformSurface.DropRule.OPEN),
+			"%s exposes its independent authored drop rule" % body.name)
 		_check(platform.get_child_count() == 1, "%s has one inspectable landing surface" % body.name)
 		var shape := platform.get_child(0) as CollisionShape2D
 		_check(shape.one_way_collision and shape.shape is RectangleShape2D,

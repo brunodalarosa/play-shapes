@@ -75,6 +75,19 @@ func _run() -> void:
 			return
 	if not _test_held_playback(samples[0]):
 		return
+	# Host stance selection must consume the same manifest-owned held clips as the lab.
+	for sign_y: float in [-1.0, 1.0]:
+		var selected := PlatformInput.classify(Vector2(0, sign_y), "neutral")
+		samples[0].seek_clip("idle", "front", 0)
+		samples[0].play(selected, "front")
+		samples[0].advance_playback(1.0)
+		var anchor: Vector2 = samples[0].get("_colorable").position
+		samples[0].play("idle", "front")
+		samples[0].advance_playback(1.0)
+		if not _check(samples[0].get("_clip_key") == "idle-front"
+			and samples[0].get("_colorable").position == anchor,
+			"Host-classified stance releases to neutral at the same floor anchor"):
+			return
 	lab.set("_expression", "auto")
 	lab.set("_blink_elapsed", 2.90)
 	lab.call("_update_expression")
