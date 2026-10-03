@@ -20,20 +20,21 @@ existing ones. The game keeps playing the same while the code is reshaped; see
 - A decision log and this roadmap.
 - A branching model, Git Flow, with `develop` as the branch work merges into
   ([branching.md](branching.md)).
+- No ticket numbers anywhere, with no exemptions: the names inside the Squircle Blender
+  source were the last.
 
 ## Next
 
-1. Rename the ticket-prefixed names inside the Squircle Blender source, and remove the
-   exemption `art/squircle/` has from the ticket rule.
-2. Clean up the tests:
-   - one shared test base in place of the 24 copies of the `_check` helper;
-   - fix the tests that leave objects behind at exit, and delete the check command's list of
-     ignored shutdown lines in the same change;
-   - give tests proper ways into the code, and turn the `private-access` lint rule back on
-     for `tests/`;
-   - free ports in place of the hard-coded ones;
-   - one shared phone helper for the browser tests;
-   - make the check fail at once on a script error, instead of waiting out its timeout.
+Clean up the tests:
+
+- one shared test base in place of the 24 copies of the `_check` helper;
+- fix the tests that leave objects behind at exit, and delete the check command's list of
+  ignored shutdown lines in the same change;
+- give tests proper ways into the code, and turn the `private-access` lint rule back on
+  for `tests/`;
+- free ports in place of the hard-coded ones;
+- one shared phone helper for the browser tests;
+- make the check fail at once on a script error, instead of waiting out its timeout.
 
 ## The refactor, in order
 

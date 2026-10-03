@@ -16,4 +16,4 @@ Each document covers one topic and states what is true now. The reason for a cho
 
 - The check command enforces links, paragraph length and the absence of ticket numbers.
 - Reviews that still need a person are listed in one document, not repeated as caveats.
-- The Squircle art source still stores names with ticket prefixes and is exempt until they are renamed in the Blender file.
+- The rule has no exemptions. The check reads text files only, so a name stored inside a binary file, such as a Blender source, is checked by whoever edits that file.

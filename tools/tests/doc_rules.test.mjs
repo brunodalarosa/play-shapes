@@ -6,7 +6,6 @@ import {
   headingAnchor,
   isProjectDocument,
   localLinks,
-  mayNameTickets,
   paragraphs,
   ticketLines,
 } from "../doc_rules.mjs";
@@ -29,12 +28,6 @@ test("finds ticket numbers in text and in file names", () => {
 
   assert.equal(hasTicketName(`docs/${ticket("080").toLowerCase()}-animations.md`), true);
   assert.equal(hasTicketName("docs/squircle-animations.md"), false);
-});
-
-test("lets only the Squircle art source name tickets", () => {
-  assert.equal(mayNameTickets("art/squircle/export_frames.py"), true);
-  assert.equal(mayNameTickets("art/bubbles/README.md"), false);
-  assert.equal(mayNameTickets("docs/architecture.md"), false);
 });
 
 test("splits Markdown into paragraphs, list items and table rows", () => {
