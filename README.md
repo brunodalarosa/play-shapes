@@ -9,16 +9,30 @@ the round; phones provide portrait touch controls.
 
 ## Requirements
 
-To run the project locally, install:
+To play from a checkout, install:
 
 - Git
 - Godot 4.7.2 or newer, with the GL Compatibility renderer available
 - A desktop PC and phones that can reach the PC on the same local network
 
-Node.js is optional for normal gameplay. It is needed only when rebuilding or
-testing the TypeScript browser client. The repository includes the compiled
-browser files, so Godot can serve a cloned checkout without an internet
-connection or a separate web server.
+The repository includes the compiled browser files, so Godot can serve a
+cloned checkout without Node, an internet connection or a separate web server.
+
+To develop, also install Node.js 22 or newer, which includes npm. Then run
+`node tools/setup.mjs` from the repository root. It checks every required
+tool, fails with install instructions when one is missing or too old, and
+installs the browser client's dependencies in `web/`. It installs nothing
+outside the repository. Godot is found as `godot` on PATH, or through
+`GODOT_BIN` when set to a Godot executable.
+
+Some tasks need more. The setup script reports these without failing:
+
+| Tool | Needed for |
+| --- | --- |
+| Godot export templates matching the installed Godot | The standalone Windows build and `node tools/check.mjs --release` |
+| mkcert | Local HTTPS for motion input; `node tools/local_https.mjs download` fetches it, see [docs/local-https-and-motion-testing.md](docs/local-https-and-motion-testing.md) |
+| GitHub CLI (`gh`) | Pull requests from the terminal |
+| Python 3 with Pillow, GIMP 3, Blender | Regenerating art; see [art/bubbles/README.md](art/bubbles/README.md) and [art/squircle/README.md](art/squircle/README.md) |
 
 The vendored Godot MCP addon is disabled by default and is optional developer
 tooling; it is not required to launch or play the game.
@@ -29,12 +43,11 @@ tooling; it is not required to launch or play the game.
 2. Open the cloned folder in Godot. This folder is the Godot project
    root and contains `project.godot`.
 3. Confirm that Godot is using the **GL Compatibility** renderer.
-4. If you want to rebuild or test the web client, install the dependencies:
+4. If you want to develop, check your tools and install the web client's
+   dependencies:
 
    ```powershell
-   cd web
-   npm ci
-   cd ..
+   node tools/setup.mjs
    ```
 
    The browser client is served by Godot from `web/public/`; do not start a

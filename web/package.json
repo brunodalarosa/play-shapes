@@ -1,6 +1,9 @@
 {
   "name": "play-shapes-controller",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc && node scripts/copy_vendor.mjs && node scripts/platform_settings.mjs",

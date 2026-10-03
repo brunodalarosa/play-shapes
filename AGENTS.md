@@ -68,9 +68,9 @@ The canonical editable Squircle source and current export tools live in `art/squ
 
 ## Setup and verification
 
-- Use Godot 4.7.2 or newer with the GL Compatibility renderer. Run `godot --version` and `godot --path .` from this repository root. Set `GODOT_BIN` to a Godot executable when it is not on PATH.
-- Run `node tools/check.mjs` before reporting a change as verified. It runs every Godot test script, the browser type check and tests, and confirms `web/public/` matches a fresh build; it prints one line per failure and writes full output under `test-results/check/`. Pass name filters for a focused run (`node tools/check.mjs bubbles`), and `--release` to add the Windows export test, which needs export templates.
-- Run a single Godot script with `godot --headless --path . --script tests/<name>.gd`. For browser work, run `npm install` once in `web/`, then `npm run check`, `npm run build`, and `npm test`.
+- Use Godot 4.7.2 or newer with the GL Compatibility renderer, and Node 22 or newer. Run `node tools/setup.mjs` after cloning and whenever a tool may be missing: it checks the required tools, reports the ones some tasks need, and installs `web/` dependencies. [README.md](README.md#requirements) lists every tool. Set `GODOT_BIN` to a Godot executable when it is not on PATH as `godot`.
+- Run `node tools/check.mjs` before reporting a change as verified. It runs every Godot test script, the tests of `tools/`, the browser type check and tests, and confirms `web/public/` matches a fresh build; it prints one line per failure and writes full output under `test-results/check/`. Pass name filters for a focused run (`node tools/check.mjs bubbles`), and `--release` to add the Windows export test, which needs export templates.
+- Run a single Godot script with `godot --headless --path . --script tests/<name>.gd`. For browser work, run `npm run check`, `npm run build`, and `npm test` in `web/`.
 - Keep changes scoped. Update `DEVELOPMENT.md` when current setup, architecture, protocols, or verification steps change.
 - The vendored `addons/godot_mcp/` editor integration is optional. Enable it in Godot's Plugin settings only when needed; configure your own local MCP client separately. Do not change the third-party addon unless the task calls for it.
 

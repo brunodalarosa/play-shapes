@@ -89,11 +89,10 @@ For Inspector help, put a `##` documentation comment immediately before the expo
 
 ## Browser build
 
-Node 22+ is development-only. After any TypeScript edit, rebuild and commit all affected modules under `web/public/`:
+Node 22+ is required for development and not for play. `node tools/setup.mjs` checks it with the other required tools and installs `web/` dependencies; [README.md](README.md#requirements) lists every tool. After any TypeScript edit, rebuild and commit all affected modules under `web/public/`:
 
 ```powershell
 cd web
-npm.cmd ci --ignore-scripts
 npm.cmd run check
 npm.cmd run build
 npm.cmd test
@@ -135,7 +134,7 @@ Close any interactive host before integration tests; the browser suite refuses t
 node tools/check.mjs
 ```
 
-This is the default `[AUTO]` check. It runs every `tests/*_test.gd` script and `tests/foundation.gd`, each in its own headless Godot process, then `npm run check` and `npm test` in `web/`, then rebuilds the browser bundle and fails if `web/public/` changed. New test scripts are picked up by name. It prints one line per failure and a one-line summary; full output for each check is in ignored `test-results/check/`. A Godot script fails on a non-zero exit code or on any `ERROR` line. Shutdown lines about objects still held at exit are ignored for now, because three passing scripts print them; that exception is temporary and is marked in `tools/check.mjs`.
+This is the default `[AUTO]` check. It runs every `tests/*_test.gd` script and `tests/foundation.gd`, each in its own headless Godot process, then the `tools/tests/` suite, then `npm run check` and `npm test` in `web/`, then rebuilds the browser bundle and fails if `web/public/` changed. New test scripts are picked up by name. It prints one line per failure and a one-line summary; full output for each check is in ignored `test-results/check/`. A Godot script fails on a non-zero exit code or on any `ERROR` line. Shutdown lines about objects still held at exit are ignored for now, because three passing scripts print them; that exception is temporary and is marked in `tools/check.mjs`.
 
 ```powershell
 node tools/check.mjs bubbles web-tests   # only checks whose name contains a filter
