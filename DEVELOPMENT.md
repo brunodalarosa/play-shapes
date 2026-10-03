@@ -134,7 +134,7 @@ Close any interactive host before integration tests; the browser suite refuses t
 node tools/check.mjs
 ```
 
-This is the default `[AUTO]` check. It runs every `tests/*_test.gd` script and `tests/foundation.gd`, each in its own headless Godot process, then the `tools/tests/` suite, then `npm run check` and `npm test` in `web/`, then rebuilds the browser bundle and fails if `web/public/` changed, then runs the end-to-end test described below. New test scripts are picked up by name. It prints one line per failure and a one-line summary; full output for each check is in ignored `test-results/check/`. A Godot script fails on a non-zero exit code or on any `ERROR` line. Shutdown lines about objects still held at exit are ignored for now, because three passing scripts print them; that exception is temporary and is marked in `tools/check.mjs`.
+This is the default `[AUTO]` check. It runs every `tests/*_test.gd` script and `tests/foundation.gd`, each in its own headless Godot process, then the `tools/tests/` suite, then `npm run check` (which type-checks the phone client and, with Node types, the end-to-end test files) and `npm test` in `web/`, then rebuilds the browser bundle and fails if `web/public/` changed, then runs the end-to-end test described below. New test scripts are picked up by name. It prints one line per failure and a one-line summary; full output for each check is in ignored `test-results/check/`. A Godot script fails on a non-zero exit code or on any `ERROR` line. Shutdown lines about objects still held at exit are ignored for now, because three passing scripts print them; that exception is temporary and is marked in `tools/check.mjs`.
 
 ```powershell
 node tools/check.mjs bubbles web-tests   # only checks whose name contains a filter
