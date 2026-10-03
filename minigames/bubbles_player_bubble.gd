@@ -48,14 +48,22 @@ func _ready() -> void:
 	_collider.shape = _collider.shape.duplicate()
 
 
-func configure(id: String, display_name: String, color: Color, selected_tuning: BubblesTuning) -> void:
+func configure(
+	id: String,
+	display_name: String,
+	color: Color,
+	selected_tuning: BubblesTuning,
+) -> void:
 	assert(not id.is_empty() and selected_tuning != null)
 	player_id = id
 	tuning = selected_tuning
 	_player_color = color
 	_character.player_color = color
 	_name_label.text = display_name
-	_blink_next_msec = roundi(selected_tuning.character_blink_interval_seconds * 1000.0 * (0.7 + float(abs(id.hash()) % 7) * 0.1))
+	_blink_next_msec = roundi(
+		selected_tuning.character_blink_interval_seconds
+		* 1000.0 * (0.7 + float(abs(id.hash()) % 7) * 0.1)
+	)
 	_refresh_visual(0)
 
 
@@ -104,15 +112,27 @@ func simulate_step(delta: float, bounds: Rect2, host_time_msec: int) -> void:
 	if tuning == null or not is_finite(delta) or delta < 0.0 or delta > 0.05 or host_time_msec < 0:
 		return
 	_visual_host_msec = host_time_msec
-	if (_charge_progress > 0.0 or _live_drag_target.length_squared() > 0.0) and host_time_msec - _charge_last_msec > BubblesProtocol.CHARGE_TIMEOUT_MSEC:
+	if (
+		(_charge_progress > 0.0 or _live_drag_target.length_squared() > 0.0)
+		and host_time_msec - _charge_last_msec > BubblesProtocol.CHARGE_TIMEOUT_MSEC
+	):
 		_charge_progress = 0.0
 		_live_drag_target = Vector2.ZERO
-	if _live_drag_started_msec >= 0 and host_time_msec - _live_drag_started_msec > roundi(tuning.swipe_max_hold_seconds * 1000.0):
+	if (
+		_live_drag_started_msec >= 0
+		and host_time_msec - _live_drag_started_msec
+		> roundi(tuning.swipe_max_hold_seconds * 1000.0)
+	):
 		_live_drag_target = Vector2.ZERO
-	_live_drag_display = _live_drag_display.lerp(_live_drag_target,
-		1.0 - exp(-delta / tuning.live_drag_response_seconds))
+	_live_drag_display = _live_drag_display.lerp(
+		_live_drag_target,
+		1.0 - exp(-delta / tuning.live_drag_response_seconds),
+	)
 	_refresh_visual(host_time_msec)
-	if _controller != null and host_time_msec - _phone_visual_sent_msec >= PHONE_VISUAL_SEND_INTERVAL_MSEC:
+	if (
+		_controller != null
+		and host_time_msec - _phone_visual_sent_msec >= PHONE_VISUAL_SEND_INTERVAL_MSEC
+	):
 		_phone_visual_sent_msec = host_time_msec
 		_controller.personal_visual_changed.emit(player_id, _phone_visual_state(host_time_msec))
 	if not _active or not bounds.has_area():
@@ -125,13 +145,13 @@ func simulate_step(delta: float, bounds: Rect2, host_time_msec: int) -> void:
 
 func request_jellyfish_collection(host_time_msec: int) -> Dictionary:
 	if _controller == null:
-		return {"accepted": false, "code": &"unbound"}
+		return { "accepted": false, "code": &"unbound" }
 	return _controller.record_jellyfish_capture(player_id, host_time_msec)
 
 
 func request_puffer_pop(host_time_msec: int) -> Dictionary:
 	if _controller == null:
-		return {"accepted": false, "code": &"unbound"}
+		return { "accepted": false, "code": &"unbound" }
 	return _controller.pop_player(player_id, host_time_msec)
 
 
@@ -140,7 +160,10 @@ func is_spinning(host_time_msec: int) -> bool:
 
 
 func is_invulnerable(host_time_msec: int) -> bool:
-	return _active and host_time_msec >= _pop_at_msec and _pop_at_msec >= 0 and host_time_msec < _invulnerable_until_msec
+	return (
+		_active and host_time_msec >= _pop_at_msec and _pop_at_msec >= 0
+		and host_time_msec < _invulnerable_until_msec
+	)
 
 
 func is_simulated() -> bool:
@@ -156,7 +179,10 @@ func score() -> int:
 
 
 func bubble_radius() -> float:
-	return minf(tuning.max_radius, tuning.starting_radius + float(_score) * tuning.radius_per_jellyfish)
+	return minf(
+		tuning.max_radius,
+		tuning.starting_radius + float(_score) * tuning.radius_per_jellyfish,
+	)
 
 
 func collision_radius() -> float:
@@ -220,22 +246,43 @@ func _refresh_visual(host_time_msec: int) -> void:
 			burst = pop_age / tuning.burst_seconds
 			rendered_radius = _burst_radius
 	(_collider.shape as CircleShape2D).radius = maxf(1.0, bubble_radius() * reform_scale)
-	var white_blink := is_invulnerable(host_time_msec) and (host_time_msec / BLINK_PERIOD_MSEC) % 2 == 0
+	var white_blink := (
+		is_invulnerable(host_time_msec) and (host_time_msec / BLINK_PERIOD_MSEC) % 2 == 0
+	)
 	_character.player_color = Color.WHITE if white_blink else _player_color
-	_character.visual_scale = minf(CHARACTER_MAX_SCALE, bubble_radius() * 0.82 / CHARACTER_OUTER_RADIUS)
+	_character.visual_scale = minf(
+		CHARACTER_MAX_SCALE,
+		bubble_radius() * 0.82 / CHARACTER_OUTER_RADIUS,
+	)
 	_character.set_playback_time_msec(host_time_msec)
 	_animate_character(host_time_msec, burst)
 	var swipe_age := float(host_time_msec - _swipe_at_msec) / 1000.0 if _swipe_at_msec >= 0 else 999.0
-	_swipe_pull = _swipe_direction * tuning.swipe_pull_strength * sin(PI * clampf(swipe_age / tuning.swipe_reaction_seconds, 0.0, 1.0))
+	_swipe_pull = _swipe_direction * tuning.swipe_pull_strength * sin(
+		PI * clampf(swipe_age / tuning.swipe_reaction_seconds, 0.0, 1.0)
+	)
 	_drag_pull = _live_drag_display * tuning.live_drag_pull_strength
 	_charge_pull = Vector2.ZERO
 	if _charge_progress > 0.0:
 		var seconds := float(host_time_msec) / 1000.0
 		_charge_pull = Vector2(sin(seconds * 13.0), cos(seconds * 17.0)) * tuning.charge_wobble_strength * _charge_progress
 	var pull := _swipe_pull + _drag_pull + _charge_pull
-	var surface_angle := float(host_time_msec - _spin_started_msec) / 1000.0 * TAU * tuning.spin_surface_turns_per_second if is_spinning(host_time_msec) and _spin_started_msec >= 0 else 0.0
-	_visual.update_appearance(rendered_radius, mini(_score, tuning.captured_visual_cap), is_spinning(host_time_msec),
-		white_blink, pull, surface_angle, burst, tuning.decorative_particle_count, _charge_progress * tuning.charge_glow_strength)
+	var surface_angle := (
+		float(host_time_msec - _spin_started_msec) / 1000.0
+		* TAU * tuning.spin_surface_turns_per_second
+		if (is_spinning(host_time_msec) and _spin_started_msec >= 0)
+		else 0.0
+	)
+	_visual.update_appearance(
+		rendered_radius,
+		mini(_score, tuning.captured_visual_cap),
+		is_spinning(host_time_msec),
+		white_blink,
+		pull,
+		surface_angle,
+		burst,
+		tuning.decorative_particle_count,
+		_charge_progress * tuning.charge_glow_strength,
+	)
 	_name_label.position = Vector2(-110.0, -rendered_radius - 42.0)
 
 
@@ -273,7 +320,10 @@ func _animate_character(host_time_msec: int, burst: float) -> void:
 	if host_time_msec >= _blink_next_msec:
 		_blink_until_msec = host_time_msec + 140
 		_blink_index += 1
-		_blink_next_msec = host_time_msec + roundi(tuning.character_blink_interval_seconds * 1000.0 * (0.72 + float(_blink_index % 5) * 0.14))
+		_blink_next_msec = host_time_msec + roundi(
+			tuning.character_blink_interval_seconds * 1000.0
+			* (0.72 + float(_blink_index % 5) * 0.14)
+		)
 	_character.face_blink = host_time_msec < _blink_until_msec
 
 
@@ -319,8 +369,11 @@ func _on_charge_visual_changed(id: String, progress: float) -> void:
 func _on_drag_visual_changed(id: String, drag: Vector2, gesture_started_msec: int) -> void:
 	if id == player_id and _active and _connected:
 		_live_drag_started_msec = gesture_started_msec
-		var within_swipe_window := (gesture_started_msec >= 0
-			and _visual_host_msec - gesture_started_msec <= roundi(tuning.swipe_max_hold_seconds * 1000.0))
+		var within_swipe_window := (
+			gesture_started_msec >= 0
+			and _visual_host_msec - gesture_started_msec
+			<= roundi(tuning.swipe_max_hold_seconds * 1000.0)
+		)
 		_live_drag_target = drag.limit_length(1.0) if within_swipe_window else Vector2.ZERO
 		_charge_last_msec = _visual_host_msec
 

@@ -52,8 +52,10 @@ func _start_round(player: Dictionary) -> void:
 		_controller.record_jellyfish_capture(String(player.player_id), now)
 	_timer = Timer.new()
 	_timer.wait_time = 1.0 / 30.0
-	_timer.timeout.connect(func() -> void:
-		if _controller.phase_name() == &"active":
-			_controller.advance(Time.get_ticks_msec()))
+	_timer.timeout.connect(
+		func() -> void:
+			if _controller.phase_name() == &"active":
+				_controller.advance(Time.get_ticks_msec()),
+	)
 	root.add_child(_timer)
 	_timer.start()

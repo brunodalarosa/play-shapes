@@ -3,8 +3,10 @@ extends SceneTree
 
 const OUTPUT_DIR := "res://test-results/lobby-playground-world"
 
+
 func _initialize() -> void:
 	_capture.call_deferred()
+
 
 func _capture() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUTPUT_DIR))

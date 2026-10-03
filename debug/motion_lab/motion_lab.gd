@@ -23,6 +23,7 @@ var _last_plot_time := -1
 var _refresh_elapsed := 0.0
 var _recenter_button: Button
 
+
 func _ready() -> void:
 	_channel = SessionHost.websocket.motion_channel
 	_build_ui()
@@ -32,6 +33,7 @@ func _ready() -> void:
 	_on_players_changed(SessionHost.players())
 	_update_readings()
 
+
 func _exit_tree() -> void:
 	SessionHost.set_accepting_new_players(false)
 	SessionHost.websocket.end_motion()
@@ -39,6 +41,7 @@ func _exit_tree() -> void:
 		SessionHost.players_changed.disconnect(_on_players_changed)
 	if _channel != null and _channel.changed.is_connected(_on_sample_changed):
 		_channel.changed.disconnect(_on_sample_changed)
+
 
 func bind_player_one() -> void:
 	SessionHost.websocket.end_motion()
@@ -50,6 +53,7 @@ func bind_player_one() -> void:
 		plot.clear()
 	_on_players_changed(SessionHost.players())
 
+
 func _on_players_changed(players: Array[Dictionary]) -> void:
 	if not target_player_id.is_empty():
 		return # An expired identity never silently changes to a newly occupied seat.
@@ -59,6 +63,7 @@ func _on_players_changed(players: Array[Dictionary]) -> void:
 			_target_name = player.name
 			SessionHost.websocket.begin_motion(target_player_id)
 			return
+
 
 func _on_sample_changed() -> void:
 	if _channel.latest.is_empty():
@@ -70,7 +75,10 @@ func _on_sample_changed() -> void:
 		return
 	_last_plot_time = _channel.received_at
 	for index: int in range(3):
-		_plots[index].append_sample(_channel.latest[["acceleration", "acceleration_gravity", "rotation_rate"][index]])
+		_plots[index].append_sample(
+			_channel.latest[["acceleration", "acceleration_gravity", "rotation_rate"][index]]
+		)
+
 
 func _process(delta: float) -> void:
 	_refresh_elapsed += delta
@@ -79,25 +87,44 @@ func _process(delta: float) -> void:
 		_update_readings()
 	if _has_orientation():
 		var target := _neutral.inverse() * _current_pose()
-		_pose = target if smoothing_seconds <= 0 else _pose.slerp(target, 1.0 - exp(-delta / smoothing_seconds))
+		_pose = (
+			target
+			if smoothing_seconds <= 0
+			else _pose.slerp(target, 1.0 - exp(-delta / smoothing_seconds))
+		)
 		_phone.quaternion = _pose
 
+
 func _has_orientation() -> bool:
-	if _channel == null or not _channel.is_fresh(Time.get_ticks_msec()) or _channel.latest.is_empty():
+	if (
+		_channel == null or not _channel.is_fresh(Time.get_ticks_msec())
+		or _channel.latest.is_empty()
+	):
 		return false
 	var sample := _channel.latest
-	return sample.orientation_age_msec != null and sample.orientation_age_msec + Time.get_ticks_msec() - _channel.received_at <= MotionInputChannel.STALE_MSEC and not sample.orientation.has(null)
+	return (
+		sample.orientation_age_msec != null
+		and sample.orientation_age_msec + Time.get_ticks_msec() - _channel.received_at
+		<= MotionInputChannel.STALE_MSEC
+		and not sample.orientation.has(null)
+	)
+
 
 func _current_pose() -> Quaternion:
-	return MotionOrientation.physical_basis(_channel.latest.orientation, _channel.latest.screen_angle).get_rotation_quaternion()
+	return MotionOrientation.physical_basis(_channel.latest.orientation, _channel
+	.latest
+	.screen_angle).get_rotation_quaternion()
+
 
 func recenter() -> void:
 	if _has_orientation():
 		_neutral = _current_pose()
 		_pose = Quaternion.IDENTITY
 
+
 func reset_calibration() -> void:
 	_neutral = Quaternion.IDENTITY
+
 
 func _update_readings() -> void:
 	var connection := "unavailable"
@@ -110,26 +137,63 @@ func _update_readings() -> void:
 	if not fresh and age >= 0:
 		state = "STALE"
 	_summary.text = "Player 1: %s · %s · %s\nSample age: %s · Sent: %.1f Hz · Received: %.1f Hz · cap %d Hz" % [
-		_target_name if not target_player_id.is_empty() else "No connected seat 1", connection, state,
-		"unavailable" if age < 0 else "%d ms" % age, _channel.transmitted_hz,
-		float(_channel.sample_count - 1) * 1000.0 / maxf(Time.get_ticks_msec() - _channel.first_received_at, 1) if _channel.sample_count > 1 else 0.0, MotionInputChannel.MAX_SEND_HZ]
+		_target_name if not target_player_id.is_empty() else "No connected seat 1",
+		connection,
+		state,
+		"unavailable" if age < 0 else "%d ms" % age,
+		_channel.transmitted_hz,
+		(
+			float(_channel.sample_count - 1) * 1000.0
+			/ maxf(Time.get_ticks_msec() - _channel.first_received_at, 1)
+			if _channel.sample_count > 1
+			else 0.0
+		),
+		MotionInputChannel.MAX_SEND_HZ,
+	]
 	var diagnostic_lines := "Phone diagnostics\n"
-	for field: String in ["secure_context", "page_protocol", "hostname", "websocket_protocol", "websocket_status", "motion_support", "orientation_support", "motion_permission", "orientation_permission", "state"]:
-		diagnostic_lines += "%s: %s\n" % [field.replace("_", " "), str(_channel.diagnostics.get(field, "unavailable"))]
+	for field: String in [
+		"secure_context",
+		"page_protocol",
+		"hostname",
+		"websocket_protocol",
+		"websocket_status",
+		"motion_support",
+		"orientation_support",
+		"motion_permission",
+		"orientation_permission",
+		"state",
+	]:
+		diagnostic_lines += "%s: %s\n" % [
+			field.replace("_", " "),
+			str(_channel.diagnostics.get(field, "unavailable")),
+		]
 	_raw.text = diagnostic_lines + "\nRaw values · unavailable ≠ zero\n"
 	if not _channel.latest.is_empty():
 		var sample := _channel.latest
 		_raw.text += "\nOrientation α, β, γ (degrees)\n%s · %s\n\nAngular velocity α, β, γ (degrees/s)\n%s\n\nAcceleration x, y, z (m/s²)\n%s\n\nIncluding gravity x, y, z (m/s²)\n%s\n\nMotion events: %.1f Hz · age %s ms\nOrientation events: %.1f Hz · age %s ms\nEvent interval: %s ms\nScreen angle: %s°" % [
-			_vector_text(sample.orientation), "absolute" if sample.absolute else "relative", _vector_text(sample.rotation_rate), _vector_text(sample.acceleration), _vector_text(sample.acceleration_gravity),
-			sample.motion_hz, _value_text(sample.motion_age_msec), sample.orientation_hz, _value_text(sample.orientation_age_msec), _value_text(sample.interval_msec), _value_text(sample.screen_angle)]
+			_vector_text(sample.orientation),
+			"absolute" if sample.absolute else "relative",
+			_vector_text(sample.rotation_rate),
+			_vector_text(sample.acceleration),
+			_vector_text(sample.acceleration_gravity),
+			sample.motion_hz,
+			_value_text(sample.motion_age_msec),
+			sample.orientation_hz,
+			_value_text(sample.orientation_age_msec),
+			_value_text(sample.interval_msec),
+			_value_text(sample.screen_angle),
+		]
 	_pose_status.text = "LIVE phone pose" if _has_orientation() else "Pose unavailable / stale — preview held"
 	_recenter_button.disabled = not _has_orientation()
+
 
 func _value_text(value: Variant) -> String:
 	return "unavailable" if value == null else "%.3f" % float(value)
 
+
 func _vector_text(values: Array) -> String:
 	return "[%s, %s, %s]" % [_value_text(values[0]), _value_text(values[1]), _value_text(values[2])]
+
 
 func _button(text: String, action: Callable, parent: Node) -> Button:
 	var button := Button.new()
@@ -138,6 +202,7 @@ func _button(text: String, action: Callable, parent: Node) -> Button:
 	button.pressed.connect(action)
 	parent.add_child(button)
 	return button
+
 
 func _build_ui() -> void:
 	theme = Theme.new()
@@ -169,7 +234,12 @@ func _build_ui() -> void:
 	_recenter_button = _button("Recenter pose", recenter, actions)
 	_button("Reset calibration", reset_calibration, actions)
 	_button("Bind current Player 1", bind_player_one, actions)
-	_button("Return to lobby", func() -> void: DebugLauncher.return_to_lobby(), actions)
+	_button(
+		"Return to lobby",
+		func() -> void:
+			DebugLauncher.return_to_lobby(),
+		actions,
+	)
 	var smooth_label := Label.new()
 	smooth_label.text = "Smoothing (seconds)"
 	actions.add_child(smooth_label)
@@ -178,7 +248,10 @@ func _build_ui() -> void:
 	smoothing.max_value = 0.5
 	smoothing.step = 0.01
 	smoothing.value = smoothing_seconds
-	smoothing.value_changed.connect(func(value: float) -> void: smoothing_seconds = value)
+	smoothing.value_changed.connect(
+		func(value: float) -> void:
+			smoothing_seconds = value,
+	)
 	actions.add_child(smoothing)
 	var row := HBoxContainer.new()
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -225,6 +298,7 @@ func _build_ui() -> void:
 		plot_column.add_child(plot)
 		_plots.append(plot)
 
+
 func _block(parent: Node3D, dimensions: Vector3, position_value: Vector3, color: Color) -> void:
 	var mesh := MeshInstance3D.new()
 	var box := BoxMesh.new()
@@ -236,6 +310,7 @@ func _block(parent: Node3D, dimensions: Vector3, position_value: Vector3, color:
 	material.roughness = 0.8
 	mesh.material_override = material
 	parent.add_child(mesh)
+
 
 func _build_phone() -> void:
 	var world := Node3D.new()

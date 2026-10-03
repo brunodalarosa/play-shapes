@@ -4,12 +4,13 @@ extends CanvasLayer
 const LOBBY_PATH := "res://scenes/lobby.tscn"
 
 var active_scenario: DebugScenario
-var _features: Dictionary = {}
+var _features: Dictionary = { }
 var _panel: PanelContainer
 var _scenario_list: VBoxContainer
 var _marker: Label
 var _restart_button: Button
 var _scenarios: Array[DebugScenario] = []
+
 
 func _ready() -> void:
 	layer = 100
@@ -17,15 +18,18 @@ func _ready() -> void:
 	_build_ui()
 	_refresh_actions()
 
+
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_F12:
 		toggle()
 		get_viewport().set_input_as_handled()
 
+
 func toggle() -> void:
 	_panel.visible = not _panel.visible
 	if _panel.visible:
 		_refresh_actions()
+
 
 func launch(scenario_id: StringName) -> bool:
 	var scenario := scenario_for_id(scenario_id)
@@ -39,6 +43,7 @@ func launch(scenario_id: StringName) -> bool:
 	get_tree().change_scene_to_file(scenario.scene_path)
 	return true
 
+
 func restart_scenario() -> bool:
 	if active_scenario == null:
 		return false
@@ -47,6 +52,7 @@ func restart_scenario() -> bool:
 	_panel.hide()
 	get_tree().change_scene_to_file(active_scenario.scene_path)
 	return true
+
 
 func return_to_lobby(notify_players := true) -> void:
 	if notify_players:
@@ -57,11 +63,13 @@ func return_to_lobby(notify_players := true) -> void:
 	_update_marker()
 	get_tree().change_scene_to_file(LOBBY_PATH)
 
+
 func scenario_for_id(scenario_id: StringName) -> DebugScenario:
 	for scenario: DebugScenario in _scenarios:
 		if scenario.id == scenario_id:
 			return scenario
 	return null
+
 
 func register_scenario(scenario: DebugScenario) -> void:
 	var existing := scenario_for_id(scenario.id)
@@ -71,15 +79,19 @@ func register_scenario(scenario: DebugScenario) -> void:
 		_scenarios.append(scenario)
 	_refresh_actions()
 
+
 func is_open() -> bool:
 	return _panel.visible
+
 
 func marker_text() -> String:
 	return _marker.text
 
+
 func set_feature_available(feature: StringName, available: bool) -> void:
 	_features[feature] = available
 	_refresh_actions()
+
 
 func _build_ui() -> void:
 	_marker = Label.new()
@@ -153,6 +165,7 @@ func _build_ui() -> void:
 	lobby_button.pressed.connect(return_to_lobby)
 	column.add_child(lobby_button)
 
+
 func _refresh_actions() -> void:
 	if _scenario_list == null:
 		return
@@ -169,6 +182,7 @@ func _refresh_actions() -> void:
 		_scenario_list.add_child(button)
 	_restart_button.disabled = active_scenario == null
 
+
 func _style_action(button: Button, fill: Color) -> void:
 	button.custom_minimum_size.y = 46.0
 	button.add_theme_font_size_override("font_size", 18)
@@ -177,13 +191,18 @@ func _style_action(button: Button, fill: Color) -> void:
 	button.add_theme_color_override("font_disabled_color", Color("eef1ec"))
 	for state: String in ["normal", "hover", "pressed", "disabled"]:
 		var style := StyleBoxFlat.new()
-		style.bg_color = Color("9aa9a8") if state == "disabled" else fill.lightened(0.13 if state == "hover" else 0.0)
+		style.bg_color = (
+			Color("9aa9a8")
+			if state == "disabled"
+			else fill.lightened(0.13 if state == "hover" else 0.0)
+		)
 		style.border_color = Color("c8d9cf") if state == "disabled" else Color("88d7c5")
 		style.set_border_width_all(2)
 		style.set_corner_radius_all(12)
 		style.content_margin_left = 12
 		style.content_margin_right = 12
 		button.add_theme_stylebox_override(state, style)
+
 
 func _update_marker() -> void:
 	_marker.visible = active_scenario != null
@@ -193,4 +212,6 @@ func _update_marker() -> void:
 func _prepare_scenario_launch(scenario: DebugScenario) -> bool:
 	if scenario.minigame_id.is_empty():
 		return true
-	return bool(SessionHost.prepare_minigame_launch(scenario.minigame_id, true).get("accepted", false))
+	return bool(
+		SessionHost.prepare_minigame_launch(scenario.minigame_id, true).get("accepted", false)
+	)

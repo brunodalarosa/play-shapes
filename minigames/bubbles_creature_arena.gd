@@ -19,8 +19,8 @@ const SPAWN_OUTSIDE_MARGIN := 20.0
 var _controller: BubblesRoundController
 var _players: BubblesPlayerArena
 var _tuning: BubblesTuning
-var _jellies: Dictionary = {}
-var _puffers: Dictionary = {}
+var _jellies: Dictionary = { }
+var _puffers: Dictionary = { }
 var _next_creature_id := 1
 var _wave_high := true
 var _wave_rate := 0.0
@@ -30,7 +30,10 @@ var _puffer_credit := 0.0
 
 
 func setup(controller: BubblesRoundController, player_arena: BubblesPlayerArena) -> bool:
-	if controller == null or player_arena == null or not player_arena.bounds.has_area() or controller.tuning == null:
+	if (
+		controller == null or player_arena == null
+		or not player_arena.bounds.has_area() or controller.tuning == null
+	):
 		return false
 	_controller = controller
 	_players = player_arena
@@ -59,24 +62,43 @@ func get_pufferfish(creature_id: int) -> BubblesPufferfish:
 
 
 func wave_status() -> Dictionary:
-	return {"high": _wave_high, "rate_per_second": _wave_rate, "until_msec": _wave_until_msec}
+	return { "high": _wave_high, "rate_per_second": _wave_rate, "until_msec": _wave_until_msec }
 
 
 func puffer_rate_at(host_time_msec: int) -> float:
-	var elapsed_ratio := clampf(float(host_time_msec - _controller.active_start_msec()) / (_tuning.round_duration_seconds * 1000.0), 0.0, 1.0)
-	return lerpf(_tuning.pufferfish_start_spawn_rate, _tuning.pufferfish_max_spawn_rate, elapsed_ratio)
+	var elapsed_ratio := clampf(
+		float(host_time_msec - _controller.active_start_msec())
+		/ (_tuning.round_duration_seconds * 1000.0),
+		0.0,
+		1.0,
+	)
+	return lerpf(
+		_tuning.pufferfish_start_spawn_rate,
+		_tuning.pufferfish_max_spawn_rate,
+		elapsed_ratio,
+	)
 
 
 ## Explicit position seam for deterministic fixtures; ordinary spawning uses bounded random attempts.
-func spawn_fresh_at(world_position: Vector2, at_msec: int, direction: Vector2 = Vector2.RIGHT) -> int:
-	if _controller == null or _jellies.size() >= _tuning.max_free_jellyfish or not _safe_jellyfish_position(world_position):
+func spawn_fresh_at(
+	world_position: Vector2,
+	at_msec: int,
+	direction: Vector2 = Vector2.RIGHT,
+) -> int:
+	if (
+		_controller == null or _jellies.size() >= _tuning.max_free_jellyfish
+		or not _safe_jellyfish_position(world_position)
+	):
 		return -1
 	return _create_jellyfish(world_position, direction, at_msec, false, 0)
 
 
 ## Explicit one-pass path seam; normal paths choose opposing edges with randomized offsets.
 func schedule_puffer_path(start: Vector2, destination: Vector2, at_msec: int) -> int:
-	if _controller == null or _puffers.size() >= MAX_ACTIVE_PUFFERS or not start.is_finite() or not destination.is_finite() or start.distance_to(destination) < 1.0:
+	if (
+		_controller == null or _puffers.size() >= MAX_ACTIVE_PUFFERS or not start.is_finite()
+		or not destination.is_finite() or start.distance_to(destination) < 1.0
+	):
 		return -1
 	var creature := PUFFERFISH_SCENE.instantiate() as BubblesPufferfish
 	add_child(creature)
@@ -92,7 +114,10 @@ func schedule_puffer_path(start: Vector2, destination: Vector2, at_msec: int) ->
 
 
 func simulate_step(delta: float, host_time_msec: int) -> bool:
-	if _controller == null or not is_finite(delta) or delta < 0.0 or delta > 0.05 or host_time_msec < 0:
+	if (
+		_controller == null or not is_finite(delta)
+		or delta < 0.0 or delta > 0.05 or host_time_msec < 0
+	):
 		return false
 	if not _controller.advance(host_time_msec).accepted:
 		return false
@@ -149,8 +174,16 @@ func _try_spawn_safe(at_msec: int) -> bool:
 	if bounds.size.x <= radius * 2.0 or bounds.size.y <= radius * 2.0:
 		return false
 	for attempt: int in MAX_SAFE_SPAWN_ATTEMPTS:
-		var x := lerpf(bounds.position.x + radius, bounds.end.x - radius, _controller.next_random_unit())
-		var y := lerpf(bounds.position.y + radius, bounds.end.y - radius, _controller.next_random_unit())
+		var x := lerpf(
+			bounds.position.x + radius,
+			bounds.end.x - radius,
+			_controller.next_random_unit(),
+		)
+		var y := lerpf(
+			bounds.position.y + radius,
+			bounds.end.y - radius,
+			_controller.next_random_unit(),
+		)
 		var position_world := Vector2(x, y)
 		if _safe_jellyfish_position(position_world):
 			var angle := _controller.next_random_unit() * TAU
@@ -168,15 +201,29 @@ func _safe_jellyfish_position(world_position: Vector2) -> bool:
 		return false
 	for player_id: String in _players.bubble_ids():
 		var bubble := _players.get_bubble(player_id)
-		if bubble.visible and world_position.distance_to(bubble.global_position) < radius + bubble.collision_radius() + _tuning.jellyfish_spawn_clearance:
+		if (
+			bubble.visible
+			and world_position.distance_to(bubble.global_position)
+			< radius + bubble.collision_radius() + _tuning.jellyfish_spawn_clearance
+		):
 			return false
 	for puffer: BubblesPufferfish in _puffers.values():
-		if not puffer.finished and world_position.distance_to(puffer.global_position) < radius + puffer.radius + _tuning.jellyfish_spawn_clearance:
+		if (
+			not puffer.finished
+			and world_position.distance_to(puffer.global_position)
+			< radius + puffer.radius + _tuning.jellyfish_spawn_clearance
+		):
 			return false
 	return true
 
 
-func _create_jellyfish(world_position: Vector2, direction: Vector2, at_msec: int, from_pop: bool, lockout_msec: int) -> int:
+func _create_jellyfish(
+	world_position: Vector2,
+	direction: Vector2,
+	at_msec: int,
+	from_pop: bool,
+	lockout_msec: int,
+) -> int:
 	var creature := JELLYFISH_SCENE.instantiate() as BubblesJellyfish
 	add_child(creature)
 	var id := _next_creature_id
@@ -194,7 +241,11 @@ func _collect_jellyfish(host_time_msec: int) -> void:
 			continue
 		for player_id: String in _players.bubble_ids():
 			var bubble := _players.get_bubble(player_id)
-			if not bubble.is_simulated() or jelly.global_position.distance_to(bubble.global_position) > jelly.radius + bubble.collision_radius():
+			if (
+				not bubble.is_simulated()
+				or jelly.global_position.distance_to(bubble.global_position)
+				> jelly.radius + bubble.collision_radius()
+			):
 				continue
 			if bubble.request_jellyfish_collection(host_time_msec).accepted:
 				_remove_jellyfish(id)
@@ -222,11 +273,16 @@ func _scatter_from_pop(player_id: String, data: Dictionary) -> void:
 	var scatter_radius := _tuning.starting_radius + _tuning.jellyfish_collider_radius + 12.0
 	var bounds := _players.bounds.grow(-_tuning.jellyfish_collider_radius)
 	for index: int in count:
-		var angle := TAU * float(index) / float(maxi(count, 1)) + (_controller.next_random_unit() - 0.5) * 0.24
+		var angle := TAU * float(index) / float(maxi(count, 1)) + (
+			_controller.next_random_unit() - 0.5
+		) * 0.24
 		var direction := Vector2.from_angle(angle)
 		var reach := scatter_radius + _controller.next_random_unit() * _tuning.jellyfish_collider_radius * 2.0
 		var raw_position := bubble.global_position + direction * reach
-		var position_world := Vector2(clampf(raw_position.x, bounds.position.x, bounds.end.x), clampf(raw_position.y, bounds.position.y, bounds.end.y))
+		var position_world := Vector2(
+			clampf(raw_position.x, bounds.position.x, bounds.end.x),
+			clampf(raw_position.y, bounds.position.y, bounds.end.y),
+		)
 		_create_jellyfish(position_world, direction, at_msec, true, lockout)
 	jellyfish_scattered.emit(player_id, count, requested - count)
 
@@ -278,15 +334,33 @@ func _spawn_random_puffer(at_msec: int) -> void:
 	var destination := Vector2.ZERO
 	match edge:
 		0: # left to right
-			start = Vector2(bounds.position.x - margin, lerpf(bounds.position.y, bounds.end.y, first))
-			destination = Vector2(bounds.end.x + margin, lerpf(bounds.position.y, bounds.end.y, last))
+			start = Vector2(
+				bounds.position.x - margin,
+				lerpf(bounds.position.y, bounds.end.y, first),
+			)
+			destination = Vector2(
+				bounds.end.x + margin,
+				lerpf(bounds.position.y, bounds.end.y, last),
+			)
 		1: # right to left
 			start = Vector2(bounds.end.x + margin, lerpf(bounds.position.y, bounds.end.y, first))
-			destination = Vector2(bounds.position.x - margin, lerpf(bounds.position.y, bounds.end.y, last))
+			destination = Vector2(
+				bounds.position.x - margin,
+				lerpf(bounds.position.y, bounds.end.y, last),
+			)
 		2: # top to bottom
-			start = Vector2(lerpf(bounds.position.x, bounds.end.x, first), bounds.position.y - margin)
-			destination = Vector2(lerpf(bounds.position.x, bounds.end.x, last), bounds.end.y + margin)
+			start = Vector2(
+				lerpf(bounds.position.x, bounds.end.x, first),
+				bounds.position.y - margin,
+			)
+			destination = Vector2(
+				lerpf(bounds.position.x, bounds.end.x, last),
+				bounds.end.y + margin,
+			)
 		3: # bottom to top
 			start = Vector2(lerpf(bounds.position.x, bounds.end.x, first), bounds.end.y + margin)
-			destination = Vector2(lerpf(bounds.position.x, bounds.end.x, last), bounds.position.y - margin)
+			destination = Vector2(
+				lerpf(bounds.position.x, bounds.end.x, last),
+				bounds.position.y - margin,
+			)
 	schedule_puffer_path(start, destination, at_msec)

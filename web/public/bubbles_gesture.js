@@ -6,9 +6,15 @@ export class GestureTrace {
         this.bounds = bounds;
     }
     add(clientX, clientY) {
-        if (!Number.isFinite(clientX) || !Number.isFinite(clientY) || this.bounds.width <= 0 || this.bounds.height <= 0)
+        if (!Number.isFinite(clientX) ||
+            !Number.isFinite(clientY) ||
+            this.bounds.width <= 0 ||
+            this.bounds.height <= 0)
             return;
-        const point = [Math.max(0, Math.min(1, (clientX - this.bounds.left) / this.bounds.width)), Math.max(0, Math.min(1, (clientY - this.bounds.top) / this.bounds.height))];
+        const point = [
+            Math.max(0, Math.min(1, (clientX - this.bounds.left) / this.bounds.width)),
+            Math.max(0, Math.min(1, (clientY - this.bounds.top) / this.bounds.height)),
+        ];
         const last = this.points.at(-1);
         if (last && Math.hypot(point[0] - last[0], point[1] - last[1]) < 0.004)
             return;
@@ -17,7 +23,9 @@ export class GestureTrace {
             this.points = this.points.filter((_, index) => index === 0 || index === this.points.length - 1 || index % 2 === 0);
         }
     }
-    completed() { return this.points.length >= 2 ? this.points.map(point => [...point]) : []; }
+    completed() {
+        return this.points.length >= 2 ? this.points.map((point) => [...point]) : [];
+    }
     displacement() {
         if (this.points.length < 2)
             return [0, 0];
@@ -28,7 +36,9 @@ export class GestureTrace {
     preview(circlesToCharge) {
         if (this.points.length < 6)
             return 0;
-        const center = this.points.reduce(([x, y], point) => [x + point[0], y + point[1]], [0, 0]).map(value => value / this.points.length);
+        const center = this.points
+            .reduce(([x, y], point) => [x + point[0], y + point[1]], [0, 0])
+            .map((value) => value / this.points.length);
         let signed = 0;
         let absolute = 0;
         for (let index = 1; index < this.points.length; index++) {

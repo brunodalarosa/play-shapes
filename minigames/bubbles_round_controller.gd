@@ -12,14 +12,28 @@ signal drag_visual_changed(player_id: String, direction: Vector2, gesture_starte
 signal round_results_ready(results: Dictionary)
 signal return_to_lobby_requested
 
-enum Phase { IDLE, INSTRUCTIONS, COUNTDOWN, ACTIVE, RESULTS, LOBBY_RETURN }
-const PHASE_NAMES := [&"idle", &"instructions", &"countdown", &"active", &"results", &"lobby_return"]
+enum Phase {
+	IDLE,
+	INSTRUCTIONS,
+	COUNTDOWN,
+	ACTIVE,
+	RESULTS,
+	LOBBY_RETURN,
+}
+const PHASE_NAMES := [
+	&"idle",
+	&"instructions",
+	&"countdown",
+	&"active",
+	&"results",
+	&"lobby_return",
+]
 const MAX_INPUT_SEQ := 9_007_199_254_740_991
 
 @export var tuning: BubblesTuning = preload("res://Tuning/Minigames/Bubbles/Default.tres")
 
 var phase: Phase = Phase.IDLE
-var _players: Dictionary = {}
+var _players: Dictionary = { }
 var _player_order: Array[String] = []
 var _debug_one_player := false
 var _last_host_msec := -1
@@ -27,7 +41,7 @@ var _instruction_deadline_msec := -1
 var _countdown_deadline_msec := -1
 var _active_start_msec := -1
 var _finish_msec := -1
-var _frozen_results: Dictionary = {}
+var _frozen_results: Dictionary = { }
 var _random := RandomNumberGenerator.new()
 var _injected_random: Array[float] = []
 
@@ -70,14 +84,21 @@ func next_random_unit() -> float:
 	return _random.randf()
 
 
-func start_round(participants: Array, host_time_msec: int, allow_one_player_debug := false) -> Dictionary:
+func start_round(
+	participants: Array,
+	host_time_msec: int,
+	allow_one_player_debug := false,
+) -> Dictionary:
 	if phase != Phase.IDLE:
 		return _reject(&"round_already_started")
 	if tuning == null or not tuning.validation_errors().is_empty():
 		return _reject(&"invalid_tuning")
-	if host_time_msec < 0 or participants.size() > 10 or participants.size() < (1 if allow_one_player_debug else 2):
+	if (
+		host_time_msec < 0 or participants.size() > 10
+		or participants.size() < (1 if allow_one_player_debug else 2)
+	):
 		return _reject(&"invalid_participants")
-	var fresh: Dictionary = {}
+	var fresh: Dictionary = { }
 	var order: Array[String] = []
 	for index: int in participants.size():
 		var source: Variant = participants[index]
@@ -91,13 +112,19 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 			return _reject(&"invalid_participants")
 		var selection := CharacterSelection.for_player(source)
 		fresh[player_id] = {
-			"player_id": player_id, "name": String(source.get("name", "")),
+			"player_id": player_id,
+			"name": String(source.get("name", "")),
 			"character_shape": selection.character_shape,
 			"character_color": selection.character_color,
-			"seat": seat, "score": 0, "connected": source.get("state", "connected") == "connected",
-			"left": false, "invulnerable_until_msec": -1,
+			"seat": seat,
+			"score": 0,
+			"connected": source.get("state", "connected") == "connected",
+			"left": false,
+			"invulnerable_until_msec": -1,
 			"last_pop_msec": -1,
-			"spin_until_msec": -1, "spin_ready_msec": -1, "last_input_seq": -1,
+			"spin_until_msec": -1,
+			"spin_ready_msec": -1,
+			"last_input_seq": -1,
 		}
 		order.append(player_id)
 	_players = fresh
@@ -109,18 +136,25 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 	_instruction_deadline_msec = host_time_msec
 	_transition(Phase.INSTRUCTIONS)
 	set_process(true)
-	return {"accepted": true, "players": player_snapshot()}
+	return { "accepted": true, "players": player_snapshot() }
 
 
 ## Presentation acknowledges that the character entrance finished.
 func complete_entrance(host_time_msec: int) -> Dictionary:
-	if not _valid_time(host_time_msec) or phase != Phase.INSTRUCTIONS or host_time_msec < _instruction_deadline_msec:
+	if (
+		not _valid_time(host_time_msec) or phase != Phase.INSTRUCTIONS
+		or host_time_msec < _instruction_deadline_msec
+	):
 		return _reject(&"entrance_not_ready")
 	_last_host_msec = host_time_msec
 	_countdown_deadline_msec = host_time_msec + roundi(tuning.countdown_seconds * 1000.0)
 	_transition(Phase.COUNTDOWN)
-	arena_event_requested.emit(&"place_starting_jellyfish", "", {"count": tuning.starting_jellyfish})
-	return {"accepted": true, "phase": phase_name()}
+	arena_event_requested.emit(
+		&"place_starting_jellyfish",
+		"",
+		{ "count": tuning.starting_jellyfish },
+	)
+	return { "accepted": true, "phase": phase_name() }
 
 
 func advance(host_time_msec: int) -> Dictionary:
@@ -133,7 +167,7 @@ func advance(host_time_msec: int) -> Dictionary:
 		_transition(Phase.ACTIVE)
 	if phase == Phase.ACTIVE and host_time_msec >= _finish_msec:
 		_freeze_results()
-	return {"accepted": true, "phase": phase_name()}
+	return { "accepted": true, "phase": phase_name() }
 
 
 ## The arena reports one actual collectible collision. Client packets never call this method.
@@ -147,8 +181,8 @@ func record_jellyfish_capture(player_id: String, host_time_msec: int) -> Diction
 		return _reject(&"not_collectible")
 	state.score += 1
 	personal_state_changed.emit(player_id, personal_snapshot(player_id))
-	feedback_requested.emit(player_id, &"captured", {"score": state.score})
-	return {"accepted": true, "score": state.score}
+	feedback_requested.emit(player_id, &"captured", { "score": state.score })
+	return { "accepted": true, "score": state.score }
 
 
 ## A hazard pop removes the whole score and requests scatter for the retained count.
@@ -158,8 +192,13 @@ func pop_player(player_id: String, host_time_msec: int) -> Dictionary:
 	return _pop(player_id, host_time_msec, false)
 
 
-func submit_trace(player_id: String, input_seq: Variant, trace: Variant, host_receipt_msec: int,
-		gesture_started_msec: int = -1) -> Dictionary:
+func submit_trace(
+	player_id: String,
+	input_seq: Variant,
+	trace: Variant,
+	host_receipt_msec: int,
+	gesture_started_msec: int = -1,
+) -> Dictionary:
 	if not _settle_active_event(host_receipt_msec):
 		return _reject(&"wrong_phase_or_time")
 	if not _players.has(player_id):
@@ -179,18 +218,32 @@ func submit_trace(player_id: String, input_seq: Variant, trace: Variant, host_re
 	if action == &"swipe" and gesture_started_msec >= 0:
 		if host_receipt_msec - gesture_started_msec > roundi(tuning.swipe_max_hold_seconds * 1000.0):
 			personal_state_changed.emit(player_id, personal_snapshot(player_id))
-			return {"accepted": true, "action": &"none", "reason": &"swipe_too_slow"}
+			return { "accepted": true, "action": &"none", "reason": &"swipe_too_slow" }
 	if action == &"spin":
 		if host_receipt_msec < state.spin_ready_msec:
-			return {"accepted": true, "action": &"none", "reason": &"spin_cooldown"}
+			return { "accepted": true, "action": &"none", "reason": &"spin_cooldown" }
 		state.spin_until_msec = host_receipt_msec + roundi(tuning.spin_duration_seconds * 1000.0)
-		state.spin_ready_msec = state.spin_until_msec + roundi(tuning.spin_cooldown_seconds * 1000.0)
-		arena_event_requested.emit(&"spin", player_id, {"direction": classified.direction, "started_msec": host_receipt_msec, "until_msec": state.spin_until_msec})
-		feedback_requested.emit(player_id, &"spin", {"until_msec": state.spin_until_msec})
+		state.spin_ready_msec = state.spin_until_msec + roundi(
+			tuning.spin_cooldown_seconds * 1000.0
+		)
+		arena_event_requested.emit(
+			&"spin",
+			player_id,
+			{
+				"direction": classified.direction,
+				"started_msec": host_receipt_msec,
+				"until_msec": state.spin_until_msec,
+			},
+		)
+		feedback_requested.emit(player_id, &"spin", { "until_msec": state.spin_until_msec })
 	elif action == &"swipe":
-		arena_event_requested.emit(&"swipe", player_id, {"direction": classified.direction, "strength": tuning.swipe_impulse})
+		arena_event_requested.emit(
+			&"swipe",
+			player_id,
+			{ "direction": classified.direction, "strength": tuning.swipe_impulse },
+		)
 	personal_state_changed.emit(player_id, personal_snapshot(player_id))
-	return {"accepted": true, "action": action}
+	return { "accepted": true, "action": action }
 
 
 ## Pass a full registry roster. Missing IDs mean explicit leave; reconnecting IDs stay active.
@@ -200,7 +253,7 @@ func observe_registry(players: Array, host_time_msec: int) -> void:
 	advance(host_time_msec)
 	if phase not in [Phase.INSTRUCTIONS, Phase.COUNTDOWN, Phase.ACTIVE]:
 		return
-	var present: Dictionary = {}
+	var present: Dictionary = { }
 	for raw: Variant in players:
 		if not raw is Dictionary:
 			continue
@@ -222,7 +275,7 @@ func observe_registry(players: Array, host_time_msec: int) -> void:
 			state.left = true
 			state.connected = false
 			personal_state_changed.emit(player_id, personal_snapshot(player_id))
-			arena_event_requested.emit(&"player_left", player_id, {})
+			arena_event_requested.emit(&"player_left", player_id, { })
 
 
 func request_return_to_lobby() -> bool:
@@ -251,7 +304,7 @@ func last_host_time_msec() -> int:
 
 
 func player_snapshot() -> Dictionary:
-	var result: Dictionary = {}
+	var result: Dictionary = { }
 	for player_id: String in _player_order:
 		result[player_id] = (_players[player_id] as Dictionary).duplicate(true)
 	return result
@@ -259,13 +312,16 @@ func player_snapshot() -> Dictionary:
 
 func personal_snapshot(player_id: String) -> Dictionary:
 	if not _players.has(player_id):
-		return {}
+		return { }
 	var state: Dictionary = (_players[player_id] as Dictionary).duplicate(true)
 	state.phase = phase_name()
 	state.host_time_msec = _last_host_msec
 	state.finish_msec = _finish_msec
 	state.visual_jellyfish = mini(state.score, tuning.captured_visual_cap)
-	state.bubble_radius = minf(tuning.max_radius, tuning.starting_radius + state.score * tuning.radius_per_jellyfish)
+	state.bubble_radius = minf(
+		tuning.max_radius,
+		tuning.starting_radius + state.score * tuning.radius_per_jellyfish,
+	)
 	return state
 
 
@@ -284,12 +340,20 @@ func _pop(player_id: String, host_time_msec: int, forced_leave: bool) -> Diction
 	state.score = 0
 	state.spin_until_msec = -1
 	state.last_pop_msec = host_time_msec
-	state.invulnerable_until_msec = host_time_msec + roundi(tuning.pop_invulnerability_seconds * 1000.0)
-	var data := {"lost": lost, "released": released, "at_msec": host_time_msec, "lockout_msec": roundi(tuning.released_collection_lockout_seconds * 1000.0), "invulnerable_until_msec": state.invulnerable_until_msec}
+	state.invulnerable_until_msec = host_time_msec + roundi(
+		tuning.pop_invulnerability_seconds * 1000.0
+	)
+	var data := {
+		"lost": lost,
+		"released": released,
+		"at_msec": host_time_msec,
+		"lockout_msec": roundi(tuning.released_collection_lockout_seconds * 1000.0),
+		"invulnerable_until_msec": state.invulnerable_until_msec,
+	}
 	arena_event_requested.emit(&"pop", player_id, data.duplicate(true))
 	feedback_requested.emit(player_id, &"pop", data.duplicate(true))
 	personal_state_changed.emit(player_id, personal_snapshot(player_id))
-	return {"accepted": true, "lost": lost, "released": released}
+	return { "accepted": true, "lost": lost, "released": released }
 
 
 func _freeze_results() -> void:
@@ -298,23 +362,35 @@ func _freeze_results() -> void:
 	var ranking: Array[Dictionary] = []
 	for player_id: String in _player_order:
 		var state: Dictionary = _players[player_id]
-		ranking.append({
-			"player_id": player_id, "name": state.name, "seat": state.seat,
-			"character_shape": state.character_shape, "character_color": state.character_color,
-			"score": state.score, "left": state.left,
-		})
-	ranking.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
-		if a.score != b.score:
-			return a.score > b.score
-		return a.seat < b.seat)
-	var by_player_id: Dictionary = {}
+		ranking.append(
+			{
+				"player_id": player_id,
+				"name": state.name,
+				"seat": state.seat,
+				"character_shape": state.character_shape,
+				"character_color": state.character_color,
+				"score": state.score,
+				"left": state.left,
+			}
+		)
+	ranking.sort_custom(
+		func(a: Dictionary, b: Dictionary) -> bool:
+			if a.score != b.score:
+				return a.score > b.score
+			return a.seat < b.seat,
+	)
+	var by_player_id: Dictionary = { }
 	for index: int in ranking.size():
 		var rank := index + 1
 		if index > 0 and ranking[index].score == ranking[index - 1].score:
 			rank = ranking[index - 1].rank
 		ranking[index].rank = rank
 		by_player_id[ranking[index].player_id] = ranking[index].duplicate(true)
-	_frozen_results = {"finished_at_msec": _finish_msec, "ranking": ranking, "by_player_id": by_player_id}
+	_frozen_results = {
+		"finished_at_msec": _finish_msec,
+		"ranking": ranking,
+		"by_player_id": by_player_id,
+	}
 	_transition(Phase.RESULTS)
 	set_process(false)
 	round_results_ready.emit(result_snapshot())
@@ -322,7 +398,7 @@ func _freeze_results() -> void:
 
 func _transition(next: Phase) -> void:
 	phase = next
-	phase_changed.emit(phase_name(), {"players": player_snapshot(), "finish_msec": _finish_msec})
+	phase_changed.emit(phase_name(), { "players": player_snapshot(), "finish_msec": _finish_msec })
 
 
 func _settle_active_event(host_time_msec: int) -> bool:
@@ -340,8 +416,11 @@ func _valid_sequence(value: Variant) -> bool:
 	if typeof(value) not in [TYPE_INT, TYPE_FLOAT]:
 		return false
 	var number := float(value)
-	return is_finite(number) and number >= 0.0 and number <= float(MAX_INPUT_SEQ) and floorf(number) == number
+	return (
+		is_finite(number) and number >= 0.0
+		and number <= float(MAX_INPUT_SEQ) and floorf(number) == number
+	)
 
 
 func _reject(code: StringName) -> Dictionary:
-	return {"accepted": false, "code": code}
+	return { "accepted": false, "code": code }

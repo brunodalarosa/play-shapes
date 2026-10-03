@@ -5,15 +5,15 @@ extends Node2D
 const CHARACTER: PackedScene = preload("res://characters/lobby_squircle.tscn")
 const MAX_SEQUENCE := 9007199254740991.0
 
-var _characters: Dictionary = {}
-var _last_sequence: Dictionary = {}
+var _characters: Dictionary = { }
+var _last_sequence: Dictionary = { }
 
 @onready var _anchors: Node2D = $FutureCharacterAnchors
 @onready var _character_layer: Node2D = $CharactersFrontOfPanels
 
 
 func reconcile(players: Array[Dictionary]) -> void:
-	var present: Dictionary = {}
+	var present: Dictionary = { }
 	for player: Dictionary in players:
 		var player_id := String(player.player_id)
 		var seat := int(player.seat)
@@ -66,8 +66,11 @@ func handle_input(player: Dictionary, message: Dictionary, now_msec: int) -> Dic
 	if typeof(raw_sequence) not in [TYPE_INT, TYPE_FLOAT]:
 		return _rejected("invalid_sequence")
 	var sequence := float(raw_sequence)
-	if is_nan(sequence) or is_inf(sequence) or sequence < 1.0 or sequence > MAX_SEQUENCE \
-			or floor(sequence) != sequence or sequence <= float(_last_sequence.get(player_id, 0)):
+	if (
+		is_nan(sequence) or is_inf(sequence) or sequence < 1.0 or sequence > MAX_SEQUENCE \
+				or floor(sequence) != sequence
+		or sequence <= float(_last_sequence.get(player_id, 0))
+	):
 		return _rejected("stale_sequence")
 	var kind: Variant = message.get("type", "")
 	if kind not in ["lobby_move", "lobby_jump_release", "lobby_fall_release"]:
@@ -80,11 +83,11 @@ func handle_input(player: Dictionary, message: Dictionary, now_msec: int) -> Dic
 	# Releases carry their own latest axes; apply atomically before host eligibility.
 	character.motor.set_input(snapshot.axes, snapshot.stance, now_msec)
 	if action == "jump":
-		return {"accepted": true, "jumped": character.motor.request_jump()}
+		return { "accepted": true, "jumped": character.motor.request_jump() }
 	if action == "fall":
-		return {"accepted": true, "dropped": character.motor.request_fall()}
-	return {"accepted": true}
+		return { "accepted": true, "dropped": character.motor.request_fall() }
+	return { "accepted": true }
 
 
 func _rejected(code: String) -> Dictionary:
-	return {"accepted": false, "code": code, "message": "Lobby input was not accepted"}
+	return { "accepted": false, "code": code, "message": "Lobby input was not accepted" }

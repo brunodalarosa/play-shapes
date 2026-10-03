@@ -25,8 +25,8 @@ var _captures := ""
 var _elapsed := 0.0
 var _scene_path := ""
 var _phase := &""
-var _start_x := {}
-var _moved := {}
+var _start_x := { }
+var _moved := { }
 var _at_rest_for := 0.0
 var _results_for := 0.0
 var _booted := false
@@ -128,7 +128,10 @@ func _watch_lobby(lobby: Node, delta: float) -> void:
 
 	# Start only after every phone has moved its character, so the lobby step is part of the run.
 	var start: Button = lobby.start_button
-	if not _started and _moved.size() >= _players and _at_rest_for >= AT_REST_SECONDS and not start.disabled:
+	if (
+		not _started and _moved.size() >= _players
+		and _at_rest_for >= AT_REST_SECONDS and not start.disabled
+	):
 		_started = true
 		_click(start, "start players=%d" % _host.player_registry.player_count())
 
@@ -154,8 +157,12 @@ func _watch_bubbles(bubbles: Node, delta: float) -> void:
 ## testing decides whether the click lands: a button that is covered, off screen,
 ## disabled or ignoring the mouse is not pressed, and the run stops saying so.
 func _click(button: BaseButton, event_text: String) -> void:
-	var clicked := {"landed": false}
-	button.pressed.connect(func() -> void: clicked.landed = true, CONNECT_ONE_SHOT)
+	var clicked := { "landed": false }
+	button.pressed.connect(
+		func() -> void:
+			clicked.landed = true,
+		CONNECT_ONE_SHOT,
+	)
 
 	var at := button.get_global_transform_with_canvas() * (button.size / 2.0)
 	var hover := InputEventMouseMotion.new()
@@ -179,8 +186,10 @@ func _click(button: BaseButton, event_text: String) -> void:
 		return
 
 	var under := root.gui_get_hovered_control()
-	push_error("E2E could not click %s at %s; under the mouse: %s" % [
-		button.get_path(), at, under.get_path() if under != null else "nothing"])
+	push_error(
+		"E2E could not click %s at %s; under the mouse: %s"
+		% [button.get_path(), at, under.get_path() if under != null else "nothing"]
+	)
 	quit(1)
 
 

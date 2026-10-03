@@ -1,8 +1,10 @@
 extends SceneTree
 ## Captures the launcher over the real lobby renderer for visual review.
 
+
 func _initialize() -> void:
 	_capture.call_deferred()
+
 
 func _capture() -> void:
 	change_scene_to_file("res://scenes/lobby.tscn")

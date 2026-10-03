@@ -5,6 +5,7 @@ extends RefCounted
 var options: TLSOptions
 var error := ""
 
+
 func prepare(config: ControllerNetworkConfig) -> Error:
 	options = null
 	error = ""
@@ -19,7 +20,10 @@ func prepare(config: ControllerNetworkConfig) -> Error:
 	if certificate.load(config.certificate_path) != OK or key.load(config.private_key_path) != OK:
 		error = "HTTPS certificate or private key is invalid; use matching PEM files."
 		return ERR_FILE_CORRUPT
-	error = ControllerCertificate.inspect(FileAccess.get_file_as_string(config.certificate_path), key)
+	error = ControllerCertificate.inspect(
+		FileAccess.get_file_as_string(config.certificate_path),
+		key,
+	)
 	if not error.is_empty():
 		return ERR_FILE_CORRUPT
 	options = TLSOptions.server(key, certificate)

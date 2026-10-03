@@ -1,8 +1,10 @@
 extends Control
 
+
 func _ready() -> void:
 	$Center/Column/Retry.pressed.connect(_start)
 	_start.call_deferred()
+
 
 func _start() -> void:
 	$Center/Column/Retry.hide()

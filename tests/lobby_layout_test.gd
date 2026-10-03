@@ -3,8 +3,10 @@ extends SceneTree
 
 const CANVAS := Vector2i(1920, 1080)
 
+
 func _initialize() -> void:
 	_run.call_deferred()
+
 
 func _run() -> void:
 	var viewport := SubViewport.new()
@@ -15,60 +17,92 @@ func _run() -> void:
 	await process_frame
 	await process_frame
 	var panels := lobby.get_node("World/PanelBackings")
-	if not _check(panels.get_node("GreenBoard") is Sprite2D
-			and panels.get_node("MinigameCalendar") is Sprite2D
-			and panels.get_index() < lobby.get_node("World/CharactersFrontOfPanels").get_index(),
-			"Board and calendar are in front of the world and behind future characters"):
+	if not _check(
+		panels.get_node("GreenBoard") is Sprite2D
+		and panels.get_node("MinigameCalendar") is Sprite2D
+		and panels.get_index() < lobby.get_node("World/CharactersFrontOfPanels").get_index(),
+		"Board and calendar are in front of the world and behind future characters",
+	):
 		return
-	if not _check(lobby.get_node("World/CharactersFrontOfPanels").get_child_count() == 0,
-			"Future character layer remains empty"):
+	if not _check(
+		lobby.get_node("World/CharactersFrontOfPanels").get_child_count() == 0,
+		"Future character layer remains empty",
+	):
 		return
-	if not _check(lobby.find_child("PlayerRoster", true, false) == null
-			and lobby.find_child("PlayerSection", true, false) == null,
-			"No old roster panel remains"):
+	if not _check(
+		lobby.find_child("PlayerRoster", true, false) == null
+		and lobby.find_child("PlayerSection", true, false) == null,
+		"No old roster panel remains",
+	):
 		return
-	if not _check(lobby.get_node("World/CharactersFrontOfPanels").z_index
-			> lobby.get_node("LiveControls").z_index
-			and lobby.get_node("World/Foreground").z_index
-			> lobby.get_node("World/CharactersFrontOfPanels").z_index,
-			"Characters draw over lobby controls and under the world foreground"):
+	if not _check(
+		lobby.get_node("World/CharactersFrontOfPanels").z_index
+		> lobby.get_node("LiveControls").z_index
+		and lobby.get_node("World/Foreground").z_index
+		> lobby.get_node("World/CharactersFrontOfPanels").z_index,
+		"Characters draw over lobby controls and under the world foreground",
+	):
 		return
-	for name: String in ["Logo", "JoinQR", "JoinAddress", "AddressPicker", "Refresh",
-			"Copy", "MinigameSelector", "StartMinigame", "StartHelp"]:
+	for name: String in [
+		"Logo",
+		"JoinQR",
+		"JoinAddress",
+		"AddressPicker",
+		"Refresh",
+		"Copy",
+		"MinigameSelector",
+		"StartMinigame",
+		"StartHelp",
+	]:
 		var control := lobby.get_node("LiveControls/" + name) as Control
-		if not _check(Rect2(Vector2.ZERO, Vector2(CANVAS)).encloses(control.get_global_rect()),
-				"%s fits the FHD canvas" % name):
+		if not _check(
+			Rect2(Vector2.ZERO, Vector2(CANVAS)).encloses(control.get_global_rect()),
+			"%s fits the FHD canvas" % name,
+		):
 			return
 	var picker := lobby.get_node("%AddressPicker") as OptionButton
 	var instructions := lobby.get_node_or_null("%Instructions") as Label
 	if not _check(instructions != null, "Join instructions resolve from the lobby script"):
 		return
 	if picker.item_count > 0:
-		if not _check(instructions.text.contains("scan"), "Join instructions match the available QR"):
+		if not _check(
+			instructions.text.contains("scan"),
+			"Join instructions match the available QR",
+		):
 			return
-		if not _check((lobby.get_node("%JoinQR") as QRCodeRect).data ==
-				(lobby.get_node("%JoinAddress") as Label).text.to_utf8_buffer(),
-				"Displayed join URL supplies the live QR data"):
+		if not _check(
+			(lobby.get_node("%JoinQR") as QRCodeRect).data
+			== (lobby.get_node("%JoinAddress") as Label).text.to_utf8_buffer(),
+			"Displayed join URL supplies the live QR data",
+		):
 			return
-		if not _check(not (lobby.get_node("%Copy") as Button).disabled,
-				"Detected LAN address keeps copy available"):
+		if not _check(
+			not (lobby.get_node("%Copy") as Button).disabled,
+			"Detected LAN address keeps copy available",
+		):
 			return
 		var selected_address := picker.get_item_text(picker.selected)
 		(lobby.get_node("%Refresh") as Button).pressed.emit()
-		if not _check(picker.get_item_text(picker.selected) == selected_address
-				and (lobby.get_node("%JoinAddress") as Label).text.contains(selected_address),
-				"Refreshing keeps the selected reachable address"):
+		if not _check(
+			picker.get_item_text(picker.selected) == selected_address
+			and (lobby.get_node("%JoinAddress") as Label).text.contains(selected_address),
+			"Refreshing keeps the selected reachable address",
+		):
 			return
-	elif not _check((lobby.get_node("%Copy") as Button).disabled
-			and instructions.text.contains("refresh"),
-			"No LAN address disables copy and explains refresh"):
+	elif not _check(
+		(lobby.get_node("%Copy") as Button).disabled and instructions.text.contains("refresh"),
+		"No LAN address disables copy and explains refresh",
+	):
 		return
-	if not _check((lobby.get_node("%StartMinigame") as Button).disabled,
-			"Start is disabled before players join"):
+	if not _check(
+		(lobby.get_node("%StartMinigame") as Button).disabled,
+		"Start is disabled before players join",
+	):
 		return
 	viewport.queue_free()
 	print("Lobby layout checks passed on the FHD reference canvas")
 	quit(0)
+
 
 func _check(condition: bool, description: String) -> bool:
 	if not condition:

@@ -1,8 +1,10 @@
 extends SceneTree
 ## Runs independently from the interactive host, using alternate test ports.
 
+
 func _initialize() -> void:
 	_run.call_deferred()
+
 
 func _run() -> void:
 	var host := root.get_node("SessionHost")
@@ -31,13 +33,17 @@ func _run() -> void:
 	qr.data = "http://192.168.1.50:8080".to_utf8_buffer()
 	qr.update()
 	DirAccess.make_dir_recursive_absolute("res://test-results")
-	if not _check(qr.texture.get_image().save_png("res://test-results/join-qr.png") == OK, "Save QR image"):
+	if not _check(
+		qr.texture.get_image().save_png("res://test-results/join-qr.png") == OK,
+		"Save QR image",
+	):
 		return
 	lobby.queue_free()
 	host.stop()
 	await process_frame
 	print("Foundation checks passed")
 	quit(0)
+
 
 func _check(condition: bool, description: String) -> bool:
 	if not condition:

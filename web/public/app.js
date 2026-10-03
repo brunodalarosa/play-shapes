@@ -1,4 +1,4 @@
-import { attemptImmersive, protectControllerSurface, bindControllerLifecycle } from "./immersive.js";
+import { attemptImmersive, protectControllerSurface, bindControllerLifecycle, } from "./immersive.js";
 import { PwaOnboarding, isStandalone } from "./pwa.js";
 import { MotionLabController } from "./motion_lab.js";
 import { controllerSocketUrl } from "./network_config.js";
@@ -22,13 +22,17 @@ function reportConnectionFailure(stage, endpoint, error) {
         if (connectionErrors.length > 6)
             connectionErrors.shift();
     }
-    connectionError.textContent = `CONTROLLER ERROR LOG (development)\nBrowser: ${navigator.userAgent}\nConnection failures retry every 2 seconds.\n\n` + connectionErrors.map(entry => `[${entry.at}]${entry.repeats > 1 ? ` (repeated ${entry.repeats} times)` : ""}\n${entry.text}`).join("\n\n");
+    connectionError.textContent =
+        `CONTROLLER ERROR LOG (development)\nBrowser: ${navigator.userAgent}\nConnection failures retry every 2 seconds.\n\n` +
+            connectionErrors
+                .map((entry) => `[${entry.at}]${entry.repeats > 1 ? ` (repeated ${entry.repeats} times)` : ""}\n${entry.text}`)
+                .join("\n\n");
     connectionError.hidden = false;
 }
-window.addEventListener("error", event => {
+window.addEventListener("error", (event) => {
     reportConnectionFailure("Browser JavaScript error", new URL(location.href).origin, `${event.error instanceof Error ? `${event.error.name}: ${event.error.message}` : event.message}\nSource: ${event.filename}:${event.lineno}:${event.colno}`);
 });
-window.addEventListener("unhandledrejection", event => {
+window.addEventListener("unhandledrejection", (event) => {
     reportConnectionFailure("Unhandled browser promise rejection", new URL(location.href).origin, event.reason);
 });
 const selectionScreen = document.querySelector("#selection-screen");
@@ -61,7 +65,12 @@ const bubblesContext = bubblesCanvas.getContext("2d", { alpha: true });
 const motionPanel = document.querySelector("#motion-lab");
 const motionButton = document.querySelector("#motion-permission");
 const motionReadings = document.querySelector("#motion-readings");
-const STORAGE = { session: "play-shapes.session-id", token: "play-shapes.reconnect-token", name: "play-shapes.last-name", inputSeq: "play-shapes.input-seq" };
+const STORAGE = {
+    session: "play-shapes.session-id",
+    token: "play-shapes.reconnect-token",
+    name: "play-shapes.last-name",
+    inputSeq: "play-shapes.input-seq",
+};
 let socket;
 let retry;
 let stopped = false;
@@ -89,26 +98,41 @@ const lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJu
     socket.send(JSON.stringify({ ...action, input_seq: inputSeq }));
 });
 const motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);
-const pwa = new PwaOnboarding(document.querySelector("#app-screen"), document.querySelector("#install-button"), document.querySelector("#install-guidance"), document.querySelector("#browser-button"), () => { selectionScreen.hidden = false; nextButton.focus(); void requestImmersiveMode(); });
+const pwa = new PwaOnboarding(document.querySelector("#app-screen"), document.querySelector("#install-button"), document.querySelector("#install-guidance"), document.querySelector("#browser-button"), () => {
+    selectionScreen.hidden = false;
+    nextButton.focus();
+    void requestImmersiveMode();
+});
 for (const surface of [lobbyController, bubblesPad, readyCard])
     protectControllerSurface(surface);
 bindControllerLifecycle(() => cancelBubblesPointer());
-function stored(key) { try {
-    return localStorage.getItem(key) ?? "";
+function stored(key) {
+    try {
+        return localStorage.getItem(key) ?? "";
+    }
+    catch {
+        return "";
+    }
 }
-catch {
-    return "";
-} }
-function store(key, value) { try {
-    localStorage.setItem(key, value);
+function store(key, value) {
+    try {
+        localStorage.setItem(key, value);
+    }
+    catch {
+        /* Page remains usable. */
+    }
 }
-catch { /* Page remains usable. */ } }
-function forgetIdentity() { try {
-    localStorage.removeItem(STORAGE.session);
-    localStorage.removeItem(STORAGE.token);
-    localStorage.removeItem(STORAGE.inputSeq);
+function forgetIdentity() {
+    try {
+        localStorage.removeItem(STORAGE.session);
+        localStorage.removeItem(STORAGE.token);
+        localStorage.removeItem(STORAGE.inputSeq);
+    }
+    catch {
+        /* Restricted storage. */
+    }
+    inputSeq = 0;
 }
-catch { /* Restricted storage. */ } inputSeq = 0; }
 function selectedCharacterName() {
     const color = colorOption(joinFlow.color)?.name ?? "Blue";
     return `${color} Squircle`;
@@ -131,7 +155,10 @@ for (const option of CHARACTER_COLORS) {
     button.style.backgroundColor = option.hex;
     button.setAttribute("aria-label", `Choose ${option.name}`);
     button.setAttribute("aria-pressed", "false");
-    button.addEventListener("click", () => { joinFlow = chooseJoinColor(joinFlow, option.hex); refreshSelectionUi(); });
+    button.addEventListener("click", () => {
+        joinFlow = chooseJoinColor(joinFlow, option.hex);
+        refreshSelectionUi();
+    });
     colorGrid.append(button);
 }
 refreshSelectionUi();
@@ -143,14 +170,18 @@ function setGameplaySurface(active) {
             try {
                 screen.orientation?.unlock?.();
             }
-            catch { /* Unsupported orientation API. */ }
+            catch {
+                /* Unsupported orientation API. */
+            }
         }
         else if (document.fullscreenElement) {
             try {
                 const orientation = screen.orientation;
                 void Promise.resolve(orientation?.lock?.("portrait")).catch(() => { });
             }
-            catch { /* Lock denied. */ }
+            catch {
+                /* Lock denied. */
+            }
         }
         activeGame = next;
     }
@@ -203,7 +234,8 @@ function showJoined(player, state = "Connected") {
     const serverColor = colorOption(player.character_color)?.hex;
     if (serverColor)
         joinFlow = chooseJoinColor(joinFlow, serverColor);
-    status.textContent = state === "Connected" ? "Joined. Keep this page open while you play." : state;
+    status.textContent =
+        state === "Connected" ? "Joined. Keep this page open while you play." : state;
     status.hidden = true;
 }
 function showReady(message) {
@@ -260,7 +292,9 @@ async function requestImmersiveMode() {
         return;
     const root = document.documentElement;
     const orientation = screen.orientation;
-    const fullscreen = root.requestFullscreen ? () => root.requestFullscreen({ navigationUI: "hide" }) : root.webkitRequestFullscreen?.bind(root);
+    const fullscreen = root.requestFullscreen
+        ? () => root.requestFullscreen({ navigationUI: "hide" })
+        : root.webkitRequestFullscreen?.bind(root);
     await attemptImmersive(fullscreen, orientation?.lock ? () => orientation.lock("portrait") : undefined);
 }
 function sendBubblesCharge(seq, stage, step = 0) {
@@ -270,7 +304,12 @@ function sendBubblesCharge(seq, stage, step = 0) {
 function sendBubblesMotion(pointer, now) {
     if (pointer.motionCount >= 48 || socket?.readyState !== WebSocket.OPEN)
         return;
-    socket.send(JSON.stringify({ type: "bubbles_charge", input_seq: pointer.seq, stage: "motion", drag: pointer.drag }));
+    socket.send(JSON.stringify({
+        type: "bubbles_charge",
+        input_seq: pointer.seq,
+        stage: "motion",
+        drag: pointer.drag,
+    }));
     pointer.sentDrag = [...pointer.drag];
     pointer.lastMotionAt = now;
     pointer.motionCount += 1;
@@ -288,7 +327,11 @@ function cancelBubblesPointer(sendCancel = true) {
         bubblesPad.releasePointerCapture(id);
 }
 function sendBubblesTrace(trace, gestureSeq) {
-    if (activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active" || trace.length < 2 || !socket || socket.readyState !== WebSocket.OPEN)
+    if (activeGame !== "bubbles" ||
+        bubblesSnapshot?.phase !== "active" ||
+        trace.length < 2 ||
+        !socket ||
+        socket.readyState !== WebSocket.OPEN)
         return;
     if (gestureSeq === undefined) {
         inputSeq += 1;
@@ -296,12 +339,19 @@ function sendBubblesTrace(trace, gestureSeq) {
     }
     socket.send(JSON.stringify({ type: "bubbles_trace", input_seq: gestureSeq ?? inputSeq, trace }));
 }
-function vibrate(pattern) { try {
-    navigator.vibrate?.(pattern);
+function vibrate(pattern) {
+    try {
+        navigator.vibrate?.(pattern);
+    }
+    catch {
+        /* Best effort only. */
+    }
 }
-catch { /* Best effort only. */ } }
-bubblesPad.addEventListener("pointerdown", event => {
-    if (activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active" || bubblesPointer || (event.pointerType === "mouse" && event.button !== 0))
+bubblesPad.addEventListener("pointerdown", (event) => {
+    if (activeGame !== "bubbles" ||
+        bubblesSnapshot?.phase !== "active" ||
+        bubblesPointer ||
+        (event.pointerType === "mouse" && event.button !== 0))
         return;
     event.preventDefault();
     const trace = new GestureTrace(bubblesPad.getBoundingClientRect());
@@ -309,7 +359,16 @@ bubblesPad.addEventListener("pointerdown", event => {
     inputSeq += 1;
     store(STORAGE.inputSeq, String(inputSeq));
     bubblesPhoneDragDisplay = [0, 0];
-    bubblesPointer = { id: event.pointerId, trace, seq: inputSeq, step: 0, drag: [0, 0], sentDrag: [0, 0], lastMotionAt: performance.now(), motionCount: 0 };
+    bubblesPointer = {
+        id: event.pointerId,
+        trace,
+        seq: inputSeq,
+        step: 0,
+        drag: [0, 0],
+        sentDrag: [0, 0],
+        lastMotionAt: performance.now(),
+        motionCount: 0,
+    };
     try {
         bubblesPad.setPointerCapture(event.pointerId);
     }
@@ -319,7 +378,7 @@ bubblesPad.addEventListener("pointerdown", event => {
     }
     sendBubblesCharge(inputSeq, "start");
 });
-bubblesPad.addEventListener("pointermove", event => {
+bubblesPad.addEventListener("pointermove", (event) => {
     if (bubblesPointer?.id !== event.pointerId)
         return;
     event.preventDefault();
@@ -332,13 +391,17 @@ bubblesPad.addEventListener("pointermove", event => {
         sendBubblesCharge(bubblesPointer.seq, "progress", step);
     }
     const [dx, dy] = bubblesPointer.trace.displacement();
-    const drag = [Math.max(-4, Math.min(4, Math.round(dx * 10))), Math.max(-4, Math.min(4, Math.round(dy * 10)))];
+    const drag = [
+        Math.max(-4, Math.min(4, Math.round(dx * 10))),
+        Math.max(-4, Math.min(4, Math.round(dy * 10))),
+    ];
     const now = performance.now();
     bubblesPointer.drag = drag;
-    if ((drag[0] !== bubblesPointer.sentDrag[0] || drag[1] !== bubblesPointer.sentDrag[1]) && now - bubblesPointer.lastMotionAt >= 70)
+    if ((drag[0] !== bubblesPointer.sentDrag[0] || drag[1] !== bubblesPointer.sentDrag[1]) &&
+        now - bubblesPointer.lastMotionAt >= 70)
         sendBubblesMotion(bubblesPointer, now);
 });
-bubblesPad.addEventListener("pointerup", event => {
+bubblesPad.addEventListener("pointerup", (event) => {
     if (bubblesPointer?.id !== event.pointerId)
         return;
     event.preventDefault();
@@ -351,15 +414,24 @@ bubblesPad.addEventListener("pointerup", event => {
     else
         sendBubblesTrace(trace, seq);
 });
-bubblesPad.addEventListener("pointercancel", event => { if (bubblesPointer?.id === event.pointerId)
-    cancelBubblesPointer(); });
-bubblesPad.addEventListener("lostpointercapture", event => { if (bubblesPointer?.id === event.pointerId)
-    cancelBubblesPointer(); });
-bubblesPad.addEventListener("contextmenu", event => event.preventDefault());
-bubblesPad.addEventListener("keydown", event => {
+bubblesPad.addEventListener("pointercancel", (event) => {
+    if (bubblesPointer?.id === event.pointerId)
+        cancelBubblesPointer();
+});
+bubblesPad.addEventListener("lostpointercapture", (event) => {
+    if (bubblesPointer?.id === event.pointerId)
+        cancelBubblesPointer();
+});
+bubblesPad.addEventListener("contextmenu", (event) => event.preventDefault());
+bubblesPad.addEventListener("keydown", (event) => {
     if (event.repeat || activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active")
         return;
-    const directions = { ArrowLeft: [0.1, 0.5], ArrowRight: [0.9, 0.5], ArrowUp: [0.5, 0.1], ArrowDown: [0.5, 0.9] };
+    const directions = {
+        ArrowLeft: [0.1, 0.5],
+        ArrowRight: [0.9, 0.5],
+        ArrowUp: [0.5, 0.1],
+        ArrowDown: [0.5, 0.9],
+    };
     if (directions[event.key]) {
         event.preventDefault();
         sendBubblesTrace([[0.5, 0.5], directions[event.key]]);
@@ -367,7 +439,10 @@ bubblesPad.addEventListener("keydown", event => {
     else if (event.key === " " || event.key === "Enter") {
         event.preventDefault();
         const circles = Math.max(1, Math.min(3, bubblesSnapshot?.circles_to_charge ?? 1));
-        const trace = Array.from({ length: 97 }, (_, index) => [0.5 + 0.22 * Math.cos(index / 96 * Math.PI * 2 * circles), 0.5 + 0.22 * Math.sin(index / 96 * Math.PI * 2 * circles)]);
+        const trace = Array.from({ length: 97 }, (_, index) => [
+            0.5 + 0.22 * Math.cos((index / 96) * Math.PI * 2 * circles),
+            0.5 + 0.22 * Math.sin((index / 96) * Math.PI * 2 * circles),
+        ]);
         sendBubblesTrace(trace);
     }
 });
@@ -381,7 +456,8 @@ function showBubbles(message) {
     playerCard.hidden = true;
     bubblesCard.hidden = false;
     const phase = message.phase ?? "waiting";
-    const active = phase === "results" || (["instructions", "countdown", "active"].includes(phase) && message.left !== true);
+    const active = phase === "results" ||
+        (["instructions", "countdown", "active"].includes(phase) && message.left !== true);
     setGameplaySurface(active);
     bubblesScore.textContent = String(Math.max(0, Math.floor(message.score ?? 0)));
     if (message.type === "bubbles_feedback") {
@@ -394,12 +470,16 @@ function showBubbles(message) {
     }
 }
 const BUBBLE_RIM_COLORS = ["#6eeaff", "#a785ff", "#ff8bce", "#ffdf9d", "#8af8c7"];
-function clamp(value, minimum, maximum) { return Math.min(maximum, Math.max(minimum, value)); }
+function clamp(value, minimum, maximum) {
+    return Math.min(maximum, Math.max(minimum, value));
+}
 function tuningValue(key, fallback) {
     const value = bubblesSnapshot?.visual_tuning?.[key];
     return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
-function imageReady(image) { return image.complete && image.naturalWidth > 0; }
+function imageReady(image) {
+    return image.complete && image.naturalWidth > 0;
+}
 function renderJoinPreviews(now) {
     for (const canvas of [selectionPreview, namePreview]) {
         if (canvas.closest("section")?.hidden)
@@ -433,22 +513,34 @@ function drawBubblePath(context, radius, pull, surfaceAngle) {
         const longitudinal = 1 + stretch * (1.25 * Math.max(forward, 0) - 0.25 * Math.max(-forward, 0));
         const normalX = -along[1];
         const normalY = along[0];
-        return [center[0] + along[0] * forward * radius * longitudinal + normalX * Math.sin(theta) * radius * (1 - stretch * 0.3),
-            center[1] + along[1] * forward * radius * longitudinal + normalY * Math.sin(theta) * radius * (1 - stretch * 0.3)];
+        return [
+            center[0] +
+                along[0] * forward * radius * longitudinal +
+                normalX * Math.sin(theta) * radius * (1 - stretch * 0.3),
+            center[1] +
+                along[1] * forward * radius * longitudinal +
+                normalY * Math.sin(theta) * radius * (1 - stretch * 0.3),
+        ];
     };
     const points = [];
     for (let index = 0; index < 65; index++)
-        points.push(at(index * Math.PI * 2 / 64));
+        points.push(at((index * Math.PI * 2) / 64));
     context.beginPath();
-    points.forEach(([x, y], index) => index === 0 ? context.moveTo(x, y) : context.lineTo(x, y));
+    points.forEach(([x, y], index) => (index === 0 ? context.moveTo(x, y) : context.lineTo(x, y)));
     context.closePath();
     return { points, center, along, stretch };
 }
 function traceBubblePoint(theta, radius, center, along, stretch) {
     const forward = Math.cos(theta);
     const longitudinal = 1 + stretch * (1.25 * Math.max(forward, 0) - 0.25 * Math.max(-forward, 0));
-    return [center[0] + along[0] * forward * radius * longitudinal - along[1] * Math.sin(theta) * radius * (1 - stretch * 0.3),
-        center[1] + along[1] * forward * radius * longitudinal + along[0] * Math.sin(theta) * radius * (1 - stretch * 0.3)];
+    return [
+        center[0] +
+            along[0] * forward * radius * longitudinal -
+            along[1] * Math.sin(theta) * radius * (1 - stretch * 0.3),
+        center[1] +
+            along[1] * forward * radius * longitudinal +
+            along[0] * Math.sin(theta) * radius * (1 - stretch * 0.3),
+    ];
 }
 function drawPolyline(context, points, color, width) {
     if (points.length < 2)
@@ -476,11 +568,13 @@ function drawBubbleBurst(context, radius, progress, density) {
     const fade = 1 - clamp((age - 0.45) / 0.55, 0, 1);
     const fragmentCount = Math.max(4, Math.floor(density / 2));
     for (let index = 0; index < fragmentCount; index++) {
-        const phase = index * Math.PI * 2 / fragmentCount + 0.14;
+        const phase = (index * Math.PI * 2) / fragmentCount + 0.14;
         const x = Math.cos(phase) * radius * (0.25 + age * 1.14);
         const y = Math.sin(phase) * radius * (0.25 + age * 1.14);
         const color = BUBBLE_RIM_COLORS[index % BUBBLE_RIM_COLORS.length];
-        drawArc(context, x, y, radius * (0.3 - age * 0.17), phase + 1, phase + 2.7, `${color}${Math.round(0.83 * fade * 255).toString(16).padStart(2, "0")}`, Math.max(2, radius * 0.055));
+        drawArc(context, x, y, radius * (0.3 - age * 0.17), phase + 1, phase + 2.7, `${color}${Math.round(0.83 * fade * 255)
+            .toString(16)
+            .padStart(2, "0")}`, Math.max(2, radius * 0.055));
         drawArc(context, x, y, radius * (0.27 - age * 0.16), phase + 1.05, phase + 2.5, `rgba(255,255,255,${0.38 * fade})`, Math.max(1, radius * 0.016));
     }
     for (let index = 0; index < density; index++) {
@@ -489,7 +583,7 @@ function drawBubbleBurst(context, radius, progress, density) {
         const x = Math.cos(phase) * distance;
         const y = Math.sin(phase) * distance;
         if (index % 4 === 0) {
-            const star = 2 + index % 3;
+            const star = 2 + (index % 3);
             context.strokeStyle = `rgba(255,255,222,${fade})`;
             context.lineWidth = 1.2;
             context.beginPath();
@@ -500,13 +594,13 @@ function drawBubbleBurst(context, radius, progress, density) {
             context.stroke();
         }
         else
-            drawArc(context, x, y, 2 + index % 3, 0, Math.PI * 2, `rgba(204,248,255,${0.75 * fade})`, 1.3);
+            drawArc(context, x, y, 2 + (index % 3), 0, Math.PI * 2, `rgba(204,248,255,${0.75 * fade})`, 1.3);
     }
 }
 function drawPhoneCharacter(context, visual, hostTime, selectedColor) {
-    const fallbackScale = Math.min(0.44, (bubblesSnapshot?.bubble_radius ?? tuningValue("starting_radius", 48)) * 0.82 / 100);
-    const position = visual?.character_position ?? [0, 40 + Math.sin(hostTime / 1000 * 2.2) * 4];
-    squircleCanvas.draw(context, visual?.recovery_white ? "#ffffff" : selectedColor, position[0], position[1], visual?.character_scale ?? fallbackScale, hostTime, visual?.face_blink ?? false, visual?.body_rotation ?? Math.sin(hostTime / 1000 * 1.7) * 0.05);
+    const fallbackScale = Math.min(0.44, ((bubblesSnapshot?.bubble_radius ?? tuningValue("starting_radius", 48)) * 0.82) / 100);
+    const position = visual?.character_position ?? [0, 40 + Math.sin((hostTime / 1000) * 2.2) * 4];
+    squircleCanvas.draw(context, visual?.recovery_white ? "#ffffff" : selectedColor, position[0], position[1], visual?.character_scale ?? fallbackScale, hostTime, visual?.face_blink ?? false, visual?.body_rotation ?? Math.sin((hostTime / 1000) * 1.7) * 0.05);
 }
 function renderBubbles(now) {
     if (bubblesCard.hidden || !bubblesSnapshot)
@@ -526,7 +620,9 @@ function renderBubbles(now) {
     const visual = bubblesVisualSnapshot;
     const snapshotElapsed = Math.max(0, now - bubblesSnapshotTime);
     const visualElapsed = visual ? Math.max(0, now - bubblesVisualReceivedAt) : 0;
-    const tuneTime = Number.isFinite(visual?.host_time_msec) ? visual.host_time_msec + visualElapsed : (message.host_time_msec ?? 0) + snapshotElapsed;
+    const tuneTime = Number.isFinite(visual?.host_time_msec)
+        ? visual.host_time_msec + visualElapsed
+        : (message.host_time_msec ?? 0) + snapshotElapsed;
     const startRadius = Math.max(1, tuningValue("starting_radius", 48));
     const baseRadius = Math.min(rect.width, rect.height) * 0.23;
     const worldScale = baseRadius / startRadius;
@@ -534,14 +630,20 @@ function renderBubbles(now) {
     const reformRemaining = Math.max(0, (message.reform_remaining_msec ?? 0) - snapshotElapsed);
     const reformScale = reformRemaining > 0 ? clamp((reformDuration - reformRemaining) / reformDuration, 0.08, 1) : 1;
     const burstDuration = Math.max(1, tuningValue("burst_seconds", 0.26) * 1000);
-    const burstProgress = visual?.burst_progress ?? (reformRemaining > 0 && reformDuration - reformRemaining < burstDuration ? (reformDuration - reformRemaining) / burstDuration : -1);
-    const radius = Math.max(1, visual?.radius ?? ((message.bubble_radius ?? startRadius) * reformScale));
+    const burstProgress = visual?.burst_progress ??
+        (reformRemaining > 0 && reformDuration - reformRemaining < burstDuration
+            ? (reformDuration - reformRemaining) / burstDuration
+            : -1);
+    const radius = Math.max(1, visual?.radius ?? (message.bubble_radius ?? startRadius) * reformScale);
     const burstRadius = message.burst_radius ?? message.bubble_radius ?? startRadius;
     const renderedRadius = burstProgress >= 0 && burstProgress < 1 ? (visual?.radius ?? burstRadius) : radius;
     const selectedColor = colorOption(message.character_color)?.hex ?? FALLBACK_CHARACTER.color;
     const spinTurns = tuningValue("spin_surface_turns_per_second", 1.8);
-    const spinning = visual?.spinning ?? (message.phase === "active" && (message.spin_remaining_msec ?? 0) - snapshotElapsed > 0);
-    const surfaceAngle = visual ? visual.surface_angle + (spinning ? visualElapsed / 1000 * Math.PI * 2 * spinTurns : 0) : 0;
+    const spinning = visual?.spinning ??
+        (message.phase === "active" && (message.spin_remaining_msec ?? 0) - snapshotElapsed > 0);
+    const surfaceAngle = visual
+        ? visual.surface_angle + (spinning ? (visualElapsed / 1000) * Math.PI * 2 * spinTurns : 0)
+        : 0;
     let pull = visual?.pull ?? [0, 0];
     let localDragPull = [0, 0];
     if (bubblesPointer && message.phase === "active") {
@@ -554,21 +656,33 @@ function renderBubbles(now) {
         const delta = clamp((now - bubblesPreviousFrame) / 1000, 0, 0.1);
         const response = Math.max(0.001, tuningValue("live_drag_response_seconds", 0.08));
         const amount = 1 - Math.exp(-delta / response);
-        bubblesPhoneDragDisplay = [bubblesPhoneDragDisplay[0] + (target[0] - bubblesPhoneDragDisplay[0]) * amount,
-            bubblesPhoneDragDisplay[1] + (target[1] - bubblesPhoneDragDisplay[1]) * amount];
+        bubblesPhoneDragDisplay = [
+            bubblesPhoneDragDisplay[0] + (target[0] - bubblesPhoneDragDisplay[0]) * amount,
+            bubblesPhoneDragDisplay[1] + (target[1] - bubblesPhoneDragDisplay[1]) * amount,
+        ];
         localDragPull = bubblesPhoneDragDisplay;
         const localCharge = bubblesPointer.step / 4;
         const seconds = tuneTime / 1000;
         const wobble = tuningValue("charge_wobble_strength", 0.07) * localCharge;
-        const localChargePull = [Math.sin(seconds * 13) * wobble, Math.cos(seconds * 17) * wobble];
+        const localChargePull = [
+            Math.sin(seconds * 13) * wobble,
+            Math.cos(seconds * 17) * wobble,
+        ];
         const hostDrag = visual?.drag_pull ?? [0, 0];
         const hostCharge = visual?.charge_pull ?? [0, 0];
-        pull = [pull[0] - hostDrag[0] - hostCharge[0] + localDragPull[0] + localChargePull[0],
-            pull[1] - hostDrag[1] - hostCharge[1] + localDragPull[1] + localChargePull[1]];
+        pull = [
+            pull[0] - hostDrag[0] - hostCharge[0] + localDragPull[0] + localChargePull[0],
+            pull[1] - hostDrag[1] - hostCharge[1] + localDragPull[1] + localChargePull[1],
+        ];
     }
     else {
-        const amount = 1 - Math.exp(-clamp((now - bubblesPreviousFrame) / 1000, 0, 0.1) / Math.max(0.001, tuningValue("live_drag_response_seconds", 0.08)));
-        bubblesPhoneDragDisplay = [bubblesPhoneDragDisplay[0] * (1 - amount), bubblesPhoneDragDisplay[1] * (1 - amount)];
+        const amount = 1 -
+            Math.exp(-clamp((now - bubblesPreviousFrame) / 1000, 0, 0.1) /
+                Math.max(0.001, tuningValue("live_drag_response_seconds", 0.08)));
+        bubblesPhoneDragDisplay = [
+            bubblesPhoneDragDisplay[0] * (1 - amount),
+            bubblesPhoneDragDisplay[1] * (1 - amount),
+        ];
     }
     context.save();
     context.translate(rect.width / 2, rect.height / 2);
@@ -580,7 +694,9 @@ function renderBubbles(now) {
         const shape = drawBubblePath(context, renderedRadius, pull, surfaceAngle);
         context.fillStyle = "rgba(69,191,255,.10)";
         context.fill();
-        const chargeGlow = bubblesPointer ? Math.max(0, bubblesPointer.step / 4) * tuningValue("charge_glow_strength", 0.12) : (visual?.charge_glow ?? 0);
+        const chargeGlow = bubblesPointer
+            ? Math.max(0, bubblesPointer.step / 4) * tuningValue("charge_glow_strength", 0.12)
+            : (visual?.charge_glow ?? 0);
         if (chargeGlow > 0) {
             context.beginPath();
             context.arc(shape.center[0], shape.center[1], renderedRadius * 0.84, 0, Math.PI * 2);
@@ -593,10 +709,10 @@ function renderBubbles(now) {
         drawPolyline(context, [...shape.points, shape.points[0]], `rgba(186,247,255,${0.65 * (visual?.recovery_white ? 1 : 0.88)})`, Math.max(2, renderedRadius * 0.045));
         drawPolyline(context, [...shape.points, shape.points[0]], `rgba(255,255,255,${0.56 * (visual?.recovery_white ? 1 : 0.88)})`, Math.max(1, renderedRadius * 0.016));
         for (let index = 0; index < 12; index++) {
-            const start = index * Math.PI * 2 / 12 + surfaceAngle;
+            const start = (index * Math.PI * 2) / 12 + surfaceAngle;
             const arc = [];
             for (let sample = 0; sample < 10; sample++)
-                arc.push(traceBubblePoint(start + sample * (Math.PI * 2 / 12 + 0.04) / 9, renderedRadius, shape.center, shape.along, shape.stretch));
+                arc.push(traceBubblePoint(start + (sample * ((Math.PI * 2) / 12 + 0.04)) / 9, renderedRadius, shape.center, shape.along, shape.stretch));
             drawPolyline(context, arc, `${visual?.recovery_white ? "rgba(255,255,255," : "rgba("}${visual?.recovery_white ? "0.5" : `${["110,234,255", "167,133,255", "255,139,206", "255,223,157", "138,248,199"][index % 5]},0.5`})`, Math.max(2, renderedRadius * 0.055));
         }
         drawArc(context, shape.center[0] - renderedRadius * 0.08, shape.center[1] - renderedRadius * 0.08, renderedRadius * 0.74, -2.55 + surfaceAngle, -1.65 + surfaceAngle, "rgba(255,255,255,.76)", Math.max(2, renderedRadius * 0.055));
@@ -607,7 +723,7 @@ function renderBubbles(now) {
                 const turn = index * 2.39996323;
                 const distance = Math.sqrt((index + 0.5) / Math.max(count, 1)) * renderedRadius * 0.67;
                 const width = renderedRadius * 0.11;
-                const height = width * bubblesArt.jellyfish.naturalHeight / bubblesArt.jellyfish.naturalWidth;
+                const height = (width * bubblesArt.jellyfish.naturalHeight) / bubblesArt.jellyfish.naturalWidth;
                 context.save();
                 context.globalAlpha = 0.82;
                 context.drawImage(bubblesArt.jellyfish, Math.cos(turn) * distance - width / 2, Math.sin(turn) * distance - height / 2, width, height);
@@ -642,7 +758,10 @@ function animateBubbles(now) {
 requestAnimationFrame(animateBubbles);
 function rememberIdentity(message) {
     const player = message.player;
-    if (!player || typeof player.name !== "string" || typeof message.session_id !== "string" || typeof message.reconnect_token !== "string")
+    if (!player ||
+        typeof player.name !== "string" ||
+        typeof message.session_id !== "string" ||
+        typeof message.reconnect_token !== "string")
         return false;
     store(STORAGE.name, player.name);
     store(STORAGE.session, message.session_id);
@@ -666,7 +785,10 @@ function reconnect() {
     }
     status.textContent = "Host disconnected. Reconnecting…";
     status.hidden = false;
-    retry = setTimeout(() => { retry = undefined; void connect(); }, 2000);
+    retry = setTimeout(() => {
+        retry = undefined;
+        void connect();
+    }, 2000);
 }
 async function connect() {
     status.textContent = joined ? "Reconnecting to the host…" : "Connecting to the host…";
@@ -674,7 +796,10 @@ async function connect() {
     let stage = "Fetch session configuration";
     let endpoint = new URL("/session.json", location.href).href;
     try {
-        const response = await fetch("/session.json", { cache: "no-store", signal: AbortSignal.timeout(5000) });
+        const response = await fetch("/session.json", {
+            cache: "no-store",
+            signal: AbortSignal.timeout(5000),
+        });
         if (!response.ok)
             throw new Error(`HTTP ${response.status} ${response.statusText}`);
         stage = "Parse session configuration JSON";
@@ -695,7 +820,13 @@ async function connect() {
         }, 7000);
         peer.onopen = () => {
             stage = "Wait for host welcome";
-            peer.send(JSON.stringify({ type: "hello", protocol: 1, ...(stored(STORAGE.token) ? { reconnect_token: stored(STORAGE.token), session_id: stored(STORAGE.session) } : {}) }));
+            peer.send(JSON.stringify({
+                type: "hello",
+                protocol: 1,
+                ...(stored(STORAGE.token)
+                    ? { reconnect_token: stored(STORAGE.token), session_id: stored(STORAGE.session) }
+                    : {}),
+            }));
         };
         peer.onmessage = (event) => {
             let message;
@@ -709,7 +840,9 @@ async function connect() {
                 peer.close();
                 return;
             }
-            if (message.type === "welcome" && message.protocol === 1 && Number.isInteger(message.connection_id)) {
+            if (message.type === "welcome" &&
+                message.protocol === 1 &&
+                Number.isInteger(message.connection_id)) {
                 stage = "Connected WebSocket";
                 connectionError.hidden = true;
                 connectionError.textContent = "";
@@ -719,7 +852,10 @@ async function connect() {
                         showBubbles(message.gameplay);
                     else if (message.gameplay?.type === "pre_minigame_snapshot")
                         showReady(message.gameplay);
-                    else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player)
+                    else if (message.gameplay?.type === "lobby" &&
+                        message.player &&
+                        "player_id" in message.player &&
+                        "name" in message.player)
                         showJoined(message.player, message.gameplay.message ?? "Waiting for the next game");
                     return;
                 }
@@ -732,7 +868,9 @@ async function connect() {
                     showJoin("Your previous player expired. Choose your character and name to join again.", true);
                 }
                 else
-                    showJoin(isStandalone(window, navigator) && !stored(STORAGE.token) ? "Choose your character to join. If already playing in a browser, leave that controller first." : "Connected. Choose your character to join.", true);
+                    showJoin(isStandalone(window, navigator) && !stored(STORAGE.token)
+                        ? "Choose your character to join. If already playing in a browser, leave that controller first."
+                        : "Connected. Choose your character to join.", true);
             }
             else if (message.type === "join_accepted") {
                 if (!rememberIdentity(message))
@@ -764,13 +902,26 @@ async function connect() {
                 showBubbles(message);
             else if (message.type === "pre_minigame_snapshot")
                 showReady(message);
-            else if (message.type === "motion_lab" && joined && typeof message.subscription_id === "string" && typeof message.send_hz === "number") {
+            else if (message.type === "motion_lab" &&
+                joined &&
+                typeof message.subscription_id === "string" &&
+                typeof message.send_hz === "number") {
                 lobbyControls.deactivate();
                 setGameplaySurface(false);
                 document.documentElement.classList.remove("ready-active");
-                selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = readyCard.hidden = bubblesCard.hidden = true;
+                selectionScreen.hidden =
+                    nameScreen.hidden =
+                        joinForm.hidden =
+                            playerCard.hidden =
+                                readyCard.hidden =
+                                    bubblesCard.hidden =
+                                        true;
                 status.hidden = true;
-                motionLab.begin({ subscription_id: message.subscription_id, send_hz: message.send_hz, stale_msec: message.stale_msec ?? 1000 });
+                motionLab.begin({
+                    subscription_id: message.subscription_id,
+                    send_hz: message.send_hz,
+                    stale_msec: message.stale_msec ?? 1000,
+                });
             }
             else if (message.type === "motion_stop") {
                 motionLab.stop();
@@ -794,7 +945,7 @@ async function connect() {
                 }
             }
         };
-        peer.onclose = event => {
+        peer.onclose = (event) => {
             clearTimeout(deadline);
             lobbyControls.deactivate();
             motionLab.disconnect();
@@ -815,7 +966,7 @@ async function connect() {
                 reportConnectionFailure(stage, endpoint, `${socketFailure ? socketFailure + "\n" : ""}WebSocket closed: code=${event.code}, reason=${event.reason || "(not provided)"}, wasClean=${event.wasClean}.`);
             reconnect();
         };
-        peer.onerror = event => {
+        peer.onerror = (event) => {
             socketFailure = `WebSocket ${event.type || "error"} event. Browser did not expose the underlying network/TLS reason.`;
             reportConnectionFailure(stage, endpoint, socketFailure);
             peer.close();
@@ -827,19 +978,44 @@ async function connect() {
         reconnect();
     }
 }
-joinForm.addEventListener("submit", event => { event.preventDefault(); if (pwa.visible)
-    return; const name = nameInput.value.trim(); store(STORAGE.name, name); if (!socket || socket.readyState !== WebSocket.OPEN) {
-    status.textContent = "Still connecting. Try again in a moment.";
+joinForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    if (pwa.visible)
+        return;
+    const name = nameInput.value.trim();
+    store(STORAGE.name, name);
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+        status.textContent = "Still connecting. Try again in a moment.";
+        status.hidden = false;
+        return;
+    }
+    joinButton.disabled = true;
+    status.textContent = "Joining…";
     status.hidden = false;
-    return;
-} joinButton.disabled = true; status.textContent = "Joining…"; status.hidden = false; socket.send(JSON.stringify(createJoinMessage(name, joinFlow))); });
-function leaveLobby() { if (!socket || socket.readyState !== WebSocket.OPEN)
-    return; lobbyControls.deactivate(); leaveButton.disabled = true; lobbyLeaveButton.disabled = true; status.textContent = "Leaving…"; socket.send(JSON.stringify({ type: "leave" })); }
+    socket.send(JSON.stringify(createJoinMessage(name, joinFlow)));
+});
+function leaveLobby() {
+    if (!socket || socket.readyState !== WebSocket.OPEN)
+        return;
+    lobbyControls.deactivate();
+    leaveButton.disabled = true;
+    lobbyLeaveButton.disabled = true;
+    status.textContent = "Leaving…";
+    socket.send(JSON.stringify({ type: "leave" }));
+}
 leaveButton.addEventListener("click", leaveLobby);
 lobbyLeaveButton.addEventListener("click", leaveLobby);
-window.addEventListener("pagehide", () => { stopped = true; lobbyControls.deactivate(); clearTimeout(retry); retry = undefined; socket?.close(); });
-window.addEventListener("pageshow", event => { if (event.persisted) {
-    stopped = false;
-    void connect();
-} });
+window.addEventListener("pagehide", () => {
+    stopped = true;
+    lobbyControls.deactivate();
+    clearTimeout(retry);
+    retry = undefined;
+    socket?.close();
+});
+window.addEventListener("pageshow", (event) => {
+    if (event.persisted) {
+        stopped = false;
+        void connect();
+    }
+});
 void connect();

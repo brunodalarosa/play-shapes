@@ -12,14 +12,17 @@ export const CHARACTER_COLORS = [
   { id: "pink", name: "Pink", hex: "#EC407A" },
   { id: "brown", name: "Brown", hex: "#8D6E63" },
 ] as const;
-export type CharacterColor = typeof CHARACTER_COLORS[number]["hex"];
+export type CharacterColor = (typeof CHARACTER_COLORS)[number]["hex"];
 
 export const FALLBACK_CHARACTER = { shape: CHARACTER_SHAPE, color: "#598DF2" } as const;
 export type JoinScreen = "selection" | "name";
 export type JoinFlowState = { screen: JoinScreen; color: CharacterColor };
 
 export function defaultJoinFlow(): JoinFlowState {
-  return { screen: "selection", color: CHARACTER_COLORS.find(option => option.id === "blue")!.hex };
+  return {
+    screen: "selection",
+    color: CHARACTER_COLORS.find((option) => option.id === "blue")!.hex,
+  };
 }
 
 export function chooseJoinColor(state: JoinFlowState, color: CharacterColor): JoinFlowState {
@@ -35,10 +38,15 @@ export function returnToCharacterSelection(state: JoinFlowState): JoinFlowState 
 }
 
 export function createJoinMessage(name: string, state: JoinFlowState) {
-  return { type: "join", name: name.trim(), character_shape: CHARACTER_SHAPE, character_color: state.color } as const;
+  return {
+    type: "join",
+    name: name.trim(),
+    character_shape: CHARACTER_SHAPE,
+    character_color: state.color,
+  } as const;
 }
 
-export function colorOption(hex: unknown): typeof CHARACTER_COLORS[number] | undefined {
+export function colorOption(hex: unknown): (typeof CHARACTER_COLORS)[number] | undefined {
   if (typeof hex !== "string") return undefined;
-  return CHARACTER_COLORS.find(option => option.hex.toUpperCase() === hex.toUpperCase());
+  return CHARACTER_COLORS.find((option) => option.hex.toUpperCase() === hex.toUpperCase());
 }

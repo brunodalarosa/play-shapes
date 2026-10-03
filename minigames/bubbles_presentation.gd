@@ -31,16 +31,16 @@ const SFX: Dictionary = {
 @onready var _debug_label: Label = $Hud/DebugLabel
 
 var _music: AudioStreamPlayer
-var _audio_players: Dictionary = {}
-var _audio_counts: Dictionary = {}
+var _audio_players: Dictionary = { }
+var _audio_counts: Dictionary = { }
 var _started := false
 var _entrance_done := false
 var _entrance_tween: Tween
 var _last_countdown_second := -1
 var _last_timer_second := -1
 var _go_until_msec := -1
-var _pending_reforms: Dictionary = {}
-var _last_shove_by_pair: Dictionary = {}
+var _pending_reforms: Dictionary = { }
+var _last_shove_by_pair: Dictionary = { }
 var _ambient_seconds := 0.0
 var _protocol_registered := false
 
@@ -72,7 +72,7 @@ func _ready() -> void:
 	var started := start_round(
 		launch.get("participants", []),
 		Time.get_ticks_msec(),
-		bool(launch.get("allow_one_player_debug", false))
+		bool(launch.get("allow_one_player_debug", false)),
 	)
 	if not bool(started.accepted):
 		push_error("Bubbles and Jellyfishes could not start: %s" % started.get("code", &"unknown"))
@@ -83,9 +83,13 @@ func _ready() -> void:
 
 
 ## The host calls this after choosing Bubbles and registering the active protocol.
-func start_round(participants: Array, host_time_msec: int, allow_one_player_debug := false) -> Dictionary:
+func start_round(
+	participants: Array,
+	host_time_msec: int,
+	allow_one_player_debug := false,
+) -> Dictionary:
 	if _started:
-		return {"accepted": false, "code": &"round_already_started"}
+		return { "accepted": false, "code": &"round_already_started" }
 	var outcome := controller.start_round(participants, host_time_msec, allow_one_player_debug)
 	if not outcome.accepted:
 		return outcome
@@ -95,13 +99,19 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 	var ordered: Array[Dictionary] = []
 	for state: Dictionary in controller.player_snapshot().values():
 		ordered.append(state)
-	ordered.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.seat < b.seat)
+	ordered.sort_custom(
+		func(a: Dictionary, b: Dictionary) -> bool:
+			return a.seat < b.seat,
+	)
 	# Equal angular spacing and a random rotation keep every starting pair separated.
 	var rotation := controller.next_random_unit() * TAU
 	for index: int in ordered.size():
 		var state := ordered[index]
 		var angle := rotation + TAU * float(index) / float(ordered.size())
-		var destination := NPC_ARENA_BOUNDS.get_center() + Vector2(cos(angle) * 570.0, sin(angle) * 270.0)
+		var destination := NPC_ARENA_BOUNDS.get_center() + Vector2(
+			cos(angle) * 570.0,
+			sin(angle) * 270.0,
+		)
 		var bubble := player_arena.add_bubble(String(state.player_id), destination)
 		if bubble == null:
 			continue
@@ -109,7 +119,9 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 		bubble.position = Vector2(-160.0 if from_left else WORLD_SIZE.x + 160.0, destination.y)
 		if _entrance_tween == null:
 			_entrance_tween = create_tween().set_parallel(true)
-		_entrance_tween.tween_property(bubble, "position", destination, maxf(0.5, controller.tuning.instructions_seconds)).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		var duration := maxf(0.5, controller.tuning.instructions_seconds)
+		var slide := _entrance_tween.tween_property(bubble, "position", destination, duration)
+		slide.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	creature_arena.setup(controller, player_arena)
 	_apply_audio_gains()
 	_play_music()
@@ -199,7 +211,9 @@ func _on_phase_changed(phase: StringName, _snapshot: Dictionary) -> void:
 		&"countdown":
 			_cue.visible = true
 			_last_countdown_second = -1
-			_countdown_end_msec = controller.last_host_time_msec() + roundi(controller.tuning.countdown_seconds * 1000.0)
+			_countdown_end_msec = controller.last_host_time_msec() + roundi(
+				controller.tuning.countdown_seconds * 1000.0
+			)
 		&"active":
 			_cue.text = "GO"
 			_cue.visible = true
@@ -218,15 +232,20 @@ func _on_phase_changed(phase: StringName, _snapshot: Dictionary) -> void:
 
 
 func _update_timer(now: int) -> void:
-	var end_msec := controller.active_start_msec() + roundi(controller.tuning.round_duration_seconds * 1000.0)
+	var end_msec := controller.active_start_msec() + roundi(
+		controller.tuning.round_duration_seconds * 1000.0
+	)
 	var second := maxi(0, ceili(float(end_msec - now) / 1000.0))
 	_timer.text = str(second)
 	if second == _last_timer_second:
 		return
 	_last_timer_second = second
 	if second > 0 and second <= controller.tuning.final_timer_emphasis_seconds:
-		var progress := 1.0 - float(second - 1) / float(controller.tuning.final_timer_emphasis_seconds)
-		var strength := 1.0 + (0.08 + progress * 0.18 + (0.16 if second <= 3 else 0.0)) * controller.tuning.timer_pulse_strength
+		var progress := 1.0 - float(second - 1) / float(
+			controller.tuning.final_timer_emphasis_seconds
+		)
+		var emphasis := 0.08 + progress * 0.18 + (0.16 if second <= 3 else 0.0)
+		var strength := 1.0 + emphasis * controller.tuning.timer_pulse_strength
 		_pulse(_timer, strength)
 		_play_sfx(&"final_beat")
 	else:
@@ -236,7 +255,8 @@ func _update_timer(now: int) -> void:
 func _pulse(label: Label, strength: float) -> void:
 	label.pivot_offset = label.size * 0.5
 	label.scale = Vector2.ONE * strength
-	create_tween().tween_property(label, "scale", Vector2.ONE, 0.36).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	var settle := create_tween().tween_property(label, "scale", Vector2.ONE, 0.36)
+	settle.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _on_feedback(_player_id: String, kind: StringName, data: Dictionary) -> void:
@@ -245,7 +265,9 @@ func _on_feedback(_player_id: String, kind: StringName, data: Dictionary) -> voi
 			_play_sfx(&"collect")
 		&"pop":
 			_play_sfx(&"pop")
-			_pending_reforms[_player_id] = int(data.get("at_msec", Time.get_ticks_msec())) + roundi(controller.tuning.bubble_reform_seconds * 1000.0)
+			_pending_reforms[_player_id] = int(data.get("at_msec", Time.get_ticks_msec())) + roundi(
+				controller.tuning.bubble_reform_seconds * 1000.0
+			)
 		&"spin":
 			# The completed release is the authoritative full-charge decision.
 			_play_sfx(&"spin_charge")
@@ -328,7 +350,6 @@ func _return_to_lobby() -> void:
 func _on_registry_players_changed(players: Array[Dictionary]) -> void:
 	if _started:
 		controller.observe_registry(players, Time.get_ticks_msec())
-
 
 
 func _setup_audio() -> void:

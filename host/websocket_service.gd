@@ -21,24 +21,33 @@ var _lobby_controller: LobbyPlaygroundWorld
 var _readiness: PreMinigameReadiness
 var motion_channel := MotionInputChannel.new()
 
+
 func begin_motion(player_id: String) -> void:
 	end_motion()
 	motion_channel.begin(player_id)
 	_send_to_player.call_deferred(player_id, motion_channel.subscription())
 
+
 func end_motion() -> void:
 	if not motion_channel.target_player_id.is_empty():
-		_send_to_player(motion_channel.target_player_id, {"type": "motion_stop"})
+		_send_to_player(motion_channel.target_player_id, { "type": "motion_stop" })
 	motion_channel.end()
 
-func start(settings: NetworkingTuning, registry: PlayerRegistry,
-		accepting_new_players: Callable, network: ControllerNetworkConfig = null, tls_options: TLSOptions = null) -> Error:
+
+func start(
+	settings: NetworkingTuning,
+	registry: PlayerRegistry,
+	accepting_new_players: Callable,
+	network: ControllerNetworkConfig = null,
+	tls_options: TLSOptions = null,
+) -> Error:
 	_tls_options = tls_options
 	_settings = settings
 	_network = network if network != null else ControllerNetworkConfig.new(settings)
 	_registry = registry
 	_accepting_new_players = accepting_new_players
 	return _server.listen(_network.websocket_port, _network.bind_address)
+
 
 func stop() -> void:
 	end_motion()
@@ -49,8 +58,10 @@ func stop() -> void:
 	_clients.clear()
 	connection_count_changed.emit(0)
 
+
 func set_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
 	_lobby_controller = controller
+
 
 func clear_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
 	if _lobby_controller == controller:
@@ -80,6 +91,7 @@ func end_pre_minigame() -> void:
 func _on_readiness_changed(_snapshot: Dictionary) -> void:
 	_broadcast_gameplay_snapshots()
 
+
 func set_bubbles_controller(controller: BubblesRoundController) -> void:
 	_clear_bubbles_controller()
 	_bubbles_protocol = BubblesProtocolScript.new(controller)
@@ -91,14 +103,21 @@ func set_bubbles_controller(controller: BubblesRoundController) -> void:
 	controller.return_to_lobby_requested.connect(_on_bubbles_return_to_lobby)
 	_broadcast_gameplay_snapshots()
 
+
 func clear_bubbles_controller(controller: BubblesRoundController) -> void:
 	if _bubbles_protocol != null and _bubbles_protocol.controller == controller:
 		_clear_bubbles_controller()
 
+
 func send_lobby_state() -> void:
 	for client: Dictionary in _clients:
 		if client.welcomed and not _registry.player_for_connection(client.connection_id).is_empty():
-			client.peer.send_text(JSON.stringify({"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}))
+			client.peer.send_text(
+				JSON.stringify(
+					{ "type": "lobby", "state": "waiting", "message": "Waiting for the next game" }
+				)
+			)
+
 
 func _process(_delta: float) -> void:
 	if not _server.is_listening():
@@ -115,22 +134,27 @@ func _process(_delta: float) -> void:
 		peer.outbound_buffer_size = 4096
 		peer.max_queued_packets = 8
 		peer.heartbeat_interval = 5.0
-		_clients.append({
-			"peer": peer,
-			"connection": ControllerStream.new(tcp, _tls_options),
-			"stream_accepted": false,
-			"welcomed": false,
-			"connection_id": 0,
-			"created": Time.get_ticks_msec(),
-			"preexisting_onboarding": false,
-		})
+		_clients.append(
+			{
+				"peer": peer,
+				"connection": ControllerStream.new(tcp, _tls_options),
+				"stream_accepted": false,
+				"welcomed": false,
+				"connection_id": 0,
+				"created": Time.get_ticks_msec(),
+				"preexisting_onboarding": false,
+			}
+		)
 	for index: int in range(_clients.size() - 1, -1, -1):
 		var client: Dictionary = _clients[index]
 		var peer: WebSocketPeer = client.peer
 		if not client.stream_accepted:
 			var connection: ControllerStream = client.connection
 			var ready := connection.poll_ready()
-			if connection.failed or Time.get_ticks_msec() - client.created > _settings.request_timeout_seconds * 1000:
+			if (
+				connection.failed
+				or Time.get_ticks_msec() - client.created > _settings.request_timeout_seconds * 1000
+			):
 				_drop(index)
 				continue
 			if not ready:
@@ -140,8 +164,14 @@ func _process(_delta: float) -> void:
 				continue
 			client.stream_accepted = true
 		peer.poll()
-		if peer.get_ready_state() == WebSocketPeer.STATE_CLOSED or (
-				not client.welcomed and Time.get_ticks_msec() - client.created > _settings.request_timeout_seconds * 1000):
+		if (
+			peer.get_ready_state() == WebSocketPeer.STATE_CLOSED
+			or (
+				not client.welcomed
+				and Time.get_ticks_msec() - client.created
+				> _settings.request_timeout_seconds * 1000
+			)
+		):
 			_drop(index)
 			continue
 		if peer.get_ready_state() != WebSocketPeer.STATE_OPEN:
@@ -151,10 +181,15 @@ func _process(_delta: float) -> void:
 				break
 			var packet := peer.get_packet()
 			var parser := JSON.new()
-			if not peer.was_string_packet() or packet.size() > MAX_PACKET_BYTES or parser.parse(packet.get_string_from_utf8()) != OK or not parser.data is Dictionary:
+			if (
+				not peer.was_string_packet() or packet.size() > MAX_PACKET_BYTES
+				or parser.parse(packet.get_string_from_utf8()) != OK
+				or not parser.data is Dictionary
+			):
 				peer.close(1008, "Expected protocol JSON")
 				break
 			_handle_message(client, parser.data)
+
 
 func _handle_message(client: Dictionary, message: Dictionary) -> void:
 	var peer: WebSocketPeer = client.peer
@@ -166,12 +201,16 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 		_next_id += 1
 		client.connection_id = connection_id
 		client.welcomed = true
-		var resume := {"accepted": false, "code": &"join_required", "message": "Enter a name to join"}
+		var resume := {
+			"accepted": false,
+			"code": &"join_required",
+			"message": "Enter a name to join",
+		}
 		if message.has("reconnect_token") or message.has("session_id"):
 			resume = _registry.resume_player(
 				connection_id,
 				message.get("session_id"),
-				message.get("reconnect_token")
+				message.get("reconnect_token"),
 			)
 		if resume.accepted:
 			_close_replaced_connection(resume.replaced_connection_id, connection_id)
@@ -196,7 +235,11 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			if resume.player.player_id == motion_channel.target_player_id:
 				motion_channel.reconnect()
 			welcome.gameplay = _active_protocol.snapshot_for(String(resume.player.player_id)) \
-				if _active_protocol != null else {"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}
+					if _active_protocol != null else {
+				"type": "lobby",
+				"state": "waiting",
+				"message": "Waiting for the next game",
+			}
 		peer.send_text(JSON.stringify(welcome))
 		if resume.accepted and resume.player.player_id == motion_channel.target_player_id:
 			peer.send_text(JSON.stringify(motion_channel.subscription()))
@@ -206,25 +249,37 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 	match message.get("type"):
 		"motion_status", "motion_sample":
 			# Identity is resolved from the current socket, never a phone-authored ID.
-			motion_channel.handle(_registry.player_for_connection(client.connection_id), message, Time.get_ticks_msec())
+			motion_channel.handle(
+				_registry.player_for_connection(client.connection_id),
+				message,
+				Time.get_ticks_msec(),
+			)
 		"join":
-			var may_join: bool = _accepting_new_players.call() or (
-				_readiness != null and _readiness.active and bool(client.preexisting_onboarding))
+			var may_join: bool = (
+				_accepting_new_players.call()
+				or (
+					_readiness != null and _readiness.active and bool(client.preexisting_onboarding)
+				)
+			)
 			var result := _registry.join_player(
 				client.connection_id,
 				message.get("name"),
 				may_join,
 				Time.get_ticks_msec(),
 				message.get("character_shape"),
-				message.get("character_color")
+				message.get("character_color"),
 			)
 			if result.accepted:
-				peer.send_text(JSON.stringify({
-					"type": "join_accepted",
-					"session_id": _registry.session_id,
-					"player": result.player,
-					"reconnect_token": result.reconnect_token,
-				}))
+				peer.send_text(
+					JSON.stringify(
+						{
+							"type": "join_accepted",
+							"session_id": _registry.session_id,
+							"player": result.player,
+							"reconnect_token": result.reconnect_token,
+						}
+					)
+				)
 				if _readiness != null:
 					client.preexisting_onboarding = false
 					_readiness.add_joined(result.player)
@@ -233,62 +288,108 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 				_send_rejection(peer, "join_rejected", result)
 		"leave":
 			if _readiness != null:
-				_send_rejection(peer, "error", {"code": &"ready_unavailable", "message": "Leave is unavailable during ready-up"})
+				_send_rejection(
+					peer,
+					"error",
+					{
+						"code": &"ready_unavailable",
+						"message": "Leave is unavailable during ready-up",
+					},
+				)
 				return
 			var result := _registry.leave_connection(client.connection_id)
 			if result.accepted:
-				peer.send_text(JSON.stringify({"type": "left", "message": "You left the lobby"}))
+				peer.send_text(JSON.stringify({ "type": "left", "message": "You left the lobby" }))
 			else:
 				_send_rejection(peer, "error", result)
 		"lobby_move", "lobby_jump_release", "lobby_fall_release":
 			var player := _registry.player_for_connection(client.connection_id)
-			var result: Dictionary = _lobby_controller.handle_input(player, message, Time.get_ticks_msec()) \
-				if _lobby_controller != null and _active_protocol == null and _accepting_new_players.call() \
-				else {"accepted": false, "code": &"lobby_unavailable", "message": "Lobby controls are not active"}
+			var result: Dictionary = _lobby_controller.handle_input(
+				player,
+				message,
+				Time.get_ticks_msec(),
+			) \
+					if (
+				_lobby_controller != null and _active_protocol == null
+				and _accepting_new_players.call()
+			) \
+					else {
+				"accepted": false,
+				"code": &"lobby_unavailable",
+				"message": "Lobby controls are not active",
+			}
 			if not result.accepted:
 				_send_rejection(peer, "error", result)
 		"pre_minigame_ready":
 			var player := _registry.player_for_connection(client.connection_id)
 			var ready_value: Variant = message.get("ready")
 			var result: Dictionary = _readiness.set_ready(player, ready_value) \
-				if _readiness != null and ready_value is bool else {"accepted": false, "code": &"invalid_ready", "message": "Invalid ready action"}
+					if _readiness != null and ready_value is bool else {
+				"accepted": false,
+				"code": &"invalid_ready",
+				"message": "Invalid ready action",
+			}
 			if not result.accepted:
 				_send_rejection(peer, "error", result)
 			elif _readiness != null:
 				_send_gameplay_snapshot(peer, String(player.player_id))
 		"bubbles_trace", "bubbles_charge":
 			var player := _registry.player_for_connection(client.connection_id)
-			var result: Dictionary = _active_protocol.handle_action(player, message, Time.get_ticks_msec()) \
-				if _active_protocol == _bubbles_protocol and _bubbles_protocol != null else {"accepted": false, "code": &"game_unavailable", "message": "Bubbles is not active"}
+			var result: Dictionary = _active_protocol.handle_action(
+				player,
+				message,
+				Time.get_ticks_msec(),
+			) \
+					if _active_protocol == _bubbles_protocol and _bubbles_protocol != null else {
+				"accepted": false,
+				"code": &"game_unavailable",
+				"message": "Bubbles is not active",
+			}
 			if not result.accepted:
 				_send_rejection(peer, "error", result)
 			elif message.get("type") == "bubbles_trace":
-				peer.send_text(JSON.stringify({"type": "bubbles_trace_result", "action": result.action,
-					"reason": result.reason, "charge": 0.0}))
+				peer.send_text(
+					JSON.stringify(
+						{
+							"type": "bubbles_trace_result",
+							"action": result.action,
+							"reason": result.reason,
+							"charge": 0.0,
+						}
+					)
+				)
 				_send_gameplay_snapshot(peer, String(player.player_id))
 		_:
-			_send_rejection(peer, "error", {
-				"code": &"unsupported_message",
-				"message": "That action is not supported",
-			})
+			_send_rejection(
+				peer,
+				"error",
+				{ "code": &"unsupported_message", "message": "That action is not supported" },
+			)
+
 
 func _send_rejection(peer: WebSocketPeer, response_type: String, result: Dictionary) -> void:
-	peer.send_text(JSON.stringify({
-		"type": response_type,
-		"code": str(result.code),
-		"message": result.message,
-	}))
+	peer.send_text(
+		JSON.stringify(
+			{ "type": response_type, "code": str(result.code), "message": result.message }
+		)
+	)
+
 
 func _send_gameplay_snapshot(peer: WebSocketPeer, player_id: String) -> void:
 	var message: Dictionary = _active_protocol.snapshot_for(player_id) if _active_protocol != null \
-		else {"type": "lobby", "state": "waiting", "message": "Waiting for the next game"}
+			else { "type": "lobby", "state": "waiting", "message": "Waiting for the next game" }
 	peer.send_text(JSON.stringify(message))
+
 
 func _send_to_player(player_id: String, message: Dictionary) -> void:
 	for client: Dictionary in _clients:
-		if client.welcomed and _registry.player_for_connection(client.connection_id).get("player_id") == player_id:
+		if (
+			client.welcomed
+			and _registry.player_for_connection(client.connection_id).get("player_id") == player_id
+		):
 			client.peer.send_text(JSON.stringify(message))
 			return
+
 
 func _broadcast_gameplay_snapshots() -> void:
 	for client: Dictionary in _clients:
@@ -298,16 +399,20 @@ func _broadcast_gameplay_snapshots() -> void:
 		if not player.is_empty():
 			_send_gameplay_snapshot(client.peer, String(player.player_id))
 
+
 func _on_bubbles_phase_changed(_phase: StringName, _snapshot: Dictionary) -> void:
 	_broadcast_gameplay_snapshots()
+
 
 func _on_bubbles_personal_state_changed(player_id: String, _snapshot: Dictionary) -> void:
 	if _bubbles_protocol != null:
 		_send_to_player(player_id, _bubbles_protocol.snapshot_for(player_id))
 
+
 func _on_bubbles_personal_visual_changed(player_id: String, visual_state: Dictionary) -> void:
 	if _bubbles_protocol != null:
-		_send_to_player(player_id, {"type": "bubbles_visual", "visual": visual_state})
+		_send_to_player(player_id, { "type": "bubbles_visual", "visual": visual_state })
+
 
 func _on_bubbles_feedback(player_id: String, kind: StringName, data: Dictionary) -> void:
 	if _bubbles_protocol == null or kind not in [&"captured", &"spin", &"pop"]:
@@ -320,19 +425,26 @@ func _on_bubbles_feedback(player_id: String, kind: StringName, data: Dictionary)
 func _on_bubbles_return_to_lobby() -> void:
 	send_lobby_state()
 
+
 func _clear_bubbles_controller() -> void:
 	if _bubbles_protocol == null:
 		return
 	var controller: BubblesRoundController = _bubbles_protocol.controller
 	if is_instance_valid(controller):
-		if controller.phase_changed.is_connected(_on_bubbles_phase_changed): controller.phase_changed.disconnect(_on_bubbles_phase_changed)
-		if controller.personal_state_changed.is_connected(_on_bubbles_personal_state_changed): controller.personal_state_changed.disconnect(_on_bubbles_personal_state_changed)
-		if controller.personal_visual_changed.is_connected(_on_bubbles_personal_visual_changed): controller.personal_visual_changed.disconnect(_on_bubbles_personal_visual_changed)
-		if controller.feedback_requested.is_connected(_on_bubbles_feedback): controller.feedback_requested.disconnect(_on_bubbles_feedback)
-		if controller.return_to_lobby_requested.is_connected(_on_bubbles_return_to_lobby): controller.return_to_lobby_requested.disconnect(_on_bubbles_return_to_lobby)
+		if controller.phase_changed.is_connected(_on_bubbles_phase_changed):
+			controller.phase_changed.disconnect(_on_bubbles_phase_changed)
+		if controller.personal_state_changed.is_connected(_on_bubbles_personal_state_changed):
+			controller.personal_state_changed.disconnect(_on_bubbles_personal_state_changed)
+		if controller.personal_visual_changed.is_connected(_on_bubbles_personal_visual_changed):
+			controller.personal_visual_changed.disconnect(_on_bubbles_personal_visual_changed)
+		if controller.feedback_requested.is_connected(_on_bubbles_feedback):
+			controller.feedback_requested.disconnect(_on_bubbles_feedback)
+		if controller.return_to_lobby_requested.is_connected(_on_bubbles_return_to_lobby):
+			controller.return_to_lobby_requested.disconnect(_on_bubbles_return_to_lobby)
 	if _active_protocol == _bubbles_protocol:
 		_active_protocol = null
 	_bubbles_protocol = null
+
 
 func _close_replaced_connection(old_connection_id: int, new_connection_id: int) -> void:
 	if old_connection_id == PlayerRegistry.DISCONNECTED or old_connection_id == new_connection_id:
@@ -342,6 +454,7 @@ func _close_replaced_connection(old_connection_id: int, new_connection_id: int) 
 			client.peer.close(4000, "Player resumed in another tab")
 			return
 
+
 func _drop(index: int) -> void:
 	var client: Dictionary = _clients[index]
 	_disconnect_player(client)
@@ -349,11 +462,13 @@ func _drop(index: int) -> void:
 	_clients.remove_at(index)
 	_emit_count()
 
+
 func _disconnect_player(client: Dictionary) -> void:
 	if client.welcomed:
 		if _registry.player_for_connection(client.connection_id).get("player_id") == motion_channel.target_player_id:
 			motion_channel.reconnect()
 		_registry.disconnect_connection(client.connection_id)
+
 
 func _emit_count() -> void:
 	var count: int = 0
@@ -361,6 +476,7 @@ func _emit_count() -> void:
 		if client.welcomed:
 			count += 1
 	connection_count_changed.emit(count)
+
 
 func _exit_tree() -> void:
 	stop()

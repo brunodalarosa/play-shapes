@@ -34,10 +34,13 @@ func _capture() -> void:
 	controller.tuning.pufferfish_speed = 700.0
 	controller.set_random_seed(43)
 	var now := Time.get_ticks_msec()
-	controller.start_round([
-		{"player_id": "p0", "name": "Player One", "seat": 1},
-		{"player_id": "p1", "name": "Player Two", "seat": 2},
-	], now)
+	controller.start_round(
+		[
+			{ "player_id": "p0", "name": "Player One", "seat": 1 },
+			{ "player_id": "p1", "name": "Player Two", "seat": 2 },
+		],
+		now,
+	)
 	var players := PlayerArena.new()
 	root.add_child(players)
 	players.setup(controller, Rect2(30, 65, 1220, 620))

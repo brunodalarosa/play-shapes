@@ -1,7 +1,9 @@
 extends SceneTree
 
+
 func _initialize() -> void:
 	_run.call_deferred()
+
 
 func _run() -> void:
 	var host := root.get_node("SessionHost")
@@ -10,7 +12,7 @@ func _run() -> void:
 	host.settings.websocket_port = 18089
 	assert(host.start(false))
 	var scenario: DebugScenario = root.get_node("DebugLauncher").scenario_for_id(&"motion_lab")
-	assert(scenario != null and scenario.availability({}).available)
+	assert(scenario != null and scenario.availability({ }).available)
 	var lab: Control = load(scenario.scene_path).instantiate()
 	root.add_child(lab)
 	await process_frame
@@ -21,10 +23,54 @@ func _run() -> void:
 	assert(lab.target_player_id == one.player.player_id)
 	assert(host.websocket.motion_channel.target_player_id != two.player.player_id)
 	var channel: MotionInputChannel = host.websocket.motion_channel
-	var diagnostics := {"secure_context": true, "motion_support": true, "orientation_support": true, "motion_permission": "granted", "orientation_permission": "granted", "state": "live", "page_protocol": "https:", "hostname": "192.168.2.79", "websocket_protocol": "wss:", "websocket_status": "open"}
-	assert(channel.handle(one.player, {"type": "motion_status", "subscription_id": channel.subscription_id, "diagnostics": diagnostics}, Time.get_ticks_msec()))
-	var sample := {"orientation": [35, 70, -15], "absolute": false, "rotation_rate": [24, -18, 4], "acceleration": [2, -1, 0], "acceleration_gravity": [2, 8.8, 1], "interval_msec": 16, "screen_angle": 90, "orientation_age_msec": 0, "motion_age_msec": 0, "orientation_hz": 60, "motion_hz": 60}
-	assert(channel.handle(one.player, {"type": "motion_sample", "subscription_id": channel.subscription_id, "sequence": 1, "sample": sample}, Time.get_ticks_msec()))
+	var diagnostics := {
+		"secure_context": true,
+		"motion_support": true,
+		"orientation_support": true,
+		"motion_permission": "granted",
+		"orientation_permission": "granted",
+		"state": "live",
+		"page_protocol": "https:",
+		"hostname": "192.168.2.79",
+		"websocket_protocol": "wss:",
+		"websocket_status": "open",
+	}
+	assert(
+		channel.handle(
+			one.player,
+			{
+				"type": "motion_status",
+				"subscription_id": channel.subscription_id,
+				"diagnostics": diagnostics,
+			},
+			Time.get_ticks_msec(),
+		)
+	)
+	var sample := {
+		"orientation": [35, 70, -15],
+		"absolute": false,
+		"rotation_rate": [24, -18, 4],
+		"acceleration": [2, -1, 0],
+		"acceleration_gravity": [2, 8.8, 1],
+		"interval_msec": 16,
+		"screen_angle": 90,
+		"orientation_age_msec": 0,
+		"motion_age_msec": 0,
+		"orientation_hz": 60,
+		"motion_hz": 60,
+	}
+	assert(
+		channel.handle(
+			one.player,
+			{
+				"type": "motion_sample",
+				"subscription_id": channel.subscription_id,
+				"sequence": 1,
+				"sample": sample,
+			},
+			Time.get_ticks_msec(),
+		)
+	)
 	await process_frame
 	assert(lab.call("_has_orientation"))
 	lab.recenter()

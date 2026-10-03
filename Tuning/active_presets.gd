@@ -12,6 +12,7 @@ var bubbles: BubblesTuning
 @export
 var networking: NetworkingTuning
 
+
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
 	if bubbles == null:

@@ -1,5 +1,5 @@
 import nipplejs from "./vendor/nipplejs.mjs";
-import { PlatformInputState, DEFAULT_PLATFORM_SETTINGS } from "./platform_input.js";
+import { PlatformInputState, DEFAULT_PLATFORM_SETTINGS, } from "./platform_input.js";
 import { bindControllerLifecycle } from "./immersive.js";
 /** One actual control component, mounted by a context adapter with its own transport. */
 export class PlatformControls {
@@ -18,11 +18,12 @@ export class PlatformControls {
         this.stickZone = stickZone;
         this.actionButton = actionButton;
         this.context = context;
-        this.input = new PlatformInputState(intent => this.context.send(intent), settings);
+        this.input = new PlatformInputState((intent) => this.context.send(intent), settings);
         this.repeat = setInterval(() => this.input.refresh(), this.input.settings.refreshIntervalMsec);
         const options = { signal: this.listeners.signal };
-        actionButton.addEventListener("pointerdown", event => {
-            if ((event.pointerType === "mouse" && event.button !== 0) || !this.input.pressAction(event.pointerId))
+        actionButton.addEventListener("pointerdown", (event) => {
+            if ((event.pointerType === "mouse" && event.button !== 0) ||
+                !this.input.pressAction(event.pointerId))
                 return;
             event.preventDefault();
             try {
@@ -33,7 +34,7 @@ export class PlatformControls {
             }
             this.renderAction();
         }, options);
-        actionButton.addEventListener("pointerup", event => {
+        actionButton.addEventListener("pointerup", (event) => {
             if (event.pointerId !== this.input.actionPointer)
                 return;
             event.preventDefault();
@@ -43,7 +44,7 @@ export class PlatformControls {
             this.renderAction();
         }, options);
         for (const name of ["pointercancel", "lostpointercapture"]) {
-            actionButton.addEventListener(name, event => {
+            actionButton.addEventListener(name, (event) => {
                 if (event.pointerId !== this.input.actionPointer)
                     return;
                 this.input.releaseAction(event.pointerId, true);
@@ -58,7 +59,7 @@ export class PlatformControls {
                     this.createJoystick();
             }, options);
         }
-        actionButton.addEventListener("keydown", event => {
+        actionButton.addEventListener("keydown", (event) => {
             if (event.key !== " " && event.key !== "Enter")
                 return;
             event.preventDefault();
@@ -66,7 +67,7 @@ export class PlatformControls {
                 this.input.pressKey(event.key);
             this.renderAction();
         }, options);
-        actionButton.addEventListener("keyup", event => {
+        actionButton.addEventListener("keyup", (event) => {
             if (event.key !== " " && event.key !== "Enter")
                 return;
             event.preventDefault();
@@ -79,18 +80,23 @@ export class PlatformControls {
             this.releaseCapture(pointer);
             this.renderAction();
         }, options);
-        actionButton.addEventListener("click", event => {
+        actionButton.addEventListener("click", (event) => {
             if (event.detail === 0)
                 this.input.activateAction();
         }, options);
-        this.unbindLifecycle = bindControllerLifecycle(event => {
+        this.unbindLifecycle = bindControllerLifecycle((event) => {
             this.cancelTouches();
-            if (event?.type !== "blur" && event?.type !== "pagehide"
-                && this.input.active && !document.hidden && document.hasFocus())
+            if (event?.type !== "blur" &&
+                event?.type !== "pagehide" &&
+                this.input.active &&
+                !document.hidden &&
+                document.hasFocus())
                 this.createJoystick();
         });
-        window.addEventListener("focus", () => { if (this.input.active)
-            this.createJoystick(); }, options);
+        window.addEventListener("focus", () => {
+            if (this.input.active)
+                this.createJoystick();
+        }, options);
         document.addEventListener("visibilitychange", () => {
             if (!document.hidden && this.input.active)
                 this.createJoystick();
@@ -121,7 +127,7 @@ export class PlatformControls {
             fadeTime: 0,
         });
         this.manager = manager;
-        manager.on("move", event => {
+        manager.on("move", (event) => {
             if (this.manager !== manager)
                 return;
             const firstMove = !this.input.stickHeld;
@@ -154,7 +160,9 @@ export class PlatformControls {
             if (this.actionButton.hasPointerCapture(pointer))
                 this.actionButton.releasePointerCapture(pointer);
         }
-        catch { /* A browser may already have released capture during cancellation. */ }
+        catch {
+            /* A browser may already have released capture during cancellation. */
+        }
     }
     destroyJoystick() {
         const manager = this.manager;

@@ -1,11 +1,11 @@
 export function isStandalone(target, browser) {
-    return target.matchMedia("(display-mode: standalone)").matches
-        || target.matchMedia("(display-mode: fullscreen)").matches
-        || browser.standalone === true;
+    return (target.matchMedia("(display-mode: standalone)").matches ||
+        target.matchMedia("(display-mode: fullscreen)").matches ||
+        browser.standalone === true);
 }
 export function installGuidance(browser) {
-    const ios = /iPhone|iPad|iPod/.test(browser.userAgent)
-        || (browser.platform === "MacIntel" && browser.maxTouchPoints > 1);
+    const ios = /iPhone|iPad|iPod/.test(browser.userAgent) ||
+        (browser.platform === "MacIntel" && browser.maxTouchPoints > 1);
     return ios
         ? "In Safari, tap Share → Add to Home Screen. Keep Open as Web App on if shown, then tap Add. Open the new icon before joining."
         : "Open your browser menu and choose Install app or Add to Home Screen if offered. Then launch Play Shapes from its icon. Otherwise, continue in your browser.";
@@ -31,8 +31,10 @@ export class PwaOnboarding {
         try {
             this.dismissed = target.sessionStorage.getItem("play-shapes.app-offer-dismissed") === "yes";
         }
-        catch { /* Memory-only fallback. */ }
-        target.addEventListener("beforeinstallprompt", event => {
+        catch {
+            /* Memory-only fallback. */
+        }
+        target.addEventListener("beforeinstallprompt", (event) => {
             event.preventDefault();
             this.pending = event;
             if (!this.busy)
@@ -42,9 +44,12 @@ export class PwaOnboarding {
             this.pending = undefined;
             this.rememberDismissal();
             this.guidance.hidden = false;
-            this.guidance.textContent = "Open Play Shapes from its new icon before joining, or continue here in your browser.";
+            this.guidance.textContent =
+                "Open Play Shapes from its new icon before joining, or continue here in your browser.";
         });
-        action.addEventListener("click", () => { void this.install(); });
+        action.addEventListener("click", () => {
+            void this.install();
+        });
         continueButton.addEventListener("click", () => {
             if (this.busy)
                 return;
@@ -53,7 +58,9 @@ export class PwaOnboarding {
             this.onContinue();
         });
     }
-    get visible() { return !this.panel.hidden; }
+    get visible() {
+        return !this.panel.hidden;
+    }
     show() {
         if (this.dismissed || isStandalone(this.target, this.browser))
             return false;
@@ -61,13 +68,17 @@ export class PwaOnboarding {
         this.action.focus();
         return true;
     }
-    hide() { this.panel.hidden = true; }
+    hide() {
+        this.panel.hidden = true;
+    }
     rememberDismissal() {
         this.dismissed = true;
         try {
             this.target.sessionStorage.setItem("play-shapes.app-offer-dismissed", "yes");
         }
-        catch { /* Memory-only fallback. */ }
+        catch {
+            /* Memory-only fallback. */
+        }
     }
     async install() {
         if (this.busy)
@@ -86,10 +97,13 @@ export class PwaOnboarding {
             const choice = await event.userChoice;
             if (choice.outcome === "accepted") {
                 this.rememberDismissal();
-                this.guidance.textContent = "Open Play Shapes from its new icon before joining, or continue here in your browser.";
+                this.guidance.textContent =
+                    "Open Play Shapes from its new icon before joining, or continue here in your browser.";
             }
         }
-        catch { /* Keep honest menu guidance and the browser continuation. */ }
+        catch {
+            /* Keep honest menu guidance and the browser continuation. */
+        }
         finally {
             this.busy = false;
             this.action.disabled = false;

@@ -1,6 +1,13 @@
 // Shared pieces for end-to-end tests: a real Godot host and phones that run the
 // real phone client in emulated Chromium.
-import { test as base, devices, expect, type Locator, type Page, type TestInfo } from "@playwright/test";
+import {
+  test as base,
+  devices,
+  expect,
+  type Locator,
+  type Page,
+  type TestInfo,
+} from "@playwright/test";
 import { spawn, type ChildProcess } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -8,7 +15,12 @@ const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const HTTP_PORT = 18200;
 const HOST_BOOT_MSEC = 60_000;
 
-type Waiter = { pattern: RegExp; occurrence: number; resolve: (line: string) => void; reject: (error: Error) => void };
+type Waiter = {
+  pattern: RegExp;
+  occurrence: number;
+  resolve: (line: string) => void;
+  reject: (error: Error) => void;
+};
 
 /** The Godot host running tests/e2e/host.gd. Its "E2E ..." lines are the events tests wait on. */
 export class Host {
@@ -21,11 +33,22 @@ export class Host {
 
   async start(players: number, testInfo: TestInfo): Promise<void> {
     // A host left running by a person would answer instead of this one.
-    const busy = await fetch(`${this.url}session.json`, { signal: AbortSignal.timeout(500) }).then(() => true, () => false);
-    expect(busy, `port ${HTTP_PORT} is already in use; close any running Play Shapes host`).toBe(false);
+    const busy = await fetch(`${this.url}session.json`, { signal: AbortSignal.timeout(500) }).then(
+      () => true,
+      () => false,
+    );
+    expect(busy, `port ${HTTP_PORT} is already in use; close any running Play Shapes host`).toBe(
+      false,
+    );
 
     const windowed = process.env.E2E_WINDOWED === "1";
-    const args = [...(windowed ? [] : ["--headless"]), "--path", ROOT, "--script", "res://tests/e2e/host.gd"];
+    const args = [
+      ...(windowed ? [] : ["--headless"]),
+      "--path",
+      ROOT,
+      "--script",
+      "res://tests/e2e/host.gd",
+    ];
     this.process = spawn(process.env.GODOT_BIN || "godot", args, {
       windowsHide: true,
       env: {
@@ -37,37 +60,53 @@ export class Host {
         PLAY_SHAPES_NETWORK_CONFIG: "off",
       },
     });
-    this.process.stdout!.on("data", chunk => this.read(String(chunk)));
-    this.process.stderr!.on("data", chunk => this.read(String(chunk)));
-    this.process.on("error", error => this.read(`ERROR: could not start Godot: ${error.message}\n`));
+    this.process.stdout!.on("data", (chunk) => this.read(String(chunk)));
+    this.process.stderr!.on("data", (chunk) => this.read(String(chunk)));
+    this.process.on("error", (error) =>
+      this.read(`ERROR: could not start Godot: ${error.message}\n`),
+    );
 
     // "close" follows the last output, so the reason the host gave is already read.
-    this.process.on("close", code => this.exited(code));
+    this.process.on("close", (code) => this.exited(code));
 
     await this.event(/^ready /, { timeout: HOST_BOOT_MSEC });
   }
 
   /** Resolves with the nth "E2E ..." line matching pattern, including lines already printed. */
   event(pattern: RegExp, { occurrence = 1, timeout = 60_000 } = {}): Promise<string> {
-    const seen = this.events.filter(line => pattern.test(line));
+    const seen = this.events.filter((line) => pattern.test(line));
     if (seen.length >= occurrence) return Promise.resolve(seen[occurrence - 1]);
     if (this.exit) return Promise.reject(new Error(this.exit));
 
     return new Promise((resolve, reject) => {
-      const settle = <Value>(finish: (value: Value) => void) => (value: Value) => { clearTimeout(timer); finish(value); };
-      const waiter: Waiter = { pattern, occurrence, resolve: settle(resolve), reject: settle(reject) };
+      const settle =
+        <Value>(finish: (value: Value) => void) =>
+        (value: Value) => {
+          clearTimeout(timer);
+          finish(value);
+        };
+      const waiter: Waiter = {
+        pattern,
+        occurrence,
+        resolve: settle(resolve),
+        reject: settle(reject),
+      };
       this.waiters.push(waiter);
 
       const timer = setTimeout(() => {
-        this.waiters = this.waiters.filter(other => other !== waiter);
-        reject(new Error(`host never printed "E2E ${pattern.source}" #${occurrence}; it printed:\n${this.events.join("\n")}`));
+        this.waiters = this.waiters.filter((other) => other !== waiter);
+        reject(
+          new Error(
+            `host never printed "E2E ${pattern.source}" #${occurrence}; it printed:\n${this.events.join("\n")}`,
+          ),
+        );
       }, timeout);
     });
   }
 
   /** Godot error lines printed so far. */
   errors(): string[] {
-    return this.output.split(/\r?\n/).filter(line => /^(SCRIPT )?ERROR:/.test(line));
+    return this.output.split(/\r?\n/).filter((line) => /^(SCRIPT )?ERROR:/.test(line));
   }
 
   async stop(testInfo: TestInfo): Promise<void> {
@@ -77,7 +116,7 @@ export class Host {
 
     const host = this.process;
     if (host && host.exitCode === null) {
-      const exited = new Promise(resolve => host.once("exit", resolve));
+      const exited = new Promise((resolve) => host.once("exit", resolve));
       host.kill();
       await exited;
     }
@@ -101,10 +140,10 @@ export class Host {
       const line = raw.slice("E2E ".length);
       this.events.push(line);
       for (const waiter of [...this.waiters]) {
-        const matches = this.events.filter(event => waiter.pattern.test(event));
+        const matches = this.events.filter((event) => waiter.pattern.test(event));
         if (matches.length < waiter.occurrence) continue;
 
-        this.waiters = this.waiters.filter(other => other !== waiter);
+        this.waiters = this.waiters.filter((other) => other !== waiter);
         waiter.resolve(matches[waiter.occurrence - 1]);
       }
     }
@@ -118,10 +157,19 @@ export class Phone {
   readonly rejections: string[] = [];
   private shots = 0;
 
-  constructor(readonly page: Page, readonly name: string, private readonly color: number, private readonly testInfo: TestInfo) {
-    page.on("pageerror", error => this.errors.push(String(error)));
-    page.on("console", message => { if (message.type() === "error") this.errors.push(message.text()); });
-    page.on("websocket", socket => socket.on("framereceived", frame => this.receive(String(frame.payload))));
+  constructor(
+    readonly page: Page,
+    readonly name: string,
+    private readonly color: number,
+    private readonly testInfo: TestInfo,
+  ) {
+    page.on("pageerror", (error) => this.errors.push(String(error)));
+    page.on("console", (message) => {
+      if (message.type() === "error") this.errors.push(message.text());
+    });
+    page.on("websocket", (socket) =>
+      socket.on("framereceived", (frame) => this.receive(String(frame.payload))),
+    );
   }
 
   async join(host: Host): Promise<void> {
@@ -176,8 +224,11 @@ export class Phone {
 
   private receive(payload: string): void {
     let message: { type?: string; code?: string; message?: string };
-    try { message = JSON.parse(payload); }
-    catch { return; }
+    try {
+      message = JSON.parse(payload);
+    } catch {
+      return;
+    }
 
     const type = message.type ?? "?";
     this.received.set(type, this.count(type) + 1);
@@ -226,12 +277,18 @@ export const test = base.extend<Fixtures>({
     for (const phone of phones) {
       // The phone's own development error panel, such as a host protocol rejection.
       const panel = phone.page.locator("#connection-error");
-      const shown = passedSoFar && await panel.isVisible() ? await panel.textContent() : "";
+      const shown = passedSoFar && (await panel.isVisible()) ? await panel.textContent() : "";
       expect(shown, `${phone.name} showed its error panel`).toBe("");
-      await testInfo.attach(`${phone.name}-received`, { body: JSON.stringify(Object.fromEntries(phone.received), null, 2), contentType: "application/json" });
+      await testInfo.attach(`${phone.name}-received`, {
+        body: JSON.stringify(Object.fromEntries(phone.received), null, 2),
+        contentType: "application/json",
+      });
       await phone.page.context().close();
     }
-    expect(phones.flatMap(phone => phone.errors.map(error => `${phone.name}: ${error}`)), "phone page errors").toEqual([]);
+    expect(
+      phones.flatMap((phone) => phone.errors.map((error) => `${phone.name}: ${error}`)),
+      "phone page errors",
+    ).toEqual([]);
   },
 });
 

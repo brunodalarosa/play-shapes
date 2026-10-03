@@ -18,8 +18,10 @@ static func classify(trace: Variant, tuning: BubblesTuning) -> Dictionary:
 		if not item is Array or item.size() != 2:
 			return _reject(&"malformed_trace")
 		var pair: Array = item
-		if (typeof(pair[0]) not in [TYPE_FLOAT, TYPE_INT]
-				or typeof(pair[1]) not in [TYPE_FLOAT, TYPE_INT]):
+		if (
+			typeof(pair[0]) not in [TYPE_FLOAT, TYPE_INT]
+			or typeof(pair[1]) not in [TYPE_FLOAT, TYPE_INT]
+		):
 			return _reject(&"malformed_trace")
 		var x := float(pair[0])
 		var y := float(pair[1])
@@ -66,16 +68,30 @@ static func classify(trace: Variant, tuning: BubblesTuning) -> Dictionary:
 		var required_turn := TAU * float(tuning.circles_to_charge)
 		var closed := points[0].distance_to(points[-1]) <= radius * tuning.circle_tolerance
 		var consistent := absolute_turn > 0.0 and absf(signed_turn) / absolute_turn >= 0.85
-		var radial_ok := radius >= MIN_CIRCLE_RADIUS and radial_error <= radius * tuning.circle_tolerance
-		if smooth and closed and consistent and radial_ok and absf(signed_turn) >= required_turn * 0.9:
-			return {"accepted": true, "action": &"spin", "direction": &"clockwise" if signed_turn > 0.0 else &"counterclockwise"}
-		return {"accepted": true, "action": &"none", "reason": &"incomplete_circle"}
+		var radial_ok := (
+			radius >= MIN_CIRCLE_RADIUS and radial_error <= radius * tuning.circle_tolerance
+		)
+		if (
+			smooth and closed and consistent and radial_ok
+			and absf(signed_turn) >= required_turn * 0.9
+		):
+			return {
+				"accepted": true,
+				"action": &"spin",
+				"direction": &"clockwise" if signed_turn > 0.0 else &"counterclockwise",
+			}
+		return { "accepted": true, "action": &"none", "reason": &"incomplete_circle" }
 
 	var displacement := points[-1] - points[0]
 	if displacement.length() >= tuning.swipe_min_distance:
-		return {"accepted": true, "action": &"swipe", "direction": displacement.normalized(), "strength": tuning.swipe_impulse}
-	return {"accepted": true, "action": &"none", "reason": &"too_short"}
+		return {
+			"accepted": true,
+			"action": &"swipe",
+			"direction": displacement.normalized(),
+			"strength": tuning.swipe_impulse,
+		}
+	return { "accepted": true, "action": &"none", "reason": &"too_short" }
 
 
 static func _reject(code: StringName) -> Dictionary:
-	return {"accepted": false, "code": code}
+	return { "accepted": false, "code": code }

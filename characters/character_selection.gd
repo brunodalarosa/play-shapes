@@ -4,16 +4,16 @@ extends RefCounted
 
 const SHAPES: Array[StringName] = [&"square", &"circle", &"squircle", &"rhombus"]
 const COLORS: Array[Dictionary] = [
-	{"id": "red", "name": "Red", "hex": "#E53935"},
-	{"id": "orange", "name": "Orange", "hex": "#F57C00"},
-	{"id": "golden_yellow", "name": "Golden Yellow", "hex": "#FBC02D"},
-	{"id": "green", "name": "Green", "hex": "#43A047"},
-	{"id": "cyan", "name": "Cyan", "hex": "#00ACC1"},
-	{"id": "blue", "name": "Blue", "hex": "#1E88E5"},
-	{"id": "indigo", "name": "Indigo", "hex": "#3949AB"},
-	{"id": "purple", "name": "Purple", "hex": "#8E24AA"},
-	{"id": "pink", "name": "Pink", "hex": "#EC407A"},
-	{"id": "brown", "name": "Brown", "hex": "#8D6E63"},
+	{ "id": "red", "name": "Red", "hex": "#E53935" },
+	{ "id": "orange", "name": "Orange", "hex": "#F57C00" },
+	{ "id": "golden_yellow", "name": "Golden Yellow", "hex": "#FBC02D" },
+	{ "id": "green", "name": "Green", "hex": "#43A047" },
+	{ "id": "cyan", "name": "Cyan", "hex": "#00ACC1" },
+	{ "id": "blue", "name": "Blue", "hex": "#1E88E5" },
+	{ "id": "indigo", "name": "Indigo", "hex": "#3949AB" },
+	{ "id": "purple", "name": "Purple", "hex": "#8E24AA" },
+	{ "id": "pink", "name": "Pink", "hex": "#EC407A" },
+	{ "id": "brown", "name": "Brown", "hex": "#8D6E63" },
 ]
 const FALLBACK_SHAPE: StringName = &"squircle"
 const FALLBACK_COLOR := "#598DF2" # Existing unselected-player blue.
@@ -28,8 +28,13 @@ static func default_selection() -> Dictionary:
 
 
 static func validate_selection(raw_shape: Variant, raw_color: Variant) -> Dictionary:
-	if raw_shape != null and (typeof(raw_shape) not in [TYPE_STRING, TYPE_STRING_NAME]
-			or not SHAPES.has(StringName(String(raw_shape).to_lower()))):
+	if (
+		raw_shape != null
+		and (
+			typeof(raw_shape) not in [TYPE_STRING, TYPE_STRING_NAME]
+			or not SHAPES.has(StringName(String(raw_shape).to_lower()))
+		)
+	):
 		return _rejected("Choose an available character shape")
 	if not raw_color is String:
 		return _rejected("Choose a character color")
@@ -54,10 +59,7 @@ static func resolve_selection(raw_shape: Variant, raw_color: Variant) -> Diction
 
 
 static func for_player(player: Dictionary) -> Dictionary:
-	return resolve_selection(
-		player.get("character_shape"),
-		player.get("character_color")
-	)
+	return resolve_selection(player.get("character_shape"), player.get("character_color"))
 
 
 static func normalize_shape(raw_shape: Variant) -> StringName:
@@ -69,4 +71,4 @@ static func normalize_shape(raw_shape: Variant) -> StringName:
 
 
 static func _rejected(message: String) -> Dictionary:
-	return {"accepted": false, "code": &"invalid_character_selection", "message": message}
+	return { "accepted": false, "code": &"invalid_character_selection", "message": message }

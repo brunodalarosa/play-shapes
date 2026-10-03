@@ -13,7 +13,10 @@ func _run() -> void:
 	var world := WORLD.instantiate() as LobbyPlaygroundWorld
 	root.add_child(world)
 	var registry := PlayerRegistry.new(10, 60.0)
-	registry.players_changed.connect(func() -> void: world.reconcile(registry.public_players()))
+	registry.players_changed.connect(
+		func() -> void:
+			world.reconcile(registry.public_players()),
+	)
 	var now := Time.get_ticks_msec()
 	var first := registry.join_player(100, "First", true, now)
 	var second := registry.join_player(101, "Second", true, now)
@@ -30,11 +33,14 @@ func _run() -> void:
 	for unused: int in 35:
 		mover.set_horizontal(1.0, Time.get_ticks_msec())
 		await physics_frame
-	_check(mover.position.x > target.position.x - 95.0
-		and mover.position.x <= target.position.x - 44.0,
-		"A moving player reaches but cannot pass through another player")
-	_check(target.position.x == target.spawn_point.x,
-		"A disconnected player remains stationary during a bump")
+	_check(
+		mover.position.x > target.position.x - 95.0 and mover.position.x <= target.position.x - 44.0,
+		"A moving player reaches but cannot pass through another player",
+	)
+	_check(
+		target.position.x == target.spawn_point.x,
+		"A disconnected player remains stationary during a bump",
+	)
 
 	mover.clear_input()
 	mover.position = target.position + Vector2(0.0, -220.0)
@@ -53,12 +59,16 @@ func _run() -> void:
 	for unused: int in 25:
 		await physics_frame
 		highest_y = minf(highest_y, mover.position.y)
-	_check(impact_y - highest_y >= 10.0 and impact_y - highest_y <= 70.0,
-		"The player bounce is visible but modest")
+	_check(
+		impact_y - highest_y >= 10.0 and impact_y - highest_y <= 70.0,
+		"The player bounce is visible but modest",
+	)
 	for unused: int in 70:
 		await physics_frame
-	_check(mover.is_on_floor() and absf(mover.velocity.y) < 1.0,
-		"The rebound settles rather than repeating forever")
+	_check(
+		mover.is_on_floor() and absf(mover.velocity.y) < 1.0,
+		"The rebound settles rather than repeating forever",
+	)
 	world.queue_free()
 	await process_frame
 	print("Lobby character collision checks: %d failures" % _failures)

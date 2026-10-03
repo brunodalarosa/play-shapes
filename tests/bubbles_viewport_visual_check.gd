@@ -38,9 +38,9 @@ func _capture_size(viewport_size: Vector2i) -> void:
 	view.controller.tuning = tuning
 	var start_time := Time.get_ticks_msec()
 	_check(view.start_round([
-		{"player_id": "left", "name": "Left", "seat": 1},
-		{"player_id": "right", "name": "Right", "seat": 2},
-	], start_time).accepted, "%s scene starts" % viewport_size)
+			{ "player_id": "left", "name": "Left", "seat": 1 },
+			{ "player_id": "right", "name": "Right", "seat": 2 },
+		], start_time).accepted, "%s scene starts" % viewport_size)
 	view.controller.complete_entrance(start_time)
 	view.controller.advance(start_time)
 	if view._entrance_tween != null:
@@ -58,10 +58,22 @@ func _capture_size(viewport_size: Vector2i) -> void:
 	right_bubble.global_position = Vector2(bounds.end.x - right_radius, bounds.get_center().y)
 	right_bubble.velocity = Vector2.RIGHT * 100.0
 	var host_time := maxi(Time.get_ticks_msec(), view.controller.last_host_time_msec())
-	_check(view.player_arena.simulate_step(0.05, host_time), "%s edge step is accepted" % viewport_size)
-	_check(left_bubble.velocity.x > 0.0 and right_bubble.velocity.x < 0.0, "%s edge bubbles rebound inward" % viewport_size)
-	_check(left_bubble.global_position.x >= bounds.position.x + left_radius - 0.001, "%s left bubble remains fully visible" % viewport_size)
-	_check(right_bubble.global_position.x <= bounds.end.x - right_radius + 0.001, "%s right bubble remains fully visible" % viewport_size)
+	_check(
+		view.player_arena.simulate_step(0.05, host_time),
+		"%s edge step is accepted" % viewport_size,
+	)
+	_check(
+		left_bubble.velocity.x > 0.0 and right_bubble.velocity.x < 0.0,
+		"%s edge bubbles rebound inward" % viewport_size,
+	)
+	_check(
+		left_bubble.global_position.x >= bounds.position.x + left_radius - 0.001,
+		"%s left bubble remains fully visible" % viewport_size,
+	)
+	_check(
+		right_bubble.global_position.x <= bounds.end.x - right_radius + 0.001,
+		"%s right bubble remains fully visible" % viewport_size,
+	)
 	await _frames(3)
 	_save("viewport-edges-%dx%d.png" % [viewport_size.x, viewport_size.y])
 	view.queue_free()

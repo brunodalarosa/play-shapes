@@ -32,8 +32,18 @@ func _setup(count: int = 2, countdown := 0.0, starting := 0) -> Dictionary:
 	controller.set_random_seed(1432)
 	var participants: Array = []
 	for index: int in count:
-		participants.append({"player_id": "p%d" % index, "name": "Player %d" % index, "seat": index + 1, "state": "connected"})
-	_check(controller.start_round(participants, 0, count == 1).accepted, "Creature fixture round starts")
+		participants.append(
+			{
+				"player_id": "p%d" % index,
+				"name": "Player %d" % index,
+				"seat": index + 1,
+				"state": "connected",
+			}
+		)
+	_check(
+		controller.start_round(participants, 0, count == 1).accepted,
+		"Creature fixture round starts",
+	)
 	var players := PlayerArena.new()
 	root.add_child(players)
 	_check(players.setup(controller, BOUNDS), "Player arena setup")
@@ -47,7 +57,7 @@ func _setup(count: int = 2, countdown := 0.0, starting := 0) -> Dictionary:
 	if countdown == 0.0:
 		players.simulate_step(0.0, 0)
 		creatures.simulate_step(0.0, 0)
-	return {"controller": controller, "players": players, "creatures": creatures}
+	return { "controller": controller, "players": players, "creatures": creatures }
 
 
 func _test_starting_spawn_and_entrance() -> void:
@@ -55,27 +65,59 @@ func _test_starting_spawn_and_entrance() -> void:
 	var controller: BubblesRoundController = fixture.controller
 	var players: BubblesPlayerArena = fixture.players
 	var creatures: BubblesCreatureArena = fixture.creatures
-	_check(creatures.jellyfish_count() == 5, "Configured starting population appears during countdown")
+	_check(
+		creatures.jellyfish_count() == 5,
+		"Configured starting population appears during countdown",
+	)
 	for id: int in creatures._jellies.keys():
 		var jelly := creatures.get_jellyfish(id)
 		_check(not jelly.is_collectible(0), "Entrance locks starting jellyfish")
 		for player_id: String in players.bubble_ids():
 			var bubble := players.get_bubble(player_id)
-			_check(jelly.global_position.distance_to(bubble.global_position) >= jelly.radius + bubble.collision_radius() + controller.tuning.jellyfish_spawn_clearance, "Starting spawn respects player clearance")
+			_check(
+				jelly.global_position.distance_to(bubble.global_position)
+				>= jelly.radius + bubble.collision_radius()
+				+ controller.tuning.jellyfish_spawn_clearance,
+				"Starting spawn respects player clearance",
+			)
 	players.simulate_step(0.0, 3000)
 	creatures.simulate_step(0.0, 3000)
 	var bubble := players.get_bubble("p0")
-	_check(creatures.spawn_fresh_at(bubble.global_position, 3000) == -1, "Explicit unsafe spawn is rejected")
-	var fixture_id := creatures._create_jellyfish(bubble.global_position, Vector2.ZERO, 3000, false, 0)
+	_check(
+		creatures.spawn_fresh_at(bubble.global_position, 3000) == -1,
+		"Explicit unsafe spawn is rejected",
+	)
+	var fixture_id := creatures._create_jellyfish(
+		bubble.global_position,
+		Vector2.ZERO,
+		3000,
+		false,
+		0,
+	)
 	creatures.simulate_step(0.0, 3599)
-	_check(controller.personal_snapshot("p0").score == 0, "Entrant cannot be caught one millisecond early")
+	_check(
+		controller.personal_snapshot("p0").score == 0,
+		"Entrant cannot be caught one millisecond early",
+	)
 	creatures.simulate_step(0.0, 3600)
-	_check(controller.personal_snapshot("p0").score == 1 and creatures.get_jellyfish(fixture_id) == null, "Entrant is collectible exactly at host unlock")
+	_check(
+		controller.personal_snapshot("p0").score == 1
+		and creatures.get_jellyfish(fixture_id) == null,
+		"Entrant is collectible exactly at host unlock",
+	)
 	var offscreen := creatures._create_jellyfish(Vector2(800, 400), Vector2.RIGHT, 3600, false, 0)
 	creatures.get_jellyfish(offscreen).global_position = Vector2(1100, 400)
 	creatures.simulate_step(0.0, 3601)
-	_check(creatures.get_jellyfish(offscreen) == null, "Jellyfish despawns after leaving arena margin")
-	_check((players.get_bubble("p0") as CollisionObject2D).collision_layer == 16 and creatures.get_jellyfish(1).collision_layer == 32 and creatures.get_jellyfish(1).collision_mask == 0, "Player and jellyfish collision layers remain separate")
+	_check(
+		creatures.get_jellyfish(offscreen) == null,
+		"Jellyfish despawns after leaving arena margin",
+	)
+	_check(
+		(players.get_bubble("p0") as CollisionObject2D).collision_layer == 16
+		and creatures.get_jellyfish(1).collision_layer == 32
+		and creatures.get_jellyfish(1).collision_mask == 0,
+		"Player and jellyfish collision layers remain separate",
+	)
 
 
 func _test_waves_cap_and_edges() -> void:
@@ -88,8 +130,10 @@ func _test_waves_cap_and_edges() -> void:
 	controller.tuning.jellyfish_wave_min_seconds = 1.0
 	controller.tuning.jellyfish_wave_max_seconds = 2.0
 	var waves: Array[Dictionary] = []
-	creatures.wave_changed.connect(func(high: bool, rate: float, duration: int) -> void:
-		waves.append({"high": high, "rate": rate, "duration": duration}))
+	creatures.wave_changed.connect(
+		func(high: bool, rate: float, duration: int) -> void:
+			waves.append({ "high": high, "rate": rate, "duration": duration }),
+	)
 	# Start a fresh wave after setting the fixture tuning.
 	creatures._begin_wave(0, true)
 	for tick: int in 80:
@@ -99,7 +143,11 @@ func _test_waves_cap_and_edges() -> void:
 	_check(waves.size() >= 2, "Timed waves transition")
 	for index: int in waves.size():
 		var wave := waves[index]
-		_check(wave.duration >= 1000 and wave.duration <= 2000 and wave.rate >= 0.0 and wave.rate <= 10.0, "Random wave duration and rate stay bounded")
+		_check(
+			wave.duration >= 1000 and wave.duration <= 2000
+			and wave.rate >= 0.0 and wave.rate <= 10.0,
+			"Random wave duration and rate stay bounded",
+		)
 		if index > 0:
 			_check(wave.high != waves[index - 1].high, "High and low waves alternate")
 	var path_ids: Array[int] = []
@@ -109,11 +157,25 @@ func _test_waves_cap_and_edges() -> void:
 		path_ids.append(creatures._next_creature_id - 1)
 	for edge: int in 4:
 		var puffer := creatures.get_pufferfish(path_ids[edge])
-		_check(puffer != null and not BOUNDS.has_point(puffer.start_position) and not BOUNDS.has_point(puffer.end_position), "Puffer path begins and ends offscreen")
+		_check(
+			puffer != null and not BOUNDS.has_point(puffer.start_position)
+			and not BOUNDS.has_point(puffer.end_position),
+			"Puffer path begins and ends offscreen",
+		)
 		_check(puffer.direction.length() > 0.99, "Puffer path has a valid one-pass direction")
-		_check(puffer.collision_layer == 64 and puffer.collision_mask == 0, "Pufferfish does not collide with NPC layer")
-	_check(creatures.spawn_fresh_at(creatures.get_pufferfish(path_ids[0]).global_position, 4000) == -1, "Safe spawn avoids a warned hazard")
-	_check(creatures.puffer_rate_at(0) < creatures.puffer_rate_at(5000) and creatures.puffer_rate_at(5000) < creatures.puffer_rate_at(10000), "Puffer spawn rate rises through the round")
+		_check(
+			puffer.collision_layer == 64 and puffer.collision_mask == 0,
+			"Pufferfish does not collide with NPC layer",
+		)
+	_check(
+		creatures.spawn_fresh_at(creatures.get_pufferfish(path_ids[0]).global_position, 4000) == -1,
+		"Safe spawn avoids a warned hazard",
+	)
+	_check(
+		creatures.puffer_rate_at(0) < creatures.puffer_rate_at(5000)
+		and creatures.puffer_rate_at(5000) < creatures.puffer_rate_at(10000),
+		"Puffer spawn rate rises through the round",
+	)
 	controller.tuning.pufferfish_size_multiplier = 1.0
 	controller.inject_random_values([0.1, 0.2, 0.8])
 	creatures._spawn_random_puffer(5000)
@@ -122,9 +184,11 @@ func _test_waves_cap_and_edges() -> void:
 	controller.inject_random_values([0.1, 0.2, 0.8])
 	creatures._spawn_random_puffer(5000)
 	var scaled_path := creatures.get_pufferfish(creatures._next_creature_id - 1)
-	_check(baseline_path.start_position == scaled_path.start_position
+	_check(
+		baseline_path.start_position == scaled_path.start_position
 		and baseline_path.end_position == scaled_path.end_position,
-		"Pufferfish size multiplier does not change the seeded crossing path")
+		"Pufferfish size multiplier does not change the seeded crossing path",
+	)
 
 
 func _test_puffer_warning_crossing_and_pop() -> void:
@@ -143,35 +207,58 @@ func _test_puffer_warning_crossing_and_pop() -> void:
 	controller.submit_trace("p0", 1, _circle(), 5)
 	_check(players.get_bubble("p0").is_spinning(5), "Hazard fixture starts during active spin")
 	var hits: Array[String] = []
-	creatures.pufferfish_hit.connect(func(_id: int, player_id: String) -> void: hits.append(player_id))
+	creatures.pufferfish_hit.connect(
+		func(_id: int, player_id: String) -> void:
+			hits.append(player_id),
+	)
 	var start := Vector2(-50, 300)
 	var id := creatures.schedule_puffer_path(start, Vector2(1050, 300), 0)
 	var puffer := creatures.get_pufferfish(id)
-	_check(not puffer.active and puffer.warning_until_msec == 500 and puffer.global_position == start,
-		"Enabled offscreen bubble burst precedes the pufferfish at its path start")
-	_check(puffer._warning_particles.emitting and puffer._warning_particles.one_shot
+	_check(
+		not puffer.active and puffer.warning_until_msec == 500 and puffer.global_position == start,
+		"Enabled offscreen bubble burst precedes the pufferfish at its path start",
+	)
+	_check(
+		puffer._warning_particles.emitting and puffer._warning_particles.one_shot
 		and puffer._warning_particles.amount == controller.tuning.pufferfish_telegraph_bubble_count,
-		"Warning uses a tuned one-shot particle burst")
-	_check(puffer._sprite.visible == false and puffer._collider.disabled,
-		"Pufferfish art and collision stay hidden during its particle warning")
+		"Warning uses a tuned one-shot particle burst",
+	)
+	_check(
+		puffer._sprite.visible == false and puffer._collider.disabled,
+		"Pufferfish art and collision stay hidden during its particle warning",
+	)
 	creatures.simulate_step(0.0, 499)
-	_check(not puffer.active and puffer._collider.disabled and controller.personal_snapshot("p0").score == 5,
-		"Warning alone never activates or pops a player")
+	_check(
+		not puffer.active and puffer._collider.disabled
+		and controller.personal_snapshot("p0").score == 5,
+		"Warning alone never activates or pops a player",
+	)
 	creatures.simulate_step(0.0, 500)
-	_check(puffer.active and puffer.global_position == start and not puffer._collider.disabled,
-		"Pufferfish appears at its particle origin when the tuned delay ends")
+	_check(
+		puffer.active and puffer.global_position == start and not puffer._collider.disabled,
+		"Pufferfish appears at its particle origin when the tuned delay ends",
+	)
 	for tick: int in 55:
 		creatures.simulate_step(0.05, 500 + tick * 50)
-	_check(hits == ["p0"] and controller.personal_snapshot("p0").score == 0, "Puffer pops spinning bubble once through host rule")
+	_check(
+		hits == ["p0"] and controller.personal_snapshot("p0").score == 0,
+		"Puffer pops spinning bubble once through host rule",
+	)
 	_check(creatures.get_pufferfish(id) == null, "Pufferfish despawns after one full crossing")
 	var no_warning := _setup()
 	var no_warning_controller: BubblesRoundController = no_warning.controller
 	var no_warning_creatures: BubblesCreatureArena = no_warning.creatures
 	no_warning_controller.tuning.pufferfish_warning_enabled = false
-	var immediate := no_warning_creatures.schedule_puffer_path(Vector2(-50, 300), Vector2(1050, 300), 0)
-	_check(no_warning_creatures.get_pufferfish(immediate).active
+	var immediate := no_warning_creatures.schedule_puffer_path(
+		Vector2(-50, 300),
+		Vector2(1050, 300),
+		0,
+	)
+	_check(
+		no_warning_creatures.get_pufferfish(immediate).active
 		and not no_warning_creatures.get_pufferfish(immediate)._warning_particles.emitting,
-		"Disabled warning activates puffer immediately without particles")
+		"Disabled warning activates puffer immediately without particles",
+	)
 	no_warning_creatures.simulate_step(0.05, 50)
 
 
@@ -189,35 +276,56 @@ func _test_creature_visuals_are_decorative() -> void:
 	var path_end := puffer.end_position
 	var expected_radius := controller.tuning.pufferfish_collider_radius * 1.5
 	var expected_scale := expected_radius * 3.5 / float(puffer._sprite.texture.get_width())
-	_check(is_equal_approx(puffer.radius, expected_radius)
+	_check(
+		is_equal_approx(puffer.radius, expected_radius)
 		and is_equal_approx((puffer._collider.shape as CircleShape2D).radius, expected_radius),
-		"Pufferfish size multiplier grows its collision radius by 50 percent")
-	_check(is_equal_approx(puffer._sprite.scale.x, expected_scale), "Pufferfish art scale matches its enlarged radius")
-	_check(not puffer.active and puffer._warning_enabled, "Enabled visual warning remains separate from activation")
+		"Pufferfish size multiplier grows its collision radius by 50 percent",
+	)
+	_check(
+		is_equal_approx(puffer._sprite.scale.x, expected_scale),
+		"Pufferfish art scale matches its enlarged radius",
+	)
+	_check(
+		not puffer.active and puffer._warning_enabled,
+		"Enabled visual warning remains separate from activation",
+	)
 	creatures.simulate_step(0.0, 500)
 	creatures.simulate_step(0.05, 550)
-	_check(puffer.active and puffer.can_hit_player(), "Pufferfish remains governed by its active path")
-	_check(puffer.start_position == path_start and puffer.end_position == path_end
+	_check(
+		puffer.active and puffer.can_hit_player(),
+		"Pufferfish remains governed by its active path",
+	)
+	_check(
+		puffer.start_position == path_start and puffer.end_position == path_end
 		and puffer.global_position.distance_to(path_start + puffer.direction * 6.0) < 0.001,
-		"Pufferfish visual jiggle and bubbles leave its host path unchanged")
-	_check(absf(puffer._sprite.rotation - puffer._base_sprite_rotation) > 0.001
+		"Pufferfish visual jiggle and bubbles leave its host path unchanged",
+	)
+	_check(
+		absf(puffer._sprite.rotation - puffer._base_sprite_rotation) > 0.001
 		and absf(puffer._sprite.scale.y - puffer._base_sprite_scale.y) > 0.001,
-		"Pufferfish body jiggles while swimming")
+		"Pufferfish body jiggles while swimming",
+	)
 	var particle_material := puffer._warning_particles.process_material as ParticleProcessMaterial
-	_check((puffer._collider.shape as CircleShape2D).radius == expected_radius
+	_check(
+		(puffer._collider.shape as CircleShape2D).radius == expected_radius
 		and puffer._warning_particles.amount == controller.tuning.pufferfish_telegraph_bubble_count
 		and particle_material != null and particle_material.tangential_accel_min < 0.0
 		and particle_material.tangential_accel_max > 0.0,
-		"Noisy decorative particles leave the creature collider unchanged")
+		"Noisy decorative particles leave the creature collider unchanged",
+	)
 	var warning_node: Node = puffer._warning_particles
-	_check(puffer.get_child_count() == 3 and warning_node is GPUParticles2D
+	_check(
+		puffer.get_child_count() == 3 and warning_node is GPUParticles2D
 		and not (warning_node is CollisionObject2D),
-		"Warning is a 2D particle node without gameplay collision")
+		"Warning is a 2D particle node without gameplay collision",
+	)
 	for tick: int in 45:
 		creatures.simulate_step(0.05, 600 + tick * 50)
-	_check(puffer.active and not puffer.finished and puffer.start_position == path_start
+	_check(
+		puffer.active and not puffer.finished and puffer.start_position == path_start
 		and puffer.end_position == path_end,
-		"Pufferfish completes its unchanged opening path while particles remain decorative")
+		"Pufferfish completes its unchanged opening path while particles remain decorative",
+	)
 
 	var jelly_fixture := _setup()
 	var jelly_controller: BubblesRoundController = jelly_fixture.controller
@@ -232,30 +340,41 @@ func _test_creature_visuals_are_decorative() -> void:
 	var large_start := large_jelly.global_position
 	small_jelly.simulate_step(0.05, 599)
 	large_jelly.simulate_step(0.05, 599)
-	_check(not small_jelly.is_collectible(599) and not large_jelly.is_collectible(599)
+	_check(
+		not small_jelly.is_collectible(599) and not large_jelly.is_collectible(599)
 		and small_jelly._collider.disabled and large_jelly._collider.disabled,
-		"Jellyfish breathing preserves the entrance collection lock")
+		"Jellyfish breathing preserves the entrance collection lock",
+	)
 	var small_expanded := small_jelly._sprite.scale.x
 	var large_expanded := large_jelly._sprite.scale.x
 	small_jelly.simulate_step(0.05, 600)
 	large_jelly.simulate_step(0.05, 600)
-	_check(small_jelly.is_collectible(600) and large_jelly.is_collectible(600)
+	_check(
+		small_jelly.is_collectible(600) and large_jelly.is_collectible(600)
 		and not small_jelly._collider.disabled and not large_jelly._collider.disabled,
-		"Jellyfish become collectible at the unchanged host-time unlock")
+		"Jellyfish become collectible at the unchanged host-time unlock",
+	)
 	small_jelly.simulate_step(0.0, 600)
 	large_jelly.simulate_step(0.0, 600)
 	small_expanded = small_jelly._sprite.scale.x
 	large_expanded = large_jelly._sprite.scale.x
 	small_jelly.simulate_step(0.0, 1800)
 	large_jelly.simulate_step(0.0, 1800)
-	_check(small_jelly._sprite.scale.x < small_expanded and large_jelly._sprite.scale.x < large_expanded,
-		"Jellyfish breathing is visible at small and large sprite sizes")
-	_check(small_jelly.global_position.distance_to(small_start + Vector2.RIGHT * 4.5) < 0.001
+	_check(
+		small_jelly._sprite.scale.x < small_expanded
+		and large_jelly._sprite.scale.x < large_expanded,
+		"Jellyfish breathing is visible at small and large sprite sizes",
+	)
+	_check(
+		small_jelly.global_position.distance_to(small_start + Vector2.RIGHT * 4.5) < 0.001
 		and large_jelly.global_position.distance_to(large_start + Vector2.RIGHT * 4.5) < 0.001,
-		"Jellyfish breathing leaves wander displacement unchanged")
-	_check((small_jelly._collider.shape as CircleShape2D).radius == 8.0
+		"Jellyfish breathing leaves wander displacement unchanged",
+	)
+	_check(
+		(small_jelly._collider.shape as CircleShape2D).radius == 8.0
 		and (large_jelly._collider.shape as CircleShape2D).radius == 60.0,
-		"Jellyfish breathing does not resize gameplay colliders")
+		"Jellyfish breathing does not resize gameplay colliders",
+	)
 
 
 func _test_scatter_lockout_and_extreme_count() -> void:
@@ -268,27 +387,52 @@ func _test_scatter_lockout_and_extreme_count() -> void:
 	for index: int in 5:
 		controller.record_jellyfish_capture("p0", index)
 	var scatter: Array[Dictionary] = []
-	creatures.jellyfish_scattered.connect(func(id: String, spawned: int, discarded: int) -> void:
-		scatter.append({"id": id, "spawned": spawned, "discarded": discarded}))
+	creatures.jellyfish_scattered.connect(
+		func(id: String, spawned: int, discarded: int) -> void:
+			scatter.append({ "id": id, "spawned": spawned, "discarded": discarded }),
+	)
 	var pop: Dictionary = players.get_bubble("p0").request_puffer_pop(10)
-	_check(pop.accepted and pop.released == 3 and creatures.jellyfish_count() == 3, "Pop scatters retained ratio immediately")
-	_check(scatter.size() == 1 and scatter[0].spawned == 3, "Scatter event reports actual free creatures")
+	_check(
+		pop.accepted and pop.released == 3 and creatures.jellyfish_count() == 3,
+		"Pop scatters retained ratio immediately",
+	)
+	_check(
+		scatter.size() == 1 and scatter[0].spawned == 3,
+		"Scatter event reports actual free creatures",
+	)
 	controller.tuning.pufferfish_warning_enabled = false
 	var protected_hits: Array[String] = []
-	creatures.pufferfish_hit.connect(func(_id: int, id: String) -> void: protected_hits.append(id))
-	var protected_id := creatures.schedule_puffer_path(players.get_bubble("p0").global_position,
-		players.get_bubble("p0").global_position + Vector2(100, 0), 10)
+	creatures.pufferfish_hit.connect(
+		func(_id: int, id: String) -> void:
+			protected_hits.append(id),
+	)
+	var protected_id := creatures.schedule_puffer_path(
+		players.get_bubble("p0").global_position,
+		players.get_bubble("p0").global_position + Vector2(100, 0),
+		10,
+	)
 	creatures.simulate_step(0.0, 10)
-	_check(creatures.get_pufferfish(protected_id) != null and protected_hits.is_empty(),
-		"Puffer collision respects post-pop invulnerability")
+	_check(
+		creatures.get_pufferfish(protected_id) != null and protected_hits.is_empty(),
+		"Puffer collision respects post-pop invulnerability",
+	)
 	var jelly := creatures.get_jellyfish(creatures._jellies.keys()[0])
 	jelly.global_position = players.get_bubble("p1").global_position
 	creatures.simulate_step(0.0, 10)
-	_check(controller.personal_snapshot("p1").score == 0, "Released jellyfish cannot recollect in pop frame")
+	_check(
+		controller.personal_snapshot("p1").score == 0,
+		"Released jellyfish cannot recollect in pop frame",
+	)
 	creatures.simulate_step(0.0, 509)
-	_check(controller.personal_snapshot("p1").score == 0, "Released jellyfish stays locked until exact end")
+	_check(
+		controller.personal_snapshot("p1").score == 0,
+		"Released jellyfish stays locked until exact end",
+	)
 	creatures.simulate_step(0.0, 510)
-	_check(controller.personal_snapshot("p1").score == 1, "Released jellyfish becomes collectible at exact lockout end")
+	_check(
+		controller.personal_snapshot("p1").score == 1,
+		"Released jellyfish becomes collectible at exact lockout end",
+	)
 	var zero_lock := _setup()
 	var zero_controller: BubblesRoundController = zero_lock.controller
 	var zero_players: BubblesPlayerArena = zero_lock.players
@@ -299,9 +443,15 @@ func _test_scatter_lockout_and_extreme_count() -> void:
 	var zero_jelly := zero_creatures.get_jellyfish(zero_creatures._jellies.keys()[0])
 	zero_jelly.global_position = zero_players.get_bubble("p1").global_position
 	zero_creatures.simulate_step(0.0, 1)
-	_check(zero_controller.personal_snapshot("p1").score == 0, "Zero lockout still prevents same-frame recollection")
+	_check(
+		zero_controller.personal_snapshot("p1").score == 0,
+		"Zero lockout still prevents same-frame recollection",
+	)
 	zero_creatures.simulate_step(0.0, 2)
-	_check(zero_controller.personal_snapshot("p1").score == 1, "Zero lockout releases on the next host millisecond")
+	_check(
+		zero_controller.personal_snapshot("p1").score == 1,
+		"Zero lockout releases on the next host millisecond",
+	)
 
 	var extreme := _setup(10)
 	var extreme_controller: BubblesRoundController = extreme.controller
@@ -310,14 +460,23 @@ func _test_scatter_lockout_and_extreme_count() -> void:
 	extreme_controller.tuning.max_free_jellyfish = 200
 	extreme_controller.tuning.pop_disappear_ratio = 0.0
 	var extreme_scatter: Array[Dictionary] = []
-	extreme_creatures.jellyfish_scattered.connect(func(_id: String, spawned: int, discarded: int) -> void:
-		extreme_scatter.append({"spawned": spawned, "discarded": discarded}))
+	extreme_creatures.jellyfish_scattered.connect(
+		func(_id: String, spawned: int, discarded: int) -> void:
+			extreme_scatter.append({ "spawned": spawned, "discarded": discarded }),
+	)
 	for index: int in 1000:
 		extreme_controller.record_jellyfish_capture("p0", index)
 	var extreme_pop: Dictionary = extreme_players.get_bubble("p0").request_puffer_pop(1000)
-	_check(extreme_pop.accepted and extreme_pop.released == 1000 and extreme_creatures.jellyfish_count() <= 200, "Extreme score scatter remains bounded by free cap")
-	_check(extreme_scatter.size() == 1 and extreme_scatter[0].spawned == 200 and extreme_scatter[0].discarded == 800,
-		"Cap overflow is reported and discarded deterministically")
+	_check(
+		extreme_pop.accepted and extreme_pop.released == 1000
+		and extreme_creatures.jellyfish_count() <= 200,
+		"Extreme score scatter remains bounded by free cap",
+	)
+	_check(
+		extreme_scatter.size() == 1 and extreme_scatter[0].spawned == 200
+		and extreme_scatter[0].discarded == 800,
+		"Cap overflow is reported and discarded deterministically",
+	)
 	extreme_creatures.simulate_step(0.0, 1000)
 	_check(extreme_creatures.jellyfish_count() <= 200, "Extreme-count step remains bounded")
 
