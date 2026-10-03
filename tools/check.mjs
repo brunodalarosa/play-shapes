@@ -1,16 +1,13 @@
 #!/usr/bin/env node
 // Development-only. Runs every automated check and reports each failure in one line.
 // Full output for every check is written under test-results/check/.
-import { spawn, spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { exportTemplatesFolder, godotBinary, godotTemplateName, godotVersion, missingWindowsTemplates, root, webDirectory } from './environment.mjs';
 
-const root = fileURLToPath(new URL('../', import.meta.url));
-const webDirectory = join(root, 'web');
 const logDirectory = join(root, 'test-results', 'check');
-const godotBinary = process.env.GODOT_BIN || 'godot';
 const GODOT_TIMEOUT_MSEC = 180_000;
 const WEB_TIMEOUT_MSEC = 300_000;
 
@@ -28,8 +25,8 @@ const IGNORED_SHUTDOWN_ERRORS = [
 
 const USAGE = `Usage: node tools/check.mjs [--release] [filter ...]
 
-Runs the Godot test scripts, the browser type check and tests, and verifies
-that web/public matches a fresh build.
+Runs the Godot test scripts, the tests of these tools, the browser type check
+and tests, and verifies that web/public matches a fresh build.
 
   filter      Run only checks whose name contains one of the filters,
               for example "bubbles" or "web".
@@ -72,7 +69,7 @@ async function runGodotTest(name) {
   const args = ['--headless', ...(RELEASE_TESTS[name] ?? []), '--path', root, '--script', `res://tests/${name}.gd`];
   const result = await run(godotBinary, args, { timeout: GODOT_TIMEOUT_MSEC });
   const log = writeLog(name, result.output);
-  if (result.spawnError) return `could not start Godot (${result.spawnError.code}); set GODOT_BIN to the Godot executable`;
+  if (result.spawnError) return `could not start Godot (${result.spawnError.code}); run "node tools/setup.mjs"`;
   if (result.timedOut) return `timed out after ${GODOT_TIMEOUT_MSEC / 1000} s (${log})`;
   const errors = godotErrorLines(result.output);
   if (result.code === 0 && errors.length === 0) return '';
@@ -84,13 +81,11 @@ async function runGodotTest(name) {
 /** Returns a message when the Windows export templates the release test needs are absent. */
 function missingExportTemplates() {
   if (process.platform !== 'win32') return 'the standalone builder supports only a Windows host';
-  const version = spawnSync(godotBinary, ['--version'], { encoding: 'utf8' }).stdout?.trim() ?? '';
-  const parts = version.split('.');
-  const status = parts.findIndex(part => /^[a-z]/.test(part));
-  if (status < 0) return `could not read the Godot version from "${version}"`;
-  const folder = join(process.env.APPDATA ?? '', 'Godot', 'export_templates', parts.slice(0, status + 1).join('.'));
-  const missing = ['windows_release_x86_64.exe', 'windows_debug_x86_64.exe'].filter(file => !existsSync(join(folder, file)));
-  return missing.length === 0 ? '' : `Godot export templates are not installed in ${folder}; install them from Editor > Manage Export Templates`;
+  const { error, text } = godotVersion();
+  const templateName = godotTemplateName(text);
+  if (error || !templateName) return `could not read the Godot version (${error || text}); run "node tools/setup.mjs"`;
+  const folder = exportTemplatesFolder(templateName);
+  return missingWindowsTemplates(folder).length === 0 ? '' : `Godot export templates are not installed in ${folder}; install them from Editor > Manage Export Templates`;
 }
 
 function npm(script) {
@@ -106,9 +101,19 @@ async function webTypes() {
   return { failure: `${first.trim()} (${log})` };
 }
 
+async function toolsTests() {
+  // Node expands the pattern itself, so no shell is needed on any platform.
+  const result = await run(process.execPath, ['--test', 'tools/tests/*.test.mjs'], { timeout: WEB_TIMEOUT_MSEC });
+  return nodeTestResult(result, writeLog('tools-tests', result.output));
+}
+
 async function webTests() {
   const result = await npm('test');
-  const log = writeLog('web-tests', result.output);
+  return nodeTestResult(result, writeLog('web-tests', result.output));
+}
+
+/** Summarizes the output of the node:test runner. */
+function nodeTestResult(result, log) {
   const count = label => Number(result.output.match(new RegExp(`^ℹ ${label} (\\d+)`, 'm'))?.[1] ?? NaN);
   const total = count('tests');
   const failed = count('fail');
@@ -168,13 +173,20 @@ async function main() {
   }
   if (godotTests.length > 0) summary.push(`Godot ${godotPassed}/${godotTests.length}`);
 
+  const toolChecks = [['tools-tests', toolsTests, 'tools tests']].filter(([name]) => selected(name));
+  for (const [name, check, label] of toolChecks) {
+    const { failure, detail } = await check();
+    if (failure) failures.push(`FAIL ${name}: ${failure}`);
+    summary.push(`${label} ${failure ? 'FAILED' : detail ?? 'ok'}`);
+  }
+
   const webChecks = [
     ['web-types', webTypes, 'types'],
     ['web-tests', webTests, 'web tests'],
     ['web-bundle', webBundle, 'bundle'],
   ].filter(([name]) => selected(name));
   if (webChecks.length > 0 && !existsSync(join(webDirectory, 'node_modules'))) {
-    failures.push('FAIL web: dependencies are missing; run "npm ci" in web/');
+    failures.push('FAIL web: dependencies are missing; run "node tools/setup.mjs"');
   } else {
     for (const [name, check, label] of webChecks) {
       const { failure, detail } = await check();
@@ -183,7 +195,7 @@ async function main() {
     }
   }
 
-  if (godotTests.length + webChecks.length === 0) {
+  if (godotTests.length + toolChecks.length + webChecks.length === 0) {
     process.stderr.write(`No check matches ${filters.join(', ')}\n`);
     return 2;
   }
