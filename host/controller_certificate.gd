@@ -74,12 +74,15 @@ static func inspect(pem: String, key: CryptoKey) -> String:
 	var after := _time(der, finish)
 	var now := Time.get_unix_time_from_system()
 	if before < 0.0 or after < 0.0 or now < before or now >= after:
-		return "Certificate is expired, not yet valid, or has unsupported validity; regenerate it and check the host clock"
+		return (
+			"Certificate is expired, not yet valid, or has unsupported validity; "
+			+ "regenerate it and check the host clock"
+		)
 	var public_info: Dictionary = fields[5 + version_offset]
 	var public_key := CryptoKey.new()
-	var public_pem := "-----BEGIN PUBLIC KEY-----\n%s\n-----END PUBLIC KEY-----\n" % Marshalls.raw_to_base64(
-		der.slice(public_info.start, public_info.end)
-	)
+	var public_der := der.slice(public_info.start, public_info.end)
+	var public_base64 := Marshalls.raw_to_base64(public_der)
+	var public_pem := "-----BEGIN PUBLIC KEY-----\n%s\n-----END PUBLIC KEY-----\n" % public_base64
 	if public_key.load_from_string(public_pem, true) != OK:
 		return "Could not read certificate public key"
 	var crypto := Crypto.new()

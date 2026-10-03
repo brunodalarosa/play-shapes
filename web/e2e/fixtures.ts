@@ -95,11 +95,9 @@ export class Host {
 
       const timer = setTimeout(() => {
         this.waiters = this.waiters.filter((other) => other !== waiter);
-        reject(
-          new Error(
-            `host never printed "E2E ${pattern.source}" #${occurrence}; it printed:\n${this.events.join("\n")}`,
-          ),
-        );
+        const printed = this.events.join("\n");
+        const missing = `"E2E ${pattern.source}" #${occurrence}`;
+        reject(new Error(`host never printed ${missing}; it printed:\n${printed}`));
       }, timeout);
     });
   }
@@ -123,7 +121,10 @@ export class Host {
     expect(errors, `host printed ${errors[0] ?? "errors"}`).toEqual([]);
   }
 
-  /** A host that stops by itself can print no more events, so nothing should keep waiting for one. */
+  /**
+   * A host that stops by itself can print no more events, so nothing should keep waiting
+   * for one.
+   */
   private exited(code: number | null): void {
     const reason = this.errors()[0] ?? "no error line";
     this.exit = `host exited with code ${code}: ${reason}`;
@@ -272,7 +273,8 @@ export const test = base.extend<Fixtures>({
       return phone;
     });
 
-    // After a failure a page can be stuck mid-load, and asking it anything would wait out the test timeout.
+    // After a failure a page can be stuck mid-load, and asking it anything would wait out the test
+    // timeout.
     const passedSoFar = testInfo.errors.length === 0;
     for (const phone of phones) {
       // The phone's own development error panel, such as a host protocol rejection.

@@ -36,19 +36,22 @@ test("two phones join, play a Bubbles round and return to the lobby", async ({
     await host.event(/^phase active$/, { timeout: 60_000 });
     for (const phone of phones) await expect(phone.page.locator("#bubbles-card")).toBeVisible();
 
-    let results = false;
-    host.event(/^phase results$/, { timeout: 5 * 60_000 }).then(
+    // The host announces the end two seconds early. A swipe that arrives after the round
+    // has ended is rejected, and the phone reports that rejection as an error.
+    let ending = false;
+    host.event(/^round ending$/, { timeout: 5 * 60_000 }).then(
       () => {
-        results = true;
+        ending = true;
       },
       () => {},
     );
-    for (let swipe = 0; !results; swipe += 1) {
+    for (let swipe = 0; !ending; swipe += 1) {
       const [dx, dy] = SWIPES[swipe % SWIPES.length];
       await Promise.all(phones.map((phone) => phone.swipe(dx, dy)));
       if (swipe === 2) for (const phone of phones) await phone.shot("bubbles");
       await phones[0].page.waitForTimeout(600);
     }
+    await host.event(/^phase results$/, { timeout: 30_000 });
 
     // The phones show results only after the host's results snapshot reaches them.
     await phones[0].page.waitForTimeout(1_000);

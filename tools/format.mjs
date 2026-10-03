@@ -6,22 +6,9 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { root, webDirectory } from "./environment.mjs";
 import { formatterPath } from "./gdscript_formatter.mjs";
+import { LINE_LENGTH, gdscriptFiles, webSourceFiles } from "./sources.mjs";
 
-const LINE_LENGTH = 100;
 const GDSCRIPT_PASSES = 5;
-
-// Relative to web/, where Prettier is installed. The .js files in web/public
-// are compiled from web/src, so only its hand-written files are listed.
-const PRETTIER_FILES = [
-  "src/**/*.ts",
-  "e2e/**/*.ts",
-  "*.ts",
-  "tests/**/*.mjs",
-  "scripts/**/*.mjs",
-  "public/index.html",
-  "public/style.css",
-  "../tools/**/*.mjs",
-];
 
 const USAGE = `Usage: node tools/format.mjs [--check]
 
@@ -32,22 +19,10 @@ Prettier. Lines wrap at ${LINE_LENGTH} characters.
   --check   Change nothing; list the files that are not formatted and fail.
 `;
 
-/** Lists the tracked and new GDScript files, leaving out vendored addons and ignored files. */
-function gdscriptFiles() {
-  const listed = spawnSync(
-    "git",
-    ["ls-files", "--cached", "--others", "--exclude-standard", "--", "*.gd"],
-    { cwd: root, encoding: "utf8" },
-  );
-  if (listed.status !== 0) throw new Error(`could not list files with git: ${listed.stderr}`);
-
-  return listed.stdout
-    .split("\n")
-    .filter((file) => file && !file.startsWith("addons/"))
-    .filter((file) => existsSync(join(root, file)));
-}
-
-/** Runs the GDScript formatter once over files. Returns the unformatted files (check only), or an error. */
+/**
+ * Runs the GDScript formatter once over files. Returns the unformatted files (check
+ * only), or an error.
+ */
 function runGdscriptFormatter(formatter, files, check) {
   // The structure check makes the formatter refuse a file rather than change what its code means.
   const args = ["--max-line-length", String(LINE_LENGTH), "--verify-structure", "--verbose"];
@@ -90,8 +65,9 @@ function gdscript(check) {
     if (remaining.error || remaining.unformatted.length === 0) return remaining;
     files = remaining.unformatted;
   }
+  const unsettled = files.join(", ");
   return {
-    error: `the GDScript formatter did not settle after ${GDSCRIPT_PASSES} passes on: ${files.join(", ")}`,
+    error: `the GDScript formatter did not settle after ${GDSCRIPT_PASSES} passes on: ${unsettled}`,
   };
 }
 
@@ -101,14 +77,16 @@ function prettier(check) {
     return { error: 'Prettier is not installed; run "node tools/setup.mjs"' };
   }
 
-  // npx is a .cmd shim on Windows, which Node only starts through a shell.
-  const files = PRETTIER_FILES.map((file) => `"${file}"`).join(" ");
+  // Prettier runs in web/, where it is installed, so the files are named from there.
+  const files = webSourceFiles().map((file) =>
+    file.startsWith("web/") ? file.slice("web/".length) : `../${file}`,
+  );
   // --list-different prints one unformatted file per line and nothing else.
-  const mode = check ? "--list-different" : "--write --log-level warn";
-  const result = spawnSync(`npx prettier ${mode} --ignore-path ../.prettierignore ${files}`, {
+  const mode = check ? ["--list-different"] : ["--write", "--log-level", "warn"];
+  const prettierProgram = join(webDirectory, "node_modules", "prettier", "bin", "prettier.cjs");
+  const result = spawnSync(process.execPath, [prettierProgram, ...mode, ...files], {
     cwd: webDirectory,
     encoding: "utf8",
-    shell: true,
     env: { ...process.env, NO_COLOR: "1" },
   });
   const errors = result.stderr.trim();

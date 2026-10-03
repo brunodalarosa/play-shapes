@@ -150,8 +150,10 @@ func _process(delta: float) -> void:
 	_mid.scale = Vector2.ONE * 1.032
 	_foreground.scale = Vector2.ONE * 1.018
 	var drift := controller.tuning.parallax_strength
-	_far.position = Vector2(sin(_ambient_seconds * 0.18) * 4.0, cos(_ambient_seconds * 0.13) * 3.0) * drift
-	_mid.position = Vector2(sin(_ambient_seconds * 0.32) * 9.0, cos(_ambient_seconds * 0.24) * 5.0) * drift
+	var far_sway := Vector2(sin(_ambient_seconds * 0.18) * 4.0, cos(_ambient_seconds * 0.13) * 3.0)
+	var mid_sway := Vector2(sin(_ambient_seconds * 0.32) * 9.0, cos(_ambient_seconds * 0.24) * 5.0)
+	_far.position = far_sway * drift
+	_mid.position = mid_sway * drift
 	_foreground.position = Vector2(sin(_ambient_seconds * 0.43) * 5.0, 0.0) * drift
 	if not _started:
 		return

@@ -9,7 +9,8 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	var world := (load("res://scenes/lobby_playground_world.tscn") as PackedScene).instantiate() as LobbyPlaygroundWorld
+	var world_scene := load("res://scenes/lobby_playground_world.tscn") as PackedScene
+	var world := world_scene.instantiate() as LobbyPlaygroundWorld
 	root.add_child(world)
 	var players: Array[Dictionary] = [
 		{
@@ -46,7 +47,8 @@ func _run() -> void:
 	_check(
 		result.accepted and result.dropped and first.motor.axes.is_equal_approx(Vector2(0.1, -0.8))
 		and first.motor.stance == "crouch" and second.motor.axes == Vector2.ZERO,
-		"Release applies latest axes atomically only to the registered identity, ignoring forged player_id",
+		"Release applies latest axes atomically only to the registered identity, "
+		+ "ignoring forged player_id",
 	)
 	_check(
 		world.handle_input(players[0], release, Time.get_ticks_msec()).code == "stale_sequence",

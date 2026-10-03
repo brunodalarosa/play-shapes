@@ -158,7 +158,8 @@ func _test_gestures_and_sequences() -> void:
 		not controller.submit_trace("unknown", 2, swipe, 2).accepted,
 		"Unknown host player ID is rejected",
 	)
-	_check(not controller.submit_trace("p1", 2, [[0.0, 0.0], [NAN, 0.0]], 3).accepted, "Malformed trace is rejected")
+	var malformed: Dictionary = controller.submit_trace("p1", 2, [[0.0, 0.0], [NAN, 0.0]], 3)
+	_check(not malformed.accepted, "Malformed trace is rejected")
 	_check(
 		controller.submit_trace("p1", 2, swipe, 4).accepted,
 		"Malformed trace does not consume sequence",
@@ -186,8 +187,10 @@ func _test_gestures_and_sequences() -> void:
 
 func _test_participants_and_random() -> void:
 	var controller := _controller()
-	_check(not controller.start_round([_players()[0]], 0).accepted, "Normal round rejects one player")
-	_check(not controller.start_round([_players()[0], _players()[0]], 0).accepted, "Duplicate host IDs are rejected")
+	var one_player: Dictionary = controller.start_round([_players()[0]], 0)
+	_check(not one_player.accepted, "Normal round rejects one player")
+	var duplicates: Dictionary = controller.start_round([_players()[0], _players()[0]], 0)
+	_check(not duplicates.accepted, "Duplicate host IDs are rejected")
 	controller.tuning.max_radius = 32.0
 	controller.tuning.starting_radius = 100.0
 	_check(
@@ -196,7 +199,8 @@ func _test_participants_and_random() -> void:
 	)
 	controller.tuning.max_radius = 110.0
 	controller.tuning.starting_radius = 48.0
-	_check(controller.start_round([_players()[0]], 0, true).accepted, "Explicit debug round accepts one player")
+	var debug_round: Dictionary = controller.start_round([_players()[0]], 0, true)
+	_check(debug_round.accepted, "Explicit debug round accepts one player")
 	_check(
 		controller.inject_random_values([0.25, 0.75]),
 		"Finite injected random values are accepted",

@@ -75,7 +75,11 @@ func handle_input(player: Dictionary, message: Dictionary, now_msec: int) -> Dic
 	var kind: Variant = message.get("type", "")
 	if kind not in ["lobby_move", "lobby_jump_release", "lobby_fall_release"]:
 		return _rejected("unsupported_message")
-	var action := "jump" if kind == "lobby_jump_release" else "fall" if kind == "lobby_fall_release" else ""
+	var action := ""
+	if kind == "lobby_jump_release":
+		action = "jump"
+	elif kind == "lobby_fall_release":
+		action = "fall"
 	var snapshot := PlatformInput.validate(message, action)
 	if not snapshot.accepted:
 		return _rejected(snapshot.code)

@@ -49,10 +49,8 @@ function zipOf(files, { deflate = true, comment = "" } = {}) {
 test("names the release archive for each supported platform", () => {
   const windows = formatterBuild("win32", "x64");
   assert.equal(windows.file, `gdscript-formatter-${FORMATTER_VERSION}-windows-x86_64.exe`);
-  assert.equal(
-    windows.url,
-    `https://github.com/GDQuest/GDScript-formatter/releases/download/${FORMATTER_VERSION}/${windows.file}.zip`,
-  );
+  const releases = "https://github.com/GDQuest/GDScript-formatter/releases/download";
+  assert.equal(windows.url, `${releases}/${FORMATTER_VERSION}/${windows.file}.zip`);
   assert.match(windows.sha256, /^[0-9a-f]{64}$/);
 
   assert.equal(

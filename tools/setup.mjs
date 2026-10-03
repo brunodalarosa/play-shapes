@@ -97,18 +97,14 @@ function checkMkcert() {
   const local = join(root, "local", "tools", `mkcert${process.platform === "win32" ? ".exe" : ""}`);
   const command = existsSync(local) ? local : "mkcert";
   const ok = !probe(command, ["-version"]).error;
-  return {
-    ok,
-    text: `mkcert, for local HTTPS: ${ok ? command : 'not found; "node tools/local_https.mjs download" fetches it'}`,
-  };
+  const found = ok ? command : 'not found; "node tools/local_https.mjs download" fetches it';
+  return { ok, text: `mkcert, for local HTTPS: ${found}` };
 }
 
 function checkGh() {
   const ok = !probe("gh").error;
-  return {
-    ok,
-    text: `GitHub CLI (gh), for pull requests from the terminal: ${ok ? "found" : "not found; https://cli.github.com"}`,
-  };
+  const found = ok ? "found" : "not found; https://cli.github.com";
+  return { ok, text: `GitHub CLI (gh), for pull requests from the terminal: ${found}` };
 }
 
 function checkExportTemplates(godot) {
@@ -151,7 +147,8 @@ async function main() {
     print(ok ? "ok" : "-", text);
   print(
     "-",
-    "Python 3 with Pillow, GIMP 3, Blender, for regenerating art: not checked; see art/bubbles/README.md and art/squircle/README.md",
+    "Python 3 with Pillow, GIMP 3, Blender, for regenerating art: not checked; " +
+      "see art/bubbles/README.md and art/squircle/README.md",
   );
 
   if (required.some(({ ok }) => !ok)) {

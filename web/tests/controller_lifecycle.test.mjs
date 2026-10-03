@@ -147,11 +147,10 @@ async function withController(
     const stub =
       "data:text/javascript," +
       encodeURIComponent("export class LobbyControls { activate(){} deactivate(){} }");
-    source = source.replace(
-      /from "(\.\/[^\"]+)"/g,
-      (match, path) =>
-        `from "${path === "./lobby_controls.js" ? stub : new URL("../public/" + path.slice(2), import.meta.url).href}"`,
-    );
+    source = source.replace(/from "(\.\/[^"]+)"/g, (match, path) => {
+      const bundled = new URL("../public/" + path.slice(2), import.meta.url).href;
+      return `from "${path === "./lobby_controls.js" ? stub : bundled}"`;
+    });
     await import(
       "data:text/javascript;base64," +
         Buffer.from(source + `\n// fixture ${++run}`).toString("base64")
@@ -178,8 +177,10 @@ async function withController(
     });
   } finally {
     window.dispatchEvent(new Event("pagehide"));
-    for (const [key, descriptor] of saved)
-      descriptor ? Object.defineProperty(globalThis, key, descriptor) : delete globalThis[key];
+    for (const [key, descriptor] of saved) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete globalThis[key];
+    }
   }
 }
 
@@ -383,7 +384,8 @@ test("actual Bubbles handlers send once immediately, cancel on lifecycle, and ne
         assert.equal(sent.stage, "start");
         timing.push(sent.sentAt - start);
         pad.dispatchEvent(pointer("pointerup", id, 300));
-        pad.dispatchEvent(pointer("pointerup", id, 300)); // A duplicate release produces no second trace.
+        // A duplicate release produces no second trace.
+        pad.dispatchEvent(pointer("pointerup", id, 300));
       }
       assert.equal(messages.filter((m) => m.type === "bubbles_trace").length, 100);
       for (const [target, name] of [
@@ -404,8 +406,12 @@ test("actual Bubbles handlers send once immediately, cancel on lifecycle, and ne
       }
       assert.equal(fullscreen(), 0);
       timing.sort((a, b) => a - b);
+      const [median, p95, max] = [timing[50], timing[95], timing.at(-1)].map((msec) =>
+        msec.toFixed(3),
+      );
       t.diagnostic(
-        `Synthetic pointerdown-to-send, fake transport, n=100: median=${timing[50].toFixed(3)}ms p95=${timing[95].toFixed(3)}ms max=${timing.at(-1).toFixed(3)}ms. Physical responsiveness unmeasured.`,
+        "Synthetic pointerdown-to-send, fake transport, n=100: " +
+          `median=${median}ms p95=${p95}ms max=${max}ms. Physical responsiveness unmeasured.`,
       );
     },
   );

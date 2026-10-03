@@ -94,9 +94,30 @@ export class MotionLabController {
             diagnostics.state === "live" &&
             send({ type: "motion_sample", sequence: ++this.sequence, sample }))
             this.sent++;
-        this.readings.textContent = `${JSON.stringify(diagnostics, null, 2)}\nSent: ${(this.sent / Math.max((performance.now() - this.started) / 1000, 0.001)).toFixed(1)} Hz\n${formatSample(sample)}`;
+        const elapsedSeconds = Math.max((performance.now() - this.started) / 1000, 0.001);
+        this.readings.textContent = [
+            JSON.stringify(diagnostics, null, 2),
+            `Sent: ${(this.sent / elapsedSeconds).toFixed(1)} Hz`,
+            formatSample(sample),
+        ].join("\n");
     }
 }
 function formatSample(sample) {
-    return `Orientation [alpha, beta, gamma] degrees\n${JSON.stringify(sample.orientation)} (${sample.absolute ? "absolute" : "relative"})\nRotation [alpha, beta, gamma] degrees/s\n${JSON.stringify(sample.rotation_rate)}\nAcceleration [x,y,z] m/s²\n${JSON.stringify(sample.acceleration)}\nIncluding gravity [x,y,z] m/s²\n${JSON.stringify(sample.acceleration_gravity)}\nEvent interval: ${sample.interval_msec ?? "unavailable"} ms\nMotion: ${sample.motion_hz.toFixed(1)} Hz, age ${sample.motion_age_msec ?? "unavailable"} ms\nOrientation: ${sample.orientation_hz.toFixed(1)} Hz, age ${sample.orientation_age_msec ?? "unavailable"} ms\nScreen angle: ${sample.screen_angle}°\nnull = unavailable`;
+    const motionAge = sample.motion_age_msec ?? "unavailable";
+    const orientationAge = sample.orientation_age_msec ?? "unavailable";
+    return [
+        "Orientation [alpha, beta, gamma] degrees",
+        `${JSON.stringify(sample.orientation)} (${sample.absolute ? "absolute" : "relative"})`,
+        "Rotation [alpha, beta, gamma] degrees/s",
+        JSON.stringify(sample.rotation_rate),
+        "Acceleration [x,y,z] m/s²",
+        JSON.stringify(sample.acceleration),
+        "Including gravity [x,y,z] m/s²",
+        JSON.stringify(sample.acceleration_gravity),
+        `Event interval: ${sample.interval_msec ?? "unavailable"} ms`,
+        `Motion: ${sample.motion_hz.toFixed(1)} Hz, age ${motionAge} ms`,
+        `Orientation: ${sample.orientation_hz.toFixed(1)} Hz, age ${orientationAge} ms`,
+        `Screen angle: ${sample.screen_angle}°`,
+        "null = unavailable",
+    ].join("\n");
 }

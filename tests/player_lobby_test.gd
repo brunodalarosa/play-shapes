@@ -1,6 +1,8 @@
 extends SceneTree
 ## The registry remains authoritative while the Playground lobby shows no roster.
 
+const LOBBY_SCENE := "res://scenes/lobby.tscn"
+
 
 func _initialize() -> void:
 	_run.call_deferred()
@@ -8,7 +10,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	var host := root.get_node("SessionHost")
-	var lobby: Control = load("res://scenes/lobby.tscn").instantiate()
+	var lobby: Control = load(LOBBY_SCENE).instantiate()
 	root.add_child(lobby)
 	await process_frame
 	var start := lobby.get_node("%StartMinigame") as Button
@@ -68,7 +70,7 @@ func _run() -> void:
 		"Leaving lobby disables joins but preserves player data",
 	):
 		return
-	var replacement: Control = load("res://scenes/lobby.tscn").instantiate()
+	var replacement: Control = load(LOBBY_SCENE).instantiate()
 	root.add_child(replacement)
 	await process_frame
 	if not _check(

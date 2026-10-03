@@ -17,7 +17,10 @@ export const MINIMUM_NODE = [22, 0, 0];
 // export unless the debug template is installed as well.
 export const WINDOWS_TEMPLATE_FILES = ["windows_release_x86_64.exe", "windows_debug_x86_64.exe"];
 
-/** Returns the first dotted number in text as an array, such as [2, 47, 1] for "git version 2.47.1.windows.1". */
+/**
+ * Returns the first dotted number in text as an array, such as [2, 47, 1] for
+ * "git version 2.47.1.windows.1".
+ */
 export function parseVersion(text) {
   const match = /\d+(?:\.\d+)+/.exec(text ?? "");
   return match ? match[0].split(".").map(Number) : null;
@@ -110,7 +113,10 @@ export function godotVersion() {
   };
 }
 
-/** True when web/node_modules is absent or older than the manifest or lockfile it was installed from. */
+/**
+ * True when web/node_modules is absent or older than the manifest or lockfile it was
+ * installed from.
+ */
 export function npmInstallNeeded(directory = webDirectory) {
   const marker = join(directory, "node_modules", ".package-lock.json");
   if (!existsSync(marker)) return true;

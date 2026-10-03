@@ -7,8 +7,10 @@ export function installGuidance(browser) {
     const ios = /iPhone|iPad|iPod/.test(browser.userAgent) ||
         (browser.platform === "MacIntel" && browser.maxTouchPoints > 1);
     return ios
-        ? "In Safari, tap Share → Add to Home Screen. Keep Open as Web App on if shown, then tap Add. Open the new icon before joining."
-        : "Open your browser menu and choose Install app or Add to Home Screen if offered. Then launch Play Shapes from its icon. Otherwise, continue in your browser.";
+        ? "In Safari, tap Share → Add to Home Screen. " +
+            "Keep Open as Web App on if shown, then tap Add. Open the new icon before joining."
+        : "Open your browser menu and choose Install app or Add to Home Screen if offered. " +
+            "Then launch Play Shapes from its icon. Otherwise, continue in your browser.";
 }
 /** Offered before registration: installation never creates a player in the old tab. */
 export class PwaOnboarding {

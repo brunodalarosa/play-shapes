@@ -31,9 +31,11 @@ func _initialize() -> void:
 		and PlatformInput.classify(Vector2(0, 0.18), "look_up") == "look_up",
 		"Radial hysteresis",
 	)
-	_check(PlatformInput.validate(_snapshot(Vector2(0, 0.18), "look_up")).accepted, "Coalesced radial release")
+	var radial_release := PlatformInput.validate(_snapshot(Vector2(0, 0.18), "look_up"))
+	_check(radial_release.accepted, "Coalesced radial release")
+	var near_boundary := { "horizontal": 0.0, "vertical": 0.160000001, "stance": "look_up" }
 	_check(
-		PlatformInput.validate({ "horizontal": 0.0, "vertical": 0.160000001, "stance": "look_up" }).accepted,
+		PlatformInput.validate(near_boundary).accepted,
 		"JSON precision near radial boundary survives Vector2 narrowing",
 	)
 	for degrees: float in [20.0, 28.0]:
@@ -51,9 +53,11 @@ func _initialize() -> void:
 		Vector2(1, 1),
 		Vector2(0, -1.1),
 	]:
-		_check(not PlatformInput.validate(_snapshot(axes, "move")).accepted, "Reject nonfinite/out-of-disk axes")
+		var rejected_axes := PlatformInput.validate(_snapshot(axes, "move"))
+		_check(not rejected_axes.accepted, "Reject nonfinite/out-of-disk axes")
 	for hint: Variant in ["crouch", "look_up", "neutral", "unknown", 1, { }]:
-		_check(not PlatformInput.validate(_snapshot(Vector2(0.7, 0.7), hint)).accepted, "Reject forged/nonstring stance")
+		var rejected_stance := PlatformInput.validate(_snapshot(Vector2(0.7, 0.7), hint))
+		_check(not rejected_stance.accepted, "Reject forged/nonstring stance")
 	_check(not PlatformInput.validate({ "horizontal": 0 }).accepted, "Require complete snapshot")
 	var fall := _snapshot(Vector2(0, -1), "crouch")
 	fall.action = "fall"

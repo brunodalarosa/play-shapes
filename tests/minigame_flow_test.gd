@@ -76,8 +76,9 @@ func _run() -> void:
 	):
 		return
 	var bubbles_debug: DebugScenario = launcher.scenario_for_id(&"one_player_bubbles")
+	var debug_features := { "one_registered_player": true }
 	if not _check(
-		bubbles_debug != null and bubbles_debug.availability({ "one_registered_player": true }).available,
+		bubbles_debug != null and bubbles_debug.availability(debug_features).available,
 		"F12 offers Bubbles only through its explicit one-player scenario",
 	):
 		return
@@ -233,8 +234,9 @@ func _run() -> void:
 		return
 	var left: Dictionary = host.player_registry.leave_connection(502)
 	await process_frame
+	var second_id := String(second.player.player_id)
 	if not _check(
-		left.accepted and bool(bubble_controller.personal_snapshot(String(second.player.player_id)).left),
+		left.accepted and bool(bubble_controller.personal_snapshot(second_id).left),
 		"Explicit phone leave is observed by the active Bubbles controller",
 	):
 		return

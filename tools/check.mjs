@@ -34,9 +34,9 @@ const IGNORED_SHUTDOWN_ERRORS = [
 
 const USAGE = `Usage: node tools/check.mjs [--full] [--release] [filter ...]
 
-Runs the Godot test scripts, the format check, the tests of these tools, the
-browser type check and tests, verifies that web/public matches a fresh build,
-then plays a round with two emulated phones against the real host.
+Runs the Godot test scripts, the format and lint checks, the tests of these
+tools, the browser type check and tests, verifies that web/public matches a
+fresh build, then plays a round with two emulated phones against the real host.
 
   filter      Run only checks whose name contains one of the filters,
               for example "bubbles", "web" or "e2e".
@@ -122,7 +122,8 @@ function missingExportTemplates() {
   const folder = exportTemplatesFolder(templateName);
   return missingWindowsTemplates(folder).length === 0
     ? ""
-    : `Godot export templates are not installed in ${folder}; install them from Editor > Manage Export Templates`;
+    : `Godot export templates are not installed in ${folder}; ` +
+        "install them from Editor > Manage Export Templates";
 }
 
 function npm(script, { timeout = WEB_TIMEOUT_MSEC, env = process.env } = {}) {
@@ -140,18 +141,20 @@ async function webTypes() {
   return { failure: `${first.trim()} (${log})` };
 }
 
-async function format() {
-  const result = await run(process.execPath, ["tools/format.mjs", "--check"], {
-    timeout: WEB_TIMEOUT_MSEC,
-  });
-  const log = writeLog("format", result.output);
+/** Runs a tool that prints one problem per line and a summary on its last line. */
+async function listing(name, args) {
+  const result = await run(process.execPath, args, { timeout: WEB_TIMEOUT_MSEC });
+  const log = writeLog(name, result.output);
   if (result.code === 0) return { failure: "" };
 
-  // Its last line is either the count of unformatted files or the reason it could not run.
+  // The last line is either the count of problems or the reason the tool could not run.
   const lines = result.output.trim().split(/\r?\n/);
-  const files = lines.slice(0, -1).slice(0, 3).join(", ");
-  return { failure: `${lines.at(-1)}${files ? `: ${files}` : ""} (${log})` };
+  const first = lines.slice(0, -1).slice(0, 3).join("; ");
+  return { failure: `${lines.at(-1)}${first ? `: ${first}` : ""} (${log})` };
 }
+
+const format = () => listing("format", ["tools/format.mjs", "--check"]);
+const lint = () => listing("lint", ["tools/lint.mjs"]);
 
 async function toolsTests() {
   // Node expands the pattern itself, so no shell is needed on any platform.
@@ -261,6 +264,7 @@ async function main() {
 
   const toolChecks = [
     ["format", format, "format"],
+    ["lint", lint, "lint"],
     ["tools-tests", toolsTests, "tools tests"],
   ].filter(([name]) => selected(name));
   for (const [name, check, label] of toolChecks) {

@@ -155,7 +155,9 @@ func _apply_clip() -> void:
 	var clip: Dictionary = _clips[_clip_key]
 	var anchor := Vector2(float(clip.anchor_px[0]), float(clip.anchor_px[1]))
 	for layer: String in ["colorable", "neutral", "blink"]:
-		var sprite: Sprite2D = _colorable if layer == "colorable" else _face if layer == "neutral" else _blink
+		var sprite: Sprite2D = (
+			_colorable if layer == "colorable" else _face if layer == "neutral" else _blink
+		)
 		sprite.texture = _sheet(_clip_key, layer)
 		sprite.position = -anchor * visual_scale
 		sprite.scale = Vector2.ONE * visual_scale

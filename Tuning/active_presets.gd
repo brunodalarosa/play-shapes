@@ -3,12 +3,14 @@ extends Resource
 ## Project-level selector. Assign committed named presets here, save, then relaunch.
 
 @export_group("Minigames")
-## Active Bubbles umbrella preset. Restore Minigames/Bubbles/Default.tres for provisional baseline values.
+## Active Bubbles umbrella preset. Restore Minigames/Bubbles/Default.tres for provisional baseline
+## values.
 @export
 var bubbles: BubblesTuning
 
 @export_group("Shared categories")
-## Active host networking/session preset. Browser-only values intentionally remain in web/src/app.ts.
+## Active host networking/session preset. Browser-only values intentionally remain in
+## web/src/app.ts.
 @export
 var networking: NetworkingTuning
 

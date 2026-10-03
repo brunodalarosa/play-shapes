@@ -136,7 +136,10 @@ func _update_readings() -> void:
 	var state := String(_channel.diagnostics.get("state", "waiting for phone"))
 	if not fresh and age >= 0:
 		state = "STALE"
-	_summary.text = "Player 1: %s · %s · %s\nSample age: %s · Sent: %.1f Hz · Received: %.1f Hz · cap %d Hz" % [
+	_summary.text = (
+		"Player 1: %s · %s · %s\n"
+		+ "Sample age: %s · Sent: %.1f Hz · Received: %.1f Hz · cap %d Hz"
+	) % [
 		_target_name if not target_player_id.is_empty() else "No connected seat 1",
 		connection,
 		state,
@@ -170,7 +173,13 @@ func _update_readings() -> void:
 	_raw.text = diagnostic_lines + "\nRaw values · unavailable ≠ zero\n"
 	if not _channel.latest.is_empty():
 		var sample := _channel.latest
-		_raw.text += "\nOrientation α, β, γ (degrees)\n%s · %s\n\nAngular velocity α, β, γ (degrees/s)\n%s\n\nAcceleration x, y, z (m/s²)\n%s\n\nIncluding gravity x, y, z (m/s²)\n%s\n\nMotion events: %.1f Hz · age %s ms\nOrientation events: %.1f Hz · age %s ms\nEvent interval: %s ms\nScreen angle: %s°" % [
+		_raw.text += (
+			"\nOrientation α, β, γ (degrees)\n%s · %s\n\n"
+			+ "Angular velocity α, β, γ (degrees/s)\n%s\n\n" + "Acceleration x, y, z (m/s²)\n%s\n\n"
+			+ "Including gravity x, y, z (m/s²)\n%s\n\n"
+			+ "Motion events: %.1f Hz · age %s ms\n" + "Orientation events: %.1f Hz · age %s ms\n"
+			+ "Event interval: %s ms\n" + "Screen angle: %s°"
+		) % [
 			_vector_text(sample.orientation),
 			"absolute" if sample.absolute else "relative",
 			_vector_text(sample.rotation_rate),
@@ -183,7 +192,9 @@ func _update_readings() -> void:
 			_value_text(sample.interval_msec),
 			_value_text(sample.screen_angle),
 		]
-	_pose_status.text = "LIVE phone pose" if _has_orientation() else "Pose unavailable / stale — preview held"
+	_pose_status.text = (
+		"LIVE phone pose" if _has_orientation() else "Pose unavailable / stale — preview held"
+	)
 	_recenter_button.disabled = not _has_orientation()
 
 
@@ -275,7 +286,10 @@ func _build_ui() -> void:
 	viewport_container.add_child(_viewport)
 	_build_phone()
 	var pose_hint := Label.new()
-	pose_hint.text = "Orange = phone top · cream = screen\nRelative orientation is not compass heading.\nAcceleration is not position. Raw values remain unsmoothed."
+	pose_hint.text = (
+		"Orange = phone top · cream = screen\n" + "Relative orientation is not compass heading.\n"
+		+ "Acceleration is not position. Raw values remain unsmoothed."
+	)
 	preview_column.add_child(pose_hint)
 	var raw_scroll := ScrollContainer.new()
 	raw_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL

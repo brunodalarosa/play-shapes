@@ -17,6 +17,7 @@ const MOVED_DISTANCE := 40.0
 # Like a person, Start waits until everyone has stopped, and results stay up before Return.
 const AT_REST_SECONDS := 1.0
 const RESULTS_SECONDS := 3.0
+const ROUND_ENDING_MSEC := 2000
 const TIMEOUT_SECONDS := 600.0
 
 var _host: Node
@@ -31,6 +32,7 @@ var _at_rest_for := 0.0
 var _results_for := 0.0
 var _booted := false
 var _started := false
+var _ending_announced := false
 var _returned := false
 
 
@@ -45,12 +47,15 @@ func _start() -> void:
 	_use_round(OS.get_environment("E2E_ROUND"))
 
 	# The networking Resource is preloaded by the host; a copy keeps the change in this process.
-	var http_port := int(OS.get_environment("E2E_HTTP_PORT")) if OS.has_environment("E2E_HTTP_PORT") else 18200
+	var http_port := 18200
+	if OS.has_environment("E2E_HTTP_PORT"):
+		http_port = int(OS.get_environment("E2E_HTTP_PORT"))
 	_host.settings = _host.settings.duplicate()
 	_host.settings.http_port = http_port
 	_host.settings.websocket_port = http_port + 1
 
-	# The game's own boot starts the host and opens the lobby, so whatever boot grows is part of the run.
+	# The game's own boot starts the host and opens the lobby, so whatever boot grows is part of the
+	# run.
 	change_scene_to_file(ProjectSettings.get_setting("application/run/main_scene"))
 
 
@@ -143,6 +148,15 @@ func _watch_bubbles(bubbles: Node, delta: float) -> void:
 		_event("phase %s" % _phase)
 		if _phase == &"results":
 			_capture_later("results")
+
+	# A swipe that reaches the host after the round ends is rejected, and the phone shows that
+	# as an error, so the phones are told to stop a little before the end.
+	if _phase == &"active" and not _ending_announced:
+		var round_msec := roundi(controller.tuning.round_duration_seconds * 1000.0)
+		var ends_msec := controller.active_start_msec() + round_msec
+		if Time.get_ticks_msec() >= ends_msec - ROUND_ENDING_MSEC:
+			_ending_announced = true
+			_event("round ending")
 
 	if _phase == &"results":
 		_results_for += delta

@@ -10,7 +10,8 @@ func _initialize() -> void:
 
 func _run() -> void:
 	var tuning := BubblesTuning.new()
-	_check(Classifier.classify([[0.2, 0.2], [0.3, 0.2]], tuning).action == &"swipe", "Short swipe is recognized")
+	var short_swipe := Classifier.classify([[0.2, 0.2], [0.3, 0.2]], tuning)
+	_check(short_swipe.action == &"swipe", "Short swipe is recognized")
 	_check(
 		Classifier.classify([
 			[0.2, 0.2],
@@ -27,7 +28,8 @@ func _run() -> void:
 		long_swipe.action == &"swipe" and long_swipe.strength == tuning.swipe_impulse,
 		"Long swipe has fixed strength",
 	)
-	_check(Classifier.classify([[0.2, 0.2], [0.21, 0.2]], tuning).action == &"none", "Tiny trace has no action")
+	var tiny_trace := Classifier.classify([[0.2, 0.2], [0.21, 0.2]], tuning)
+	_check(tiny_trace.action == &"none", "Tiny trace has no action")
 	var clockwise := _circle(2.0, false)
 	var counterclockwise := _circle(2.0, true)
 	_check(
@@ -43,12 +45,16 @@ func _run() -> void:
 		partial.action == &"none" and partial.reason == &"incomplete_circle",
 		"Partial circle cannot become a swipe",
 	)
-	_check(Classifier.classify(_circle(0.5, false), tuning).action == &"none", "Half-circle remains discarded")
+	var half_circle := Classifier.classify(_circle(0.5, false), tuning)
+	_check(half_circle.action == &"none", "Half-circle remains discarded")
 	_check(not Classifier.classify([], tuning).accepted, "Empty trace is rejected")
 	_check(not Classifier.classify(_many_points(), tuning).accepted, "Oversized trace is rejected")
-	_check(not Classifier.classify([[0.1, 0.2], [INF, 0.2]], tuning).accepted, "Non-finite point is rejected")
-	_check(not Classifier.classify([[0.1, 0.2], [1.1, 0.2]], tuning).accepted, "Out-of-range point is rejected")
-	_check(not Classifier.classify([[0.1, 0.2], ["0.3", 0.2]], tuning).accepted, "String coordinate is rejected")
+	var non_finite := Classifier.classify([[0.1, 0.2], [INF, 0.2]], tuning)
+	_check(not non_finite.accepted, "Non-finite point is rejected")
+	var out_of_range := Classifier.classify([[0.1, 0.2], [1.1, 0.2]], tuning)
+	_check(not out_of_range.accepted, "Out-of-range point is rejected")
+	var string_coordinate := Classifier.classify([[0.1, 0.2], ["0.3", 0.2]], tuning)
+	_check(not string_coordinate.accepted, "String coordinate is rejected")
 	print("Bubbles classifier checks: %d failures" % _failures)
 	quit(0 if _failures == 0 else 1)
 

@@ -174,7 +174,11 @@ func _refresh_actions() -> void:
 	for scenario: DebugScenario in _scenarios:
 		var state := scenario.availability(_features)
 		var button := Button.new()
-		button.text = scenario.display_name if bool(state.available) else "%s — Unavailable" % scenario.display_name
+		button.text = (
+			scenario.display_name
+			if bool(state.available)
+			else "%s — Unavailable" % scenario.display_name
+		)
 		button.disabled = not bool(state.available)
 		button.tooltip_text = str(state.reason)
 		_style_action(button, Color("1d4367"))

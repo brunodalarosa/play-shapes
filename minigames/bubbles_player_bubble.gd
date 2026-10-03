@@ -256,7 +256,9 @@ func _refresh_visual(host_time_msec: int) -> void:
 	)
 	_character.set_playback_time_msec(host_time_msec)
 	_animate_character(host_time_msec, burst)
-	var swipe_age := float(host_time_msec - _swipe_at_msec) / 1000.0 if _swipe_at_msec >= 0 else 999.0
+	var swipe_age := (
+		float(host_time_msec - _swipe_at_msec) / 1000.0 if _swipe_at_msec >= 0 else 999.0
+	)
 	_swipe_pull = _swipe_direction * tuning.swipe_pull_strength * sin(
 		PI * clampf(swipe_age / tuning.swipe_reaction_seconds, 0.0, 1.0)
 	)
@@ -264,7 +266,8 @@ func _refresh_visual(host_time_msec: int) -> void:
 	_charge_pull = Vector2.ZERO
 	if _charge_progress > 0.0:
 		var seconds := float(host_time_msec) / 1000.0
-		_charge_pull = Vector2(sin(seconds * 13.0), cos(seconds * 17.0)) * tuning.charge_wobble_strength * _charge_progress
+		var wobble := Vector2(sin(seconds * 13.0), cos(seconds * 17.0))
+		_charge_pull = wobble * tuning.charge_wobble_strength * _charge_progress
 	var pull := _swipe_pull + _drag_pull + _charge_pull
 	var surface_angle := (
 		float(host_time_msec - _spin_started_msec) / 1000.0
@@ -312,10 +315,14 @@ func _animate_character(host_time_msec: int, burst: float) -> void:
 	if not _character.visible:
 		return
 	var seconds := float(host_time_msec) / 1000.0
-	var bob := sin(seconds * 2.2 + float(abs(player_id.hash()) % 10)) * tuning.character_float_pixels
-	var swipe_age := float(host_time_msec - _swipe_at_msec) / 1000.0 if _swipe_at_msec >= 0 else 999.0
+	var bob_phase := seconds * 2.2 + float(abs(player_id.hash()) % 10)
+	var bob := sin(bob_phase) * tuning.character_float_pixels
+	var swipe_age := (
+		float(host_time_msec - _swipe_at_msec) / 1000.0 if _swipe_at_msec >= 0 else 999.0
+	)
 	var push := sin(PI * clampf(swipe_age / tuning.swipe_reaction_seconds, 0.0, 1.0))
-	_character.position = Vector2(0.0, 40.0 + bob) + _swipe_direction * push * tuning.swipe_character_push_pixels
+	var push_offset := _swipe_direction * push * tuning.swipe_character_push_pixels
+	_character.position = Vector2(0.0, 40.0 + bob) + push_offset
 	_character.rotation = sin(seconds * 1.7) * 0.05
 	if host_time_msec >= _blink_next_msec:
 		_blink_until_msec = host_time_msec + 140

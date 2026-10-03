@@ -23,7 +23,13 @@ const show = (value) => {
   const describe = `${axes.x.toFixed(2)}, ${axes.y.toFixed(2)}; ${stance}`;
   if (stance !== "neutral") lastActive = describe;
   if (action) lastRelease = `${action}; ${describe}`;
-  record.textContent = `Adapter: ${contextName}\nMessages: ${count}\nLatest: ${describe}\nLast active: ${lastActive}\nLast release: ${lastRelease}`;
+  record.textContent = [
+    `Adapter: ${contextName}`,
+    `Messages: ${count}`,
+    `Latest: ${describe}`,
+    `Last active: ${lastActive}`,
+    `Last release: ${lastRelease}`,
+  ].join("\n");
 };
 const context = () =>
   contextName === "preview" ? createPreviewContext(show) : createLobbyContext(show);

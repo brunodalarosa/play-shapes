@@ -3,6 +3,7 @@ extends Node
 ## A bounded, nonblocking HTTP service for a fixed set of bundled assets.
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
+const BUBBLES_ART := "res://assets/runtime/minigames/bubbles_and_jellyfishes"
 const ASSETS: Dictionary = {
 	"/pwa.js": {
 		"path": "res://web/public/pwa.js",
@@ -105,12 +106,12 @@ const ASSETS: Dictionary = {
 		"resource_type": "Texture2D",
 	},
 	"/bubbles-jellyfish.png": {
-		"path": "res://assets/runtime/minigames/bubbles_and_jellyfishes/jellyfish/jellyfish_small.png",
+		"path": BUBBLES_ART + "/jellyfish/jellyfish_small.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
 	"/bubbles-phone-background.png": {
-		"path": "res://assets/runtime/minigames/bubbles_and_jellyfishes/environment/phone_background_portrait.png",
+		"path": BUBBLES_ART + "/environment/phone_background_portrait.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
@@ -250,9 +251,11 @@ func _process(_delta: float) -> void:
 				continue
 			client.sent += write[1]
 			if write[1] > 0:
-				client.created = Time.get_ticks_msec() # Timeout measures stalls, not total transfer time.
+				# Timeout measures stalls, not total transfer time.
+				client.created = Time.get_ticks_msec()
 			if client.sent == client.output.size():
-				client.finished = Time.get_ticks_msec() # Let TCP flush before closing a larger asset response.
+				# Let TCP flush before closing a larger asset response.
+				client.finished = Time.get_ticks_msec()
 
 
 func _drop(index: int) -> void:
@@ -279,11 +282,11 @@ func _route(request: String) -> PackedByteArray:
 
 
 func _response(status: String, mime: String, body: PackedByteArray) -> PackedByteArray:
-	var headers := "HTTP/1.1 %s\r\nContent-Type: %s\r\nContent-Length: %d\r\nConnection: close\r\nCache-Control: no-store\r\nX-Content-Type-Options: nosniff\r\n\r\n" % [
-		status,
-		mime,
-		body.size(),
-	]
+	var headers := (
+		"HTTP/1.1 %s\r\n" + "Content-Type: %s\r\n" + "Content-Length: %d\r\n"
+		+ "Connection: close\r\n" + "Cache-Control: no-store\r\n"
+		+ "X-Content-Type-Options: nosniff\r\n" + "\r\n"
+	) % [status, mime, body.size()]
 	var result := headers.to_utf8_buffer()
 	result.append_array(body)
 	return result

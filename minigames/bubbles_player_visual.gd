@@ -134,7 +134,8 @@ func _draw() -> void:
 	)
 	for index: int in captured_visual_count:
 		var turn := float(index) * 2.39996323
-		var distance := sqrt((float(index) + 0.5) / float(maxi(captured_visual_count, 1))) * radius * 0.67
+		var fill := (float(index) + 0.5) / float(maxi(captured_visual_count, 1))
+		var distance := sqrt(fill) * radius * 0.67
 		var marker_center := Vector2(cos(turn), sin(turn)) * distance
 		var width := clampf(radius * 0.25, 22.0, 32.0)
 		var size := Vector2(
@@ -154,9 +155,9 @@ func _draw() -> void:
 func _bubble_point(theta: float, center: Vector2, along: Vector2, stretch: float) -> Vector2:
 	var forward := cos(theta)
 	var longitudinal := 1.0 + stretch * (1.25 * maxf(forward, 0.0) - 0.25 * maxf(-forward, 0.0))
-	return center + along * forward * radius * longitudinal + along.orthogonal() * sin(theta) * radius * (
-		1.0 - stretch * 0.3
-	)
+	var lengthwise := along * forward * radius * longitudinal
+	var sideways := along.orthogonal() * sin(theta) * radius * (1.0 - stretch * 0.3)
+	return center + lengthwise + sideways
 
 
 func _draw_rim(points: PackedVector2Array, opacity: float) -> void:

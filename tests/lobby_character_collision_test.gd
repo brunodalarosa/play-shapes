@@ -33,10 +33,9 @@ func _run() -> void:
 	for unused: int in 35:
 		mover.set_horizontal(1.0, Time.get_ticks_msec())
 		await physics_frame
-	_check(
-		mover.position.x > target.position.x - 95.0 and mover.position.x <= target.position.x - 44.0,
-		"A moving player reaches but cannot pass through another player",
-	)
+	var reached := mover.position.x > target.position.x - 95.0
+	var blocked := mover.position.x <= target.position.x - 44.0
+	_check(reached and blocked, "A moving player reaches but cannot pass through another player")
 	_check(
 		target.position.x == target.spawn_point.x,
 		"A disconnected player remains stationary during a bump",
