@@ -109,7 +109,9 @@ func start_round(participants: Array, host_time_msec: int, allow_one_player_debu
 		bubble.position = Vector2(-160.0 if from_left else WORLD_SIZE.x + 160.0, destination.y)
 		if _entrance_tween == null:
 			_entrance_tween = create_tween().set_parallel(true)
-		_entrance_tween.tween_property(bubble, "position", destination, maxf(0.5, controller.tuning.instructions_seconds)).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+		var duration := maxf(0.5, controller.tuning.instructions_seconds)
+		var slide := _entrance_tween.tween_property(bubble, "position", destination, duration)
+		slide.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	creature_arena.setup(controller, player_arena)
 	_apply_audio_gains()
 	_play_music()
@@ -226,7 +228,8 @@ func _update_timer(now: int) -> void:
 	_last_timer_second = second
 	if second > 0 and second <= controller.tuning.final_timer_emphasis_seconds:
 		var progress := 1.0 - float(second - 1) / float(controller.tuning.final_timer_emphasis_seconds)
-		var strength := 1.0 + (0.08 + progress * 0.18 + (0.16 if second <= 3 else 0.0)) * controller.tuning.timer_pulse_strength
+		var emphasis := 0.08 + progress * 0.18 + (0.16 if second <= 3 else 0.0)
+		var strength := 1.0 + emphasis * controller.tuning.timer_pulse_strength
 		_pulse(_timer, strength)
 		_play_sfx(&"final_beat")
 	else:
@@ -236,7 +239,8 @@ func _update_timer(now: int) -> void:
 func _pulse(label: Label, strength: float) -> void:
 	label.pivot_offset = label.size * 0.5
 	label.scale = Vector2.ONE * strength
-	create_tween().tween_property(label, "scale", Vector2.ONE, 0.36).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	var settle := create_tween().tween_property(label, "scale", Vector2.ONE, 0.36)
+	settle.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 
 func _on_feedback(_player_id: String, kind: StringName, data: Dictionary) -> void:

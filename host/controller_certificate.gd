@@ -32,7 +32,8 @@ static func _time(bytes: PackedByteArray, entry: Dictionary) -> float:
 	return float(Time.get_unix_time_from_datetime_string(stamp))
 
 static func inspect(pem: String, key: CryptoKey) -> String:
-	var encoded := pem.get_slice("-----BEGIN CERTIFICATE-----", 1).get_slice("-----END CERTIFICATE-----", 0).replace("\n", "").replace("\r", "")
+	var armored := pem.get_slice("-----BEGIN CERTIFICATE-----", 1).get_slice("-----END CERTIFICATE-----", 0)
+	var encoded := armored.replace("\n", "").replace("\r", "")
 	var der := Marshalls.base64_to_raw(encoded)
 	var outer := _element(der, 0)
 	if outer.is_empty():

@@ -55,7 +55,9 @@ static func local_path() -> String:
 	if OS.has_environment("PLAY_SHAPES_NETWORK_CONFIG"):
 		var override := OS.get_environment("PLAY_SHAPES_NETWORK_CONFIG")
 		return "" if override == "off" else override
-	var base := ProjectSettings.globalize_path("res://") if OS.has_feature("editor") else OS.get_executable_path().get_base_dir()
+	var base := OS.get_executable_path().get_base_dir()
+	if OS.has_feature("editor"):
+		base = ProjectSettings.globalize_path("res://")
 	return base.path_join("local/network.json")
 
 func validation_error() -> String:
