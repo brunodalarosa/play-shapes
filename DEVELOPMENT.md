@@ -10,6 +10,8 @@ none of them needs the others first.
 | Messages between phone and host, HTTP routes, limits | [docs/protocol.md](docs/protocol.md) |
 | Tests, the check command, evidence labels | [docs/verification.md](docs/verification.md) |
 | What still needs a person or a real phone | [docs/pending-reviews.md](docs/pending-reviews.md) |
+| What is done, what is next, known bugs | [docs/roadmap.md](docs/roadmap.md) |
+| Why things are the way they are | [docs/decisions/](docs/decisions/README.md) |
 | Formatting, linting and the document rules | [docs/formatting-and-linting.md](docs/formatting-and-linting.md) |
 | The phone client's TypeScript and its build | [docs/browser-build.md](docs/browser-build.md) |
 | The phone page: app install, touch, error panel | [docs/phone-client.md](docs/phone-client.md) |
@@ -28,7 +30,7 @@ none of them needs the others first.
 ## Writing these documents
 
 - One topic per document, named after the topic.
-- Say what is true now. Reasons and history go in the pull request that makes the change.
+- Say what is true now. The reason for a choice goes in a [decision record](docs/decisions/README.md). How a change was verified goes in its pull request.
 - Open with one or two sentences that say what the document covers.
 - Keep paragraphs short and use lists for anything enumerated.
 - State each fact in one place and link to it from the others.

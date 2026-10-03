@@ -7,9 +7,9 @@ with the branch name. -->
 
 ## Task
 
-<!-- The task ID and, in one sentence, what a player or contributor gets from
-it. Say which of its acceptance criteria this branch covers if it is not all
-of them. -->
+<!-- In one sentence, what a player or contributor gets from the task. No task
+or ticket number. Say which of its acceptance criteria this branch covers if it
+is not all of them. -->
 
 ## What changed
 
@@ -35,7 +35,8 @@ nothing. -->
 ## Decisions worth knowing
 
 <!-- Choices a reader could not infer from the diff, and why the alternative
-lost. Omit the section if there were none. -->
+lost. A choice that will outlive this change also gets a record under
+docs/decisions/. Omit the section if there were none. -->
 
 ## Left out
 
