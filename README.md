@@ -20,13 +20,18 @@ cloned checkout without Node, an internet connection or a separate web server.
 
 To develop, also install Node.js 22 or newer, which includes npm. Then run
 `node tools/setup.mjs` from the repository root. It checks every required
-tool, fails with install instructions when one is missing or too old, and
-installs the browser client's dependencies in `web/`. It also downloads the
-GDScript formatter into the ignored `local/tools/` folder, and installs the
-Chromium that the end-to-end test drives in Playwright's standard per-user
-folder (about 700 MB); it installs nothing else outside the repository. Godot
-is found as `godot` on PATH, or through `GODOT_BIN` when set to a Godot
+tool and fails with install instructions when one is missing or too old.
+Godot is found as `godot` on PATH, or through `GODOT_BIN` when set to a Godot
 executable.
+
+The setup script also installs three things:
+
+- the browser client's dependencies, in `web/`;
+- the GDScript formatter, in the ignored `local/tools/` folder;
+- the Chromium that the end-to-end test drives, in Playwright's standard
+  per-user folder (about 700 MB).
+
+It installs nothing else outside the repository.
 
 Run `node tools/format.mjs` and `node tools/lint.mjs` before committing. The
 first formats GDScript and the web sources; the second reports mistakes and
@@ -38,7 +43,7 @@ Some tasks need more. The setup script reports these without failing:
 | Tool | Needed for |
 | --- | --- |
 | Godot export templates matching the installed Godot | The standalone Windows build and `node tools/check.mjs --release` |
-| mkcert | Local HTTPS for motion input; `node tools/local_https.mjs download` fetches it, see [docs/local-https-and-motion-testing.md](docs/local-https-and-motion-testing.md) |
+| mkcert | Local HTTPS for motion input; `node tools/local_https.mjs download` fetches it, see [docs/local-https.md](docs/local-https.md) |
 | GitHub CLI (`gh`) | Pull requests from the terminal |
 | Python 3 with Pillow, GIMP 3, Blender | Regenerating art; see [art/bubbles/README.md](art/bubbles/README.md) and [art/squircle/README.md](art/squircle/README.md) |
 
@@ -155,11 +160,12 @@ The generated files in `web/public/` are the files Godot serves to phones.
   layout, orientation, and touch behavior still need broader device coverage.
 - Bubbles still needs its owner-led two-phone and game-feel review. No validation here
   guarantees every phone, browser, Wi-Fi configuration, or accessibility
-  setup. See `DEVELOPMENT.md` for evidence and troubleshooting notes.
+  setup. See [docs/pending-reviews.md](docs/pending-reviews.md) for what still
+  needs a person, and [docs/networking.md](docs/networking.md) when a phone
+  cannot connect.
 
 ## Project notes
 
-`DEVELOPMENT.md` contains architecture details, focused test commands,
-networking defaults, validation evidence, and implementation caveats. It is
-the technical reference for contributors; this README is the current run and
-play guide.
+[DEVELOPMENT.md](DEVELOPMENT.md) is the table of the development documents:
+architecture, protocol, verification, networking and the build. This README is
+the run and play guide.

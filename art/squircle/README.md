@@ -59,14 +59,17 @@ Keep action range, frame count and timing in agreement after edits.
   The depth retains a floating gap above the original feet without resizing the body.
 - Both keep the original mesh, spherical hands, materials and fixed 4.5 camera scale.
 
-`SquircleV1Playback.play("look_up", view)` and `play("crouch", view)` enter and
-hold the final frame. Repeated requests do not restart entry. Request `idle` to
-reverse from current progress; selecting another action first releases to neutral,
-then enters it. Re-requesting the current stance during release reverses direction
-without jumping. `advance_playback(delta)` supports paused/slow review;
-`seek_clip(action, view, milliseconds)` supports deterministic frame inspection.
-The existing external absolute clock remains available for looping locomotion.
-Tint and face/blink controls remain independent. Input selection is PS-082 scope.
+In the game, `SquircleV1Playback` plays these stances:
+
+- `play("look_up", view)` and `play("crouch", view)` enter and hold the final frame.
+  Repeated requests do not restart entry.
+- Request `idle` to reverse from current progress. Selecting another action first
+  releases to neutral, then enters it.
+- Re-requesting the current stance during release reverses direction without jumping.
+- `advance_playback(delta)` supports paused and slow review.
+  `seek_clip(action, view, milliseconds)` supports deterministic frame inspection.
+- The external absolute clock remains available for looping locomotion.
+- Tint and face/blink controls remain independent.
 
 ## Export and synchronize
 
