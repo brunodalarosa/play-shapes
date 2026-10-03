@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Development-only. Checks the tools a contributor needs and installs the
-// browser client's npm dependencies. It never installs or changes anything
-// outside this repository.
+// Development-only. Checks the tools a contributor needs, installs the browser
+// client's npm dependencies, and installs the Chromium the end-to-end test
+// drives, in Playwright's standard per-user folder. It installs nothing else.
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -15,7 +15,8 @@ const USAGE = `Usage: node tools/setup.mjs
 Checks the required tools (Git, Node, npm, Godot) and fails when one is
 missing or too old, reports the tools some tasks need, then runs
 "npm ci --ignore-scripts" in web/ when its dependencies are missing or out of
-date. README.md lists every tool and what it is for.
+date, and installs Playwright's Chromium for the end-to-end test when it is
+missing. README.md lists every tool and what it is for.
 `;
 
 const GODOT_DOWNLOAD = 'https://godotengine.org/download';
@@ -108,6 +109,11 @@ function main() {
     if (result.status !== 0) { print('FAILED', '"npm ci" in web/ did not finish; see its output above'); return 1; }
     print('ok', 'web/node_modules installed');
   }
+
+  // Does nothing when this Playwright version's Chromium is already installed.
+  const chromium = spawnSync('npx playwright install chromium', { cwd: webDirectory, shell: true, stdio: 'inherit' });
+  if (chromium.status !== 0) { print('FAILED', '"npx playwright install chromium" in web/ did not finish; see its output above'); return 1; }
+  print('ok', 'Playwright Chromium, for the end-to-end test');
   process.stdout.write('\nReady. Run "node tools/check.mjs" to run every check.\n');
   return 0;
 }
