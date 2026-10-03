@@ -42,8 +42,9 @@ If planning shows the task itself should change, stop and say so. Do not reshape
 
 ### 4. Verify
 
-- Run the checks under Setup and verification, and the focused commands in `DEVELOPMENT.md` for what was touched.
-- Report what changed, what was verified under which evidence label, what still needs a person, and what was documented.
+- Run the checks under Setup and verification, and the focused checks in [docs/verification.md](docs/verification.md) for what was touched.
+- Report what changed, what was verified under which [evidence label](docs/verification.md#evidence-labels), what still needs a person, and what was documented.
+- Add what still needs a person to [docs/pending-reviews.md](docs/pending-reviews.md), and remove an entry there when its review is done.
 - State failures plainly, with output. A task is not done because the code is written.
 
 ### 5. Pull request
@@ -56,7 +57,8 @@ A pull request is history, read later by someone who was not there. Write what i
 
 - Godot is the authoritative PC host. Phones are TypeScript/HTML/CSS browser clients over HTTP and WebSockets. Clients send input and choices; only the host changes game state.
 - Use typed GDScript where practical, small reusable scenes, composition, signals for loose coupling, and Control/Container nodes for UI. Avoid fixed viewport dimensions and duplicate behavior. Explain complex code in comments.
-- Layout is decided by the formatters, not by hand. Run `node tools/format.mjs` before committing: it formats GDScript and the TypeScript, JavaScript, HTML and CSS sources of `web/` and `tools/`, wrapping at 100 characters. Separate the logical steps inside a function with a blank line; the formatters keep those lines but do not add them. When the GDScript formatter refuses a file as "structurally different", it names only the file: the cause is a long chained call or an inline `if`/`else` inside a longer expression, and splitting that statement into shorter ones fixes it. Do not leave the file unformatted.
+- Layout is decided by the formatters, not by hand. Run `node tools/format.mjs` before committing. Separate the logical steps inside a function with a blank line; the formatters keep those lines but do not add them. If the GDScript formatter refuses a file, see [what to do](docs/formatting-and-linting.md#the-gdscript-formatter).
+- Name things for what they are. Ticket and task numbers do not belong anywhere in the repository: not in file names, comments, documents, test names or output folders.
 - Run `node tools/lint.mjs` as well. It reports naming, unused code and other mistakes in GDScript, TypeScript and JavaScript, and every line over 100 characters that the formatters could not shorten. Shorten such a line by naming part of the expression on the line before, by wrapping the expression in parentheses, or by joining a long string from shorter ones; move a trailing comment above its statement. Do not reword a message or a test title to make it fit.
 - Preserve the bundled runtime assets and `web/public/` output. Rebuild the browser bundle after changing `web/src/`.
 - Minigame numbers are stable identifiers. 001 was retired; 002 is the first approved game. Never reuse or renumber IDs.
@@ -64,16 +66,34 @@ A pull request is history, read later by someone who was not there. Write what i
 
 ## Visual direction
 
-Read game-design-documents/Art Direction.md and apply this to UI, environments, characters, effects, shaders, and animation.
+Read [game-design-documents/Art direction.md](game-design-documents/Art%20direction.md) and apply it to UI, environments, characters, effects, shaders, and animation.
 
 The canonical editable Squircle source and current export tools live in `art/squircle/`. Keep only current source and useful pipeline/review resources there. Prior versions, backups, variant experiments and version comparisons are temporary artifacts: use ignored `scratch/` or `comparisons/` directories and do not commit them or obsolete one-time construction scripts.
 
 ## Setup and verification
 
 - Use Godot 4.7.2 or newer with the GL Compatibility renderer, and Node 22 or newer. Run `node tools/setup.mjs` after cloning and whenever a tool may be missing: it checks the required tools, reports the ones some tasks need, and installs `web/` dependencies, Playwright's Chromium and the GDScript formatter. [README.md](README.md#requirements) lists every tool. Set `GODOT_BIN` to a Godot executable when it is not on PATH as `godot`.
-- Run `node tools/check.mjs` before reporting a change as verified. It runs every Godot test script, the format and lint checks, the tests of `tools/`, the browser type check and tests, confirms `web/public/` matches a fresh build, and plays a shortened Bubbles round with two emulated phones against the real host; it prints one line per failure and writes full output under `test-results/check/`. Pass name filters for a focused run (`node tools/check.mjs bubbles`), `--full` to play that round with every default, and `--release` to add the Windows export test, which needs export templates.
+- Run `node tools/check.mjs` before reporting a change as verified. It runs every Godot test script, the format, lint and document checks, the tests of `tools/`, the browser type check and tests, confirms `web/public/` matches a fresh build, and plays a shortened Bubbles round with two emulated phones against the real host. It prints one line per failure and writes full output under `test-results/check/`.
+- Pass name filters for a focused run (`node tools/check.mjs bubbles`), `--full` to play that round with every default, and `--release` to add the Windows export test, which needs export templates.
 - Run a single Godot script with `godot --headless --path . --script tests/<name>.gd`. For browser work, run `npm run check`, `npm run build`, and `npm test` in `web/`.
-- Keep changes scoped. Update `DEVELOPMENT.md` when current setup, architecture, protocols, or verification steps change.
+- Keep changes scoped. When setup, architecture, protocols or verification steps change, update the document for that area in the same change. `node tools/docs.mjs` checks the rules documents follow.
 - The vendored `addons/godot_mcp/` editor integration is optional. Enable it in Godot's Plugin settings only when needed; configure your own local MCP client separately. Do not change the third-party addon unless the task calls for it.
 
-See [README.md](README.md) for clone and play instructions and [DEVELOPMENT.md](DEVELOPMENT.md) for implementation details.
+## Documents
+
+Read the one document for the area you are working on, not all of them. [DEVELOPMENT.md](DEVELOPMENT.md) describes each and states the rules they follow.
+
+- [README.md](README.md): what to install, how to play.
+- [docs/overview.md](docs/overview.md): what exists today, running the project.
+- [docs/architecture.md](docs/architecture.md): which script or scene owns what.
+- [docs/protocol.md](docs/protocol.md): messages, HTTP routes, limits.
+- [docs/verification.md](docs/verification.md): the check command, tests, evidence labels.
+- [docs/pending-reviews.md](docs/pending-reviews.md): what still needs a person or a real phone.
+- [docs/formatting-and-linting.md](docs/formatting-and-linting.md): format, lint and document rules.
+- [docs/browser-build.md](docs/browser-build.md): building the phone client.
+- [docs/phone-client.md](docs/phone-client.md): app install, touch handling, the error panel.
+- [docs/platform-phone-controller.md](docs/platform-phone-controller.md): joystick, action button, platform movement.
+- [docs/motion-input.md](docs/motion-input.md): phone sensors and the motion lab.
+- [docs/networking.md](docs/networking.md): LAN, connection problems, network settings.
+- [docs/local-https.md](docs/local-https.md): HTTPS for test phones.
+- [docs/standalone-build.md](docs/standalone-build.md): the Windows package.

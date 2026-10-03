@@ -28,7 +28,9 @@ failed. Attach captures for anything a person can see. -->
 
 <!-- What no automated run could establish and who has to look: device and
 browser behavior, couch-distance readability, feel, accessibility, a tuning
-value waiting on the owner. Omit the section if there is nothing. -->
+value waiting on the owner. Add the same items to docs/pending-reviews.md, and
+remove from it any review this change completes. Omit the section if there is
+nothing. -->
 
 ## Decisions worth knowing
 
@@ -42,5 +44,5 @@ surfaced rather than fixed. -->
 
 ## Documented
 
-<!-- What changed in DEVELOPMENT.md, README.md or a guide, or why nothing
-needed to. -->
+<!-- Which documents under docs/, or README.md, changed, or why none needed
+to. DEVELOPMENT.md lists them. -->
