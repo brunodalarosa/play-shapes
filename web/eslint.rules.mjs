@@ -8,9 +8,11 @@ import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   {
-    // Compiled, vendored, generated or not ours.
+    // Compiled, vendored, generated or not ours. node tools/lint.mjs names the files it
+    // lints, so this list only keeps an editor's ESLint away from the rest.
     ignores: [
       "web/public/**",
+      "web/src/vendor/**",
       "web/node_modules/**",
       "addons/**",
       "art/**",
@@ -19,7 +21,7 @@ export default tseslint.config(
       "builds/**",
       "test-results/**",
       ".godot/**",
-      ".obsidian/plugins/kanban-bases-view/**",
+      ".obsidian/**",
     ],
   },
   js.configs.recommended,

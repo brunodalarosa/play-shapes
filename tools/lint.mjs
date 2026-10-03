@@ -6,7 +6,14 @@ import { existsSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { root, webDirectory } from "./environment.mjs";
 import { formatterPath } from "./gdscript_formatter.mjs";
-import { LINE_LENGTH, gdscriptFiles, mayExceedLineLength, webSourceFiles } from "./sources.mjs";
+import {
+  LINE_LENGTH,
+  gdscriptFiles,
+  isUncoveredScript,
+  mayExceedLineLength,
+  repositoryFiles,
+  webSourceFiles,
+} from "./sources.mjs";
 
 // Temporary: the tests reach into private members of the code they test, which
 // this rule reports. Remove this exception when the tests are given proper
@@ -50,26 +57,41 @@ function eslint() {
   const program = join(webDirectory, "node_modules", "eslint", "bin", "eslint.js");
   if (!existsSync(program)) return { error: 'ESLint is not installed; run "node tools/setup.mjs"' };
 
-  const result = spawnSync(process.execPath, [program, ".", "--format", "json"], {
+  // ESLint is given the files to lint. Left to scan the folder, it would also read
+  // folders git ignores, such as an editor's plugins.
+  const files = webSourceFiles().filter((file) => /\.(ts|mjs)$/.test(file));
+  const result = spawnSync(process.execPath, [program, "--format", "json", ...files], {
     cwd: root,
     encoding: "utf8",
     maxBuffer: 64 * 1024 * 1024,
   });
 
-  let files;
+  let linted;
   try {
-    files = JSON.parse(result.stdout);
+    linted = JSON.parse(result.stdout);
   } catch {
     const reason = result.stderr.trim().split(/\r?\n/)[0] || `exit code ${result.status}`;
     return { error: `ESLint failed: ${reason}` };
   }
 
-  const findings = files.flatMap((file) => {
+  const findings = linted.flatMap((file) => {
     const path = relative(root, file.filePath).split(sep).join("/");
     return file.messages.map(
       (message) => `${path}:${message.line}: ${message.ruleId ?? "syntax"}: ${message.message}`,
     );
   });
+  return { findings };
+}
+
+/** Reports script files that neither command covers, so a new location cannot go unnoticed. */
+function uncoveredScripts() {
+  const findings = repositoryFiles()
+    .filter(isUncoveredScript)
+    .map(
+      (file) =>
+        `${file}:1: uncovered-source: No format or lint rule covers this file. ` +
+        "Add its folder to tools/sources.mjs, or to the places it leaves alone on purpose",
+    );
   return { findings };
 }
 
@@ -120,6 +142,7 @@ function main() {
     ),
     gdscript(linter, scripts.filter(isTest), RULES_OFF_IN_TESTS),
     eslint(),
+    uncoveredScripts(),
     longLines(),
   ];
 

@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   gdscriptFiles,
   isGdscriptSource,
+  isUncoveredScript,
   isWebSource,
   mayExceedLineLength,
   webSourceFiles,
@@ -37,6 +38,8 @@ test("leaves compiled, vendored and other files alone", () => {
   for (const file of [
     "web/public/app.js",
     "web/public/vendor/nipplejs.mjs",
+    "web/src/vendor/nipplejs.d.mts",
+    "web/src/vendor/other.ts",
     "web/public/platform_input_settings.json",
     "web/node_modules/prettier/index.mjs",
     "web/package.json",
@@ -47,6 +50,22 @@ test("leaves compiled, vendored and other files alone", () => {
   ]) {
     assert.equal(isWebSource(file), false, file);
   }
+});
+
+test("reports a script that no rule covers and is not left alone on purpose", () => {
+  assert.equal(isUncoveredScript("server/index.ts"), true);
+  assert.equal(isUncoveredScript("web/extra/helper.mjs"), true);
+  assert.equal(isUncoveredScript("scripts/build.js"), true);
+
+  assert.equal(isUncoveredScript("web/src/app.ts"), false);
+  assert.equal(isUncoveredScript("tools/lint.mjs"), false);
+  assert.equal(isUncoveredScript("web/public/app.js"), false);
+  assert.equal(isUncoveredScript("web/public/vendor/nipplejs.mjs"), false);
+  assert.equal(isUncoveredScript("web/src/vendor/nipplejs.d.mts"), false);
+  assert.equal(isUncoveredScript("addons/kenyoni/tool.js"), false);
+  assert.equal(isUncoveredScript("art/squircle/review.js"), false);
+  assert.equal(isUncoveredScript("host/session_host.gd"), false);
+  assert.equal(isUncoveredScript("README.md"), false);
 });
 
 test("lets only HTML lines and test titles exceed the line length", () => {
