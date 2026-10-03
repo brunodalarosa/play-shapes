@@ -101,7 +101,7 @@ async function withControls(verify) {
       );
     let source = readFileSync(new URL("../public/platform_controls.js", import.meta.url), "utf8");
     source = source.replace(
-      /from "(\.\/[^\"]+)"/g,
+      /from "(\.\/[^"]+)"/g,
       (_, path) =>
         `from "${path === "./vendor/nipplejs.mjs" ? stub : new URL("../public/" + path.slice(2), import.meta.url).href}"`,
     );
@@ -136,8 +136,10 @@ async function withControls(verify) {
     });
   } finally {
     controls?.destroy();
-    for (const [name, descriptor] of saved)
-      descriptor ? Object.defineProperty(globalThis, name, descriptor) : delete globalThis[name];
+    for (const [name, descriptor] of saved) {
+      if (descriptor) Object.defineProperty(globalThis, name, descriptor);
+      else delete globalThis[name];
+    }
   }
 }
 

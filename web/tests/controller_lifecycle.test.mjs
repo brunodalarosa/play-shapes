@@ -148,7 +148,7 @@ async function withController(
       "data:text/javascript," +
       encodeURIComponent("export class LobbyControls { activate(){} deactivate(){} }");
     source = source.replace(
-      /from "(\.\/[^\"]+)"/g,
+      /from "(\.\/[^"]+)"/g,
       (match, path) =>
         `from "${path === "./lobby_controls.js" ? stub : new URL("../public/" + path.slice(2), import.meta.url).href}"`,
     );
@@ -178,8 +178,10 @@ async function withController(
     });
   } finally {
     window.dispatchEvent(new Event("pagehide"));
-    for (const [key, descriptor] of saved)
-      descriptor ? Object.defineProperty(globalThis, key, descriptor) : delete globalThis[key];
+    for (const [key, descriptor] of saved) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete globalThis[key];
+    }
   }
 }
 

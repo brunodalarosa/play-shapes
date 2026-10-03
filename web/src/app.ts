@@ -634,7 +634,6 @@ function drawBubblePath(
   context: CanvasRenderingContext2D,
   radius: number,
   pull: Point,
-  surfaceAngle: number,
 ): { points: Point[]; center: Point; along: Point; stretch: number } {
   const length = Math.hypot(pull[0], pull[1]);
   const stretch = clamp(length, 0, 0.22);
@@ -901,7 +900,7 @@ function renderBubbles(now: number): void {
       visual?.particle_density ?? 10,
     );
   } else {
-    const shape = drawBubblePath(context, renderedRadius, pull, surfaceAngle);
+    const shape = drawBubblePath(context, renderedRadius, pull);
     context.fillStyle = "rgba(69,191,255,.10)";
     context.fill();
     const chargeGlow = bubblesPointer

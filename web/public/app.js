@@ -503,7 +503,7 @@ function renderJoinPreviews(now) {
         squircleCanvas.draw(context, joinFlow.color, rect.width / 2, rect.height * 0.89, scale, now);
     }
 }
-function drawBubblePath(context, radius, pull, surfaceAngle) {
+function drawBubblePath(context, radius, pull) {
     const length = Math.hypot(pull[0], pull[1]);
     const stretch = clamp(length, 0, 0.22);
     const along = stretch > 0.001 ? [pull[0] / length, pull[1] / length] : [1, 0];
@@ -691,7 +691,7 @@ function renderBubbles(now) {
         drawBubbleBurst(context, renderedRadius, burstProgress + (visual ? visualElapsed / burstDuration : 0), visual?.particle_density ?? 10);
     }
     else {
-        const shape = drawBubblePath(context, renderedRadius, pull, surfaceAngle);
+        const shape = drawBubblePath(context, renderedRadius, pull);
         context.fillStyle = "rgba(69,191,255,.10)";
         context.fill();
         const chargeGlow = bubblesPointer
