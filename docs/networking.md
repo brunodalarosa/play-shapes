@@ -1,26 +1,94 @@
 # Networking
 
-## Networking, export, and operational warnings
+How the host and phones reach each other on the LAN, what to check when a phone cannot
+connect, and how the host's network settings are overridden locally. Setting up HTTPS for
+test phones is in [local-https.md](local-https.md). The messages themselves are in
+[protocol.md](protocol.md).
 
-- Listeners bind the configured LAN interfaces. HTTP/WS defaults and explicitly provisioned HTTPS/WSS are supported; registry reconnect tokens authenticate player input. There is no public hosting or CORS API. Never forward ports 8080/8081 to the Internet.
-- If a phone cannot connect, check the selected adapter, both TCP ports, same Wi-Fi, guest/client isolation, VPN LAN restrictions, and Windows Firewall. The user handles private-network permission prompts; tooling does not change firewall or VPN settings.
-- A busy service port shows Retry in boot. WebSocket bind failure rolls HTTP back rather than leaving a partial host.
-- Editor/runtime checks do not prove a package. Smoke the exported executable without Godot or Node, including lobby, HTTP routes, WebSocket, and a browser connection.
-- Preserve `web/public/`, the Kenyoni QR addon, external-PCK output, and the curated runtime/source-archive boundary in export changes.
-- A phone reload creates a new transport connection but may resume the same player during grace. Duplicate active-token resume gives the newest tab ownership and closes the old connection.
+## How it works
 
-## Network audit
+- `SessionHost` starts its own TCP HTTP and WebSocket services, on all interfaces by default,
+  on separate ports 8080 and 8081.
+- The lobby discovers IPv4 addresses and sends `SessionHost.join_url` directly to its QR and
+  address display.
+- Phones fetch the session metadata, then connect or resume over WebSocket protocol 1.
+- There is no Node server, no mDNS or Bonjour discovery, no environment framework and no
+  Internet dependency.
+- TLS listeners use Godot's `StreamPeerTLS`, shared by HTTP and WebSocket through
+  `ControllerStream`. No extra server or runtime dependency is needed.
+- Hard-coded HTTP or WS URLs outside this path are test fixtures, preview fixtures or
+  documentation. Fixtures explicitly opt out of workstation overrides.
 
-Godot SessionHost starts custom TCP HTTP and WebSocket services on all interfaces by default, with separate 8080/8081 ports. The lobby discovers IPv4 addresses and sends SessionHost.join_url directly to its QR/address display. Phones obtain session metadata then connect/resume over WebSocket protocol 1. There is no Node server, mDNS/Bonjour discovery, environment framework, or Internet dependency. Hard-coded HTTP/WS URLs outside the canonical path are test/preview fixtures or documentation; fixtures explicitly opt out of workstation overrides. Keep local networking/certificate configuration outside tracked Resources and standalone packages. TLS listeners use Godot StreamPeerTLS, shared by HTTP and WebSocket via ControllerStream; no extra server/runtime dependency is required.
+## Safety
 
-## Secure LAN transport
+- Listeners bind the configured LAN interfaces.
+- The HTTP and WS defaults are supported, and so are explicitly provisioned HTTPS and WSS.
+- Registry reconnect tokens authenticate player input.
+- There is no public hosting and no CORS API.
+- Never forward ports 8080 or 8081 to the Internet.
+- Keep local networking and certificate configuration outside tracked Resources and
+  standalone packages.
 
-In editor/development, create ignored `local/network.json` (or select a JSON file with `PLAY_SHAPES_NETWORK_CONFIG`). In a standalone build, use `local/network.json` beside the executable. Relative PEM paths resolve beside the JSON file. Example:
+## When a phone cannot connect
+
+Check, in this order:
+
+1. The address selected in the lobby belongs to the adapter the phone can reach.
+2. Both TCP ports are reachable.
+3. The phone is on the same Wi-Fi.
+4. The network is not a guest network and has no client isolation.
+5. A VPN is not restricting LAN access.
+6. Windows Firewall allows the host.
+
+The user handles private-network permission prompts. The tooling does not change firewall or
+VPN settings.
+
+If a service port is busy, boot shows Retry. If the WebSocket cannot bind, the host rolls
+HTTP back rather than staying half started.
+
+## Local network configuration
+
+The host reads an optional JSON file that overrides its network settings:
+
+- In the editor and in development: ignored `local/network.json` beside the project.
+- In a standalone build: `local/network.json` beside the executable.
+- Anywhere: the path in the `PLAY_SHAPES_NETWORK_CONFIG` environment variable.
+- The value `off` for that variable ignores local overrides. Tests use it.
+- Relative PEM paths resolve beside the JSON file.
 
 ```json
-{"tls_enabled":true,"bind_address":"*","advertised_host":"","http_port":8080,"websocket_port":8081,"certificate_path":"certificate.pem","private_key_path":"key.pem"}
+{
+  "tls_enabled": true,
+  "bind_address": "*",
+  "advertised_host": "",
+  "http_port": 8080,
+  "websocket_port": 8081,
+  "certificate_path": "certificate.pem",
+  "private_key_path": "key.pem"
+}
 ```
 
-Restart the host. The lobby QR/address uses HTTPS and session discovery selects WSS; an empty advertised hostname keeps explicit LAN-IP selection. Certificates must cover that IP or the advertised hostname and be trusted on the phone. ControllerTLS checks readable PEM material, leaf validity against the host clock, and matching private/public keys before either listener binds. Both listeners start or neither does. Slow TLS/HTTP/WebSocket handshakes remain bounded by the existing request timeout. There is no insecure fallback or browser verification bypass. To return to HTTP, set `tls_enabled` false (or remove this local override), then restart. Do not install or modify trust implicitly. Use `node tools/local_https.mjs setup --ip LAN_IP` for certificate provisioning; see [controlled-device HTTPS and motion testing](local-https-and-motion-testing.md) for exact enable/regenerate/disable commands, optional explicit host trust, Chrome iPhone/Android root installation, and the physical-device checklist. No system trust changes occur during setup. mDNS advertisement is intentionally deferred; explicit IP/SAN alignment is the initial controlled-test discovery strategy.
+Restart the host after changing it.
 
-Verification: `godot --headless --path . --script tests/controller_tls_test.gd` generates disposable ignored fixture material; `node --test tests/tls.test.mjs` in web verifies HTTPS asset loading, WSS join/resume, rejection of untrusted and wrong-host certificates, and service availability alongside stalled handshakes. Test clients explicitly trust only their fixture certificate; they never disable verification. Secret file patterns and local configuration are ignored and excluded from both export presets.
+## HTTPS and WSS
+
+With `tls_enabled` true:
+
+- The lobby QR and address use HTTPS, and session discovery selects WSS.
+- An empty advertised hostname keeps the explicit LAN-IP selection.
+- The certificate must cover that IP, or the advertised hostname, and be trusted on the phone.
+- There is no mDNS advertisement. The certificate has to name the address phones use.
+
+Before either listener binds, `ControllerTLS` checks that the PEM material is readable, that
+the leaf certificate is valid against the host clock, and that the private and public keys
+match.
+
+- Both listeners start, or neither does.
+- Slow TLS, HTTP and WebSocket handshakes are bounded by the request timeout.
+- There is no insecure fallback and no way to bypass browser verification.
+
+To return to HTTP, set `tls_enabled` to false or remove the local override, then restart.
+
+Certificates are provisioned with `node tools/local_https.mjs setup --ip LAN_IP`. Setup never
+changes system trust. The commands, the per-phone steps and how to undo them are in
+[local-https.md](local-https.md).

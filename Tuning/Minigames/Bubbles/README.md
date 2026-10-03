@@ -75,4 +75,12 @@ Every Inspector tooltip gives the field's purpose, default, safe range, and high
 
 The maximum radius must exceed the starting radius. Starting jellyfish cannot exceed the free cap. High jellyfish spawn rate must be at least low rate; maximum wave duration must be at least minimum; late pufferfish rate must be at least early rate. Inspector setters clamp out-of-range values; the preset validator rejects any non-finite value that remains. Passing checks establishes safe configuration only; phone feel, accessibility, and balance still need human review.
 
-The jellyfish breathing and pufferfish body jiggle affect sprites only. The pufferfish size multiplier scales both its sprite and collision radius from the configured baseline radius. With warnings enabled, a one-shot `GPUParticles2D` burst starts at the offscreen path origin and drifts inward during the configured warning delay. The pufferfish sprite and collider remain disabled until the host warning deadline, when the fish appears at that same origin and begins its existing path. Random per-particle spread, speed, and acceleration add small movement variations to these decorative bubbles, which have no collision. Disabling warnings skips both the burst and delay.
+The jellyfish breathing and pufferfish body jiggle affect sprites only. The pufferfish size multiplier scales both its sprite and collision radius from the configured baseline radius.
+
+With warnings enabled:
+
+- A one-shot `GPUParticles2D` burst starts at the offscreen path origin and drifts inward during the configured warning delay.
+- The pufferfish sprite and collider remain disabled until the host warning deadline, when the fish appears at that same origin and begins its existing path.
+- Random per-particle spread, speed, and acceleration add small movement variations to these decorative bubbles, which have no collision.
+
+Disabling warnings skips both the burst and delay.
