@@ -22,7 +22,6 @@ func _initialize() -> void:
 	_plugin = Plugin.new()
 	root.add_child(_plugin)
 	_plugin._reveal_on_success = false
-	_plugin._create_dialog()
 	_plugin.call_deferred("_on_build_requested")
 
 
