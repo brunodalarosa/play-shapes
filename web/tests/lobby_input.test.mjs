@@ -5,13 +5,17 @@ import { createLobbyContext } from "../public/lobby_input.js";
 
 test("Playground adapter keeps ordinary movement/jump and hands off explicit fall without a jump fallback", () => {
   const sent = [];
-  const context = createLobbyContext(value => sent.push(value));
+  const context = createLobbyContext((value) => sent.push(value));
   const input = new PlatformInputState(context.send);
   input.activate();
-  input.updateAxes(-0.7, 0.4); input.refresh();
-  input.pressAction(1); input.releaseAction(1);
+  input.updateAxes(-0.7, 0.4);
+  input.refresh();
+  input.pressAction(1);
+  input.releaseAction(1);
   input.updateAxes(0, -1);
-  input.pressAction(2); input.releaseAction(2); input.endStick();
+  input.pressAction(2);
+  input.releaseAction(2);
+  input.endStick();
   assert.deepEqual(sent, [
     { type: "lobby_move", horizontal: -0.7, vertical: 0.4, stance: "move" },
     { type: "lobby_jump_release", action: "jump", horizontal: -0.7, vertical: 0.4, stance: "move" },

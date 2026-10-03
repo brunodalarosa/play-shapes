@@ -3,11 +3,13 @@ class_name PlatformSurface
 extends StaticBody2D
 ## A drop rule independent of the landing shape's existing one-way behavior.
 
-enum DropRule { OPEN, CLOSED }
+enum DropRule {
+	OPEN,
+	CLOSED,
+}
 
 ## Open permits deliberate FALL; Closed rejects FALL. Does not change underside collision.
-@export_enum("Open", "Closed")
-var drop_rule: int = DropRule.OPEN
+@export_enum("Open", "Closed") var drop_rule: int = DropRule.OPEN
 
 
 func world_bounds() -> Rect2:

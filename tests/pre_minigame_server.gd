@@ -22,7 +22,10 @@ func _start() -> void:
 
 
 func _process(_delta: float) -> bool:
-	if _launched or current_scene == null or current_scene.scene_file_path != "res://scenes/lobby.tscn":
+	if (
+		_launched or current_scene == null
+		or current_scene.scene_file_path != "res://scenes/lobby.tscn"
+	):
 		return false
 	var host := root.get_node("SessionHost")
 	if host.player_registry.player_count() != 2:

@@ -11,16 +11,38 @@ func _initialize() -> void:
 func _run() -> void:
 	var tuning := BubblesTuning.new()
 	_check(Classifier.classify([[0.2, 0.2], [0.3, 0.2]], tuning).action == &"swipe", "Short swipe is recognized")
-	_check(Classifier.classify([[0.2, 0.2], [0.22, 0.2], [0.24, 0.2], [0.26, 0.2], [0.28, 0.2], [0.3, 0.2]], tuning).action == &"swipe", "Sampled straight swipe is recognized")
+	_check(
+		Classifier.classify([
+			[0.2, 0.2],
+			[0.22, 0.2],
+			[0.24, 0.2],
+			[0.26, 0.2],
+			[0.28, 0.2],
+			[0.3, 0.2],
+		], tuning).action == &"swipe",
+		"Sampled straight swipe is recognized",
+	)
 	var long_swipe: Dictionary = Classifier.classify([[0.1, 0.2], [0.8, 0.2]], tuning)
-	_check(long_swipe.action == &"swipe" and long_swipe.strength == tuning.swipe_impulse, "Long swipe has fixed strength")
+	_check(
+		long_swipe.action == &"swipe" and long_swipe.strength == tuning.swipe_impulse,
+		"Long swipe has fixed strength",
+	)
 	_check(Classifier.classify([[0.2, 0.2], [0.21, 0.2]], tuning).action == &"none", "Tiny trace has no action")
 	var clockwise := _circle(2.0, false)
 	var counterclockwise := _circle(2.0, true)
-	_check(Classifier.classify(clockwise, tuning).action == &"spin", "Two clockwise circles charge one spin")
-	_check(Classifier.classify(counterclockwise, tuning).action == &"spin", "Two counterclockwise circles charge one spin")
+	_check(
+		Classifier.classify(clockwise, tuning).action == &"spin",
+		"Two clockwise circles charge one spin",
+	)
+	_check(
+		Classifier.classify(counterclockwise, tuning).action == &"spin",
+		"Two counterclockwise circles charge one spin",
+	)
 	var partial: Dictionary = Classifier.classify(_circle(1.5, false), tuning)
-	_check(partial.action == &"none" and partial.reason == &"incomplete_circle", "Partial circle cannot become a swipe")
+	_check(
+		partial.action == &"none" and partial.reason == &"incomplete_circle",
+		"Partial circle cannot become a swipe",
+	)
 	_check(Classifier.classify(_circle(0.5, false), tuning).action == &"none", "Half-circle remains discarded")
 	_check(not Classifier.classify([], tuning).accepted, "Empty trace is rejected")
 	_check(not Classifier.classify(_many_points(), tuning).accepted, "Oversized trace is rejected")

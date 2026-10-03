@@ -20,8 +20,9 @@ var http: HttpService
 var websocket: WebsocketService
 var player_registry: PlayerRegistry
 var accepting_new_players: bool = false
-var _pending_minigame_launch: Dictionary = {}
+var _pending_minigame_launch: Dictionary = { }
 var readiness: PreMinigameReadiness
+
 
 func _ready() -> void:
 	settings = active_presets.networking
@@ -34,15 +35,20 @@ func _ready() -> void:
 	player_registry.players_changed.connect(_on_players_changed)
 	_on_players_changed()
 
+
 func _process(_delta: float) -> void:
 	player_registry.expire_players()
+
 
 func start(use_local_config := true) -> bool:
 	if running:
 		return true
 	network = ControllerNetworkConfig.new(settings)
 	var path := ControllerNetworkConfig.local_path()
-	if use_local_config and not path.is_empty() and (OS.has_environment("PLAY_SHAPES_NETWORK_CONFIG") or FileAccess.file_exists(path)):
+	if (
+		use_local_config and not path.is_empty()
+		and (OS.has_environment("PLAY_SHAPES_NETWORK_CONFIG") or FileAccess.file_exists(path))
+	):
 		network.load_local(path)
 	startup_error = network.error if not network.error.is_empty() else network.validation_error()
 	if not startup_error.is_empty():
@@ -59,20 +65,42 @@ func start(use_local_config := true) -> bool:
 			startup_error = "Could not start HTTP service: %s" % error_string(error)
 		http.stop()
 		return false
-	error = websocket.start(settings, player_registry, func() -> bool: return accepting_new_players, network, tls.options)
+	error = websocket.start(
+		settings,
+		player_registry,
+		func() -> bool:
+			return accepting_new_players,
+		network,
+		tls.options,
+	)
 	if error != OK:
 		http.stop()
-		startup_error = "Could not listen for WebSocket on port %d: %s" % [network.websocket_port, error_string(error)]
+		startup_error = "Could not listen for WebSocket on port %d: %s" % [
+			network.websocket_port,
+			error_string(error),
+		]
 		return false
 	running = true
 	startup_error = ""
-	print("Play Shapes ready: %s %d / %s %d" % [network.http_scheme(), network.http_port, network.websocket_scheme(), network.websocket_port])
+	print(
+		"Play Shapes ready: %s %d / %s %d"
+		% [
+			network.http_scheme(),
+			network.http_port,
+			network.websocket_scheme(),
+			network.websocket_port,
+		]
+	)
 	return true
+
 
 func addresses() -> PackedStringArray:
 	var result := PackedStringArray()
 	for address: String in IP.get_local_addresses():
-		if address.contains(":") or address.begins_with("127.") or address.begins_with("169.254.") or address == "0.0.0.0":
+		if (
+			address.contains(":") or address.begins_with("127.")
+			or address.begins_with("169.254.") or address == "0.0.0.0"
+		):
 			continue
 		if not result.has(address):
 			result.append(address)
@@ -85,19 +113,24 @@ func addresses() -> PackedStringArray:
 			break
 	return result
 
+
 func stop() -> void:
 	http.stop()
 	websocket.stop()
 	running = false
 
+
 func join_url(address: String) -> String:
 	return (network if network != null else ControllerNetworkConfig.new(settings)).join_url(address)
+
 
 func set_accepting_new_players(accepting: bool) -> void:
 	accepting_new_players = accepting
 
+
 func players() -> Array[Dictionary]:
 	return player_registry.public_players()
+
 
 func minigame_scene_path(minigame_id: StringName) -> String:
 	match minigame_id:
@@ -112,25 +145,20 @@ func minigame_availability(minigame_id: StringName, allow_one_player_debug := fa
 		MINIGAME_BUBBLES:
 			maximum_players = BUBBLES_MAX_PLAYERS
 		_:
-			return {"available": false, "reason": "Choose a supported minigame"}
+			return { "available": false, "reason": "Choose a supported minigame" }
 	var player_count := players().size()
 	if allow_one_player_debug:
 		if player_count != 1:
-			return {
-				"available": false,
-				"reason": "Requires exactly one registered player",
-			}
+			return { "available": false, "reason": "Requires exactly one registered player" }
 	elif player_count < 2:
-		return {
-			"available": false,
-			"reason": "At least 2 registered players are needed",
-		}
+		return { "available": false, "reason": "At least 2 registered players are needed" }
 	if player_count > maximum_players:
 		return {
 			"available": false,
-			"reason": "%s supports up to %d players" % [minigame_display_name(minigame_id), maximum_players],
+			"reason": "%s supports up to %d players"
+			% [minigame_display_name(minigame_id), maximum_players],
 		}
-	return {"available": true, "reason": ""}
+	return { "available": true, "reason": "" }
 
 
 func minigame_display_name(minigame_id: StringName) -> String:
@@ -140,12 +168,15 @@ func minigame_display_name(minigame_id: StringName) -> String:
 	return "Minigame"
 
 
-func prepare_minigame_launch(minigame_id: StringName, allow_one_player_debug := false) -> Dictionary:
+func prepare_minigame_launch(
+	minigame_id: StringName,
+	allow_one_player_debug := false,
+) -> Dictionary:
 	if minigame_scene_path(minigame_id).is_empty():
-		return {"accepted": false, "reason": "Choose a supported minigame"}
+		return { "accepted": false, "reason": "Choose a supported minigame" }
 	var availability := minigame_availability(minigame_id, allow_one_player_debug)
 	if not bool(availability.available):
-		return {"accepted": false, "reason": availability.reason}
+		return { "accepted": false, "reason": availability.reason }
 	# Snapshot before leaving the lobby so later registry changes cannot alter the
 	# participant list. Connectivity changes still reach the scene controller.
 	_pending_minigame_launch = {
@@ -154,24 +185,28 @@ func prepare_minigame_launch(minigame_id: StringName, allow_one_player_debug := 
 		"allow_one_player_debug": allow_one_player_debug,
 	}
 	set_accepting_new_players(false)
-	return {"accepted": true}
+	return { "accepted": true }
 
 
 func begin_pre_minigame(minigame_id: StringName) -> Dictionary:
 	if readiness != null and readiness.active:
-		return {"accepted": false, "reason": "Ready-up is already active"}
+		return { "accepted": false, "reason": "Ready-up is already active" }
 	var availability := minigame_availability(minigame_id)
 	if not bool(availability.available):
-		return {"accepted": false, "reason": availability.reason}
-	readiness = PreMinigameReadiness.new(minigame_id, players(),
-		func() -> bool: return bool(minigame_availability(minigame_id).available))
+		return { "accepted": false, "reason": availability.reason }
+	readiness = PreMinigameReadiness.new(
+		minigame_id,
+		players(),
+		func() -> bool:
+			return bool(minigame_availability(minigame_id).available),
+	)
 	readiness.changed.connect(_on_readiness_changed)
 	readiness.launch_requested.connect(_on_readiness_launch)
 	readiness.canceled.connect(_on_readiness_canceled)
 	set_accepting_new_players(false)
 	websocket.begin_pre_minigame(readiness)
 	readiness_changed.emit(readiness.snapshot_for(""))
-	return {"accepted": true}
+	return { "accepted": true }
 
 
 func cancel_pre_minigame() -> void:
@@ -200,17 +235,21 @@ func _on_readiness_canceled() -> void:
 	readiness = null
 	readiness_canceled.emit()
 
+
 func consume_minigame_launch(minigame_id: StringName) -> Dictionary:
 	if StringName(_pending_minigame_launch.get("minigame_id", &"")) != minigame_id:
-		return {}
+		return { }
 	var launch := _pending_minigame_launch
-	_pending_minigame_launch = {}
+	_pending_minigame_launch = { }
 	return launch
 
 
 func clear_minigame_launch(minigame_id: StringName = &"") -> void:
-	if minigame_id.is_empty() or StringName(_pending_minigame_launch.get("minigame_id", &"")) == minigame_id:
-		_pending_minigame_launch = {}
+	if (
+		minigame_id.is_empty()
+		or StringName(_pending_minigame_launch.get("minigame_id", &"")) == minigame_id
+	):
+		_pending_minigame_launch = { }
 
 
 func bubbles_availability(allow_one_player_debug := false) -> Dictionary:
@@ -228,25 +267,31 @@ func consume_bubbles_launch() -> Dictionary:
 func clear_bubbles_launch() -> void:
 	clear_minigame_launch(MINIGAME_BUBBLES)
 
+
 func send_players_to_lobby() -> void:
 	if websocket != null:
 		websocket.send_lobby_state()
+
 
 func register_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
 	if websocket != null:
 		websocket.set_lobby_controller(controller)
 
+
 func unregister_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
 	if websocket != null:
 		websocket.clear_lobby_controller(controller)
+
 
 func register_bubbles_controller(controller: BubblesRoundController) -> void:
 	if websocket != null:
 		websocket.set_bubbles_controller(controller)
 
+
 func unregister_bubbles_controller(controller: BubblesRoundController) -> void:
 	if websocket != null:
 		websocket.clear_bubbles_controller(controller)
+
 
 func _on_players_changed() -> void:
 	var public_players := player_registry.public_players()

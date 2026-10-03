@@ -8,12 +8,13 @@ var scene_path: String
 var required_feature: String
 var minigame_id: StringName
 
+
 func _init(
-		new_id: StringName,
-		new_display_name: String,
-		new_scene_path: String,
-		new_required_feature: String = "",
-		new_minigame_id: StringName = &""
+	new_id: StringName,
+	new_display_name: String,
+	new_scene_path: String,
+	new_required_feature: String = "",
+	new_minigame_id: StringName = &"",
 ) -> void:
 	id = new_id
 	display_name = new_display_name
@@ -21,9 +22,10 @@ func _init(
 	required_feature = new_required_feature
 	minigame_id = new_minigame_id
 
+
 func availability(features: Dictionary) -> Dictionary:
 	if scene_path.is_empty() or not ResourceLoader.exists(scene_path, "PackedScene"):
-		return {"available": false, "reason": "Scenario not implemented yet"}
+		return { "available": false, "reason": "Scenario not implemented yet" }
 	if not required_feature.is_empty() and not bool(features.get(required_feature, false)):
-		return {"available": false, "reason": "Requires %s" % required_feature}
-	return {"available": true, "reason": ""}
+		return { "available": false, "reason": "Requires %s" % required_feature }
+	return { "available": true, "reason": "" }

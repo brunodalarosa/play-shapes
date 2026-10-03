@@ -64,18 +64,24 @@ func _stage(count: int) -> Dictionary:
 	controller.tuning.countdown_seconds = 0.0
 	var players: Array = []
 	for index: int in count:
-		players.append({"player_id": "p%d" % index, "name": "Player %d" % (index + 1), "seat": index + 1})
+		players.append(
+			{ "player_id": "p%d" % index, "name": "Player %d" % (index + 1), "seat": index + 1 }
+		)
 	var now := Time.get_ticks_msec()
 	controller.start_round(players, now)
 	var arena := Arena.new()
 	root.add_child(arena)
 	arena.setup(controller, Rect2(25, 65, 1230, 625))
 	for index: int in count:
-		var position := Vector2(240 + index * 400, 390) if count == 3 else Vector2(145 + (index % 5) * 245, 245 + (index / 5) * 290)
+		var position := (
+			Vector2(240 + index * 400, 390)
+			if count == 3
+			else Vector2(145 + (index % 5) * 245, 245 + (index / 5) * 290)
+		)
 		arena.add_bubble("p%d" % index, position)
 	controller.complete_entrance(now)
 	arena.simulate_step(0.0, now)
-	return {"controller": controller, "arena": arena}
+	return { "controller": controller, "arena": arena }
 
 
 func _circle() -> Array:

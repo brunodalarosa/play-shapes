@@ -25,7 +25,7 @@ func _capture() -> void:
 	controller.tuning.instructions_seconds = 0.0
 	controller.tuning.countdown_seconds = 0.0
 	var now := Time.get_ticks_msec()
-	controller.start_round([{"player_id": "sample", "name": "Player", "seat": 1}], now, true)
+	controller.start_round([{ "player_id": "sample", "name": "Player", "seat": 1 }], now, true)
 	controller.set_process(false)
 	var arena := Arena.new() as BubblesPlayerArena
 	root.add_child(arena)
@@ -39,28 +39,68 @@ func _capture() -> void:
 	arena.simulate_step(0.0, now + 40)
 	await _save("maximum-idle")
 	var protocol := Protocol.new(controller)
-	protocol.handle_action({"player_id": "sample"}, {"type": "bubbles_charge", "input_seq": 1, "stage": "start", "step": 0}, now + 41)
-	protocol.handle_action({"player_id": "sample"}, {"type": "bubbles_charge", "input_seq": 1, "stage": "motion", "drag": [-4, 0]}, now + 110)
+	protocol.handle_action(
+		{ "player_id": "sample" },
+		{ "type": "bubbles_charge", "input_seq": 1, "stage": "start", "step": 0 },
+		now + 41,
+	)
+	protocol.handle_action(
+		{ "player_id": "sample" },
+		{ "type": "bubbles_charge", "input_seq": 1, "stage": "motion", "drag": [-4, 0] },
+		now + 110,
+	)
 	arena.simulate_step(0.05, now + 150)
 	await _save("held-left-before-release")
-	protocol.handle_action({"player_id": "sample"}, {"type": "bubbles_trace", "input_seq": 1, "trace": [[0.9, 0.5], [0.1, 0.5]]}, now + 200)
+	protocol.handle_action(
+		{ "player_id": "sample" },
+		{ "type": "bubbles_trace", "input_seq": 1, "trace": [[0.9, 0.5], [0.1, 0.5]] },
+		now + 200,
+	)
 	arena.simulate_step(0.05, now + 280)
 	await _save("accepted-swipe")
 	bubble.velocity = Vector2.ZERO
 	bubble.global_position = Vector2(640, 355)
-	protocol.handle_action({"player_id": "sample"}, {"type": "bubbles_charge", "input_seq": 2, "stage": "start", "step": 0}, now + 350)
-	protocol.handle_action({"player_id": "sample"}, {"type": "bubbles_charge", "input_seq": 2, "stage": "motion", "drag": [-4, 0]}, now + 420)
+	protocol.handle_action(
+		{ "player_id": "sample" },
+		{ "type": "bubbles_charge", "input_seq": 2, "stage": "start", "step": 0 },
+		now + 350,
+	)
+	protocol.handle_action(
+		{ "player_id": "sample" },
+		{ "type": "bubbles_charge", "input_seq": 2, "stage": "motion", "drag": [-4, 0] },
+		now + 420,
+	)
 	arena.simulate_step(0.05, now + 500)
 	await _save("slow-held-drag")
-	protocol.handle_action({"player_id": "sample"}, {"type": "bubbles_trace", "input_seq": 2, "trace": [[0.9, 0.5], [0.1, 0.5]]}, now + 1100)
+	protocol.handle_action(
+		{ "player_id": "sample" },
+		{ "type": "bubbles_trace", "input_seq": 2, "trace": [[0.9, 0.5], [0.1, 0.5]] },
+		now + 1100,
+	)
 	arena.simulate_step(0.05, now + 1150)
 	await _save("slow-release-no-impulse")
-	protocol.handle_action({"player_id": "sample"}, {"type": "bubbles_charge", "input_seq": 3, "stage": "start", "step": 0}, now + 1250)
-	protocol.handle_action({"player_id": "sample"}, {"type": "bubbles_charge", "input_seq": 3, "stage": "progress", "step": 3}, now + 1300)
-	protocol.handle_action({"player_id": "sample"}, {"type": "bubbles_charge", "input_seq": 3, "stage": "motion", "drag": [2, 2]}, now + 1370)
+	protocol.handle_action(
+		{ "player_id": "sample" },
+		{ "type": "bubbles_charge", "input_seq": 3, "stage": "start", "step": 0 },
+		now + 1250,
+	)
+	protocol.handle_action(
+		{ "player_id": "sample" },
+		{ "type": "bubbles_charge", "input_seq": 3, "stage": "progress", "step": 3 },
+		now + 1300,
+	)
+	protocol.handle_action(
+		{ "player_id": "sample" },
+		{ "type": "bubbles_charge", "input_seq": 3, "stage": "motion", "drag": [2, 2] },
+		now + 1370,
+	)
 	arena.simulate_step(0.05, now + 1420)
 	await _save("charge-glow-wobble")
-	protocol.handle_action({"player_id": "sample"}, {"type": "bubbles_trace", "input_seq": 3, "trace": _circle()}, now + 1500)
+	protocol.handle_action(
+		{ "player_id": "sample" },
+		{ "type": "bubbles_trace", "input_seq": 3, "trace": _circle() },
+		now + 1500,
+	)
 	arena.simulate_step(0.0, now + 1560)
 	await _save("active-spin")
 	controller.pop_player("sample", now + 1600)

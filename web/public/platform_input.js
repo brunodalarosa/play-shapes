@@ -8,15 +8,23 @@ export const DEFAULT_PLATFORM_SETTINGS = Object.freeze({
     refreshIntervalMsec: 100,
 });
 export function validatePlatformSettings(settings) {
-    if (![settings.deadZone, settings.deadZoneHysteresis, settings.verticalEnterDegrees,
-        settings.verticalExitDegrees, settings.moveIntervalMsec, settings.refreshIntervalMsec].every(Number.isFinite)
-        || settings.deadZone < 0 || settings.deadZoneHysteresis < 0
-        || settings.deadZone + settings.deadZoneHysteresis >= 1
-        || settings.verticalEnterDegrees < 0
-        || settings.verticalExitDegrees < settings.verticalEnterDegrees
-        || settings.verticalExitDegrees >= 45
-        || settings.moveIntervalMsec < 1 || settings.refreshIntervalMsec < settings.moveIntervalMsec
-        || settings.refreshIntervalMsec >= 350)
+    if (![
+        settings.deadZone,
+        settings.deadZoneHysteresis,
+        settings.verticalEnterDegrees,
+        settings.verticalExitDegrees,
+        settings.moveIntervalMsec,
+        settings.refreshIntervalMsec,
+    ].every(Number.isFinite) ||
+        settings.deadZone < 0 ||
+        settings.deadZoneHysteresis < 0 ||
+        settings.deadZone + settings.deadZoneHysteresis >= 1 ||
+        settings.verticalEnterDegrees < 0 ||
+        settings.verticalExitDegrees < settings.verticalEnterDegrees ||
+        settings.verticalExitDegrees >= 45 ||
+        settings.moveIntervalMsec < 1 ||
+        settings.refreshIntervalMsec < settings.moveIntervalMsec ||
+        settings.refreshIntervalMsec >= 350)
         throw new RangeError("Invalid platform input settings");
 }
 const neutral = () => ({ axes: { x: 0, y: 0 }, stance: "neutral" });
@@ -36,11 +44,11 @@ export function classifyPlatformInput(x, y, previous, settings = DEFAULT_PLATFOR
         y /= length;
     }
     const magnitude = Math.hypot(x, y);
-    if (magnitude <= settings.deadZone
-        || (previous.stance === "neutral" && magnitude < settings.deadZone + settings.deadZoneHysteresis))
+    if (magnitude <= settings.deadZone ||
+        (previous.stance === "neutral" && magnitude < settings.deadZone + settings.deadZoneHysteresis))
         return neutral();
     const vertical = y > 0 ? "look_up" : "crouch";
-    const angle = Math.atan2(Math.abs(x), Math.abs(y)) * 180 / Math.PI;
+    const angle = (Math.atan2(Math.abs(x), Math.abs(y)) * 180) / Math.PI;
     const sector = previous.stance === vertical ? settings.verticalExitDegrees : settings.verticalEnterDegrees;
     return { axes: { x, y }, stance: angle <= sector ? vertical : "move" };
 }
@@ -57,15 +65,28 @@ export class PlatformInputState {
         this.settings = Object.freeze({ ...settings });
         validatePlatformSettings(this.settings);
     }
-    get actionPointer() { return this.owner && "pointer" in this.owner ? this.owner.pointer : undefined; }
-    get actionHeld() { return this.owner !== undefined; }
-    get action() { return this.current.stance === "crouch" ? "fall" : "jump"; }
-    snapshot() { return { axes: { ...this.current.axes }, stance: this.current.stance }; }
-    activate() { if (!this.active) {
+    get actionPointer() {
+        return this.owner && "pointer" in this.owner ? this.owner.pointer : undefined;
+    }
+    get actionHeld() {
+        return this.owner !== undefined;
+    }
+    get action() {
+        return this.current.stance === "crouch" ? "fall" : "jump";
+    }
+    snapshot() {
+        return { axes: { ...this.current.axes }, stance: this.current.stance };
+    }
+    activate() {
+        if (!this.active) {
+            this.cancel();
+            this.active = true;
+        }
+    }
+    deactivate() {
         this.cancel();
-        this.active = true;
-    } }
-    deactivate() { this.cancel(); this.active = false; }
+        this.active = false;
+    }
     /** Every device move updates local state, even when its network send is throttled. */
     updateAxes(x, y) {
         if (!this.active || !Number.isFinite(x) || !Number.isFinite(y))
@@ -85,8 +106,13 @@ export class PlatformInputState {
         if (sendNeutral)
             this.emit({ kind: "move", input: this.snapshot() });
     }
-    cancelAction() { this.owner = undefined; }
-    cancel() { this.cancelAction(); this.endStick(); }
+    cancelAction() {
+        this.owner = undefined;
+    }
+    cancel() {
+        this.cancelAction();
+        this.endStick();
+    }
     pressAction(pointer) {
         if (!this.active || this.owner !== undefined)
             return false;

@@ -4,10 +4,12 @@ extends Node2D
 
 const MANIFEST_PATH := "res://assets/runtime/animated_characters/squircle/v1/manifest.json"
 const ASSET_ROOT := "res://assets/runtime/animated_characters/squircle/v1/"
-const TINT_SHADER: Shader = preload("res://assets/runtime/animated_characters/squircle/v1/render_tint.gdshader")
+const TINT_SHADER: Shader = preload(
+	"res://assets/runtime/animated_characters/squircle/v1/render_tint.gdshader"
+)
 
-static var _clips: Dictionary = {}
-static var _sheets: Dictionary = {}
+static var _clips: Dictionary = { }
+static var _sheets: Dictionary = { }
 static var _manifest_tile_size := Vector2i(256, 256)
 static var _live_instances := 0
 
@@ -77,7 +79,11 @@ func advance_playback(delta: float) -> void:
 	var clip: Dictionary = _clips[_clip_key]
 	if clip.get("playback", "loop") == "held":
 		var duration := float(int(clip.frames) - 1) * 1000.0 / float(clip.fps)
-		_elapsed_msec = clampf(_elapsed_msec + delta * 1000.0 * (-1.0 if _releasing else 1.0), 0.0, duration)
+		_elapsed_msec = clampf(
+			_elapsed_msec + delta * 1000.0 * (-1.0 if _releasing else 1.0),
+			0.0,
+			duration,
+		)
 		if _releasing and _elapsed_msec <= 0.0:
 			var next := _pending_clip_key
 			_releasing = false
@@ -90,10 +96,18 @@ func advance_playback(delta: float) -> void:
 	if clip.get("playback", "loop") != "held" and _external_time_msec >= 0:
 		time_msec = float(_external_time_msec)
 	var frame := int(floor(time_msec * float(clip.fps) / 1000.0 + 0.00001))
-	frame = mini(frame, int(clip.frames) - 1) if clip.get("playback", "loop") == "held" else frame % int(clip.frames)
+	frame = (
+		mini(frame, int(clip.frames) - 1)
+		if clip.get("playback", "loop") == "held"
+		else frame % int(clip.frames)
+	)
 	var columns := int(clip.sheet_columns)
-	var tile := Rect2(frame % columns * _tile_size.x,
-		floori(float(frame) / float(columns)) * _tile_size.y, _tile_size.x, _tile_size.y)
+	var tile := Rect2(
+		frame % columns * _tile_size.x,
+		floori(float(frame) / float(columns)) * _tile_size.y,
+		_tile_size.x,
+		_tile_size.y,
+	)
 	for sprite: Sprite2D in [_colorable, _face, _blink]:
 		sprite.region_rect = tile
 

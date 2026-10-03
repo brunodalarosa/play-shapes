@@ -10,11 +10,15 @@ const PLAYER_RESTITUTION := 0.5
 var bounds := Rect2()
 var wall_bounds := Rect2()
 var _controller: BubblesRoundController
-var _bubbles: Dictionary = {}
+var _bubbles: Dictionary = { }
 var _ordered_ids: Array[String] = []
 
 
-func setup(controller: BubblesRoundController, arena_bounds: Rect2, viewport_bounds: Rect2 = Rect2()) -> bool:
+func setup(
+	controller: BubblesRoundController,
+	arena_bounds: Rect2,
+	viewport_bounds: Rect2 = Rect2(),
+) -> bool:
 	if controller == null or not arena_bounds.has_area() or controller.tuning == null:
 		return false
 	_controller = controller
@@ -44,7 +48,7 @@ func add_bubble(player_id: String, start_position: Vector2) -> BubblesPlayerBubb
 		player_id,
 		String(snapshot.get("name", "")),
 		Color(String(selection.character_color)),
-		_controller.tuning
+		_controller.tuning,
 	)
 	bubble.bind_controller(_controller)
 	_bubbles[player_id] = bubble
@@ -63,7 +67,10 @@ func bubble_ids() -> Array[String]:
 
 ## Caller supplies the host clock and a fixed delta, normally 1/60 second.
 func simulate_step(delta: float, host_time_msec: int) -> bool:
-	if _controller == null or not is_finite(delta) or delta < 0.0 or delta > 0.05 or host_time_msec < 0:
+	if (
+		_controller == null or not is_finite(delta)
+		or delta < 0.0 or delta > 0.05 or host_time_msec < 0
+	):
 		return false
 	if not _controller.advance(host_time_msec).accepted:
 		return false
@@ -75,7 +82,11 @@ func simulate_step(delta: float, host_time_msec: int) -> bool:
 			var a: BubblesPlayerBubble = _bubbles[_ordered_ids[first]]
 			var b: BubblesPlayerBubble = _bubbles[_ordered_ids[second]]
 			if _resolve_pair(a, b, host_time_msec):
-				var spun_id := a.player_id if a.is_spinning(host_time_msec) else (b.player_id if b.is_spinning(host_time_msec) else "")
+				var spun_id := (
+					a.player_id
+					if a.is_spinning(host_time_msec)
+					else (b.player_id if b.is_spinning(host_time_msec) else "")
+				)
 				player_collision.emit(a.player_id, b.player_id, spun_id)
 	# Pair separation can move a body through the invisible boundary.
 	for player_id: String in _ordered_ids:

@@ -4,6 +4,7 @@ extends SceneTree
 const Policy := preload("res://addons/standalone_build/standalone_build_policy.gd")
 const PACK := "res://builds/standalone/windows-x86_64/Play Shapes.pck"
 
+
 func _initialize() -> void:
 	var path := ProjectSettings.globalize_path(PACK)
 	var missing := Policy.pack_contains_required_browser_paths(path)

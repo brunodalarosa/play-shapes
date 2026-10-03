@@ -2,8 +2,12 @@ class_name BubblesPufferfish
 extends Area2D
 ## One warned, one-pass host trajectory. Particle motion never drives collision checks.
 
-const LEFT_TEXTURE: Texture2D = preload("res://assets/runtime/minigames/bubbles_and_jellyfishes/pufferfish/pufferfish_left.png")
-const RIGHT_TEXTURE: Texture2D = preload("res://assets/runtime/minigames/bubbles_and_jellyfishes/pufferfish/pufferfish_right.png")
+const LEFT_TEXTURE: Texture2D = preload(
+	"res://assets/runtime/minigames/bubbles_and_jellyfishes/pufferfish/pufferfish_left.png"
+)
+const RIGHT_TEXTURE: Texture2D = preload(
+	"res://assets/runtime/minigames/bubbles_and_jellyfishes/pufferfish/pufferfish_right.png"
+)
 const WARNING_PARTICLE_TEXTURE_SIZE := 32
 const WARNING_PARTICLE_LIFETIME_TAIL := 0.35
 
@@ -45,8 +49,13 @@ func _ready() -> void:
 	_warning_particles.emitting = false
 
 
-func configure(id: int, selected_tuning: BubblesTuning, at_msec: int,
-		start: Vector2, destination: Vector2) -> void:
+func configure(
+	id: int,
+	selected_tuning: BubblesTuning,
+	at_msec: int,
+	start: Vector2,
+	destination: Vector2,
+) -> void:
 	creature_id = id
 	radius = selected_tuning.pufferfish_collider_radius * selected_tuning.pufferfish_size_multiplier
 	start_position = start
@@ -113,7 +122,10 @@ func can_hit_player() -> bool:
 func _update_body_motion() -> void:
 	var wave := sin(TAU * _animation_elapsed / _jiggle_period_seconds)
 	_sprite.rotation = _base_sprite_rotation + deg_to_rad(_jiggle_degrees) * wave
-	_sprite.scale = _base_sprite_scale * Vector2(1.0 + wave * _jiggle_squash * 0.35, 1.0 - wave * _jiggle_squash)
+	_sprite.scale = _base_sprite_scale * Vector2(
+		1.0 + wave * _jiggle_squash * 0.35,
+		1.0 - wave * _jiggle_squash,
+	)
 
 
 func _create_warning_particle_material() -> ParticleProcessMaterial:
@@ -144,7 +156,12 @@ func _create_warning_fade_ramp() -> GradientTexture1D:
 
 
 func _create_warning_bubble_texture() -> ImageTexture:
-	var image := Image.create(WARNING_PARTICLE_TEXTURE_SIZE, WARNING_PARTICLE_TEXTURE_SIZE, false, Image.FORMAT_RGBA8)
+	var image := Image.create(
+		WARNING_PARTICLE_TEXTURE_SIZE,
+		WARNING_PARTICLE_TEXTURE_SIZE,
+		false,
+		Image.FORMAT_RGBA8,
+	)
 	var texture_center := Vector2.ONE * (float(WARNING_PARTICLE_TEXTURE_SIZE) - 1.0) * 0.5
 	for y: int in WARNING_PARTICLE_TEXTURE_SIZE:
 		for x: int in WARNING_PARTICLE_TEXTURE_SIZE:
@@ -152,7 +169,14 @@ func _create_warning_bubble_texture() -> ImageTexture:
 			var radius_ratio := offset.length() / texture_center.x
 			var inner_rim := _smoothstep(0.69, 0.78, radius_ratio)
 			var outer_rim := 1.0 - _smoothstep(0.9, 1.0, radius_ratio)
-			var highlight := exp(-((offset.x + 4.0) * (offset.x + 4.0) + (offset.y + 4.0) * (offset.y + 4.0)) * 0.09) if radius_ratio < 0.82 else 0.0
+			var highlight := (
+				exp(
+					-((offset.x + 4.0) * (offset.x + 4.0) + (offset.y + 4.0) * (offset.y + 4.0))
+					* 0.09
+				)
+				if radius_ratio < 0.82
+				else 0.0
+			)
 			var interior := clampf(1.0 - radius_ratio, 0.0, 1.0) * 0.08
 			var alpha := clampf(inner_rim * outer_rim * 0.9 + highlight * 0.55 + interior, 0.0, 1.0)
 			image.set_pixel(x, y, Color(0.55, 0.94, 1.0, alpha))

@@ -13,7 +13,10 @@ export const CHARACTER_COLORS = [
 ];
 export const FALLBACK_CHARACTER = { shape: CHARACTER_SHAPE, color: "#598DF2" };
 export function defaultJoinFlow() {
-    return { screen: "selection", color: CHARACTER_COLORS.find(option => option.id === "blue").hex };
+    return {
+        screen: "selection",
+        color: CHARACTER_COLORS.find((option) => option.id === "blue").hex,
+    };
 }
 export function chooseJoinColor(state, color) {
     return { ...state, color };
@@ -25,10 +28,15 @@ export function returnToCharacterSelection(state) {
     return { ...state, screen: "selection" };
 }
 export function createJoinMessage(name, state) {
-    return { type: "join", name: name.trim(), character_shape: CHARACTER_SHAPE, character_color: state.color };
+    return {
+        type: "join",
+        name: name.trim(),
+        character_shape: CHARACTER_SHAPE,
+        character_color: state.color,
+    };
 }
 export function colorOption(hex) {
     if (typeof hex !== "string")
         return undefined;
-    return CHARACTER_COLORS.find(option => option.hex.toUpperCase() === hex.toUpperCase());
+    return CHARACTER_COLORS.find((option) => option.hex.toUpperCase() === hex.toUpperCase());
 }

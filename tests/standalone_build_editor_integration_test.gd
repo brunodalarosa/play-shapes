@@ -17,12 +17,14 @@ var _plugin: EditorPlugin
 var _elapsed := 0.0
 var _dialog_size_checked := false
 
+
 func _initialize() -> void:
 	_plugin = Plugin.new()
 	root.add_child(_plugin)
 	_plugin._reveal_on_success = false
 	_plugin._create_dialog()
 	_plugin.call_deferred("_on_build_requested")
+
 
 func _process(delta: float) -> bool:
 	_elapsed += delta
@@ -33,8 +35,13 @@ func _process(delta: float) -> bool:
 	if _plugin._build_active and not _dialog_size_checked:
 		_dialog_size_checked = true
 		var dialog_size: Vector2i = _plugin._dialog.size
-		var landscape: bool = dialog_size.y <= 600 and float(dialog_size.x) / float(dialog_size.y) >= 1.5
-		if not _require(landscape, "dialog opens in a bounded landscape shape (actual %s)" % dialog_size):
+		var landscape: bool = (
+			dialog_size.y <= 600 and float(dialog_size.x) / float(dialog_size.y) >= 1.5
+		)
+		if not _require(
+			landscape,
+			"dialog opens in a bounded landscape shape (actual %s)" % dialog_size,
+		):
 			return true
 	if _plugin._build_active:
 		return false
@@ -52,13 +59,20 @@ func _process(delta: float) -> bool:
 		return true
 	if not _require(FileAccess.file_exists(archive), "portable ZIP exists"):
 		return true
-	if not _require(Policy.pack_contains_required_runtime_paths(pack).is_empty(), "PCK contains browser routes, host scenes, and runtime QR code"):
+	if not _require(
+		Policy.pack_contains_required_runtime_paths(pack).is_empty(),
+		"PCK contains browser routes, host scenes, and runtime QR code",
+	):
 		return true
 	var forbidden := Policy.pack_contains_any_path(pack, FORBIDDEN_PACK_PATHS)
 	if not _require(forbidden.is_empty(), "PCK excludes development-only path: %s" % forbidden):
 		return true
 	var metadata: Variant = JSON.parse_string(FileAccess.get_file_as_string(metadata_path))
-	if not _require(metadata is Dictionary and metadata.preset == Policy.PRESET_NAME and metadata.architecture == Policy.ARCHITECTURE, "metadata identifies the preset and architecture"):
+	if not _require(
+		metadata is Dictionary and metadata.preset == Policy.PRESET_NAME
+		and metadata.architecture == Policy.ARCHITECTURE,
+		"metadata identifies the preset and architecture",
+	):
 		return true
 	var reader := ZIPReader.new()
 	if not _require(reader.open(archive) == OK, "portable ZIP opens"):
@@ -74,6 +88,7 @@ func _process(delta: float) -> bool:
 	print("Standalone builder editor integration checks passed")
 	quit(0)
 	return true
+
 
 func _require(condition: bool, description: String) -> bool:
 	if condition:

@@ -9,7 +9,7 @@ var player_id: String = ""
 var spawn_point: Vector2 = Vector2.ZERO
 var connected: bool = true
 var _blink_elapsed: float = 0.0
-var _initial_player: Dictionary = {}
+var _initial_player: Dictionary = { }
 
 @onready var motor: PlatformMotor = $PlatformMotor
 @onready var _character: SquircleV1Playback = $SquircleV1Playback
@@ -39,7 +39,10 @@ func configure(player: Dictionary, anchor: Vector2) -> void:
 
 func _update_player(player: Dictionary) -> void:
 	_nameplate.text = String(player.name)
-	_nameplate.add_theme_font_size_override("font_size", maxi(18, 24 - maxi(0, _nameplate.text.length() - 11)))
+	_nameplate.add_theme_font_size_override(
+		"font_size",
+		maxi(18, 24 - maxi(0, _nameplate.text.length() - 11)),
+	)
 	_character.player_color = Color(String(player.character_color))
 	set_connected(String(player.state) == "connected")
 

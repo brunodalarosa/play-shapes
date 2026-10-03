@@ -7,6 +7,7 @@ var tls: StreamPeerTLS
 var stream: StreamPeer
 var failed := false
 
+
 func _init(connection: StreamPeerTCP, options: TLSOptions = null) -> void:
 	tcp = connection
 	tcp.set_no_delay(true)
@@ -15,6 +16,7 @@ func _init(connection: StreamPeerTCP, options: TLSOptions = null) -> void:
 		tls = StreamPeerTLS.new()
 		failed = tls.accept_stream(tcp, options) != OK
 		stream = tls
+
 
 func poll_ready() -> bool:
 	tcp.poll()
@@ -28,6 +30,7 @@ func poll_ready() -> bool:
 			failed = true
 		return state == StreamPeerTLS.STATUS_CONNECTED
 	return not failed
+
 
 func close() -> void:
 	if tls != null:

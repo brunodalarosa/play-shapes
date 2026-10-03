@@ -26,15 +26,26 @@ export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = Object.freeze({
 });
 
 export function validatePlatformSettings(settings: PlatformSettings): void {
-  if (![settings.deadZone, settings.deadZoneHysteresis, settings.verticalEnterDegrees,
-    settings.verticalExitDegrees, settings.moveIntervalMsec, settings.refreshIntervalMsec].every(Number.isFinite)
-    || settings.deadZone < 0 || settings.deadZoneHysteresis < 0
-    || settings.deadZone + settings.deadZoneHysteresis >= 1
-    || settings.verticalEnterDegrees < 0
-    || settings.verticalExitDegrees < settings.verticalEnterDegrees
-    || settings.verticalExitDegrees >= 45
-    || settings.moveIntervalMsec < 1 || settings.refreshIntervalMsec < settings.moveIntervalMsec
-    || settings.refreshIntervalMsec >= 350) throw new RangeError("Invalid platform input settings");
+  if (
+    ![
+      settings.deadZone,
+      settings.deadZoneHysteresis,
+      settings.verticalEnterDegrees,
+      settings.verticalExitDegrees,
+      settings.moveIntervalMsec,
+      settings.refreshIntervalMsec,
+    ].every(Number.isFinite) ||
+    settings.deadZone < 0 ||
+    settings.deadZoneHysteresis < 0 ||
+    settings.deadZone + settings.deadZoneHysteresis >= 1 ||
+    settings.verticalEnterDegrees < 0 ||
+    settings.verticalExitDegrees < settings.verticalEnterDegrees ||
+    settings.verticalExitDegrees >= 45 ||
+    settings.moveIntervalMsec < 1 ||
+    settings.refreshIntervalMsec < settings.moveIntervalMsec ||
+    settings.refreshIntervalMsec >= 350
+  )
+    throw new RangeError("Invalid platform input settings");
 }
 
 const neutral = (): PlatformSnapshot => ({ axes: { x: 0, y: 0 }, stance: "neutral" });
@@ -44,7 +55,9 @@ const neutral = (): PlatformSnapshot => ({ axes: { x: 0, y: 0 }, stance: "neutra
  * documents the same ordered comparisons; client stance is never a physics decision.
  */
 export function classifyPlatformInput(
-  x: number, y: number, previous: PlatformSnapshot,
+  x: number,
+  y: number,
+  previous: PlatformSnapshot,
   settings: PlatformSettings = DEFAULT_PLATFORM_SETTINGS,
 ): PlatformSnapshot {
   if (!Number.isFinite(x) || !Number.isFinite(y)) return neutral();
@@ -52,13 +65,20 @@ export function classifyPlatformInput(
   x = Math.max(-1, Math.min(1, x));
   y = Math.max(-1, Math.min(1, y));
   const length = Math.hypot(x, y);
-  if (length > 1) { x /= length; y /= length; }
+  if (length > 1) {
+    x /= length;
+    y /= length;
+  }
   const magnitude = Math.hypot(x, y);
-  if (magnitude <= settings.deadZone
-    || (previous.stance === "neutral" && magnitude < settings.deadZone + settings.deadZoneHysteresis)) return neutral();
+  if (
+    magnitude <= settings.deadZone ||
+    (previous.stance === "neutral" && magnitude < settings.deadZone + settings.deadZoneHysteresis)
+  )
+    return neutral();
   const vertical: PlatformStance = y > 0 ? "look_up" : "crouch";
-  const angle = Math.atan2(Math.abs(x), Math.abs(y)) * 180 / Math.PI;
-  const sector = previous.stance === vertical ? settings.verticalExitDegrees : settings.verticalEnterDegrees;
+  const angle = (Math.atan2(Math.abs(x), Math.abs(y)) * 180) / Math.PI;
+  const sector =
+    previous.stance === vertical ? settings.verticalExitDegrees : settings.verticalEnterDegrees;
   return { axes: { x, y }, stance: angle <= sector ? vertical : "move" };
 }
 
@@ -70,18 +90,37 @@ export class PlatformInputState {
   private owner: { pointer: number } | { key: string } | undefined;
   readonly settings: PlatformSettings;
 
-  constructor(private readonly emit: (intent: PlatformIntent) => void, settings = DEFAULT_PLATFORM_SETTINGS) {
+  constructor(
+    private readonly emit: (intent: PlatformIntent) => void,
+    settings = DEFAULT_PLATFORM_SETTINGS,
+  ) {
     this.settings = Object.freeze({ ...settings });
     validatePlatformSettings(this.settings);
   }
 
-  get actionPointer(): number | undefined { return this.owner && "pointer" in this.owner ? this.owner.pointer : undefined; }
-  get actionHeld(): boolean { return this.owner !== undefined; }
-  get action(): PlatformAction { return this.current.stance === "crouch" ? "fall" : "jump"; }
-  snapshot(): PlatformSnapshot { return { axes: { ...this.current.axes }, stance: this.current.stance }; }
+  get actionPointer(): number | undefined {
+    return this.owner && "pointer" in this.owner ? this.owner.pointer : undefined;
+  }
+  get actionHeld(): boolean {
+    return this.owner !== undefined;
+  }
+  get action(): PlatformAction {
+    return this.current.stance === "crouch" ? "fall" : "jump";
+  }
+  snapshot(): PlatformSnapshot {
+    return { axes: { ...this.current.axes }, stance: this.current.stance };
+  }
 
-  activate(): void { if (!this.active) { this.cancel(); this.active = true; } }
-  deactivate(): void { this.cancel(); this.active = false; }
+  activate(): void {
+    if (!this.active) {
+      this.cancel();
+      this.active = true;
+    }
+  }
+  deactivate(): void {
+    this.cancel();
+    this.active = false;
+  }
 
   /** Every device move updates local state, even when its network send is throttled. */
   updateAxes(x: number, y: number): boolean {
@@ -102,8 +141,13 @@ export class PlatformInputState {
     if (sendNeutral) this.emit({ kind: "move", input: this.snapshot() });
   }
 
-  cancelAction(): void { this.owner = undefined; }
-  cancel(): void { this.cancelAction(); this.endStick(); }
+  cancelAction(): void {
+    this.owner = undefined;
+  }
+  cancel(): void {
+    this.cancelAction();
+    this.endStick();
+  }
 
   pressAction(pointer: number): boolean {
     if (!this.active || this.owner !== undefined) return false;
@@ -129,6 +173,7 @@ export class PlatformInputState {
 
   /** Native assistive activation and owned pointer/key releases use the same current snapshot. */
   activateAction(): void {
-    if (this.active && !this.actionHeld) this.emit({ kind: "release", action: this.action, input: this.snapshot() });
+    if (this.active && !this.actionHeld)
+      this.emit({ kind: "release", action: this.action, input: this.snapshot() });
   }
 }

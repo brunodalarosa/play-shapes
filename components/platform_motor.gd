@@ -82,7 +82,10 @@ func clear_input() -> void:
 
 
 func request_jump() -> bool:
-	if not enabled or not _contacts_valid or _jump_queued or _dropping or not body.is_on_floor() or body.velocity.y < 0.0:
+	if (
+		not enabled or not _contacts_valid or _jump_queued or _dropping
+		or not body.is_on_floor() or body.velocity.y < 0.0
+	):
 		return false
 	_jump_queued = true
 	return true
@@ -125,7 +128,10 @@ func request_fall() -> bool:
 
 
 func presentation_action() -> String:
-	if body.is_on_floor() and body.velocity.y >= 0.0 and not _dropping and stance in ["look_up", "crouch"]:
+	if (
+		body.is_on_floor() and body.velocity.y >= 0.0
+		and not _dropping and stance in ["look_up", "crouch"]
+	):
 		return stance
 	return "idle" if absf(body.velocity.x) < 20.0 else "run" if absf(axes.x) >= run_threshold else "walk"
 
@@ -149,7 +155,10 @@ func _physics_process(delta: float) -> void:
 		for index: int in body.get_slide_collision_count():
 			var contact := body.get_slide_collision(index)
 			if contact.get_collider() is CharacterBody2D and contact.get_normal().y < -0.7:
-				body.velocity.y = -minf(falling_speed * player_bounce_factor, player_bounce_max_impulse)
+				body.velocity.y = -minf(
+					falling_speed * player_bounce_factor,
+					player_bounce_max_impulse,
+				)
 				break
 	if body.position.y > fall_reset_y:
 		clear_input()
@@ -166,8 +175,11 @@ func _update_drop(delta: float) -> void:
 	var body_bounds := _body_bounds()
 	# Full clearance, walking off an edge, or landing on a different support all end
 	# the exclusion. Lower platforms/characters remain collidable throughout.
-	if body_bounds.position.y > support_bounds.end.y + drop_clearance \
-			or body_bounds.end.x < support_bounds.position.x or body_bounds.position.x > support_bounds.end.x \
+	if (
+		body_bounds.position.y > support_bounds.end.y + drop_clearance \
+				or body_bounds.end.x < support_bounds.position.x
+		or body_bounds.position.x > support_bounds.end.x
+	) \
 			or body.is_on_floor():
 		_restore_contact()
 

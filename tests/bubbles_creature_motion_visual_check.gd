@@ -35,10 +35,13 @@ func _capture() -> void:
 	controller.tuning.pufferfish_speed = 350.0
 	controller.set_random_seed(49)
 	var now := Time.get_ticks_msec()
-	controller.start_round([
-		{"player_id": "p0", "name": "Player One", "seat": 1},
-		{"player_id": "p1", "name": "Player Two", "seat": 2},
-	], now)
+	controller.start_round(
+		[
+			{ "player_id": "p0", "name": "Player One", "seat": 1 },
+			{ "player_id": "p1", "name": "Player Two", "seat": 2 },
+		],
+		now,
+	)
 	var players := PlayerArena.new()
 	root.add_child(players)
 	players.setup(controller, Rect2(30, 65, 1220, 620))
@@ -52,9 +55,21 @@ func _capture() -> void:
 	creatures.simulate_step(0.0, now)
 
 	controller.tuning.jellyfish_collider_radius = 8.0
-	var small_jelly_id: int = creatures._create_jellyfish(Vector2(620, 270), Vector2.ZERO, now, false, 0)
+	var small_jelly_id: int = creatures._create_jellyfish(
+		Vector2(620, 270),
+		Vector2.ZERO,
+		now,
+		false,
+		0,
+	)
 	controller.tuning.jellyfish_collider_radius = 36.0
-	var large_jelly_id: int = creatures._create_jellyfish(Vector2(740, 430), Vector2.ZERO, now, false, 0)
+	var large_jelly_id: int = creatures._create_jellyfish(
+		Vector2(740, 430),
+		Vector2.ZERO,
+		now,
+		false,
+		0,
+	)
 	var puffer_id: int = creatures.schedule_puffer_path(Vector2(-60, 520), Vector2(1340, 520), now)
 	if small_jelly_id < 0 or large_jelly_id < 0 or puffer_id < 0:
 		push_error("Could not create Bubbles telegraph visual fixtures")
@@ -99,7 +114,11 @@ func _capture() -> void:
 	creatures.get_pufferfish(puffer_id)._collider.disabled = true
 
 	controller.tuning.pufferfish_warning_enabled = false
-	var no_warning_id := creatures.schedule_puffer_path(Vector2(640, -60), Vector2(640, 780), now + 2150)
+	var no_warning_id := creatures.schedule_puffer_path(
+		Vector2(640, -60),
+		Vector2(640, 780),
+		now + 2150,
+	)
 	var no_warning_puffer := creatures.get_pufferfish(no_warning_id)
 	if no_warning_puffer == null or no_warning_puffer._warning_particles.emitting:
 		push_error("Disabled warning unexpectedly created particles")

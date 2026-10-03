@@ -1,8 +1,18 @@
 import { expect, test } from "./fixtures";
 
-const SWIPES: [number, number][] = [[120, 0], [0, 120], [-120, 0], [0, -120], [90, 90], [-90, -90]];
+const SWIPES: [number, number][] = [
+  [120, 0],
+  [0, 120],
+  [-120, 0],
+  [0, -120],
+  [90, 90],
+  [-90, -90],
+];
 
-test("two phones join, play a Bubbles round and return to the lobby", async ({ host, openPhone }) => {
+test("two phones join, play a Bubbles round and return to the lobby", async ({
+  host,
+  openPhone,
+}) => {
   const phones = [await openPhone("Ana", 2), await openPhone("Bo", 5)];
 
   await test.step("join", async () => {
@@ -27,10 +37,15 @@ test("two phones join, play a Bubbles round and return to the lobby", async ({ h
     for (const phone of phones) await expect(phone.page.locator("#bubbles-card")).toBeVisible();
 
     let results = false;
-    host.event(/^phase results$/, { timeout: 5 * 60_000 }).then(() => { results = true; }, () => {});
+    host.event(/^phase results$/, { timeout: 5 * 60_000 }).then(
+      () => {
+        results = true;
+      },
+      () => {},
+    );
     for (let swipe = 0; !results; swipe += 1) {
       const [dx, dy] = SWIPES[swipe % SWIPES.length];
-      await Promise.all(phones.map(phone => phone.swipe(dx, dy)));
+      await Promise.all(phones.map((phone) => phone.swipe(dx, dy)));
       if (swipe === 2) for (const phone of phones) await phone.shot("bubbles");
       await phones[0].page.waitForTimeout(600);
     }
@@ -38,7 +53,10 @@ test("two phones join, play a Bubbles round and return to the lobby", async ({ h
     // The phones show results only after the host's results snapshot reaches them.
     await phones[0].page.waitForTimeout(1_000);
     for (const phone of phones) {
-      expect(phone.count("bubbles_trace_result"), `${phone.name} had no accepted swipe`).toBeGreaterThan(0);
+      expect(
+        phone.count("bubbles_trace_result"),
+        `${phone.name} had no accepted swipe`,
+      ).toBeGreaterThan(0);
       await phone.shot("results");
     }
   });
@@ -52,6 +70,9 @@ test("two phones join, play a Bubbles round and return to the lobby", async ({ h
     }
   });
 
-  const rejections = phones.flatMap(phone => phone.rejections.map(rejection => `${phone.name}: ${rejection}`));
-  if (rejections.length > 0) test.info().annotations.push({ type: "rejected input", description: rejections.join("\n") });
+  const rejections = phones.flatMap((phone) =>
+    phone.rejections.map((rejection) => `${phone.name}: ${rejection}`),
+  );
+  if (rejections.length > 0)
+    test.info().annotations.push({ type: "rejected input", description: rejections.join("\n") });
 });

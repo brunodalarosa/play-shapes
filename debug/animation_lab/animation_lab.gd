@@ -5,7 +5,7 @@ const MANIFEST_PATH := "res://assets/runtime/animated_characters/squircle/v1/man
 const VIEWS := ["front", "three-quarter"]
 const EXPRESSIONS := ["auto", "neutral", "blink"]
 
-var _clips: Dictionary = {}
+var _clips: Dictionary = { }
 var _samples: Array[SquircleV1Playback] = []
 var _actions: Array[String] = []
 var _action: String = "idle"
@@ -78,35 +78,71 @@ func _build_ui() -> void:
 	controls.add_theme_constant_override("h_separation", 18)
 	controls.add_theme_constant_override("v_separation", 12)
 	column.add_child(controls)
-	_add_picker(controls, "Action", _actions, 0, func(index: int) -> void:
-		_action = _actions[index]
-		_update_selection())
-	_add_picker(controls, "View", VIEWS, 0, func(index: int) -> void:
-		_view = VIEWS[index]
-		_update_selection())
+	_add_picker(
+		controls,
+		"Action",
+		_actions,
+		0,
+		func(index: int) -> void:
+			_action = _actions[index]
+			_update_selection(),
+	)
+	_add_picker(
+		controls,
+		"View",
+		VIEWS,
+		0,
+		func(index: int) -> void:
+			_view = VIEWS[index]
+			_update_selection(),
+	)
 	var color_names: Array[String] = []
 	for option: Dictionary in CharacterSelection.COLORS:
 		color_names.append(String(option.name))
-	_add_picker(controls, "Player color", color_names, 5, func(index: int) -> void:
-		_color = CharacterSelection.COLORS[index]
-		_update_selection())
-	_add_picker(controls, "Face", EXPRESSIONS, 0, func(index: int) -> void:
-		_expression = EXPRESSIONS[index]
-		_update_selection())
+	_add_picker(
+		controls,
+		"Player color",
+		color_names,
+		5,
+		func(index: int) -> void:
+			_color = CharacterSelection.COLORS[index]
+			_update_selection(),
+	)
+	_add_picker(
+		controls,
+		"Face",
+		EXPRESSIONS,
+		0,
+		func(index: int) -> void:
+			_expression = EXPRESSIONS[index]
+			_update_selection(),
+	)
 	_play_button = Button.new()
 	_play_button.text = "Pause"
 	_play_button.pressed.connect(_toggle_play)
 	controls.add_child(_play_button)
 	var release := Button.new()
 	release.text = "Release to idle"
-	release.pressed.connect(func() -> void: _request_action("idle"))
+	release.pressed.connect(
+		func() -> void:
+			_request_action("idle"),
+	)
 	controls.add_child(release)
 	var enter := Button.new()
 	enter.text = "Enter selected pose"
-	enter.pressed.connect(func() -> void: _request_action(_action))
+	enter.pressed.connect(
+		func() -> void:
+			_request_action(_action),
+	)
 	controls.add_child(enter)
-	_add_picker(controls, "Speed", ["Normal", "Half", "Quarter"], 0, func(index: int) -> void:
-		_speed = [1.0, 0.5, 0.25][index])
+	_add_picker(
+		controls,
+		"Speed",
+		["Normal", "Half", "Quarter"],
+		0,
+		func(index: int) -> void:
+			_speed = [1.0, 0.5, 0.25][index],
+	)
 
 	var stage := HBoxContainer.new()
 	stage.add_theme_constant_override("separation", 40)
@@ -124,7 +160,13 @@ func _build_ui() -> void:
 	column.add_child(note)
 
 
-func _add_picker(parent: Container, title: String, names: Array, initial: int, changed: Callable) -> void:
+func _add_picker(
+	parent: Container,
+	title: String,
+	names: Array,
+	initial: int,
+	changed: Callable,
+) -> void:
 	var group := VBoxContainer.new()
 	parent.add_child(group)
 	var label := Label.new()
@@ -177,8 +219,15 @@ func _update_selection() -> void:
 		sample.advance_playback(0.0)
 	var anchor := Vector2(float(clip.anchor_px[0]), float(clip.anchor_px[1]))
 	_info.text = "%s · %s · %s · %s  |  %d frames · %d fps · anchor (%.2f, %.2f)" % [
-		_action.capitalize(), _view.capitalize(), _color.name, _expression.capitalize(),
-		clip.frames, clip.fps, anchor.x, anchor.y]
+		_action.capitalize(),
+		_view.capitalize(),
+		_color.name,
+		_expression.capitalize(),
+		clip.frames,
+		clip.fps,
+		anchor.x,
+		anchor.y,
+	]
 	_update_expression()
 
 
@@ -197,7 +246,10 @@ func _request_action(action: String) -> void:
 
 func _update_expression() -> void:
 	var blink_time := fmod(_blink_elapsed, 3.7)
-	var blinking := _expression == "blink" or (_expression == "auto" and blink_time > 2.84 and blink_time < 2.98)
+	var blinking := (
+		_expression == "blink"
+		or (_expression == "auto" and blink_time > 2.84 and blink_time < 2.98)
+	)
 	for sample: SquircleV1Playback in _samples:
 		sample.face_blink = blinking
 

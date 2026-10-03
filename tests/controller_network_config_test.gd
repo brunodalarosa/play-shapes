@@ -1,5 +1,6 @@
 extends SceneTree
 
+
 func _initialize() -> void:
 	var settings := NetworkingTuning.new()
 	var config := ControllerNetworkConfig.new(settings)

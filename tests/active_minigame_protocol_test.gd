@@ -18,16 +18,30 @@ func _run() -> void:
 	bubbles.tuning = BubblesTuning.new()
 	bubbles.tuning.instructions_seconds = 0.0
 	bubbles.tuning.countdown_seconds = 0.0
-	bubbles.start_round([{"player_id": "p0", "name": "First", "seat": 1}, {"player_id": "p1", "name": "Second", "seat": 2}], 0)
+	bubbles.start_round(
+		[
+			{ "player_id": "p0", "name": "First", "seat": 1 },
+			{ "player_id": "p1", "name": "Second", "seat": 2 },
+		],
+		0,
+	)
 	bubbles.complete_entrance(0)
 	bubbles.advance(0)
 	service.set_bubbles_controller(bubbles)
-	_check(service._active_protocol == service._bubbles_protocol and service._active_protocol.snapshot_for("p0").type == "bubbles_snapshot",
-		"Bubbles is the only active gameplay protocol")
-	_check(bubbles.return_to_lobby_requested.is_connected(service._on_bubbles_return_to_lobby),
-		"Bubbles results return resets the connected phones")
+	_check(
+		service._active_protocol == service._bubbles_protocol
+		and service._active_protocol.snapshot_for("p0").type == "bubbles_snapshot",
+		"Bubbles is the only active gameplay protocol",
+	)
+	_check(
+		bubbles.return_to_lobby_requested.is_connected(service._on_bubbles_return_to_lobby),
+		"Bubbles results return resets the connected phones",
+	)
 	service.clear_bubbles_controller(bubbles)
-	_check(service._active_protocol == null and service._bubbles_protocol == null, "Leaving Bubbles clears active routing")
+	_check(
+		service._active_protocol == null and service._bubbles_protocol == null,
+		"Leaving Bubbles clears active routing",
+	)
 	print("Active minigame protocol checks: %d failures" % _failures)
 	quit(0 if _failures == 0 else 1)
 

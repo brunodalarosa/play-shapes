@@ -30,13 +30,24 @@ func _ready() -> void:
 	_sprite.material = _white_material
 
 
-func configure(id: int, selected_tuning: BubblesTuning, at_msec: int, position_world: Vector2,
-		movement: Vector2, from_pop := false, release_lockout_msec := 0) -> void:
+func configure(
+	id: int,
+	selected_tuning: BubblesTuning,
+	at_msec: int,
+	position_world: Vector2,
+	movement: Vector2,
+	from_pop := false,
+	release_lockout_msec := 0,
+) -> void:
 	creature_id = id
 	released = from_pop
 	radius = selected_tuning.jellyfish_collider_radius
 	spawned_at_msec = at_msec
-	collectible_at_msec = at_msec + (maxi(1, release_lockout_msec) if from_pop else roundi(selected_tuning.jellyfish_entrance_seconds * 1000.0))
+	collectible_at_msec = at_msec + (
+		maxi(1, release_lockout_msec)
+		if from_pop
+		else roundi(selected_tuning.jellyfish_entrance_seconds * 1000.0)
+	)
 	_next_turn_msec = at_msec + TURN_INTERVAL_MSEC
 	_breath_amplitude = selected_tuning.jellyfish_breath_amplitude
 	_breath_period_seconds = selected_tuning.jellyfish_breath_period_seconds
@@ -70,11 +81,18 @@ func is_offscreen(bounds: Rect2) -> bool:
 func _refresh(host_time_msec: int) -> void:
 	var scale_factor := 1.0
 	if not released and collectible_at_msec > spawned_at_msec:
-		var progress := clampf(float(host_time_msec - spawned_at_msec) / float(collectible_at_msec - spawned_at_msec), 0.0, 1.0)
+		var progress := clampf(
+			float(host_time_msec - spawned_at_msec) / float(collectible_at_msec - spawned_at_msec),
+			0.0,
+			1.0,
+		)
 		scale_factor = 0.15 + 0.85 * progress
 	var elapsed_seconds := float(maxi(0, host_time_msec - spawned_at_msec)) / 1000.0
 	var breath := 1.0 + sin(TAU * elapsed_seconds / _breath_period_seconds) * _breath_amplitude
 	_sprite.scale = Vector2.ONE * _base_sprite_scale * scale_factor * breath
-	var white_on := released and not is_collectible(host_time_msec) and (host_time_msec / BLINK_INTERVAL_MSEC) % 2 == 0
+	var white_on := (
+		released and not is_collectible(host_time_msec)
+		and (host_time_msec / BLINK_INTERVAL_MSEC) % 2 == 0
+	)
 	_white_material.set_shader_parameter("whiten", 1.0 if white_on else 0.0)
 	_collider.disabled = not is_collectible(host_time_msec)

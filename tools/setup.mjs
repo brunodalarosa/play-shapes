@@ -3,14 +3,26 @@
 // client's npm dependencies, installs the Chromium the end-to-end test drives,
 // in Playwright's standard per-user folder, and downloads the GDScript
 // formatter into the ignored local/tools/ folder. It installs nothing else.
-import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import {
-  MINIMUM_GODOT, MINIMUM_NODE, compareVersions, exportTemplatesFolder, formatVersion, godotBinary, godotTemplateName,
-  godotVersion, missingWindowsTemplates, npmInstallNeeded, parseVersion, probe, root, webDirectory,
-} from './environment.mjs';
-import { FORMATTER_VERSION, formatterPath, installFormatter } from './gdscript_formatter.mjs';
+  MINIMUM_GODOT,
+  MINIMUM_NODE,
+  compareVersions,
+  exportTemplatesFolder,
+  formatVersion,
+  godotBinary,
+  godotTemplateName,
+  godotVersion,
+  missingWindowsTemplates,
+  npmInstallNeeded,
+  parseVersion,
+  probe,
+  root,
+  webDirectory,
+} from "./environment.mjs";
+import { FORMATTER_VERSION, formatterPath, installFormatter } from "./gdscript_formatter.mjs";
 
 const USAGE = `Usage: node tools/setup.mjs
 
@@ -22,61 +34,95 @@ missing, and downloads the pinned GDScript formatter into local/tools/ when
 it is missing. README.md lists every tool and what it is for.
 `;
 
-const GODOT_DOWNLOAD = 'https://godotengine.org/download';
+const GODOT_DOWNLOAD = "https://godotengine.org/download";
 
 // npm is a .cmd shim on Windows, which Node only starts through a shell.
-const npmShell = process.platform === 'win32';
+const npmShell = process.platform === "win32";
 
 function versioned(name, minimum, result, install) {
-  if (result.error) return { ok: false, text: `${name}: could not be started (${result.error}). ${install}` };
+  if (result.error)
+    return { ok: false, text: `${name}: could not be started (${result.error}). ${install}` };
   const version = parseVersion(result.output);
-  if (!version) return { ok: false, text: `${name}: could not read the version from "${result.output}". ${install}` };
+  if (!version)
+    return {
+      ok: false,
+      text: `${name}: could not read the version from "${result.output}". ${install}`,
+    };
   if (compareVersions(version, minimum) < 0) {
-    return { ok: false, text: `${name} ${formatVersion(version)} is older than ${formatVersion(minimum)}. ${install}` };
+    return {
+      ok: false,
+      text: `${name} ${formatVersion(version)} is older than ${formatVersion(minimum)}. ${install}`,
+    };
   }
   return { ok: true, text: `${name} ${formatVersion(version)}` };
 }
 
 function checkGit() {
-  return versioned('Git', [0], probe('git'), 'Install it from https://git-scm.com/downloads.');
+  return versioned("Git", [0], probe("git"), "Install it from https://git-scm.com/downloads.");
 }
 
 function checkNode() {
-  return versioned('Node', MINIMUM_NODE, { error: '', output: process.versions.node },
-    `Install Node ${MINIMUM_NODE[0]} or newer from https://nodejs.org.`);
+  return versioned(
+    "Node",
+    MINIMUM_NODE,
+    { error: "", output: process.versions.node },
+    `Install Node ${MINIMUM_NODE[0]} or newer from https://nodejs.org.`,
+  );
 }
 
 function checkNpm() {
-  return versioned('npm', [0], probe('npm', ['--version'], { shell: npmShell }), 'npm comes with Node; reinstall Node.');
+  return versioned(
+    "npm",
+    [0],
+    probe("npm", ["--version"], { shell: npmShell }),
+    "npm comes with Node; reinstall Node.",
+  );
 }
 
 function checkGodot() {
   const where = process.env.GODOT_BIN ? `GODOT_BIN (${godotBinary})` : '"godot" on PATH';
-  const install = `Install Godot ${formatVersion(MINIMUM_GODOT)} or newer from ${GODOT_DOWNLOAD}, `
-    + 'then put it on PATH as "godot" or set GODOT_BIN to its executable.';
+  const install =
+    `Install Godot ${formatVersion(MINIMUM_GODOT)} or newer from ${GODOT_DOWNLOAD}, ` +
+    'then put it on PATH as "godot" or set GODOT_BIN to its executable.';
   const { error, text } = godotVersion();
-  const result = versioned('Godot', MINIMUM_GODOT, { error, output: text }, install);
-  return { ...result, templateName: godotTemplateName(text), text: `${result.text}${result.ok ? '' : ` Looked for ${where}.`}` };
+  const result = versioned("Godot", MINIMUM_GODOT, { error, output: text }, install);
+  return {
+    ...result,
+    templateName: godotTemplateName(text),
+    text: `${result.text}${result.ok ? "" : ` Looked for ${where}.`}`,
+  };
 }
 
 function checkMkcert() {
-  const local = join(root, 'local', 'tools', `mkcert${process.platform === 'win32' ? '.exe' : ''}`);
-  const command = existsSync(local) ? local : 'mkcert';
-  const ok = !probe(command, ['-version']).error;
-  return { ok, text: `mkcert, for local HTTPS: ${ok ? command : 'not found; "node tools/local_https.mjs download" fetches it'}` };
+  const local = join(root, "local", "tools", `mkcert${process.platform === "win32" ? ".exe" : ""}`);
+  const command = existsSync(local) ? local : "mkcert";
+  const ok = !probe(command, ["-version"]).error;
+  return {
+    ok,
+    text: `mkcert, for local HTTPS: ${ok ? command : 'not found; "node tools/local_https.mjs download" fetches it'}`,
+  };
 }
 
 function checkGh() {
-  const ok = !probe('gh').error;
-  return { ok, text: `GitHub CLI (gh), for pull requests from the terminal: ${ok ? 'found' : 'not found; https://cli.github.com'}` };
+  const ok = !probe("gh").error;
+  return {
+    ok,
+    text: `GitHub CLI (gh), for pull requests from the terminal: ${ok ? "found" : "not found; https://cli.github.com"}`,
+  };
 }
 
 function checkExportTemplates(godot) {
   const { templateName } = godot;
-  if (!godot.ok || !templateName) return { ok: false, text: 'Godot export templates, for the standalone build: needs Godot first' };
+  if (!godot.ok || !templateName)
+    return {
+      ok: false,
+      text: "Godot export templates, for the standalone build: needs Godot first",
+    };
   const folder = exportTemplatesFolder(templateName);
   const ok = missingWindowsTemplates(folder).length === 0;
-  const where = ok ? folder : `not in ${folder}; install ${templateName} from Editor > Manage Export Templates`;
+  const where = ok
+    ? folder
+    : `not in ${folder}; install ${templateName} from Editor > Manage Export Templates`;
   return { ok, text: `Godot export templates, for the standalone build: ${where}` };
 }
 
@@ -86,49 +132,78 @@ function print(status, text) {
 
 async function main() {
   const args = process.argv.slice(2);
-  if (args.includes('--help') || args.includes('-h')) { process.stdout.write(USAGE); return 0; }
-  if (args.length > 0) { process.stderr.write(`Unknown option ${args[0]}\n\n${USAGE}`); return 2; }
+  if (args.includes("--help") || args.includes("-h")) {
+    process.stdout.write(USAGE);
+    return 0;
+  }
+  if (args.length > 0) {
+    process.stderr.write(`Unknown option ${args[0]}\n\n${USAGE}`);
+    return 2;
+  }
 
-  process.stdout.write('Required\n');
+  process.stdout.write("Required\n");
   const godot = checkGodot();
   const required = [checkGit(), checkNode(), checkNpm(), godot];
-  for (const { ok, text } of required) print(ok ? 'ok' : 'MISSING', text);
+  for (const { ok, text } of required) print(ok ? "ok" : "MISSING", text);
 
-  process.stdout.write('As needed\n');
-  for (const { ok, text } of [checkExportTemplates(godot), checkMkcert(), checkGh()]) print(ok ? 'ok' : '-', text);
-  print('-', 'Python 3 with Pillow, GIMP 3, Blender, for regenerating art: not checked; see art/bubbles/README.md and art/squircle/README.md');
+  process.stdout.write("As needed\n");
+  for (const { ok, text } of [checkExportTemplates(godot), checkMkcert(), checkGh()])
+    print(ok ? "ok" : "-", text);
+  print(
+    "-",
+    "Python 3 with Pillow, GIMP 3, Blender, for regenerating art: not checked; see art/bubbles/README.md and art/squircle/README.md",
+  );
 
   if (required.some(({ ok }) => !ok)) {
-    process.stdout.write('\nInstall the missing required tools, then run "node tools/setup.mjs" again.\n');
+    process.stdout.write(
+      '\nInstall the missing required tools, then run "node tools/setup.mjs" again.\n',
+    );
     return 1;
   }
 
-  process.stdout.write('Browser client\n');
+  process.stdout.write("Browser client\n");
   if (!npmInstallNeeded()) {
-    print('ok', 'web/node_modules is up to date');
+    print("ok", "web/node_modules is up to date");
   } else {
-    print('...', 'installing web/ dependencies with "npm ci --ignore-scripts"');
-    const result = spawnSync('npm ci --ignore-scripts', { cwd: webDirectory, shell: true, stdio: 'inherit' });
-    if (result.status !== 0) { print('FAILED', '"npm ci" in web/ did not finish; see its output above'); return 1; }
-    print('ok', 'web/node_modules installed');
+    print("...", 'installing web/ dependencies with "npm ci --ignore-scripts"');
+    const result = spawnSync("npm ci --ignore-scripts", {
+      cwd: webDirectory,
+      shell: true,
+      stdio: "inherit",
+    });
+    if (result.status !== 0) {
+      print("FAILED", '"npm ci" in web/ did not finish; see its output above');
+      return 1;
+    }
+    print("ok", "web/node_modules installed");
   }
 
   // Does nothing when this Playwright version's Chromium is already installed.
-  const chromium = spawnSync('npx playwright install chromium', { cwd: webDirectory, shell: true, stdio: 'inherit' });
-  if (chromium.status !== 0) { print('FAILED', '"npx playwright install chromium" in web/ did not finish; see its output above'); return 1; }
-  print('ok', 'Playwright Chromium, for the end-to-end test');
+  const chromium = spawnSync("npx playwright install chromium", {
+    cwd: webDirectory,
+    shell: true,
+    stdio: "inherit",
+  });
+  if (chromium.status !== 0) {
+    print(
+      "FAILED",
+      '"npx playwright install chromium" in web/ did not finish; see its output above',
+    );
+    return 1;
+  }
+  print("ok", "Playwright Chromium, for the end-to-end test");
 
-  process.stdout.write('Formatting\n');
+  process.stdout.write("Formatting\n");
   const formatter = formatterPath();
   if (formatter && existsSync(formatter)) {
-    print('ok', `GDScript formatter ${FORMATTER_VERSION}`);
+    print("ok", `GDScript formatter ${FORMATTER_VERSION}`);
   } else {
     try {
-      print('...', `downloading GDScript formatter ${FORMATTER_VERSION} into local/tools/`);
+      print("...", `downloading GDScript formatter ${FORMATTER_VERSION} into local/tools/`);
       await installFormatter();
-      print('ok', `GDScript formatter ${FORMATTER_VERSION} installed`);
+      print("ok", `GDScript formatter ${FORMATTER_VERSION} installed`);
     } catch (error) {
-      print('FAILED', `GDScript formatter: ${error.message}`);
+      print("FAILED", `GDScript formatter: ${error.message}`);
       return 1;
     }
   }

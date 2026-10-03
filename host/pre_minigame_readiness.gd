@@ -10,11 +10,15 @@ var minigame_id: StringName
 var active := true
 var transitioning := false
 var _participants: Array[Dictionary] = []
-var _ready_by_id: Dictionary = {}
+var _ready_by_id: Dictionary = { }
 var _eligible: Callable
 
 
-func _init(selected_minigame: StringName, players: Array[Dictionary], eligible: Callable = Callable()) -> void:
+func _init(
+	selected_minigame: StringName,
+	players: Array[Dictionary],
+	eligible: Callable = Callable(),
+) -> void:
 	minigame_id = selected_minigame
 	_eligible = eligible
 	for player: Dictionary in players:
@@ -48,21 +52,28 @@ func add_joined(player: Dictionary) -> bool:
 
 
 func set_ready(player: Dictionary, ready: bool) -> Dictionary:
-	if not active or transitioning or player.is_empty() or not _ready_by_id.has(String(player.get("player_id", ""))):
-		return {"accepted": false, "code": &"ready_unavailable", "message": "Ready-up is not active for this player"}
+	if (
+		not active or transitioning or player.is_empty()
+		or not _ready_by_id.has(String(player.get("player_id", "")))
+	):
+		return {
+			"accepted": false,
+			"code": &"ready_unavailable",
+			"message": "Ready-up is not active for this player",
+		}
 	var player_id := String(player.player_id)
 	if _ready_by_id[player_id] == ready:
-		return {"accepted": true}
+		return { "accepted": true }
 	_ready_by_id[player_id] = ready
 	changed.emit(snapshot_for(""))
 	_maybe_launch()
-	return {"accepted": true}
+	return { "accepted": true }
 
 
 func sync_players(current: Array[Dictionary]) -> void:
 	if not active:
 		return
-	var by_id: Dictionary = {}
+	var by_id: Dictionary = { }
 	for player: Dictionary in current:
 		by_id[String(player.player_id)] = player
 	var changed_state := false
@@ -96,7 +107,10 @@ func cancel() -> void:
 func _add(player: Dictionary) -> void:
 	var player_id := String(player.player_id)
 	_participants.append(player.duplicate(true))
-	_participants.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return int(a.seat) < int(b.seat))
+	_participants.sort_custom(
+		func(a: Dictionary, b: Dictionary) -> bool:
+			return int(a.seat) < int(b.seat),
+	)
 	_ready_by_id[player_id] = false
 
 

@@ -37,7 +37,9 @@ func _capture() -> void:
 	stage.controller.tuning = tuning
 	var roster: Array = []
 	for index: int in 10:
-		roster.append({"player_id": "p%d" % index, "name": "Player %d" % (index + 1), "seat": index + 1})
+		roster.append(
+			{ "player_id": "p%d" % index, "name": "Player %d" % (index + 1), "seat": index + 1 }
+		)
 	var now := Time.get_ticks_msec()
 	stage.start_round(roster, now)
 	await _frames(4)
@@ -48,7 +50,9 @@ func _capture() -> void:
 	var active_time := stage.controller.active_start_msec()
 	for index: int in 10:
 		var bubble := stage.player_arena.get_bubble("p%d" % index)
-		bubble.position = BubblesPresentation.NPC_ARENA_BOUNDS.get_center() + Vector2.from_angle(TAU * float(index) / 10.0) * Vector2(550, 270)
+		bubble.position = BubblesPresentation.NPC_ARENA_BOUNDS.get_center() + Vector2.from_angle(
+			TAU * float(index) / 10.0
+		) * Vector2(550, 270)
 		for score_index: int in 8 + index:
 			stage.controller.record_jellyfish_capture("p%d" % index, active_time)
 	stage._entrance_tween.kill()
@@ -101,10 +105,13 @@ func _capture() -> void:
 	pair_tuning.pufferfish_max_spawn_rate = 0.0
 	pair.controller.tuning = pair_tuning
 	var pair_now := Time.get_ticks_msec()
-	pair.start_round([
-		{"player_id": "a", "name": "Player One", "seat": 1},
-		{"player_id": "b", "name": "Player Two", "seat": 2},
-	], pair_now)
+	pair.start_round(
+		[
+			{ "player_id": "a", "name": "Player One", "seat": 1 },
+			{ "player_id": "b", "name": "Player Two", "seat": 2 },
+		],
+		pair_now,
+	)
 	var pair_start := maxi(pair_now, pair.controller.last_host_time_msec())
 	pair.controller.complete_entrance(pair_start)
 	pair.controller.advance(pair_start)

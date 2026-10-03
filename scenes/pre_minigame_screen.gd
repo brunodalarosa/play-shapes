@@ -14,7 +14,7 @@ var _controls: Label
 var _win: Label
 var _hints: Label
 var _tray: HBoxContainer
-var _snapshot: Dictionary = {}
+var _snapshot: Dictionary = { }
 
 
 func _ready() -> void:
@@ -78,7 +78,11 @@ func set_snapshot(snapshot: Dictionary) -> void:
 		slot.custom_minimum_size = Vector2(171, 178)
 		slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_tray.add_child(slot)
-		var ready := _label("Ready!" if bool(player.get("ready", false)) else "", 26, Color("#137541"))
+		var ready := _label(
+			"Ready!" if bool(player.get("ready", false)) else "",
+			26,
+			Color("#137541"),
+		)
 		ready.position = Vector2(0, 6)
 		ready.size = Vector2(171, 35)
 		ready.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -146,10 +150,12 @@ func _build_tabletop() -> void:
 	cancel.position = Vector2(1605, 23)
 	cancel.size = Vector2(244, 52)
 	cancel.add_theme_font_size_override("font_size", 22)
-	cancel.pressed.connect(func() -> void:
-		var host := get_node_or_null("/root/SessionHost")
-		if host != null:
-			host.cancel_pre_minigame())
+	cancel.pressed.connect(
+		func() -> void:
+			var host := get_node_or_null("/root/SessionHost")
+			if host != null:
+				host.cancel_pre_minigame(),
+	)
 	add_child(cancel)
 
 

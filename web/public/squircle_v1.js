@@ -7,31 +7,39 @@ export class SquircleV1Canvas {
     neutral = new Image();
     blink = new Image();
     tinted = new Map();
-    constructor() { void this.load(); }
+    constructor() {
+        void this.load();
+    }
     async load() {
         try {
             const response = await fetch(`${ROOT}manifest.json`);
             if (!response.ok)
                 return;
-            const manifest = await response.json();
+            const manifest = (await response.json());
             this.tile = manifest.resolution;
-            this.clip = manifest.clips.find(clip => clip.name === "idle" && clip.view === "front");
+            this.clip = manifest.clips.find((clip) => clip.name === "idle" && clip.view === "front");
             this.colorable.src = `${ROOT}idle-front-colorable.png`;
             this.neutral.src = `${ROOT}idle-front-neutral.png`;
             this.blink.src = `${ROOT}idle-front-blink.png`;
         }
-        catch { /* The page remains usable if character art is unavailable. */ }
+        catch {
+            /* The page remains usable if character art is unavailable. */
+        }
     }
     draw(context, color, x, y, scale, timeMsec, blinking = false, rotation = 0) {
         const clip = this.clip;
         const face = blinking ? this.blink : this.neutral;
-        if (!clip || !this.colorable.complete || !face.complete || !this.colorable.naturalWidth || !face.naturalWidth)
+        if (!clip ||
+            !this.colorable.complete ||
+            !face.complete ||
+            !this.colorable.naturalWidth ||
+            !face.naturalWidth)
             return false;
         const sheet = this.tint(color);
         if (!sheet)
             return false;
-        const frame = Math.floor(Math.max(0, timeMsec) * clip.fps / 1000) % clip.frames;
-        const sx = frame % clip.sheet_columns * this.tile[0];
+        const frame = Math.floor((Math.max(0, timeMsec) * clip.fps) / 1000) % clip.frames;
+        const sx = (frame % clip.sheet_columns) * this.tile[0];
         const sy = Math.floor(frame / clip.sheet_columns) * this.tile[1];
         context.save();
         context.translate(x, y);
@@ -54,7 +62,7 @@ export class SquircleV1Canvas {
             return undefined;
         context.drawImage(this.colorable, 0, 0);
         const image = context.getImageData(0, 0, canvas.width, canvas.height);
-        const rgb = [1, 3, 5].map(index => Number.parseInt(key.slice(index, index + 2), 16));
+        const rgb = [1, 3, 5].map((index) => Number.parseInt(key.slice(index, index + 2), 16));
         for (let offset = 0; offset < image.data.length; offset += 4) {
             if (image.data[offset + 3] === 0)
                 continue;

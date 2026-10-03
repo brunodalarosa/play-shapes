@@ -1,6 +1,7 @@
 extends SceneTree
 ## Run from an empty project so source-tree resources cannot hide missing pack art.
 
+
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	if args.size() != 2:
@@ -24,7 +25,10 @@ func _initialize() -> void:
 			fail("Missing packed texture bytes: " + path)
 			return
 		var texture := load(path) as Texture2D
-		if texture == null or texture.get_width() != int(entry["size"][0]) or texture.get_height() != int(entry["size"][1]):
+		if (
+			texture == null or texture.get_width() != int(entry["size"][0])
+			or texture.get_height() != int(entry["size"][1])
+		):
 			fail("Packed texture could not load at expected dimensions: " + path)
 			return
 		checked += 1
