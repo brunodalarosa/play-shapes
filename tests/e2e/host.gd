@@ -1,7 +1,8 @@
 extends SceneTree
-## End-to-end host for web/e2e: the real SessionHost and scenes, driven by real
-## phone clients. It presses the host's own buttons, which a person would click,
-## and prints one "E2E ..." line per event for the test runner to wait on.
+## End-to-end host for web/e2e: the game's main scene, real SessionHost and real
+## scenes, driven by real phone clients. It presses the host's own buttons, which
+## a person would click, and prints one "E2E ..." line per event for the test
+## runner to wait on.
 ##
 ## Environment:
 ##   E2E_PLAYERS        players expected before Start is pressed (default 2)
@@ -28,6 +29,7 @@ var _start_x := {}
 var _moved := {}
 var _at_rest_for := 0.0
 var _results_for := 0.0
+var _booted := false
 var _started := false
 var _returned := false
 
@@ -48,13 +50,18 @@ func _start() -> void:
 	_host.settings.http_port = http_port
 	_host.settings.websocket_port = http_port + 1
 
-	if not _host.start(false):
+	# The game's own boot starts the host and opens the lobby, so whatever boot grows is part of the run.
+	change_scene_to_file(ProjectSettings.get_setting("application/run/main_scene"))
+
+
+## Reports the host as ready once boot has started it, or stops when boot could not.
+func _watch_boot() -> void:
+	if _host.running:
+		_booted = true
+		_event("ready http=%d" % _host.settings.http_port)
+	elif not _host.startup_error.is_empty():
 		push_error("E2E host could not start: %s" % _host.startup_error)
 		quit(1)
-		return
-
-	change_scene_to_file(LOBBY_SCENE)
-	_event("ready http=%d" % http_port)
 
 
 func _use_round(mode: String) -> void:
@@ -80,6 +87,9 @@ func _process(delta: float) -> bool:
 	var scene := current_scene
 	if scene == null:
 		return false
+
+	if not _booted:
+		_watch_boot()
 
 	if scene.scene_file_path != _scene_path:
 		_scene_path = scene.scene_file_path

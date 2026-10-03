@@ -8,7 +8,7 @@ const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const HTTP_PORT = 18200;
 const HOST_BOOT_MSEC = 60_000;
 
-type Waiter = { pattern: RegExp; occurrence: number; resolve: (line: string) => void };
+type Waiter = { pattern: RegExp; occurrence: number; resolve: (line: string) => void; reject: (error: Error) => void };
 
 /** The Godot host running tests/e2e/host.gd. Its "E2E ..." lines are the events tests wait on. */
 export class Host {
@@ -17,6 +17,7 @@ export class Host {
   private events: string[] = [];
   private waiters: Waiter[] = [];
   private process?: ChildProcess;
+  private exit?: string;
 
   async start(players: number, testInfo: TestInfo): Promise<void> {
     // A host left running by a person would answer instead of this one.
@@ -40,6 +41,9 @@ export class Host {
     this.process.stderr!.on("data", chunk => this.read(String(chunk)));
     this.process.on("error", error => this.read(`ERROR: could not start Godot: ${error.message}\n`));
 
+    // "close" follows the last output, so the reason the host gave is already read.
+    this.process.on("close", code => this.exited(code));
+
     await this.event(/^ready /, { timeout: HOST_BOOT_MSEC });
   }
 
@@ -47,11 +51,14 @@ export class Host {
   event(pattern: RegExp, { occurrence = 1, timeout = 60_000 } = {}): Promise<string> {
     const seen = this.events.filter(line => pattern.test(line));
     if (seen.length >= occurrence) return Promise.resolve(seen[occurrence - 1]);
+    if (this.exit) return Promise.reject(new Error(this.exit));
 
     return new Promise((resolve, reject) => {
-      const waiter: Waiter = { pattern, occurrence, resolve };
+      const settle = <Value>(finish: (value: Value) => void) => (value: Value) => { clearTimeout(timer); finish(value); };
+      const waiter: Waiter = { pattern, occurrence, resolve: settle(resolve), reject: settle(reject) };
       this.waiters.push(waiter);
-      setTimeout(() => {
+
+      const timer = setTimeout(() => {
         this.waiters = this.waiters.filter(other => other !== waiter);
         reject(new Error(`host never printed "E2E ${pattern.source}" #${occurrence}; it printed:\n${this.events.join("\n")}`));
       }, timeout);
@@ -74,7 +81,16 @@ export class Host {
       host.kill();
       await exited;
     }
-    expect(errors, "host printed errors").toEqual([]);
+    expect(errors, `host printed ${errors[0] ?? "errors"}`).toEqual([]);
+  }
+
+  /** A host that stops by itself can print no more events, so nothing should keep waiting for one. */
+  private exited(code: number | null): void {
+    const reason = this.errors()[0] ?? "no error line";
+    this.exit = `host exited with code ${code}: ${reason}`;
+
+    for (const waiter of this.waiters) waiter.reject(new Error(this.exit));
+    this.waiters = [];
   }
 
   private read(chunk: string): void {
@@ -186,9 +202,14 @@ export const test = base.extend<Fixtures>({
 
   host: async ({ players }, use, testInfo) => {
     const host = new Host();
-    await host.start(players, testInfo);
-    await use(host);
-    await host.stop(testInfo);
+
+    // Stops the host even when it never became ready, so no Godot process is left behind.
+    try {
+      await host.start(players, testInfo);
+      await use(host);
+    } finally {
+      await host.stop(testInfo);
+    }
   },
 
   openPhone: async ({ browser }, use, testInfo) => {
@@ -200,10 +221,12 @@ export const test = base.extend<Fixtures>({
       return phone;
     });
 
+    // After a failure a page can be stuck mid-load, and asking it anything would wait out the test timeout.
+    const passedSoFar = testInfo.errors.length === 0;
     for (const phone of phones) {
       // The phone's own development error panel, such as a host protocol rejection.
       const panel = phone.page.locator("#connection-error");
-      const shown = await panel.isVisible() ? await panel.textContent() : "";
+      const shown = passedSoFar && await panel.isVisible() ? await panel.textContent() : "";
       expect(shown, `${phone.name} showed its error panel`).toBe("");
       await testInfo.attach(`${phone.name}-received`, { body: JSON.stringify(Object.fromEntries(phone.received), null, 2), contentType: "application/json" });
       await phone.page.context().close();
