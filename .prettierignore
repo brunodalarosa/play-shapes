@@ -1,0 +1,21 @@
+# node tools/format.mjs names the files it formats. This list keeps an editor's
+# format-on-save away from everything else Prettier could reach.
+
+# Compiled from web/src by the browser build, and vendored code.
+web/public/**/*.js
+web/public/**/*.mjs
+addons/
+
+# Written by Godot, npm and the art tools.
+*.tscn
+*.tres
+*.import
+package-lock.json
+assets/
+art/
+
+# Not formatted yet.
+*.md
+*.json
+*.yml
+*.yaml

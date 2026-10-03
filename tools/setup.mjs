@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Development-only. Checks the tools a contributor needs, installs the browser
-// client's npm dependencies, and installs the Chromium the end-to-end test
-// drives, in Playwright's standard per-user folder. It installs nothing else.
+// client's npm dependencies, installs the Chromium the end-to-end test drives,
+// in Playwright's standard per-user folder, and downloads the GDScript
+// formatter into the ignored local/tools/ folder. It installs nothing else.
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -9,14 +10,16 @@ import {
   MINIMUM_GODOT, MINIMUM_NODE, compareVersions, exportTemplatesFolder, formatVersion, godotBinary, godotTemplateName,
   godotVersion, missingWindowsTemplates, npmInstallNeeded, parseVersion, probe, root, webDirectory,
 } from './environment.mjs';
+import { FORMATTER_VERSION, formatterPath, installFormatter } from './gdscript_formatter.mjs';
 
 const USAGE = `Usage: node tools/setup.mjs
 
 Checks the required tools (Git, Node, npm, Godot) and fails when one is
 missing or too old, reports the tools some tasks need, then runs
 "npm ci --ignore-scripts" in web/ when its dependencies are missing or out of
-date, and installs Playwright's Chromium for the end-to-end test when it is
-missing. README.md lists every tool and what it is for.
+date, installs Playwright's Chromium for the end-to-end test when it is
+missing, and downloads the pinned GDScript formatter into local/tools/ when
+it is missing. README.md lists every tool and what it is for.
 `;
 
 const GODOT_DOWNLOAD = 'https://godotengine.org/download';
@@ -81,7 +84,7 @@ function print(status, text) {
   process.stdout.write(`  ${status.padEnd(8)} ${text}\n`);
 }
 
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   if (args.includes('--help') || args.includes('-h')) { process.stdout.write(USAGE); return 0; }
   if (args.length > 0) { process.stderr.write(`Unknown option ${args[0]}\n\n${USAGE}`); return 2; }
@@ -114,8 +117,24 @@ function main() {
   const chromium = spawnSync('npx playwright install chromium', { cwd: webDirectory, shell: true, stdio: 'inherit' });
   if (chromium.status !== 0) { print('FAILED', '"npx playwright install chromium" in web/ did not finish; see its output above'); return 1; }
   print('ok', 'Playwright Chromium, for the end-to-end test');
+
+  process.stdout.write('Formatting\n');
+  const formatter = formatterPath();
+  if (formatter && existsSync(formatter)) {
+    print('ok', `GDScript formatter ${FORMATTER_VERSION}`);
+  } else {
+    try {
+      print('...', `downloading GDScript formatter ${FORMATTER_VERSION} into local/tools/`);
+      await installFormatter();
+      print('ok', `GDScript formatter ${FORMATTER_VERSION} installed`);
+    } catch (error) {
+      print('FAILED', `GDScript formatter: ${error.message}`);
+      return 1;
+    }
+  }
+
   process.stdout.write('\nReady. Run "node tools/check.mjs" to run every check.\n');
   return 0;
 }
 
-process.exitCode = main();
+process.exitCode = await main();
