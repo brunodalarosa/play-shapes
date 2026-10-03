@@ -1,8 +1,8 @@
 extends SceneTree
 ## End-to-end host for web/e2e: the game's main scene, real SessionHost and real
-## scenes, driven by real phone clients. It presses the host's own buttons, which
-## a person would click, and prints one "E2E ..." line per event for the test
-## runner to wait on.
+## scenes, driven by real phone clients. It clicks the host's own buttons with
+## injected mouse events, as a person would, and prints one "E2E ..." line per
+## event for the test runner to wait on.
 ##
 ## Environment:
 ##   E2E_PLAYERS        players expected before Start is pressed (default 2)
@@ -130,8 +130,7 @@ func _watch_lobby(lobby: Node, delta: float) -> void:
 	var start: Button = lobby.start_button
 	if not _started and _moved.size() >= _players and _at_rest_for >= AT_REST_SECONDS and not start.disabled:
 		_started = true
-		_event("start players=%d" % _host.player_registry.player_count())
-		start.pressed.emit()
+		_click(start, "start players=%d" % _host.player_registry.player_count())
 
 
 func _watch_bubbles(bubbles: Node, delta: float) -> void:
@@ -148,8 +147,41 @@ func _watch_bubbles(bubbles: Node, delta: float) -> void:
 	var return_button: Button = bubbles.get_node("Hud/Results/ReturnToLobby")
 	if _results_for >= RESULTS_SECONDS and not _returned and not return_button.disabled:
 		_returned = true
-		_event("return")
-		return_button.pressed.emit()
+		_click(return_button, "return")
+
+
+## Clicks a button with mouse events at its place on screen, so Godot's own hit
+## testing decides whether the click lands: a button that is covered, off screen,
+## disabled or ignoring the mouse is not pressed, and the run stops saying so.
+func _click(button: BaseButton, event_text: String) -> void:
+	var clicked := {"landed": false}
+	button.pressed.connect(func() -> void: clicked.landed = true, CONNECT_ONE_SHOT)
+
+	var at := button.get_global_transform_with_canvas() * (button.size / 2.0)
+	var hover := InputEventMouseMotion.new()
+	hover.position = at
+	hover.global_position = at
+	root.push_input(hover, true)
+	await process_frame
+
+	for pressed: bool in [true, false]:
+		var press := InputEventMouseButton.new()
+		press.button_index = MOUSE_BUTTON_LEFT
+		press.button_mask = MOUSE_BUTTON_MASK_LEFT if pressed else 0
+		press.pressed = pressed
+		press.position = at
+		press.global_position = at
+		root.push_input(press, true)
+		await process_frame
+
+	if clicked.landed:
+		_event(event_text)
+		return
+
+	var under := root.gui_get_hovered_control()
+	push_error("E2E could not click %s at %s; under the mouse: %s" % [
+		button.get_path(), at, under.get_path() if under != null else "nothing"])
+	quit(1)
 
 
 func _event(text: String) -> void:
