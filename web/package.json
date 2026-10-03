@@ -12,12 +12,16 @@
     "e2e": "playwright test"
   },
   "devDependencies": {
+    "@eslint/js": "9.39.5",
     "@playwright/test": "1.63.0",
     "@types/node": "22.20.5",
+    "eslint": "9.39.5",
+    "globals": "17.13.0",
     "jsqr": "1.4.0",
     "pngjs": "7.0.0",
     "prettier": "3.9.9",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.0"
   },
   "dependencies": {
     "nipplejs": "1.0.4"
