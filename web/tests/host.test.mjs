@@ -126,7 +126,7 @@ test('Playground controller is locally bundled, portrait safe, and touch-accessi
   const controls = await (await fetch(base + '/platform_controls.js')).text();
   assert.match(html, /id="lobby-stick-zone"[^>]*aria-label="Movement and stance joystick"/);
   assert.match(html, /id="lobby-jump-button"[^>]*aria-label="Jump"/);
-  assert.match(css, /#lobby-stick-zone, #lobby-jump-button[^}]*safe-area-inset-bottom/);
+  assert.match(css, /#lobby-stick-zone,\s*#lobby-jump-button[^}]*safe-area-inset-bottom/);
   assert.match(controls, /vendor\/nipplejs\.mjs/);
   assert.match(adapter, /createLobbyContext/);
   assert.doesNotMatch(controls, /lock[XY]: true/);

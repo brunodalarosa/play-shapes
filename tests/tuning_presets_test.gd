@@ -101,18 +101,37 @@ func _check_tooltip_contract(path: String, property_names: Array[String]) -> boo
 		return false
 	var lines := source.split("\n")
 	for property_name: String in property_names:
-		var declaration_index := -1
-		for index: int in lines.size():
-			if (lines[index] as String).begins_with("var %s:" % property_name):
-				declaration_index = index
+		# The annotation may share the variable's line or sit on the lines above it.
+		var declaration := "var %s:" % property_name
+		var index := -1
+		for candidate: int in lines.size():
+			var line := lines[candidate] as String
+			if line.begins_with(declaration) or (line.begins_with("@export") and line.contains(" " + declaration)):
+				index = candidate
 				break
-		if not _check(declaration_index >= 2, "Tunable declaration exists: %s" % property_name):
+		if not _check(index >= 1, "Tunable declaration exists: %s" % property_name):
 			return false
-		# Godot associates the tooltip only when the documentation comment precedes
-		# the annotation and the annotation is on its own line before the variable.
-		if not _check((lines[declaration_index - 1] as String).begins_with("@export"), "Export annotation immediately precedes %s" % property_name):
+
+		var exported := (lines[index] as String).begins_with("@export")
+		while index > 0 and _is_property_annotation(lines[index - 1]):
+			exported = true
+			index -= 1
+		if not _check(exported, "Export annotation precedes %s" % property_name):
 			return false
-		if not _check((lines[declaration_index - 2] as String).begins_with("## "), "Tooltip documentation immediately precedes the annotation for %s" % property_name):
+
+		# Godot attaches the tooltip only when the documentation comment comes directly
+		# before the property and its annotations; a group annotation in between detaches it.
+		if not _check(index > 0 and (lines[index - 1] as String).begins_with("## "), "Tooltip documentation immediately precedes the annotation for %s" % property_name):
+			return false
+	return true
+
+
+func _is_property_annotation(line: String) -> bool:
+	if not line.begins_with("@export"):
+		return false
+
+	for grouping: String in ["@export_group", "@export_subgroup", "@export_category"]:
+		if line.begins_with(grouping):
 			return false
 	return true
 
