@@ -45,7 +45,9 @@ func _start() -> void:
 	_use_round(OS.get_environment("E2E_ROUND"))
 
 	# The networking Resource is preloaded by the host; a copy keeps the change in this process.
-	var http_port := int(OS.get_environment("E2E_HTTP_PORT")) if OS.has_environment("E2E_HTTP_PORT") else 18200
+	var http_port := 18200
+	if OS.has_environment("E2E_HTTP_PORT"):
+		http_port = int(OS.get_environment("E2E_HTTP_PORT"))
 	_host.settings = _host.settings.duplicate()
 	_host.settings.http_port = http_port
 	_host.settings.websocket_port = http_port + 1

@@ -213,8 +213,9 @@ func _test_spin_collision_and_pop() -> void:
 		"Bubble re-forms by configured duration",
 	)
 	arena.simulate_step(0.0, 2020)
+	var restored_look := a.get_node("SquircleV1Playback") as SquircleV1Playback
 	_check(
-		not a.is_invulnerable(2020) and a.get_node("SquircleV1Playback").player_color != Color.WHITE,
+		not a.is_invulnerable(2020) and restored_look.player_color != Color.WHITE,
 		"I-frames end and original color returns",
 	)
 	_check(a.request_jellyfish_collection(2021).accepted, "Collection resumes after i-frames")

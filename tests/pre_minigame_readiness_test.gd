@@ -22,12 +22,15 @@ func _run() -> void:
 		func() -> void:
 			cancels[0] += 1,
 	)
+	var first_snapshot: Dictionary = phase.snapshot_for(String(first.player.player_id))
 	_check(
-		phase.status_players().size() == 2 and not phase.snapshot_for(String(first.player.player_id)).ready,
+		phase.status_players().size() == 2 and not first_snapshot.ready,
 		"Initial roster is unready",
 	)
+	var forged_player := { "player_id": "forged" }
 	_check(
-		not phase.set_ready({ }, true).accepted and not phase.set_ready({ "player_id": "forged" }, true).accepted,
+		not phase.set_ready({ }, true).accepted
+		and not phase.set_ready(forged_player, true).accepted,
 		"Unknown players cannot change readiness",
 	)
 	phase.set_ready(first.player, true)

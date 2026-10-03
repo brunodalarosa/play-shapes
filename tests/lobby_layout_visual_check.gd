@@ -32,10 +32,8 @@ func _capture() -> void:
 	character.position = Vector2(960, 420)
 	await _wait_for_render()
 	_save_capture("%s/character-over-qr-%s.png" % [OUTPUT_DIR, size_label])
-	print(
-		"[GODOT-RUNTIME] Playground lobby captures saved at %s for empty, ready, and QR overlap states"
-		% size_label
-	)
+	var saved := "[GODOT-RUNTIME] Playground lobby captures saved at %s" % size_label
+	print(saved + " for empty, ready, and QR overlap states")
 	quit(0)
 
 

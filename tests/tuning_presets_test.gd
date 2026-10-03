@@ -128,7 +128,8 @@ func _run() -> void:
 		return
 	var bubbles: Resource = BubblesTuningScript.new()
 	bubbles.starting_radius = -1.0
-	if not _check(bubbles.starting_radius == 16.0, "Bubbles individual values clamp to safe ranges"):
+	var clamped: bool = bubbles.starting_radius == 16.0
+	if not _check(clamped, "Bubbles individual values clamp to safe ranges"):
 		return
 	bubbles.starting_radius = 100.0
 	bubbles.max_radius = 32.0

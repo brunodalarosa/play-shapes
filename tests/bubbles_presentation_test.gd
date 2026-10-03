@@ -36,9 +36,11 @@ func _run() -> void:
 	var now := Time.get_ticks_msec()
 	_check(view.start_round(roster, now).accepted, "Ten-player scene starts")
 	_check(view.player_arena.bubble_ids().size() == 10, "All ten named bubble scenes exist")
-	var first_character := view.player_arena.get_bubble("p0").get_node(^"SquircleV1Playback") as SquircleV1Playback
-	var second_character := view.player_arena.get_bubble("p1").get_node(^"SquircleV1Playback") as SquircleV1Playback
-	var fallback_character := view.player_arena.get_bubble("p2").get_node(^"SquircleV1Playback") as SquircleV1Playback
+	var arena: BubblesPlayerArena = view.player_arena
+	var playback := ^"SquircleV1Playback"
+	var first_character := arena.get_bubble("p0").get_node(playback) as SquircleV1Playback
+	var second_character := arena.get_bubble("p1").get_node(playback) as SquircleV1Playback
+	var fallback_character := arena.get_bubble("p2").get_node(playback) as SquircleV1Playback
 	_check(
 		first_character.player_color.is_equal_approx(Color("#EC407A"))
 		and second_character.player_color.is_equal_approx(Color("#00ACC1"))
@@ -61,10 +63,8 @@ func _run() -> void:
 		_rect_matches(view.player_arena.bounds, BubblesPresentation.NPC_ARENA_BOUNDS),
 		"Existing NPC arena bounds remain unchanged",
 	)
-	_check(
-		view._far.texture != null and view._mid.texture != null and view._foreground.texture != null,
-		"Three approved environment layers load",
-	)
+	var layers: Array = [view._far.texture, view._mid.texture, view._foreground.texture]
+	_check(not layers.has(null), "Three approved environment layers load")
 	_check(
 		view._music.stream is AudioStreamOggVorbis
 		and (view._music.stream as AudioStreamOggVorbis).loop,
