@@ -134,13 +134,24 @@ Close any interactive host before integration tests; the browser suite refuses t
 node tools/check.mjs
 ```
 
-This is the default `[AUTO]` check. It runs every `tests/*_test.gd` script and `tests/foundation.gd`, each in its own headless Godot process, then the `tools/tests/` suite, then `npm run check` and `npm test` in `web/`, then rebuilds the browser bundle and fails if `web/public/` changed. New test scripts are picked up by name. It prints one line per failure and a one-line summary; full output for each check is in ignored `test-results/check/`. A Godot script fails on a non-zero exit code or on any `ERROR` line. Shutdown lines about objects still held at exit are ignored for now, because three passing scripts print them; that exception is temporary and is marked in `tools/check.mjs`.
+This is the default `[AUTO]` check. It runs every `tests/*_test.gd` script and `tests/foundation.gd`, each in its own headless Godot process, then the `tools/tests/` suite, then `npm run check` (which type-checks the phone client and, with Node types, the end-to-end test files) and `npm test` in `web/`, then rebuilds the browser bundle and fails if `web/public/` changed, then runs the end-to-end test described below. New test scripts are picked up by name. It prints one line per failure and a one-line summary; full output for each check is in ignored `test-results/check/`. A Godot script fails on a non-zero exit code or on any `ERROR` line. Shutdown lines about objects still held at exit are ignored for now, because three passing scripts print them; that exception is temporary and is marked in `tools/check.mjs`.
 
 ```powershell
 node tools/check.mjs bubbles web-tests   # only checks whose name contains a filter
+node tools/check.mjs --full              # end-to-end round with every default
 node tools/check.mjs --release           # also run the Windows export test
 godot --headless --path . --script res://tests/player_registry_test.gd   # one script, full output
 godot --headless --editor --path . --quit-after 30                        # editor import scan
+```
+
+The end-to-end test, `web/e2e/bubbles_two_phones.spec.ts`, runs the real phone client in two emulated Pixel 7 Chromium contexts against the real host on ports 18200/18201. `tests/e2e/host.gd` sets the ports and loads the project's main scene, so the game's own boot starts the host and opens the lobby; a boot that cannot start the host fails the test at once with its message. End-to-end tests go through boot; unit, integration and single-minigame tests start only what they need, so they stay fast. The phones join, walk in the lobby, ready up, swipe through a Bubbles round and return to the lobby. The host script clicks Start once every character has moved and stood still, and Return to lobby after results have been up for 3 s. It clicks with mouse events injected at the button's place on screen, so Godot's hit testing applies: a button that is covered, off screen, disabled or ignoring the mouse stops the run with a message naming what was under the mouse. That covers reachability, not appearance. It prints one `E2E ...` line per event for the test to wait on. By default it shortens only the Bubbles round, to 10 s and in memory; `E2E_ROUND=full` keeps every default. The test fails on a missing step, a phone without an accepted swipe, a page error, a visible phone error panel or a host `ERROR` line. Each phone saves a screenshot per step in `test-results/e2e/`, with a Playwright trace when the test fails. It is `[AUTO]` evidence from desktop Chromium; it never stands in for `[PHYSICAL-PHONE]`.
+
+```powershell
+cd web
+npm run e2e                                    # the test alone
+$env:E2E_WINDOWED = "1"; npm run e2e; Remove-Item env:E2E_WINDOWED   # show the host and save its screenshots
+npx playwright show-trace ../test-results/e2e/<test>/trace.zip    # inspect a failure
+cd ..
 ```
 
 `tests/standalone_build_editor_integration_test.gd` performs a real Windows export and writes `builds/`, so it needs matching installed export templates and runs only with `--release`; without templates the command names the missing folder. `tests/standalone_build_test.gd` needs no templates and runs by default.

@@ -10,6 +10,7 @@ import { exportTemplatesFolder, godotBinary, godotTemplateName, godotVersion, mi
 const logDirectory = join(root, 'test-results', 'check');
 const GODOT_TIMEOUT_MSEC = 180_000;
 const WEB_TIMEOUT_MSEC = 300_000;
+const E2E_TIMEOUT_MSEC = 900_000;
 
 // Needs an installed export and writes builds/, so it only runs with --release.
 const RELEASE_TESTS = { standalone_build_editor_integration_test: ['--editor'] };
@@ -23,19 +24,22 @@ const IGNORED_SHUTDOWN_ERRORS = [
   /ObjectDB instances leaked at exit/,
 ];
 
-const USAGE = `Usage: node tools/check.mjs [--release] [filter ...]
+const USAGE = `Usage: node tools/check.mjs [--full] [--release] [filter ...]
 
 Runs the Godot test scripts, the tests of these tools, the browser type check
-and tests, and verifies that web/public matches a fresh build.
+and tests, verifies that web/public matches a fresh build, then plays a round
+with two emulated phones against the real host.
 
   filter      Run only checks whose name contains one of the filters,
-              for example "bubbles" or "web".
+              for example "bubbles", "web" or "e2e".
+  --full      Play the end-to-end round with every default, a full-length
+              round, instead of a shortened one.
   --release   Also run the Windows export test. Needs Godot export templates.
 `;
 
-function run(command, args, { cwd = root, timeout, shell = false } = {}) {
+function run(command, args, { cwd = root, timeout, shell = false, env = process.env } = {}) {
   return new Promise(resolve => {
-    const child = spawn(command, args, { cwd, shell, windowsHide: true, env: process.env });
+    const child = spawn(command, args, { cwd, shell, windowsHide: true, env });
     let output = '';
     let timedOut = false;
     const timer = setTimeout(() => { timedOut = true; child.kill(); }, timeout);
@@ -88,9 +92,9 @@ function missingExportTemplates() {
   return missingWindowsTemplates(folder).length === 0 ? '' : `Godot export templates are not installed in ${folder}; install them from Editor > Manage Export Templates`;
 }
 
-function npm(script) {
+function npm(script, { timeout = WEB_TIMEOUT_MSEC, env = process.env } = {}) {
   // npm is a .cmd shim on Windows, which Node only starts through a shell.
-  return run(`npm run --silent ${script}`, [], { cwd: webDirectory, timeout: WEB_TIMEOUT_MSEC, shell: true });
+  return run(`npm run --silent ${script}`, [], { cwd: webDirectory, timeout, shell: true, env });
 }
 
 async function webTypes() {
@@ -148,12 +152,26 @@ async function webBundle() {
   return { failure: 'web/public did not match web/src and has now been rebuilt; review and commit it' };
 }
 
+async function e2e(full) {
+  const env = { ...process.env, E2E_ROUND: full ? 'full' : 'quick' };
+  const result = await npm('e2e -- --reporter=line', { timeout: E2E_TIMEOUT_MSEC, env });
+  const log = writeLog('e2e', result.output);
+  const count = label => Number(result.output.match(new RegExp(`(\\d+) ${label}`))?.[1] ?? 0);
+  const total = count('passed') + count('failed');
+  if (result.code === 0) return { failure: '', detail: `${count('passed')}/${total}${full ? ' full' : ''}` };
+  if (result.timedOut) return { failure: `timed out after ${E2E_TIMEOUT_MSEC / 1000} s (${log})` };
+
+  const error = result.output.match(/^\s*Error: (.+)$/m)?.[1] ?? `exit code ${result.code}`;
+  return { failure: `${error}; screenshots and traces in test-results/e2e/ (${log})` };
+}
+
 async function main() {
   const args = process.argv.slice(2);
   if (args.includes('--help') || args.includes('-h')) { process.stdout.write(USAGE); return 0; }
-  const unknown = args.find(arg => arg.startsWith('-') && arg !== '--release');
+  const unknown = args.find(arg => arg.startsWith('-') && !['--release', '--full'].includes(arg));
   if (unknown) { process.stderr.write(`Unknown option ${unknown}\n\n${USAGE}`); return 2; }
   const release = args.includes('--release');
+  const full = args.includes('--full');
   const filters = args.filter(arg => !arg.startsWith('-'));
   const selected = name => filters.length === 0 || filters.some(filter => name.includes(filter));
 
@@ -184,6 +202,8 @@ async function main() {
     ['web-types', webTypes, 'types'],
     ['web-tests', webTests, 'web tests'],
     ['web-bundle', webBundle, 'bundle'],
+    // Last, because it serves the bundle the step above rebuilt.
+    ['e2e', () => e2e(full), 'e2e'],
   ].filter(([name]) => selected(name));
   if (webChecks.length > 0 && !existsSync(join(webDirectory, 'node_modules'))) {
     failures.push('FAIL web: dependencies are missing; run "node tools/setup.mjs"');
