@@ -34,9 +34,10 @@ const IGNORED_SHUTDOWN_ERRORS = [
 
 const USAGE = `Usage: node tools/check.mjs [--full] [--release] [filter ...]
 
-Runs the Godot test scripts, the format and lint checks, the tests of these
-tools, the browser type check and tests, verifies that web/public matches a
-fresh build, then plays a round with two emulated phones against the real host.
+Runs the Godot test scripts, the format, lint and document checks, the tests
+of these tools, the browser type check and tests, verifies that web/public
+matches a fresh build, then plays a round with two emulated phones against the
+real host.
 
   filter      Run only checks whose name contains one of the filters,
               for example "bubbles", "web" or "e2e".
@@ -155,6 +156,7 @@ async function listing(name, args) {
 
 const format = () => listing("format", ["tools/format.mjs", "--check"]);
 const lint = () => listing("lint", ["tools/lint.mjs"]);
+const docs = () => listing("docs", ["tools/docs.mjs"]);
 
 async function toolsTests() {
   // Node expands the pattern itself, so no shell is needed on any platform.
@@ -265,6 +267,7 @@ async function main() {
   const toolChecks = [
     ["format", format, "format"],
     ["lint", lint, "lint"],
+    ["docs", docs, "docs"],
     ["tools-tests", toolsTests, "tools tests"],
   ].filter(([name]) => selected(name));
   for (const [name, check, label] of toolChecks) {
