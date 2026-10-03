@@ -28,8 +28,10 @@ folder (about 700 MB); it installs nothing else outside the repository. Godot
 is found as `godot` on PATH, or through `GODOT_BIN` when set to a Godot
 executable.
 
-Run `node tools/format.mjs` before committing: it formats GDScript and the
-web sources, and `node tools/check.mjs` fails on a file that is not formatted.
+Run `node tools/format.mjs` and `node tools/lint.mjs` before committing. The
+first formats GDScript and the web sources; the second reports mistakes and
+lines over 100 characters. `node tools/check.mjs` fails on a file that is not
+formatted or has a lint finding.
 
 Some tasks need more. The setup script reports these without failing:
 

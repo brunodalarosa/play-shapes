@@ -87,11 +87,15 @@ Open `Tuning/Active Presets.tres` to select named resources. Current front doors
 
 For Inspector help, put a `##` documentation comment immediately before the export annotation and variable declaration. Use `@export_group`, not `@export_category`, because categories can break subsequent property help. `tests/tuning_presets_test.gd` enforces this and recursively checks committed presets.
 
-## Formatting
+## Formatting and linting
 
 `node tools/format.mjs` formats every GDScript file outside `addons/` with the GDQuest GDScript formatter, and the TypeScript, JavaScript, HTML and CSS sources of `web/` and `tools/` with Prettier, both wrapping at 100 characters. `--check` changes nothing and lists the unformatted files; the check command runs it as its `format` step. `.editorconfig` states the same rules for editors, and `.prettierignore` keeps an editor's format-on-save away from compiled and generated files. Markdown, JSON, Godot's `.tscn`/`.tres` files, the compiled `.js` in `web/public/` and the Python art tools are not formatted.
 
 Godot has no formatter of its own. `node tools/setup.mjs` downloads the pinned formatter version into ignored `local/tools/` and verifies it against the SHA-256 recorded in `tools/gdscript_formatter.mjs`; changing the version means recording a new checksum for every platform there, then reformatting. The formatter runs with its structure check and refuses a file whose wrapped form it cannot prove equivalent. It names only the file; so far the cause has always been a long chained call or an inline `if`/`else` inside a longer expression, and splitting that statement into shorter ones fixes it. One pass does not always reach its own fixed point, so the command repeats until a pass changes nothing.
+
+`node tools/lint.mjs` prints one finding per line and fails when there is any; the check command runs it as its `lint` step. It runs the GDScript formatter's own linter over the same GDScript files, ESLint with the recommended JavaScript and typescript-eslint rules over the TypeScript and JavaScript of `web/` and `tools/`, and reports every line over 100 characters. The ESLint rules are in `web/eslint.rules.mjs`, next to the packages they import; `eslint.config.mjs` at the root re-exports them so the linter and editors also cover `tools/`. `tools/sources.mjs` decides which files both commands cover.
+
+Three exceptions are deliberate. The linter's `private-access` rule is off for `tests/`, where the tests reach into private members of the code they test; that is temporary and marked in `tools/lint.mjs`. A line of an HTML file may exceed 100 characters, because an attribute value cannot continue on another line. So may the line that opens a test with its title, because splitting the title makes Prettier indent the whole test body a level deeper.
 
 `.git-blame-ignore-revs` lists the commits that only changed layout. GitHub's blame view skips them; locally run `git config blame.ignoreRevsFile .git-blame-ignore-revs` once.
 
@@ -142,7 +146,7 @@ Close any interactive host before integration tests; the browser suite refuses t
 node tools/check.mjs
 ```
 
-This is the default `[AUTO]` check. It runs every `tests/*_test.gd` script and `tests/foundation.gd`, each in its own headless Godot process, then `node tools/format.mjs --check` and the `tools/tests/` suite, then `npm run check` (which type-checks the phone client and, with Node types, the end-to-end test files) and `npm test` in `web/`, then rebuilds the browser bundle and fails if `web/public/` changed, then runs the end-to-end test described below. New test scripts are picked up by name. It prints one line per failure and a one-line summary; full output for each check is in ignored `test-results/check/`. A Godot script fails on a non-zero exit code or on any `ERROR` line. Shutdown lines about objects still held at exit are ignored for now, because three passing scripts print them; that exception is temporary and is marked in `tools/check.mjs`.
+This is the default `[AUTO]` check. It runs every `tests/*_test.gd` script and `tests/foundation.gd`, each in its own headless Godot process, then `node tools/format.mjs --check`, `node tools/lint.mjs` and the `tools/tests/` suite, then `npm run check` (which type-checks the phone client and, with Node types, the end-to-end test files) and `npm test` in `web/`, then rebuilds the browser bundle and fails if `web/public/` changed, then runs the end-to-end test described below. New test scripts are picked up by name. It prints one line per failure and a one-line summary; full output for each check is in ignored `test-results/check/`. A Godot script fails on a non-zero exit code or on any `ERROR` line. Shutdown lines about objects still held at exit are ignored for now, because three passing scripts print them; that exception is temporary and is marked in `tools/check.mjs`.
 
 ```powershell
 node tools/check.mjs bubbles web-tests   # only checks whose name contains a filter
