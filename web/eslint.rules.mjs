@@ -19,6 +19,7 @@ export default tseslint.config(
       "builds/**",
       "test-results/**",
       ".godot/**",
+      ".obsidian/plugins/kanban-bases-view/**",
     ],
   },
   js.configs.recommended,
