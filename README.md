@@ -21,9 +21,11 @@ cloned checkout without Node, an internet connection or a separate web server.
 To develop, also install Node.js 22 or newer, which includes npm. Then run
 `node tools/setup.mjs` from the repository root. It checks every required
 tool, fails with install instructions when one is missing or too old, and
-installs the browser client's dependencies in `web/`. It installs nothing
-outside the repository. Godot is found as `godot` on PATH, or through
-`GODOT_BIN` when set to a Godot executable.
+installs the browser client's dependencies in `web/`. It also installs the
+Chromium that the end-to-end test drives, in Playwright's standard per-user
+folder (about 700 MB); it installs nothing else outside the repository. Godot
+is found as `godot` on PATH, or through `GODOT_BIN` when set to a Godot
+executable.
 
 Some tasks need more. The setup script reports these without failing:
 
