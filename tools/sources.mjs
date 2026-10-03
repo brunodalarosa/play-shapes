@@ -30,6 +30,7 @@ export function isGdscriptSource(file) {
  */
 export function isWebSource(file) {
   if (file === "web/public/index.html" || file === "web/public/style.css") return true;
+  if (file.startsWith("web/src/vendor/")) return false;
   if (/^web\/(src|e2e|tests|scripts)\/.+\.(ts|mjs)$/.test(file)) return true;
   if (/^web\/[^/]+\.(ts|mjs)$/.test(file)) return true;
   return /^(tools\/.+|[^/]+)\.mjs$/.test(file);
@@ -44,6 +45,18 @@ export function isWebSource(file) {
 export function mayExceedLineLength(file, line) {
   if (file.endsWith(".html")) return true;
   return /^\s*test\((["'`]).*\1, (async )?\(\w*\) => \{$/.test(line);
+}
+
+/**
+ * True for a TypeScript or JavaScript file that is neither a source above nor one of the
+ * places left alone on purpose: the compiled and vendored files in web/public, the
+ * vendored declarations in web/src/vendor, vendored addons, and the art review pages.
+ * Such a file would otherwise go unformatted and unlinted without anyone noticing.
+ */
+export function isUncoveredScript(file) {
+  if (!/\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/.test(file)) return false;
+  if (/^(web\/public|web\/src\/vendor|addons|art)\//.test(file)) return false;
+  return !isWebSource(file);
 }
 
 export function gdscriptFiles() {
