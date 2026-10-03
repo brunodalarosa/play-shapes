@@ -52,7 +52,11 @@ func configure(
 	_breath_amplitude = selected_tuning.jellyfish_breath_amplitude
 	_breath_period_seconds = selected_tuning.jellyfish_breath_period_seconds
 	global_position = position_world
-	velocity = movement.normalized() * selected_tuning.jellyfish_speed if movement.length_squared() > 0.0 else Vector2.ZERO
+	velocity = (
+		movement.normalized() * selected_tuning.jellyfish_speed
+		if movement.length_squared() > 0.0
+		else Vector2.ZERO
+	)
 	(_collider.shape as CircleShape2D).radius = radius
 	_base_sprite_scale = (radius * 4.0) / float(_sprite.texture.get_width())
 	_refresh(at_msec)

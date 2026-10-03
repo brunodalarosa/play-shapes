@@ -278,7 +278,8 @@ func _scatter_from_pop(player_id: String, data: Dictionary) -> void:
 			_controller.next_random_unit() - 0.5
 		) * 0.24
 		var direction := Vector2.from_angle(angle)
-		var reach := scatter_radius + _controller.next_random_unit() * _tuning.jellyfish_collider_radius * 2.0
+		var spread := _controller.next_random_unit() * _tuning.jellyfish_collider_radius * 2.0
+		var reach := scatter_radius + spread
 		var raw_position := bubble.global_position + direction * reach
 		var position_world := Vector2(
 			clampf(raw_position.x, bounds.position.x, bounds.end.x),
@@ -305,7 +306,8 @@ func _step_puffers(delta: float, host_time_msec: int) -> void:
 			var bubble := _players.get_bubble(player_id)
 			if not bubble.is_simulated() or bubble.is_invulnerable(host_time_msec):
 				continue
-			if puffer.global_position.distance_to(bubble.global_position) <= puffer.radius + bubble.collision_radius():
+			var touching := puffer.radius + bubble.collision_radius()
+			if puffer.global_position.distance_to(bubble.global_position) <= touching:
 				if bubble.request_puffer_pop(host_time_msec).accepted:
 					pufferfish_hit.emit(id, player_id)
 
@@ -316,7 +318,11 @@ func _begin_wave(at_msec: int, first: bool) -> void:
 	var seconds := _tuning.jellyfish_wave_min_seconds + _controller.next_random_unit() * span
 	_wave_until_msec = at_msec + roundi(seconds * 1000.0)
 	var unit := _controller.next_random_unit()
-	_wave_rate = lerpf(_tuning.jellyfish_low_spawn_rate, _tuning.jellyfish_high_spawn_rate, unit) if _wave_high else _tuning.jellyfish_low_spawn_rate * unit
+	_wave_rate = (
+		lerpf(_tuning.jellyfish_low_spawn_rate, _tuning.jellyfish_high_spawn_rate, unit)
+		if _wave_high
+		else _tuning.jellyfish_low_spawn_rate * unit
+	)
 	wave_changed.emit(_wave_high, _wave_rate, _wave_until_msec - at_msec)
 
 

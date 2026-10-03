@@ -13,7 +13,10 @@ func prepare(config: ControllerNetworkConfig) -> Error:
 		return OK
 	for path: String in [config.certificate_path, config.private_key_path]:
 		if path.is_empty() or not FileAccess.file_exists(path):
-			error = "HTTPS requires readable certificate_path and private_key_path files. Run the local HTTPS setup."
+			error = (
+				"HTTPS requires readable certificate_path and private_key_path files. "
+				+ "Run the local HTTPS setup."
+			)
 			return ERR_FILE_NOT_FOUND
 	var certificate := X509Certificate.new()
 	var key := CryptoKey.new()

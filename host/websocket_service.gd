@@ -73,7 +73,8 @@ func begin_pre_minigame(phase: PreMinigameReadiness) -> void:
 	_readiness = phase
 	_active_protocol = phase
 	for client: Dictionary in _clients:
-		client.preexisting_onboarding = _registry.player_for_connection(int(client.connection_id)).is_empty()
+		var joined := _registry.player_for_connection(int(client.connection_id))
+		client.preexisting_onboarding = joined.is_empty()
 	phase.changed.connect(_on_readiness_changed)
 	_broadcast_gameplay_snapshots()
 
@@ -465,7 +466,8 @@ func _drop(index: int) -> void:
 
 func _disconnect_player(client: Dictionary) -> void:
 	if client.welcomed:
-		if _registry.player_for_connection(client.connection_id).get("player_id") == motion_channel.target_player_id:
+		var leaving := _registry.player_for_connection(client.connection_id)
+		if leaving.get("player_id") == motion_channel.target_player_id:
 			motion_channel.reconnect()
 		_registry.disconnect_connection(client.connection_id)
 

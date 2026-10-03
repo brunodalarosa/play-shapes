@@ -133,14 +133,18 @@ func presentation_action() -> String:
 		and not _dropping and stance in ["look_up", "crouch"]
 	):
 		return stance
-	return "idle" if absf(body.velocity.x) < 20.0 else "run" if absf(axes.x) >= run_threshold else "walk"
+	if absf(body.velocity.x) < 20.0:
+		return "idle"
+
+	return "run" if absf(axes.x) >= run_threshold else "walk"
 
 
 func _physics_process(delta: float) -> void:
 	expire_input(Time.get_ticks_msec())
 	body.velocity.x = move_toward(body.velocity.x, axes.x * move_speed, acceleration * delta)
 	if _jump_queued:
-		# Eligibility is checked again at consumption, so an edge/transition cannot queue a later jump.
+		# Eligibility is checked again at consumption, so an edge/transition cannot queue a later
+		# jump.
 		if body.is_on_floor() and body.velocity.y >= 0.0:
 			body.velocity.y = -jump_impulse
 		_jump_queued = false

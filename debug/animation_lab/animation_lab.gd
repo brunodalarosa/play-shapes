@@ -156,7 +156,11 @@ func _build_ui() -> void:
 	column.add_child(_info)
 	var note := Label.new()
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	note.text = "Actions transition through neutral. Held poses stay held. Release / Enter also works during entry. Pause and speed affect motion and natural blinking."
+	note.text = (
+		"Actions transition through neutral. Held poses stay held. "
+		+ "Release / Enter also works during entry. "
+		+ "Pause and speed affect motion and natural blinking."
+	)
 	column.add_child(note)
 
 

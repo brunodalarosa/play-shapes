@@ -38,7 +38,9 @@ func _exit_tree() -> void:
 
 
 func _refresh_addresses() -> void:
-	var previous := address_picker.get_item_text(address_picker.selected) if address_picker.selected >= 0 else ""
+	var previous := ""
+	if address_picker.selected >= 0:
+		previous = address_picker.get_item_text(address_picker.selected)
 	address_picker.clear()
 	var addresses := SessionHost.addresses()
 	for address: String in addresses:

@@ -216,7 +216,8 @@ func submit_trace(
 	state.last_input_seq = int(input_seq)
 	var action: StringName = classified.action
 	if action == &"swipe" and gesture_started_msec >= 0:
-		if host_receipt_msec - gesture_started_msec > roundi(tuning.swipe_max_hold_seconds * 1000.0):
+		var longest_hold_msec := roundi(tuning.swipe_max_hold_seconds * 1000.0)
+		if host_receipt_msec - gesture_started_msec > longest_hold_msec:
 			personal_state_changed.emit(player_id, personal_snapshot(player_id))
 			return { "accepted": true, "action": &"none", "reason": &"swipe_too_slow" }
 	if action == &"spin":
