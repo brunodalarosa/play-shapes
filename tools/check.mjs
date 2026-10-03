@@ -34,9 +34,9 @@ const IGNORED_SHUTDOWN_ERRORS = [
 
 const USAGE = `Usage: node tools/check.mjs [--full] [--release] [filter ...]
 
-Runs the Godot test scripts, the tests of these tools, the browser type check
-and tests, verifies that web/public matches a fresh build, then plays a round
-with two emulated phones against the real host.
+Runs the Godot test scripts, the format check, the tests of these tools, the
+browser type check and tests, verifies that web/public matches a fresh build,
+then plays a round with two emulated phones against the real host.
 
   filter      Run only checks whose name contains one of the filters,
               for example "bubbles", "web" or "e2e".
@@ -138,6 +138,19 @@ async function webTypes() {
     result.output.split(/\r?\n/).find((line) => /error TS\d+/.test(line)) ??
     `exit code ${result.code}`;
   return { failure: `${first.trim()} (${log})` };
+}
+
+async function format() {
+  const result = await run(process.execPath, ["tools/format.mjs", "--check"], {
+    timeout: WEB_TIMEOUT_MSEC,
+  });
+  const log = writeLog("format", result.output);
+  if (result.code === 0) return { failure: "" };
+
+  // Its last line is either the count of unformatted files or the reason it could not run.
+  const lines = result.output.trim().split(/\r?\n/);
+  const files = lines.slice(0, -1).slice(0, 3).join(", ");
+  return { failure: `${lines.at(-1)}${files ? `: ${files}` : ""} (${log})` };
 }
 
 async function toolsTests() {
@@ -246,9 +259,10 @@ async function main() {
   }
   if (godotTests.length > 0) summary.push(`Godot ${godotPassed}/${godotTests.length}`);
 
-  const toolChecks = [["tools-tests", toolsTests, "tools tests"]].filter(([name]) =>
-    selected(name),
-  );
+  const toolChecks = [
+    ["format", format, "format"],
+    ["tools-tests", toolsTests, "tools tests"],
+  ].filter(([name]) => selected(name));
   for (const [name, check, label] of toolChecks) {
     const { failure, detail } = await check();
     if (failure) failures.push(`FAIL ${name}: ${failure}`);
