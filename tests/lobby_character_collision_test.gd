@@ -28,7 +28,7 @@ func _run() -> void:
 	mover.position = target.position + Vector2(-100.0, 0.0)
 	mover.velocity = Vector2.ZERO
 	for unused: int in 35:
-		mover.set_horizontal(1.0, Time.get_ticks_msec())
+		mover.motor.set_input(Vector2.RIGHT, "move", Time.get_ticks_msec())
 		await physics_frame
 	_check(mover.position.x > target.position.x - 95.0
 		and mover.position.x <= target.position.x - 44.0,
@@ -48,7 +48,7 @@ func _run() -> void:
 			impact_y = mover.position.y
 			break
 	_check(bounced, "Landing on another player produces an upward rebound")
-	_check(not mover.request_jump(), "The rebound does not allow an extra grounded jump")
+	_check(not mover.motor.request_jump(), "The rebound does not allow an extra grounded jump")
 	var highest_y := impact_y
 	for unused: int in 25:
 		await physics_frame

@@ -128,7 +128,9 @@ During this early development phase, controller connection/protocol errors appea
 
 Keep evidence labels separate: `[AUTO]`, `[EDITOR]`, `[GODOT-RUNTIME]`, `[DESKTOP-BROWSER]`, `[PHYSICAL-PHONE]`, `[EXPORTED-BUILD]`, and `[HUMAN-PLAY]`. One never implies another. Render captures establish technical composition, not couch-distance readability, accessibility, comfort, or creative approval.
 
-Close any interactive host before integration tests; the browser suite refuses to run over an existing host. It uses `18080`/`18081` for startup lifecycle checks. `GODOT_BIN` can override the executable used by `web/tests/host.test.mjs`.
+Close any interactive host before integration tests; the browser suite refuses to run over an existing host. It uses `18080`/`18081` for startup lifecycle checks. The checker and browser tests use `GODOT_BIN` when set, otherwise `godot` on PATH. Set `GODOT_BIN` to the actual Godot executable on your computer; on Windows, Node's direct process launches cannot use a `.cmd` or `.bat` wrapper. Run `node tools/setup.mjs` to confirm tool discovery before checking the project.
+
+Godot checks need access to the current user's application-data directories and the operating system's certificate store. A restricted runner can report `Failed to open log file for writing: user://logs/godot.log` or `Failed to read the root certificate store` even when a fixture starts successfully. These errors also fail browser integration tests that require clean host output. If they occur, rerun the same checks with the required user-profile and certificate-store access before diagnosing a code regression. Keep error detection enabled; a run with access errors is not passing verification.
 
 ```powershell
 node tools/check.mjs
