@@ -69,7 +69,7 @@ async function runGodotTest(name) {
   const args = ['--headless', ...(RELEASE_TESTS[name] ?? []), '--path', root, '--script', `res://tests/${name}.gd`];
   const result = await run(godotBinary, args, { timeout: GODOT_TIMEOUT_MSEC });
   const log = writeLog(name, result.output);
-  if (result.spawnError) return `could not start Godot (${result.spawnError.code}); set GODOT_BIN to the Godot executable`;
+  if (result.spawnError) return `could not start Godot (${result.spawnError.code}); run "node tools/setup.mjs"`;
   if (result.timedOut) return `timed out after ${GODOT_TIMEOUT_MSEC / 1000} s (${log})`;
   const errors = godotErrorLines(result.output);
   if (result.code === 0 && errors.length === 0) return '';
@@ -83,7 +83,7 @@ function missingExportTemplates() {
   if (process.platform !== 'win32') return 'the standalone builder supports only a Windows host';
   const { error, text } = godotVersion();
   const templateName = godotTemplateName(text);
-  if (error || !templateName) return `could not read the Godot version (${error || text}); set GODOT_BIN to the Godot executable`;
+  if (error || !templateName) return `could not read the Godot version (${error || text}); run "node tools/setup.mjs"`;
   const folder = exportTemplatesFolder(templateName);
   return missingWindowsTemplates(folder).length === 0 ? '' : `Godot export templates are not installed in ${folder}; install them from Editor > Manage Export Templates`;
 }
@@ -186,7 +186,7 @@ async function main() {
     ['web-bundle', webBundle, 'bundle'],
   ].filter(([name]) => selected(name));
   if (webChecks.length > 0 && !existsSync(join(webDirectory, 'node_modules'))) {
-    failures.push('FAIL web: dependencies are missing; run "npm ci" in web/');
+    failures.push('FAIL web: dependencies are missing; run "node tools/setup.mjs"');
   } else {
     for (const [name, check, label] of webChecks) {
       const { failure, detail } = await check();

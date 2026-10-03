@@ -60,7 +60,9 @@ export function missingWindowsTemplates(folder) {
 
 /** Runs a tool to read its version. `error` is set when the tool could not be started. */
 export function probe(command, args = ['--version'], { shell = false } = {}) {
-  const result = spawnSync(command, args, { encoding: 'utf8', shell, windowsHide: true, timeout: 30_000 });
+  // Node rejects separate arguments with a shell, so a shell gets one command line.
+  const [file, list] = shell ? [[command, ...args].join(' '), []] : [command, args];
+  const result = spawnSync(file, list, { encoding: 'utf8', shell, windowsHide: true, timeout: 30_000 });
   if (result.error) return { error: result.error.code ?? result.error.message, output: '' };
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`.trim();
   if (result.status !== 0) return { error: `exit code ${result.status}`, output };
