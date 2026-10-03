@@ -14,12 +14,12 @@ by the existing `art/**` export filter.
 
 Open the source in Blender 5.2.2. Textures are packed and their current editable
 PNG originals are in `textures/`. No add-on or automatic script execution is needed.
-The saved scene and action identifiers retain their established names so the
-existing rig/export contract stays stable:
+The export scripts find the scene, the actions and the face images by name, so a
+rename there needs the same change in the scripts:
 
-- Scene: `PS057 | Squircle Animation Studio`.
-- Select `Animation.Controls`; choose `PS057 | Idle`, `PS057 | Walk` or
-  `PS057 | Run`, or `PS080 | Look Up` / `PS080 | Crouch` in Dope Sheet > Action Editor.
+- Scene: `Squircle Animation Studio`.
+- Select `Animation.Controls`; choose `Squircle | Idle`, `Squircle | Walk` or
+  `Squircle | Run`, or `Squircle | Look Up` / `Squircle | Crouch` in Dope Sheet > Action Editor.
 - Timeline ends: 48, 24 or 16, all at 24 fps. Space plays; Numpad 0 shows the camera.
 - Pose Mode edits the five independent body/hand/foot controls. The face follows
   the body. All actions have fake users and linear interpolation. Locomotion has
@@ -50,7 +50,7 @@ property `Hand diameter m`. Save and regenerate the complete export below.
 Frame 1 of each stance matches idle frame 1. Nine samples cover eight intervals
 at 24 fps; smoothstep spacing eases entry and reverse release. Edit the `Body`,
 `Hand.L` and `Hand.R` pose bones in the new actions. Scene custom properties
-prefixed `PS080` describe the current values and timing; they are notes, not drivers.
+prefixed `Stance` describe the current values and timing; they are notes, not drivers.
 `animation_common.py` defines the exported frame counts, FPS and `playback: held`.
 Keep action range, frame count and timing in agreement after edits.
 

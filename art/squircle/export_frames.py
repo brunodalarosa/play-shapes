@@ -29,7 +29,7 @@ if args.output == 'export' and (args.frames or args.clips != list(CLIPS) or args
     parser.error('Partial exports require --output to a separate folder')
 out = HERE / args.output
 out.mkdir(parents=True, exist_ok=True)
-scene = bpy.data.scenes['PS057 | Squircle Animation Studio']
+scene = bpy.data.scenes['Squircle Animation Studio']
 bpy.context.window.scene = scene
 face = bpy.data.objects['Face.Plane - neutral artwork']
 parts = [bpy.data.objects[n] for n in PARTS]
@@ -70,8 +70,8 @@ def material(name, node):
     return mat
 
 
-holdout = material('PS057 Export | Holdout occluder', 'ShaderNodeHoldout')
-mask_mat = material('PS057 Export | Visible face rectangle', 'ShaderNodeEmission')
+holdout = material('Squircle Export | Holdout occluder', 'ShaderNodeHoldout')
+mask_mat = material('Squircle Export | Visible face rectangle', 'ShaderNodeEmission')
 mask_mat.node_tree.nodes.get('Emission').inputs['Color'].default_value = (1,1,1,1)
 
 
@@ -119,7 +119,7 @@ manifest['hand_model'] = 'sphere'
 manifest['hand_diameter_m'] = scene['Hand diameter m']
 (out/'expressions').mkdir(exist_ok=True)
 for expression in ('neutral', 'blink'):
-    bpy.data.images['PS056 Face - '+expression].save_render(str(out/'expressions'/f'{expression}.png'), scene=scene)
+    bpy.data.images['Squircle Face - '+expression].save_render(str(out/'expressions'/f'{expression}.png'), scene=scene)
 for clip in args.clips:
     spec = CLIPS[clip]
     rig = activate_clip(scene, clip)

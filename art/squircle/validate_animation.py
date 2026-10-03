@@ -9,7 +9,7 @@ from bpy_extras.object_utils import world_to_camera_view
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 from animation_common import CLIPS, CONTROLS, PARTS, VIEWS, activate_clip, action_name
-scene=bpy.data.scenes['PS057 | Squircle Animation Studio']
+scene=bpy.data.scenes['Squircle Animation Studio']
 bpy.context.window.scene=scene
 report={'source':'squircle-animated.blend','blender':bpy.app.version_string,'checks':[], 'clips':{},
         'approval':'Technical evidence only; physical-phone and owner motion review are separate.'}
@@ -127,7 +127,7 @@ for clip,spec in CLIPS.items():
 check('run hand swing exceeds walk',report['clips']['run']['hand_y_travel_m']>1.2 and report['clips']['run']['hand_y_travel_m']>2*report['clips']['walk']['hand_y_travel_m'])
 check('all independent editable actions', all(action_name(x) in bpy.data.actions for x in CLIPS))
 check('five independently controlled parts',len(rig.pose.bones)==5)
-check('packed neutral and blink textures',all(bpy.data.images['PS056 Face - '+x].packed_file for x in ('neutral','blink')))
+check('packed neutral and blink textures',all(bpy.data.images['Squircle Face - '+x].packed_file for x in ('neutral','blink')))
 check('root fixed at ground origin',bpy.data.objects['Character.Root - ground anchor'].location.length<1e-8)
 check('optional shadow disabled',bpy.data.objects['Ground.ShadowCatcher - optional'].hide_render)
 report['passed']=all(c['passed'] for c in report['checks'])
