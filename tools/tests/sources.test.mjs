@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { gdscriptFiles, isGdscriptSource, isWebSource, webSourceFiles } from "../sources.mjs";
+import {
+  gdscriptFiles,
+  isGdscriptSource,
+  isWebSource,
+  mayExceedLineLength,
+  webSourceFiles,
+} from "../sources.mjs";
 
 test("treats project GDScript as source and vendored addons as not", () => {
   assert.equal(isGdscriptSource("host/session_host.gd"), true);
@@ -41,6 +47,19 @@ test("leaves compiled, vendored and other files alone", () => {
   ]) {
     assert.equal(isWebSource(file), false, file);
   }
+});
+
+test("lets only HTML lines and test titles exceed the line length", () => {
+  const file = "web/tests/host.test.mjs";
+  assert.equal(mayExceedLineLength(file, 'test("a title", async () => {'), true);
+  assert.equal(mayExceedLineLength(file, 'test("a title", async (t) => {'), true);
+  assert.equal(mayExceedLineLength(file, "  test('a title', () => {"), true);
+  assert.equal(mayExceedLineLength("web/public/index.html", '<div aria-label="long">'), true);
+
+  assert.equal(mayExceedLineLength(file, 'const text = "a long string";'), false);
+  assert.equal(mayExceedLineLength(file, 'test("a title", async () => { run(); });'), false);
+  assert.equal(mayExceedLineLength(file, 'assert.equal(test("a"), 1); // () => {'), false);
+  assert.equal(mayExceedLineLength("web/public/style.css", "a { color: red; }"), false);
 });
 
 test("finds this repository's own sources", () => {

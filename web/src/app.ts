@@ -38,20 +38,24 @@ function reportConnectionFailure(stage: string, endpoint: string, error: unknown
     if (connectionErrors.length > 6) connectionErrors.shift();
   }
   connectionError.textContent =
-    `CONTROLLER ERROR LOG (development)\nBrowser: ${navigator.userAgent}\nConnection failures retry every 2 seconds.\n\n` +
+    "CONTROLLER ERROR LOG (development)\n" +
+    `Browser: ${navigator.userAgent}\n` +
+    "Connection failures retry every 2 seconds.\n\n" +
     connectionErrors
-      .map(
-        (entry) =>
-          `[${entry.at}]${entry.repeats > 1 ? ` (repeated ${entry.repeats} times)` : ""}\n${entry.text}`,
-      )
+      .map((entry) => {
+        const repeats = entry.repeats > 1 ? ` (repeated ${entry.repeats} times)` : "";
+        return `[${entry.at}]${repeats}\n${entry.text}`;
+      })
       .join("\n\n");
   connectionError.hidden = false;
 }
 window.addEventListener("error", (event) => {
+  const cause =
+    event.error instanceof Error ? `${event.error.name}: ${event.error.message}` : event.message;
   reportConnectionFailure(
     "Browser JavaScript error",
     new URL(location.href).origin,
-    `${event.error instanceof Error ? `${event.error.name}: ${event.error.message}` : event.message}\nSource: ${event.filename}:${event.lineno}:${event.colno}`,
+    `${cause}\nSource: ${event.filename}:${event.lineno}:${event.colno}`,
   );
 });
 window.addEventListener("unhandledrejection", (event) => {
@@ -967,12 +971,9 @@ function renderBubbles(now: number): void {
             shape.stretch,
           ),
         );
-      drawPolyline(
-        context,
-        arc,
-        `${visual?.recovery_white ? "rgba(255,255,255," : "rgba("}${visual?.recovery_white ? "0.5" : `${["110,234,255", "167,133,255", "255,139,206", "255,223,157", "138,248,199"][index % 5]},0.5`})`,
-        Math.max(2, renderedRadius * 0.055),
-      );
+      const hues = ["110,234,255", "167,133,255", "255,139,206", "255,223,157", "138,248,199"];
+      const hue = visual?.recovery_white ? "255,255,255" : hues[index % 5];
+      drawPolyline(context, arc, `rgba(${hue},0.5)`, Math.max(2, renderedRadius * 0.055));
     }
     drawArc(
       context,
@@ -1124,7 +1125,8 @@ async function connect(): Promise<void> {
         message = JSON.parse(event.data) as HostMessage;
       } catch (error) {
         // Parser messages can quote the payload, including a welcome's resume token.
-        socketFailure = `Invalid JSON received from host (${error instanceof Error ? error.name : "parse error"}).`;
+        const cause = error instanceof Error ? error.name : "parse error";
+        socketFailure = `Invalid JSON received from host (${cause}).`;
         reportConnectionFailure("Parse host message JSON", endpoint, socketFailure);
         peer.close();
         return;
@@ -1168,7 +1170,8 @@ async function connect(): Promise<void> {
         } else
           showJoin(
             isStandalone(window, navigator) && !stored(STORAGE.token)
-              ? "Choose your character to join. If already playing in a browser, leave that controller first."
+              ? "Choose your character to join. " +
+                  "If already playing in a browser, leave that controller first."
               : "Connected. Choose your character to join.",
             true,
           );
@@ -1258,12 +1261,15 @@ async function connect(): Promise<void> {
         reportConnectionFailure(
           stage,
           endpoint,
-          `${socketFailure ? socketFailure + "\n" : ""}WebSocket closed: code=${event.code}, reason=${event.reason || "(not provided)"}, wasClean=${event.wasClean}.`,
+          `${socketFailure ? socketFailure + "\n" : ""}WebSocket closed: code=${event.code}, ` +
+            `reason=${event.reason || "(not provided)"}, wasClean=${event.wasClean}.`,
         );
       reconnect();
     };
     peer.onerror = (event) => {
-      socketFailure = `WebSocket ${event.type || "error"} event. Browser did not expose the underlying network/TLS reason.`;
+      socketFailure =
+        `WebSocket ${event.type || "error"} event. ` +
+        "Browser did not expose the underlying network/TLS reason.";
       reportConnectionFailure(stage, endpoint, socketFailure);
       peer.close();
     };

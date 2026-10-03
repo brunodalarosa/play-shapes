@@ -19,7 +19,10 @@ Prettier. Lines wrap at ${LINE_LENGTH} characters.
   --check   Change nothing; list the files that are not formatted and fail.
 `;
 
-/** Runs the GDScript formatter once over files. Returns the unformatted files (check only), or an error. */
+/**
+ * Runs the GDScript formatter once over files. Returns the unformatted files (check
+ * only), or an error.
+ */
 function runGdscriptFormatter(formatter, files, check) {
   // The structure check makes the formatter refuse a file rather than change what its code means.
   const args = ["--max-line-length", String(LINE_LENGTH), "--verify-structure", "--verbose"];
@@ -62,8 +65,9 @@ function gdscript(check) {
     if (remaining.error || remaining.unformatted.length === 0) return remaining;
     files = remaining.unformatted;
   }
+  const unsettled = files.join(", ");
   return {
-    error: `the GDScript formatter did not settle after ${GDSCRIPT_PASSES} passes on: ${files.join(", ")}`,
+    error: `the GDScript formatter did not settle after ${GDSCRIPT_PASSES} passes on: ${unsettled}`,
   };
 }
 

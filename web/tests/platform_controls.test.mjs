@@ -100,11 +100,10 @@ async function withControls(verify) {
         "export default { create: options => globalThis.__platformJoystickFactory(options) }",
       );
     let source = readFileSync(new URL("../public/platform_controls.js", import.meta.url), "utf8");
-    source = source.replace(
-      /from "(\.\/[^"]+)"/g,
-      (_, path) =>
-        `from "${path === "./vendor/nipplejs.mjs" ? stub : new URL("../public/" + path.slice(2), import.meta.url).href}"`,
-    );
+    source = source.replace(/from "(\.\/[^"]+)"/g, (_, path) => {
+      const bundled = new URL("../public/" + path.slice(2), import.meta.url).href;
+      return `from "${path === "./vendor/nipplejs.mjs" ? stub : bundled}"`;
+    });
     const { PlatformControls } = await import(
       "data:text/javascript;base64," +
         Buffer.from(source + `\n// fixture ${++fixtureId}`).toString("base64")

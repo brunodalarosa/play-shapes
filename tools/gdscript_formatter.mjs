@@ -47,7 +47,10 @@ export function formatterBuild(platform = process.platform, arch = process.arch)
   return { file, sha256, url: `${RELEASES}/${FORMATTER_VERSION}/${file}.zip` };
 }
 
-/** Returns where the formatter is installed. The version is in the name, so a new pin is a new file. */
+/**
+ * Returns where the formatter is installed. The version is in the name, so a new pin is
+ * a new file.
+ */
 export function formatterPath(platform = process.platform, arch = process.arch) {
   const build = formatterBuild(platform, arch);
   return build ? join(root, "local", "tools", build.file) : null;
@@ -81,7 +84,10 @@ export function extractOnlyFile(zip) {
   return content;
 }
 
-/** Downloads the pinned formatter, checks the archive against its recorded checksum and installs it. */
+/**
+ * Downloads the pinned formatter, checks the archive against its recorded checksum and
+ * installs it.
+ */
 export async function installFormatter() {
   const build = formatterBuild();
   if (!build)

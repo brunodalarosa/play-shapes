@@ -11,7 +11,8 @@ import { isIP } from "node:net";
 export function namesFor(ip, hostname = "") {
   if (isIP(ip) !== 4 || ip === "0.0.0.0")
     throw new Error(
-      "Specify the reachable host IPv4 address with --ip (see the lobby address picker or the ips command).",
+      "Specify the reachable host IPv4 address with --ip " +
+        "(see the lobby address picker or the ips command).",
     );
   if (hostname && !/^[a-zA-Z0-9][a-zA-Z0-9.-]{0,252}$/.test(hostname))
     throw new Error("Hostname must contain only letters, digits, dots and hyphens.");
@@ -62,7 +63,8 @@ async function main() {
     });
     if (result.error)
       throw new Error(
-        `mkcert is unavailable. Run the download command or install mkcert from its official releases. ${result.error.message}`,
+        "mkcert is unavailable. Run the download command or install mkcert from its official " +
+          `releases. ${result.error.message}`,
       );
     if (result.status !== 0) throw new Error(`mkcert failed (${result.status}).`);
   };
@@ -89,7 +91,8 @@ async function main() {
     const name = `mkcert-v1.4.4-${platform}-${architecture}${platform === "windows" ? ".exe" : ""}`;
     const url = `https://github.com/FiloSottile/mkcert/releases/download/v1.4.4/${name}`;
     console.log(
-      `Downloading the official mkcert v1.4.4 development tool: ${url}. No installation or trust changes.`,
+      `Downloading the official mkcert v1.4.4 development tool: ${url}. ` +
+        "No installation or trust changes.",
     );
     const response = await fetch(url);
     if (!response.ok) throw new Error(`Download failed: ${response.status}`);
@@ -109,7 +112,13 @@ async function main() {
   }
   if (!["setup", "regenerate", "disable", "trust", "untrust"].includes(command)) {
     console.log(
-      "Commands: ips | download | setup --ip LAN_IP [--hostname playshapes.local] | regenerate --ip LAN_IP | disable | trust | untrust | status\nOptions: --dir DIRECTORY --mkcert EXECUTABLE --advertise-hostname\nsetup/regenerate never change system trust. trust/untrust explicitly change ONLY this development CA. Restart Godot after configuration changes.",
+      [
+        "Commands: ips | download | setup --ip LAN_IP [--hostname playshapes.local] | " +
+          "regenerate --ip LAN_IP | disable | trust | untrust | status",
+        "Options: --dir DIRECTORY --mkcert EXECUTABLE --advertise-hostname",
+        "setup/regenerate never change system trust. trust/untrust explicitly change ONLY " +
+          "this development CA. Restart Godot after configuration changes.",
+      ].join("\n"),
     );
     return;
   }
@@ -123,8 +132,10 @@ async function main() {
   if (command === "trust" || command === "untrust") {
     if (!existsSync(join(caDirectory, "rootCA.pem")))
       throw new Error("Run setup before changing trust.");
+    const action = command === "trust" ? "INSTALLING" : "REMOVING";
     console.log(
-      `${command === "trust" ? "INSTALLING" : "REMOVING"} this Play Shapes development root in the host trust stores. This is an explicit system trust change; mkcert may request elevation.`,
+      `${action} this Play Shapes development root in the host trust stores. ` +
+        "This is an explicit system trust change; mkcert may request elevation.",
     );
     run([command === "trust" ? "-install" : "-uninstall"]);
     return;
@@ -178,8 +189,16 @@ async function main() {
     certificate_path: "certificate.pem",
     private_key_path: "key.pem",
   });
+  const outcome = reuse ? "Reused valid certificate" : "Generated certificate";
   console.log(
-    `${reuse ? "Reused valid certificate" : "Generated certificate"} for ${names.join(", ")}. Restart the host.\nTrust has NOT been changed. Transfer only Play-Shapes-Dev-CA.cer to controlled phones; NEVER share ca/rootCA-key.pem or key.pem.\nRoot SHA-256: ${rootCA.fingerprint256}\nName discovery is not installed; use the configured IP unless you have verified hostname resolution on every test phone.`,
+    [
+      `${outcome} for ${names.join(", ")}. Restart the host.`,
+      "Trust has NOT been changed. Transfer only Play-Shapes-Dev-CA.cer to controlled phones; " +
+        "NEVER share ca/rootCA-key.pem or key.pem.",
+      `Root SHA-256: ${rootCA.fingerprint256}`,
+      "Name discovery is not installed; use the configured IP unless you have verified " +
+        "hostname resolution on every test phone.",
+    ].join("\n"),
   );
 }
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url))

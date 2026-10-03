@@ -35,6 +35,17 @@ export function isWebSource(file) {
   return /^(tools\/.+|[^/]+)\.mjs$/.test(file);
 }
 
+/**
+ * True for the two kinds of line that cannot be shortened without a worse result: any
+ * line of an HTML file, where an attribute value cannot continue on another line without
+ * changing its text, and the line that opens a test with its title, where splitting the
+ * title makes Prettier indent the whole test body a level deeper.
+ */
+export function mayExceedLineLength(file, line) {
+  if (file.endsWith(".html")) return true;
+  return /^\s*test\((["'`]).*\1, (async )?\(\w*\) => \{$/.test(line);
+}
+
 export function gdscriptFiles() {
   return repositoryFiles().filter(isGdscriptSource);
 }

@@ -122,7 +122,8 @@ function missingExportTemplates() {
   const folder = exportTemplatesFolder(templateName);
   return missingWindowsTemplates(folder).length === 0
     ? ""
-    : `Godot export templates are not installed in ${folder}; install them from Editor > Manage Export Templates`;
+    : `Godot export templates are not installed in ${folder}; ` +
+        "install them from Editor > Manage Export Templates";
 }
 
 function npm(script, { timeout = WEB_TIMEOUT_MSEC, env = process.env } = {}) {

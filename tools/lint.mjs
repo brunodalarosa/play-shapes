@@ -6,7 +6,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { root, webDirectory } from "./environment.mjs";
 import { formatterPath } from "./gdscript_formatter.mjs";
-import { LINE_LENGTH, gdscriptFiles, webSourceFiles } from "./sources.mjs";
+import { LINE_LENGTH, gdscriptFiles, mayExceedLineLength, webSourceFiles } from "./sources.mjs";
 
 // Temporary: the tests reach into private members of the code they test, which
 // this rule reports. Remove this exception when the tests are given proper
@@ -18,7 +18,7 @@ const USAGE = `Usage: node tools/lint.mjs
 Lints every GDScript file outside addons/ with the pinned GDScript formatter's
 linter, and the TypeScript and JavaScript sources of web/ and tools/ with
 ESLint. Reports lines over ${LINE_LENGTH} characters in all of them, and in
-the hand-written HTML and CSS. Prints one finding per line and fails when
+the hand-written CSS. Prints one finding per line and fails when
 there is any.
 `;
 
@@ -73,13 +73,16 @@ function eslint() {
   return { findings };
 }
 
-/** Reports lines over the limit in the sources Prettier formats, which it cannot always shorten. */
+/**
+ * Reports lines over the limit in the sources Prettier formats, which it cannot always
+ * shorten.
+ */
 function longLines() {
   const findings = [];
   for (const file of webSourceFiles()) {
     const lines = readFileSync(join(root, file), "utf8").split(/\r?\n/);
     for (const [index, line] of lines.entries()) {
-      if (line.length <= LINE_LENGTH) continue;
+      if (line.length <= LINE_LENGTH || mayExceedLineLength(file, line)) continue;
 
       findings.push(
         `${file}:${index + 1}: max-line-length: Line is too long. ` +
