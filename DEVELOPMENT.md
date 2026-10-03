@@ -12,6 +12,7 @@ none of them needs the others first.
 | What still needs a person or a real phone | [docs/pending-reviews.md](docs/pending-reviews.md) |
 | What is done, what is next, known bugs | [docs/roadmap.md](docs/roadmap.md) |
 | Why things are the way they are | [docs/decisions/](docs/decisions/README.md) |
+| Branches, merging, releases and version numbers | [docs/branching.md](docs/branching.md) |
 | Formatting, linting and the document rules | [docs/formatting-and-linting.md](docs/formatting-and-linting.md) |
 | The phone client's TypeScript and its build | [docs/browser-build.md](docs/browser-build.md) |
 | The phone page: app install, touch, error panel | [docs/phone-client.md](docs/phone-client.md) |

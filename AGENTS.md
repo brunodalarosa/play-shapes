@@ -1,6 +1,6 @@
 # Contributor guidance
 
-This directory is the Godot project root. Work on a new local branch and commit implementation changes locally. Do not push or open a pull request until the project owner approves publication.
+This directory is the Godot project root. Work on a new local `feature/<name>` branch started from `develop`, as [docs/branching.md](docs/branching.md) describes, and commit implementation changes locally. Do not push or open a pull request until the project owner approves publication.
 
 ## Working method
 
@@ -91,6 +91,7 @@ Read the one document for the area you are working on, not all of them. [DEVELOP
 - [docs/pending-reviews.md](docs/pending-reviews.md): what still needs a person or a real phone.
 - [docs/roadmap.md](docs/roadmap.md): what is done, what is next, known bugs.
 - [docs/decisions/](docs/decisions/README.md): why things are the way they are. Add a record when a change makes a choice whose reason will not show in the code.
+- [docs/branching.md](docs/branching.md): branches, merging, releases and version numbers.
 - [docs/formatting-and-linting.md](docs/formatting-and-linting.md): format, lint and document rules.
 - [docs/browser-build.md](docs/browser-build.md): building the phone client.
 - [docs/phone-client.md](docs/phone-client.md): app install, touch handling, the error panel.
