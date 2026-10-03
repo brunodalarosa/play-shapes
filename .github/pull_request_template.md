@@ -3,7 +3,8 @@ the project well. Write facts about the change, not the story of making it: no
 first person, no "as discussed", no reference to a chat, a review or who
 suggested what. A rejected alternative is worth recording; how it came to be
 rejected is not. Keep it short. Title the pull request with what changed, not
-with the branch name. -->
+with the branch name. Target develop unless this is a release or a hotfix;
+docs/branching.md has the rules. -->
 
 ## Task
 

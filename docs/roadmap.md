@@ -18,6 +18,8 @@ existing ones. The game keeps playing the same while the code is reshaped; see
 - Formatters and linters, with the whole code base reformatted once.
 - The development manual split into one document per area, held to one standard.
 - A decision log and this roadmap.
+- A branching model, Git Flow, with `develop` as the branch work merges into
+  ([branching.md](branching.md)).
 
 ## Next
 
@@ -56,6 +58,8 @@ After the input pipeline: bots that fill a game with players
 
 ## Backlog
 
+- The first release, `0.1.0`: decide where the project and the Windows package record the
+  version, then follow [branching.md](branching.md#a-release).
 - Cloud CI, if hosted runners turn out to be free for this repository
   ([0021](decisions/0021-no-cloud-ci.md)).
 - The end-to-end test on WebKit, in the `--full` run.

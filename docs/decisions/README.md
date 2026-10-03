@@ -58,3 +58,4 @@ What was decided.
 | [0019](0019-typed-classes.md) | Typed classes inside the host; dictionaries only at the edges |
 | [0020](0020-roadmap-in-the-repository.md) | The plan lives in the repository |
 | [0021](0021-no-cloud-ci.md) | No cloud CI for now; verification is local |
+| [0022](0022-git-flow.md) | Git Flow: `main` holds releases, `develop` holds the work |
