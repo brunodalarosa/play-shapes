@@ -50,7 +50,8 @@ func _start() -> void:
 	_host.settings.http_port = http_port
 	_host.settings.websocket_port = http_port + 1
 
-	# The game's own boot starts the host and opens the lobby, so whatever boot grows is part of the run.
+	# The game's own boot starts the host and opens the lobby, so whatever boot grows is part of the
+	# run.
 	change_scene_to_file(ProjectSettings.get_setting("application/run/main_scene"))
 
 

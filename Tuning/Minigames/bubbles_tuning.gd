@@ -3,62 +3,75 @@ extends Resource
 ## Provisional Bubbles and jellyfishes values. Save a named preset and relaunch to compare feel.
 
 @export_group("Round lifecycle")
-## Character entrance time after the shared booklet. Higher lengthens the entrance; lower reaches countdown sooner. Default: 3. Safe range: 0-15.
+## Character entrance time after the shared booklet. Higher lengthens the entrance; lower reaches
+## countdown sooner. Default: 3. Safe range: 0-15.
 @export_range(0.0, 15.0, 0.25, "suffix:s")
 var instructions_seconds: float = 3.0:
 	set(value):
 		instructions_seconds = clampf(value, 0.0, 15.0)
-## Countdown after the entrance is acknowledged, in seconds. Higher gives more preparation; lower starts sooner. Default: 3. Safe range: 0-10.
+## Countdown after the entrance is acknowledged, in seconds. Higher gives more preparation; lower
+## starts sooner. Default: 3. Safe range: 0-10.
 @export_range(0.0, 10.0, 0.25, "suffix:s") var countdown_seconds: float = 3.0:
 	set(value):
 		countdown_seconds = clampf(value, 0.0, 10.0)
-## Active round duration, in seconds. Higher allows more collecting; lower makes each catch matter more. Default: 90. Safe range: 10-300.
+## Active round duration, in seconds. Higher allows more collecting; lower makes each catch matter
+## more. Default: 90. Safe range: 10-300.
 @export_range(10.0, 300.0, 1.0, "suffix:s") var round_duration_seconds: float = 90.0:
 	set(value):
 		round_duration_seconds = clampf(value, 10.0, 300.0)
 
 @export_group("Player bubble")
-## Initial bubble radius, in world pixels. Higher begins with more reach and hazard exposure. Default: 48. Safe range: 16-160.
+## Initial bubble radius, in world pixels. Higher begins with more reach and hazard exposure.
+## Default: 48. Safe range: 16-160.
 @export_range(16.0, 160.0, 1.0, "suffix:px")
 var starting_radius: float = 48.0:
 	set(value):
 		starting_radius = clampf(value, 16.0, 160.0)
-## Largest visual/collision radius, in world pixels. Higher permits more reach and exposure. Default: 110. Safe range: 32-240; must exceed starting radius.
+## Largest visual/collision radius, in world pixels. Higher permits more reach and exposure.
+## Default: 110. Safe range: 32-240; must exceed starting radius.
 @export_range(32.0, 240.0, 1.0, "suffix:px") var max_radius: float = 110.0:
 	set(value):
 		max_radius = clampf(value, 32.0, 240.0)
-## Radius gained for each captured jellyfish, in world pixels. Higher grows faster; lower delays growth. Default: 2. Safe range: 0.1-10.
+## Radius gained for each captured jellyfish, in world pixels. Higher grows faster; lower delays
+## growth. Default: 2. Safe range: 0.1-10.
 @export_range(0.1, 10.0, 0.1, "suffix:px") var radius_per_jellyfish: float = 2.0:
 	set(value):
 		radius_per_jellyfish = clampf(value, 0.1, 10.0)
-## Maximum captured jellyfish sprites shown inside a bubble. Higher shows more detail; lower reduces clutter. Scores remain uncapped. Default: 12. Safe range: 0-40.
+## Maximum captured jellyfish sprites shown inside a bubble. Higher shows more detail; lower reduces
+## clutter. Scores remain uncapped. Default: 12. Safe range: 0-40.
 @export_range(0, 40, 1) var captured_visual_cap: int = 12:
 	set(value):
 		captured_visual_cap = clampi(value, 0, 40)
-## Extra mass per jellyfish as a fraction of base mass. Higher makes large bubbles harder to shove. Default: 0.025. Safe range: 0-0.2.
+## Extra mass per jellyfish as a fraction of base mass. Higher makes large bubbles harder to shove.
+## Default: 0.025. Safe range: 0-0.2.
 @export_range(0.0, 0.2, 0.005) var mass_growth_per_jellyfish: float = 0.025:
 	set(value):
 		mass_growth_per_jellyfish = clampf(value, 0.0, 0.2)
-## Fractional speed reduction per jellyfish, before the physics cap. Higher slows large bubbles more. Default: 0.01. Safe range: 0-0.1.
+## Fractional speed reduction per jellyfish, before the physics cap. Higher slows large bubbles
+## more. Default: 0.01. Safe range: 0-0.1.
 @export_range(0.0, 0.1, 0.002) var speed_reduction_per_jellyfish: float = 0.01:
 	set(value):
 		speed_reduction_per_jellyfish = clampf(value, 0.0, 0.1)
 
 @export_group("Movement and gestures")
-## Fixed swipe impulse, in world pixels per second. Higher makes each swipe stronger. Default: 280. Safe range: 20-1000.
+## Fixed swipe impulse, in world pixels per second. Higher makes each swipe stronger. Default: 280.
+## Safe range: 20-1000.
 @export_range(20.0, 1000.0, 5.0, "suffix:px/s")
 var swipe_impulse: float = 280.0:
 	set(value):
 		swipe_impulse = clampf(value, 20.0, 1000.0)
-## Maximum touch hold before a swipe loses its movement impulse. Spin gestures are unaffected. Default: 0.65. Safe range: 0.2-2.
+## Maximum touch hold before a swipe loses its movement impulse. Spin gestures are unaffected.
+## Default: 0.65. Safe range: 0.2-2.
 @export_range(0.2, 2.0, 0.05, "suffix:s") var swipe_max_hold_seconds: float = 0.65:
 	set(value):
 		swipe_max_hold_seconds = clampf(value, 0.2, 2.0)
-## Minimum normalized net swipe distance. Higher requires a longer swipe; lower accepts smaller gestures. Default: 0.07. Safe range: 0.02-0.3.
+## Minimum normalized net swipe distance. Higher requires a longer swipe; lower accepts smaller
+## gestures. Default: 0.07. Safe range: 0.02-0.3.
 @export_range(0.02, 0.3, 0.005) var swipe_min_distance: float = 0.07:
 	set(value):
 		swipe_min_distance = clampf(value, 0.02, 0.3)
-## Bubble speed cap, in world pixels per second. Higher permits faster travel. Default: 460. Safe range: 50-1200.
+## Bubble speed cap, in world pixels per second. Higher permits faster travel. Default: 460. Safe
+## range: 50-1200.
 @export_range(50.0, 1200.0, 10.0, "suffix:px/s") var max_player_speed: float = 460.0:
 	set(value):
 		max_player_speed = clampf(value, 50.0, 1200.0)
@@ -66,38 +79,46 @@ var swipe_impulse: float = 280.0:
 @export_range(0.0, 8.0, 0.1, "suffix:/s") var water_drag: float = 1.8:
 	set(value):
 		water_drag = clampf(value, 0.0, 8.0)
-## Wall bounce multiplier. Higher rebounds more strongly; zero stops at the wall. Default: 0.65. Safe range: 0-1.
+## Wall bounce multiplier. Higher rebounds more strongly; zero stops at the wall. Default: 0.65.
+## Safe range: 0-1.
 @export_range(0.0, 1.0, 0.01) var wall_bounciness: float = 0.65:
 	set(value):
 		wall_bounciness = clampf(value, 0.0, 1.0)
-## Complete circles needed in one touch to charge spin. Higher asks for more deliberate drawing. Default: 2. Safe range: 1-4.
+## Complete circles needed in one touch to charge spin. Higher asks for more deliberate drawing.
+## Default: 2. Safe range: 1-4.
 @export_range(1, 4, 1) var circles_to_charge: int = 2:
 	set(value):
 		circles_to_charge = clampi(value, 1, 4)
-## Allowed radial variation and end gap as a fraction of circle radius. Higher accepts rougher circles. Default: 0.4. Safe range: 0.2-0.7.
+## Allowed radial variation and end gap as a fraction of circle radius. Higher accepts rougher
+## circles. Default: 0.4. Safe range: 0.2-0.7.
 @export_range(0.2, 0.7, 0.01) var circle_tolerance: float = 0.4:
 	set(value):
 		circle_tolerance = clampf(value, 0.2, 0.7)
-## Active spin duration, in seconds. Higher extends the shove advantage. Default: 1.5. Safe range: 0.2-5.
+## Active spin duration, in seconds. Higher extends the shove advantage. Default: 1.5. Safe range:
+## 0.2-5.
 @export_range(0.2, 5.0, 0.1, "suffix:s") var spin_duration_seconds: float = 1.5:
 	set(value):
 		spin_duration_seconds = clampf(value, 0.2, 5.0)
-## Spin cooldown after activation, in seconds. Higher spaces out spins. Default: 5. Safe range: 0-20.
+## Spin cooldown after activation, in seconds. Higher spaces out spins. Default: 5. Safe range:
+## 0-20.
 @export_range(0.0, 20.0, 0.25, "suffix:s") var spin_cooldown_seconds: float = 5.0:
 	set(value):
 		spin_cooldown_seconds = clampf(value, 0.0, 20.0)
-## Additional shove impulse against another player while spinning, in world pixels per second. Higher pushes opponents farther. Default: 250. Safe range: 0-1000.
+## Additional shove impulse against another player while spinning, in world pixels per second.
+## Higher pushes opponents farther. Default: 250. Safe range: 0-1000.
 @export_range(0.0, 1000.0, 5.0, "suffix:px/s") var spin_shove_impulse: float = 250.0:
 	set(value):
 		spin_shove_impulse = clampf(value, 0.0, 1000.0)
 
 @export_group("Jellyfish")
-## Jellyfish collision radius, in world pixels. Higher makes collection easier. Default: 14. Safe range: 4-60.
+## Jellyfish collision radius, in world pixels. Higher makes collection easier. Default: 14. Safe
+## range: 4-60.
 @export_range(4.0, 60.0, 1.0, "suffix:px")
 var jellyfish_collider_radius: float = 14.0:
 	set(value):
 		jellyfish_collider_radius = clampf(value, 4.0, 60.0)
-## Jellyfish sprite breathing amplitude as a fraction of its resting size. Zero disables breathing. Default: 0.045. Safe range: 0-0.12.
+## Jellyfish sprite breathing amplitude as a fraction of its resting size. Zero disables breathing.
+## Default: 0.045. Safe range: 0-0.12.
 @export_range(0.0, 0.12, 0.005, "suffix:fraction") var jellyfish_breath_amplitude: float = 0.045:
 	set(value):
 		jellyfish_breath_amplitude = clampf(value, 0.0, 0.12)
@@ -105,19 +126,23 @@ var jellyfish_collider_radius: float = 14.0:
 @export_range(1.2, 5.0, 0.1, "suffix:s") var jellyfish_breath_period_seconds: float = 2.4:
 	set(value):
 		jellyfish_breath_period_seconds = clampf(value, 1.2, 5.0)
-## Initial free jellyfish population at GO. Higher gives earlier opportunities. Default: 20. Safe range: 0-100; cannot exceed free cap.
+## Initial free jellyfish population at GO. Higher gives earlier opportunities. Default: 20. Safe
+## range: 0-100; cannot exceed free cap.
 @export_range(0, 100, 1) var starting_jellyfish: int = 20:
 	set(value):
 		starting_jellyfish = clampi(value, 0, 100)
-## Maximum free jellyfish in the arena. Higher makes collection busier. Default: 70. Safe range: 1-200.
+## Maximum free jellyfish in the arena. Higher makes collection busier. Default: 70. Safe range:
+## 1-200.
 @export_range(1, 200, 1) var max_free_jellyfish: int = 70:
 	set(value):
 		max_free_jellyfish = clampi(value, 1, 200)
-## Low-wave spawn rate, in jellyfish per second. Higher keeps quiet periods busy. Default: 0.5. Safe range: 0-10.
+## Low-wave spawn rate, in jellyfish per second. Higher keeps quiet periods busy. Default: 0.5. Safe
+## range: 0-10.
 @export_range(0.0, 10.0, 0.1, "suffix:/s") var jellyfish_low_spawn_rate: float = 0.5:
 	set(value):
 		jellyfish_low_spawn_rate = clampf(value, 0.0, 10.0)
-## High-wave spawn rate, in jellyfish per second. Higher creates denser scoring bursts. Default: 2. Safe range: 0-15; at least low rate.
+## High-wave spawn rate, in jellyfish per second. Higher creates denser scoring bursts. Default: 2.
+## Safe range: 0-15; at least low rate.
 @export_range(0.0, 15.0, 0.1, "suffix:/s") var jellyfish_high_spawn_rate: float = 2.0:
 	set(value):
 		jellyfish_high_spawn_rate = clampf(value, 0.0, 15.0)
@@ -125,38 +150,46 @@ var jellyfish_collider_radius: float = 14.0:
 @export_range(1.0, 30.0, 0.5, "suffix:s") var jellyfish_wave_min_seconds: float = 4.0:
 	set(value):
 		jellyfish_wave_min_seconds = clampf(value, 1.0, 30.0)
-## Longest jellyfish wave, in seconds. Higher allows longer unpredictable bursts. Default: 9. Safe range: 1-45; at least shortest wave.
+## Longest jellyfish wave, in seconds. Higher allows longer unpredictable bursts. Default: 9. Safe
+## range: 1-45; at least shortest wave.
 @export_range(1.0, 45.0, 0.5, "suffix:s") var jellyfish_wave_max_seconds: float = 9.0:
 	set(value):
 		jellyfish_wave_max_seconds = clampf(value, 1.0, 45.0)
-## Jellyfish wandering speed, in world pixels per second. Higher makes catches harder. Default: 45. Safe range: 0-200.
+## Jellyfish wandering speed, in world pixels per second. Higher makes catches harder. Default: 45.
+## Safe range: 0-200.
 @export_range(0.0, 200.0, 5.0, "suffix:px/s") var jellyfish_speed: float = 45.0:
 	set(value):
 		jellyfish_speed = clampf(value, 0.0, 200.0)
-## Minimum spawn clearance around players and hazards, in world pixels. Higher reduces immediate collisions. Default: 90. Safe range: 0-300.
+## Minimum spawn clearance around players and hazards, in world pixels. Higher reduces immediate
+## collisions. Default: 90. Safe range: 0-300.
 @export_range(0.0, 300.0, 5.0, "suffix:px") var jellyfish_spawn_clearance: float = 90.0:
 	set(value):
 		jellyfish_spawn_clearance = clampf(value, 0.0, 300.0)
-## Non-collectible entrance duration, in seconds. Higher delays a new catch. Default: 0.6. Safe range: 0-3.
+## Non-collectible entrance duration, in seconds. Higher delays a new catch. Default: 0.6. Safe
+## range: 0-3.
 @export_range(0.0, 3.0, 0.05, "suffix:s") var jellyfish_entrance_seconds: float = 0.6:
 	set(value):
 		jellyfish_entrance_seconds = clampf(value, 0.0, 3.0)
-## Collection lockout after a pop scatters jellyfish, in seconds. Higher gives opponents more time to reach them. Default: 0.5. Safe range: 0-3.
+## Collection lockout after a pop scatters jellyfish, in seconds. Higher gives opponents more time
+## to reach them. Default: 0.5. Safe range: 0-3.
 @export_range(0.0, 3.0, 0.05, "suffix:s") var released_collection_lockout_seconds: float = 0.5:
 	set(value):
 		released_collection_lockout_seconds = clampf(value, 0.0, 3.0)
 
 @export_group("Pufferfish and pop")
-## Pufferfish baseline collision radius before the creature-size multiplier, in world pixels. Default: 30. Safe range: 8-100.
+## Pufferfish baseline collision radius before the creature-size multiplier, in world pixels.
+## Default: 30. Safe range: 8-100.
 @export_range(8.0, 100.0, 1.0, "suffix:px")
 var pufferfish_collider_radius: float = 30.0:
 	set(value):
 		pufferfish_collider_radius = clampf(value, 8.0, 100.0)
-## Multiplies both the pufferfish art and collision radius. Default: 1.5 (50% larger). Safe range: 1-2.
+## Multiplies both the pufferfish art and collision radius. Default: 1.5 (50% larger). Safe range:
+## 1-2.
 @export_range(1.0, 2.0, 0.05, "suffix:×") var pufferfish_size_multiplier: float = 1.5:
 	set(value):
 		pufferfish_size_multiplier = clampf(value, 1.0, 2.0)
-## Pufferfish body jiggle rotation while swimming, in degrees. Zero disables rotation. Default: 3.5. Safe range: 0-12.
+## Pufferfish body jiggle rotation while swimming, in degrees. Zero disables rotation. Default: 3.5.
+## Safe range: 0-12.
 @export_range(0.0, 12.0, 0.5, "suffix:deg") var pufferfish_jiggle_degrees: float = 3.5:
 	set(value):
 		pufferfish_jiggle_degrees = clampf(value, 0.0, 12.0)
@@ -164,7 +197,8 @@ var pufferfish_collider_radius: float = 30.0:
 @export_range(0.15, 1.2, 0.05, "suffix:s") var pufferfish_jiggle_period_seconds: float = 0.32:
 	set(value):
 		pufferfish_jiggle_period_seconds = clampf(value, 0.15, 1.2)
-## Body squash during a pufferfish jiggle as a fraction of its size. Zero disables squash. Default: 0.035. Safe range: 0-0.1.
+## Body squash during a pufferfish jiggle as a fraction of its size. Zero disables squash. Default:
+## 0.035. Safe range: 0-0.1.
 @export_range(0.0, 0.1, 0.005, "suffix:fraction") var pufferfish_jiggle_squash: float = 0.035:
 	set(value):
 		pufferfish_jiggle_squash = clampf(value, 0.0, 0.1)
@@ -172,41 +206,50 @@ var pufferfish_collider_radius: float = 30.0:
 @export_range(0.0, 2.0, 0.01, "suffix:/s") var pufferfish_start_spawn_rate: float = 0.08:
 	set(value):
 		pufferfish_start_spawn_rate = clampf(value, 0.0, 2.0)
-## Late pufferfish spawns per second. Higher increases endgame risk. Default: 0.3. Safe range: 0-3; at least start rate.
+## Late pufferfish spawns per second. Higher increases endgame risk. Default: 0.3. Safe range: 0-3;
+## at least start rate.
 @export_range(0.0, 3.0, 0.01, "suffix:/s") var pufferfish_max_spawn_rate: float = 0.3:
 	set(value):
 		pufferfish_max_spawn_rate = clampf(value, 0.0, 3.0)
-## Pufferfish drift speed, in world pixels per second. Higher shortens reaction time. Default: 120. Safe range: 20-400.
+## Pufferfish drift speed, in world pixels per second. Higher shortens reaction time. Default: 120.
+## Safe range: 20-400.
 @export_range(20.0, 400.0, 5.0, "suffix:px/s") var pufferfish_speed: float = 120.0:
 	set(value):
 		pufferfish_speed = clampf(value, 20.0, 400.0)
-## Fraction of held jellyfish destroyed on pop. Higher leaves fewer to recollect. Default: 0.5. Safe range: 0-1.
+## Fraction of held jellyfish destroyed on pop. Higher leaves fewer to recollect. Default: 0.5. Safe
+## range: 0-1.
 @export_range(0.0, 1.0, 0.01) var pop_disappear_ratio: float = 0.5:
 	set(value):
 		pop_disappear_ratio = clampf(value, 0.0, 1.0)
-## Post-pop invulnerability and collection lockout, in seconds. Higher grants safer recovery. Default: 2. Safe range: 0-8.
+## Post-pop invulnerability and collection lockout, in seconds. Higher grants safer recovery.
+## Default: 2. Safe range: 0-8.
 @export_range(0.0, 8.0, 0.1, "suffix:s") var pop_invulnerability_seconds: float = 2.0:
 	set(value):
 		pop_invulnerability_seconds = clampf(value, 0.0, 8.0)
-## Bubble re-form animation after a pop, in seconds. Higher makes recovery more visible; lower feels snappier. Default: 0.35. Safe range: 0.1-1.5.
+## Bubble re-form animation after a pop, in seconds. Higher makes recovery more visible; lower feels
+## snappier. Default: 0.35. Safe range: 0.1-1.5.
 @export_range(0.1, 1.5, 0.05, "suffix:s") var bubble_reform_seconds: float = 0.35:
 	set(value):
 		bubble_reform_seconds = clampf(value, 0.1, 1.5)
 ## Show an edge warning before pufferfish enter. Disabling removes visual notice. Default: enabled.
 @export var pufferfish_warning_enabled: bool = true
-## Time the offscreen bubble burst precedes the pufferfish reveal, in seconds. Higher gives more notice. Default: 0.8. Safe range: 0-3.
+## Time the offscreen bubble burst precedes the pufferfish reveal, in seconds. Higher gives more
+## notice. Default: 0.8. Safe range: 0-3.
 @export_range(0.0, 3.0, 0.05, "suffix:s") var pufferfish_warning_seconds: float = 0.8:
 	set(value):
 		pufferfish_warning_seconds = clampf(value, 0.0, 3.0)
-## Count of bubbles in the pufferfish's one-shot edge burst. Higher makes the cue denser. Default: 24. Safe range: 4-64.
+## Count of bubbles in the pufferfish's one-shot edge burst. Higher makes the cue denser. Default:
+## 24. Safe range: 4-64.
 @export_range(4, 64, 1) var pufferfish_telegraph_bubble_count: int = 24:
 	set(value):
 		pufferfish_telegraph_bubble_count = clampi(value, 4, 64)
-## Radius of each pufferfish telegraph bubble, in world pixels. Higher makes particles more prominent. Default: 4.5. Safe range: 2-10.
+## Radius of each pufferfish telegraph bubble, in world pixels. Higher makes particles more
+## prominent. Default: 4.5. Safe range: 2-10.
 @export_range(2.0, 10.0, 0.5, "suffix:px") var pufferfish_telegraph_bubble_radius: float = 4.5:
 	set(value):
 		pufferfish_telegraph_bubble_radius = clampf(value, 2.0, 10.0)
-## Strength of randomized bubble drift. Zero disables extra acceleration; higher values create more varied paths. Default: 3.0. Safe range: 0-10.
+## Strength of randomized bubble drift. Zero disables extra acceleration; higher values create more
+## varied paths. Default: 3.0. Safe range: 0-10.
 @export_range(0.0, 10.0, 0.25) var pufferfish_telegraph_noise_strength: float = 3.0:
 	set(value):
 		pufferfish_telegraph_noise_strength = clampf(value, 0.0, 10.0)
@@ -233,7 +276,8 @@ var character_float_pixels: float = 4.0:
 @export_range(0.0, 24.0, 1.0, "suffix:px") var swipe_character_push_pixels: float = 13.0:
 	set(value):
 		swipe_character_push_pixels = clampf(value, 0.0, 24.0)
-## Bubble stretch from coarse live drag direction. Zero disables held-touch deformation. Default: 0.20. Safe range: 0-0.22.
+## Bubble stretch from coarse live drag direction. Zero disables held-touch deformation. Default:
+## 0.20. Safe range: 0-0.22.
 @export_range(0.0, 0.22, 0.01) var live_drag_pull_strength: float = 0.20:
 	set(value):
 		live_drag_pull_strength = clampf(value, 0.0, 0.22)
@@ -249,7 +293,8 @@ var character_float_pixels: float = 4.0:
 @export_range(0.0, 0.15, 0.01) var charge_wobble_strength: float = 0.07:
 	set(value):
 		charge_wobble_strength = clampf(value, 0.0, 0.15)
-## Surface rotation speed during authoritative spin, in revolutions per second. Default: 1.8. Safe range: 0.2-5.
+## Surface rotation speed during authoritative spin, in revolutions per second. Default: 1.8. Safe
+## range: 0.2-5.
 @export_range(0.2, 5.0, 0.1, "suffix:rev/s") var spin_surface_turns_per_second: float = 1.8:
 	set(value):
 		spin_surface_turns_per_second = clampf(value, 0.2, 5.0)
@@ -261,23 +306,28 @@ var character_float_pixels: float = 4.0:
 @export_range(0, 32, 1) var decorative_particle_count: int = 10:
 	set(value):
 		decorative_particle_count = clampi(value, 0, 32)
-## Remaining whole seconds when the final timer pulses begin. Higher starts urgency earlier. Default: 10. Safe range: 1-30.
+## Remaining whole seconds when the final timer pulses begin. Higher starts urgency earlier.
+## Default: 10. Safe range: 1-30.
 @export_range(1, 30, 1, "suffix:s") var final_timer_emphasis_seconds: int = 10:
 	set(value):
 		final_timer_emphasis_seconds = clampi(value, 1, 30)
-## Strength of gentle environment layer motion. Zero holds the plates still; higher increases drift. Default: 1. Safe range: 0-2.
+## Strength of gentle environment layer motion. Zero holds the plates still; higher increases drift.
+## Default: 1. Safe range: 0-2.
 @export_range(0.0, 2.0, 0.05) var parallax_strength: float = 1.0:
 	set(value):
 		parallax_strength = clampf(value, 0.0, 2.0)
-## Multiplier for final timer size pulses. Zero keeps numbers steady; higher emphasizes each beat. Default: 1. Safe range: 0-2.
+## Multiplier for final timer size pulses. Zero keeps numbers steady; higher emphasizes each beat.
+## Default: 1. Safe range: 0-2.
 @export_range(0.0, 2.0, 0.05) var timer_pulse_strength: float = 1.0:
 	set(value):
 		timer_pulse_strength = clampf(value, 0.0, 2.0)
-## Bubbles background music level in decibels. Higher is louder; lower leaves more room for effects. Default: -12. Safe range: -30-0.
+## Bubbles background music level in decibels. Higher is louder; lower leaves more room for effects.
+## Default: -12. Safe range: -30-0.
 @export_range(-30.0, 0.0, 0.5, "suffix:dB") var music_gain_db: float = -12.0:
 	set(value):
 		music_gain_db = clampf(value, -30.0, 0.0)
-## Base effect level in decibels. Higher makes feedback louder; lower keeps it softer. Default: -6. Safe range: -30-0.
+## Base effect level in decibels. Higher makes feedback louder; lower keeps it softer. Default: -6.
+## Safe range: -30-0.
 @export_range(-30.0, 0.0, 0.5, "suffix:dB") var sfx_gain_db: float = -6.0:
 	set(value):
 		sfx_gain_db = clampf(value, -30.0, 0.0)

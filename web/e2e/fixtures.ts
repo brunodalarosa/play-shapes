@@ -272,7 +272,8 @@ export const test = base.extend<Fixtures>({
       return phone;
     });
 
-    // After a failure a page can be stuck mid-load, and asking it anything would wait out the test timeout.
+    // After a failure a page can be stuck mid-load, and asking it anything would wait out the test
+    // timeout.
     const passedSoFar = testInfo.errors.length === 0;
     for (const phone of phones) {
       // The phone's own development error panel, such as a host protocol rejection.

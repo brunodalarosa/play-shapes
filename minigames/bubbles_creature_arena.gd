@@ -79,7 +79,8 @@ func puffer_rate_at(host_time_msec: int) -> float:
 	)
 
 
-## Explicit position seam for deterministic fixtures; ordinary spawning uses bounded random attempts.
+## Explicit position seam for deterministic fixtures; ordinary spawning uses bounded random
+## attempts.
 func spawn_fresh_at(
 	world_position: Vector2,
 	at_msec: int,
