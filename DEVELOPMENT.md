@@ -132,37 +132,19 @@ Keep evidence labels separate: `[AUTO]`, `[EDITOR]`, `[GODOT-RUNTIME]`, `[DESKTO
 Close any interactive host before integration tests; the browser suite refuses to run over an existing host. It uses `18080`/`18081` for startup lifecycle checks. `GODOT_BIN` can override the executable used by `web/tests/host.test.mjs`.
 
 ```powershell
-godot --headless --editor --path . --quit-after 30
-godot --headless --path . --script res://tests/foundation.gd
-godot --headless --path . --script res://tests/player_registry_test.gd
-godot --headless --path . --script res://tests/player_lobby_test.gd
-godot --headless --path . --script res://tests/lobby_layout_test.gd
-godot --headless --path . --script res://tests/lobby_playground_world_test.gd
-godot --headless --path . --script res://tests/lobby_playground_control_test.gd
-godot --headless --path . --script res://tests/platform_input_test.gd
-godot --headless --path . --script res://tests/platform_drop_reuse_test.gd
-godot --headless --path . --script res://tests/platform_lobby_boundary_test.gd
-godot --headless --path . --script res://tests/squircle_animation_lab_test.gd
-godot --headless --path . --script res://tests/bubbles_gesture_classifier_test.gd
-godot --headless --path . --script res://tests/bubbles_round_controller_test.gd
-godot --headless --path . --script res://tests/bubbles_player_physics_test.gd
-godot --headless --path . --script res://tests/bubbles_creature_arena_test.gd
-godot --headless --path . --script res://tests/bubbles_protocol_test.gd
-godot --headless --path . --script res://tests/bubbles_presentation_test.gd
-godot --headless --path . --script res://tests/active_minigame_protocol_test.gd
-godot --headless --path . --script res://tests/debug_launcher_test.gd
-godot --headless --path . --script res://tests/tuning_presets_test.gd
-godot --headless --path . --script res://tests/minigame_flow_test.gd
-godot --headless --path . --script res://tests/pre_minigame_readiness_test.gd
-godot --headless --path . --script res://tests/pre_minigame_screen_test.gd
+node tools/check.mjs
 ```
 
-Builder checks require matching installed export templates:
+This is the default `[AUTO]` check. It runs every `tests/*_test.gd` script and `tests/foundation.gd`, each in its own headless Godot process, then `npm run check` and `npm test` in `web/`, then rebuilds the browser bundle and fails if `web/public/` changed. New test scripts are picked up by name. It prints one line per failure and a one-line summary; full output for each check is in ignored `test-results/check/`. A Godot script fails on a non-zero exit code or on any `ERROR` line. Shutdown lines about objects still held at exit are ignored for now, because three passing scripts print them; that exception is temporary and is marked in `tools/check.mjs`.
 
 ```powershell
-godot --headless --path . --script res://tests/standalone_build_test.gd
-godot --headless --editor --path . --script res://tests/standalone_build_editor_integration_test.gd
+node tools/check.mjs bubbles web-tests   # only checks whose name contains a filter
+node tools/check.mjs --release           # also run the Windows export test
+godot --headless --path . --script res://tests/player_registry_test.gd   # one script, full output
+godot --headless --editor --path . --quit-after 30                        # editor import scan
 ```
+
+`tests/standalone_build_editor_integration_test.gd` performs a real Windows export and writes `builds/`, so it needs matching installed export templates and runs only with `--release`; without templates the command names the missing folder. `tests/standalone_build_test.gd` needs no templates and runs by default.
 
 After a local Windows release export, `godot --headless --path . --script res://tests/lobby_export_pack_check.gd` verifies that its external PCK includes the offline phone modules, squircle metadata/sheets, and required runtime paths.
 
