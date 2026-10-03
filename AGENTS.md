@@ -6,7 +6,7 @@ This directory is the Godot project root. Work on a new local branch and commit 
 
 A change has two plans, and they answer different questions.
 
-- **The feature plan is the task.** It says what a player or contributor gets, what counts as done, and which approvals only a person can give. It lives in the planning system under its task ID and belongs to the project owner. It does not say how the code changes.
+- **The feature plan is the task.** It says what a player or contributor gets, what counts as done, and which approvals only a person can give. It is stated in a sentence, in [docs/roadmap.md](docs/roadmap.md) or by a project owner, and belongs to the project owner. It does not say how the code changes.
 - **The implementation plan is the branch's.** It says how the code changes to deliver the task. It is written after the task is understood and before any code, and it is approved before implementation starts.
 
 Every non-trivial task runs through the five phases below. Phases 1 and 2 end at a checkpoint: stop and wait for an answer. Scale each phase to the task; a one line plan is a valid plan for a one line change.
@@ -89,6 +89,8 @@ Read the one document for the area you are working on, not all of them. [DEVELOP
 - [docs/protocol.md](docs/protocol.md): messages, HTTP routes, limits.
 - [docs/verification.md](docs/verification.md): the check command, tests, evidence labels.
 - [docs/pending-reviews.md](docs/pending-reviews.md): what still needs a person or a real phone.
+- [docs/roadmap.md](docs/roadmap.md): what is done, what is next, known bugs.
+- [docs/decisions/](docs/decisions/README.md): why things are the way they are. Add a record when a change makes a choice whose reason will not show in the code.
 - [docs/formatting-and-linting.md](docs/formatting-and-linting.md): format, lint and document rules.
 - [docs/browser-build.md](docs/browser-build.md): building the phone client.
 - [docs/phone-client.md](docs/phone-client.md): app install, touch handling, the error panel.
