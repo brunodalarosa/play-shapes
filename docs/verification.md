@@ -30,8 +30,9 @@ node tools/check.mjs
 
 This is the default `[AUTO]` check. In order, it runs:
 
-1. Every `tests/*_test.gd` script and `tests/foundation.gd`, each in its own headless Godot
-   process. New test scripts are picked up by name. [Test scripts](#test-scripts) says how
+1. Every `*_test.gd` script in `tests/` and in the `tests/` folder of each minigame, and
+   `tests/foundation.gd`, each in its own headless Godot process. New test scripts are picked
+   up by name. [Test scripts](#test-scripts) says how
    one is written.
 2. `node tools/format.mjs --check`, `node tools/lint.mjs` and `node tools/docs.mjs`. See
    [formatting-and-linting.md](formatting-and-linting.md).
@@ -133,10 +134,11 @@ func _run() -> void:
   Disconnect the callback at the end of the test.
 - `tests/test_script_test.gd` tests the base with the small scripts in `tests/fixtures/`.
 
-Five scripts in `tests/` do not use the base:
+Five scripts do not use the base:
 
-- `pre_minigame_server.gd`, `motion_lab_server.gd`, `bubbles_phone_preview.gd` and
-  `e2e/host.gd` are hosts that a browser test starts and stops. They never reach an end.
+- `pre_minigame_server.gd`, `motion_lab_server.gd` and `e2e/host.gd` in `tests/`, and
+  `bubbles_phone_preview.gd` in the Bubbles `tests/` folder, are hosts that a browser test
+  starts and stops. They never reach an end.
 - `standalone_build_editor_integration_test.gd` runs inside the editor, where freeing the
   tree would free the editor.
 
@@ -182,6 +184,9 @@ uses the Compatibility renderer by default.
 godot --path . --rendering-method gl_compatibility --script res://tests/<helper>.gd
 ```
 
+The helpers whose names start with `bubbles_` are in
+`minigames/002_bubbles_and_jellyfishes/tests/`; use that folder in place of `tests/`.
+
 | Helper | What it saves | Folder |
 | --- | --- | --- |
 | `bubbles_player_visual_check` | One player bubble: small, grown, spinning, pop and re-form, and ten players. Components only, not a composed arena. | `bubbles-player/` |
@@ -201,8 +206,12 @@ godot --path . --rendering-method gl_compatibility --script res://tests/<helper>
 
 ## Phone preview in a desktop browser
 
-Run `godot --headless --path . --script res://tests/bubbles_phone_preview.gd`, then join at
-`http://127.0.0.1:8080`.
+Run the preview host, then join at `http://127.0.0.1:8080`:
+
+```powershell
+$preview = "res://minigames/002_bubbles_and_jellyfishes/tests/bubbles_phone_preview.gd"
+godot --headless --path . --script $preview
+```
 
 - It starts a one-player Bubbles protocol fixture with eight collected jellyfish and the
   explicit debug label.

@@ -30,7 +30,7 @@ existing ones. The game keeps playing the same while the code is reshaped; see
 
 This is what comes next.
 
-1. One folder per minigame, and a minigame catalog the other lists derive from
+1. A minigame catalog the other lists derive from. Each minigame already has one folder
    ([0015](decisions/0015-one-folder-per-minigame.md)).
 2. Bundle the phone client into one file, then split its largest module
    ([0016](decisions/0016-bundle-the-phone-client.md)).

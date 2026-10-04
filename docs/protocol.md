@@ -48,8 +48,9 @@ The host serves a fixed list and nothing else:
 
 - Pages and styles: `/`, `/style.css`, `/session.json`.
 - Modules: `/app.js`, `/pwa.js`, `/lobby_controls.js`, `/lobby_input.js`,
-  `/platform_controls.js`, `/platform_input.js`, `/immersive.js`, `/bubbles_gesture.js`,
-  `/character_selection.js`, `/squircle_v1.js`, `/vendor/nipplejs.mjs`.
+  `/platform_controls.js`, `/platform_input.js`, `/immersive.js`,
+  `/character_selection.js`, `/squircle_v1.js`, `/vendor/nipplejs.mjs`. A minigame's modules
+  are under its folder: `/002_bubbles_and_jellyfishes/bubbles_gesture.js`.
 - Generated settings: `/platform_input_settings.json`.
 - App manifest and icons: `/manifest.webmanifest`, `/app-icon-180.png`, `/app-icon-192.png`,
   `/app-icon-512.png`.

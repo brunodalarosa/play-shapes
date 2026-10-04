@@ -65,8 +65,8 @@ git tracks or would add.
 
 ## Deliberate lint exceptions
 
-- The linter's `private-access` rule is off for `tests/`, where the tests reach into private
-  members of the code they test. That is temporary and marked in `tools/lint.mjs`.
+- The linter's `private-access` rule is off for `tests/` and for each minigame's `tests/`
+  folder, where the tests reach into private members of the code they test. That is temporary and marked in `tools/lint.mjs`.
 - A line of an HTML file may exceed 100 characters, because an attribute value cannot continue
   on another line.
 - The line that opens a test with its title may exceed 100 characters, because splitting the

@@ -58,23 +58,31 @@ The reusable parts behind the lobby characters. Setup and reuse are in
   resolves ready actions through each registered connection, and sends personalized ready
   snapshots on resume.
 - `scenes/pre_minigame_screen.tscn` uses editable Bubbles content in
-  `scenes/bubbles_pre_minigame_content.tres` and a curated gameplay capture in
-  `assets/runtime/pre_minigame/bubbles_preview.png`.
+  `bubbles_pre_minigame_content.tres`, in the minigame's folder, and a curated gameplay capture
+  in `assets/runtime/pre_minigame/bubbles_preview.png`.
 
 ## Bubbles and Jellyfishes
 
-The gameplay shared-screen scene is `minigames/bubbles_and_jellyfishes.tscn`.
+A minigame has one folder under `minigames/`, named with its number and name
+([decision 0015](decisions/0015-one-folder-per-minigame.md)). It holds the minigame's scenes,
+scripts, protocol script and tuning script, its presets in `tuning/` and its tests and render
+helpers in `tests/`. Its phone code is in the folder of the same name under `web/src/`, and
+its browser tests in the one under `web/tests/`. Art sources and runtime assets stay under
+`art/` and `assets/runtime/`.
+
+Every file named in this section is in `minigames/002_bubbles_and_jellyfishes/`. The gameplay
+shared-screen scene is `bubbles_and_jellyfishes.tscn`.
 
 ### Round
 
-- `minigames/bubbles_round_controller.gd` owns the entrance, countdown, active and results
+- `bubbles_round_controller.gd` owns the entrance, countdown, active and results
   lifecycle, the score and pop state, the host-time finish freeze, and snapshots keyed by
   player ID.
 - `bubbles_gesture_classifier.gd` validates and classifies one completed normalized trace.
 
 ### Player bubbles
 
-- `minigames/bubbles_player_bubble.tscn` reuses `SquircleV1Playback` in a procedural
+- `bubbles_player_bubble.tscn` reuses `SquircleV1Playback` in a procedural
   translucent bubble with a per-instance circle collider, capped approved small-jellyfish art,
   and a readable name.
 - `bubbles_player_visual.gd` draws the iridescent rim, the live directional drag pull, the
@@ -96,7 +104,7 @@ The gameplay shared-screen scene is `minigames/bubbles_and_jellyfishes.tscn`.
 
 ### Creatures
 
-- `minigames/bubbles_creature_arena.gd` owns the free jellyfish and pufferfish scenes, the
+- `bubbles_creature_arena.gd` owns the free jellyfish and pufferfish scenes, the
   initial safe spawns, the alternating waves, the warning and crossing paths, and the host-time
   collection and hit checks.
 - The shared-screen scene creates player bodies, then calls `setup(controller, player_arena)`
@@ -120,7 +128,7 @@ The gameplay shared-screen scene is `minigames/bubbles_and_jellyfishes.tscn`.
 
 ### Protocol
 
-- `host/bubbles_protocol.gd` validates completed normalized traces and makes personalized
+- `bubbles_protocol.gd` validates completed normalized traces and makes personalized
   Bubbles snapshots. The messages are in [protocol.md](protocol.md#bubbles-input).
 - The browser never supplies a player ID or host time.
 
@@ -191,18 +199,21 @@ The gameplay shared-screen scene is `minigames/bubbles_and_jellyfishes.tscn`.
   separate from gameplay implementation.
 - `addons/standalone_build/` is the editor-only Windows builder.
   `addons/kenyoni/qr_code/` is the required vendored runtime QR dependency.
-- `tests/` holds focused headless, integration, policy and render checks. Generated evidence
-  belongs under ignored `test-results/`.
+- `tests/` holds focused headless, integration, policy and render checks of the shared code. A
+  minigame's own are in its `tests/` folder. Generated evidence belongs under ignored
+  `test-results/`.
 
 ## Tuning
 
-`Tuning/` contains the active selector, the named resources, a guide and an experiment
-template. There is no runtime tuning UI.
+`Tuning/` contains the active selector, the shared named resources, a guide and an experiment
+template. A minigame's named resources are in its own `tuning/` folder. There is no runtime
+tuning UI.
 
 - Open `Tuning/Active Presets.tres` to select named resources. The current front doors are
-  `Tuning/Minigames/Bubbles/Default.tres` and `Tuning/Shared/Networking/Default.tres`.
+  `minigames/002_bubbles_and_jellyfishes/tuning/Default.tres` and
+  `Tuning/Shared/Networking/Default.tres`.
 - Restart to apply a changed selection.
-- Bubbles field descriptions are in `Tuning/Minigames/Bubbles/README.md`.
+- Bubbles field descriptions are in the `README.md` beside its `Default.tres`.
 - Only the human owner promotes subjective feel into `Default`. Tests establish configuration
   safety, not fun or comfort.
 
