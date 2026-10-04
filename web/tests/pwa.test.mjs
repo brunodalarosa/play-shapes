@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { PwaOnboarding, isStandalone, installGuidance } from "../public/pwa.js";
+import { PwaOnboarding, isStandalone, installGuidance } from "../build/pwa.js";
 
 function fixture({
   standalone = false,

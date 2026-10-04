@@ -5,10 +5,6 @@ extends Node
 
 const BUBBLES_ART := "res://assets/runtime/minigames/bubbles_and_jellyfishes"
 const ASSETS: Dictionary = {
-	"/pwa.js": {
-		"path": "res://web/public/pwa.js",
-		"content_type": "text/javascript; charset=utf-8",
-	},
 	"/manifest.webmanifest": {
 		"path": "res://web/public/manifest.webmanifest",
 		"content_type": "application/manifest+json",
@@ -29,62 +25,14 @@ const ASSETS: Dictionary = {
 		"resource_type": "Texture2D",
 	},
 
-	"/motion_lab.js": {
-		"path": "res://web/public/motion_lab.js",
-		"content_type": "text/javascript; charset=utf-8",
-	},
-	"/motion_input.js": {
-		"path": "res://web/public/motion_input.js",
-		"content_type": "text/javascript; charset=utf-8",
-	},
-	"/network_config.js": {
-		"path": "res://web/public/network_config.js",
-		"content_type": "text/javascript; charset=utf-8",
-	},
 	"/": { "path": "res://web/public/index.html", "content_type": "text/html; charset=utf-8" },
 	"/app.js": {
 		"path": "res://web/public/app.js",
 		"content_type": "text/javascript; charset=utf-8",
 	},
-	"/lobby_controls.js": {
-		"path": "res://web/public/lobby_controls.js",
-		"content_type": "text/javascript; charset=utf-8",
-	},
-	"/lobby_input.js": {
-		"path": "res://web/public/lobby_input.js",
-		"content_type": "text/javascript; charset=utf-8",
-	},
-	"/platform_input.js": {
-		"path": "res://web/public/platform_input.js",
-		"content_type": "text/javascript; charset=utf-8",
-	},
-	"/platform_controls.js": {
-		"path": "res://web/public/platform_controls.js",
-		"content_type": "text/javascript; charset=utf-8",
-	},
 	"/platform_input_settings.json": {
 		"path": "res://web/public/platform_input_settings.json",
 		"content_type": "application/json",
-	},
-	"/vendor/nipplejs.mjs": {
-		"path": "res://web/public/vendor/nipplejs.mjs",
-		"content_type": "text/javascript; charset=utf-8",
-	},
-	"/immersive.js": {
-		"path": "res://web/public/immersive.js",
-		"content_type": "text/javascript; charset=utf-8",
-	},
-	"/002_bubbles_and_jellyfishes/bubbles_gesture.js": {
-		"path": "res://web/public/002_bubbles_and_jellyfishes/bubbles_gesture.js",
-		"content_type": "text/javascript; charset=utf-8",
-	},
-	"/character_selection.js": {
-		"path": "res://web/public/character_selection.js",
-		"content_type": "text/javascript; charset=utf-8",
-	},
-	"/squircle_v1.js": {
-		"path": "res://web/public/squircle_v1.js",
-		"content_type": "text/javascript; charset=utf-8",
 	},
 	"/squircle-v1/manifest.json": {
 		"path": "res://assets/runtime/animated_characters/squircle/v1/manifest.json",

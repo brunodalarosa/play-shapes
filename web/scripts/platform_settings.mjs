@@ -1,5 +1,5 @@
 import { writeFileSync } from "node:fs";
-import { DEFAULT_PLATFORM_SETTINGS, validatePlatformSettings } from "../public/platform_input.js";
+import { DEFAULT_PLATFORM_SETTINGS, validatePlatformSettings } from "../build/platform_input.js";
 
 validatePlatformSettings(DEFAULT_PLATFORM_SETTINGS);
 writeFileSync(

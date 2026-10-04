@@ -2,16 +2,21 @@ import { createServer } from "node:http";
 import { readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
+// The harness loads the modules one by one, as the unit tests do, so it serves the
+// per-module build. Run "npm run modules" first.
+const modulesRoot = new URL("../build/", import.meta.url);
 const publicRoot = new URL("../public/", import.meta.url);
 const fixtures = new URL("../tests/fixtures/", import.meta.url);
 const routes = new Map([
   ["/", new URL("platform_controller.html", fixtures)],
   ["/platform_controller_review.mjs", new URL("platform_controller_review.mjs", fixtures)],
   ["/platform_context.mjs", new URL("platform_context.mjs", fixtures)],
-  ["/vendor/nipplejs.mjs", new URL("vendor/nipplejs.mjs", publicRoot)],
+  ["/vendor/nipplejs.mjs", new URL("vendor/nipplejs.mjs", modulesRoot)],
 ]);
+for (const name of readdirSync(modulesRoot))
+  if (name.endsWith(".js")) routes.set("/" + name, new URL(name, modulesRoot));
 for (const name of readdirSync(publicRoot))
-  if (/\.(js|css|json)$/.test(name)) routes.set("/" + name, new URL(name, publicRoot));
+  if (/\.(css|json)$/.test(name)) routes.set("/" + name, new URL(name, publicRoot));
 const server = createServer((request, response) => {
   const path = new URL(request.url, "http://localhost").pathname;
   const file = routes.get(path);

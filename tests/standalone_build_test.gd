@@ -32,13 +32,8 @@ func _run() -> void:
 	check(
 		Policy.REQUIRED_BROWSER_PATHS.has("web/public/manifest.webmanifest")
 		and Policy.REQUIRED_BROWSER_PATHS.has("web/public/app-icon-512.png")
-		and Policy
-		.REQUIRED_BROWSER_PATHS
-		.has("web/public/002_bubbles_and_jellyfishes/bubbles_gesture.js") \
-				and Policy.REQUIRED_BROWSER_PATHS.has("web/public/character_selection.js") \
-				and Policy.REQUIRED_BROWSER_PATHS.has("web/public/squircle_v1.js") \
-				and Policy.REQUIRED_BROWSER_PATHS.has("web/public/vendor/nipplejs.mjs"),
-		"every browser module is required in the PCK",
+		and Policy.REQUIRED_BROWSER_PATHS.has("web/public/app.js"),
+		"the bundled phone client and its page assets are required in the PCK",
 	)
 	check(
 		Policy

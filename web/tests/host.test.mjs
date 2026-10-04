@@ -71,18 +71,9 @@ test("serves bundled HTML, JS, CSS and session configuration", async () => {
   for (const [path, mime, text] of [
     ["/", "text/html", "PLAY SHAPES"],
     ["/app.js", "text/javascript", "localStorage"],
-    ["/immersive.js", "text/javascript", "attemptImmersive"],
-    ["/pwa.js", "text/javascript", "PwaOnboarding"],
     ["/manifest.webmanifest", "application/manifest+json", "standalone"],
     ...[180, 192, 512].map((size) => [`/app-icon-${size}.png`, "image/png", null]),
-    ["/002_bubbles_and_jellyfishes/bubbles_gesture.js", "text/javascript", "GestureTrace"],
-    ["/lobby_controls.js", "text/javascript", "PlatformControls"],
-    ["/lobby_input.js", "text/javascript", "createLobbyContext"],
-    ["/platform_controls.js", "text/javascript", "PlatformControls"],
-    ["/platform_input.js", "text/javascript", "PlatformInputState"],
     ["/platform_input_settings.json", "application/json", "x-right-y-up"],
-    ["/squircle_v1.js", "text/javascript", "SquircleV1Canvas"],
-    ["/vendor/nipplejs.mjs", "text/javascript", "create"],
     ["/bubbles-jellyfish.png", "image/png", null],
     ["/style.css", "text/css", "focus-visible"],
     ["/session.json", "application/json", "session_id"],
@@ -98,6 +89,30 @@ test("serves bundled HTML, JS, CSS and session configuration", async () => {
       throw new Error(`Failed to serve ${path}`, { cause: error });
     }
   }
+});
+
+test("the one script holds every module of the client and imports nothing", async () => {
+  const js = await (await fetch(base + "/app.js")).text();
+
+  for (const expected of [
+    "attemptImmersive",
+    "PwaOnboarding",
+    "GestureTrace",
+    "PlatformControls",
+    "createLobbyContext",
+    "PlatformInputState",
+    "SquircleV1Canvas",
+    "MotionLabController",
+    "controllerSocketUrl",
+  ]) {
+    assert.ok(js.includes(expected), `the bundle should include ${expected}`);
+  }
+  // A module left out of the bundle would show up as an import the host has no route for.
+  assert.doesNotMatch(js, /^\s*import\s/m);
+  assert.doesNotMatch(js, /\bimport\(/);
+
+  for (const path of ["/pwa.js", "/platform_controls.js", "/vendor/nipplejs.mjs"])
+    assert.equal((await fetch(base + path)).status, 404, `${path} is no longer served`);
 });
 
 test("manifest has stable origin-local identity and correctly sized bundled icons", async () => {
@@ -164,13 +179,11 @@ test("Bubbles controller keeps a clean portrait screen and accessible touch cont
 test("Playground controller is locally bundled, portrait safe, and touch-accessible", async () => {
   const html = await (await fetch(base)).text();
   const css = await (await fetch(base + "/style.css")).text();
-  const adapter = await (await fetch(base + "/lobby_controls.js")).text();
-  const controls = await (await fetch(base + "/platform_controls.js")).text();
+  const controls = await (await fetch(base + "/app.js")).text();
   assert.match(html, /id="lobby-stick-zone"[^>]*aria-label="Movement and stance joystick"/);
   assert.match(html, /id="lobby-jump-button"[^>]*aria-label="Jump"/);
   assert.match(css, /#lobby-stick-zone,\s*#lobby-jump-button[^}]*safe-area-inset-bottom/);
-  assert.match(controls, /vendor\/nipplejs\.mjs/);
-  assert.match(adapter, /createLobbyContext/);
+  assert.match(controls, /createLobbyContext/);
   assert.doesNotMatch(controls, /lock[XY]: true/);
   assert.match(controls, /event\.data\.vector\.y/);
   assert.match(controls, /"FALL"/);

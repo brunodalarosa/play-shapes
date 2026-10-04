@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { PlatformInputState } from "../public/platform_input.js";
-import { createLobbyContext } from "../public/lobby_input.js";
+import { PlatformInputState } from "../build/platform_input.js";
+import { createLobbyContext } from "../build/lobby_input.js";
 
 test("Playground adapter keeps ordinary movement/jump and hands off explicit fall without a jump fallback", () => {
   const sent = [];

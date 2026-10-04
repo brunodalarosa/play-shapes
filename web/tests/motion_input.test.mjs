@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { MotionInput } from "../public/motion_input.js";
+import { MotionInput } from "../build/motion_input.js";
 
 function fixture(overrides = {}) {
   let now = 0;

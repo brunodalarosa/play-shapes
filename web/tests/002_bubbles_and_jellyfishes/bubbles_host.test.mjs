@@ -231,8 +231,7 @@ async function verifyPhoneJoinAndAssets() {
     "/",
     "/style.css",
     "/bubbles-phone-background.png",
-    "/character_selection.js",
-    "/squircle_v1.js",
+    "/app.js",
     "/squircle-v1/manifest.json",
     "/squircle-v1/idle-front-colorable.png",
     "/squircle-v1/idle-front-neutral.png",
@@ -245,8 +244,7 @@ async function verifyPhoneJoinAndAssets() {
     htmlResponse,
     cssResponse,
     backgroundResponse,
-    catalogResponse,
-    rendererResponse,
+    clientResponse,
     manifestResponse,
     ...sheets
   ] = responses;
@@ -265,8 +263,9 @@ async function verifyPhoneJoinAndAssets() {
   assert.match(css, /inset-block-start: 15%/);
   assert.match(css, /grid-template-columns: repeat\(5, minmax\(0, 1fr\)\)/);
   assert.match(css, /env\(safe-area-inset-top\)/);
-  assert.match(await catalogResponse.text(), /character_shape: CHARACTER_SHAPE/);
-  assert.match(await rendererResponse.text(), /manifest\.json/);
+  const client = await clientResponse.text();
+  assert.match(client, /character_shape: CHARACTER_SHAPE/);
+  assert.match(client, /manifest\.json/);
   const manifest = await manifestResponse.json();
   assert.equal(manifest.shape_id, "squircle");
   assert.equal(

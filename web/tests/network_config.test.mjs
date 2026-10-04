@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { controllerSocketUrl } from "../public/network_config.js";
+import { controllerSocketUrl } from "../build/network_config.js";
 
 test("canonical transport pairs schemes and preserves the joining hostname", () => {
   const config = {
