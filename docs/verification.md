@@ -31,7 +31,8 @@ node tools/check.mjs
 This is the default `[AUTO]` check. In order, it runs:
 
 1. Every `tests/*_test.gd` script and `tests/foundation.gd`, each in its own headless Godot
-   process. New test scripts are picked up by name.
+   process. New test scripts are picked up by name. [Test scripts](#test-scripts) says how
+   one is written.
 2. `node tools/format.mjs --check`, `node tools/lint.mjs` and `node tools/docs.mjs`. See
    [formatting-and-linting.md](formatting-and-linting.md).
 3. The `tools/tests/` suite.
@@ -45,9 +46,10 @@ How it reports:
 
 - One line per failure and a one-line summary.
 - Full output for each check is in ignored `test-results/check/`.
-- A Godot script fails on a non-zero exit code or on any `ERROR` line.
-- Shutdown lines about objects still held at exit are ignored for now, because three passing
-  scripts print them. That exception is temporary and is marked in `tools/check.mjs`.
+- A Godot script fails on a non-zero exit code, on any `ERROR` line, and on any line Godot
+  prints at exit about something still held, whether Godot calls it an error or a warning.
+- The export test that runs with `--release` is excused the lines about things held at exit.
+  It quits the editor, and the editor always holds a great deal when a script quits it.
 
 Options and single runs:
 
@@ -102,6 +104,41 @@ $env:E2E_WINDOWED = "1"; npm run e2e; Remove-Item env:E2E_WINDOWED   # show the 
 npx playwright show-trace ../test-results/e2e/<test>/trace.zip    # inspect a failure
 cd ..
 ```
+
+## Test scripts
+
+A test or a render helper extends `TestScript`, in `tests/test_script.gd`, and puts its body
+in `_run()`, which may `await`:
+
+```gdscript
+extends TestScript
+
+
+func _run() -> void:
+	var registry := PlayerRegistry.new(10, 60.0)
+
+	check(registry.player_count() == 0, "A new registry is empty")
+```
+
+- `check(condition, description)` records a failure when the condition is false and goes on.
+  It returns the condition, so `if not check(...): return` stops a test where going on makes
+  no sense. The description says what should be true.
+- The script fails on a failed check, on a script error, and on any error the code under test
+  logs. All three print an `ERROR` line.
+- A script error ends `_run()` where it happened. The base still reports and quits.
+- The script does not call `quit()`. The base frees what the test put in the tree, prints
+  `<script name>: <count> failures` and exits with 0 or 1.
+- A test that holds something at exit fails. The usual cause is two objects that hold each
+  other, such as an object and a callback connected to its own signal that uses it.
+  Disconnect the callback at the end of the test.
+- `tests/test_script_test.gd` tests the base with the small scripts in `tests/fixtures/`.
+
+Five scripts in `tests/` do not use the base:
+
+- `pre_minigame_server.gd`, `motion_lab_server.gd`, `bubbles_phone_preview.gd` and
+  `e2e/host.gd` are hosts that a browser test starts and stops. They never reach an end.
+- `standalone_build_editor_integration_test.gd` runs inside the editor, where freeing the
+  tree would free the editor.
 
 ## Which tests go through boot
 

@@ -78,6 +78,10 @@ device.
 
 - `[EXPORTED-BUILD]` Real phones playing against the exported executable, including the
   installed app.
+- `[AUTO]` `node tools/check.mjs --release`, and `tests/lobby_export_pack_check.gd` after an
+  export. Both need export templates. Neither has run with them since the check command
+  changed how it reads a Godot script's result and the pack check moved to the shared test
+  base.
 
 ## Debug screens
 
