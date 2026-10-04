@@ -3,7 +3,7 @@ import { PwaOnboarding, isStandalone } from "./pwa.js";
 import { MotionLabController } from "./motion_lab.js";
 import { controllerSocketUrl } from "./network_config.js";
 import { SquircleV1Canvas } from "./squircle_v1.js";
-import { GestureTrace } from "./bubbles_gesture.js";
+import { GestureTrace } from "./002_bubbles_and_jellyfishes/bubbles_gesture.js";
 import { LobbyControls } from "./lobby_controls.js";
 import { advanceJoinFlow, CHARACTER_COLORS, chooseJoinColor, colorOption, createJoinMessage, defaultJoinFlow, FALLBACK_CHARACTER, returnToCharacterSelection, } from "./character_selection.js";
 const status = document.querySelector("#status");

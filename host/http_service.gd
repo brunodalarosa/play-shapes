@@ -74,8 +74,8 @@ const ASSETS: Dictionary = {
 		"path": "res://web/public/immersive.js",
 		"content_type": "text/javascript; charset=utf-8",
 	},
-	"/bubbles_gesture.js": {
-		"path": "res://web/public/bubbles_gesture.js",
+	"/002_bubbles_and_jellyfishes/bubbles_gesture.js": {
+		"path": "res://web/public/002_bubbles_and_jellyfishes/bubbles_gesture.js",
 		"content_type": "text/javascript; charset=utf-8",
 	},
 	"/character_selection.js": {

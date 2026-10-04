@@ -4,10 +4,10 @@ Start with `Active Presets.tres`. It is the project-level selector and shows the
 
 ## Find, compare, and reset values
 
-- Bubbles and jellyfishes: `Minigames/Bubbles/Default.tres` is the provisional umbrella profile for round rules, gesture recognition, and values used by the arena systems. See [its field guide](Minigames/Bubbles/README.md). Select a named copy in `Active Presets.tres` and relaunch before comparing feel.
+- Bubbles and jellyfishes: `minigames/002_bubbles_and_jellyfishes/tuning/Default.tres`, in the minigame's own folder, is the provisional umbrella profile for round rules, gesture recognition, and values used by the arena systems. See [its field guide](../minigames/002_bubbles_and_jellyfishes/tuning/README.md). Select a named copy in `Active Presets.tres` and relaunch before comparing feel.
 - Networking/session: `Shared/Networking/Default.tres` owns host-only listener, capacity, timeout, and reconnect behavior.
 - Default recovery: assign the appropriate `Default.tres` back into `Active Presets.tres`, save, and relaunch.
-- Named comparison: duplicate `Default.tres` beside it, use a descriptive name such as `Generous.tres` or `Experimental_2026-09-14.tres`, change one logical group, assign it through `Active Presets.tres`, and commit it. Every committed `.tres` below `Tuning/` is validated.
+- Named comparison: duplicate `Default.tres` beside it, use a descriptive name such as `Generous.tres` or `Experimental_2026-09-14.tres`, change one logical group, assign it through `Active Presets.tres`, and commit it. Every committed `.tres` below `Tuning/` or in a minigame's `tuning/` folder is validated.
 - Experiment record: copy `Experiments/EXPERIMENT_TEMPLATE.md`; record the preset, hypothesis, conditions, observations, and human decision separately from the asset.
 
 Hover an Inspector property for its purpose, units, default, safe range, and higher/lower guidance. Range metadata and clamping protect individual fields. Automated validation handles related-field rules, including distinct listener ports and player capacity versus connection capacity.

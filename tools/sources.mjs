@@ -23,6 +23,11 @@ export function isGdscriptSource(file) {
   return file.endsWith(".gd") && !file.startsWith("addons/");
 }
 
+/** True for a GDScript test file: one in tests/ or in the tests/ folder of a minigame. */
+export function isGodotTest(file) {
+  return isGdscriptSource(file) && /^(tests|minigames\/[^/]+\/tests)\//.test(file);
+}
+
 /**
  * True for a file Prettier formats: the TypeScript and JavaScript of web/ and
  * tools/, the configuration modules at the root, and the two hand-written files

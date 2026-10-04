@@ -2,7 +2,7 @@ extends TestScript
 ## Exercises the remaining minigame's normal/debug launch, reconnect, and teardown.
 
 const LOBBY_PATH := "res://scenes/lobby.tscn"
-const BUBBLES_PATH := "res://minigames/bubbles_and_jellyfishes.tscn"
+const BUBBLES_PATH := "res://minigames/002_bubbles_and_jellyfishes/bubbles_and_jellyfishes.tscn"
 
 
 func _run() -> void:

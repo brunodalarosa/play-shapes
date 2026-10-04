@@ -30,7 +30,9 @@ const PHASE_NAMES := [
 ]
 const MAX_INPUT_SEQ := 9_007_199_254_740_991
 
-@export var tuning: BubblesTuning = preload("res://Tuning/Minigames/Bubbles/Default.tres")
+@export var tuning: BubblesTuning = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/tuning/Default.tres"
+)
 
 var phase: Phase = Phase.IDLE
 var _players: Dictionary = { }

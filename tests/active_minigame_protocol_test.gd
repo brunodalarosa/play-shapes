@@ -1,7 +1,9 @@
 extends TestScript
 
 const Service = preload("res://host/websocket_service.gd")
-const BubblesController = preload("res://minigames/bubbles_round_controller.gd")
+const BubblesController = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_round_controller.gd"
+)
 
 
 func _run() -> void:

@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   gdscriptFiles,
   isGdscriptSource,
+  isGodotTest,
   isUncoveredScript,
   isWebSource,
   mayExceedLineLength,
@@ -14,6 +15,17 @@ test("treats project GDScript as source and vendored addons as not", () => {
   assert.equal(isGdscriptSource("tests/e2e/host.gd"), true);
   assert.equal(isGdscriptSource("addons/godot_mcp/plugin.gd"), false);
   assert.equal(isGdscriptSource("host/session_host.gd.uid"), false);
+});
+
+test("finds Godot tests in tests/ and in a minigame's tests/ folder", () => {
+  const game = "minigames/002_bubbles_and_jellyfishes";
+
+  assert.equal(isGodotTest("tests/player_registry_test.gd"), true);
+  assert.equal(isGodotTest("tests/e2e/host.gd"), true);
+  assert.equal(isGodotTest(`${game}/tests/bubbles_protocol_test.gd`), true);
+  assert.equal(isGodotTest(`${game}/bubbles_protocol.gd`), false);
+  assert.equal(isGodotTest("host/session_host.gd"), false);
+  assert.equal(isGodotTest("tests/fixtures/debug_scenario.tscn"), false);
 });
 
 test("treats the hand-written web and tools files as source", () => {

@@ -3,8 +3,8 @@ extends Resource
 ## Project-level selector. Assign committed named presets here, save, then relaunch.
 
 @export_group("Minigames")
-## Active Bubbles umbrella preset. Restore Minigames/Bubbles/Default.tres for provisional baseline
-## values.
+## Active Bubbles umbrella preset. Restore the Default.tres in the minigame's tuning folder for
+## provisional baseline values.
 @export
 var bubbles: BubblesTuning
 

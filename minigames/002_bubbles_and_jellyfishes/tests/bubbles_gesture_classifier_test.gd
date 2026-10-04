@@ -1,6 +1,8 @@
 extends TestScript
 
-const Classifier = preload("res://minigames/bubbles_gesture_classifier.gd")
+const Classifier = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_gesture_classifier.gd"
+)
 
 
 func _run() -> void:

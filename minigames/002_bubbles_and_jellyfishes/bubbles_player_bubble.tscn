@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3]
 
-[ext_resource type="Script" path="res://minigames/bubbles_player_bubble.gd" id="1"]
-[ext_resource type="Script" path="res://minigames/bubbles_player_visual.gd" id="2"]
+[ext_resource type="Script" path="res://minigames/002_bubbles_and_jellyfishes/bubbles_player_bubble.gd" id="1"]
+[ext_resource type="Script" path="res://minigames/002_bubbles_and_jellyfishes/bubbles_player_visual.gd" id="2"]
 [ext_resource type="PackedScene" path="res://characters/squircle_v1_playback.tscn" id="3"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]

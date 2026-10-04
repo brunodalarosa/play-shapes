@@ -1,7 +1,9 @@
 extends TestScript
 ## Render player bubbles against viewport edges at FHD and HD sizes.
 
-const SCENE: PackedScene = preload("res://minigames/bubbles_and_jellyfishes.tscn")
+const SCENE: PackedScene = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_and_jellyfishes.tscn"
+)
 const OUTPUT := "res://test-results/bubbles-viewport"
 
 

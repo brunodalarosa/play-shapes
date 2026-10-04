@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3]
 
-[ext_resource type="Script" path="res://minigames/bubbles_pufferfish.gd" id="1"]
+[ext_resource type="Script" path="res://minigames/002_bubbles_and_jellyfishes/bubbles_pufferfish.gd" id="1"]
 [ext_resource type="Texture2D" path="res://assets/runtime/minigames/bubbles_and_jellyfishes/pufferfish/pufferfish_right.png" id="2"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_pufferfish"]

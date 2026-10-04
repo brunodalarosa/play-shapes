@@ -5,7 +5,9 @@ extends Node2D
 
 signal player_collision(first_id: String, second_id: String, spun_id: String)
 
-const BUBBLE_SCENE: PackedScene = preload("res://minigames/bubbles_player_bubble.tscn")
+const BUBBLE_SCENE: PackedScene = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_player_bubble.tscn"
+)
 const PLAYER_RESTITUTION := 0.5
 var bounds := Rect2()
 var wall_bounds := Rect2()

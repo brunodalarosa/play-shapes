@@ -10,8 +10,12 @@ signal pufferfish_hit(creature_id: int, player_id: String)
 signal jellyfish_scattered(player_id: String, spawned: int, discarded_by_cap: int)
 signal wave_changed(high: bool, rate_per_second: float, duration_msec: int)
 
-const JELLYFISH_SCENE: PackedScene = preload("res://minigames/bubbles_jellyfish.tscn")
-const PUFFERFISH_SCENE: PackedScene = preload("res://minigames/bubbles_pufferfish.tscn")
+const JELLYFISH_SCENE: PackedScene = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_jellyfish.tscn"
+)
+const PUFFERFISH_SCENE: PackedScene = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_pufferfish.tscn"
+)
 const MAX_SAFE_SPAWN_ATTEMPTS := 64
 const MAX_ACTIVE_PUFFERS := 64
 const SPAWN_OUTSIDE_MARGIN := 20.0

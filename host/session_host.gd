@@ -7,7 +7,8 @@ signal readiness_changed(snapshot: Dictionary)
 signal readiness_launch_requested(minigame_id: StringName)
 signal readiness_canceled
 
-const BUBBLES_SCENE_PATH := "res://minigames/bubbles_and_jellyfishes.tscn"
+const BUBBLES_FOLDER := "res://minigames/002_bubbles_and_jellyfishes"
+const BUBBLES_SCENE_PATH := BUBBLES_FOLDER + "/bubbles_and_jellyfishes.tscn"
 const BUBBLES_MAX_PLAYERS := 10
 const MINIGAME_BUBBLES := &"bubbles"
 

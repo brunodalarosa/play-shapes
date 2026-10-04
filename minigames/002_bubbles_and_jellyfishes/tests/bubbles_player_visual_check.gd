@@ -1,8 +1,10 @@
 extends TestScript
 ## Renderer captures of isolated player-bubble components; not game-feel approval.
 
-const Controller = preload("res://minigames/bubbles_round_controller.gd")
-const Arena = preload("res://minigames/bubbles_player_arena.gd")
+const Controller = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_round_controller.gd"
+)
+const Arena = preload("res://minigames/002_bubbles_and_jellyfishes/bubbles_player_arena.gd")
 const OUTPUT := "res://test-results/bubbles-player"
 
 

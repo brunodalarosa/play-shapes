@@ -1,6 +1,8 @@
 extends TestScript
 
-const Controller = preload("res://minigames/bubbles_round_controller.gd")
+const Controller = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_round_controller.gd"
+)
 
 
 func _run() -> void:
