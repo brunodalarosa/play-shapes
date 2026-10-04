@@ -12,6 +12,16 @@ removes it. The evidence labels are defined in
 - `[HUMAN-PLAY]` Couch-distance readability of the shared screen, the final audio mix, and
   the fairness of creature collisions and telegraphs.
 
+## Tilt Shift art
+
+- `[PHYSICAL-PHONE]` Paddle readability on a real landscape phone, including five
+  simultaneous assignments, when the phone presentation is integrated.
+- `[HUMAN-PLAY]` Couch-distance readability of balls, paddles and basket openings,
+  including different basket widths/counts and ten operator stations.
+- `[HUMAN-PLAY]` Both-side Squircle hand contact and lever travel when operating
+  animation consumes the documented art anchors.
+- `[EXPORTED-BUILD]` Run the integrated Tilt Shift presentation in a Windows package.
+
 ## Platform movement in the lobby
 
 `[PHYSICAL-PHONE]`, on real phones:

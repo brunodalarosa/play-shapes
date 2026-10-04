@@ -160,6 +160,12 @@ start only what they need, so they stay fast.
 
 ## Focused checks by area
 
+- Tilt Shift art: `python tools/assets/prepare_tilt_shift_art.py check` compares
+  runtime pixels, alpha, padding and import policies against the source masters.
+  `tests/tilt_shift_art_test.gd` loads all textures and checks their shared pivots
+  and contact references. [The source guide](../art/tilt_shift/README.md)
+  describes isolated export-pack inspection.
+
 - Local HTTPS: `godot --headless --path . --script tests/controller_tls_test.gd` generates
   disposable ignored fixture material. `node --test tests/tls.test.mjs` in `web/` verifies
   HTTPS asset loading, WSS join and resume, rejection of untrusted and wrong-host certificates,
