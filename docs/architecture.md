@@ -193,8 +193,9 @@ shared-screen scene is `bubbles_and_jellyfishes.tscn`.
 
 ## Phone client
 
-- `web/src/` is the TypeScript source. `web/public/` is the committed offline runtime bundle
-  served by Godot. Normal play needs neither Node nor Internet. See
+- `web/src/` is the TypeScript source. The build bundles it into one script,
+  `web/public/app.js`, which is committed and served by Godot with the page, the styles and
+  the icons beside it. Normal play needs neither Node nor Internet. See
   [browser-build.md](browser-build.md).
 - The phone onboarding keeps the socket available while players choose a Squircle color and
   enter a name. The host creates the player record only on the final join submission.

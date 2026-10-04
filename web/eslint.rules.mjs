@@ -12,6 +12,7 @@ export default tseslint.config(
     // lints, so this list only keeps an editor's ESLint away from the rest.
     ignores: [
       "web/public/**",
+      "web/build/**",
       "web/src/vendor/**",
       "web/node_modules/**",
       "addons/**",

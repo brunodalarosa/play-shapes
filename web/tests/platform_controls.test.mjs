@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { createLobbyContext } from "../public/lobby_input.js";
+import { createLobbyContext } from "../build/lobby_input.js";
 import { createPreviewContext } from "./fixtures/platform_context.mjs";
 
 class Element extends EventTarget {
@@ -99,9 +99,9 @@ async function withControls(verify) {
       encodeURIComponent(
         "export default { create: options => globalThis.__platformJoystickFactory(options) }",
       );
-    let source = readFileSync(new URL("../public/platform_controls.js", import.meta.url), "utf8");
+    let source = readFileSync(new URL("../build/platform_controls.js", import.meta.url), "utf8");
     source = source.replace(/from "(\.\/[^"]+)"/g, (_, path) => {
-      const bundled = new URL("../public/" + path.slice(2), import.meta.url).href;
+      const bundled = new URL("../build/" + path.slice(2), import.meta.url).href;
       return `from "${path === "./vendor/nipplejs.mjs" ? stub : bundled}"`;
     });
     const { PlatformControls } = await import(

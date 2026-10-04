@@ -31,13 +31,15 @@ existing ones. The game keeps playing the same while the code is reshaped; see
 - One folder per minigame ([0015](decisions/0015-one-folder-per-minigame.md)), and a catalog
   of minigames that the lobby, the launch rules, the ready screen and the debug menu read
   ([0024](decisions/0024-minigame-catalog.md)).
+- The phone client bundled into one script, so a new module needs no route and no export
+  rule ([0016](decisions/0016-bundle-the-phone-client.md)).
 
 ## The refactor, in order
 
 This is what comes next.
 
-1. Bundle the phone client into one file, then split its largest module
-   ([0016](decisions/0016-bundle-the-phone-client.md)).
+1. Split the phone client's largest module, `app.ts`. The client is already bundled into
+   one file ([0016](decisions/0016-bundle-the-phone-client.md)).
 2. The input pipeline: one message for gameplay input and reusable controls
    ([0017](decisions/0017-one-input-message.md)). The late-input bugs below belong here,
    and so does one shared phone helper for the browser tests, which this step rewrites.

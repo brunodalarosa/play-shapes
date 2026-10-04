@@ -245,8 +245,8 @@ Its host configuration and its browser constructor must share settings, not tune
 
 ## Harness and tests
 
-From `web/`, run `node scripts/serve_platform_harness.mjs` and open
-`http://127.0.0.1:18181`.
+From `web/`, run `npm run modules`, then `node scripts/serve_platform_harness.mjs`, and open
+`http://127.0.0.1:18181`. The harness loads the modules one by one from `web/build/`.
 
 - The loopback fixture mounts the real component with `createPreviewContext`, recording
   intent without a lobby socket or another minigame.

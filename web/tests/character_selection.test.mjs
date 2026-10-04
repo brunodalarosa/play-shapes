@@ -10,7 +10,7 @@ import {
   defaultJoinFlow,
   FALLBACK_CHARACTER,
   returnToCharacterSelection,
-} from "../public/character_selection.js";
+} from "../build/character_selection.js";
 
 test("phone setup keeps one approved body and all ten player colors", () => {
   assert.equal(CHARACTER_SHAPE, "squircle");

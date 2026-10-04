@@ -160,12 +160,10 @@ test("verified HTTPS serves assets and WSS joins then resumes a registered playe
   for (const path of [
     "/",
     "/app.js",
-    "/pwa.js",
     "/manifest.webmanifest",
     "/app-icon-180.png",
     "/app-icon-192.png",
     "/app-icon-512.png",
-    "/network_config.js",
     "/squircle-v1/idle-front-colorable.png",
   ]) {
     const response = await get(path);

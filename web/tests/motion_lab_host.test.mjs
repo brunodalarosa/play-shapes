@@ -41,8 +41,9 @@ test("live lab pins Player 1, rejects another phone, rotates subscription on res
     for (let index = 0; index < 100 && !output.includes("Motion lab fixture ready"); index++)
       await delay(50);
     assert.ok(output.includes("Motion lab fixture ready"), output);
-    for (const name of ["motion_input", "motion_lab", "network_config"])
-      assert.equal((await fetch(`http://127.0.0.1:18090/${name}.js`)).status, 200);
+    const client = await (await fetch("http://127.0.0.1:18090/app.js")).text();
+    for (const expected of ["MotionInput", "MotionLabController", "controllerSocketUrl"])
+      assert.ok(client.includes(expected), `the bundle should include ${expected}`);
     const one = await peer();
     clients.push(one);
     await one.until((value) => value.type === "welcome");

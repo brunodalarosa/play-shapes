@@ -3,6 +3,7 @@
 .obsidian/
 /android/
 web/node_modules/
+web/build/
 web/.npm-cache/
 test-results/*
 !test-results/.gdignore

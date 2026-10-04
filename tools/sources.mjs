@@ -31,7 +31,7 @@ export function isGodotTest(file) {
 /**
  * True for a file Prettier formats: the TypeScript and JavaScript of web/ and
  * tools/, the configuration modules at the root, and the two hand-written files
- * in web/public, whose .js files are compiled from web/src.
+ * in web/public, whose app.js is bundled from web/src.
  */
 export function isWebSource(file) {
   if (file === "web/public/index.html" || file === "web/public/style.css") return true;
@@ -54,7 +54,7 @@ export function mayExceedLineLength(file, line) {
 
 /**
  * True for a TypeScript or JavaScript file that is neither a source above nor one of the
- * places left alone on purpose: the compiled and vendored files in web/public, the
+ * places left alone on purpose: the bundle in web/public, the
  * vendored declarations in web/src/vendor, vendored addons, and the art review pages.
  * Such a file would otherwise go unformatted and unlinted without anyone noticing.
  */
