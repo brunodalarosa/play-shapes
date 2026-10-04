@@ -14,6 +14,7 @@ import {
   root,
   webDirectory,
 } from "./environment.mjs";
+import { godotFailureLines, withoutLevel } from "./godot_output.mjs";
 
 const logDirectory = join(root, "test-results", "check");
 const GODOT_TIMEOUT_MSEC = 180_000;
@@ -22,15 +23,6 @@ const E2E_TIMEOUT_MSEC = 900_000;
 
 // Needs an installed export and writes builds/, so it only runs with --release.
 const RELEASE_TESTS = { standalone_build_editor_integration_test: ["--editor"] };
-
-// Temporary: three passing tests still hold objects when they quit, and Godot
-// reports that at shutdown. Delete this list when those tests release what
-// they hold, so that any such line fails the check again.
-const IGNORED_SHUTDOWN_ERRORS = [
-  /resources still in use at exit/,
-  /RID allocations of type .* were leaked at exit/,
-  /ObjectDB instances leaked at exit/,
-];
 
 const USAGE = `Usage: node tools/check.mjs [--full] [--release] [filter ...]
 
@@ -85,30 +77,17 @@ function godotTestNames(includeRelease) {
     .sort();
 }
 
-function godotErrorLines(output) {
-  return output
-    .split(/\r?\n/)
-    .filter((line) => /^(SCRIPT )?ERROR:/.test(line))
-    .filter((line) => !IGNORED_SHUTDOWN_ERRORS.some((pattern) => pattern.test(line)));
-}
-
 async function runGodotTest(name) {
-  const args = [
-    "--headless",
-    ...(RELEASE_TESTS[name] ?? []),
-    "--path",
-    root,
-    "--script",
-    `res://tests/${name}.gd`,
-  ];
+  const extra = RELEASE_TESTS[name] ?? [];
+  const args = ["--headless", ...extra, "--path", root, "--script", `res://tests/${name}.gd`];
   const result = await run(godotBinary, args, { timeout: GODOT_TIMEOUT_MSEC });
   const log = writeLog(name, result.output);
   if (result.spawnError)
     return `could not start Godot (${result.spawnError.code}); run "node tools/setup.mjs"`;
   if (result.timedOut) return `timed out after ${GODOT_TIMEOUT_MSEC / 1000} s (${log})`;
-  const errors = godotErrorLines(result.output);
+  const errors = godotFailureLines(result.output, { editor: extra.includes("--editor") });
   if (result.code === 0 && errors.length === 0) return "";
-  const reason = errors[0]?.replace(/^(SCRIPT )?ERROR:\s*/, "") ?? `exit code ${result.code}`;
+  const reason = errors[0] ? withoutLevel(errors[0]) : `exit code ${result.code}`;
   const more = errors.length > 1 ? ` (+${errors.length - 1} more)` : "";
   return `${reason}${more} (${log})`;
 }
