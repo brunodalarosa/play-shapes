@@ -1,15 +1,11 @@
-extends SceneTree
+extends TestScript
 ## Local Bubbles presentation captures; saved under ignored test-results.
 
 const SCENE: PackedScene = preload("res://minigames/bubbles_and_jellyfishes.tscn")
 const OUTPUT := "res://test-results/bubbles-presentation"
 
 
-func _initialize() -> void:
-	_capture.call_deferred()
-
-
-func _capture() -> void:
+func _run() -> void:
 	DirAccess.make_dir_recursive_absolute(OUTPUT)
 	root.size = Vector2i(1920, 1080)
 	root.content_scale_size = Vector2i(1920, 1080)
@@ -126,7 +122,6 @@ func _capture() -> void:
 	pair.queue_free()
 	await _frames(2)
 	print("Saved Bubbles presentation captures")
-	quit(0)
 
 
 func _frames(count: int) -> void:
@@ -138,4 +133,3 @@ func _save(label: String) -> void:
 	var image := root.get_viewport().get_texture().get_image()
 	if image.is_empty() or image.save_png(OUTPUT.path_join("%s.png" % label)) != OK:
 		push_error("Could not save %s" % label)
-		quit(1)

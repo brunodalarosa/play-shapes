@@ -1,15 +1,11 @@
-extends SceneTree
+extends TestScript
 ## Technical composition captures; generated files remain outside the runtime bundle.
 
 const SCENE: PackedScene = preload("res://scenes/pre_minigame_screen.tscn")
 const OUTPUT := "res://test-results/pre-minigame"
 
 
-func _initialize() -> void:
-	_capture.call_deferred()
-
-
-func _capture() -> void:
+func _run() -> void:
 	DirAccess.make_dir_recursive_absolute(OUTPUT)
 	for count: int in [2, 10]:
 		for dimensions: Vector2i in [Vector2i(1920, 1080), Vector2i(1280, 720)]:
@@ -41,9 +37,7 @@ func _capture() -> void:
 				!= OK
 			):
 				push_error("Could not save ready screen")
-				quit(1)
 				return
 			screen.queue_free()
 			await process_frame
 	print("Saved pre-minigame tabletop captures")
-	quit(0)

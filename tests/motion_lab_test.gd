@@ -1,8 +1,4 @@
-extends SceneTree
-
-
-func _initialize() -> void:
-	_run.call_deferred()
+extends TestScript
 
 
 func _run() -> void:
@@ -10,18 +6,26 @@ func _run() -> void:
 	host.settings = NetworkingTuning.new()
 	host.settings.http_port = 18088
 	host.settings.websocket_port = 18089
-	assert(host.start(false))
+	if not check(host.start(false), "The host starts on the test ports"):
+		return
 	var scenario: DebugScenario = root.get_node("DebugLauncher").scenario_for_id(&"motion_lab")
-	assert(scenario != null and scenario.availability({ }).available)
+	if not check(
+		scenario != null and scenario.availability({ }).available,
+		"The motion lab scenario exists and is available",
+	):
+		return
 	var lab: Control = load(scenario.scene_path).instantiate()
 	root.add_child(lab)
 	await process_frame
-	assert(lab.target_player_id.is_empty())
-	assert(lab.get("_viewport").own_world_3d)
+	check(lab.target_player_id.is_empty(), "The lab targets nobody before a player joins")
+	check(lab.get("_viewport").own_world_3d, "The lab renders its model in a world of its own")
 	var one: Dictionary = host.player_registry.join_player(1, "Player One", true)
 	var two: Dictionary = host.player_registry.join_player(2, "Player Two", true)
-	assert(lab.target_player_id == one.player.player_id)
-	assert(host.websocket.motion_channel.target_player_id != two.player.player_id)
+	check(lab.target_player_id == one.player.player_id, "The lab targets the first player to join")
+	check(
+		host.websocket.motion_channel.target_player_id != two.player.player_id,
+		"The motion channel does not target the second player",
+	)
 	var channel: MotionInputChannel = host.websocket.motion_channel
 	var diagnostics := {
 		"secure_context": true,
@@ -35,7 +39,7 @@ func _run() -> void:
 		"websocket_protocol": "wss:",
 		"websocket_status": "open",
 	}
-	assert(
+	check(
 		channel.handle(
 			one.player,
 			{
@@ -44,7 +48,8 @@ func _run() -> void:
 				"diagnostics": diagnostics,
 			},
 			Time.get_ticks_msec(),
-		)
+		),
+		"The channel accepts a status message from the target player",
 	)
 	var sample := {
 		"orientation": [35, 70, -15],
@@ -59,7 +64,7 @@ func _run() -> void:
 		"orientation_hz": 60,
 		"motion_hz": 60,
 	}
-	assert(
+	check(
 		channel.handle(
 			one.player,
 			{
@@ -69,26 +74,40 @@ func _run() -> void:
 				"sample": sample,
 			},
 			Time.get_ticks_msec(),
-		)
+		),
+		"The channel accepts a motion sample from the target player",
 	)
 	await process_frame
-	assert(lab.call("_has_orientation"))
+	check(lab.call("_has_orientation"), "The lab has an orientation after a sample")
 	lab.recenter()
-	assert(lab.get("_pose").is_equal_approx(Quaternion.IDENTITY))
+	check(
+		lab.get("_pose").is_equal_approx(Quaternion.IDENTITY),
+		"Recentering makes the current pose the identity",
+	)
 	lab.reset_calibration()
-	assert(lab.get("_neutral").is_equal_approx(Quaternion.IDENTITY))
+	check(
+		lab.get("_neutral").is_equal_approx(Quaternion.IDENTITY),
+		"Resetting the calibration clears the neutral pose",
+	)
 	var plots: Array = lab.get("_plots")
 	for index: int in range(150):
 		plots[0].append_sample([index, null, 0])
-	assert(plots[0].history.size() == 120)
+	check(plots[0].history.size() == 120, "A plot keeps only its last 120 samples")
 	host.player_registry.leave_connection(1)
 	var replacement: Dictionary = host.player_registry.join_player(3, "Replacement", true)
-	assert(replacement.player.seat == 1 and lab.target_player_id == one.player.player_id)
+	check(
+		replacement.player.seat == 1 and lab.target_player_id == one.player.player_id,
+		"A replacement takes seat one while the lab keeps its target",
+	)
 	lab.bind_player_one()
-	assert(lab.target_player_id == replacement.player.player_id)
+	check(
+		lab.target_player_id == replacement.player.player_id,
+		"Binding to player one targets the replacement",
+	)
 	lab.queue_free()
 	await process_frame
-	assert(channel.target_player_id.is_empty() and channel.latest.is_empty())
+	check(
+		channel.target_player_id.is_empty() and channel.latest.is_empty(),
+		"Freeing the lab clears the channel's target and its latest sample",
+	)
 	host.stop()
-	print("Motion lab identity, scene, calibration and cleanup checks passed")
-	quit(0)

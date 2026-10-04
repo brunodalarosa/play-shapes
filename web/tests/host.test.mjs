@@ -36,7 +36,7 @@ before(async () => {
     check.on("error", reject);
     check.on("exit", (code) => {
       clearTimeout(timeout);
-      if (code !== 0 || /ERROR:/.test(log) || !log.includes("Foundation checks passed"))
+      if (code !== 0 || /ERROR:/.test(log) || !log.includes("foundation: 0 failures"))
         reject(new Error(log));
       else resolve();
     });

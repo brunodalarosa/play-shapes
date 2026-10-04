@@ -1,12 +1,8 @@
-extends SceneTree
+extends TestScript
 ## Exercises the remaining minigame's normal/debug launch, reconnect, and teardown.
 
 const LOBBY_PATH := "res://scenes/lobby.tscn"
 const BUBBLES_PATH := "res://minigames/bubbles_and_jellyfishes.tscn"
-
-
-func _initialize() -> void:
-	_run.call_deferred()
 
 
 func _run() -> void:
@@ -15,10 +11,10 @@ func _run() -> void:
 	host.settings = NetworkingTuning.new()
 	host.settings.http_port = 18088
 	host.settings.websocket_port = 18089
-	if not _check(host.start(false), "Persistent host services start"):
+	if not check(host.start(false), "Persistent host services start"):
 		return
 	var jellyfish_png: PackedByteArray = host.http._bodies["/bubbles-jellyfish.png"]
-	if not _check(
+	if not check(
 		jellyfish_png.size() > 8
 		and jellyfish_png.slice(0, 8) == PackedByteArray([137, 80, 78, 71, 13, 10, 26, 10]),
 		"HTTP serves the imported Bubbles jellyfish texture as PNG bytes",
@@ -27,7 +23,7 @@ func _run() -> void:
 	var jellyfish_response: PackedByteArray = host.http._route(
 		"GET /bubbles-jellyfish.png HTTP/1.1\r\n\r\n"
 	)
-	if not _check(
+	if not check(
 		jellyfish_response.slice(0, 128).get_string_from_utf8().contains("Content-Type: image/png"),
 		"Bubbles jellyfish HTTP route uses the PNG content type",
 	):
@@ -43,12 +39,12 @@ func _run() -> void:
 	var selector := current_scene.get_node("%MinigameSelector") as OptionButton
 	var start_button := current_scene.get_node("%StartMinigame") as Button
 	var start_help := current_scene.get_node("%StartHelp") as Label
-	if not _check(
+	if not check(
 		selector.item_count == 1 and selector.get_item_text(0) == "Bubbles and Jellyfishes",
 		"Lobby offers only Bubbles and Jellyfishes",
 	):
 		return
-	if not _check(
+	if not check(
 		host.minigame_scene_path(&"flash_pose").is_empty()
 		and not host.prepare_minigame_launch(&"flash_pose").accepted,
 		"Retired game cannot launch through the host",
@@ -56,13 +52,13 @@ func _run() -> void:
 		return
 	selector.select(0)
 	selector.item_selected.emit(0)
-	if not _check(
+	if not check(
 		start_button.disabled and start_help.text.contains("At least 2"),
 		"Selected Bubbles blocks launch at zero players with actionable copy",
 	):
 		return
 	var rejected: Dictionary = host.prepare_minigame_launch(&"bubbles")
-	if not _check(
+	if not check(
 		not rejected.accepted and host.accepting_new_players,
 		"The host rechecks and rejects a direct one-player normal launch",
 	):
@@ -70,19 +66,19 @@ func _run() -> void:
 
 	var first := _join(host, 501, "First")
 	await process_frame
-	if not _check(
+	if not check(
 		first.accepted and start_button.disabled,
 		"One real player still cannot use the normal Bubbles launch",
 	):
 		return
 	var bubbles_debug: DebugScenario = launcher.scenario_for_id(&"one_player_bubbles")
 	var debug_features := { "one_registered_player": true }
-	if not _check(
+	if not check(
 		bubbles_debug != null and bubbles_debug.availability(debug_features).available,
 		"F12 offers Bubbles only through its explicit one-player scenario",
 	):
 		return
-	if not _check(
+	if not check(
 		launcher.launch(&"one_player_bubbles"),
 		"F12 starts the one-player Bubbles scenario",
 	):
@@ -91,31 +87,31 @@ func _run() -> void:
 	await process_frame
 	var presentation := current_scene as BubblesPresentation
 	var bubble_controller := current_scene.get_node("RoundController") as BubblesRoundController
-	if not _check(
+	if not check(
 		current_scene.scene_file_path == BUBBLES_PATH and bubble_controller.is_one_player_debug()
 		and bubble_controller.player_snapshot().size() == 1,
 		"Bubbles debug uses the same round scene with one registered player",
 	):
 		return
-	if not _check(
+	if not check(
 		launcher.marker_text() == "DEBUG — One-player Bubbles and Jellyfishes"
 		and presentation.get_node("Hud/DebugLabel").visible,
 		"F12 and the shared screen clearly label the debug round",
 	):
 		return
-	if not _check(
+	if not check(
 		host.websocket._active_protocol == host.websocket._bubbles_protocol
 		and host.websocket._bubbles_protocol.controller == bubble_controller,
 		"Bubbles is the only active phone protocol",
 	):
 		return
 	var first_debug_scene_id := current_scene.get_instance_id()
-	if not _check(launcher.restart_scenario(), "Bubbles debug can restart from F12"):
+	if not check(launcher.restart_scenario(), "Bubbles debug can restart from F12"):
 		return
 	await scene_changed
 	await process_frame
 	bubble_controller = current_scene.get_node("RoundController") as BubblesRoundController
-	if not _check(
+	if not check(
 		current_scene.get_instance_id() != first_debug_scene_id
 		and bubble_controller.is_one_player_debug()
 		and host.websocket._bubbles_protocol.controller == bubble_controller,
@@ -125,7 +121,7 @@ func _run() -> void:
 	launcher.return_to_lobby()
 	await scene_changed
 	await process_frame
-	if not _check(
+	if not check(
 		current_scene.scene_file_path == LOBBY_PATH and launcher.marker_text().is_empty()
 		and host.accepting_new_players and host.running and host.get_instance_id() == host_id
 		and host.player_registry.player_count() == 1 and host.websocket._active_protocol == null
@@ -143,17 +139,17 @@ func _run() -> void:
 	for index: int in 9:
 		var connection_id := 600 + index
 		var overflow := _join(host, connection_id, "Extra %d" % index)
-		if not _check(overflow.accepted, "Lobby fills to ten registered players"):
+		if not check(overflow.accepted, "Lobby fills to ten registered players"):
 			return
 		overflow_connections.append(connection_id)
 	await process_frame
-	if not _check(
+	if not check(
 		host.player_registry.player_count() == 10 and not start_button.disabled
 		and host.minigame_availability(&"bubbles").available,
 		"Full ten-player lobby can launch Bubbles",
 	):
 		return
-	if not _check(
+	if not check(
 		host.player_registry.join_player(700, "Eleventh", true).code == &"full",
 		"Host rejects an eleventh new player",
 	):
@@ -163,7 +159,7 @@ func _run() -> void:
 	await process_frame
 	var second := _join(host, 502, "Second")
 	await process_frame
-	if not _check(
+	if not check(
 		second.accepted and not start_button.disabled,
 		"Two registered players unlock normal Bubbles",
 	):
@@ -173,7 +169,7 @@ func _run() -> void:
 	start_button.pressed.emit()
 	await scene_changed
 	await process_frame
-	if not _check(
+	if not check(
 		current_scene.scene_file_path == "res://scenes/pre_minigame_screen.tscn"
 		and host.readiness != null and host.websocket._active_protocol == host.readiness,
 		"Normal Bubbles opens host-owned ready-up before gameplay",
@@ -182,7 +178,7 @@ func _run() -> void:
 	host.cancel_pre_minigame()
 	await scene_changed
 	await process_frame
-	if not _check(
+	if not check(
 		current_scene.scene_file_path == LOBBY_PATH and host.readiness == null
 		and host.accepting_new_players and host.player_registry.player_count() == 2,
 		"Host cancel returns to joining lobby with both players intact",
@@ -192,7 +188,7 @@ func _run() -> void:
 	await scene_changed
 	await process_frame
 	host.readiness.set_ready(first.player, true)
-	if not _check(
+	if not check(
 		current_scene.scene_file_path == "res://scenes/pre_minigame_screen.tscn",
 		"One ready player cannot start gameplay",
 	):
@@ -201,14 +197,14 @@ func _run() -> void:
 	await scene_changed
 	await process_frame
 	bubble_controller = current_scene.get_node("RoundController") as BubblesRoundController
-	if not _check(
+	if not check(
 		current_scene.scene_file_path == BUBBLES_PATH
 		and bubble_controller.phase_name() == &"instructions"
 		and bubble_controller.player_snapshot().size() == 2,
 		"The selected Bubbles round starts with the registered roster snapshot",
 	):
 		return
-	if not _check(
+	if not check(
 		host.websocket._active_protocol == host.websocket._bubbles_protocol
 		and not host.accepting_new_players,
 		"Bubbles launch disables joins and owns gameplay routing",
@@ -216,7 +212,7 @@ func _run() -> void:
 		return
 	host.player_registry.disconnect_connection(501)
 	await process_frame
-	if not _check(
+	if not check(
 		not bool(bubble_controller.personal_snapshot(first_id).connected),
 		"Bubbles observes the registered player's disconnect",
 	):
@@ -227,7 +223,7 @@ func _run() -> void:
 		first_token,
 	)
 	await process_frame
-	if not _check(
+	if not check(
 		resumed.accepted and bool(bubble_controller.personal_snapshot(first_id).connected),
 		"Reconnect restores the same Bubbles participant and identity",
 	):
@@ -235,7 +231,7 @@ func _run() -> void:
 	var left: Dictionary = host.player_registry.leave_connection(502)
 	await process_frame
 	var second_id := String(second.player.player_id)
-	if not _check(
+	if not check(
 		left.accepted and bool(bubble_controller.personal_snapshot(second_id).left),
 		"Explicit phone leave is observed by the active Bubbles controller",
 	):
@@ -245,7 +241,7 @@ func _run() -> void:
 		if bubble_controller.phase_name() == &"active":
 			break
 		await process_frame
-	if not _check(
+	if not check(
 		bubble_controller.phase_name() == &"active",
 		"Bubbles presentation reaches active play",
 	):
@@ -255,7 +251,7 @@ func _run() -> void:
 	)
 	await process_frame
 	var bubbles_return := current_scene.find_child("ReturnToLobby", true, false) as Button
-	if not _check(
+	if not check(
 		bubble_controller.phase_name() == &"results"
 		and bubbles_return != null and bubbles_return.visible,
 		"Bubbles results expose the host-only lobby return",
@@ -264,7 +260,7 @@ func _run() -> void:
 	bubbles_return.pressed.emit()
 	await scene_changed
 	await process_frame
-	if not _check(
+	if not check(
 		current_scene.scene_file_path == LOBBY_PATH and host.accepting_new_players
 		and host.player_registry.player_count() == 1 and host.running
 		and host.get_instance_id() == host_id and host.websocket._active_protocol == null
@@ -279,7 +275,7 @@ func _run() -> void:
 	await process_frame
 	selector.select(0)
 	selector.item_selected.emit(0)
-	if not _check(
+	if not check(
 		fourth.accepted and not start_button.disabled,
 		"Bubbles can start again after returning to the lobby",
 	):
@@ -287,7 +283,7 @@ func _run() -> void:
 	start_button.pressed.emit()
 	await scene_changed
 	await process_frame
-	if not _check(
+	if not check(
 		current_scene.scene_file_path == "res://scenes/pre_minigame_screen.tscn",
 		"Second normal launch also visits ready-up",
 	):
@@ -297,7 +293,7 @@ func _run() -> void:
 	await scene_changed
 	await process_frame
 	bubble_controller = current_scene.get_node("RoundController") as BubblesRoundController
-	if not _check(
+	if not check(
 		current_scene.scene_file_path == BUBBLES_PATH
 		and host.websocket._active_protocol == host.websocket._bubbles_protocol,
 		"Repeated Bubbles launch leaves exactly one protocol active",
@@ -308,7 +304,7 @@ func _run() -> void:
 		if bubble_controller.phase_name() == &"active":
 			break
 		await process_frame
-	if not _check(
+	if not check(
 		bubble_controller.phase_name() == &"active",
 		"Second Bubbles round reaches active play",
 	):
@@ -318,7 +314,7 @@ func _run() -> void:
 	)
 	await process_frame
 	bubbles_return = current_scene.find_child("ReturnToLobby", true, false) as Button
-	if not _check(
+	if not check(
 		bubbles_return != null and bubbles_return.visible,
 		"Second Bubbles round reaches results",
 	):
@@ -326,7 +322,7 @@ func _run() -> void:
 	bubbles_return.pressed.emit()
 	await scene_changed
 	await process_frame
-	if not _check(
+	if not check(
 		current_scene.scene_file_path == LOBBY_PATH
 		and host.websocket._active_protocol == null and host.websocket._bubbles_protocol == null
 		and host.running and host.get_instance_id() == host_id,
@@ -335,8 +331,6 @@ func _run() -> void:
 		return
 
 	host.stop()
-	print("[GODOT-RUNTIME] Bubbles selection and repeated flow checks passed")
-	quit(0)
 
 
 func _join(host: Node, connection_id: int, player_name: String) -> Dictionary:
@@ -346,11 +340,3 @@ func _join(host: Node, connection_id: int, player_name: String) -> Dictionary:
 		host.accepting_new_players,
 		Time.get_ticks_msec(),
 	)
-
-
-func _check(condition: bool, description: String) -> bool:
-	if condition:
-		return true
-	push_error(description)
-	quit(1)
-	return false

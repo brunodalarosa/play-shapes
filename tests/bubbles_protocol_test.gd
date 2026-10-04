@@ -1,13 +1,7 @@
-extends SceneTree
+extends TestScript
 
 const Controller = preload("res://minigames/bubbles_round_controller.gd")
 const Protocol = preload("res://host/bubbles_protocol.gd")
-
-var _failures := 0
-
-
-func _initialize() -> void:
-	_run.call_deferred()
 
 
 func _run() -> void:
@@ -35,7 +29,7 @@ func _run() -> void:
 			"character_color": "#00ACC1",
 		},
 	]
-	_check(controller.start_round(players, 0).accepted, "Round starts")
+	check(controller.start_round(players, 0).accepted, "Round starts")
 	controller.complete_entrance(0)
 	controller.advance(0)
 	var protocol := Protocol.new(controller)
@@ -46,11 +40,11 @@ func _run() -> void:
 				visual_updates.append(progress),
 	)
 	var charge_start := { "type": "bubbles_charge", "input_seq": 1, "stage": "start", "step": 0 }
-	_check(
+	check(
 		protocol.handle_action(players[0], charge_start, 1).accepted,
 		"Authenticated charge starts a visual gesture",
 	)
-	_check(
+	check(
 		protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 1,
@@ -59,26 +53,23 @@ func _run() -> void:
 		}, 2).accepted,
 		"Coarse charge step reaches presentation",
 	)
-	_check(
+	check(
 		visual_updates.back() == 0.5 and controller.personal_snapshot("p0").last_input_seq == -1,
 		"Charge changes only presentation, never accepted gameplay sequence",
 	)
-	_check(
-		not protocol.handle_action(players[0], {
+	check(not protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 1,
 			"stage": "progress",
 			"step": 1,
-		}, 3).accepted,
-		"Out-of-order progress is rejected",
-	)
-	_check(not protocol.handle_action(players[0], {
+		}, 3).accepted, "Out-of-order progress is rejected")
+	check(not protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 1,
 			"stage": "progress",
 			"step": 5,
 		}, 3).accepted, "Over-range progress is rejected")
-	_check(
+	check(
 		not protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 1,
@@ -88,7 +79,7 @@ func _run() -> void:
 		}, 3).accepted,
 		"Client-authored player identity is rejected",
 	)
-	_check(
+	check(
 		not protocol.handle_action(players[1], {
 			"type": "bubbles_charge",
 			"input_seq": 1,
@@ -100,35 +91,35 @@ func _run() -> void:
 	var json_charge: Dictionary = JSON.parse_string(
 		'{"type":"bubbles_charge","input_seq":1,"stage":"progress","step":3}'
 	)
-	_check(
+	check(
 		protocol.handle_action(players[0], json_charge, 4).accepted,
 		"JSON numeric charge step reaches the host",
 	)
 	var swipe := { "type": "bubbles_trace", "input_seq": 1, "trace": [[0.1, 0.5], [0.9, 0.5]] }
-	_check(
+	check(
 		protocol.handle_action(players[0], swipe, 1).accepted,
 		"Authenticated swipe reaches controller",
 	)
-	_check(visual_updates.back() == 0.0, "Completed trace clears charge cue")
-	_check(protocol.handle_action(players[0], {
+	check(visual_updates.back() == 0.0, "Completed trace clears charge cue")
+	check(protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 2,
 			"stage": "start",
 			"step": 0,
 		}, 6).accepted, "Next gesture may start")
-	_check(protocol.handle_action(players[0], {
+	check(protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 2,
 			"stage": "cancel",
 			"step": 0,
 		}, 7).accepted, "Canceled gesture clears visual cue")
-	_check(not protocol.handle_action(players[0], {
+	check(not protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 2,
 			"stage": "progress",
 			"step": 3,
 		}, 8).accepted, "Canceled gesture cannot resume")
-	_check(
+	check(
 		not protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 2,
@@ -137,7 +128,7 @@ func _run() -> void:
 		}, 9).accepted,
 		"Canceled gesture sequence cannot restart",
 	)
-	_check(
+	check(
 		protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 3,
@@ -146,16 +137,13 @@ func _run() -> void:
 		}, 9).accepted,
 		"A fresh gesture can start after cancel",
 	)
-	_check(
-		not protocol.handle_action(players[0], {
+	check(not protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 3,
 			"stage": "progress",
 			"step": 3,
-		}, 2000).accepted,
-		"Timed-out charge cannot resume",
-	)
-	_check(
+		}, 2000).accepted, "Timed-out charge cannot resume")
+	check(
 		not protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 3,
@@ -164,16 +152,16 @@ func _run() -> void:
 		}, 2001).accepted,
 		"Timed-out gesture sequence cannot restart",
 	)
-	_check(
+	check(
 		controller.personal_snapshot("p0").spin_until_msec == -1,
 		"Charge and cancellation never activate spin",
 	)
-	_check(
+	check(
 		controller.personal_snapshot("p0").last_input_seq == 1
 		and controller.personal_snapshot("p1").last_input_seq == -1,
 		"Action only mutates authenticated player",
 	)
-	_check(not protocol.handle_action(players[0], swipe, 2).accepted, "Duplicate sequence rejected")
+	check(not protocol.handle_action(players[0], swipe, 2).accepted, "Duplicate sequence rejected")
 	var malformed: Array[Dictionary] = [
 		{ "type": "bubbles_trace", "input_seq": -1, "trace": swipe.trace },
 		{ "type": "bubbles_trace", "input_seq": 1.5, "trace": swipe.trace },
@@ -197,27 +185,27 @@ func _run() -> void:
 		{ "type": "bubbles_trace", "input_seq": 2, "trace": _oversized_trace() },
 	]
 	for packet: Dictionary in malformed:
-		_check(
+		check(
 			not protocol.handle_action(players[0], packet, 3).accepted,
 			"Malformed, oversized, or authority-shaped input rejected",
 		)
-	_check(not protocol.handle_action({ }, {
+	check(not protocol.handle_action({ }, {
 			"type": "bubbles_trace",
 			"input_seq": 2,
 			"trace": swipe.trace,
 		}, 3).accepted, "Unjoined connection cannot act")
-	_check(
+	check(
 		controller.personal_snapshot("p0").last_input_seq == 1,
 		"Rejected packets do not advance accepted sequence",
 	)
 	var json_packet: Dictionary = JSON.parse_string(
 		'{"type":"bubbles_trace","input_seq":2,"trace":[[0.1,0.5],[0.9,0.5]]}'
 	)
-	_check(
+	check(
 		protocol.handle_action(players[1], json_packet, 4).accepted,
 		"JSON browser packet is accepted for authenticated player",
 	)
-	_check(
+	check(
 		controller.personal_snapshot("p1").last_input_seq == 2,
 		"Second player's sequence remains independent",
 	)
@@ -231,60 +219,58 @@ func _run() -> void:
 		{ "type": "bubbles_trace", "input_seq": 5, "trace": swipe.trace },
 		5,
 	)
-	_check(
+	check(
 		spin.accepted and spin.action == "spin"
 		and while_spinning.accepted and while_spinning.action == "swipe",
 		"Swipe remains available during host-approved spin",
 	)
 	var snapshot := protocol.snapshot_for("p0")
-	_check(
+	check(
 		snapshot.type == "bubbles_snapshot" and snapshot.score == 0
 		and snapshot.visual_jellyfish == 0 and snapshot.seat == 1,
 		"Personal snapshot contains exact score and visual state",
 	)
-	_check(
+	check(
 		snapshot.character_shape == "squircle" and snapshot.character_color == "#EC407A",
 		"Phone Bubbles snapshots keep the authenticated player's host-owned selection",
 	)
-	_check(
+	check(
 		snapshot.host_time_msec >= 0
 		and snapshot.visual_tuning.live_drag_pull_strength
 		== controller.tuning.live_drag_pull_strength,
 		"Phone receives the shared host clock and configured visual response",
 	)
-	_check(not snapshot.debug_mode, "Normal Bubbles snapshots do not claim debug mode")
-	_check(
+	check(not snapshot.debug_mode, "Normal Bubbles snapshots do not claim debug mode")
+	check(
 		protocol.snapshot_for("unknown").type == "lobby",
 		"Unknown player receives no gameplay state",
 	)
 	controller.record_jellyfish_capture("p0", 5)
 	var collected := protocol.feedback_for("p0", &"captured", { })
-	_check(
+	check(
 		collected.event == "captured" and collected.score == 1 and collected.visual_jellyfish == 1,
 		"Collection feedback reflects host score",
 	)
 	controller.pop_player("p0", 6)
 	var pop := protocol.feedback_for("p0", &"pop", { "lost": 1 })
-	_check(
+	check(
 		pop.score == 0 and pop.lost == 1 and pop.burst_radius == 50.0
 		and pop.invulnerable_remaining_msec > 0 and pop.reform_remaining_msec > 0,
 		"Pop feedback carries authoritative re-form and invulnerability state",
 	)
 	controller.advance(10000)
 	var results := protocol.snapshot_for("p0")
-	_check(results.phase == "results" and results.rank > 0, "Result snapshot includes placement")
+	check(results.phase == "results" and results.rank > 0, "Result snapshot includes placement")
 	var debug_controller := _controller()
 	debug_controller.start_round([{ "player_id": "debug", "name": "Debug", "seat": 1 }], 0, true)
 	var debug_snapshot: Dictionary = Protocol.new(debug_controller).snapshot_for("debug")
-	_check(
+	check(
 		debug_controller.is_one_player_debug() and debug_snapshot.debug_mode
 		and debug_snapshot.character_shape == "squircle"
 		and debug_snapshot.character_color == CharacterSelection.FALLBACK_COLOR,
 		"One-player debug state reaches the phone with the Squircle fallback",
 	)
 	_test_timed_swipes()
-	print("Bubbles protocol checks: %d failures" % _failures)
-	quit(0 if _failures == 0 else 1)
 
 
 func _oversized_trace() -> Array:
@@ -337,7 +323,7 @@ func _test_timed_swipes() -> void:
 		{ "type": "bubbles_trace", "input_seq": 1, "trace": swipe },
 		100 + limit,
 	)
-	_check(
+	check(
 		quick.action == "swipe" and impulses.size() == 1,
 		"Swipe at the configured host-time limit applies impulse",
 	)
@@ -346,7 +332,7 @@ func _test_timed_swipes() -> void:
 		{ "type": "bubbles_charge", "input_seq": 2, "stage": "start", "step": 0 },
 		1000,
 	)
-	_check(
+	check(
 		protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 2,
@@ -355,17 +341,17 @@ func _test_timed_swipes() -> void:
 		}, 1070).accepted,
 		"Authenticated coarse drag updates visual cue while held",
 	)
-	_check(
+	check(
 		drags.back() == Vector2(-1.0, 0.25) and impulses.size() == 1,
 		"Live drag changes no gameplay state before release",
 	)
-	_check(not protocol.handle_action(players[0], {
+	check(not protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 2,
 			"stage": "motion",
 			"drag": [-5, 0],
 		}, 1080).accepted, "Out-of-range drag is rejected")
-	_check(
+	check(
 		not protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 2,
@@ -374,7 +360,7 @@ func _test_timed_swipes() -> void:
 		}, 1080).accepted,
 		"Fractional drag cell is rejected",
 	)
-	_check(
+	check(
 		not protocol.handle_action(players[0], {
 			"type": "bubbles_charge",
 			"input_seq": 2,
@@ -389,18 +375,18 @@ func _test_timed_swipes() -> void:
 		{ "type": "bubbles_charge", "input_seq": 2, "stage": "motion", "drag": [-4, 1] },
 		1000 + limit + 1,
 	)
-	_check(drags.back() == Vector2.ZERO, "Held drag cue clears after the swipe activation limit")
+	check(drags.back() == Vector2.ZERO, "Held drag cue clears after the swipe activation limit")
 	var slow := protocol.handle_action(
 		players[0],
 		{ "type": "bubbles_trace", "input_seq": 2, "trace": swipe },
 		1000 + limit + 1,
 	)
-	_check(
+	check(
 		slow.accepted and slow.action == "none"
 		and slow.reason == "swipe_too_slow" and impulses.size() == 1,
 		"Slow touch consumes its sequence without applying swipe impulse",
 	)
-	_check(drags.back() == Vector2.ZERO, "Release clears live drag cue")
+	check(drags.back() == Vector2.ZERO, "Release clears live drag cue")
 	protocol.handle_action(
 		players[0],
 		{ "type": "bubbles_charge", "input_seq": 3, "stage": "start", "step": 0 },
@@ -411,7 +397,7 @@ func _test_timed_swipes() -> void:
 		{ "type": "bubbles_trace", "input_seq": 3, "trace": _circle() },
 		2000 + limit + 500,
 	)
-	_check(
+	check(
 		long_spin.accepted and long_spin.action == "spin" and impulses.size() == 2,
 		"Completed spin remains available after the swipe-only time limit",
 	)
@@ -432,7 +418,7 @@ func _test_timed_swipes() -> void:
 			},
 			5100 + index * 60,
 		)
-	_check(
+	check(
 		drags.size() - before_motion == Protocol.MAX_MOTION_UPDATES and impulses.size() == 2,
 		"Motion packet cap bounds visual work without changing gameplay",
 	)
@@ -441,7 +427,7 @@ func _test_timed_swipes() -> void:
 		{ "type": "bubbles_charge", "input_seq": 4, "stage": "cancel", "step": 0 },
 		8100,
 	)
-	_check(
+	check(
 		not protocol.handle_action(players[0], {
 			"type": "bubbles_trace",
 			"input_seq": 4,
@@ -456,9 +442,3 @@ func _controller() -> BubblesRoundController:
 	root.add_child(result)
 	result.tuning = BubblesTuning.new()
 	return result
-
-
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		_failures += 1
-		push_error(message)

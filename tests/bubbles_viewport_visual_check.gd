@@ -1,22 +1,14 @@
-extends SceneTree
+extends TestScript
 ## Render player bubbles against viewport edges at FHD and HD sizes.
 
 const SCENE: PackedScene = preload("res://minigames/bubbles_and_jellyfishes.tscn")
 const OUTPUT := "res://test-results/bubbles-viewport"
 
-var _failures := 0
 
-
-func _initialize() -> void:
-	_capture.call_deferred()
-
-
-func _capture() -> void:
+func _run() -> void:
 	DirAccess.make_dir_recursive_absolute(OUTPUT)
 	await _capture_size(Vector2i(1920, 1080))
 	await _capture_size(Vector2i(1280, 720))
-	print("Bubbles viewport captures: %d failure(s)" % _failures)
-	quit(0 if _failures == 0 else 1)
 
 
 func _capture_size(viewport_size: Vector2i) -> void:
@@ -37,7 +29,7 @@ func _capture_size(viewport_size: Vector2i) -> void:
 	tuning.pufferfish_max_spawn_rate = 0.0
 	view.controller.tuning = tuning
 	var start_time := Time.get_ticks_msec()
-	_check(view.start_round([
+	check(view.start_round([
 			{ "player_id": "left", "name": "Left", "seat": 1 },
 			{ "player_id": "right", "name": "Right", "seat": 2 },
 		], start_time).accepted, "%s scene starts" % viewport_size)
@@ -58,19 +50,19 @@ func _capture_size(viewport_size: Vector2i) -> void:
 	right_bubble.global_position = Vector2(bounds.end.x - right_radius, bounds.get_center().y)
 	right_bubble.velocity = Vector2.RIGHT * 100.0
 	var host_time := maxi(Time.get_ticks_msec(), view.controller.last_host_time_msec())
-	_check(
+	check(
 		view.player_arena.simulate_step(0.05, host_time),
 		"%s edge step is accepted" % viewport_size,
 	)
-	_check(
+	check(
 		left_bubble.velocity.x > 0.0 and right_bubble.velocity.x < 0.0,
 		"%s edge bubbles rebound inward" % viewport_size,
 	)
-	_check(
+	check(
 		left_bubble.global_position.x >= bounds.position.x + left_radius - 0.001,
 		"%s left bubble remains fully visible" % viewport_size,
 	)
-	_check(
+	check(
 		right_bubble.global_position.x <= bounds.end.x - right_radius + 0.001,
 		"%s right bubble remains fully visible" % viewport_size,
 	)
@@ -89,10 +81,3 @@ func _save(file_name: String) -> void:
 	var image := root.get_viewport().get_texture().get_image()
 	if image.is_empty() or image.save_png(OUTPUT.path_join(file_name)) != OK:
 		push_error("Could not save %s" % file_name)
-		_failures += 1
-
-
-func _check(condition: bool, message: String) -> void:
-	if not condition:
-		_failures += 1
-		push_error(message)

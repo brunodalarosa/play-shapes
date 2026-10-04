@@ -1,11 +1,7 @@
-extends SceneTree
+extends TestScript
 ## The registry remains authoritative while the Playground lobby shows no roster.
 
 const LOBBY_SCENE := "res://scenes/lobby.tscn"
-
-
-func _initialize() -> void:
-	_run.call_deferred()
 
 
 func _run() -> void:
@@ -15,12 +11,12 @@ func _run() -> void:
 	await process_frame
 	var start := lobby.get_node("%StartMinigame") as Button
 	var help := lobby.get_node("%StartHelp") as Label
-	if not _check(
+	if not check(
 		host.accepting_new_players and start.disabled and help.text.contains("At least 2"),
 		"Empty lobby accepts joins and explains start availability",
 	):
 		return
-	if not _check(
+	if not check(
 		lobby.find_child("PlayerRoster", true, false) == null
 		and lobby.find_child("PlayerCount", true, false) == null
 		and lobby.find_child("EmptyRoster", true, false) == null,
@@ -30,18 +26,18 @@ func _run() -> void:
 
 	var first: Dictionary = host.player_registry.join_player(90, "First", true, 1000)
 	await process_frame
-	if not _check(first.accepted and start.disabled, "One registered player cannot start"):
+	if not check(first.accepted and start.disabled, "One registered player cannot start"):
 		return
 	var second: Dictionary = host.player_registry.join_player(91, "Second", true, 1001)
 	await process_frame
-	if not _check(
+	if not check(
 		second.accepted and not start.disabled and help.text.contains("Ready"),
 		"Second join refreshes start availability",
 	):
 		return
 	host.player_registry.disconnect_connection(90, 2000)
 	await process_frame
-	if not _check(
+	if not check(
 		host.player_registry.player_count() == 2 and not start.disabled,
 		"Reconnect grace retains the registered player and availability",
 	):
@@ -53,11 +49,11 @@ func _run() -> void:
 		2001,
 	)
 	await process_frame
-	if not _check(resumed.accepted and not start.disabled, "Resume preserves availability"):
+	if not check(resumed.accepted and not start.disabled, "Resume preserves availability"):
 		return
 	host.player_registry.leave_connection(91)
 	await process_frame
-	if not _check(
+	if not check(
 		start.disabled and help.text.contains("At least 2"),
 		"Leaving updates availability without a roster",
 	):
@@ -65,7 +61,7 @@ func _run() -> void:
 
 	lobby.queue_free()
 	await process_frame
-	if not _check(
+	if not check(
 		not host.accepting_new_players and host.player_registry.player_count() == 1,
 		"Leaving lobby disables joins but preserves player data",
 	):
@@ -73,18 +69,9 @@ func _run() -> void:
 	var replacement: Control = load(LOBBY_SCENE).instantiate()
 	root.add_child(replacement)
 	await process_frame
-	if not _check(
+	if not check(
 		host.accepting_new_players and (replacement.get_node("%StartMinigame") as Button).disabled,
 		"Replacement lobby reads persistent player data",
 	):
 		return
 	replacement.queue_free()
-	print("Player lobby checks passed")
-	quit(0)
-
-
-func _check(condition: bool, description: String) -> bool:
-	if not condition:
-		push_error(description)
-		quit(1)
-	return condition
