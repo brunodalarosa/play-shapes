@@ -4,7 +4,7 @@ import {
   attemptImmersive,
   protectControllerSurface,
   bindControllerLifecycle,
-} from "../public/immersive.js";
+} from "../build/immersive.js";
 
 test("fullscreen and orientation denials resolve as playable fallbacks", async () => {
   let orientationAttempted = false;

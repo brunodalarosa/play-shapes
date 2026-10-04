@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { MotionLabController } from "../public/motion_lab.js";
+import { MotionLabController } from "../build/motion_lab.js";
 
 test("phone lab requires a gesture, recovers status, skips backpressure and stops on exit", async () => {
   const names = [

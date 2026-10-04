@@ -143,12 +143,12 @@ async function withController(
   for (const [key, value] of Object.entries(globals))
     Object.defineProperty(globalThis, key, { configurable: true, writable: true, value });
   try {
-    let source = readFileSync(new URL("../public/app.js", import.meta.url), "utf8");
+    let source = readFileSync(new URL("../build/app.js", import.meta.url), "utf8");
     const stub =
       "data:text/javascript," +
       encodeURIComponent("export class LobbyControls { activate(){} deactivate(){} }");
     source = source.replace(/from "(\.\/[^"]+)"/g, (match, path) => {
-      const bundled = new URL("../public/" + path.slice(2), import.meta.url).href;
+      const bundled = new URL("../build/" + path.slice(2), import.meta.url).href;
       return `from "${path === "./lobby_controls.js" ? stub : bundled}"`;
     });
     await import(

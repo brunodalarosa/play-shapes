@@ -5,7 +5,7 @@ import {
   PlatformInputState,
   DEFAULT_PLATFORM_SETTINGS,
   classifyPlatformInput,
-} from "../public/platform_input.js";
+} from "../build/platform_input.js";
 
 const neutral = { axes: { x: 0, y: 0 }, stance: "neutral" };
 const fromVertical = (degrees, sign = 1) => [

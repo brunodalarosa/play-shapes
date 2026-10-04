@@ -130,7 +130,7 @@ behavior.
 
 ## Browser client development
 
-After changing TypeScript in `web/src/`, rebuild the committed browser files:
+After changing TypeScript in `web/src/`, rebuild the committed bundle, `web/public/app.js`:
 
 Host-backed browser tests require a `godot` executable on PATH. If Godot has a
 different name or is not on PATH, set `GODOT_BIN` to its executable path before

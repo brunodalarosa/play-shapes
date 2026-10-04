@@ -54,8 +54,8 @@ Record the exact OS and browser versions for each row.
 
 | Device and browser | Journey to check |
 | --- | --- |
-| iPhone Safari | The offer in a tab; Share, Add to Home Screen, Open as Web App; launching the icon to the current host; the standalone layout; switching with separate or shared storage; lobby stick and jump together; READY and CANCEL; Bubbles swipe, spin and cancel; the keyboard; pinch and double tap; bars and rotation; background, lock and unlock; the motion lab permission. |
-| Android Chrome | A real native install event when eligible; the accepted, dismissed and unsupported paths; launching the icon; the same play, lifecycle, keyboard and permission journey. |
+| iPhone Safari | The page loads the bundled client and reaches the name screen; the offer in a tab; Share, Add to Home Screen, Open as Web App; launching the icon to the current host; the standalone layout; switching with separate or shared storage; lobby stick and jump together; READY and CANCEL; Bubbles swipe, spin and cancel; the keyboard; pinch and double tap; bars and rotation; background, lock and unlock; the motion lab permission. |
+| Android Chrome | The page loads the bundled client and reaches the name screen; a real native install event when eligible; the accepted, dismissed and unsupported paths; launching the icon; the same play, lifecycle, keyboard and permission journey. |
 | Both | Host restart, grace expiry, a change of LAN origin, certificate trust, reconnecting to the current host, and no duplicate active players after switching from browser to app. |
 | Both | Measured timing from touch to host receipt, and subjective responsiveness. Name the measurement method, the sample count and the versions. |
 
