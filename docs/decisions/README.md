@@ -60,3 +60,4 @@ What was decided.
 | [0021](0021-no-cloud-ci.md) | No cloud CI for now; verification is local |
 | [0022](0022-git-flow.md) | Git Flow: `main` holds releases, `develop` holds the work |
 | [0023](0023-shared-test-base.md) | Test scripts share one base of our own, and any logged error fails them |
+| [0024](0024-minigame-catalog.md) | The minigame catalog is an explicit list of definitions that hold paths |

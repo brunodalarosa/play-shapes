@@ -26,24 +26,28 @@ existing ones. The game keeps playing the same while the code is reshaped; see
   ([0023](decisions/0023-shared-test-base.md)). A script error, or anything a test still
   holds at exit, fails the check at once.
 
+## Done: the refactor so far
+
+- One folder per minigame ([0015](decisions/0015-one-folder-per-minigame.md)), and a catalog
+  of minigames that the lobby, the launch rules, the ready screen and the debug menu read
+  ([0024](decisions/0024-minigame-catalog.md)).
+
 ## The refactor, in order
 
 This is what comes next.
 
-1. A minigame catalog the other lists derive from. Each minigame already has one folder
-   ([0015](decisions/0015-one-folder-per-minigame.md)).
-2. Bundle the phone client into one file, then split its largest module
+1. Bundle the phone client into one file, then split its largest module
    ([0016](decisions/0016-bundle-the-phone-client.md)).
-3. The input pipeline: one message for gameplay input and reusable controls
+2. The input pipeline: one message for gameplay input and reusable controls
    ([0017](decisions/0017-one-input-message.md)). The late-input bugs below belong here,
    and so does one shared phone helper for the browser tests, which this step rewrites.
-4. A shared round lifecycle and a stage kit.
-5. A shared character component, and screens rebuilt with containers and a theme
+3. A shared round lifecycle and a stage kit.
+4. A shared character component, and screens rebuilt with containers and a theme
    ([0018](decisions/0018-ui-with-containers.md)).
-6. Typed classes throughout the host. It starts with the lint list of files still allowed to
+5. Typed classes throughout the host. It starts with the lint list of files still allowed to
    declare a dictionary, and ends when only the two edges remain
    ([0019](decisions/0019-typed-classes.md)).
-7. Tools for faster iteration: a control route for quick tests
+6. Tools for faster iteration: a control route for quick tests
    ([0004](decisions/0004-end-to-end-test.md)), a short-round tuning preset, screenshot
    comparison against references, bot phones that speak the protocol, and free ports in
    place of the hard-coded ones in the tests.
