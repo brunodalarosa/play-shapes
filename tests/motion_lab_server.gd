@@ -11,7 +11,10 @@ func _boot() -> void:
 	host.settings = NetworkingTuning.new()
 	host.settings.http_port = 18090
 	host.settings.websocket_port = 18091
-	assert(host.start(false))
+	if not host.start(false):
+		push_error("Motion lab fixture could not start")
+		quit(1)
+		return
 	var lab: Control = load("res://debug/motion_lab/motion_lab.tscn").instantiate()
 	root.add_child(lab)
 	var timer := Timer.new()
