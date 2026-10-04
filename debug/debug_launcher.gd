@@ -14,7 +14,7 @@ var _scenarios: Array[DebugScenario] = []
 
 func _ready() -> void:
 	layer = 100
-	_scenarios = DebugScenarioCatalog.scenarios()
+	_scenarios = DebugScenarioCatalog.scenarios(SessionHost.minigame_catalog)
 	_build_ui()
 	_refresh_actions()
 

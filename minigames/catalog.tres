@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="MinigameCatalog" format=3]
+
+[ext_resource type="Script" path="res://minigames/minigame_definition.gd" id="1_hl4hp"]
+[ext_resource type="Resource" path="res://minigames/002_bubbles_and_jellyfishes/bubbles_minigame.tres" id="2_wea0d"]
+[ext_resource type="Script" path="res://minigames/minigame_catalog.gd" id="3_7uu0u"]
+
+[resource]
+script = ExtResource("3_7uu0u")
+minigames = Array[ExtResource("1_hl4hp")]([ExtResource("2_wea0d")])

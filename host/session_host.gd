@@ -7,12 +7,8 @@ signal readiness_changed(snapshot: Dictionary)
 signal readiness_launch_requested(minigame_id: StringName)
 signal readiness_canceled
 
-const BUBBLES_FOLDER := "res://minigames/002_bubbles_and_jellyfishes"
-const BUBBLES_SCENE_PATH := BUBBLES_FOLDER + "/bubbles_and_jellyfishes.tscn"
-const BUBBLES_MAX_PLAYERS := 10
-const MINIGAME_BUBBLES := &"bubbles"
-
 @export var active_presets: ActivePresets = preload("res://Tuning/Active Presets.tres")
+@export var minigame_catalog: MinigameCatalog = preload("res://minigames/catalog.tres")
 var settings: NetworkingTuning
 var network: ControllerNetworkConfig
 var running: bool = false
@@ -134,39 +130,32 @@ func players() -> Array[Dictionary]:
 
 
 func minigame_scene_path(minigame_id: StringName) -> String:
-	match minigame_id:
-		MINIGAME_BUBBLES:
-			return BUBBLES_SCENE_PATH
-	return ""
+	var minigame := minigame_catalog.find(minigame_id)
+
+	return minigame.scene_path if minigame != null else ""
 
 
 func minigame_availability(minigame_id: StringName, allow_one_player_debug := false) -> Dictionary:
-	var maximum_players := 0
-	match minigame_id:
-		MINIGAME_BUBBLES:
-			maximum_players = BUBBLES_MAX_PLAYERS
-		_:
-			return { "available": false, "reason": "Choose a supported minigame" }
+	var minigame := minigame_catalog.find(minigame_id)
+	if minigame == null:
+		return { "available": false, "reason": "Choose a supported minigame" }
+
 	var player_count := players().size()
 	if allow_one_player_debug:
 		if player_count != 1:
 			return { "available": false, "reason": "Requires exactly one registered player" }
 	elif player_count < 2:
 		return { "available": false, "reason": "At least 2 registered players are needed" }
-	if player_count > maximum_players:
-		return {
-			"available": false,
-			"reason": "%s supports up to %d players"
-			% [minigame_display_name(minigame_id), maximum_players],
-		}
+	if player_count > minigame.max_players:
+		var limit := [minigame.display_name, minigame.max_players]
+		return { "available": false, "reason": "%s supports up to %d players" % limit }
 	return { "available": true, "reason": "" }
 
 
 func minigame_display_name(minigame_id: StringName) -> String:
-	match minigame_id:
-		MINIGAME_BUBBLES:
-			return "Bubbles and Jellyfishes"
-	return "Minigame"
+	var minigame := minigame_catalog.find(minigame_id)
+
+	return minigame.display_name if minigame != null else "Minigame"
 
 
 func prepare_minigame_launch(
@@ -251,22 +240,6 @@ func clear_minigame_launch(minigame_id: StringName = &"") -> void:
 		or StringName(_pending_minigame_launch.get("minigame_id", &"")) == minigame_id
 	):
 		_pending_minigame_launch = { }
-
-
-func bubbles_availability(allow_one_player_debug := false) -> Dictionary:
-	return minigame_availability(MINIGAME_BUBBLES, allow_one_player_debug)
-
-
-func prepare_bubbles_launch(allow_one_player_debug := false) -> Dictionary:
-	return prepare_minigame_launch(MINIGAME_BUBBLES, allow_one_player_debug)
-
-
-func consume_bubbles_launch() -> Dictionary:
-	return consume_minigame_launch(MINIGAME_BUBBLES)
-
-
-func clear_bubbles_launch() -> void:
-	clear_minigame_launch(MINIGAME_BUBBLES)
 
 
 func send_players_to_lobby() -> void:

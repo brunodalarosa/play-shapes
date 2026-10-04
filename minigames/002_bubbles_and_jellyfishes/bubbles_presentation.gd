@@ -2,6 +2,8 @@ class_name BubblesPresentation
 extends Control
 ## Shared screen composition. All scores, phases and outcomes come from the controller.
 
+## The id this minigame has in the catalog.
+const MINIGAME_ID := &"bubbles"
 const WORLD_SIZE := Vector2(1920.0, 1080.0)
 const NPC_ARENA_BOUNDS := Rect2(120.0, 160.0, 1680.0, 780.0)
 const CHARACTER_SCENE: PackedScene = preload("res://characters/squircle_v1_playback.tscn")
@@ -64,7 +66,7 @@ func _ready() -> void:
 	var session_host := get_node_or_null("/root/SessionHost")
 	if session_host == null:
 		return
-	var launch: Dictionary = session_host.consume_bubbles_launch()
+	var launch: Dictionary = session_host.consume_minigame_launch(MINIGAME_ID)
 	if launch.is_empty():
 		return
 	controller.return_to_lobby_requested.connect(_on_return_to_lobby_requested)

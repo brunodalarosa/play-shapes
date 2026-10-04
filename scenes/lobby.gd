@@ -8,8 +8,6 @@ extends Control
 @onready var start_help: Label = %StartHelp
 @onready var world: LobbyPlaygroundWorld = $World
 
-const MINIGAMES := [{ "id": &"bubbles", "name": "Bubbles and Jellyfishes" }]
-
 
 func _ready() -> void:
 	SessionHost.set_accepting_new_players(true)
@@ -18,8 +16,8 @@ func _ready() -> void:
 	world.reconcile(SessionHost.players())
 	_style_controls()
 	address_picker.item_selected.connect(_select_address)
-	for minigame: Dictionary in MINIGAMES:
-		minigame_selector.add_item(String(minigame.name))
+	for minigame: MinigameDefinition in SessionHost.minigame_catalog.minigames:
+		minigame_selector.add_item(minigame.display_name)
 		minigame_selector.set_item_metadata(minigame_selector.item_count - 1, minigame.id)
 	minigame_selector.item_selected.connect(_on_minigame_selected)
 	%Refresh.pressed.connect(_refresh_addresses)
@@ -78,7 +76,7 @@ func _on_minigame_selected(_index: int) -> void:
 
 func _selected_minigame_id() -> StringName:
 	if minigame_selector.selected < 0:
-		return SessionHost.MINIGAME_BUBBLES
+		return &""
 	return StringName(minigame_selector.get_item_metadata(minigame_selector.selected))
 
 
