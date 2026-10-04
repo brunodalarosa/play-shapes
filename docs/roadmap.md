@@ -22,28 +22,21 @@ existing ones. The game keeps playing the same while the code is reshaped; see
   ([branching.md](branching.md)).
 - No ticket numbers anywhere, with no exemptions: the names inside the Squircle Blender
   source were the last.
-
-## Next
-
-Clean up the tests:
-
-- one shared test base in place of the 24 copies of the `_check` helper;
-- fix the tests that leave objects behind at exit, and delete the check command's list of
-  ignored shutdown lines in the same change;
-- give tests proper ways into the code, and turn the `private-access` lint rule back on
-  for `tests/`;
-- free ports in place of the hard-coded ones;
-- one shared phone helper for the browser tests;
-- make the check fail at once on a script error, instead of waiting out its timeout.
+- One shared base for the test scripts
+  ([0023](decisions/0023-shared-test-base.md)). A script error, or anything a test still
+  holds at exit, fails the check at once.
 
 ## The refactor, in order
+
+This is what comes next.
 
 1. One folder per minigame, and a minigame catalog the other lists derive from
    ([0015](decisions/0015-one-folder-per-minigame.md)).
 2. Bundle the phone client into one file, then split its largest module
    ([0016](decisions/0016-bundle-the-phone-client.md)).
 3. The input pipeline: one message for gameplay input and reusable controls
-   ([0017](decisions/0017-one-input-message.md)). The late-input bugs below belong here.
+   ([0017](decisions/0017-one-input-message.md)). The late-input bugs below belong here,
+   and so does one shared phone helper for the browser tests, which this step rewrites.
 4. A shared round lifecycle and a stage kit.
 5. A shared character component, and screens rebuilt with containers and a theme
    ([0018](decisions/0018-ui-with-containers.md)).
@@ -52,7 +45,12 @@ Clean up the tests:
    ([0019](decisions/0019-typed-classes.md)).
 7. Tools for faster iteration: a control route for quick tests
    ([0004](decisions/0004-end-to-end-test.md)), a short-round tuning preset, screenshot
-   comparison against references, and bot phones that speak the protocol.
+   comparison against references, bot phones that speak the protocol, and free ports in
+   place of the hard-coded ones in the tests.
+
+Each step gives the tests of the code it reshapes proper ways into that code. When the last
+one has, the `private-access` lint rule is turned back on for `tests/`
+([0007](decisions/0007-lint-rules-and-exceptions.md)).
 
 After the input pipeline: bots that fill a game with players
 ([0008](decisions/0008-bots.md)).

@@ -1,13 +1,9 @@
-extends SceneTree
+extends TestScript
 
 const TUNING_ROOT := "res://Tuning"
 const BubblesTuningScript := preload("res://Tuning/Minigames/bubbles_tuning.gd")
 const NetworkingTuningScript := preload("res://Tuning/Shared/networking_tuning.gd")
 const ActivePresetsScript := preload("res://Tuning/active_presets.gd")
-
-
-func _initialize() -> void:
-	_run.call_deferred()
 
 
 func _run() -> void:
@@ -76,7 +72,7 @@ func _run() -> void:
 		return
 
 	var preset_paths := _find_presets(TUNING_ROOT)
-	if not _check(
+	if not check(
 		preset_paths.has("res://Tuning/Active Presets.tres")
 		and preset_paths.has("res://Tuning/Minigames/Bubbles/Default.tres")
 		and preset_paths.has("res://Tuning/Shared/Networking/Default.tres"),
@@ -85,20 +81,18 @@ func _run() -> void:
 		return
 	for path: String in preset_paths:
 		var preset: Resource = load(path)
-		if not _check(preset != null, "Preset loads: %s" % path):
+		if not check(preset != null, "Preset loads: %s" % path):
 			return
-		if not _check(
-			preset.has_method("validation_errors"),
-			"Preset exposes validation: %s" % path,
-		):
+		var validates := preset.has_method("validation_errors")
+		if not check(validates, "Preset exposes validation: %s" % path):
 			return
 		var errors: PackedStringArray = preset.validation_errors()
-		if not _check(errors.is_empty(), "Preset is valid: %s — %s" % [path, "; ".join(errors)]):
+		if not check(errors.is_empty(), "Preset is valid: %s — %s" % [path, "; ".join(errors)]):
 			return
 
 	var networking: Resource = NetworkingTuningScript.new()
 	var default_networking: Resource = load("res://Tuning/Shared/Networking/Default.tres")
-	if not _check(
+	if not check(
 		networking.max_players == 10 and default_networking.max_players == 10
 		and default_networking.max_connections == 32
 		and default_networking.reconnect_grace_seconds == 60.0,
@@ -106,11 +100,11 @@ func _run() -> void:
 	):
 		return
 	networking.max_players = 20
-	if not _check(networking.max_players == 10, "Designer tuning clamps capacity at ten"):
+	if not check(networking.max_players == 10, "Designer tuning clamps capacity at ten"):
 		return
 	networking.http_port = 1
 	networking.max_connections = 999
-	if not _check(
+	if not check(
 		networking.http_port == 1024 and networking.max_connections == 128,
 		"Networking individual values clamp to safe ranges",
 	):
@@ -120,7 +114,7 @@ func _run() -> void:
 	networking.max_connections = 2
 	networking.max_players = 3
 	var network_errors: PackedStringArray = networking.validation_errors()
-	if not _check(
+	if not check(
 		network_errors.size() == 2 and network_errors[0].contains("must be different")
 		and network_errors[1].contains("cannot exceed"),
 		"Networking invalid combinations report actionable messages",
@@ -129,13 +123,13 @@ func _run() -> void:
 	var bubbles: Resource = BubblesTuningScript.new()
 	bubbles.starting_radius = -1.0
 	var clamped: bool = bubbles.starting_radius == 16.0
-	if not _check(clamped, "Bubbles individual values clamp to safe ranges"):
+	if not check(clamped, "Bubbles individual values clamp to safe ranges"):
 		return
 	bubbles.starting_radius = 100.0
 	bubbles.max_radius = 32.0
 	bubbles.starting_jellyfish = 100
 	bubbles.max_free_jellyfish = 1
-	if not _check(
+	if not check(
 		bubbles.validation_errors().size() == 2,
 		"Bubbles invalid radius and population combinations are rejected",
 	):
@@ -147,32 +141,30 @@ func _run() -> void:
 	bubbles.jellyfish_high_spawn_rate = 1.0
 	bubbles.pufferfish_start_spawn_rate = 0.8
 	bubbles.pufferfish_max_spawn_rate = 0.2
-	if not _check(
+	if not check(
 		bubbles.validation_errors().size() == 2,
 		"Bubbles invalid spawn-rate ordering is rejected",
 	):
 		return
 	bubbles = BubblesTuningScript.new()
 	bubbles.water_drag = INF
-	if not _check(
+	if not check(
 		bubbles.water_drag == 8.0 and bubbles.validation_errors().is_empty(),
 		"Bubbles clamps non-finite positive input to a safe bound",
 	):
 		return
 
 	var active: Resource = ActivePresetsScript.new()
-	if not _check(
+	if not check(
 		active.validation_errors().size() == 2,
 		"Active selector rejects missing preset references",
 	):
 		return
-	print("Tuning preset checks passed (%d committed assets)" % preset_paths.size())
-	quit(0)
 
 
 func _check_tooltip_contract(path: String, property_names: Array[String]) -> bool:
 	var source := FileAccess.get_file_as_string(path)
-	if not _check(
+	if not check(
 		not source.contains("@export_category"),
 		"Tuning groups must not replace the script class used for Inspector documentation: %s"
 		% path,
@@ -191,19 +183,19 @@ func _check_tooltip_contract(path: String, property_names: Array[String]) -> boo
 			):
 				index = candidate
 				break
-		if not _check(index >= 1, "Tunable declaration exists: %s" % property_name):
+		if not check(index >= 1, "Tunable declaration exists: %s" % property_name):
 			return false
 
 		var exported := (lines[index] as String).begins_with("@export")
 		while index > 0 and _is_property_annotation(lines[index - 1]):
 			exported = true
 			index -= 1
-		if not _check(exported, "Export annotation precedes %s" % property_name):
+		if not check(exported, "Export annotation precedes %s" % property_name):
 			return false
 
 		# Godot attaches the tooltip only when the documentation comment comes directly
 		# before the property and its annotations; a group annotation in between detaches it.
-		if not _check(
+		if not check(
 			index > 0 and (lines[index - 1] as String).begins_with("## "),
 			"Tooltip documentation immediately precedes the annotation for %s" % property_name,
 		):
@@ -233,10 +225,3 @@ func _find_presets(path: String) -> PackedStringArray:
 		result.append_array(_find_presets(path.path_join(directory_name)))
 	result.sort()
 	return result
-
-
-func _check(condition: bool, description: String) -> bool:
-	if not condition:
-		push_error(description)
-		quit(1)
-	return condition

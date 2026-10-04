@@ -27,7 +27,7 @@ before(async () => {
       process.stderr.on("data", (data) => (output += data));
       process.on("error", reject);
       process.on("exit", (code) =>
-        code === 0 && output.includes("Controller TLS credential checks passed")
+        code === 0 && output.includes("controller_tls_test: 0 failures")
           ? resolve()
           : reject(new Error(output)),
       );

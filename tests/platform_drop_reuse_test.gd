@@ -1,8 +1,7 @@
-extends SceneTree
+extends TestScript
 ## Real physics on generic bodies: no LobbySquircle, registry or UI required.
 
 const FIXTURE := preload("res://tests/fixtures/platform_reuse.tscn")
-var _failures := 0
 var _fixture: Node2D
 var _body: CharacterBody2D
 var _other: CharacterBody2D
@@ -10,10 +9,6 @@ var _motor: PlatformMotor
 var _top: PlatformSurface
 var _lower: PlatformSurface
 var _ground: PlatformSurface
-
-
-func _initialize() -> void:
-	_run.call_deferred()
 
 
 func _run() -> void:
@@ -26,104 +21,104 @@ func _run() -> void:
 	_lower = _fixture.get_node("OpenLower")
 	_ground = _fixture.get_node("ClosedGround")
 	await _frames(5)
-	_check(_motor.supporting_surface() == _top, "Generic motor resolves its actual Open support")
+	check(_motor.supporting_surface() == _top, "Generic motor resolves its actual Open support")
 	_down()
-	_check(_motor.presentation_action() == "crouch", "Grounded down selects crouch")
+	check(_motor.presentation_action() == "crouch", "Grounded down selects crouch")
 	var shape: CollisionShape2D = _body.get_node("CollisionShape2D")
-	_check(
+	check(
 		(shape.shape as CapsuleShape2D).height == 96.0 and shape.position == Vector2(0, -48),
 		"Crouch preserves full upright hitbox and feet",
 	)
-	_check(
+	check(
 		_motor.request_fall() and _body.get_collision_exceptions() == [_top]
 		and _body.floor_snap_length == 0.0 and _body.collision_mask == 384,
 		"Drop excludes only support and temporarily suspends snap",
 	)
-	_check(
+	check(
 		not _motor.request_fall() and not _motor.request_jump(),
 		"Repeated/competing attempts cannot queue during drop",
 	)
 	await _frames(42)
-	_check(
+	check(
 		_motor.supporting_surface() == _lower and absf(_body.position.y - 390.0) < 1.0,
 		"Drop lands on the next Open platform below",
 	)
-	_check(
+	check(
 		_other.is_on_floor() and absf(_other.position.y - 240.0) < 1.0
 		and _other.get_collision_exceptions().is_empty() and _top.collision_layer == 128,
 		"Other player and shared support remain untouched",
 	)
-	_check(
+	check(
 		_body.get_collision_exceptions().is_empty() and _body.floor_snap_length == 8.0,
 		"Full clearance restores support and floor snap",
 	)
 	_down()
-	_check(not _motor.request_fall(), "Held-down repeated release cannot bypass the next floor")
+	check(not _motor.request_fall(), "Held-down repeated release cannot bypass the next floor")
 	_motor.set_input(Vector2.ZERO, "neutral", Time.get_ticks_msec())
 	_down()
-	_check(_motor.request_fall(), "Fresh downward gesture allows a deliberate second descent")
+	check(_motor.request_fall(), "Fresh downward gesture allows a deliberate second descent")
 	await _frames(42)
-	_check(_motor.supporting_surface() == _ground, "Second deliberate drop lands on Closed ground")
+	check(_motor.supporting_surface() == _ground, "Second deliberate drop lands on Closed ground")
 	_down()
-	_check(
+	check(
 		not _motor.request_fall() and _body.velocity.y >= 0.0,
 		"Closed rejects FALL without jumping",
 	)
 	await _frames(4)
-	_check(
+	check(
 		_body.is_on_floor() and absf(_body.position.y - 540.0) < 1.0,
 		"Closed remains dependable after rejected attempt",
 	)
 	_top.drop_rule = PlatformSurface.DropRule.CLOSED
 	await _place(Vector2(180, 240))
 	_down()
-	_check(
+	check(
 		not _motor.request_fall(),
 		"Changing one authored Open to Closed changes only its drop rule",
 	)
-	_check(
+	check(
 		(_top.get_node("LandingTop") as CollisionShape2D).one_way_collision,
 		"Closed still preserves its one-way underside",
 	)
 	_top.drop_rule = PlatformSurface.DropRule.OPEN
 	_motor.set_input(Vector2(0, 1), "look_up", Time.get_ticks_msec())
-	_check(_motor.presentation_action() == "look_up", "Grounded up selects look-up")
+	check(_motor.presentation_action() == "look_up", "Grounded up selects look-up")
 	_motor.set_input(Vector2(0.7, 0.7), "move", Time.get_ticks_msec())
-	_check(
+	check(
 		_motor.presentation_action() not in ["look_up", "crouch"],
 		"Diagonal returns to ordinary locomotion",
 	)
 	_down()
 	_motor.expire_input(Time.get_ticks_msec() + 351)
-	_check(
+	check(
 		_motor.axes == Vector2.ZERO and _motor.stance == "neutral" and not _motor._jump_queued,
 		"Lost release expires both axes and stance",
 	)
 	await _frames(2)
 	_down()
-	_check(_motor.request_fall(), "Drop begins for disconnect cleanup")
+	check(_motor.request_fall(), "Drop begins for disconnect cleanup")
 	_motor.set_enabled(false)
-	_check(
+	check(
 		_body.get_collision_exceptions().is_empty() and _body.floor_snap_length == 8.0
 		and _motor.axes == Vector2.ZERO and _motor.stance == "neutral",
 		"Disconnect clears exclusion, snap, stance and actions",
 	)
 	_motor.set_enabled(true)
 	_down()
-	_check(not _motor.request_fall(), "Resume cannot reuse cached floor contacts before physics")
+	check(not _motor.request_fall(), "Resume cannot reuse cached floor contacts before physics")
 	await _frames(2)
 	_down()
-	_check(_motor.request_fall(), "Fresh post-resume physics allows control")
+	check(_motor.request_fall(), "Fresh post-resume physics allows control")
 	_motor.clear_input()
-	_check(
+	check(
 		_body.get_collision_exceptions().is_empty(),
 		"Active-context exit restores exclusion immediately",
 	)
 	await _place(Vector2(180, 190))
 	_down()
-	_check(not _motor.request_fall(), "Airborne fall attempt is discarded")
+	check(not _motor.request_fall(), "Airborne fall attempt is discarded")
 	await _frames(30)
-	_check(
+	check(
 		_motor.supporting_surface() == _top and _body.get_collision_exceptions().is_empty(),
 		"Rejected airborne FALL never becomes a later drop",
 	)
@@ -131,9 +126,9 @@ func _run() -> void:
 	_lower.position.y = 290
 	await _frames(2)
 	_down()
-	_check(_motor.request_fall(), "Drop into close stacked surface begins")
+	check(_motor.request_fall(), "Drop into close stacked surface begins")
 	await _frames(24)
-	_check(
+	check(
 		_motor.supporting_surface() == _lower and _body.get_collision_exceptions().is_empty(),
 		"Close lower contact restores upper while keeping the lower landing",
 	)
@@ -142,7 +137,7 @@ func _run() -> void:
 	await _place(Vector2(_other.position.x, _other.position.y - 96))
 	await _frames(5)
 	_down()
-	_check(
+	check(
 		_body.is_on_floor() and _motor.supporting_surface() == null and not _motor.request_fall(),
 		"Standing on another character rejects FALL",
 	)
@@ -155,15 +150,15 @@ func _run() -> void:
 		if _body.velocity.y < 0:
 			bounced = true
 			break
-	_check(bounced, "Falling onto another character retains bounce")
+	check(bounced, "Falling onto another character retains bounce")
 	await _place(Vector2(180, 240))
 	_motor.drop_timeout_seconds = 0.1
 	_motor.drop_speed = 1.0
 	_motor.gravity = 0.0
 	_down()
-	_check(_motor.request_fall(), "Slow clearance timeout begins")
+	check(_motor.request_fall(), "Slow clearance timeout begins")
 	await _frames(8)
-	_check(
+	check(
 		_body.get_collision_exceptions().is_empty() and _body.floor_snap_length == 8.0,
 		"Timeout restores collision even without clearance",
 	)
@@ -172,40 +167,40 @@ func _run() -> void:
 	_motor.drop_timeout_seconds = 0.65
 	await _place(Vector2(559, 240))
 	_down()
-	_check(_motor.request_fall(), "Edge drop begins")
+	check(_motor.request_fall(), "Edge drop begins")
 	_body.position.x = 600
 	await _frames(2)
-	_check(
+	check(
 		_body.get_collision_exceptions().is_empty(),
 		"Horizontal clearance at edge restores exclusion",
 	)
 	await _place(Vector2(180, 240))
 	_down()
-	_check(_motor.request_fall(), "Fall reset cleanup begins")
+	check(_motor.request_fall(), "Fall reset cleanup begins")
 	_body.position.y = _motor.fall_reset_y + 10
 	await _frames(2)
-	_check(
+	check(
 		_body.get_collision_exceptions().is_empty() and _motor.axes == Vector2.ZERO,
 		"Fall reset clears temporary contact and intent",
 	)
 	await _place(Vector2(180, 240))
 	_motor.set_input(Vector2.ZERO, "neutral", Time.get_ticks_msec())
-	_check(_motor.request_jump(), "Grounded jump accepted before lost-input timeout")
+	check(_motor.request_jump(), "Grounded jump accepted before lost-input timeout")
 	_motor.expire_input(Time.get_ticks_msec() + 351)
 	await _frames(2)
-	_check(_body.velocity.y >= 0 and _body.is_on_floor(), "Expired jump never executes later")
+	check(_body.velocity.y >= 0 and _body.is_on_floor(), "Expired jump never executes later")
 	_down()
-	_check(_motor.request_fall(), "Input lease cleanup begins")
+	check(_motor.request_fall(), "Input lease cleanup begins")
 	_motor.expire_input(Time.get_ticks_msec() + 351)
-	_check(
+	check(
 		_body.get_collision_exceptions().is_empty() and _body.floor_snap_length == 8.0,
 		"Input expiry also restores transient drop contact",
 	)
 	await _place(Vector2(180, 240))
 	_down()
-	_check(_motor.request_fall(), "Removal cleanup begins")
+	check(_motor.request_fall(), "Removal cleanup begins")
 	_body.remove_child(_motor)
-	_check(
+	check(
 		_body.get_collision_exceptions().is_empty() and _body.floor_snap_length == 8.0,
 		"Removing component restores the surviving body",
 	)
@@ -213,19 +208,17 @@ func _run() -> void:
 	# A freed support must not leave an exclusion or a dangling access in another motor.
 	var other_motor: PlatformMotor = _other.get_node("PlatformMotor")
 	other_motor.set_input(Vector2(0, -1), "crouch", Time.get_ticks_msec())
-	_check(other_motor.request_fall(), "Support removal cleanup begins")
+	check(other_motor.request_fall(), "Support removal cleanup begins")
 	_top.queue_free()
 	await process_frame
 	await physics_frame
 	await process_frame
-	_check(
+	check(
 		_other.get_collision_exceptions().is_empty() and _other.floor_snap_length == 8.0,
 		"Freeing active support restores contact without dangling accesses",
 	)
 	_fixture.queue_free()
 	await process_frame
-	print("Platform drop/reuse checks: %d failures" % _failures)
-	quit(0 if _failures == 0 else 1)
 
 
 func _down() -> void:
@@ -245,9 +238,3 @@ func _frames(count: int) -> void:
 		_motor.set_input(_motor.axes, _motor.stance, Time.get_ticks_msec())
 		await physics_frame
 		await process_frame
-
-
-func _check(condition: bool, description: String) -> void:
-	if not condition:
-		_failures += 1
-		push_error(description)

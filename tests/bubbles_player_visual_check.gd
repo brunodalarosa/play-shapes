@@ -1,4 +1,4 @@
-extends SceneTree
+extends TestScript
 ## Renderer captures of isolated player-bubble components; not game-feel approval.
 
 const Controller = preload("res://minigames/bubbles_round_controller.gd")
@@ -6,11 +6,7 @@ const Arena = preload("res://minigames/bubbles_player_arena.gd")
 const OUTPUT := "res://test-results/bubbles-player"
 
 
-func _initialize() -> void:
-	_capture.call_deferred()
-
-
-func _capture() -> void:
+func _run() -> void:
 	root.size = Vector2i(1280, 720)
 	root.content_scale_size = Vector2i(1280, 720)
 	var backdrop := ColorRect.new()
@@ -53,7 +49,6 @@ func _capture() -> void:
 	if not _save("ten-players"):
 		return
 	print("Saved player-bubble renderer captures")
-	quit(0)
 
 
 func _stage(count: int) -> Dictionary:
@@ -101,11 +96,9 @@ func _save(label: String) -> bool:
 	var image := root.get_viewport().get_texture().get_image()
 	if image.is_empty():
 		push_error("Renderer returned an empty image")
-		quit(1)
 		return false
 	var code := image.save_png(OUTPUT.path_join("%s.png" % label))
 	if code != OK:
 		push_error("Could not save %s: %s" % [label, error_string(code)])
-		quit(1)
 		return false
 	return true

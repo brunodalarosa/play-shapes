@@ -59,3 +59,4 @@ What was decided.
 | [0020](0020-roadmap-in-the-repository.md) | The plan lives in the repository |
 | [0021](0021-no-cloud-ci.md) | No cloud CI for now; verification is local |
 | [0022](0022-git-flow.md) | Git Flow: `main` holds releases, `develop` holds the work |
+| [0023](0023-shared-test-base.md) | Test scripts share one base of our own, and any logged error fails them |

@@ -1,9 +1,5 @@
-extends SceneTree
+extends TestScript
 ## Rendered desktop evidence using explicitly synthetic sensor input.
-
-
-func _initialize() -> void:
-	_run.call_deferred()
 
 
 func _run() -> void:
@@ -12,13 +8,14 @@ func _run() -> void:
 	host.settings = NetworkingTuning.new()
 	host.settings.http_port = 18580
 	host.settings.websocket_port = 18581
-	assert(host.start(false))
+	if not check(host.start(false), "The host starts on the capture ports"):
+		return
 	var player: Dictionary = host.player_registry.join_player(900, "Preview phone", true)
-	assert(player.accepted)
+	check(player.accepted, "The registry accepts the preview phone")
 	var lab: Control = load("res://debug/motion_lab/motion_lab.tscn").instantiate()
 	root.add_child(lab)
 	await process_frame
-	assert(lab.target_player_id == player.player.player_id)
+	check(lab.target_player_id == player.player.player_id, "The lab targets the preview phone")
 	var channel: MotionInputChannel = host.websocket.motion_channel
 	channel.diagnostics = {
 		"secure_context": true,
@@ -54,15 +51,15 @@ func _run() -> void:
 		await process_frame
 	await RenderingServer.frame_post_draw
 	DirAccess.make_dir_recursive_absolute("res://test-results/motion-lab")
-	assert(
+	check(
 		root
 		.get_texture()
 		.get_image()
 		.save_png("res://test-results/motion-lab/desktop-synthetic.png")
-		== OK
+		== OK,
+		"The capture is saved",
 	)
 	print("Synthetic motion lab desktop capture saved")
 	lab.queue_free()
 	await process_frame
 	host.stop()
-	quit(0)

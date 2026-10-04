@@ -1,4 +1,4 @@
-extends SceneTree
+extends TestScript
 ## Captures creature size, warning, and breathing states for owner review.
 
 const Controller = preload("res://minigames/bubbles_round_controller.gd")
@@ -7,11 +7,7 @@ const CreatureArena = preload("res://minigames/bubbles_creature_arena.gd")
 const OUTPUT := "res://test-results/bubbles-telegraphs"
 
 
-func _initialize() -> void:
-	_capture.call_deferred()
-
-
-func _capture() -> void:
+func _run() -> void:
 	root.size = Vector2i(1280, 720)
 	root.content_scale_size = Vector2i(1280, 720)
 	var backdrop := ColorRect.new()
@@ -73,7 +69,6 @@ func _capture() -> void:
 	var puffer_id: int = creatures.schedule_puffer_path(Vector2(-60, 520), Vector2(1340, 520), now)
 	if small_jelly_id < 0 or large_jelly_id < 0 or puffer_id < 0:
 		push_error("Could not create Bubbles telegraph visual fixtures")
-		quit(1)
 		return
 	await _frames(36)
 	var debug_puffer := creatures.get_pufferfish(puffer_id)
@@ -122,7 +117,6 @@ func _capture() -> void:
 	var no_warning_puffer := creatures.get_pufferfish(no_warning_id)
 	if no_warning_puffer == null or no_warning_puffer._warning_particles.emitting:
 		push_error("Disabled warning unexpectedly created particles")
-		quit(1)
 		return
 	for tick: int in 10:
 		creatures.get_pufferfish(no_warning_id).simulate_step(0.05, now + 2200 + tick * 50)
@@ -130,7 +124,6 @@ func _capture() -> void:
 	if not _save("pufferfish-warning-off"):
 		return
 	print("Saved Bubbles creature telegraph review captures")
-	quit(0)
 
 
 func _frames(count: int) -> void:
@@ -142,6 +135,5 @@ func _save(label: String) -> bool:
 	var image := root.get_viewport().get_texture().get_image()
 	if image.is_empty() or image.save_png(OUTPUT.path_join("%s.png" % label)) != OK:
 		push_error("Could not save %s" % label)
-		quit(1)
 		return false
 	return true

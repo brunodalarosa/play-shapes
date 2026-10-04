@@ -1,4 +1,4 @@
-extends SceneTree
+extends TestScript
 ## Isolated creature and bubble renderer captures for art/feedback review.
 
 const Controller = preload("res://minigames/bubbles_round_controller.gd")
@@ -7,11 +7,7 @@ const CreatureArena = preload("res://minigames/bubbles_creature_arena.gd")
 const OUTPUT := "res://test-results/bubbles-creatures"
 
 
-func _initialize() -> void:
-	_capture.call_deferred()
-
-
-func _capture() -> void:
+func _run() -> void:
 	root.size = Vector2i(1280, 720)
 	root.content_scale_size = Vector2i(1280, 720)
 	var backdrop := ColorRect.new()
@@ -79,7 +75,6 @@ func _capture() -> void:
 	if not _save("released-blink"):
 		return
 	print("Saved Bubbles creature renderer captures")
-	quit(0)
 
 
 func _frames(count: int) -> void:
@@ -91,6 +86,5 @@ func _save(label: String) -> bool:
 	var image := root.get_viewport().get_texture().get_image()
 	if image.is_empty() or image.save_png(OUTPUT.path_join("%s.png" % label)) != OK:
 		push_error("Could not save %s" % label)
-		quit(1)
 		return false
 	return true

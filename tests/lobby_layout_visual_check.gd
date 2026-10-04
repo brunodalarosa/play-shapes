@@ -1,14 +1,10 @@
-extends SceneTree
+extends TestScript
 ## Saves the Playground lobby before and after players unlock minigame launch.
 
 const OUTPUT_DIR := "res://test-results/lobby-layout"
 
 
-func _initialize() -> void:
-	_capture.call_deferred()
-
-
-func _capture() -> void:
+func _run() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUTPUT_DIR))
 	var lobby := load("res://scenes/lobby.tscn").instantiate() as Control
 	root.add_child(lobby)
@@ -24,7 +20,7 @@ func _capture() -> void:
 			true,
 			2000 + index,
 		)
-		assert(result.accepted)
+		check(result.accepted, "The registry accepts the preview player")
 	await _wait_for_render()
 	_save_capture("%s/ready-%s.png" % [OUTPUT_DIR, size_label])
 	var character := lobby.get_node("World/CharactersFrontOfPanels").get_child(0) as LobbySquircle
@@ -34,7 +30,6 @@ func _capture() -> void:
 	_save_capture("%s/character-over-qr-%s.png" % [OUTPUT_DIR, size_label])
 	var saved := "[GODOT-RUNTIME] Playground lobby captures saved at %s" % size_label
 	print(saved + " for empty, ready, and QR overlap states")
-	quit(0)
 
 
 func _wait_for_render() -> void:
@@ -45,4 +40,4 @@ func _wait_for_render() -> void:
 
 func _save_capture(path: String) -> void:
 	var image := root.get_texture().get_image()
-	assert(image.save_png(path) == OK)
+	check(image.save_png(path) == OK, "The capture is saved")

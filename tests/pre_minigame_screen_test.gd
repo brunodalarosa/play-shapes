@@ -1,10 +1,6 @@
-extends SceneTree
+extends TestScript
 
 const SCENE: PackedScene = preload("res://scenes/pre_minigame_screen.tscn")
-
-
-func _initialize() -> void:
-	_run.call_deferred()
 
 
 func _run() -> void:
@@ -32,6 +28,4 @@ func _run() -> void:
 		and screen._tray.get_child(0).get_child(0).text == "Ready!"
 		and screen._tray.get_child(1).get_child(0).text == ""
 	)
-	if not okay:
-		push_error("Reusable screen content, preview, or ordered tray failed")
-	quit(0 if okay else 1)
+	check(okay, "Reusable screen content, preview, or ordered tray failed")

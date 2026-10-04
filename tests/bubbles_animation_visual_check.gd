@@ -1,4 +1,4 @@
-extends SceneTree
+extends TestScript
 ## Representative isolated renders for Bubbles animation review.
 
 const Controller = preload("res://minigames/bubbles_round_controller.gd")
@@ -7,11 +7,7 @@ const Protocol = preload("res://host/bubbles_protocol.gd")
 const OUTPUT := "res://test-results/bubbles-animation"
 
 
-func _initialize() -> void:
-	_capture.call_deferred()
-
-
-func _capture() -> void:
+func _run() -> void:
 	root.size = Vector2i(1280, 720)
 	root.content_scale_size = Vector2i(1280, 720)
 	var backdrop := ColorRect.new()
@@ -110,10 +106,8 @@ func _capture() -> void:
 	await _save("reformed")
 	if bubble == null:
 		push_error("Missing bubble")
-		quit(1)
 		return
 	print("Saved Bubbles isolated animation captures")
-	quit(0)
 
 
 func _circle() -> Array:
@@ -130,4 +124,3 @@ func _save(label: String) -> void:
 	var image := root.get_viewport().get_texture().get_image()
 	if image.is_empty() or image.save_png(OUTPUT.path_join("%s.png" % label)) != OK:
 		push_error("Could not save %s" % label)
-		quit(1)
