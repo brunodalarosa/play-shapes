@@ -70,6 +70,22 @@ helpers in `tests/`. Its phone code is in the folder of the same name under `web
 its browser tests in the one under `web/tests/`. Art sources and runtime assets stay under
 `art/` and `assets/runtime/`.
 
+The shared code learns about a minigame from the catalog, `minigames/catalog.tres`
+([decision 0024](decisions/0024-minigame-catalog.md)):
+
+- The catalog lists one `MinigameDefinition` per minigame: its id, its name, the path of its
+  scene, its largest number of players, the path of its ready-screen content, and whether the
+  debug menu offers a one-player round.
+- `SessionHost` owns the catalog. The lobby fills its picker from it in the catalog's order,
+  the host takes the scene, the name and the player limit from it, the ready screen loads its
+  content through it, and the debug menu derives its one-player scenarios from it.
+- `tests/minigame_catalog_test.gd` checks that every definition names things that exist.
+
+To add a minigame: make its folder, save a `MinigameDefinition` in it, and add that
+definition to the catalog. Three places still name each minigame by hand: its slot in
+`Tuning/Active Presets.tres`, the phone asset routes in `host/http_service.gd`, and the
+export policy's list of required paths.
+
 Every file named in this section is in `minigames/002_bubbles_and_jellyfishes/`. The gameplay
 shared-screen scene is `bubbles_and_jellyfishes.tscn`.
 

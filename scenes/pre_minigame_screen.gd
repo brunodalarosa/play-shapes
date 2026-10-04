@@ -3,11 +3,6 @@ extends Control
 ## One tabletop composition for every minigame content resource.
 
 const CHARACTER: PackedScene = preload("res://characters/squircle_v1_playback.tscn")
-const CONTENT: Dictionary = {
-	&"bubbles": preload(
-		"res://minigames/002_bubbles_and_jellyfishes/bubbles_pre_minigame_content.tres"
-	),
-}
 
 var _content: PreMinigameContent
 var _preview: TextureRect
@@ -57,7 +52,7 @@ func _on_canceled() -> void:
 
 
 func configure(minigame_id: StringName, snapshot: Dictionary) -> void:
-	_content = CONTENT.get(minigame_id)
+	_content = _content_for(minigame_id)
 	if _content == null:
 		return
 	_title.text = _content.title
@@ -66,6 +61,19 @@ func configure(minigame_id: StringName, snapshot: Dictionary) -> void:
 	_win.text = _content.win_condition
 	_hints.text = _content.hints
 	set_snapshot(snapshot)
+
+
+func _content_for(minigame_id: StringName) -> PreMinigameContent:
+	# Looked up in the tree, not by its global name: a script that preloads this scene is
+	# compiled before Godot knows the autoloads by name.
+	var host := get_node_or_null("/root/SessionHost")
+	if host == null:
+		return null
+
+	var catalog: MinigameCatalog = host.minigame_catalog
+	var minigame := catalog.find(minigame_id)
+
+	return minigame.load_pre_minigame_content() if minigame != null else null
 
 
 func set_snapshot(snapshot: Dictionary) -> void:
