@@ -38,6 +38,16 @@ removes it. The evidence labels are defined in
 - `[HUMAN-PLAY]` The owner's approval of the animation timing and feel, and of the poses.
 - `[PHYSICAL-PHONE]` How the stances read on a real phone and from the couch.
 
+## Squircle source and sheets
+
+The sheets were rendered again on another machine after the names inside the Blender source
+changed. A pixel comparison with the previous sheets found nothing a viewer should notice.
+
+- `[GODOT-RUNTIME]` A look at the Squircle in the lobby and in the F12 Animation Lab, in every
+  clip and both views.
+- The source opened in Blender by someone who edits it: the scene, the actions and the face
+  images are found under their new names. No evidence label covers Blender.
+
 ## Phone client
 
 Record the exact OS and browser versions for each row.

@@ -17,15 +17,6 @@ export function isProjectDocument(file) {
   return !file.startsWith("addons/") && !file.startsWith("game-design-documents/");
 }
 
-/**
- * True where a ticket number may stay for now: the Squircle art source stores scene and
- * action names that start with one, and its scripts and guide have to quote those names
- * until they are renamed in the Blender file itself.
- */
-export function mayNameTickets(file) {
-  return file.startsWith("art/squircle/");
-}
-
 /** Returns the 1-based numbers of the lines that contain a ticket number. */
 export function ticketLines(text) {
   return text.split(/\r?\n/).flatMap((line, index) => (TICKET.test(line) ? [index + 1] : []));

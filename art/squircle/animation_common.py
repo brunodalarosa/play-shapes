@@ -27,4 +27,4 @@ def activate_clip(scene, name):
 
 
 def action_name(name):
-    return ('PS080 | ' if CLIPS[name].get('playback') == 'held' else 'PS057 | ') + name.replace('_', ' ').title()
+    return 'Squircle | ' + name.replace('_', ' ').title()

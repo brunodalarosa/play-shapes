@@ -9,7 +9,6 @@ import {
   hasTicketName,
   isProjectDocument,
   localLinks,
-  mayNameTickets,
   paragraphs,
   ticketLines,
 } from "./doc_rules.mjs";
@@ -54,17 +53,15 @@ function main() {
   };
 
   for (const file of files) {
-    if (!mayNameTickets(file) && hasTicketName(file)) {
+    if (hasTicketName(file)) {
       findings.push(`${file}:1: ticket-id: The file name carries a ticket number`);
     }
 
     const text = readText(file);
     if (text === null) continue;
 
-    if (!mayNameTickets(file)) {
-      for (const line of ticketLines(text)) {
-        findings.push(`${file}:${line}: ticket-id: Name the thing, not the ticket it came from`);
-      }
+    for (const line of ticketLines(text)) {
+      findings.push(`${file}:${line}: ticket-id: Name the thing, not the ticket it came from`);
     }
     if (!isProjectDocument(file)) continue;
 

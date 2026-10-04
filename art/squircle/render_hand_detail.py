@@ -6,7 +6,7 @@ from mathutils import Vector
 HERE=Path(__file__).resolve().parent
 sys.path.insert(0,str(HERE))
 from animation_common import activate_clip
-scene=bpy.data.scenes['PS057 | Squircle Animation Studio']
+scene=bpy.data.scenes['Squircle Animation Studio']
 bpy.context.window.scene=scene
 hand=bpy.data.objects['Hand.R']
 for obj in scene.objects:

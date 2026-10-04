@@ -1,10 +1,10 @@
 {
   "schema": "play-shapes.squircle-source.v1",
   "source": "squircle-animated.blend",
-  "source_sha256": "97d13b850b7c02d5999b6ff653a5e477197c37009f45974b40c7d2e78bc251e0",
+  "source_sha256": "7764ba0c9ecfd4e28b4c59388742c172262a182e63fcad032bb98858c04d680a",
   "blender": "5.2.2 LTS",
   "engine": "Cycles",
-  "device": "GPU",
+  "device": "CPU",
   "resolution": [
     256,
     256

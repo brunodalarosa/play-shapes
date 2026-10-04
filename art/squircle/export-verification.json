@@ -3,7 +3,7 @@
   "metadata_identical": true,
   "fresh_reopen_export_files": 426,
   "byte_identical_png_files": 2,
-  "max_consumed_channel_difference_8bit": 1,
+  "max_consumed_channel_difference_8bit": 0,
   "max_unused_mask_rgb_difference_8bit": 0,
   "minimum_rendered_alpha_margin_px": 13,
   "straight_alpha_edge_evidence": {
