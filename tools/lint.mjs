@@ -9,6 +9,7 @@ import { formatterPath } from "./gdscript_formatter.mjs";
 import {
   LINE_LENGTH,
   gdscriptFiles,
+  isGodotTest,
   isUncoveredScript,
   mayExceedLineLength,
   repositoryFiles,
@@ -133,14 +134,13 @@ function main() {
   }
 
   const scripts = gdscriptFiles();
-  const isTest = (file) => file.startsWith("tests/");
   const results = [
     gdscript(
       linter,
-      scripts.filter((file) => !isTest(file)),
+      scripts.filter((file) => !isGodotTest(file)),
       [],
     ),
-    gdscript(linter, scripts.filter(isTest), RULES_OFF_IN_TESTS),
+    gdscript(linter, scripts.filter(isGodotTest), RULES_OFF_IN_TESTS),
     eslint(),
     uncoveredScripts(),
     longLines(),

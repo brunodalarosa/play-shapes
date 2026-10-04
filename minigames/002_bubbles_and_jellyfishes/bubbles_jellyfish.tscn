@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://nuhdfr3xe0rb"]
 
-[ext_resource type="Script" uid="uid://b2k5cybqhf10f" path="res://minigames/bubbles_jellyfish.gd" id="1"]
+[ext_resource type="Script" uid="uid://b2k5cybqhf10f" path="res://minigames/002_bubbles_and_jellyfishes/bubbles_jellyfish.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://drnmwax11y7ya" path="res://assets/runtime/minigames/bubbles_and_jellyfishes/jellyfish/jellyfish.png" id="2"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_jellyfish"]

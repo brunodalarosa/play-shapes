@@ -2,7 +2,9 @@ class_name BubblesJellyfish
 extends Area2D
 ## One free collectible. Host timestamps, not animation frames, decide collection.
 
-const WHITE_SHADER: Shader = preload("res://minigames/bubbles_white_blink.gdshader")
+const WHITE_SHADER: Shader = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_white_blink.gdshader"
+)
 const TURN_INTERVAL_MSEC := 1600
 const BLINK_INTERVAL_MSEC := 120
 

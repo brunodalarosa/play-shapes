@@ -1,9 +1,9 @@
 [gd_scene load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://minigames/bubbles_round_controller.gd" id="1"]
-[ext_resource type="Script" path="res://minigames/bubbles_player_arena.gd" id="2"]
-[ext_resource type="Script" path="res://minigames/bubbles_creature_arena.gd" id="3"]
-[ext_resource type="Script" path="res://minigames/bubbles_presentation.gd" id="4"]
+[ext_resource type="Script" path="res://minigames/002_bubbles_and_jellyfishes/bubbles_round_controller.gd" id="1"]
+[ext_resource type="Script" path="res://minigames/002_bubbles_and_jellyfishes/bubbles_player_arena.gd" id="2"]
+[ext_resource type="Script" path="res://minigames/002_bubbles_and_jellyfishes/bubbles_creature_arena.gd" id="3"]
+[ext_resource type="Script" path="res://minigames/002_bubbles_and_jellyfishes/bubbles_presentation.gd" id="4"]
 [ext_resource type="Texture2D" path="res://assets/runtime/minigames/bubbles_and_jellyfishes/environment/far_background.png" id="5"]
 [ext_resource type="Texture2D" path="res://assets/runtime/minigames/bubbles_and_jellyfishes/environment/midground.png" id="6"]
 [ext_resource type="Texture2D" path="res://assets/runtime/minigames/bubbles_and_jellyfishes/environment/foreground.png" id="7"]

@@ -1,9 +1,11 @@
 extends TestScript
 ## Representative isolated renders for Bubbles animation review.
 
-const Controller = preload("res://minigames/bubbles_round_controller.gd")
-const Arena = preload("res://minigames/bubbles_player_arena.gd")
-const Protocol = preload("res://host/bubbles_protocol.gd")
+const Controller = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_round_controller.gd"
+)
+const Arena = preload("res://minigames/002_bubbles_and_jellyfishes/bubbles_player_arena.gd")
+const Protocol = preload("res://minigames/002_bubbles_and_jellyfishes/bubbles_protocol.gd")
 const OUTPUT := "res://test-results/bubbles-animation"
 
 

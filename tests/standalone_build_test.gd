@@ -32,14 +32,18 @@ func _run() -> void:
 	check(
 		Policy.REQUIRED_BROWSER_PATHS.has("web/public/manifest.webmanifest")
 		and Policy.REQUIRED_BROWSER_PATHS.has("web/public/app-icon-512.png")
-		and Policy.REQUIRED_BROWSER_PATHS.has("web/public/bubbles_gesture.js") \
+		and Policy
+		.REQUIRED_BROWSER_PATHS
+		.has("web/public/002_bubbles_and_jellyfishes/bubbles_gesture.js") \
 				and Policy.REQUIRED_BROWSER_PATHS.has("web/public/character_selection.js") \
 				and Policy.REQUIRED_BROWSER_PATHS.has("web/public/squircle_v1.js") \
 				and Policy.REQUIRED_BROWSER_PATHS.has("web/public/vendor/nipplejs.mjs"),
 		"every browser module is required in the PCK",
 	)
 	check(
-		Policy.REQUIRED_RUNTIME_PATHS.has("minigames/bubbles_and_jellyfishes.tscn") \
+		Policy
+		.REQUIRED_RUNTIME_PATHS
+		.has("minigames/002_bubbles_and_jellyfishes/bubbles_and_jellyfishes.tscn") \
 				and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/bgm/Beach_music.ogg") \
 				and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/sfxs/woosh4.ogg"),
 		"Bubbles scene, music, and sound effects remain in the standalone PCK",
@@ -47,7 +51,9 @@ func _run() -> void:
 	check(
 		Policy.REQUIRED_RUNTIME_PATHS.has("host/pre_minigame_readiness.gd") \
 				and Policy.REQUIRED_RUNTIME_PATHS.has("scenes/pre_minigame_screen.tscn") \
-				and Policy.REQUIRED_RUNTIME_PATHS.has("scenes/bubbles_pre_minigame_content.tres") \
+				and Policy
+		.REQUIRED_RUNTIME_PATHS
+		.has("minigames/002_bubbles_and_jellyfishes/bubbles_pre_minigame_content.tres") \
 				and Policy
 		.REQUIRED_RUNTIME_PATHS
 		.has("assets/runtime/pre_minigame/bubbles_preview.png"),

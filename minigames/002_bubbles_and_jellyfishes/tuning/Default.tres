@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="BubblesTuning" format=3 uid="uid://cudlwubldgpr7"]
 
-[ext_resource type="Script" uid="uid://cvuwa0ru0pqpe" path="res://Tuning/Minigames/bubbles_tuning.gd" id="1"]
+[ext_resource type="Script" uid="uid://cvuwa0ru0pqpe" path="res://minigames/002_bubbles_and_jellyfishes/bubbles_tuning.gd" id="1"]
 
 [resource]
 script = ExtResource("1")

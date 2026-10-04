@@ -7,7 +7,7 @@ import { PwaOnboarding, isStandalone } from "./pwa.js";
 import { MotionLabController } from "./motion_lab.js";
 import { controllerSocketUrl } from "./network_config.js";
 import { SquircleV1Canvas } from "./squircle_v1.js";
-import { GestureTrace, type Point } from "./bubbles_gesture.js";
+import { GestureTrace, type Point } from "./002_bubbles_and_jellyfishes/bubbles_gesture.js";
 import { LobbyControls } from "./lobby_controls.js";
 import type { LobbyAction } from "./lobby_input.js";
 import {

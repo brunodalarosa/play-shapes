@@ -1,6 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { GestureTrace, MAX_TRACE_POINTS } from "../public/bubbles_gesture.js";
+import {
+  GestureTrace,
+  MAX_TRACE_POINTS,
+} from "../../public/002_bubbles_and_jellyfishes/bubbles_gesture.js";
 
 test("completed trace clamps coordinates and requires movement", () => {
   const trace = new GestureTrace({ left: 10, top: 20, width: 100, height: 200 });

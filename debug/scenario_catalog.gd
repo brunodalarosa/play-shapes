@@ -18,7 +18,7 @@ static func scenarios() -> Array[DebugScenario]:
 		DebugScenario.new(
 			&"one_player_bubbles",
 			"One-player Bubbles and Jellyfishes",
-			"res://minigames/bubbles_and_jellyfishes.tscn",
+			"res://minigames/002_bubbles_and_jellyfishes/bubbles_and_jellyfishes.tscn",
 			"one_registered_player",
 			&"bubbles",
 		),

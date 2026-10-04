@@ -69,17 +69,31 @@ function writeLog(name, output) {
   return `test-results/check/${name}.log`;
 }
 
-function godotTestNames(includeRelease) {
-  return readdirSync(join(root, "tests"))
-    .filter((file) => file.endsWith("_test.gd") || file === "foundation.gd")
-    .map((file) => file.slice(0, -".gd".length))
-    .filter((name) => includeRelease || !(name in RELEASE_TESTS))
-    .sort();
+/** The folders that hold Godot test scripts: tests/ and the tests/ of each minigame. */
+function godotTestFolders() {
+  const ofMinigames = readdirSync(join(root, "minigames"), { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => `minigames/${entry.name}/tests`)
+    .filter((folder) => existsSync(join(root, folder)));
+
+  return ["tests", ...ofMinigames];
 }
 
-async function runGodotTest(name) {
+/** Lists the test scripts in those folders, by name. */
+function godotTests(includeRelease) {
+  return godotTestFolders()
+    .flatMap((folder) =>
+      readdirSync(join(root, folder))
+        .filter((file) => file.endsWith("_test.gd") || file === "foundation.gd")
+        .map((file) => ({ name: file.slice(0, -".gd".length), script: `res://${folder}/${file}` })),
+    )
+    .filter(({ name }) => includeRelease || !(name in RELEASE_TESTS))
+    .sort((a, b) => (a.name < b.name ? -1 : 1));
+}
+
+async function runGodotTest({ name, script }) {
   const extra = RELEASE_TESTS[name] ?? [];
-  const args = ["--headless", ...extra, "--path", root, "--script", `res://tests/${name}.gd`];
+  const args = ["--headless", ...extra, "--path", root, "--script", script];
   const result = await run(godotBinary, args, { timeout: GODOT_TIMEOUT_MSEC });
   const log = writeLog(name, result.output);
   if (result.spawnError)
@@ -233,15 +247,15 @@ async function main() {
   const failures = [];
   const summary = [];
 
-  const godotTests = godotTestNames(release).filter(selected);
+  const selectedTests = godotTests(release).filter(({ name }) => selected(name));
   let godotPassed = 0;
-  for (const name of godotTests) {
-    const blocked = name in RELEASE_TESTS ? missingExportTemplates() : "";
-    const failure = blocked || (await runGodotTest(name));
-    if (failure) failures.push(`FAIL ${name}: ${failure}`);
+  for (const test of selectedTests) {
+    const blocked = test.name in RELEASE_TESTS ? missingExportTemplates() : "";
+    const failure = blocked || (await runGodotTest(test));
+    if (failure) failures.push(`FAIL ${test.name}: ${failure}`);
     else godotPassed += 1;
   }
-  if (godotTests.length > 0) summary.push(`Godot ${godotPassed}/${godotTests.length}`);
+  if (selectedTests.length > 0) summary.push(`Godot ${godotPassed}/${selectedTests.length}`);
 
   const toolChecks = [
     ["format", format, "format"],
@@ -272,7 +286,7 @@ async function main() {
     }
   }
 
-  if (godotTests.length + toolChecks.length + webChecks.length === 0) {
+  if (selectedTests.length + toolChecks.length + webChecks.length === 0) {
     process.stderr.write(`No check matches ${filters.join(", ")}\n`);
     return 2;
   }

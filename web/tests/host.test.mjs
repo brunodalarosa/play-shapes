@@ -75,7 +75,7 @@ test("serves bundled HTML, JS, CSS and session configuration", async () => {
     ["/pwa.js", "text/javascript", "PwaOnboarding"],
     ["/manifest.webmanifest", "application/manifest+json", "standalone"],
     ...[180, 192, 512].map((size) => [`/app-icon-${size}.png`, "image/png", null]),
-    ["/bubbles_gesture.js", "text/javascript", "GestureTrace"],
+    ["/002_bubbles_and_jellyfishes/bubbles_gesture.js", "text/javascript", "GestureTrace"],
     ["/lobby_controls.js", "text/javascript", "PlatformControls"],
     ["/lobby_input.js", "text/javascript", "createLobbyContext"],
     ["/platform_controls.js", "text/javascript", "PlatformControls"],

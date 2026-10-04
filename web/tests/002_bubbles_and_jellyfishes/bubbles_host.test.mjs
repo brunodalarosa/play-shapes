@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { setTimeout as delay } from "node:timers/promises";
 import { PNG } from "pngjs";
 
-const root = fileURLToPath(new URL("../../", import.meta.url));
+const root = fileURLToPath(new URL("../../../", import.meta.url));
 const binary = process.env.GODOT_BIN || "godot";
 const port = 8090;
 let host;
@@ -15,7 +15,13 @@ async function startPreview() {
   await assert.rejects(fetch(`http://127.0.0.1:${port}`, { signal: AbortSignal.timeout(500) }));
   host = spawn(
     binary,
-    ["--headless", "--path", root, "--script", "tests/bubbles_phone_preview.gd"],
+    [
+      "--headless",
+      "--path",
+      root,
+      "--script",
+      "minigames/002_bubbles_and_jellyfishes/tests/bubbles_phone_preview.gd",
+    ],
     {
       windowsHide: true,
       env: {

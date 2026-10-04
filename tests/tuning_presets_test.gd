@@ -1,7 +1,10 @@
 extends TestScript
 
 const TUNING_ROOT := "res://Tuning"
-const BubblesTuningScript := preload("res://Tuning/Minigames/bubbles_tuning.gd")
+const MINIGAMES_ROOT := "res://minigames"
+const BubblesTuningScript := preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_tuning.gd"
+)
 const NetworkingTuningScript := preload("res://Tuning/Shared/networking_tuning.gd")
 const ActivePresetsScript := preload("res://Tuning/active_presets.gd")
 
@@ -20,7 +23,7 @@ func _run() -> void:
 	):
 		return
 	if not _check_tooltip_contract(
-		"res://Tuning/Minigames/bubbles_tuning.gd",
+		"res://minigames/002_bubbles_and_jellyfishes/bubbles_tuning.gd",
 		[
 			"instructions_seconds",
 			"countdown_seconds",
@@ -72,9 +75,12 @@ func _run() -> void:
 		return
 
 	var preset_paths := _find_presets(TUNING_ROOT)
+	for minigame: String in DirAccess.get_directories_at(MINIGAMES_ROOT):
+		var tuning_folder := MINIGAMES_ROOT.path_join(minigame).path_join("tuning")
+		preset_paths.append_array(_find_presets(tuning_folder))
 	if not check(
 		preset_paths.has("res://Tuning/Active Presets.tres")
-		and preset_paths.has("res://Tuning/Minigames/Bubbles/Default.tres")
+		and preset_paths.has("res://minigames/002_bubbles_and_jellyfishes/tuning/Default.tres")
 		and preset_paths.has("res://Tuning/Shared/Networking/Default.tres"),
 		"Default presets and Active Presets are discovered",
 	):

@@ -4,7 +4,9 @@ extends Control
 
 const CHARACTER: PackedScene = preload("res://characters/squircle_v1_playback.tscn")
 const CONTENT: Dictionary = {
-	&"bubbles": preload("res://scenes/bubbles_pre_minigame_content.tres"),
+	&"bubbles": preload(
+		"res://minigames/002_bubbles_and_jellyfishes/bubbles_pre_minigame_content.tres"
+	),
 }
 
 var _content: PreMinigameContent

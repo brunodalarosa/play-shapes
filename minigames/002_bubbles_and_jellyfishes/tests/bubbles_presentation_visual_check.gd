@@ -1,7 +1,9 @@
 extends TestScript
 ## Local Bubbles presentation captures; saved under ignored test-results.
 
-const SCENE: PackedScene = preload("res://minigames/bubbles_and_jellyfishes.tscn")
+const SCENE: PackedScene = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_and_jellyfishes.tscn"
+)
 const OUTPUT := "res://test-results/bubbles-presentation"
 
 

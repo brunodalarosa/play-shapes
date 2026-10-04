@@ -5,7 +5,9 @@ extends Node
 signal connection_count_changed(count: int)
 
 const MAX_PACKET_BYTES := 8192 # One bounded 128-point Bubbles trace plus protocol envelope.
-const BubblesProtocolScript = preload("res://host/bubbles_protocol.gd")
+const BubblesProtocolScript = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_protocol.gd"
+)
 
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []

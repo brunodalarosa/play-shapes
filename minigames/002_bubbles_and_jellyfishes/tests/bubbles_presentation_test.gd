@@ -1,7 +1,9 @@
 extends TestScript
 ## Scene, event mapping, timer, warning and dense results contracts.
 
-const SCENE: PackedScene = preload("res://minigames/bubbles_and_jellyfishes.tscn")
+const SCENE: PackedScene = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_and_jellyfishes.tscn"
+)
 
 
 func _run() -> void:

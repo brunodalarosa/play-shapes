@@ -1,9 +1,13 @@
 extends TestScript
 ## Isolated creature and bubble renderer captures for art/feedback review.
 
-const Controller = preload("res://minigames/bubbles_round_controller.gd")
-const PlayerArena = preload("res://minigames/bubbles_player_arena.gd")
-const CreatureArena = preload("res://minigames/bubbles_creature_arena.gd")
+const Controller = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_round_controller.gd"
+)
+const PlayerArena = preload("res://minigames/002_bubbles_and_jellyfishes/bubbles_player_arena.gd")
+const CreatureArena = preload(
+	"res://minigames/002_bubbles_and_jellyfishes/bubbles_creature_arena.gd"
+)
 const OUTPUT := "res://test-results/bubbles-creatures"
 
 
