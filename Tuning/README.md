@@ -1,6 +1,8 @@
 # Play Shapes tuning guide
 
-Start with `Active Presets.tres`. It is the project-level selector and shows the active Bubbles and shared Networking assets in one Inspector. Save a selection and relaunch the relevant scene; there is intentionally no runtime tuning UI.
+Start with `Active Presets.tres`. It is the project-level selector for active Bubbles,
+Tilt Shift rules/content and shared Networking assets. Save a selection and relaunch
+the relevant consumer; there is intentionally no runtime tuning UI.
 
 ## Find, compare, and reset values
 
@@ -11,6 +13,13 @@ Start with `Active Presets.tres`. It is the project-level selector and shows the
 - Experiment record: copy `Experiments/EXPERIMENT_TEMPLATE.md`; record the preset, hypothesis, conditions, observations, and human decision separately from the asset.
 
 Hover an Inspector property for its purpose, units, default, safe range, and higher/lower guidance. Range metadata and clamping protect individual fields. Automated validation handles related-field rules, including distinct listener ports and player capacity versus connection capacity.
+
+## Tilt Shift rules/content
+
+`minigames/003_tilt_shift/tuning/Default.tres` selects duration/count, proximity,
+one paddle layout and baskets by numbered round. The controller accepts the selected
+Resource through its tuning property; game launch integration is deferred.
+See [the field guide](../minigames/003_tilt_shift/tuning/README.md).
 
 ## Shared category map
 

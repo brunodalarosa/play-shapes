@@ -61,6 +61,13 @@ one has, the `private-access` lint rule is turned back on for `tests/`
 After the input pipeline: bots that fill a game with players
 ([0008](decisions/0008-bots.md)).
 
+## Tilt Shift foundation
+
+Host rules and editable content exist for Tilt Shift: equal teams, balanced rotating
+paddle assignments, immediate deadlines and cumulative team scoring. Its physics,
+motion, workshop, presentation and lobby launch remain outside this foundation.
+See [the rules contract](../minigames/003_tilt_shift/README.md).
+
 ## Backlog
 
 - The first release, `0.1.0`: decide where the project and the Windows package record the

@@ -1,0 +1,70 @@
+[gd_resource type="Resource" script_class="TiltShiftPaddleLayout" load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://minigames/003_tilt_shift/tilt_shift_paddle_layout.gd" id="1"]
+[ext_resource type="Script" path="res://minigames/003_tilt_shift/tilt_shift_paddle.gd" id="2"]
+
+[sub_resource type="Resource" id="Orange_top"]
+script = ExtResource("2")
+paddle_id = "orange_top"
+team = 0
+position = Vector2(0.32, 0.10)
+
+[sub_resource type="Resource" id="Blue_top"]
+script = ExtResource("2")
+paddle_id = "blue_top"
+team = 1
+position = Vector2(0.68, 0.10)
+
+[sub_resource type="Resource" id="Blue_upper"]
+script = ExtResource("2")
+paddle_id = "blue_upper"
+team = 1
+position = Vector2(0.22, 0.20)
+
+[sub_resource type="Resource" id="Orange_upper"]
+script = ExtResource("2")
+paddle_id = "orange_upper"
+team = 0
+position = Vector2(0.78, 0.20)
+
+[sub_resource type="Resource" id="Orange_middle_left"]
+script = ExtResource("2")
+paddle_id = "orange_middle_left"
+team = 0
+position = Vector2(0.14, 0.31)
+
+[sub_resource type="Resource" id="Blue_middle_left"]
+script = ExtResource("2")
+paddle_id = "blue_middle_left"
+team = 1
+position = Vector2(0.38, 0.31)
+
+[sub_resource type="Resource" id="Orange_middle_right"]
+script = ExtResource("2")
+paddle_id = "orange_middle_right"
+team = 0
+position = Vector2(0.62, 0.31)
+
+[sub_resource type="Resource" id="Blue_middle_right"]
+script = ExtResource("2")
+paddle_id = "blue_middle_right"
+team = 1
+position = Vector2(0.86, 0.31)
+
+[sub_resource type="Resource" id="Blue_bottom"]
+script = ExtResource("2")
+paddle_id = "blue_bottom"
+team = 1
+position = Vector2(0.30, 0.43)
+
+[sub_resource type="Resource" id="Orange_bottom"]
+script = ExtResource("2")
+paddle_id = "orange_bottom"
+team = 0
+position = Vector2(0.70, 0.43)
+
+[resource]
+script = ExtResource("1")
+preset_name = "Mirrored four rows"
+arena_size = Vector2(1, 0.5625)
+paddles = Array[ExtResource("2")]([SubResource("Orange_top"), SubResource("Blue_top"), SubResource("Blue_upper"), SubResource("Orange_upper"), SubResource("Orange_middle_left"), SubResource("Blue_middle_left"), SubResource("Orange_middle_right"), SubResource("Blue_middle_right"), SubResource("Blue_bottom"), SubResource("Orange_bottom")])

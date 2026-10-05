@@ -3,8 +3,10 @@
 [ext_resource type="Script" uid="uid://30jj0wxp5yer" path="res://Tuning/active_presets.gd" id="1"]
 [ext_resource type="Resource" path="res://Tuning/Shared/Networking/Default.tres" id="3"]
 [ext_resource type="Resource" uid="uid://cudlwubldgpr7" path="res://minigames/002_bubbles_and_jellyfishes/tuning/Default.tres" id="4"]
+[ext_resource type="Resource" path="res://minigames/003_tilt_shift/tuning/Default.tres" id="5"]
 
 [resource]
 script = ExtResource("1")
 bubbles = ExtResource("4")
+tilt_shift = ExtResource("5")
 networking = ExtResource("3")

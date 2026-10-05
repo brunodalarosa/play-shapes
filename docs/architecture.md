@@ -148,6 +148,17 @@ shared-screen scene is `bubbles_and_jellyfishes.tscn`.
   Bubbles snapshots. The messages are in [protocol.md](protocol.md#bubbles-input).
 - The browser never supplies a player ID or host time.
 
+## Tilt Shift rules
+
+`minigames/003_tilt_shift/tilt_shift_shift_controller.gd` owns equal teams, frozen
+shift content, rounds, deadlines, cumulative scores, ball resolution, assignments
+and held angles. The [rules contract](../minigames/003_tilt_shift/README.md)
+describes its typed host calls and signals for later consumers.
+
+The allocator returns inspectable neighbor/conflict diagnostics. Selected Resources
+are in the [field guide](../minigames/003_tilt_shift/tuning/README.md). The arena,
+motion, workshop, phone presentation and catalog/lobby launch are not integrated yet.
+
 ## Characters
 
 - `characters/character_selection.gd` normalizes missing and legacy shapes to Squircle while

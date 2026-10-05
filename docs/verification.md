@@ -160,11 +160,16 @@ start only what they need, so they stay fast.
 
 ## Focused checks by area
 
-- Tilt Shift art: `python tools/assets/prepare_tilt_shift_art.py check` compares
-  runtime pixels, alpha, padding and import policies against the source masters.
-  `tests/tilt_shift_art_test.gd` loads all textures and checks their shared pivots
-  and contact references. [The source guide](../art/tilt_shift/README.md)
-  describes isolated export-pack inspection.
+- Tilt Shift rules: `tilt_shift_allocation_test.gd`, `tilt_shift_rules_test.gd` and
+  `tilt_shift_presets_test.gd` in `minigames/003_tilt_shift/tests/`. Run
+  `node tools/check.mjs tilt_shift tuning_presets` for fairness cycles, adversarial
+  graph optima, exclusive deadlines, resolution, identity and content validity.
+- Tilt Shift cost: run that folder's `tilt_shift_cost_check.gd` as a headless script.
+  It writes controller-only assignment/transition median, p95 and maximum to ignored
+  `test-results/tilt-shift/cost.txt`, with 20 warmups and 200 measured samples per case.
+  Cases include ten players and dense graphs; physics and phones are absent.
+  The same helper writes readable neighbor, ownership and unavoidable-conflict tables
+  to `test-results/tilt-shift/assignments.md` for synthetic four-round examples.
 
 - Local HTTPS: `godot --headless --path . --script tests/controller_tls_test.gd` generates
   disposable ignored fixture material. `node --test tests/tls.test.mjs` in `web/` verifies

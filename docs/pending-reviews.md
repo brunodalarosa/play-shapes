@@ -6,6 +6,15 @@ the review is done, and record the device and browser versions in the pull reque
 removes it. The evidence labels are defined in
 [verification.md](verification.md#evidence-labels).
 
+## Tilt Shift rules
+
+- `[EDITOR]` Owner inspection of the rules profile, round mapping, geometry and neighbor
+  diagnostics. Automated Resource reload does not establish Inspector usability.
+- `[HUMAN-PLAY]` Owner tuning of duration/count and proximity, and strategic fairness
+  of ownership variety after gameplay integration.
+- The future workshop must expose the same neighbor graph visually before editor
+  avoidance review is complete; this foundation exposes typed diagnostics only.
+
 ## Bubbles and Jellyfishes
 
 - `[HUMAN-PLAY]` The owner's two-phone play and game-feel review.

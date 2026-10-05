@@ -71,7 +71,21 @@ func _run() -> void:
 		],
 	):
 		return
-	if not _check_tooltip_contract("res://Tuning/active_presets.gd", ["bubbles", "networking"]):
+	if not _check_tooltip_contract(
+		"res://minigames/003_tilt_shift/tilt_shift_tuning.gd",
+		[
+			"round_duration_seconds",
+			"round_count",
+			"neighbor_distance",
+			"paddle_layout",
+			"baskets_by_round",
+		],
+	):
+		return
+	if not _check_tooltip_contract(
+		"res://Tuning/active_presets.gd",
+		["bubbles", "tilt_shift", "networking"],
+	):
 		return
 
 	var preset_paths := _find_presets(TUNING_ROOT)
@@ -162,7 +176,7 @@ func _run() -> void:
 
 	var active: Resource = ActivePresetsScript.new()
 	if not check(
-		active.validation_errors().size() == 2,
+		active.validation_errors().size() == 3,
 		"Active selector rejects missing preset references",
 	):
 		return
