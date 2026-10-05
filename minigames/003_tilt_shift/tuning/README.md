@@ -15,14 +15,16 @@ content; relaunch the shift to apply changes.
 | Baskets by round | `baskets/FiveOpenings.tres` repeated four times | One valid entry per numbered round | Orange/Blue/trash/Orange/Blue mirrored example. |
 
 Values are provisional. Owner play chooses duration, shift length and useful separation.
-The profile contains rules/content only; it has no motion, physics, delivery or
-presentation settings yet.
+The profile selects `Physics.tres` for arena geometry, contact materials and delivery.
+See [the physics field guide](PHYSICS.md). Motion and production presentation tuning
+remain separate future work.
 
 ## Arena coordinates and neighbors
 
 Positions are measured from the arena's top-left. Both axes use the same unit: one default
 arena width. The example arena is `Vector2(1, 0.5625)`, independent of viewport dimensions.
-The future arena scales these coordinates into world space.
+The arena uses 1,000 world units per coordinate unit. Fit the view with a camera;
+do not scale or move the active physical subtree to resize the screen.
 
 Centers are neighbors when their Euclidean distance is less than or equal to
 `neighbor_distance`, including vertical and diagonal pairs. Snapshots return each pair's

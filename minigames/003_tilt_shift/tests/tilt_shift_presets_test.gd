@@ -136,6 +136,12 @@ func _test_saved_content() -> void:
 	tuning.paddle_layout.preset_name = "Saved arrangement"
 	tuning.paddle_layout.paddles[0].position = Vector2(0.31, 0.105)
 	tuning.neighbor_distance = 0.18
+	tuning.physics.use_position_seed = true
+	tuning.physics.position_seed = 491
+	tuning.physics.paddle_bounce = 0.3
+	tuning.physics.delivery_curve = PackedVector2Array(
+		[Vector2(0, 0), Vector2(0.5, 2), Vector2(1, 0)]
+	)
 	var path := directory.path_join("reload.tres")
 	if not check(ResourceSaver.save(tuning, path) == OK, "Selected content saves as a Resource"):
 		return
@@ -147,6 +153,12 @@ func _test_saved_content() -> void:
 	):
 		return
 	check(reloaded.validation_errors().is_empty(), "Saved preset is still valid after reload")
+	check(
+		reloaded.physics.use_position_seed and reloaded.physics.position_seed == 491
+		and is_equal_approx(reloaded.physics.paddle_bounce, 0.3)
+		and reloaded.physics.delivery_curve == tuning.physics.delivery_curve,
+		"Physics materials, delivery curve and seed survive Resource save/reload",
+	)
 	check(
 		reloaded.paddle_layout.preset_name == "Saved arrangement"
 		and reloaded.paddle_layout.paddles[0].position == Vector2(0.31, 0.105)

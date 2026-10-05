@@ -160,6 +160,15 @@ start only what they need, so they stay fast.
 
 ## Focused checks by area
 
+- Tilt Shift physics: `tilt_shift_delivery_test.gd`, `tilt_shift_arena_test.gd` and
+  `tilt_shift_physics_test.gd` in `minigames/003_tilt_shift/tests/`. The focused command
+  below includes curve counts/gaps, seed sequences, catches, exclusive cutoff, cleanup,
+  native material/pair contacts, acceleration, fast impacts, full turns and reversal.
+- Run `tilt_shift_physics_cost_check.gd` in that folder as a headless script for the
+  300-ball/45-second, ten-player profile and empty-arena baseline. It writes ignored
+  `test-results/tilt-shift/physics-cost.txt`. Engine timings are sampled one-second
+  maxima; script timings are per callback. See [measurement limits](../minigames/003_tilt_shift/tuning/PHYSICS.md#measurement-limits).
+
 - Tilt Shift rules: `tilt_shift_allocation_test.gd`, `tilt_shift_rules_test.gd` and
   `tilt_shift_presets_test.gd` in `minigames/003_tilt_shift/tests/`. Run
   `node tools/check.mjs tilt_shift tuning_presets` for fairness cycles, adversarial
@@ -200,6 +209,7 @@ The helpers whose names start with `bubbles_` are in
 
 | Helper | What it saves | Folder |
 | --- | --- | --- |
+| `tilt_shift_physics_visual_check` | Three live-arena captures with ten synthetic players, repeated turns/reversal and 180 balls over eight seconds. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/physics/` |
 | `bubbles_player_visual_check` | One player bubble: small, grown, spinning, pop and re-form, and ten players. Components only, not a composed arena. | `bubbles-player/` |
 | `bubbles_animation_visual_check` | Player animation in order: small and maximum idle, held left drag, accepted swipe, slow held and released drag, charge glow and wobble, active spin, burst, reformed. | `bubbles-animation/` |
 | `bubbles_creature_visual_check` | Creatures: entrance and warning, active creatures, white-blinking scatter. | `bubbles-creatures/` |

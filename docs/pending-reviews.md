@@ -15,6 +15,18 @@ removes it. The evidence labels are defined in
 - The future workshop must expose the same neighbor graph visually before editor
   avoidance review is complete; this foundation exposes typed diagnostics only.
 
+## Tilt Shift physics
+
+- `[EDITOR]` Owner inspection of the physics profile's units, linear curve points,
+  materials and launch errors. Script save/reload and editor import do not prove usability.
+- `[HUMAN-PLAY]` Owner tuning of density, curve shape, dimensions, gravity, entry speed,
+  friction and restitution; routing coverage, fairness and full-turn control feel.
+- `[PHYSICAL-PHONE]` Responsiveness and physical-angle presentation once motion/phone
+  integration uses the arena's confirmed pose rather than its requested target.
+- `[EXPORTED-BUILD]` Physics and cleanup in the integrated Windows minigame.
+- The workshop must consume the same arena and display its swept-clearance diagnostics;
+  its editor interface and owner inspection remain future work.
+
 ## Bubbles and Jellyfishes
 
 - `[HUMAN-PLAY]` The owner's two-phone play and game-feel review.

@@ -21,9 +21,11 @@ var round_duration_seconds: float = 45.0:
 		neighbor_distance = clampf(value, 0.01, 2.0)
 
 @export_group("Selected content")
-## One ten-paddle layout for the entire shift. Positions and teams stay fixed between rounds.
+## Selected arena physics and delivery profile, frozen with the rules at launch.
 @export
-var paddle_layout: TiltShiftPaddleLayout
+var physics: TiltShiftPhysicsTuning = preload("res://minigames/003_tilt_shift/tuning/Physics.tres")
+## One ten-paddle layout for the entire shift. Positions and teams stay fixed between rounds.
+@export var paddle_layout: TiltShiftPaddleLayout
 ## Array entry zero selects round one. Exactly round_count valid mirrored presets are required.
 @export var baskets_by_round: Array[TiltShiftBasketPreset] = []
 
@@ -32,6 +34,25 @@ func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
 	if not is_finite(round_duration_seconds) or not is_finite(neighbor_distance):
 		errors.append("Tilt Shift: duration and neighbor distance must be finite.")
+	if physics == null:
+		errors.append("Tilt Shift: select a physics and delivery profile.")
+	else:
+		errors.append_array(physics.validation_errors())
+		if errors.is_empty():
+			var duration := roundi(round_duration_seconds * 1000.0)
+			var deliveries := TiltShiftDelivery.schedule(
+				physics.ball_count,
+				physics.delivery_curve,
+				duration,
+			)
+			if deliveries.size() != physics.ball_count:
+				errors.append(
+					"Tilt Shift delivery: curve cannot fit deliveries before the deadline."
+				)
+		if paddle_layout != null and paddle_layout.arena_size.is_finite():
+			var half_width := paddle_layout.arena_size.x * 0.5
+			if physics.spawn_half_width + physics.ball_radius > half_width:
+				errors.append("Tilt Shift delivery: symmetric spawn bounds must clear both walls.")
 	if paddle_layout == null:
 		errors.append("Tilt Shift: select a paddle layout.")
 	else:

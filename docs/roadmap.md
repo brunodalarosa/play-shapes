@@ -64,8 +64,9 @@ After the input pipeline: bots that fill a game with players
 ## Tilt Shift foundation
 
 Host rules and editable content exist for Tilt Shift: equal teams, balanced rotating
-paddle assignments, immediate deadlines and cumulative team scoring. Its physics,
-motion, workshop, presentation and lobby launch remain outside this foundation.
+paddle assignments, immediate deadlines and cumulative team scoring. A shared physics
+arena adds falling/colliding balls, full-turn paddles, basket catches and seeded delivery.
+Motion, workshop UI, production presentation and lobby launch remain outside this foundation.
 See [the rules contract](../minigames/003_tilt_shift/README.md).
 
 ## Backlog
@@ -101,3 +102,9 @@ its red error panel for the rest of the session. Two cases are known:
 
 Late input after a phase change should be dropped quietly. The end-to-end test avoids both
 cases on purpose; fixing the bug means removing those two waits.
+
+On Windows with Godot 4.7.2, `tilt_shift_rules_test` intermittently exits with code
+`3221225477` during native shutdown after printing zero assertion failures. It also
+reproduces in a fresh, fully imported copy of the rules-only commit. Treat that exit as
+a failed check, retain its log and report it separately from assertion results; its
+cause remains unresolved.

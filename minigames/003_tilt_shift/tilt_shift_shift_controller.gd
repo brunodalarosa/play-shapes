@@ -210,6 +210,7 @@ func snapshot(player_id: String = "") -> TiltShiftState.Snapshot:
 	for neighbor: TiltShiftState.Neighbor in _neighbors:
 		result.neighbors.append(TiltShiftState.copy_neighbor(neighbor))
 	if _content != null:
+		result.physics = _content.physics.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
 		result.neighbor_distance = _content.neighbor_distance
 		result.paddle_layout = _content.paddle_layout.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
 		result.basket_preset = _content.baskets_by_round[_round_number - 1].duplicate_deep(

@@ -55,6 +55,7 @@ class Snapshot:
 	var neighbor_distance: float
 	var paddle_layout: TiltShiftPaddleLayout
 	var basket_preset: TiltShiftBasketPreset
+	var physics: TiltShiftPhysicsTuning
 
 
 class Result:

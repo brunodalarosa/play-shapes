@@ -216,6 +216,13 @@ motion, workshop, phone presentation and catalog/lobby launch are not integrated
   personalized Bubbles snapshot.
 - What the phone screens do is in [phone-client.md](phone-client.md).
 
+## Tilt Shift
+
+Tilt Shift's [host contract](../minigames/003_tilt_shift/README.md) describes its separate
+rules controller and shared gameplay/preview physics arena. The arena owns live bodies and
+delivery; its controller owns rounds, assignments, deadlines and scores. Physics snapshots
+copy the launch-frozen selected profile; no extra autoload or network message is involved.
+
 ## Assets, addons and tests
 
 - `assets/runtime/` is the curated runtime-media boundary. Source and archive art remains

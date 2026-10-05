@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TiltShiftPhysicsTuning" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://minigames/003_tilt_shift/tilt_shift_physics_tuning.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+ball_count = 60
+delivery_curve = PackedVector2Array(0, 1, 1, 1)
+use_position_seed = false
+position_seed = 1
+spawn_half_width = 0.4
+ball_radius = 0.006
+paddle_length = 0.1
+paddle_thickness = 0.01
+gravity = 0.4
+entry_speed = 0.1
+rotation_speed_degrees = 180.0
+ball_friction = 0.2
+paddle_friction = 0.4
+ball_bounce = 0.0
+paddle_bounce = 0.0

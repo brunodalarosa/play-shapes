@@ -1,7 +1,8 @@
-# Tilt Shift host rules
+# Tilt Shift host rules and physics
 
-Tilt Shift has a host-only rules foundation. Its physics, motion capture, editor workshop,
-phone/shared presentation and lobby entry are not integrated yet.
+Tilt Shift has host rules and a reusable playable physics arena with paper/toy placeholders.
+Motion capture, editor workshop, phone/shared production presentation and lobby entry
+are not integrated yet.
 
 ## Ownership
 
@@ -59,9 +60,35 @@ publish typed snapshots. `angle_changed` and `presence_changed` publish copied p
 State is committed before notification. Mutation calls during notification are rejected;
 start the next round after the finishing call returns.
 
-The future arena maps each paddle owner to that player's angle. Presentation plays the
+The arena maps each paddle owner to that player's angle. Presentation plays the
 whistle from `round_ended`. The controller has no frame loop of its own: its host consumer
 supplies time through `advance` and event calls.
+
+## Shared gameplay and preview arena
+
+Instantiate `tilt_shift_arena.tscn`, then call `start_shift(selected_tuning, players)`.
+The arena owns its ordinary rules-controller child, ball bodies, paddle bodies, walls,
+floor and delivery cursor. Its `controller` exposes the same authenticated host control
+seam for future motion consumers. `start_next_round()` is available only between rounds.
+
+The arena samples its injectable monotonic `clock` on each physics tick. Catch resolution
+and ball registration use that same time. A stopped deadline clears all balls immediately;
+the caller decides when to begin the next round. `stop()` clears bodies and scores by
+retiring the controller. Removing the arena frees its complete scene subtree.
+
+Rules snapshots include independent copies of the frozen physics profile. Live Inspector
+edits cannot replace its dimensions, curve, materials or seed. The same paddle bodies and
+anchors survive round changes; the selected floor openings and owner targets change.
+
+`paddle_bodies()` exposes each stable ID, unwrapped target and confirmed `applied_angle`.
+The actual collider and placeholder drawing share one transform. Sync-to-physics can keep
+the previous confirmed pose for a tick; presentation must use the actual pose, not the
+requested target. The angular-rate bound delays large target jumps without dropping turns.
+
+The workshop can instantiate this arena with copied content and synthetic host controls.
+It must call `stop()` before restart/exit; it needs no separate physics implementation.
+`ball_spawned` and `ball_removed` expose host observations; neither awards points itself.
+The [physics guide](tuning/PHYSICS.md) describes delivery, contacts and supported limits.
 
 ## Assignment diagnostics
 

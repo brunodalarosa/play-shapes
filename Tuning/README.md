@@ -17,8 +17,8 @@ Hover an Inspector property for its purpose, units, default, safe range, and hig
 ## Tilt Shift rules/content
 
 `minigames/003_tilt_shift/tuning/Default.tres` selects duration/count, proximity,
-one paddle layout and baskets by numbered round. The controller accepts the selected
-Resource through its tuning property; game launch integration is deferred.
+one paddle layout, baskets by numbered round and the physics/delivery profile.
+The standalone arena accepts this Resource at shift launch; lobby integration is deferred.
 See [the field guide](../minigames/003_tilt_shift/tuning/README.md).
 
 ## Shared category map
