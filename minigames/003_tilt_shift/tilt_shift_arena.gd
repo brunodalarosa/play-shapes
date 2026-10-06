@@ -4,6 +4,7 @@ extends Node2D
 
 signal ball_spawned(ball: TiltShiftBall)
 signal ball_removed(handle: TiltShiftState.BallHandle, basket_id: String)
+signal stopped
 
 const WORLD_UNITS := 1000.0
 const WALL_THICKNESS := 20.0
@@ -58,6 +59,7 @@ func start_next_round() -> TiltShiftState.Result:
 
 
 func stop() -> void:
+	stopped.emit()
 	_active = false
 	_clear_balls()
 	for body: Node in _paddles + _walls + _floor:

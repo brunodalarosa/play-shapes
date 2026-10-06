@@ -107,5 +107,18 @@ have at most 1,024 raw mappings per team before pruning; one/five teammates bypa
 Per-frame rule work is one deadline check. Ball status lookup is constant time; player
 lookup visits at most ten entries.
 
-This foundation introduces no HTTP/WebSocket messages or phone traffic. Snapshots are
-host objects; later consumers select and serialize the wire fields they need.
+Rules snapshots are host objects; presentation consumers select and serialize the wire
+fields they need. Calibrated control reuses the shared motion transport described in
+[motion-input.md](../../docs/motion-input.md#tilt-shift-control).
+
+## Calibrated phone control
+
+Create an ordinary `TiltShiftMotionController` node and call `prepare(service, ids, motion)`
+before readiness. After explicit per-player calibration, `ready_for(id)` exposes the host
+gate. Start the arena, then `activate(arena)` verifies that same calibrated roster.
+The caller still owns readiness and launch; neither is added to the lobby by this consumer.
+
+The node consumes latest samples, maps the physical sideways gesture to unwrapped angles
+and calls the existing rules seam. Neutral stays fixed throughout the shift. Arena stop,
+exit, shift completion and replacement subscriptions retire the consumer. `stop()` also
+cancels preparation. A later game gets fresh capture/calibration state.

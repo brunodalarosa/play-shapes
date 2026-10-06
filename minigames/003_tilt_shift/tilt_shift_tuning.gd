@@ -21,9 +21,13 @@ var round_duration_seconds: float = 45.0:
 		neighbor_distance = clampf(value, 0.01, 2.0)
 
 @export_group("Selected content")
-## Selected arena physics and delivery profile, frozen with the rules at launch.
+## Selected calibrated phone control profile. Frozen by the motion consumer at preparation.
 @export
-var physics: TiltShiftPhysicsTuning = preload("res://minigames/003_tilt_shift/tuning/Physics.tres")
+var motion: TiltShiftMotionTuning = preload("res://minigames/003_tilt_shift/tuning/Motion.tres")
+## Selected arena physics and delivery profile, frozen with the rules at launch.
+@export var physics: TiltShiftPhysicsTuning = preload(
+	"res://minigames/003_tilt_shift/tuning/Physics.tres"
+)
 ## One ten-paddle layout for the entire shift. Positions and teams stay fixed between rounds.
 @export var paddle_layout: TiltShiftPaddleLayout
 ## Array entry zero selects round one. Exactly round_count valid mirrored presets are required.
@@ -32,6 +36,10 @@ var physics: TiltShiftPhysicsTuning = preload("res://minigames/003_tilt_shift/tu
 
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
+	if motion == null:
+		errors.append("Tilt Shift: select a motion control profile.")
+	else:
+		errors.append_array(motion.validation_errors())
 	if not is_finite(round_duration_seconds) or not is_finite(neighbor_distance):
 		errors.append("Tilt Shift: duration and neighbor distance must be finite.")
 	if physics == null:

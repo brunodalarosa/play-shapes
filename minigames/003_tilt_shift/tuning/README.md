@@ -16,8 +16,8 @@ content; relaunch the shift to apply changes.
 
 Values are provisional. Owner play chooses duration, shift length and useful separation.
 The profile selects `Physics.tres` for arena geometry, contact materials and delivery.
-See [the physics field guide](PHYSICS.md). Motion and production presentation tuning
-remain separate future work.
+See [the physics field guide](PHYSICS.md). The selected `Motion.tres` profile supplies
+[calibrated motion tuning](MOTION.md). Production presentation tuning remains future work.
 
 ## Arena coordinates and neighbors
 

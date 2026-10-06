@@ -3,6 +3,7 @@ extends Node
 ## Versioned browser transport. Identity mutations are delegated to PlayerRegistry.
 
 signal connection_count_changed(count: int)
+signal motion_session_ended
 
 const MAX_PACKET_BYTES := 8192 # One bounded 128-point Bubbles trace plus protocol envelope.
 const BubblesProtocolScript = preload(
@@ -22,18 +23,64 @@ var _active_protocol: RefCounted
 var _lobby_controller: LobbyPlaygroundWorld
 var _readiness: PreMinigameReadiness
 var motion_channel := MotionInputChannel.new()
+var motion_channels: Dictionary[String, MotionInputChannel] = { }
 
 
 func begin_motion(player_id: String) -> void:
 	end_motion()
 	motion_channel.begin(player_id)
-	_send_to_player.call_deferred(player_id, motion_channel.subscription())
+	motion_channels[player_id] = motion_channel
+	_send_motion_subscription.call_deferred(player_id, motion_channel.subscription_id)
+
+
+func begin_multiplayer_motion(player_ids: PackedStringArray) -> bool:
+	if player_ids.is_empty() or player_ids.size() > 10:
+		return false
+	var unique: Dictionary[String, bool] = { }
+	for player_id: String in player_ids:
+		if player_id.is_empty() or unique.has(player_id):
+			return false
+		unique[player_id] = true
+	end_motion()
+	for player_id: String in player_ids:
+		var channel := MotionInputChannel.new()
+		channel.begin(player_id)
+		motion_channels[player_id] = channel
+		_send_motion_subscription.call_deferred(player_id, channel.subscription_id)
+	return true
+
+
+func _send_motion_subscription(player_id: String, generation: String) -> void:
+	var channel := motion_channels.get(player_id) as MotionInputChannel
+	if channel == null or channel.subscription_id != generation:
+		return
+	var message := channel.subscription()
+	if channel != motion_channel:
+		message.type = "motion_subscribe"
+	_send_to_player(player_id, message)
+
+
+func send_motion_feedback(player_id: String, generation: String, state: Dictionary) -> void:
+	var channel := motion_channels.get(player_id) as MotionInputChannel
+	if channel == null or channel.subscription_id != generation:
+		return
+	_send_to_player(
+		player_id,
+		{ "type": "motion_control_state", "subscription_id": generation, "control_state": state },
+	)
 
 
 func end_motion() -> void:
-	if not motion_channel.target_player_id.is_empty():
-		_send_to_player(motion_channel.target_player_id, { "type": "motion_stop" })
-	motion_channel.end()
+	var retiring := motion_channels.values()
+	motion_channels.clear()
+	for channel: MotionInputChannel in retiring:
+		_send_to_player(
+			channel.target_player_id,
+			{ "type": "motion_stop", "subscription_id": channel.subscription_id },
+		)
+		channel.end()
+	if not retiring.is_empty():
+		motion_session_ended.emit()
 
 
 func start(
@@ -179,6 +226,7 @@ func _process(_delta: float) -> void:
 			continue
 		if peer.get_ready_state() != WebSocketPeer.STATE_OPEN:
 			continue
+		var pending_motion: Dictionary = { }
 		for unused: int in range(8):
 			if peer.get_available_packet_count() == 0:
 				break
@@ -191,7 +239,15 @@ func _process(_delta: float) -> void:
 			):
 				peer.close(1008, "Expected protocol JSON")
 				break
-			_handle_message(client, parser.data)
+			if parser.data.get("type") == "motion_sample":
+				pending_motion = parser.data
+			else:
+				if not pending_motion.is_empty():
+					_handle_message(client, pending_motion)
+					pending_motion = { }
+				_handle_message(client, parser.data)
+		if not pending_motion.is_empty() and peer.get_ready_state() == WebSocketPeer.STATE_OPEN:
+			_handle_message(client, pending_motion)
 
 
 func _handle_message(client: Dictionary, message: Dictionary) -> void:
@@ -235,8 +291,10 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			"reconnect_token": resume.get("reconnect_token"),
 		}
 		if resume.accepted:
-			if resume.player.player_id == motion_channel.target_player_id:
-				motion_channel.reconnect()
+			var resumed_id := String(resume.player.player_id)
+			var channel := motion_channels.get(resumed_id) as MotionInputChannel
+			if channel != null:
+				channel.reconnect()
 			welcome.gameplay = _active_protocol.snapshot_for(String(resume.player.player_id)) \
 					if _active_protocol != null else {
 				"type": "lobby",
@@ -244,19 +302,22 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 				"message": "Waiting for the next game",
 			}
 		peer.send_text(JSON.stringify(welcome))
-		if resume.accepted and resume.player.player_id == motion_channel.target_player_id:
-			peer.send_text(JSON.stringify(motion_channel.subscription()))
+		if resume.accepted:
+			var resumed_id := String(resume.player.player_id)
+			var channel := motion_channels.get(resumed_id) as MotionInputChannel
+			if channel != null:
+				_send_motion_subscription(resumed_id, channel.subscription_id)
 		_emit_count()
 		return
 
 	match message.get("type"):
-		"motion_status", "motion_sample":
+		"motion_status", "motion_sample", "motion_calibrate":
 			# Identity is resolved from the current socket, never a phone-authored ID.
-			motion_channel.handle(
-				_registry.player_for_connection(client.connection_id),
-				message,
-				Time.get_ticks_msec(),
-			)
+			var player := _registry.player_for_connection(client.connection_id)
+			var channel := motion_channels.get(String(player.get("player_id", ""))) \
+					as MotionInputChannel
+			if channel != null:
+				channel.handle(player, message, Time.get_ticks_msec())
 		"join":
 			var may_join: bool = (
 				_accepting_new_players.call()
@@ -469,8 +530,10 @@ func _drop(index: int) -> void:
 func _disconnect_player(client: Dictionary) -> void:
 	if client.welcomed:
 		var leaving := _registry.player_for_connection(client.connection_id)
-		if leaving.get("player_id") == motion_channel.target_player_id:
-			motion_channel.reconnect()
+		var player_id := String(leaving.get("player_id", ""))
+		var channel := motion_channels.get(player_id) as MotionInputChannel
+		if channel != null:
+			channel.reconnect()
 		_registry.disconnect_connection(client.connection_id)
 
 

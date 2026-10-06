@@ -63,3 +63,4 @@ What was decided.
 | [0024](0024-minigame-catalog.md) | The minigame catalog is an explicit list of definitions that hold paths |
 | [0025](0025-tilt-shift-rules.md) | Tilt Shift owns rounds and uses complete paddle assignment searches |
 | [0026](0026-tilt-shift-physics.md) | Tilt Shift shares native physics and integrates a delivery budget |
+| [0027](0027-calibrated-multiplayer-motion.md) | Calibrated multiplayer motion uses physical gravity phase |

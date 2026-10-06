@@ -27,6 +27,18 @@ removes it. The evidence labels are defined in
 - The workshop must consume the same arena and display its swept-clearance diagnostics;
   its editor interface and owner inspection remain future work.
 
+## Tilt Shift calibrated motion
+
+- `[PHYSICAL-PHONE]` Owner trials on supported iPhone and Android browsers: record versions,
+  comfortable sideways neutral, both holds, mirrored tilts, repeated full turns/reversal,
+  screen autorotation, off-axis tolerance, denial, background/lock and permission recovery.
+- `[PHYSICAL-PHONE]` Ten-phone load, end-to-end sensor delay and reconnect correction with
+  neutral preserved. Synthetic traffic and CPU measurements do not establish these results.
+- `[HUMAN-PLAY]` Owner approval of gain, filtering needs and target-versus-collider lag.
+  The initial gain is 1, with continuous mode and no extra smoothing.
+- `[EDITOR]` Owner inspection of the motion profile's units, valid ranges and launch errors.
+- `[EXPORTED-BUILD]` Calibrated control and lifecycle after readiness/phone integration.
+
 ## Bubbles and Jellyfishes
 
 - `[HUMAN-PLAY]` The owner's two-phone play and game-feel review.

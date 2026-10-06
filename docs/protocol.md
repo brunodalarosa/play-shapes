@@ -15,6 +15,30 @@ Phones send UI actions and controller input only.
 - Registered socket identity and the lobby or active-protocol gates decide what a message may
   do.
 
+## Motion subscriptions
+
+The host selects one lab player or a roster of at most ten gameplay players. Each receives
+`motion_lab` or `motion_subscribe`, with `subscription_id`, `send_hz` and `stale_msec`.
+Subscription identity is opaque, per player and replaced on reconnect; a phone-authored
+player ID is rejected. The raw sample/status schema is shared with the lab.
+
+- `motion_sample`: current subscription, increasing integer `sequence`, and nullable raw
+  orientation, angular velocity, acceleration, screen angle, event ages/rates and interval.
+  Unknown/missing sample fields and non-finite/out-of-bound values are rejected.
+- `motion_status`: current subscription, capture/network diagnostics and transmission rate.
+  At most five accepted status messages/s; the browser normally sends about four/s.
+- `motion_calibrate`: exactly `type` and current `subscription_id`. At most five requests/s.
+  The host consumer chooses its latest usable orientation; active calibration is rejected.
+- `motion_control_state`: host feedback with current subscription and `control_state`,
+  containing `calibrated`, `usable` and `capture_state`. Calibration replies also contain
+  `accepted` and `reason`. Feedback contains no client-selected physical angle or identity.
+- `motion_stop`: retiring `subscription_id`. The phone stops only its matching capture.
+
+Samples are accepted no faster than every 34 ms; the raw transport stale threshold is
+1000 ms. Latest-only burst handling and browser backpressure avoid catch-up replay.
+Capture failure states and Tilt Shift's shorter continuity gap are documented in
+[motion-input.md](motion-input.md#tilt-shift-control).
+
 ## Defaults
 
 From `Tuning/Shared/Networking/Default.tres`:

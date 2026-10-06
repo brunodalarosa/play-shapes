@@ -156,8 +156,16 @@ and held angles. The [rules contract](../minigames/003_tilt_shift/README.md)
 describes its typed host calls and signals for later consumers.
 
 The allocator returns inspectable neighbor/conflict diagnostics. Selected Resources
-are in the [field guide](../minigames/003_tilt_shift/tuning/README.md). The arena,
-motion, workshop, phone presentation and catalog/lobby launch are not integrated yet.
+are in the [field guide](../minigames/003_tilt_shift/tuning/README.md).
+
+`TiltShiftArena` owns shared physics and delivery beneath its rules controller.
+`TiltShiftMotionController` owns capture preparation, calibration and active-consumer
+lifecycle; each `TiltShiftTiltInput` holds one player's neutral and continuous input.
+It consumes WebsocketService's keyed raw channels and supplies validated host angles
+to the rules. See [motion input](motion-input.md#tilt-shift-control).
+
+Readiness integration, workshop UI, phone presentation and catalog/lobby launch remain
+future work. The shared arena and motion consumer are callable host components.
 
 ## Characters
 

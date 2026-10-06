@@ -134,11 +134,13 @@ func _run() -> void:
   Disconnect the callback at the end of the test.
 - `tests/test_script_test.gd` tests the base with the small scripts in `tests/fixtures/`.
 
-Five scripts do not use the base:
+Six scripts do not use the base:
 
 - `pre_minigame_server.gd`, `motion_lab_server.gd` and `e2e/host.gd` in `tests/`, and
   `bubbles_phone_preview.gd` in the Bubbles `tests/` folder, are hosts that a browser test
   starts and stops. They never reach an end.
+- `tests/multiplayer_motion_server.gd` is the ten-socket calibrated-control fixture;
+  its browser test starts and stops it.
 - `standalone_build_editor_integration_test.gd` runs inside the editor, where freeing the
   tree would free the editor.
 
@@ -159,6 +161,14 @@ start only what they need, so they stay fast.
   the required runtime paths.
 
 ## Focused checks by area
+
+- Calibrated Tilt Shift motion: `tilt_shift_motion_test.gd` in the minigame's `tests/`
+  folder, `web/tests/motion_stream.test.mjs` and `web/tests/multiplayer_motion_host.test.mjs`.
+  Cover repeated turns/reversal, calibration/gain, autorotation, capture failure states,
+  ten real sockets, forged identity/subscription, replaced-tab resume and arena teardown.
+- Run `tilt_shift_motion_cost_check.gd` in that folder for ten-stream host polling costs.
+  The browser stream test writes encoded traffic measurements. Their measurement scopes
+  and outputs are described in [MOTION.md](../minigames/003_tilt_shift/tuning/MOTION.md#measurement-boundaries).
 
 - Tilt Shift physics: `tilt_shift_delivery_test.gd`, `tilt_shift_arena_test.gd` and
   `tilt_shift_physics_test.gd` in `minigames/003_tilt_shift/tests/`. The focused command

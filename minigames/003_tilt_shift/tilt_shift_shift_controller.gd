@@ -158,7 +158,7 @@ func discard_ball(handle: TiltShiftState.BallHandle, host_time_msec: int) -> Til
 	return TiltShiftState.accepted()
 
 
-## Only a future authenticated host motion consumer calls this seam, never a client callback.
+## Only an authenticated host motion consumer calls this seam, never a client callback.
 func accept_angle(
 	player_id: String,
 	angle_radians: float,
