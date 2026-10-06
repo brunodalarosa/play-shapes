@@ -162,6 +162,18 @@ start only what they need, so they stay fast.
 
 ## Focused checks by area
 
+- Tilt Shift workshop: `tilt_shift_workshop_test.gd` and `tilt_shift_workshop_preview_test.gd`
+  in the minigame's `tests/` folder cover deep-copy isolation, snapping, paired edits,
+  undo/redo, fresh-process reload, draft versus usable saves, curve gaps and actual
+  gameplay preview cleanup/materials. Run `node tools/check.mjs tilt_shift_workshop`.
+- Run `node tools/verify_tilt_shift_workshop.mjs` with other project editors closed for
+  scripted drag/hit-testing, guide/error reports, save/close/reopen, mapped presets,
+  invalid launch rejection and separate preview-process start/restart/stop. Captures
+  and logs are under `test-results/tilt-shift/workshop/`; usability still needs the owner.
+- Run `tilt_shift_workshop_preview_visual_check.gd` in that folder without `--headless`
+  to capture and measure a 45-second, 300-ball preview with ten synthetic players.
+  Its reported p95 covers sampled arena script time, excluding native physics/rendering.
+
 - Calibrated Tilt Shift motion: `tilt_shift_motion_test.gd` in the minigame's `tests/`
   folder, `web/tests/motion_stream.test.mjs` and `web/tests/multiplayer_motion_host.test.mjs`.
   Cover repeated turns/reversal, calibration/gain, autorotation, capture failure states,

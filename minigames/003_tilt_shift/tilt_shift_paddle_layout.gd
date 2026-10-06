@@ -1,3 +1,4 @@
+@tool
 class_name TiltShiftPaddleLayout
 extends Resource
 ## One selected layout stays fixed for the entire shift.

@@ -4,6 +4,9 @@ Select a rules Resource in `Tuning/Active Presets.tres`, under Tilt Shift. The h
 injects it into the controller. Editing it during a shift does not rewrite frozen live
 content; relaunch the shift to apply changes.
 
+The Godot **Tilt Shift** tab provides snapped editing, named saves, geometry guides and
+actual gameplay preview. See [the editor workshop workflow](WORKSHOP.md).
+
 ## Provisional profile
 
 | Field | Default | Units / safe range | Effect |

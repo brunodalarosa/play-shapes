@@ -1,3 +1,4 @@
+@tool
 class_name TiltShiftTypes
 extends RefCounted
 ## Stable scoring categories. Display names are presentation choices.

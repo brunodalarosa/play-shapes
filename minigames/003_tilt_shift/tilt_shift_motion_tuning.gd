@@ -1,3 +1,4 @@
+@tool
 class_name TiltShiftMotionTuning
 extends Resource
 ## Frozen per control session. Gain is output degrees per physical in-plane degree.

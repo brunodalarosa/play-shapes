@@ -12,7 +12,7 @@ const GDSCRIPT_PASSES = 5;
 
 const USAGE = `Usage: node tools/format.mjs [--check]
 
-Formats every GDScript file outside addons/ with the pinned GDScript formatter,
+Formats project GDScript, including the owned Tilt Shift workshop addon, with its formatter,
 and the TypeScript, JavaScript, HTML and CSS sources of web/ and tools/ with
 Prettier. Lines wrap at ${LINE_LENGTH} characters.
 

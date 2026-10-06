@@ -9,6 +9,8 @@ test-results/*
 !test-results/.gdignore
 __pycache__/
 builds/
+scratch/
+comparisons/
 BRUNO_GIT_IGNORE/
 opencode.json
 *.local.json

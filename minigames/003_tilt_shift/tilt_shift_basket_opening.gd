@@ -1,3 +1,4 @@
+@tool
 class_name TiltShiftBasketOpening
 extends Resource
 ## A floor opening. Physics reports its ID; only the rules controller awards points.

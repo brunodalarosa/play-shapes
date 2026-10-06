@@ -1,3 +1,4 @@
+@tool
 class_name TiltShiftBasketPreset
 extends Resource
 ## Reflection exchanges team colors and preserves trash. No strategic fairness claim.

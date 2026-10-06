@@ -14,6 +14,8 @@ test("treats project GDScript as source and vendored addons as not", () => {
   assert.equal(isGdscriptSource("host/session_host.gd"), true);
   assert.equal(isGdscriptSource("tests/e2e/host.gd"), true);
   assert.equal(isGdscriptSource("addons/godot_mcp/plugin.gd"), false);
+  assert.equal(isGdscriptSource("addons/tilt_shift_workshop/workshop_model.gd"), true);
+  assert.equal(isGdscriptSource("addons/standalone_build/standalone_build_plugin.gd"), false);
   assert.equal(isGdscriptSource("host/session_host.gd.uid"), false);
 });
 

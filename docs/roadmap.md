@@ -69,8 +69,9 @@ arena adds falling/colliding balls, full-turn paddles, basket catches and seeded
 
 Calibrated multiplayer motion has its host consumer and reusable browser stream, with
 per-player neutral, continuous turns, bounded comparison, reconnect policy and lifecycle.
-Readiness/phone presentation, workshop UI, production presentation and lobby launch remain
-outside this foundation. Real-phone accuracy and feel await owner trials.
+The editor workshop provides snapped content editing, geometry guides, named saves and
+actual gameplay preview. Readiness/phone presentation, production presentation and lobby
+launch remain outside this foundation. Real-phone accuracy and feel await owner trials.
 See [the rules contract](../minigames/003_tilt_shift/README.md).
 
 ## Backlog
@@ -107,9 +108,9 @@ its red error panel for the rest of the session. Two cases are known:
 Late input after a phase change should be dropped quietly. The end-to-end test avoids both
 cases on purpose; fixing the bug means removing those two waits.
 
-On Windows with Godot 4.7.2, `tilt_shift_rules_test` intermittently exits with code
+On Windows with Godot 4.7.2, `tilt_shift_rules_test` and `tilt_shift_motion_test` have exited with code
 `3221225477` during native shutdown after printing zero assertion failures. It also
-reproduces in a fresh, fully imported copy of the rules-only commit. Treat that exit as
+reproduces for the rules test in a fresh, fully imported copy of the rules-only commit. Treat that exit as
 a failed check, retain its log and report it separately from assertion results; its
 cause remains unresolved.
 

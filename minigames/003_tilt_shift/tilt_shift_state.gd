@@ -1,3 +1,4 @@
+@tool
 class_name TiltShiftState
 extends RefCounted
 ## Typed host contracts; later transport converts these to its own wire representation.

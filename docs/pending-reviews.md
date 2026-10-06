@@ -24,8 +24,9 @@ removes it. The evidence labels are defined in
 - `[PHYSICAL-PHONE]` Responsiveness and physical-angle presentation once motion/phone
   integration uses the arena's confirmed pose rather than its requested target.
 - `[EXPORTED-BUILD]` Physics and cleanup in the integrated Windows minigame.
-- The workshop must consume the same arena and display its swept-clearance diagnostics;
-  its editor interface and owner inspection remain future work.
+- `[EDITOR]` Owner usability review of the workshop, guide measurements, snap/tolerance
+  preferences and save/preview workflow. Scripted editor checks and captures do not
+  establish usability. The workshop now consumes the actual runtime arena.
 
 ## Tilt Shift calibrated motion
 

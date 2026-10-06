@@ -231,6 +231,11 @@ rules controller and shared gameplay/preview physics arena. The arena owns live 
 delivery; its controller owns rounds, assignments, deadlines and scores. Physics snapshots
 copy the launch-frozen selected profile; no extra autoload or network message is involved.
 
+`addons/tilt_shift_workshop/` owns editor-only deep-copied drafts and geometry guides.
+Its separate preview process runs the same arena/controller with designer input; it
+does not start phone services. [The workshop guide](../minigames/003_tilt_shift/tuning/WORKSHOP.md)
+describes saving, explicit active selection and preview isolation.
+
 ## Assets, addons and tests
 
 - `assets/runtime/` is the curated runtime-media boundary. Source and archive art remains

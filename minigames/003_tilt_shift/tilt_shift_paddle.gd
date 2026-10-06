@@ -1,3 +1,4 @@
+@tool
 class_name TiltShiftPaddle
 extends Resource
 ## One fixed paddle anchor, in arena-width units on both axes.

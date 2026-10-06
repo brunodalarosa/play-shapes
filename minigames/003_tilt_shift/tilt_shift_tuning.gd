@@ -1,3 +1,4 @@
+@tool
 class_name TiltShiftTuning
 extends Resource
 ## Provisional rules/content profile. The owner tunes duration and control separation.

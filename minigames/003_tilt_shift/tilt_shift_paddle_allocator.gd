@@ -1,3 +1,4 @@
+@tool
 class_name TiltShiftPaddleAllocator
 extends RefCounted
 ## Exact count-constrained separation on five paddles per team, only at round boundaries.

@@ -1,3 +1,4 @@
+@tool
 class_name TiltShiftDelivery
 extends RefCounted
 ## Exact trapezoid integration and midpoint quantiles of a linear intensity profile.

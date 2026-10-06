@@ -22,6 +22,7 @@ none of them needs the others first.
 | HTTPS for test phones | [docs/local-https.md](docs/local-https.md) |
 | The Windows package | [docs/standalone-build.md](docs/standalone-build.md) |
 | Tuning values | [Tuning/README.md](Tuning/README.md) |
+| Tilt Shift editor workshop | [the workshop guide](minigames/003_tilt_shift/tuning/WORKSHOP.md) |
 | Squircle art source and export | [art/squircle/README.md](art/squircle/README.md) |
 | Bubbles art source and runtime assets | [art/bubbles/README.md](art/bubbles/README.md), [the asset guide](assets/runtime/minigames/bubbles_and_jellyfishes/README.md) |
 | Tilt Shift art source and runtime assets | [art/tilt_shift/README.md](art/tilt_shift/README.md), [the asset guide](assets/runtime/minigames/003/README.md) |

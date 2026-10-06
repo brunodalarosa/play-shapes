@@ -1,3 +1,4 @@
+@tool
 class_name TiltShiftPhysicsTuning
 extends Resource
 ## Arena-local physics and delivery. Both axes use the layout's arena-width unit.
