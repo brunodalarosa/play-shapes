@@ -17,6 +17,7 @@ var _locked: bool = false
 var _token: String = ""
 var _playing: bool = false
 var _new_round: bool = false
+var _profile: TiltShiftMotionTuning
 
 
 func prepare(
@@ -30,6 +31,7 @@ func prepare(
 	if not service.begin_multiplayer_motion(player_ids):
 		return false
 	_service = service
+	_profile = selected.duplicate() as TiltShiftMotionTuning
 	_service.motion_session_ended.connect(_on_session_ended)
 	for player_id: String in player_ids:
 		var channel := service.motion_channels[player_id]
@@ -39,6 +41,39 @@ func prepare(
 		_callbacks[player_id] = callback
 		channel.calibration_requested.connect(callback)
 	return true
+
+
+func sync_roster(player_ids: PackedStringArray) -> void:
+	if _locked or _service == null:
+		return
+	for player_id: String in inputs.keys():
+		if player_id in player_ids:
+			continue
+		_channels[player_id].calibration_requested.disconnect(_callbacks[player_id])
+		_service.remove_multiplayer_motion(player_id)
+		inputs.erase(player_id)
+		_channels.erase(player_id)
+		_callbacks.erase(player_id)
+		_states.erase(player_id)
+		_feedback_at.erase(player_id)
+		_generations.erase(player_id)
+	for player_id: String in player_ids:
+		if inputs.has(player_id):
+			continue
+		var channel := _service.add_multiplayer_motion(player_id)
+		if channel == null:
+			continue
+		_channels[player_id] = channel
+		inputs[player_id] = TiltShiftTiltInput.new(_profile)
+		var callback := _calibrate.bind(player_id)
+		_callbacks[player_id] = callback
+		channel.calibration_requested.connect(callback)
+
+
+func reset_preparation(player_id: String) -> void:
+	if not _locked and inputs.has(player_id):
+		inputs[player_id] = TiltShiftTiltInput.new(_profile)
+		_states.erase(player_id)
 
 
 func activate(arena: TiltShiftArena) -> bool:

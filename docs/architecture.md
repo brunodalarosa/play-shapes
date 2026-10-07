@@ -167,8 +167,12 @@ to the rules. See [motion input](motion-input.md#tilt-shift-control).
 `TiltShiftPresentation` wraps the arena with imported factory artwork, physical-body
 beam visuals, one cosmetic operator per participant and host-derived score/time/result
 feedback. The editor workshop gameplay preview uses that same presentation scene.
-Readiness integration, phone presentation and catalog/lobby launch remain future work.
-These are callable host components; presentation adds no protocol or gameplay state owner.
+
+`TiltShiftSession`, a SessionHost child, carries preparation into the gameplay wrapper,
+sequences mapped rounds and retires capture on results or exit. `TiltShiftProtocol`
+copies accepted state into personalized snapshots. The catalog lists the normal
+2/4/6/8/10-player entry; the separately labeled F12 review uses simulated controls.
+See [decision 0029](decisions/0029-tilt-shift-session.md).
 
 ## Characters
 
@@ -221,8 +225,9 @@ These are callable host components; presentation adds no protocol or gameplay st
   [browser-build.md](browser-build.md).
 - The phone onboarding keeps the socket available while players choose a Squircle color and
   enter a name. The host creates the player record only on the final join submission.
-- Ready-up shows one host-confirmed READY/CANCEL toggle, without gameplay controls, preview or
-  booklet.
+- Ordinary ready-up shows one host-confirmed READY/CANCEL toggle. Tilt Shift additionally
+  exposes permission and neutral calibration; its phone shows one canonical team paddle
+  as a movement guide. Preview and instructions remain on the shared screen.
 - `web/src/squircle_v1.ts` draws manifest-owned front idle sheets in setup and in the player's
   personalized Bubbles snapshot.
 - What the phone screens do is in [phone-client.md](phone-client.md).

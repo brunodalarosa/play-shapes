@@ -17,6 +17,9 @@ extends Resource
 ## Largest number of players a round supports.
 @export_range(2, 10) var max_players := 10
 
+## Empty accepts every count within the normal limits; otherwise only these counts launch.
+@export var allowed_player_counts := PackedInt32Array()
+
 ## The PreMinigameContent the ready screen shows.
 @export_file("*.tres") var pre_minigame_content_path: String
 

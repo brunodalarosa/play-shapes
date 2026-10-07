@@ -615,3 +615,83 @@ html.ready-active main {
   border-radius: 16px;
   padding: 14px;
 }
+
+html.tilt-active,
+html.tilt-active body {
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  background: #eee1c8;
+  overscroll-behavior: none;
+}
+html.tilt-active main {
+  padding: 0;
+  margin: 0;
+  inline-size: 100%;
+  max-inline-size: none;
+  block-size: var(--controller-height, 100dvh);
+}
+html.tilt-active main > :not(#tilt-shift) {
+  display: none !important;
+}
+#tilt-shift {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  user-select: none;
+  touch-action: none;
+}
+#tilt-paddle {
+  inline-size: 100%;
+  min-block-size: 0;
+  flex: 1;
+}
+#tilt-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+#tilt-actions button {
+  min-block-size: 48px;
+  padding: 12px 20px;
+  border: 3px solid #c1aa7c;
+  border-radius: 14px;
+  background: #fff7e1;
+  color: #2d453c;
+  font-size: clamp(16px, 3vw, 23px);
+  font-weight: 800;
+  touch-action: manipulation;
+}
+#tilt-actions button:disabled {
+  opacity: 0.5;
+}
+#tilt-ready {
+  background: #9eddb6 !important;
+}
+#tilt-ready[aria-pressed="true"] {
+  background: #f4bc82 !important;
+}
+#tilt-state {
+  flex-basis: 100%;
+  margin: 0;
+  text-align: center;
+}
+.tilt-phone-icon {
+  display: none;
+  border: 3px solid #9a8565;
+  border-radius: 8px;
+  inline-size: 58px;
+  block-size: 30px;
+  text-align: center;
+  line-height: 24px;
+}
+@media (orientation: portrait) {
+  .tilt-phone-icon {
+    display: block;
+  }
+}

@@ -60,6 +60,44 @@ func _send_motion_subscription(player_id: String, generation: String) -> void:
 	_send_to_player(player_id, message)
 
 
+func add_multiplayer_motion(player_id: String) -> MotionInputChannel:
+	if player_id.is_empty() or motion_channels.size() >= 10 or motion_channels.has(player_id):
+		return null
+	var channel := MotionInputChannel.new()
+	channel.begin(player_id)
+	motion_channels[player_id] = channel
+	_send_motion_subscription.call_deferred(player_id, channel.subscription_id)
+	return channel
+
+
+func remove_multiplayer_motion(player_id: String) -> void:
+	var channel := motion_channels.get(player_id) as MotionInputChannel
+	if channel == null:
+		return
+	motion_channels.erase(player_id)
+	_send_to_player(
+		player_id,
+		{ "type": "motion_stop", "subscription_id": channel.subscription_id },
+	)
+	channel.end()
+
+
+func set_tilt_shift_protocol(protocol: RefCounted) -> void:
+	# Keep game state types out of shared transport startup; adapters expose snapshot_for().
+	_active_protocol = protocol
+	_broadcast_gameplay_snapshots()
+
+
+func clear_tilt_shift_protocol(protocol: RefCounted) -> void:
+	if _active_protocol == protocol:
+		_active_protocol = null
+
+
+func send_current_snapshot(player_id: String, coalesce := true) -> void:
+	if _active_protocol != null:
+		_send_to_player(player_id, _active_protocol.snapshot_for(player_id), coalesce)
+
+
 func send_motion_feedback(player_id: String, generation: String, state: Dictionary) -> void:
 	var channel := motion_channels.get(player_id) as MotionInputChannel
 	if channel == null or channel.subscription_id != generation:
@@ -445,12 +483,14 @@ func _send_gameplay_snapshot(peer: WebSocketPeer, player_id: String) -> void:
 	peer.send_text(JSON.stringify(message))
 
 
-func _send_to_player(player_id: String, message: Dictionary) -> void:
+func _send_to_player(player_id: String, message: Dictionary, coalesce := false) -> void:
 	for client: Dictionary in _clients:
 		if (
 			client.welcomed
 			and _registry.player_for_connection(client.connection_id).get("player_id") == player_id
 		):
+			if coalesce and client.peer.get_current_outbound_buffered_amount() > 0:
+				return
 			client.peer.send_text(JSON.stringify(message))
 			return
 

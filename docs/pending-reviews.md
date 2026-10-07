@@ -48,8 +48,8 @@ removes it. The evidence labels are defined in
 
 ## Tilt Shift art
 
-- `[PHYSICAL-PHONE]` Paddle readability on a real landscape phone, including five
-  simultaneous assignments, when the phone presentation is integrated.
+- `[PHYSICAL-PHONE]` One-paddle guide readability on a real landscape phone across
+  every supported roster, including players who control five factory paddles.
 - `[HUMAN-PLAY]` Couch-distance readability of balls, paddles and basket openings,
   including different basket widths/counts and ten operator stations.
 - `[HUMAN-PLAY]` Both-side Squircle hand contact and lever travel when operating
@@ -108,6 +108,18 @@ changed. A pixel comparison with the previous sheets found nothing a viewer shou
 - The source opened in Blender by someone who edits it: the scene, the actions and the face
   images are found under their new names. No evidence label covers Blender.
 
+## Tilt Shift phone and complete flow
+
+- `[PHYSICAL-PHONE]` Chrome on iPhone and Android: real gesture permission, denied/no-event
+  paths, comfortable sideways neutral, portrait/landscape changes, repeated full turns,
+  gameplay reconnect without neutral reset, lock/background/foreground and lobby cleanup.
+  Record exact device, OS and browser versions. Synthetic Chromium events do not cover this.
+- `[HUMAN-PLAY]` One-paddle phone guide readability and responsiveness, the provisional
+  intermission, team recognition and fairness with the three- and five-opening presets.
+- `[EXPORTED-BUILD]` Physical-phone play against the Windows executable; desktop
+  export/pack checks do not establish this real-device journey.
+- Audio selection, whistle playback and listening remain deferred.
+
 ## Phone client
 
 Record the exact OS and browser versions for each row.
@@ -138,10 +150,6 @@ device.
 
 - `[EXPORTED-BUILD]` Real phones playing against the exported executable, including the
   installed app.
-- `[AUTO]` `node tools/check.mjs --release`, and `tests/lobby_export_pack_check.gd` after an
-  export. Both need export templates. Neither has run with them since the check command
-  changed how it reads a Godot script's result and the pack check moved to the shared test
-  base.
 
 ## Debug screens
 

@@ -134,9 +134,10 @@ func _run() -> void:
   Disconnect the callback at the end of the test.
 - `tests/test_script_test.gd` tests the base with the small scripts in `tests/fixtures/`.
 
-Six scripts do not use the base:
+Seven scripts do not use the base:
 
-- `pre_minigame_server.gd`, `motion_lab_server.gd` and `e2e/host.gd` in `tests/`, and
+- `pre_minigame_server.gd`, `motion_lab_server.gd`, `e2e/host.gd` and
+  `e2e/tilt_shift_host.gd` in `tests/`, and
   `bubbles_phone_preview.gd` in the Bubbles `tests/` folder, are hosts that a browser test
   starts and stops. They never reach an end.
 - `tests/multiplayer_motion_server.gd` is the ten-socket calibrated-control fixture;
@@ -161,6 +162,27 @@ start only what they need, so they stay fast.
   the required runtime paths.
 
 ## Focused checks by area
+
+- Tilt Shift complete flow: `tilt_shift_flow_test.gd` under the minigame's tests covers
+  every allowed roster, readiness bypass, stale capture, final joins, calibration transfer,
+  reconnect neutrality, mapped presets, results and cleanup. Run
+  `node tools/check.mjs tilt_shift_flow minigame_flow pre_minigame_readiness` alongside
+  the catalog and debug checks.
+- `web/tests/003_tilt_shift/phone.test.mjs` checks malformed/replayed snapshots and one
+  canonical guide for five assignments. `web/e2e/tilt_shift_phones.spec.ts` uses the real
+  boot/catalog/gameplay journey with 2/4/6/8/10 Chromium phones and synthetic sensor events.
+  It is included in the consolidated check. Traffic and coordination costs are described
+  in [flow tuning](../minigames/003_tilt_shift/tuning/FLOW.md).
+- `E2E_WINDOWED=1` enables real-host captures for those scenarios. It does not supply
+  physical-phone evidence. The quick Tilt Shift fixture maps two eight-second rounds;
+  Bubbles retains its existing quick/full behavior.
+- Set `E2E_EXPORTED_PACK` to the absolute Windows package PCK to run the same browser
+  journey against exported resources in Godot. The driver remains an external test script;
+  it rejects a package run that can see the workspace's test resources. This loads the
+  exported boot, browser bundle, scenes and art. The release executable ignores external
+  script drivers, so its startup/served-assets check is separate from this PCK journey.
+- `debug_launcher_test.gd` checks the separately labeled simulated factory, ten synthetic
+  operators, no registered phones/subscriptions, restart and clean lobby return.
 
 - Tilt Shift factory: `tilt_shift_presentation_test.gd` in the minigame's `tests/`
   folder checks 2/4/6/8/10 players, actual collider sizes/transforms through turns and

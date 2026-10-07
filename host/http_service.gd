@@ -4,7 +4,27 @@ extends Node
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
 const BUBBLES_ART := "res://assets/runtime/minigames/bubbles_and_jellyfishes"
+const TILT_ART := "res://assets/runtime/minigames/003"
 const ASSETS: Dictionary = {
+	"/tilt-shift/manifest.json": {
+		"path": TILT_ART + "/manifest.json",
+		"content_type": "application/json",
+	},
+	"/tilt-shift/paddle_orange.png": {
+		"path": TILT_ART + "/paddles/paddle_orange.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/tilt-shift/paddle_blue.png": {
+		"path": TILT_ART + "/paddles/paddle_blue.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/tilt-shift/paddle_neutral.png": {
+		"path": TILT_ART + "/paddles/paddle_neutral.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
 	"/manifest.webmanifest": {
 		"path": "res://web/public/manifest.webmanifest",
 		"content_type": "application/manifest+json",

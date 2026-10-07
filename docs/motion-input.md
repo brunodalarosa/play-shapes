@@ -79,6 +79,18 @@ channels, listeners and calibration. A later preparation starts fresh. The consu
 state-change feedback at most five times/s, plus calibration replies limited to five/s;
 a new subscription receives fresh feedback. No per-frame angle snapshots are added.
 
+## Tilt Shift preparation lifecycle
+
+The normal catalog flow uses TiltShiftSession to keep the same motion consumer across
+the preparation-to-factory scene transition. Final joins from existing onboarding sockets
+receive new isolated channels without resetting earlier players. Expired preparation
+participants lose their channels. READY is revoked when capture becomes stale or unusable.
+
+Preparation resume clears neutral and readiness; active resume keeps neutral and ownership.
+Host cancel, scene startup failure, results, debug replacement and return to the lobby retire
+the prepared consumer. The F12 factory review is explicitly simulated and creates no motion
+subscriptions. See [flow tuning](../minigames/003_tilt_shift/tuning/FLOW.md).
+
 ## Units and axes
 
 - Orientation angles are W3C intrinsic Z-X'-Y'' degrees.

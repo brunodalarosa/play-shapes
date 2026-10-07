@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="TiltShiftBasketPreset" load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://minigames/003_tilt_shift/tilt_shift_basket_preset.gd" id="1"]
+[ext_resource type="Script" path="res://minigames/003_tilt_shift/tilt_shift_basket_opening.gd" id="2"]
+
+[sub_resource type="Resource" id="Orange"]
+script = ExtResource("2")
+basket_id = "orange"
+team = 0
+center = 0.2
+width = 0.4
+
+[sub_resource type="Resource" id="Trash"]
+script = ExtResource("2")
+basket_id = "trash"
+team = 2
+center = 0.5
+width = 0.2
+
+[sub_resource type="Resource" id="Blue"]
+script = ExtResource("2")
+basket_id = "blue"
+team = 1
+center = 0.8
+width = 0.4
+
+[resource]
+script = ExtResource("1")
+preset_name = "Three mirrored openings"
+arena_width = 1.0
+openings = Array[ExtResource("2")]([SubResource("Orange"), SubResource("Trash"), SubResource("Blue")])

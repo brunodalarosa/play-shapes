@@ -12,6 +12,23 @@ development error panel. The joystick and action button are in
   and the player's personalized character preview.
 - The Squircle v1 body, hands and feet share the player's chosen color.
 
+## The Tilt Shift screen
+
+Preparation exposes Enable tilt, Set neutral and the host-confirmed READY/CANCEL action.
+Current usable orientation and completed calibration are required by the host. A browser
+without a permission enum may still provide valid samples; denial or absent samples block READY.
+The preview and play instructions remain on the shared screen.
+
+Gameplay shows one canonical team paddle as a movement guide, even when that player owns
+several factory paddles. Its crop, center pivot, end-cap fitting and proportions match the
+shared beam; its angle comes from the host. There are no touch gameplay controls or score HUD.
+Landscape is preferred, with responsive portrait fallback and optional orientation lock.
+
+Preparation reconnect clears READY and neutral. Gameplay reconnect retains neutral and
+shows only a temporary permission action if capture needs reacquisition. Results, cancel
+and lobby return retire capture and hide the guide. Returning from a cached page reconnects
+through the authenticated subscription before capture can resume.
+
 ## The offer to run as an app
 
 The controller offers **Run Play Shapes as an app** before the host registers a new player,
