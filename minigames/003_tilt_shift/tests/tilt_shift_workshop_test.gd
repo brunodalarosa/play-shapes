@@ -35,6 +35,7 @@ func _run() -> void:
 		"Redo restores snapped coordinates",
 	)
 	draft.load_profile(DEFAULT)
+	var original_center := draft.basket().openings[0].center
 	var other := draft.reflected_index(0)
 	check(other == 4, "Example pairs outer Orange with reflected Blue")
 	draft.begin_edit()
@@ -46,10 +47,10 @@ func _run() -> void:
 		"One width edit snaps and changes both team openings",
 	)
 	draft.begin_edit()
-	check(draft.move_basket(0, 0.84), "Paired reorder is supported")
+	check(draft.move_basket(0, 1.0 - original_center), "Paired reorder is supported")
 	draft.end_edit()
 	check(
-		is_equal_approx(draft.basket().openings[other].center, 0.16),
+		is_equal_approx(draft.basket().openings[other].center, original_center),
 		"Paired reorder moves the existing stable partner instead of silently re-pairing",
 	)
 	check(
@@ -58,7 +59,7 @@ func _run() -> void:
 	)
 	draft.undo()
 	check(
-		is_equal_approx(draft.basket().openings[0].center, 0.16),
+		is_equal_approx(draft.basket().openings[0].center, original_center),
 		"Paired move is one undo operation",
 	)
 	draft.basket().openings[other].center = 0.79
@@ -67,7 +68,10 @@ func _run() -> void:
 		"Missing reflected partner cannot change team width silently",
 	)
 	check(not draft.move_basket(0, 0.20), "Missing reflected partner blocks paired dragging")
-	check(draft.move_basket(other, 0.84, false), "Single-opening draft repair stays available")
+	check(
+		draft.move_basket(other, 1.0 - original_center, false),
+		"Single-opening draft repair stays available",
+	)
 	draft.load_profile(DEFAULT)
 	draft.profile.paddle_layout.paddles[0].position = Vector2(0.10, 0.10)
 	draft.profile.paddle_layout.paddles[1].position = Vector2(0.10, 0.18)

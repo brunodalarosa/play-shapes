@@ -59,7 +59,9 @@ removes it. The evidence labels are defined in
 ## Tilt Shift factory presentation
 
 - `[HUMAN-PLAY]` Owner review of ball/paddle/basket readability at couch distance,
-  ownership badges, names, selected character colors and ten-player station density.
+  ownership badges, selected character colors, inward-facing operators and ten-player density.
+- `[HUMAN-PLAY]` Full-width basket routing, colored score numbers and deeper fronts at
+  FHD/HD/4:3. The default row has no gaps and catches by center at shared rims.
 - `[HUMAN-PLAY]` Lever loop, reversal and held poses on both sides; catch/cutoff and
   cumulative score/round/win/draw feedback. Runtime captures do not establish feel.
 - `[PHYSICAL-PHONE]` Accepted-motion timing and shared-screen readability during real play.

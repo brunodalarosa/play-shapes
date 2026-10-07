@@ -254,8 +254,8 @@ func _on_angle(player: TiltShiftState.Player) -> void:
 
 func _on_scores(state: TiltShiftState.Snapshot) -> void:
 	_state = state
-	_orange.text = "Orange Team  %d" % state.scores[0]
-	_blue.text = "Blue Team  %d" % state.scores[1]
+	_orange.text = str(state.scores[0])
+	_blue.text = str(state.scores[1])
 
 
 func _on_round_ended(state: TiltShiftState.Snapshot) -> void:
@@ -274,11 +274,9 @@ func _on_round_ended(state: TiltShiftState.Snapshot) -> void:
 
 func _on_finished(state: TiltShiftState.Snapshot) -> void:
 	_state = state
-	_cue.text = (
-		"DRAW"
+	_cue.text = ("DRAW"
 		if state.is_draw
-		else "%s TEAM WINS" % ("ORANGE" if state.winner == 0 else "BLUE")
-	)
+		else "%s WINS" % ("ORANGE" if state.winner == 0 else "BLUE"))
 	_cue.show()
 
 
@@ -316,6 +314,9 @@ func _fit_camera() -> void:
 		float(viewport.size.x) / _world_bounds.size.x,
 		float(viewport.size.y) / _world_bounds.size.y,
 	)
+	var bottom := _camera.position.y + (float(viewport.size.y) * 0.5 + 2.0) / _camera.zoom.y
+	for basket: TiltShiftBasketVisual in _baskets.values():
+		basket.fill_to(bottom)
 
 
 func _on_stopped() -> void:

@@ -5,6 +5,7 @@ extends Node2D
 var opening_rect: Rect2
 var back: NinePatchRect
 var front: NinePatchRect
+var _badge: Sprite2D
 var _flash_remaining := 0.0
 var _flash_seconds := 0.25
 
@@ -27,6 +28,8 @@ func configure(opening: TiltShiftBasketOpening, floor_y: float, art_scale: float
 	)
 	back = TiltShiftArt.strip(prefix + "_back", width, art_scale)
 	front = TiltShiftArt.strip(prefix + "_front", width, art_scale)
+	front.patch_margin_top = 32
+	front.patch_margin_bottom = 32
 	var rear_region := TiltShiftArt.bounds(prefix + "_back")
 	var rear_origin_y := -float(mouth[2]) * art_scale
 	back.position = Vector2(-width * 0.5, rear_origin_y + rear_region.position.y * art_scale)
@@ -41,10 +44,27 @@ func configure(opening: TiltShiftBasketOpening, floor_y: float, art_scale: float
 	add_child(back)
 	add_child(front)
 	if opening.team == 2:
-		var badge := TiltShiftArt.sprite("baskets/trash_badge", width * 0.30)
-		badge.position.y = front.position.y + front.size.y * art_scale * 0.5
-		badge.z_index = 6
-		add_child(badge)
+		_badge = TiltShiftArt.sprite("baskets/trash_badge", width * 0.30)
+		_badge.z_index = 6
+		add_child(_badge)
+		_update_badge()
+
+
+func fill_to(bottom_y: float) -> void:
+	var depth := bottom_y - position.y - front.position.y
+	front.size.y = maxf(front.texture.get_height(), depth / front.scale.y)
+	_update_badge(depth)
+
+
+func _update_badge(visible_depth: float = INF) -> void:
+	if _badge != null:
+		var depth := minf(front.size.y * front.scale.y, visible_depth)
+		var width := front.size.x * front.scale.x * 0.30
+		_badge.scale = Vector2.ONE * minf(
+			width / _badge.texture.get_width(),
+			depth * 0.8 / _badge.texture.get_height(),
+		)
+		_badge.position.y = front.position.y + depth * 0.5
 
 
 func pulse(seconds: float) -> void:

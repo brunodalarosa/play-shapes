@@ -54,7 +54,9 @@ in this asset import. Visual bounds exclude transparent canvas padding.
 Draw the rear/opening behind balls, then the front panel over balls. Put the
 trash badge above the trash front. Match the centers of a back and its front;
 the back's `front_overlay_offset_px` locates the front canvas from the back canvas.
-Both layers share a canvas width and keep their native heights.
+Both layers share a canvas width. The rear keeps its native height; the factory front
+uses 32-pixel top/bottom caps and stretches its center down to the viewport edge.
+The trash badge keeps its aspect ratio and fits the visible front panel.
 
 For width edits, use the shared canvas region x=8..420 for both layers,
 preserving the first and last 64 pixels. Stretch only the intervening center

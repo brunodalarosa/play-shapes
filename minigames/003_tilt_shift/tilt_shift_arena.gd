@@ -222,10 +222,15 @@ func _observe_balls(host_time_msec: int) -> void:
 		if previous.y < height and current.y >= height:
 			var fraction := (height - previous.y) / (current.y - previous.y)
 			var crossing := lerpf(previous.x, current.x, fraction)
+			# A continuous basket row has shared rims, not gaps. Its center decides which
+			# basket catches a straddling ball; gapped presets still require a full fit.
+			var fit_radius := 0.0 if _floor.is_empty() else ball.radius
+			var tolerance := TiltShiftBasketPreset.REFLECTION_TOLERANCE * WORLD_UNITS
 			for basket: TiltShiftBasketOpening in _snapshot.basket_preset.openings:
 				var left := (basket.center - basket.width * 0.5) * WORLD_UNITS
 				var right := (basket.center + basket.width * 0.5) * WORLD_UNITS
-				if crossing - ball.radius >= left and crossing + ball.radius <= right:
+				if crossing - fit_radius >= left - tolerance \
+						and crossing + fit_radius <= right + tolerance:
 					_resolve(ball, basket.basket_id, host_time_msec)
 					break
 		if ball.resolved:
@@ -316,7 +321,7 @@ func _build_floor() -> void:
 
 
 func _floor_segment(left: float, right: float, height: float) -> void:
-	if right <= left:
+	if right - left <= TiltShiftBasketPreset.REFLECTION_TOLERANCE * WORLD_UNITS:
 		return
 	_floor.append(
 		_wall(

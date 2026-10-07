@@ -15,7 +15,7 @@ actual gameplay preview. See [the editor workshop workflow](WORKSHOP.md).
 | Round count | 4 | Integer, 1–24 | Higher lengthens a shift; edit the round mapping alongside it. |
 | Neighbor distance | 0.24 | Arena-width units, 0.01–2 | Higher asks the allocator to separate more nearby paddles. |
 | Paddle layout | `layouts/Mirrored.tres` | One selected Resource | Ten stable anchors in four rows, five per team. |
-| Baskets by round | `baskets/FiveOpenings.tres` repeated four times | One valid entry per numbered round | Orange/Blue/trash/Orange/Blue mirrored example. |
+| Baskets by round | `baskets/FiveOpenings.tres` repeated four times | One valid entry per numbered round | Five touching openings cover the stage: Orange/Blue/trash/Orange/Blue. |
 
 Values are provisional. Owner play chooses duration, shift length and useful separation.
 The profile selects `Physics.tres` for arena geometry, contact materials and delivery.
@@ -55,7 +55,7 @@ Centers/widths share the layout's arena units, and floor width must match the ar
 Every Orange opening needs a reflected Blue opening of equal width. Off-center trash
 needs reflected trash; center trash reflects to itself. Basket count is configurable.
 
-Reflection tolerance is `0.00001` coordinate units for float/serialization precision,
+Reflection and touching-opening tolerance is `0.00001` coordinate units for float precision,
 not a fairness control. Missing references, duplicate IDs, non-finite geometry,
 nonpositive widths, overlaps, out-of-bounds openings and missing reflections fail
 validation. Drafts can be edited but cannot launch until valid.

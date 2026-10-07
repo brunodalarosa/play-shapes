@@ -13,7 +13,6 @@ var _shaft: Sprite2D
 var _grip: Sprite2D
 var _socket: Vector2
 var _grip_path: String
-var _label: Label
 var _frame := -1
 var _blink_time := 0.0
 var _has_angle := false
@@ -29,7 +28,7 @@ func configure(player: TiltShiftState.Player, selected: TiltShiftPresentationTun
 		if clip.name == "lever_pull" and clip.view == VIEW:
 			_clip = clip
 	assert(_clip.hand_centers_px.size() == int(_clip.frames))
-	var mirrored := player.team == 1
+	var mirrored := player.team == 0
 	scale.x = -1.0 if mirrored else 1.0
 	var base := TiltShiftArt.sprite("stations/station_base", selected.station_width)
 	base.position.y = 12.0
@@ -61,23 +60,6 @@ func configure(player: TiltShiftState.Player, selected: TiltShiftPresentationTun
 	character.position = Vector2(-10, -10)
 	character.z_index = 5
 	add_child(character)
-	var name_plate := TiltShiftArt.sprite("stations/name_plate", selected.station_width * 0.78)
-	name_plate.position = Vector2(0, 12)
-	name_plate.z_index = 7
-	add_child(name_plate)
-	_label = Label.new()
-	_label.text = "P%d · %s" % [player.seat, player.player_name]
-	_label.size = Vector2(selected.station_width * 0.72, 17)
-	_label.position = Vector2(_label.size.x * (0.5 if mirrored else -0.5), 4)
-	_label.scale.x = -1.0 if mirrored else 1.0
-	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	_label.clip_text = true
-	_label.add_theme_font_size_override("font_size", 9)
-	_label.add_theme_color_override("font_color", Color("312419"))
-	_label.z_index = 8
-	add_child(_label)
 	_blink_time = float(player.seat) * 0.37
 	apply_player(player)
 

@@ -60,8 +60,13 @@ adds the two non-absorbent material values, bounded by the engine. Zero paddle b
 with nonzero ball bounce still rebounds. With both zero, paddle motion still transfers
 momentum. Friction changes tangential sliding/rolling; it is not air damping.
 
-Solid floor segments occupy gaps between openings. A downward center crossing of the
-floor line counts only when the ball's full diameter fits the opening at that crossing.
+The default five baskets cover the full floor, each one-fifth of its width. Every downward
+center crossing resolves to a basket, including balls straddling a shared rim. The first
+matching opening owns an exact shared boundary, and each ball resolves only once.
+
+Custom gapped presets have solid floor segments and still require the full ball diameter
+to fit an opening at the crossing. Floating-point seams within `0.00001` arena widths
+do not create microscopic colliders or invalidate touching openings.
 The host reports the basket ID to the rules controller; the basket team receives one point.
 Trash, misses and out-of-bounds removal never score, and handles cannot resolve twice.
 

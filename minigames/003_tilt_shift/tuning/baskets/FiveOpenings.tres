@@ -7,36 +7,36 @@
 script = ExtResource("2")
 basket_id = "orange_left"
 team = 0
-center = 0.16
-width = 0.12
+center = 0.10
+width = 0.20
 
 [sub_resource type="Resource" id="Blue_left"]
 script = ExtResource("2")
 basket_id = "blue_left"
 team = 1
-center = 0.33
-width = 0.12
+center = 0.30
+width = 0.20
 
 [sub_resource type="Resource" id="Trash_center"]
 script = ExtResource("2")
 basket_id = "trash_center"
 team = 2
 center = 0.50
-width = 0.12
+width = 0.20
 
 [sub_resource type="Resource" id="Orange_right"]
 script = ExtResource("2")
 basket_id = "orange_right"
 team = 0
-center = 0.67
-width = 0.12
+center = 0.70
+width = 0.20
 
 [sub_resource type="Resource" id="Blue_right"]
 script = ExtResource("2")
 basket_id = "blue_right"
 team = 1
-center = 0.84
-width = 0.12
+center = 0.90
+width = 0.20
 
 [resource]
 script = ExtResource("1")
