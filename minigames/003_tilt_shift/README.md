@@ -101,9 +101,13 @@ Paddle artwork is a child of each physical body and fits its RectangleShape2D ex
 End caps keep their aspect; the beam center stretches to match the selected length and
 thickness. Camera zoom fits the view without scaling the physical subtree. Basket mouth
 centers/widths match scoring openings; balls draw between the rear and front layers.
-Neutral beams reveal solid floor gaps. Decorative side rails add no extra colliders.
 
-One mirrored station per participant retains selected names and body/hand/foot colors.
+The five default mouths meet across the full stage, with no solid floor gaps. Their
+front panels extend to the viewport's lower edge; top/bottom trim keeps its proportions.
+Custom gapped presets retain visible neutral floor beams. Side rails add no colliders.
+
+One station per participant faces into the arena and retains body/hand/foot colors.
+Stations have no text labels. Team scores use colored numbers without team names.
 Signed accepted-angle changes advance the authored `lever_pull` loop; missing or rejected
 input holds the operating frame. Natural blinks continue during a hold. The station never
 supplies physical angles. Paddle badges identify the current owner's seat, independent

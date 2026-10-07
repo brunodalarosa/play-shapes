@@ -87,7 +87,7 @@ func _check_rosters_and_geometry() -> void:
 			var operator := presentation.operator_for(player.player_id)
 			check(operator != null, "Every participant has an operator")
 			check(
-				(operator.scale.x < 0.0) == (player.team == 1),
+				(operator.scale.x < 0.0) == (player.team == 0),
 				"Team sides mirror the same character and lever without another asset library",
 			)
 			var selection := CharacterSelection.resolve_selection(
@@ -99,8 +99,8 @@ func _check_rosters_and_geometry() -> void:
 				"Selected body, hand and foot tint is retained independently of team",
 			)
 			check(
-				player.player_name in operator._label.text,
-				"Station labels retain selected names",
+				operator.find_children("*", "Label", true, false).is_empty(),
+				"Operator stations have no text labels",
 			)
 		for body: TiltShiftPaddleBody in presentation.arena.paddle_bodies():
 			var beam := presentation.beam_for(body.paddle_id)
@@ -136,6 +136,21 @@ func _check_rosters_and_geometry() -> void:
 				"Balls draw between basket layers",
 			)
 			_check_rendered_mouth(basket, opening)
+			var front_end := basket.position + basket.front.position
+			front_end.y += basket.front.size.y * basket.front.scale.y
+			var canvas := presentation.viewport.get_canvas_transform()
+			check(
+				(canvas * front_end).y >= presentation.viewport.size.y,
+				"Basket fronts fill the lower viewport edge after resizing",
+			)
+			if basket._badge != null:
+				var badge := basket._badge
+				var bottom := badge.global_position
+				bottom.y += badge.texture.get_height() * badge.scale.y * 0.5
+				check(
+					(canvas * bottom).y < presentation.viewport.size.y,
+					"Trash emblem remains fully visible in the deeper basket front",
+				)
 		presentation.stop()
 		check(
 			presentation._operators.is_empty() and presentation._beams.is_empty(),
@@ -181,6 +196,10 @@ func _check_control_and_rounds() -> void:
 	var catch_result := controller.resolve_ball(scored, orange.basket_id, time[0])
 	check(catch_result.accepted, "A valid catch scores")
 	check(presentation._orange.text.ends_with("1"), "HUD uses cumulative authoritative team scores")
+	check(
+		presentation._orange.text == "1" and presentation._blue.text == "0",
+		"Colored score numbers have no team labels",
+	)
 	presentation.arena.ball_removed.emit(scored, orange.basket_id)
 	var old_basket := presentation.basket_for(orange.basket_id)
 	check(old_basket._flash_remaining > 0.0, "A host catch triggers restrained basket feedback")
@@ -255,7 +274,7 @@ func _check_winner() -> void:
 	controller.resolve_ball(ball, basket.basket_id, time[0])
 	time[0] = state.deadline_msec
 	controller.advance(time[0])
-	check(presentation._cue.text == "ORANGE TEAM WINS", "Winner comes from shift totals")
+	check(presentation._cue.text == "ORANGE WINS", "Winner comes from shift totals")
 	presentation.stop()
 	presentation.queue_free()
 	await process_frame

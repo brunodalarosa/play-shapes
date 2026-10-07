@@ -164,7 +164,8 @@ start only what they need, so they stay fast.
 
 - Tilt Shift factory: `tilt_shift_presentation_test.gd` in the minigame's `tests/`
   folder checks 2/4/6/8/10 players, actual collider sizes/transforms through turns and
-  reversal, selected colors/names, scoring mouths, accepted-control holds, cutoff,
+  reversal, selected colors, label-free inward-facing operators, colored scores,
+  scoring mouths/front depth, accepted-control holds, cutoff,
   cleanup, remapped rounds and cumulative win/draw. Run
   `node tools/check.mjs tilt_shift_presentation tilt_shift_workshop_preview`.
 - Run `tilt_shift_presentation_visual_check.gd` without `--headless` for two/ten-player
@@ -197,6 +198,8 @@ start only what they need, so they stay fast.
   `tilt_shift_physics_test.gd` in `minigames/003_tilt_shift/tests/`. The focused command
   below includes curve counts/gaps, seed sequences, catches, exclusive cutoff, cleanup,
   native material/pair contacts, acceleration, fast impacts, full turns and reversal.
+- The arena test samples 201 crossings across the default continuous basket row,
+  including shared rims and stage edges; all resolve exactly once to a basket.
 - Run `tilt_shift_physics_cost_check.gd` in that folder as a headless script for the
   300-ball/45-second, ten-player profile and empty-arena baseline. It writes ignored
   `test-results/tilt-shift/physics-cost.txt`. Engine timings are sampled one-second

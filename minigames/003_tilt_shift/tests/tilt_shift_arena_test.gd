@@ -4,6 +4,7 @@ extends TestScript
 func _run() -> void:
 	await _test_seed_and_cleanup()
 	await _test_catches_and_deadline()
+	await _test_continuous_basket_row()
 	await _test_rotation_and_content()
 	await _test_delivery_pauses()
 	await _test_observer_stop()
@@ -125,6 +126,37 @@ func _test_catches_and_deadline() -> void:
 		not arena.controller.resolve_ball(late.handle, "orange_left", 1001).accepted,
 		"An old ball cannot resolve into a later round",
 	)
+	arena.stop()
+	arena.queue_free()
+	await process_frame
+
+
+func _test_continuous_basket_row() -> void:
+	var selected := TiltShiftFixtures.tuning(1)
+	selected.physics.ball_count = 201
+	var time: Array[int] = [0]
+	var arena := _arena(selected, time)
+	check(arena.floor_bodies().is_empty(), "Default basket row has no solid floor gaps")
+	var state := arena.controller.snapshot()
+	var height := state.paddle_layout.arena_size.y * TiltShiftArena.WORLD_UNITS
+	var catches := PackedStringArray()
+	var record := func(_handle: TiltShiftState.BallHandle, basket_id: String) -> void:
+		catches.append(basket_id)
+	arena.ball_removed.connect(record)
+	for index: int in 201:
+		var ball := arena._spawn(0)
+		var crossing := float(index) * 5.0
+		ball.previous_position = Vector2(crossing, height - 10)
+		ball.position = Vector2(crossing, height + 1)
+		arena.step(0, 0)
+		check(ball.resolved, "Every stage crossing resolves, including shared rims and edges")
+	check(
+		catches.size() == 201 and not catches.has(""),
+		"Continuous openings catch all falling balls exactly once without unscored gaps",
+	)
+	check(catches.has("trash_center"), "Trash remains a basket destination without points")
+	check(arena.live_balls().is_empty(), "Every caught ball retires its live body")
+	arena.ball_removed.disconnect(record)
 	arena.stop()
 	arena.queue_free()
 	await process_frame
