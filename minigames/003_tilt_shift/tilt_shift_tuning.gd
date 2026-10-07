@@ -22,9 +22,11 @@ var round_duration_seconds: float = 45.0:
 		neighbor_distance = clampf(value, 0.01, 2.0)
 
 @export_group("Selected content")
+@export var flow: TiltShiftFlowTuning = preload("res://minigames/003_tilt_shift/tuning/Flow.tres")
 ## Selected calibrated phone control profile. Frozen by the motion consumer at preparation.
-@export
-var motion: TiltShiftMotionTuning = preload("res://minigames/003_tilt_shift/tuning/Motion.tres")
+@export var motion: TiltShiftMotionTuning = preload(
+	"res://minigames/003_tilt_shift/tuning/Motion.tres"
+)
 ## Selected arena physics and delivery profile, frozen with the rules at launch.
 @export var physics: TiltShiftPhysicsTuning = preload(
 	"res://minigames/003_tilt_shift/tuning/Physics.tres"
@@ -37,6 +39,10 @@ var motion: TiltShiftMotionTuning = preload("res://minigames/003_tilt_shift/tuni
 
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
+	if flow == null:
+		errors.append("Tilt Shift: select a flow profile.")
+	else:
+		errors.append_array(flow.validation_errors())
 	if motion == null:
 		errors.append("Tilt Shift: select a motion control profile.")
 	else:

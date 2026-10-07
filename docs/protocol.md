@@ -79,6 +79,8 @@ The host serves a fixed list and nothing else:
 - Character sheets: `/squircle-v1/manifest.json`, `/squircle-v1/idle-front-colorable.png`,
   `/squircle-v1/idle-front-neutral.png`, `/squircle-v1/idle-front-blink.png`.
 - Bubbles art: `/bubbles-jellyfish.png`, `/bubbles-phone-background.png`.
+- Tilt Shift art: `/tilt-shift/manifest.json`, `/tilt-shift/paddle_orange.png`,
+  `/tilt-shift/paddle_blue.png` and `/tilt-shift/paddle_neutral.png`.
 
 Responses:
 
@@ -140,6 +142,24 @@ During ready-up, a registered phone sends `{"type":"pre_minigame_ready","ready":
   already open may finish joining, and registered phones may resume.
 - Disconnect and resume clear the ready state.
 - Host cancel restores the lobby state on connected phones.
+
+## Tilt Shift state
+
+Tilt Shift extends `pre_minigame_snapshot` with personalized `preparation` state:
+generation, calibrated/usable flags, capture state, host control angle and paddle size.
+The host checks fresh motion and calibration on READY and again at the final even-roster launch.
+Sensor status, samples and calibration retain their existing authenticated subscription messages.
+
+`tilt_shift_snapshot` carries generation, increasing sequence, phase, round, team,
+accepted angle in radians, owned paddle IDs and physical paddle length/thickness.
+The phone shows one movement guide regardless of the number of IDs. No client-authored
+angle, team, assignment or score message is accepted. Obsolete snapshot generations
+or sequences cannot replace the current phone view.
+
+Angle updates coalesce to the latest state at the selected flow ceiling, 15 Hz by default.
+Queued socket output skips that update rather than accumulating a backlog. Round and
+resume transitions send current state immediately. Calibration is locked throughout play;
+reconnect preserves the original neutral and does not recover unseen complete turns.
 
 ## Bubbles input
 

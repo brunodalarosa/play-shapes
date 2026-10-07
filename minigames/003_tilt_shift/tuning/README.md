@@ -24,6 +24,10 @@ See [the physics field guide](PHYSICS.md). The selected `Motion.tres` profile su
 view described in [the presentation contract](../README.md#factory-presentation).
 It is copied by the presentation at launch and does not alter frozen gameplay content.
 
+The selected `Flow.tres` controls intermission and phone update rate; see
+[flow tuning](FLOW.md). `ThreeOpenings.tres` supplies a distinct mirrored basket comparison
+alongside the unchanged five-opening default.
+
 ## Arena coordinates and neighbors
 
 Positions are measured from the arena's top-left. Both axes use the same unit: one default

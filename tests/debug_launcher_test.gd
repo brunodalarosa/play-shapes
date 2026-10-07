@@ -106,4 +106,42 @@ func _run() -> void:
 		"LAN service owner survives lobby return",
 	):
 		return
+	var tilt_review: DebugScenario = launcher.scenario_for_id(&"tilt_shift_review")
+	if not check(
+		tilt_review != null and tilt_review.minigame_id.is_empty(),
+		"Tilt Shift review is separate from real minigame launch",
+	):
+		return
+	var review_launched := launcher.launch(&"tilt_shift_review")
+	if not check(review_launched, "Simulated factory launches without phones"):
+		return
+	await scene_changed
+	var review_id := current_scene.get_instance_id()
+	var factory: TiltShiftPresentation = current_scene._factory
+	if not check(
+		factory.arena.controller.snapshot().players.size() == 10,
+		"Factory review contains ten synthetic operators",
+	):
+		return
+	if not check(
+		host.players().is_empty() and host.websocket.motion_channels.is_empty(),
+		"Factory review creates no registered phones or motion subscriptions",
+	):
+		return
+	if not check(
+		launcher.marker_text().contains("simulated controls")
+		and not host.minigame_availability(&"tilt_shift").available,
+		"Simulated marker persists without granting normal launch eligibility",
+	):
+		return
+	if not check(launcher.restart_scenario(), "Simulated factory restarts"):
+		return
+	await scene_changed
+	if not check(current_scene.get_instance_id() != review_id, "Restart creates a fresh factory"):
+		return
+	launcher.return_to_lobby()
+	await scene_changed
+	check(current_scene.scene_file_path == launcher.LOBBY_PATH, "Factory return loads the lobby")
+	check(launcher.marker_text().is_empty(), "Factory return removes the simulated marker")
+	check(host.accepting_new_players, "Factory return restores onboarding")
 	host.stop()

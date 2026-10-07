@@ -7,6 +7,11 @@ extends RefCounted
 static func scenarios(minigames: MinigameCatalog) -> Array[DebugScenario]:
 	var result: Array[DebugScenario] = [
 		DebugScenario.new(
+			&"tilt_shift_review",
+			"Tilt Shift factory · simulated controls",
+			"res://debug/tilt_shift_review.tscn",
+		),
+		DebugScenario.new(
 			&"motion_lab",
 			"Gyroscope and Accelerometer Lab",
 			"res://debug/motion_lab/motion_lab.tscn",

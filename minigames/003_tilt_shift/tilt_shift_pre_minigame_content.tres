@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PreMinigameContent" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scenes/pre_minigame_content.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/runtime/pre_minigame/tilt_shift_preview.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+title = "Tilt Shift"
+preview = ExtResource("2")
+controls = "Hold sideways. Enable tilt, set neutral, then READY."
+win_condition = "Your team's baskets score points. Highest shift total wins."
+hints = "Assignments change each round. Scoring stops with the timer."

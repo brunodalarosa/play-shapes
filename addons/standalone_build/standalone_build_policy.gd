@@ -28,6 +28,18 @@ const REQUIRED_BROWSER_PATHS := [
 	"web/public/style.css",
 ]
 const REQUIRED_RUNTIME_PATHS := [
+	"minigames/003_tilt_shift/tilt_shift_gameplay.tscn",
+	"minigames/003_tilt_shift/tilt_shift_minigame.tres",
+	"minigames/003_tilt_shift/tilt_shift_pre_minigame_content.tres",
+	"minigames/003_tilt_shift/tilt_shift_session.gd",
+	"minigames/003_tilt_shift/tilt_shift_protocol.gd",
+	"minigames/003_tilt_shift/tuning/Flow.tres",
+	"minigames/003_tilt_shift/tuning/baskets/ThreeOpenings.tres",
+	"assets/runtime/pre_minigame/tilt_shift_preview.png",
+	"assets/runtime/minigames/003/paddles/paddle_orange.png",
+	"assets/runtime/minigames/003/paddles/paddle_blue.png",
+	"assets/runtime/minigames/003/paddles/paddle_neutral.png",
+	"debug/tilt_shift_review.tscn",
 	"assets/runtime/minigames/003/manifest.json",
 	"minigames/003_tilt_shift/tilt_shift_presentation.tscn",
 	"web/public/platform_input_settings.json",

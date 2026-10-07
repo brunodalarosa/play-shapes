@@ -1,8 +1,8 @@
 # Tilt Shift host rules, physics and presentation
 
 Tilt Shift has host rules, calibrated motion, an editor workshop and a reusable factory
-presentation around the playable physics arena. Phone presentation and lobby entry
-are not integrated yet.
+presentation around the playable physics arena. Its normal catalog entry now connects
+permission/calibration, host readiness, gameplay, mapped rounds, results and lobby return.
 
 ## Ownership
 
@@ -155,9 +155,22 @@ fields they need. Calibrated control reuses the shared motion transport describe
 Create an ordinary `TiltShiftMotionController` node and call `prepare(service, ids, motion)`
 before readiness. After explicit per-player calibration, `ready_for(id)` exposes the host
 gate. Start the arena, then `activate(arena)` verifies that same calibrated roster.
-The caller still owns readiness and launch; neither is added to the lobby by this consumer.
+The caller still owns readiness and launch. `TiltShiftSession` provides that coordination
+for the normal catalog flow without changing the independently usable consumer.
 
 The node consumes latest samples, maps the physical sideways gesture to unwrapped angles
 and calls the existing rules seam. Neutral stays fixed throughout the shift. Arena stop,
 exit, shift completion and replacement subscriptions retire the consumer. `stop()` also
 cancels preparation. A later game gets fresh capture/calibration state.
+
+## Normal flow and phone guide
+
+The normal wrapper `tilt_shift_gameplay.tscn` attaches the session prepared by SessionHost.
+Its readiness predicate rechecks current samples and calibration before accepting READY
+and before launching an even roster. The reusable factory remains directly usable by the
+workshop and the explicitly simulated F12 review, without granting real launch eligibility.
+
+The phone consumes personalized host snapshots and displays one canonical team paddle as
+a movement guide. The actual host assignments may include several paddles; phone display
+does not communicate that count. Capture ends at results, and host Return to lobby restores
+ordinary controls. The [flow field guide](tuning/FLOW.md) describes intermission and traffic.
