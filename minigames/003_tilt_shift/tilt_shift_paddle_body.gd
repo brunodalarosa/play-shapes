@@ -13,6 +13,10 @@ var _maximum_tip_step: float = 3.0
 var speed: float = PI
 var size := Vector2(100, 10)
 var color := Color("ec9644")
+var placeholder_visible := true:
+	set(value):
+		placeholder_visible = value
+		queue_redraw()
 
 
 func configure(paddle: TiltShiftPaddle, profile: TiltShiftPhysicsTuning, units: float) -> void:
@@ -46,6 +50,8 @@ func advance_pose(delta: float) -> void:
 
 
 func _draw() -> void:
+	if not placeholder_visible:
+		return
 	draw_rect(Rect2(-size * 0.5, size), color)
 	draw_rect(Rect2(-size * 0.5, size), color.darkened(0.4), false, 1.0)
 	draw_circle(Vector2.ZERO, size.y * 0.25, Color("f4e6ad"))

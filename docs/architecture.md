@@ -164,8 +164,11 @@ lifecycle; each `TiltShiftTiltInput` holds one player's neutral and continuous i
 It consumes WebsocketService's keyed raw channels and supplies validated host angles
 to the rules. See [motion input](motion-input.md#tilt-shift-control).
 
-Readiness integration, workshop UI, phone presentation and catalog/lobby launch remain
-future work. The shared arena and motion consumer are callable host components.
+`TiltShiftPresentation` wraps the arena with imported factory artwork, physical-body
+beam visuals, one cosmetic operator per participant and host-derived score/time/result
+feedback. The editor workshop gameplay preview uses that same presentation scene.
+Readiness integration, phone presentation and catalog/lobby launch remain future work.
+These are callable host components; presentation adds no protocol or gameplay state owner.
 
 ## Characters
 

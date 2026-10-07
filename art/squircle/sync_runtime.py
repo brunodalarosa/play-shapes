@@ -40,6 +40,10 @@ runtime = {
                'first_frame': 1, 'last_frame': c['frames'],
                'playback': c.get('playback', 'loop')} for c in manifest['clips']],
 }
+for source_clip, runtime_clip in zip(manifest['clips'], runtime['clips']):
+    if source_clip['name'] == 'lever_pull':
+        runtime_clip['hand_centers_px'] = [frame['hand_center_px']
+                                         for frame in source_clip['sequence']]
 (OUT / 'manifest.json').write_text(json.dumps(runtime, indent=2) + '\n', encoding='utf-8')
 record = {'source_sha256': manifest['source_sha256'], 'sheets': hashes,
           'runtime_directory': OUT.relative_to(ROOT).as_posix(),

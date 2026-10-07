@@ -20,7 +20,9 @@ actual gameplay preview. See [the editor workshop workflow](WORKSHOP.md).
 Values are provisional. Owner play chooses duration, shift length and useful separation.
 The profile selects `Physics.tres` for arena geometry, contact materials and delivery.
 See [the physics field guide](PHYSICS.md). The selected `Motion.tres` profile supplies
-[calibrated motion tuning](MOTION.md). Production presentation tuning remains future work.
+[calibrated motion tuning](MOTION.md). `Presentation.tres` controls the cosmetic factory
+view described in [the presentation contract](../README.md#factory-presentation).
+It is copied by the presentation at launch and does not alter frozen gameplay content.
 
 ## Arena coordinates and neighbors
 

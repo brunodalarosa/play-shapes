@@ -25,6 +25,14 @@ var _schedule := PackedInt32Array()
 var _next_delivery: int = 0
 var _active: bool = false
 var _positions := RandomNumberGenerator.new()
+var placeholder_visible := true:
+	set(value):
+		placeholder_visible = value
+		for paddle: TiltShiftPaddleBody in _paddles:
+			paddle.placeholder_visible = value
+		for ball: TiltShiftBall in _balls:
+			ball.placeholder_visible = value
+		queue_redraw()
 
 
 func start_shift(
@@ -82,6 +90,10 @@ func live_balls() -> Array[TiltShiftBall]:
 
 func paddle_bodies() -> Array[TiltShiftPaddleBody]:
 	return _paddles.duplicate()
+
+
+func floor_bodies() -> Array[StaticBody2D]:
+	return _floor.duplicate()
 
 
 ## Signed swept clearances, in arena units. Negative values are diagnostics, not auto edits.
@@ -148,6 +160,7 @@ func _on_round_started(snapshot: TiltShiftState.Snapshot) -> void:
 		for paddle: TiltShiftPaddle in snapshot.paddle_layout.paddles:
 			var body := TiltShiftPaddleBody.new()
 			body.configure(paddle, _profile, WORLD_UNITS)
+			body.placeholder_visible = placeholder_visible
 			add_child(body)
 			_paddles.append(body)
 		_build_walls()
@@ -185,6 +198,7 @@ func _spawn(host_time_msec: int) -> TiltShiftBall:
 	var ball := TiltShiftBall.new()
 	ball.handle = registration.ball
 	ball.configure(_profile, WORLD_UNITS)
+	ball.placeholder_visible = placeholder_visible
 	var center := _snapshot.paddle_layout.arena_size.x * 0.5
 	var horizontal := _positions.randf_range(-_profile.spawn_half_width, _profile.spawn_half_width)
 	ball.position = Vector2(center + horizontal, _profile.ball_radius) * WORLD_UNITS
@@ -265,6 +279,7 @@ func _wall(position: Vector2, size: Vector2) -> StaticBody2D:
 	var shape := RectangleShape2D.new()
 	shape.size = size
 	var collider := CollisionShape2D.new()
+	collider.name = "CollisionShape2D"
 	collider.shape = shape
 	body.add_child(collider)
 	add_child(body)
@@ -312,7 +327,7 @@ func _floor_segment(left: float, right: float, height: float) -> void:
 
 
 func _draw() -> void:
-	if _snapshot == null:
+	if _snapshot == null or not placeholder_visible:
 		return
 	var size := _snapshot.paddle_layout.arena_size * WORLD_UNITS
 	draw_rect(Rect2(Vector2.ZERO, size), Color("ede5d5"))

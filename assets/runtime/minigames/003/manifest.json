@@ -1,0 +1,428 @@
+{
+  "schema": "play-shapes.tilt-shift-presentation.v1",
+  "assets": {
+    "environment/blue_paper_backdrop.png": {
+      "size": [
+        1672,
+        941
+      ]
+    },
+    "paddles/paddle_orange.png": {
+      "size": [
+        673,
+        160
+      ],
+      "visible_bounds_px": [
+        10,
+        9,
+        663,
+        151
+      ],
+      "pivot_px": [
+        336.5,
+        80.0
+      ]
+    },
+    "paddles/paddle_blue.png": {
+      "size": [
+        673,
+        160
+      ],
+      "visible_bounds_px": [
+        9,
+        8,
+        663,
+        152
+      ],
+      "pivot_px": [
+        336.5,
+        80.0
+      ]
+    },
+    "paddles/paddle_neutral.png": {
+      "size": [
+        673,
+        160
+      ],
+      "visible_bounds_px": [
+        8,
+        9,
+        665,
+        150
+      ],
+      "pivot_px": [
+        336.5,
+        80.0
+      ]
+    },
+    "gameplay/player_badge.png": {
+      "size": [
+        261,
+        264
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        253,
+        256
+      ],
+      "pivot_px": [
+        130.5,
+        132.0
+      ]
+    },
+    "gameplay/ball.png": {
+      "size": [
+        248,
+        251
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        240,
+        243
+      ],
+      "pivot_px": [
+        124.0,
+        125.5
+      ]
+    },
+    "gameplay/falling_marks.png": {
+      "size": [
+        149,
+        215
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        141,
+        207
+      ],
+      "pivot_px": [
+        74.5,
+        107.5
+      ]
+    },
+    "baskets/orange_back.png": {
+      "size": [
+        428,
+        271
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        420,
+        263
+      ],
+      "pivot_px": [
+        214.0,
+        135.5
+      ],
+      "horizontal_cap_margins_px": [
+        64,
+        64
+      ],
+      "front_overlay_offset_px": [
+        0,
+        161
+      ]
+    },
+    "baskets/blue_back.png": {
+      "size": [
+        428,
+        271
+      ],
+      "visible_bounds_px": [
+        18,
+        8,
+        409,
+        263
+      ],
+      "pivot_px": [
+        214.0,
+        135.5
+      ],
+      "horizontal_cap_margins_px": [
+        64,
+        64
+      ],
+      "front_overlay_offset_px": [
+        0,
+        161
+      ]
+    },
+    "baskets/trash_back.png": {
+      "size": [
+        428,
+        271
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        419,
+        263
+      ],
+      "pivot_px": [
+        214.0,
+        135.5
+      ],
+      "horizontal_cap_margins_px": [
+        64,
+        64
+      ],
+      "front_overlay_offset_px": [
+        0,
+        161
+      ]
+    },
+    "baskets/orange_front.png": {
+      "size": [
+        428,
+        185
+      ],
+      "visible_bounds_px": [
+        10,
+        8,
+        417,
+        177
+      ],
+      "pivot_px": [
+        214.0,
+        92.5
+      ],
+      "horizontal_cap_margins_px": [
+        64,
+        64
+      ]
+    },
+    "baskets/blue_front.png": {
+      "size": [
+        428,
+        185
+      ],
+      "visible_bounds_px": [
+        21,
+        8,
+        407,
+        177
+      ],
+      "pivot_px": [
+        214.0,
+        92.5
+      ],
+      "horizontal_cap_margins_px": [
+        64,
+        64
+      ]
+    },
+    "baskets/trash_front.png": {
+      "size": [
+        428,
+        184
+      ],
+      "visible_bounds_px": [
+        10,
+        8,
+        417,
+        176
+      ],
+      "pivot_px": [
+        214.0,
+        92.0
+      ],
+      "horizontal_cap_margins_px": [
+        64,
+        64
+      ]
+    },
+    "baskets/trash_badge.png": {
+      "size": [
+        289,
+        287
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        281,
+        279
+      ],
+      "pivot_px": [
+        144.5,
+        143.5
+      ]
+    },
+    "environment/rail_left.png": {
+      "size": [
+        161,
+        609
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        153,
+        601
+      ],
+      "pivot_px": [
+        80.5,
+        304.5
+      ]
+    },
+    "environment/rail_right.png": {
+      "size": [
+        160,
+        609
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        152,
+        601
+      ],
+      "pivot_px": [
+        80.0,
+        304.5
+      ]
+    },
+    "stations/station_base.png": {
+      "size": [
+        376,
+        204
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        368,
+        196
+      ],
+      "pivot_px": [
+        188.0,
+        102.0
+      ],
+      "anchors_px": {
+        "socket_mount": [
+          189,
+          64
+        ]
+      }
+    },
+    "stations/name_plate.png": {
+      "size": [
+        292,
+        141
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        284,
+        133
+      ],
+      "pivot_px": [
+        146.0,
+        70.5
+      ]
+    },
+    "stations/lever_shaft.png": {
+      "size": [
+        113,
+        338
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        105,
+        330
+      ],
+      "pivot_px": [
+        56,
+        282
+      ],
+      "anchors_px": {
+        "rotation_pivot": [
+          56,
+          282
+        ],
+        "grip_mount": [
+          58,
+          30
+        ]
+      }
+    },
+    "stations/grip_orange.png": {
+      "size": [
+        196,
+        224
+      ],
+      "visible_bounds_px": [
+        10,
+        9,
+        186,
+        214
+      ],
+      "pivot_px": [
+        98.0,
+        112.0
+      ],
+      "anchors_px": {
+        "shaft_mount": [
+          98,
+          199
+        ],
+        "hand_contact": [
+          98,
+          97
+        ]
+      }
+    },
+    "stations/grip_blue.png": {
+      "size": [
+        196,
+        224
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        188,
+        216
+      ],
+      "pivot_px": [
+        98.0,
+        112.0
+      ],
+      "anchors_px": {
+        "shaft_mount": [
+          98,
+          200
+        ],
+        "hand_contact": [
+          98,
+          98
+        ]
+      }
+    },
+    "stations/pivot_socket.png": {
+      "size": [
+        196,
+        192
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        188,
+        184
+      ],
+      "pivot_px": [
+        98.0,
+        96.0
+      ]
+    }
+  },
+  "basket_mouth_px": [
+    76,
+    352,
+    169
+  ],
+  "basket_canvas_region_x": [
+    8,
+    420
+  ]
+}

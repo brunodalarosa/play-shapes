@@ -56,6 +56,15 @@ removes it. The evidence labels are defined in
   animation consumes the documented art anchors.
 - `[EXPORTED-BUILD]` Run the integrated Tilt Shift presentation in a Windows package.
 
+## Tilt Shift factory presentation
+
+- `[HUMAN-PLAY]` Owner review of ball/paddle/basket readability at couch distance,
+  ownership badges, names, selected character colors and ten-player station density.
+- `[HUMAN-PLAY]` Lever loop, reversal and held poses on both sides; catch/cutoff and
+  cumulative score/round/win/draw feedback. Runtime captures do not establish feel.
+- `[PHYSICAL-PHONE]` Accepted-motion timing and shared-screen readability during real play.
+- `[EDITOR]` Owner inspection of `Presentation.tres` and the art-equipped workshop preview.
+
 ## Platform movement in the lobby
 
 `[PHYSICAL-PHONE]`, on real phones:

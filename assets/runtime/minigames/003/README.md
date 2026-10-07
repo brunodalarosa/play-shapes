@@ -16,6 +16,8 @@ consume them separately.
 
 The 22 textures and their exact dimensions, visible bounds, pivots and contact
 points are in the [import manifest](../../../../art/tilt_shift/import_manifest.json).
+The exported [runtime manifest](manifest.json) repeats only geometry needed by gameplay
+presentation, including calibrated basket-mouth and common canvas references.
 All sprites have at least eight transparent pixels around their visible bounds.
 The opaque background is kept at its original size and aspect ratio.
 
@@ -24,7 +26,8 @@ The opaque background is kept at its original size and aspect ratio.
 Godot imports use lossless compression, mipmaps, alpha-border correction,
 straight alpha and disabled automatic 3D compression. Consumers should select
 `CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS` and
-`CanvasItem.TEXTURE_REPEAT_DISABLED`. Retain the native aspect ratio when scaling.
+`CanvasItem.TEXTURE_REPEAT_DISABLED`. Retain the native aspect ratio when scaling,
+except the beam center and basket centers fitted as described below.
 The blue paper background is not a seamless tile.
 
 Use the runtime PNGs for both host and phone artwork. The source sheet is the
@@ -35,6 +38,12 @@ the same selected team texture and host angle as the shared arena.
 The paddle neutral pose is horizontal. Rotate the beam about its center; add
 player labels to the separate blank badge. PNG files do not encode a Godot pivot,
 collision shape or filtering mode. The manifest describes these art references.
+
+The factory beam renderer crops transparent padding and maps the visible surface to
+the actual collider rectangle. Its 96-pixel end caps scale uniformly with thickness;
+the center stretches to match length. This explicit fitting is necessary because
+physics presets can choose a different length/thickness ratio from the painted source.
+The beam remains a child of the physical paddle, including full turns and reversal.
 
 Choose display scale against the actual arena and phone composition. There is no
 approved ball radius, paddle collider, operator size or gameplay opening width
@@ -47,16 +56,21 @@ trash badge above the trash front. Match the centers of a back and its front;
 the back's `front_overlay_offset_px` locates the front canvas from the back canvas.
 Both layers share a canvas width and keep their native heights.
 
-For width edits, use each layer's `visible_bounds_px` as its working region,
+For width edits, use the shared canvas region x=8..420 for both layers,
 preserving the first and last 64 pixels. Stretch only the intervening center
 with a `NinePatchRect` or equivalent three-part renderer. Use the same displayed
 width for both layers and each reflected team pair; do not stretch entire rims.
 The separate trash emblem keeps its own aspect ratio and center pivot.
 
-These margins are relative to the visible region, not the padded PNG canvas.
+These margins are relative to that common working region, not the padded PNG canvas.
 The working region needs more than 128 pixels of width before its center can
 stretch. Different basket counts repeat the same parts; count and scoring
 openings belong to the host preset, independently of decorative art extents.
+
+The calibrated inner mouth runs x=76..352 at y=169 in the rear canvas.
+The runtime consumer maps that inner width and height to the authoritative scoring
+opening, applying the same horizontal transformation to front and back. The front
+overlay starts at the scoring plane; its panel hides balls after they cross it.
 
 ## Stations and character contact
 
@@ -73,8 +87,9 @@ points with the same scale and rotation as their texture.
 The lever shaft has a lower pivot; other sprites use their center pivot.
 Station placement can face either arena side without duplicating characters.
 Cosmetic lever travel and operating poses do not imply full-body rotation when
-a gameplay paddle completes repeated turns. Animation contact remains to be
-reviewed in the actual character consumer.
+a gameplay paddle completes repeated turns. The consumer seeks the authored lever
+loop from accepted angle changes and uses its exported right-hand centers for grip
+placement. Animation contact remains an owner review in the moving composition.
 
 ## Sources and review
 

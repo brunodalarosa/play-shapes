@@ -162,6 +162,17 @@ start only what they need, so they stay fast.
 
 ## Focused checks by area
 
+- Tilt Shift factory: `tilt_shift_presentation_test.gd` in the minigame's `tests/`
+  folder checks 2/4/6/8/10 players, actual collider sizes/transforms through turns and
+  reversal, selected colors/names, scoring mouths, accepted-control holds, cutoff,
+  cleanup, remapped rounds and cumulative win/draw. Run
+  `node tools/check.mjs tilt_shift_presentation tilt_shift_workshop_preview`.
+- Run `tilt_shift_presentation_visual_check.gd` without `--headless` for two/ten-player
+  FHD, ten-player HD and 4:3 captures, plus ten synthetic players and 300 balls over
+  45 seconds. The report measures arena, accepted-control and clock callback p95;
+  native physics, rendering, blink and badge callbacks are excluded. Presentation
+  adds zero phone messages. Readability and motion feel still need the owner.
+
 - Tilt Shift workshop: `tilt_shift_workshop_test.gd` and `tilt_shift_workshop_preview_test.gd`
   in the minigame's `tests/` folder cover deep-copy isolation, snapping, paired edits,
   undo/redo, fresh-process reload, draft versus usable saves, curve gaps and actual
@@ -231,6 +242,7 @@ The helpers whose names start with `bubbles_` are in
 
 | Helper | What it saves | Folder |
 | --- | --- | --- |
+| `tilt_shift_presentation_visual_check` | Two/ten-player factory at FHD, ten-player HD and 4:3, and immediate shift outcome. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/presentation/` |
 | `tilt_shift_physics_visual_check` | Three live-arena captures with ten synthetic players, repeated turns/reversal and 180 balls over eight seconds. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/physics/` |
 | `bubbles_player_visual_check` | One player bubble: small, grown, spinning, pop and re-form, and ten players. Components only, not a composed arena. | `bubbles-player/` |
 | `bubbles_animation_visual_check` | Player animation in order: small and maximum idle, held left drag, accepted swipe, slow held and released drag, charge glow and wobble, active spin, burst, reformed. | `bubbles-animation/` |

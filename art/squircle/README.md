@@ -159,6 +159,11 @@ three-quarter (128, 203.292557). Forward is -Y; root travel is
 game scenes supply ground shadows. Sheets have eight columns in row-major order;
 blank trailing cells are never animation frames.
 
+Lever Pull additionally exports each right wrist's projected `hand_center_px` in the
+same tile coordinates. Runtime clips publish the ordered `hand_centers_px` array.
+Factory operators use these points for cosmetic grip contact while seeking existing
+frames; this metadata adds no new render or alternate character library.
+
 Colorable layers include body, hands, feet, shading and self-occlusion with the face
 hidden. Display-space blue-basis tint preserves highlights across all five parts.
 Neutral/blink are independent untinted face layers. Projected face corners give
