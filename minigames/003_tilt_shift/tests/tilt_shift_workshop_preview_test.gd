@@ -20,10 +20,10 @@ func _run() -> void:
 	preview.profile = profile
 	preview.roster = 10
 	root.add_child(preview)
-	await process_frame
-	await process_frame
 	preview.arena.ball_spawned.connect(_record_spawn)
 	preview.arena.ball_removed.connect(_record_catch)
+	await process_frame
+	await process_frame
 	check(
 		preview.arena is TiltShiftArena and preview.arena.controller != null,
 		"Workshop preview starts the actual runtime arena and host rules",

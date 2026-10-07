@@ -28,7 +28,8 @@ builds/standalone/
 
 Before archiving, the builder verifies the external PCK, every browser module, the boot and
 lobby scenes, the QR dependency, the Bubbles scenes and scripts, and the Bubbles runtime art
-and audio.
+and audio. The required runtime paths also include the reusable Tilt Shift factory
+scene and its art geometry manifest. The Squircle manifest carries lever hand positions.
 
 ## What the package includes
 
@@ -37,7 +38,7 @@ The `Play Shapes Windows Release` preset includes the committed browser runtime.
 - the browser source and its dependencies;
 - tests and test results;
 - tools;
-- source art and runtime asset manifests;
+- source art and extraction manifests; runtime Squircle and factory geometry remain included;
 - build output;
 - editor addons;
 - package configuration.

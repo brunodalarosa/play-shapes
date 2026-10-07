@@ -1,7 +1,7 @@
-# Tilt Shift host rules and physics
+# Tilt Shift host rules, physics and presentation
 
-Tilt Shift has host rules and a reusable playable physics arena with paper/toy placeholders.
-Motion capture, editor workshop, phone/shared production presentation and lobby entry
+Tilt Shift has host rules, calibrated motion, an editor workshop and a reusable factory
+presentation around the playable physics arena. Phone presentation and lobby entry
 are not integrated yet.
 
 ## Ownership
@@ -60,8 +60,8 @@ publish typed snapshots. `angle_changed` and `presence_changed` publish copied p
 State is committed before notification. Mutation calls during notification are rejected;
 start the next round after the finishing call returns.
 
-The arena maps each paddle owner to that player's angle. Presentation plays the
-whistle from `round_ended`. The controller has no frame loop of its own: its host consumer
+The arena maps each paddle owner to that player's angle. Presentation exposes one
+`round_feedback` signal for later sound integration. The controller has no frame loop: its consumer
 supplies time through `advance` and event calls.
 
 ## Shared gameplay and preview arena
@@ -89,6 +89,41 @@ The workshop can instantiate this arena with copied content and synthetic host c
 It must call `stop()` before restart/exit; it needs no separate physics implementation.
 `ball_spawned` and `ball_removed` expose host observations; neither awards points itself.
 The [physics guide](tuning/PHYSICS.md) describes delivery, contacts and supported limits.
+
+## Factory presentation
+
+Instantiate `tilt_shift_presentation.tscn` as a full-size Control, then call
+`start_shift(selected_tuning, players)`. It owns an ordinary `TiltShiftArena` in an
+isolated SubViewport. The workshop gameplay preview uses this same scene. Future
+readiness/catalog consumers can attach calibrated motion to its exposed `arena`.
+
+Paddle artwork is a child of each physical body and fits its RectangleShape2D exactly.
+End caps keep their aspect; the beam center stretches to match the selected length and
+thickness. Camera zoom fits the view without scaling the physical subtree. Basket mouth
+centers/widths match scoring openings; balls draw between the rear and front layers.
+Neutral beams reveal solid floor gaps. Decorative side rails add no extra colliders.
+
+One mirrored station per participant retains selected names and body/hand/foot colors.
+Signed accepted-angle changes advance the authored `lever_pull` loop; missing or rejected
+input holds the operating frame. Natural blinks continue during a hold. The station never
+supplies physical angles. Paddle badges identify the current owner's seat, independent
+of their selected character color.
+
+Host notifications update cumulative scores, assignments, baskets and final win/draw.
+The timer reads the host deadline. Each round end clears catch flashes and shows an
+immediate cutoff cue once; `round_feedback(snapshot)` is available for future SFX.
+No audio is bundled by this presentation. The caller chooses `start_next_round()`;
+`stop()` disconnects retired controller notifications and clears all temporary visuals.
+
+`tuning/Presentation.tres` controls side width, station/character size, basket art scale,
+badge size, turns per animation loop, catch flash duration and HUD font size. Distances
+use arena world units; the default arena width is 1,000. Presentation settings are copied
+at launch and never change gameplay dimensions, scoring or phone message traffic.
+The runtime art manifest contains geometry only and is included in export presets.
+
+See [focused checks and capture helpers](../../docs/verification.md#focused-checks-by-area).
+Capture checks establish local rendering; couch-distance readability, density, motion
+feel and physical-phone responsiveness remain owner reviews.
 
 ## Assignment diagnostics
 

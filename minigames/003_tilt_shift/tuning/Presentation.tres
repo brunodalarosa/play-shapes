@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="TiltShiftPresentationTuning" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://minigames/003_tilt_shift/tilt_shift_presentation_tuning.gd" id="1"]
+
+[resource]
+script = ExtResource("1")

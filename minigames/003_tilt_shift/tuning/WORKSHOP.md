@@ -97,6 +97,11 @@ catches and exclusive deadlines. Angles are unwrapped: type repeated turns or us
 ±360° buttons. **Next round** uses the next mapped preset after the deadline.
 **Stop / clear** resets temporary bodies, assignments and scores; restarting starts a new shift.
 
+The factory view uses the runtime presentation scene, including imported art fitted to
+actual colliders, one player-colored lever operator per designer, cumulative scores,
+round timer and cutoff/win/draw feedback. Its compact window is a preview; inspect the
+full-size render captures before judging couch-distance readability.
+
 **Stop preview**, closing the window or disabling the plugin closes the preview process
 and removes its owned temporary snapshot. Changes made during preview require restart.
 Preview never saves content or starts phone networking. Native physics/rendering are

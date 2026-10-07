@@ -7,6 +7,10 @@ var previous_position := Vector2.ZERO
 var acceleration: float = 400.0
 var radius: float = 6.0
 var resolved: bool = false
+var placeholder_visible := true:
+	set(value):
+		placeholder_visible = value
+		queue_redraw()
 
 
 func configure(profile: TiltShiftPhysicsTuning, units: float) -> void:
@@ -38,5 +42,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 
 
 func _draw() -> void:
+	if not placeholder_visible:
+		return
 	draw_circle(Vector2.ZERO, radius, Color("f4e6ad"))
 	draw_arc(Vector2.ZERO, radius, 0, TAU, 24, Color("78684d"), 1.0, true)

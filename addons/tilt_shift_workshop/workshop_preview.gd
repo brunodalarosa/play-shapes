@@ -5,13 +5,13 @@ var profile: TiltShiftTuning
 var roster: int = 10
 var arena: TiltShiftArena
 var viewport: SubViewport
+var presentation: TiltShiftPresentation
 var _status: Label
 var _inputs: VBoxContainer
 var _angles: Dictionary = { }
 var _elapsed: float = 0.0
 var _sample_elapsed: float = 0.0
 var _timings := PackedInt32Array()
-var _camera: Camera2D
 var _players: Array[TiltShiftState.Player] = []
 
 
@@ -38,21 +38,14 @@ func _ready() -> void:
 	var row := HSplitContainer.new()
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	add_child(row)
-	var frame := SubViewportContainer.new()
+	var frame := Control.new()
 	frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	frame.stretch = true
 	row.add_child(frame)
-	viewport = SubViewport.new()
-	viewport.size = Vector2i(800, 600)
-	viewport.world_2d = World2D.new()
-	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	frame.add_child(viewport)
-	arena = TiltShiftArena.new()
-	viewport.add_child(arena)
-	_camera = Camera2D.new()
-	viewport.add_child(_camera)
-	frame.resized.connect(_fit_camera)
+	presentation = TiltShiftPresentation.new()
+	frame.add_child(presentation)
+	arena = presentation.arena
+	viewport = presentation.viewport
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size.x = 300
 	row.add_child(scroll)
@@ -72,15 +65,15 @@ func restart() -> bool:
 		var player := TiltShiftState.Player.new()
 		player.player_id = "designer_%d" % index
 		player.player_name = "Designer %d" % (index + 1)
+		player.character_color = String(CharacterSelection.COLORS[index % 10].hex)
 		player.seat = index + 1
 		_players.append(player)
-	var result := arena.start_shift(profile, _players)
+	var result := presentation.start_shift(profile, _players)
 	if not result.accepted:
 		_status.text = "Preview rejected: " + "\n".join(result.errors)
 		return false
 	_timings.clear()
 	_build_inputs()
-	_fit_camera()
 	return true
 
 
@@ -152,15 +145,6 @@ func _build_inputs() -> void:
 			func() -> void:
 				angle.value += 360,
 		)
-
-
-func _fit_camera() -> void:
-	if profile == null or not is_instance_valid(viewport):
-		return
-	var extent := profile.paddle_layout.arena_size * TiltShiftArena.WORLD_UNITS
-	_camera.position = extent * 0.5 + Vector2(0, 15)
-	var zoom := minf(viewport.size.x / (extent.x + 40), viewport.size.y / (extent.y + 60))
-	_camera.zoom = Vector2.ONE * zoom
 
 
 func _process(delta: float) -> void:
