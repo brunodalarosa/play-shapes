@@ -1,10 +1,10 @@
 {
   "schema": "play-shapes.squircle-source.v1",
   "source": "squircle-animated.blend",
-  "source_sha256": "7764ba0c9ecfd4e28b4c59388742c172262a182e63fcad032bb98858c04d680a",
+  "source_sha256": "6355f360008ee389ef5d1b3a34e8985d1414bc8970dac053acf94870e2b0f858",
   "blender": "5.2.2 LTS",
   "engine": "Cycles",
-  "device": "CPU",
+  "device": "GPU",
   "resolution": [
     256,
     256
@@ -9943,6 +9943,2252 @@
             [
               77.175568,
               142.440392
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "lever_pull",
+      "view": "front",
+      "frames": 24,
+      "fps": 24,
+      "speed": 0.0,
+      "stance": 1.0,
+      "duration_seconds": 1.0,
+      "camera": "Camera.Front",
+      "yaw_degrees": 0,
+      "elevation_degrees": 0,
+      "orthographic_scale": 4.5,
+      "anchor_px": [
+        128.0,
+        204.231186
+      ],
+      "sequence": [
+        {
+          "frame": 1,
+          "time_seconds": 0.0,
+          "colorable": "lever_pull/front/colorable/0001.png",
+          "face_mask": "lever_pull/front/face-mask/0001.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 2,
+          "time_seconds": 0.041666666666666664,
+          "colorable": "lever_pull/front/colorable/0002.png",
+          "face_mask": "lever_pull/front/face-mask/0002.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 3,
+          "time_seconds": 0.08333333333333333,
+          "colorable": "lever_pull/front/colorable/0003.png",
+          "face_mask": "lever_pull/front/face-mask/0003.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 4,
+          "time_seconds": 0.125,
+          "colorable": "lever_pull/front/colorable/0004.png",
+          "face_mask": "lever_pull/front/face-mask/0004.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 5,
+          "time_seconds": 0.16666666666666666,
+          "colorable": "lever_pull/front/colorable/0005.png",
+          "face_mask": "lever_pull/front/face-mask/0005.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 6,
+          "time_seconds": 0.20833333333333334,
+          "colorable": "lever_pull/front/colorable/0006.png",
+          "face_mask": "lever_pull/front/face-mask/0006.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 7,
+          "time_seconds": 0.25,
+          "colorable": "lever_pull/front/colorable/0007.png",
+          "face_mask": "lever_pull/front/face-mask/0007.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 8,
+          "time_seconds": 0.2916666666666667,
+          "colorable": "lever_pull/front/colorable/0008.png",
+          "face_mask": "lever_pull/front/face-mask/0008.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 9,
+          "time_seconds": 0.3333333333333333,
+          "colorable": "lever_pull/front/colorable/0009.png",
+          "face_mask": "lever_pull/front/face-mask/0009.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 10,
+          "time_seconds": 0.375,
+          "colorable": "lever_pull/front/colorable/0010.png",
+          "face_mask": "lever_pull/front/face-mask/0010.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 11,
+          "time_seconds": 0.4166666666666667,
+          "colorable": "lever_pull/front/colorable/0011.png",
+          "face_mask": "lever_pull/front/face-mask/0011.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 12,
+          "time_seconds": 0.4583333333333333,
+          "colorable": "lever_pull/front/colorable/0012.png",
+          "face_mask": "lever_pull/front/face-mask/0012.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 13,
+          "time_seconds": 0.5,
+          "colorable": "lever_pull/front/colorable/0013.png",
+          "face_mask": "lever_pull/front/face-mask/0013.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 14,
+          "time_seconds": 0.5416666666666666,
+          "colorable": "lever_pull/front/colorable/0014.png",
+          "face_mask": "lever_pull/front/face-mask/0014.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 15,
+          "time_seconds": 0.5833333333333334,
+          "colorable": "lever_pull/front/colorable/0015.png",
+          "face_mask": "lever_pull/front/face-mask/0015.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 16,
+          "time_seconds": 0.625,
+          "colorable": "lever_pull/front/colorable/0016.png",
+          "face_mask": "lever_pull/front/face-mask/0016.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 17,
+          "time_seconds": 0.6666666666666666,
+          "colorable": "lever_pull/front/colorable/0017.png",
+          "face_mask": "lever_pull/front/face-mask/0017.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 18,
+          "time_seconds": 0.7083333333333334,
+          "colorable": "lever_pull/front/colorable/0018.png",
+          "face_mask": "lever_pull/front/face-mask/0018.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 19,
+          "time_seconds": 0.75,
+          "colorable": "lever_pull/front/colorable/0019.png",
+          "face_mask": "lever_pull/front/face-mask/0019.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 20,
+          "time_seconds": 0.7916666666666666,
+          "colorable": "lever_pull/front/colorable/0020.png",
+          "face_mask": "lever_pull/front/face-mask/0020.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 21,
+          "time_seconds": 0.8333333333333334,
+          "colorable": "lever_pull/front/colorable/0021.png",
+          "face_mask": "lever_pull/front/face-mask/0021.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 22,
+          "time_seconds": 0.875,
+          "colorable": "lever_pull/front/colorable/0022.png",
+          "face_mask": "lever_pull/front/face-mask/0022.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 23,
+          "time_seconds": 0.9166666666666666,
+          "colorable": "lever_pull/front/colorable/0023.png",
+          "face_mask": "lever_pull/front/face-mask/0023.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 24,
+          "time_seconds": 0.9583333333333334,
+          "colorable": "lever_pull/front/colorable/0024.png",
+          "face_mask": "lever_pull/front/face-mask/0024.png",
+          "face_corners_px": [
+            [
+              92.294785,
+              90.845383
+            ],
+            [
+              163.404144,
+              90.346924
+            ],
+            [
+              92.583893,
+              132.088814
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.124443,
+                204.231186
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                155.875549,
+                204.231186
+              ],
+              "planted": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "lever_pull",
+      "view": "three-quarter",
+      "frames": 24,
+      "fps": 24,
+      "speed": 0.0,
+      "stance": 1.0,
+      "duration_seconds": 1.0,
+      "camera": "Camera.ThreeQuarter",
+      "yaw_degrees": 35,
+      "elevation_degrees": 9,
+      "orthographic_scale": 4.5,
+      "anchor_px": [
+        128.0,
+        203.292557
+      ],
+      "sequence": [
+        {
+          "frame": 1,
+          "time_seconds": 0.0,
+          "colorable": "lever_pull/three-quarter/colorable/0001.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0001.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 2,
+          "time_seconds": 0.041666666666666664,
+          "colorable": "lever_pull/three-quarter/colorable/0002.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0002.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 3,
+          "time_seconds": 0.08333333333333333,
+          "colorable": "lever_pull/three-quarter/colorable/0003.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0003.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 4,
+          "time_seconds": 0.125,
+          "colorable": "lever_pull/three-quarter/colorable/0004.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0004.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 5,
+          "time_seconds": 0.16666666666666666,
+          "colorable": "lever_pull/three-quarter/colorable/0005.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0005.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 6,
+          "time_seconds": 0.20833333333333334,
+          "colorable": "lever_pull/three-quarter/colorable/0006.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0006.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 7,
+          "time_seconds": 0.25,
+          "colorable": "lever_pull/three-quarter/colorable/0007.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0007.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 8,
+          "time_seconds": 0.2916666666666667,
+          "colorable": "lever_pull/three-quarter/colorable/0008.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0008.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 9,
+          "time_seconds": 0.3333333333333333,
+          "colorable": "lever_pull/three-quarter/colorable/0009.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0009.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 10,
+          "time_seconds": 0.375,
+          "colorable": "lever_pull/three-quarter/colorable/0010.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0010.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 11,
+          "time_seconds": 0.4166666666666667,
+          "colorable": "lever_pull/three-quarter/colorable/0011.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0011.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 12,
+          "time_seconds": 0.4583333333333333,
+          "colorable": "lever_pull/three-quarter/colorable/0012.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0012.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 13,
+          "time_seconds": 0.5,
+          "colorable": "lever_pull/three-quarter/colorable/0013.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0013.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 14,
+          "time_seconds": 0.5416666666666666,
+          "colorable": "lever_pull/three-quarter/colorable/0014.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0014.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 15,
+          "time_seconds": 0.5833333333333334,
+          "colorable": "lever_pull/three-quarter/colorable/0015.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0015.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 16,
+          "time_seconds": 0.625,
+          "colorable": "lever_pull/three-quarter/colorable/0016.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0016.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 17,
+          "time_seconds": 0.6666666666666666,
+          "colorable": "lever_pull/three-quarter/colorable/0017.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0017.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 18,
+          "time_seconds": 0.7083333333333334,
+          "colorable": "lever_pull/three-quarter/colorable/0018.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0018.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 19,
+          "time_seconds": 0.75,
+          "colorable": "lever_pull/three-quarter/colorable/0019.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0019.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 20,
+          "time_seconds": 0.7916666666666666,
+          "colorable": "lever_pull/three-quarter/colorable/0020.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0020.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 21,
+          "time_seconds": 0.8333333333333334,
+          "colorable": "lever_pull/three-quarter/colorable/0021.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0021.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 22,
+          "time_seconds": 0.875,
+          "colorable": "lever_pull/three-quarter/colorable/0022.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0022.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 23,
+          "time_seconds": 0.9166666666666666,
+          "colorable": "lever_pull/three-quarter/colorable/0023.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0023.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
+            ]
+          ],
+          "feet": {
+            "Foot.L": {
+              "world": [
+                -0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                100.923767,
+                201.739056
+              ],
+              "planted": true
+            },
+            "Foot.R": {
+              "world": [
+                0.49,
+                -0.13,
+                0.0
+              ],
+              "pixel": [
+                146.592407,
+                206.74144
+              ],
+              "planted": true
+            }
+          }
+        },
+        {
+          "frame": 24,
+          "time_seconds": 0.9583333333333334,
+          "colorable": "lever_pull/three-quarter/colorable/0024.png",
+          "face_mask": "lever_pull/three-quarter/face-mask/0024.png",
+          "face_corners_px": [
+            [
+              77.052971,
+              92.946823
+            ],
+            [
+              135.302338,
+              98.834946
+            ],
+            [
+              77.289795,
+              133.70842
             ]
           ],
           "feet": {

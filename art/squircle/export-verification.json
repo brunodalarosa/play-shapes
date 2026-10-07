@@ -1,9 +1,9 @@
 {
   "passed": true,
   "metadata_identical": true,
-  "fresh_reopen_export_files": 426,
+  "fresh_reopen_export_files": 522,
   "byte_identical_png_files": 2,
-  "max_consumed_channel_difference_8bit": 0,
+  "max_consumed_channel_difference_8bit": 1,
   "max_unused_mask_rgb_difference_8bit": 0,
   "minimum_rendered_alpha_margin_px": 13,
   "straight_alpha_edge_evidence": {
@@ -11,8 +11,8 @@
     "edge_rgb_mean_8bit": 125.84391534391534,
     "edge_alpha_mean_8bit": 7.261904761904762
   },
-  "clips": 10,
-  "animation_frames": 212,
+  "clips": 12,
+  "animation_frames": 260,
   "packed_colorable_tiles_match_raw": true,
   "maximum_held_face_rectangle_occlusion_fraction": 0.0006961263780963511,
   "scope": "Same machine, Blender version, seed and render settings; owner motion approval separate."

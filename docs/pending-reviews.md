@@ -82,6 +82,11 @@ removes it. The evidence labels are defined in
 - `[HUMAN-PLAY]` The owner's approval of the animation timing and feel, and of the poses.
 - `[PHYSICAL-PHONE]` How the stances read on a real phone and from the couch.
 
+## Squircle lever pull
+
+- `[HUMAN-PLAY]` Owner approval of the reach, downward pull, upward return and loop
+  timing in F12 > Animation Lab > Lever Pull, including the small reference size.
+
 ## Squircle source and sheets
 
 The sheets were rendered again on another machine after the names inside the Blender source

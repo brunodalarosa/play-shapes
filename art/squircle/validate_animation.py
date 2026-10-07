@@ -51,11 +51,17 @@ for clip,spec in CLIPS.items():
         check(clip+' no cyclic reset',not any(m.type=='CYCLES' for l in rig.animation_data.action.layers for s in l.strips for b in s.channelbags for c in b.fcurves for m in c.modifiers))
     min_z=1e9;planted_z=0;max_slip=0;min_border=1e9;min_foot_body_gap=1e9
     hand_y=[]; hand_min_z=1e9; min_hand_body_gap=1e9; min_hand_foot_gap=1e9
+    lever_fixed_error=0.0
     previous={}
     for sub in range(spec['frames']*4+1):
         f=1+sub/4
         scene.frame_set(int(f),subframe=f-int(f));bpy.context.view_layer.update()
         deps=bpy.context.evaluated_depsgraph_get()
+        if clip=='lever_pull':
+            lever_fixed_error=max(lever_fixed_error,max(
+                abs(first[n][r][c]-bpy.data.objects[CONTROLS[n]].matrix_world[r][c])
+                for n in ('Body','Hand.L','Foot.L','Foot.R')
+                for r in range(4) for c in range(4)))
         for hand_name in ('Hand.L','Hand.R'):
             hand=bpy.data.objects[hand_name].evaluated_get(deps)
             mesh=hand.to_mesh()
@@ -116,6 +122,15 @@ for clip,spec in CLIPS.items():
     check(clip+' sphere foot clearance (conservative AABB)',min_hand_foot_gap>0,min_hand_foot_gap)
     check(clip+' hand floor clearance',hand_min_z>.05,hand_min_z)
     check(clip+' hand body clearance in X',min_hand_body_gap>0,min_hand_body_gap)
+    if clip=='lever_pull':
+        check('lever pull keeps body, left hand and feet fixed',lever_fixed_error<1e-6,lever_fixed_error)
+        wrist=[]
+        for frame in (1,5,13,21,25):
+            scene.frame_set(frame);bpy.context.view_layer.update()
+            wrist.append(bpy.data.objects[CONTROLS['Hand.R']].matrix_world.translation.copy())
+        check('lever pull reaches forward and up',wrist[1].y<wrist[0].y-.2 and wrist[1].z>wrist[0].z+.2)
+        check('lever pull moves down then returns up',wrist[2].z<wrist[1].z-.2 and (wrist[1]-wrist[3]).length<1e-6)
+        check('lever pull returns to neutral at wrap',(wrist[0]-wrist[4]).length<1e-6)
     report['clips'][clip]={'max_seam_matrix_error':seam,'minimum_sole_z':min_z,
                            'max_planted_sole_error':planted_z,'max_stance_slip_per_quarter_frame_m':max_slip,
                            'minimum_projected_bound_margin_px':min_border*256,
