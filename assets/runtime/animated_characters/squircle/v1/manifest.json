@@ -1,7 +1,7 @@
 {
   "schema": "play-shapes.squircle-animation.v1",
   "source": "art/squircle/squircle-animated.blend",
-  "source_sha256": "7764ba0c9ecfd4e28b4c59388742c172262a182e63fcad032bb98858c04d680a",
+  "source_sha256": "6355f360008ee389ef5d1b3a34e8985d1414bc8970dac053acf94870e2b0f858",
   "resolution": [
     256,
     256
@@ -147,6 +147,34 @@
       "first_frame": 1,
       "last_frame": 9,
       "playback": "held"
+    },
+    {
+      "name": "lever_pull",
+      "view": "front",
+      "frames": 24,
+      "fps": 24,
+      "anchor_px": [
+        128.0,
+        204.231186
+      ],
+      "sheet_columns": 8,
+      "first_frame": 1,
+      "last_frame": 24,
+      "playback": "loop"
+    },
+    {
+      "name": "lever_pull",
+      "view": "three-quarter",
+      "frames": 24,
+      "fps": 24,
+      "anchor_px": [
+        128.0,
+        203.292557
+      ],
+      "sheet_columns": 8,
+      "first_frame": 1,
+      "last_frame": 24,
+      "playback": "loop"
     }
   ]
 }
