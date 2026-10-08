@@ -164,7 +164,7 @@ start only what they need, so they stay fast.
 ## Focused checks by area
 
 - Tilt Shift complete flow: `tilt_shift_flow_test.gd` under the minigame's tests covers
-  every allowed roster, readiness bypass, stale capture, final joins, calibration transfer,
+  every allowed roster, rejected debug bypass, stale capture, final joins, calibration transfer,
   reconnect neutrality, mapped presets, results and cleanup. Run
   `node tools/check.mjs tilt_shift_flow minigame_flow pre_minigame_readiness` alongside
   the catalog and debug checks.
@@ -172,10 +172,15 @@ start only what they need, so they stay fast.
   and `tilt_shift_round_arena_test.gd` cover all roster selections, layout exposure,
   sharing, automatic direction, READY/timeout/force, calibration and reconnect, fitted
   offscreen spawns and no pre-active delivery. Run `node tools/check.mjs tilt_shift`.
-- `tilt_shift_preparation_test.gd` also checks initial calibration waits for two/four phones,
-  delayed permission, disconnected/stale capture, accepted angles and later-round reuse.
-  The two-phone browser journey delays permission beyond the default countdown and keeps
-  the real three-second countdown, so it cannot hide the initial-calibration regression.
+- `tilt_shift_preparation_test.gd` also checks shared preparation for mapped two/four-phone
+  sessions, delayed permission, portrait rejection, both landscape holds, READY revocation,
+  reconnect, calibration transfer, accepted angles and later-round reuse.
+  The two-phone browser journey delays permission beyond the default countdown, checks
+  portrait readiness and the real shared screen, then keeps the three-second countdown.
+- `web/tests/screen_wake_lock.test.mjs` checks page-level acquisition, refusal, external
+  release, visibility, cached-page restoration, cleanup and pending-request races.
+  The Tilt Shift browser journey uses a synthetic wake lock across preparation, gameplay
+  and lobby return. It does not prove the physical phone avoids automatic screen lock.
 - `web/tests/003_tilt_shift/phone.test.mjs` checks malformed/replayed snapshots and one
   canonical guide for five assignments. `web/e2e/tilt_shift_phones.spec.ts` uses the real
   boot/catalog/gameplay journey with 2/4/6/8/10 Chromium phones and synthetic sensor events.

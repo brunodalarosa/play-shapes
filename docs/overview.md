@@ -10,7 +10,8 @@ repository.
 - The lobby opens a shared ready screen for **Bubbles and Jellyfishes** with 2–10 registered
   players. Bubbles starts after every current participant is ready.
 - **Tilt Shift** supports 2/4/6/8/10 players. Each phone enables motion, sets a comfortable
-  neutral and confirms READY before automatic launch. One team paddle on each phone mirrors
+  landscape neutral and confirms READY on the shared Pre-minigame screen before launch.
+  One team paddle on each phone mirrors
   the host's accepted angle throughout the factory rounds.
 - Registered players appear as Squircle v1 characters in the Playground lobby. Each steers
   their character from a portrait phone stick and a release-action button. Near-vertical input

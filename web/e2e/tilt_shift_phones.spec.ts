@@ -17,6 +17,27 @@ async function sensors(page: import("@playwright/test").Page): Promise<void> {
     const api = { requestPermission: () => Promise.resolve("granted") };
     Object.defineProperty(window, "DeviceMotionEvent", { configurable: true, value: api });
     Object.defineProperty(window, "DeviceOrientationEvent", { configurable: true, value: api });
+    Object.defineProperty(screen.orientation, "angle", {
+      configurable: true,
+      get: () => (matchMedia("(orientation: landscape)").matches ? 90 : 0),
+    });
+    let wakeRequests = 0;
+    Object.defineProperty(navigator, "wakeLock", {
+      configurable: true,
+      value: {
+        async request() {
+          wakeRequests++;
+          document.documentElement.dataset.wakeRequests = String(wakeRequests);
+          const lock = new EventTarget() as WakeLockSentinel;
+          Object.defineProperty(lock, "released", { value: false, writable: true });
+          lock.release = async () => {
+            Object.defineProperty(lock, "released", { value: true });
+            lock.dispatchEvent(new Event("release"));
+          };
+          return lock;
+        },
+      },
+    });
     setInterval(() => {
       const turn = Math.sin(performance.now() / 700) * 0.4;
       const lean = (80 * Math.PI) / 180;
@@ -69,13 +90,20 @@ for (const count of [2, 4, 6, 8, 10]) {
       const phones = [];
       const traffic: { bytes: number; updates: number; maximum: number; angles: Set<number> }[] =
         [];
+      const preparationFeedback: Record<string, unknown>[][] = [];
       for (let i = 0; i < count; i++) {
         const phone = await openPhone("Player " + (i + 1), i);
         const wire = { bytes: 0, updates: 0, maximum: 0, angles: new Set<number>() };
         traffic.push(wire);
+        const feedback: Record<string, unknown>[] = [];
+        preparationFeedback.push(feedback);
         phone.page.on("websocket", (socket) =>
           socket.on("framereceived", (frame) => {
             const value = JSON.parse(String(frame.payload));
+            if (value.type === "motion_control_state") {
+              feedback.push({ ...value.control_state });
+              if (feedback.length > 20) feedback.shift();
+            }
             if (value.type !== "tilt_shift_snapshot") return;
             const bytes = Buffer.byteLength(String(frame.payload));
             wire.bytes += bytes;
@@ -89,34 +117,54 @@ for (const count of [2, 4, 6, 8, 10]) {
         phones.push(phone);
       }
       await host.event(/^start /);
-      for (const phone of phones) await viewport(phone.page, 844, 390);
-      if (count <= 4) {
-        for (const phone of phones) {
-          await expect(phone.page.locator("#tilt-shift")).toBeVisible();
-          await expect(phone.page.locator("#tilt-ready")).toBeHidden();
-        }
+      await host.event(/^scene pre_minigame_screen$/);
+      for (const phone of phones) {
+        await expect(phone.page.locator("#tilt-shift")).toBeVisible();
+        await expect(phone.page.locator("#tilt-ready")).toBeVisible();
+        await expect(phone.page.locator("#tilt-ready")).toBeDisabled();
+        await expect(phone.page.locator("html")).toHaveAttribute("data-wake-requests", "1");
       }
       if (count === 2) {
-        await host.event(/^tilt phase=preparing round=1$/);
-        // A human may spend longer than the old countdown granting sensor permission.
+        await phones[0].shot("shared-preparation-portrait");
+        // The shared screen waits through permission delays and portrait calibration.
         await phones[0].page.waitForTimeout(5_000);
-        for (const phone of phones) {
-          await expect(phone.page.locator("#tilt-permission")).toBeVisible();
-          await expect(phone.page.locator("#tilt-calibrate")).toBeVisible();
-          await expect(phone.page.locator("#tilt-ready")).toBeHidden();
-        }
+        await phones[0].page.click("#tilt-permission");
+        await expect(phones[0].page.locator("#tilt-calibrate")).toBeEnabled();
+        await phones[0].page.click("#tilt-calibrate");
+        await expect(phones[0].page.locator("#tilt-ready")).toBeDisabled();
+        await expect(phones[0].page.locator("#tilt-orientation")).toContainText("rotation lock");
+        await viewport(phones[0].page, 844, 390);
         await prepare([phones[0]]);
+        await expect(phones[0].page.locator("#tilt-ready")).toHaveAttribute("aria-pressed", "true");
+        await phones[0].shot("shared-preparation-landscape");
+        await viewport(phones[0].page, 390, 844);
+        await expect(phones[0].page.locator("#tilt-ready")).toHaveAttribute(
+          "aria-pressed",
+          "false",
+        );
+        await expect(phones[0].page.locator("#tilt-ready")).toBeDisabled();
         await phones[1].page.waitForTimeout(4_000);
-        await expect(phones[1].page.locator("#tilt-calibrate")).toBeVisible();
-        await prepare(phones.slice(1));
-      } else {
-        await prepare(phones);
       }
+      for (const phone of phones) await viewport(phone.page, 844, 390);
+      try {
+        await prepare(phones);
+      } catch (error) {
+        const folder = fileURLToPath(new URL("../../test-results/tilt-shift/", import.meta.url));
+        mkdirSync(folder, { recursive: true });
+        writeFileSync(
+          folder + "/preparation-feedback-" + count + ".json",
+          JSON.stringify(preparationFeedback, null, 2),
+        );
+        throw error;
+      }
+      await host.event(/^scene tilt_shift_gameplay$/);
+      if (count > 4) await prepare(phones);
       await host.event(/^tilt phase=active round=1$/);
       let active = 0,
         waiting = 0;
       for (const phone of phones) {
         await expect(phone.page.locator("#tilt-actions")).toBeHidden();
+        await expect(phone.page.locator("html")).toHaveAttribute("data-wake-requests", "1");
         if (await phone.page.locator("#tilt-paddle").isVisible()) active++;
         else waiting++;
       }
@@ -134,6 +182,7 @@ for (const count of [2, 4, 6, 8, 10]) {
         await phones[0].shot("reconnected-portrait");
       }
       await host.event(/^tilt round=2$/);
+      for (const phone of phones) await viewport(phone.page, 844, 390);
       await prepare(phones);
       await host.event(/^tilt phase=active round=2$/);
       active = 0;
@@ -146,6 +195,7 @@ for (const count of [2, 4, 6, 8, 10]) {
       for (const phone of phones) {
         await expect(phone.page.locator("#lobby-controller")).toBeVisible();
         await expect(phone.page.locator("#tilt-shift")).toBeHidden();
+        await expect(phone.page.locator("html")).toHaveAttribute("data-wake-requests", "1");
       }
       for (const wire of traffic) {
         expect(wire.angles.size).toBeGreaterThan(3);

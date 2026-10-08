@@ -51,7 +51,13 @@ static func diagnostics(state: String = "live") -> Dictionary:
 	}
 
 
-static func live(channel: MotionInputChannel, turn: float, sequence: int, now: int) -> bool:
+static func live(
+	channel: MotionInputChannel,
+	turn: float,
+	sequence: int,
+	now: int,
+	screen_angle: float = 90.0,
+) -> bool:
 	if channel.diagnostics.is_empty():
 		channel.handle(
 			{ "player_id": channel.target_player_id },
@@ -68,7 +74,7 @@ static func live(channel: MotionInputChannel, turn: float, sequence: int, now: i
 			"type": "motion_sample",
 			"subscription_id": channel.subscription_id,
 			"sequence": sequence,
-			"sample": sample(turn),
+			"sample": sample(turn, screen_angle),
 		},
 		now,
 	)

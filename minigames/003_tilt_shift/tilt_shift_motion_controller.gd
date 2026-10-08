@@ -103,7 +103,10 @@ func activate(arena: TiltShiftArena) -> bool:
 
 func ready_for(player_id: String) -> bool:
 	var state := player_state(player_id)
-	return bool(state.get("calibrated", false)) and bool(state.get("usable", false))
+	return (
+		bool(state.get("calibrated", false)) and bool(state.get("usable", false))
+		and bool(state.get("landscape", false))
+	)
 
 
 func player_state(player_id: String) -> Dictionary:

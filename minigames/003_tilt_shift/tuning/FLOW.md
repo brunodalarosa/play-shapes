@@ -19,10 +19,15 @@ The default five-opening basket preset is unchanged. `ThreeOpenings.tres` provid
 a second mirrored preset for mapping selected rounds or workshop comparisons.
 Neither preset establishes strategic fairness without owner playtesting.
 
-The normal catalog path freezes an even roster, then prepares the selected participants.
+The normal catalog path first uses the shared Pre-minigame screen: every player enables tilt,
+calibrates in landscape and confirms READY. It then freezes an even roster and prepares
+the selected participants inside gameplay.
+
 Round one opens the panel only with spectators; later rounds open it when the participant
 set changes. Otherwise both panel and READY are skipped. The host accepts READY only
-from selected players with fresh usable calibration. Recalibration clears READY.
+from selected players with fresh usable calibration and landscape orientation.
+Recalibration or losing landscape eligibility clears READY while waiting.
+
 All selected READY, local force start or the panel deadline starts countdown. Disconnects
 never restart its clock or a countdown already running. Calibration is allowed before
 active scoring and between rounds; reconnect preserves neutral.

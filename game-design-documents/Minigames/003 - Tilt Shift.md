@@ -5,6 +5,11 @@ by holding phones sideways like balancing beams. One playthrough is a multi-roun
 
 ## Preparation and control
 
+Every normal launch first shows the shared Pre-minigame screen. All players hold their
+phones in landscape, unlock rotation if needed, enable motion, set neutral and press READY.
+Portrait blocks READY; returning to portrait while waiting clears it. This initial screen
+is separate from the participant panels inside gameplay. Debug review remains an exception.
+
 The starting roster is exactly 2, 4, 6, 8 or 10 players. The host selects participants
 for each round. A participant panel appears in round one when some players sit out,
 and in later rounds when the participant set changes. It shows names, player-colored
@@ -12,7 +17,7 @@ Shape Characters and readiness grouped by team. Only selected players use READY.
 If the panel is skipped, READY is skipped too.
 
 Phones enable motion and choose a comfortable neutral before or between rounds.
-Fresh usable calibration is required for READY; recalibration clears READY.
+Fresh usable calibration and landscape are required for READY; recalibration clears READY.
 The local host can force the round, and a 60-second panel timeout starts it regardless
 of connectivity. Disconnects never restart this timer. A centered 3, 2, 1 countdown
 and short START fade precede the full active scoring window and ball delivery.

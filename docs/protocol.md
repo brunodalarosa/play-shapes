@@ -146,15 +146,15 @@ During ready-up, a registered phone sends `{"type":"pre_minigame_ready","ready":
 
 ## Tilt Shift state
 
-The mapped Tilt Shift journey freezes an even roster and opens the factory directly.
-Its round controller owns selected-player readiness; the shared all-player gate remains
-available for older single-layout profiles. Sensor status and samples use the existing
+Every normal Tilt Shift launch uses the shared all-player Pre-minigame gate before freezing
+an even roster and opening the factory. Its round controller owns subsequent selected-player
+readiness. Sensor status and samples use the existing
 authenticated subscriptions.
 
 `tilt_shift_snapshot` carries generation, increasing sequence, phase, round, team,
 accepted angle in radians, owned paddle IDs and physical paddle length/thickness.
 Mapped snapshots also carry `round_token`, `selected`, `ready`, `ready_available`,
-`calibration_available`, `calibrated` and `usable`. Phases include `preparing`, `countdown`,
+`calibration_available`, `calibrated`, `usable` and `landscape`. Phases include `preparing`, `countdown`,
 `start`, `active`, `between_rounds` and `finished`. Spectators have empty owned IDs and
 show a team waiting visual with no paddle guide. Selected phones show one guide.
 
@@ -164,8 +164,9 @@ or sequences cannot replace the current phone view.
 
 `tilt_shift_ready` carries exactly `type`, current `generation`, `round_token` and Boolean
 `ready`. The connection supplies identity. Only selected players in a visible ready panel
-can change readiness. Fresh usable calibration is required; recalibration, disconnection
-or stale capture clears READY. Countdown start is final even if a player then disconnects.
+can change readiness. Fresh usable calibration and landscape are required; recalibration,
+disconnection, portrait or stale capture clears READY. Countdown start is final even if a
+player then disconnects.
 The panel timeout runs once from opening; force start is a local host action, not a message.
 
 Angle updates coalesce to the latest state at the selected flow ceiling, 15 Hz by default.
@@ -173,6 +174,10 @@ Queued socket output skips that update rather than accumulating a backlog. Round
 resume transitions send current state immediately. Calibration is available before and
 between active rounds, including countdown and START; it is locked during scoring.
 Reconnect preserves neutral and does not recover unseen complete turns.
+
+`landscape` is derived from the authenticated motion sample's `screen_angle`: either
+quarter-turn display orientation qualifies. It is included in existing Tilt Shift preparation,
+control feedback and gameplay snapshots. It does not change capture `usable` or paddle angles.
 
 ## Bubbles input
 

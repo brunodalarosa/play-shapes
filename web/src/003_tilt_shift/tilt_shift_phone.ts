@@ -12,6 +12,7 @@ export type TiltSnapshot = {
   calibration_available?: boolean;
   calibrated?: boolean;
   usable?: boolean;
+  landscape?: boolean;
   round: number;
   team: 0 | 1;
   angle_radians: number;
@@ -23,6 +24,7 @@ export type Preparation = {
   generation: string;
   calibrated: boolean;
   usable: boolean;
+  landscape: boolean;
   capture_state: string;
   angle_radians: number;
 };
@@ -51,9 +53,14 @@ export function validTiltSnapshot(value: unknown): value is TiltSnapshot {
       (typeof v.round_token === "string" &&
         v.round_token.length > 0 &&
         v.round_token.length <= 64)) &&
-    [v.ready, v.ready_available, v.calibration_available, v.calibrated, v.usable].every(
-      (flag) => flag === undefined || typeof flag === "boolean",
-    ) &&
+    [
+      v.ready,
+      v.ready_available,
+      v.calibration_available,
+      v.calibrated,
+      v.usable,
+      v.landscape,
+    ].every((flag) => flag === undefined || typeof flag === "boolean") &&
     v.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) &&
     Array.isArray(v.paddle_size) &&
     v.paddle_size.length === 2 &&
@@ -69,6 +76,7 @@ export class TiltShiftPhone {
   private calibration: HTMLButtonElement;
   private ready: HTMLButtonElement;
   private state: HTMLElement;
+  private orientation: HTMLElement;
   private images: HTMLImageElement[] = [];
   private bounds: number[][] = [];
   private angle = 0;
@@ -83,6 +91,7 @@ export class TiltShiftPhone {
   private connected = false;
   private usable = false;
   private calibrated = false;
+  private landscape = false;
   private isReady = false;
   private capture = "waiting";
   private observer: ResizeObserver;
@@ -94,6 +103,8 @@ export class TiltShiftPhone {
       ready: boolean,
       context?: { generation: string; round_token: string },
     ) => void,
+    private isLandscape: () => boolean = () =>
+      window.matchMedia("(orientation: landscape)").matches,
   ) {
     this.canvas = surface.querySelector<HTMLCanvasElement>("canvas")!;
     this.context = this.canvas.getContext("2d")!;
@@ -102,6 +113,7 @@ export class TiltShiftPhone {
     this.calibration = surface.querySelector<HTMLButtonElement>("#tilt-calibrate")!;
     this.ready = surface.querySelector<HTMLButtonElement>("#tilt-ready")!;
     this.state = surface.querySelector<HTMLElement>("#tilt-state")!;
+    this.orientation = surface.querySelector<HTMLElement>("#tilt-orientation")!;
     this.permission.addEventListener("click", () => {
       this.permission.disabled = true;
       void this.stream.requestPermission().finally(() => this.buttons());
@@ -110,10 +122,14 @@ export class TiltShiftPhone {
       if (this.stream.requestCalibration(this.actionContext())) this.calibration.disabled = true;
     });
     this.ready.addEventListener("click", () => {
+      if (this.ready.disabled) return;
       this.ready.disabled = true;
       this.sendReady(!this.isReady, this.actionContext());
     });
-    this.observer = new ResizeObserver(() => this.draw());
+    this.observer = new ResizeObserver(() => {
+      this.buttons();
+      this.draw();
+    });
     this.observer.observe(this.canvas);
     void this.loadArt();
   }
@@ -141,6 +157,7 @@ export class TiltShiftPhone {
     this.roundToken = undefined;
     this.usable = value.usable;
     this.calibrated = value.calibrated;
+    this.landscape = value.landscape === true;
     this.capture = value.capture_state;
     this.angle = value.angle_radians;
     if (
@@ -174,6 +191,7 @@ export class TiltShiftPhone {
     this.isReady = value.ready === true;
     if (value.usable !== undefined) this.usable = value.usable;
     if (value.calibrated !== undefined) this.calibrated = value.calibrated;
+    this.landscape = value.landscape === true;
     this.connected = true;
     this.team = value.team;
     this.angle = value.angle_radians;
@@ -193,6 +211,7 @@ export class TiltShiftPhone {
     this.capture = state.capture_state;
     this.usable = state.usable;
     this.calibrated = state.calibrated;
+    this.landscape = state.landscape === true;
     this.buttons();
   }
 
@@ -215,12 +234,18 @@ export class TiltShiftPhone {
   }
 
   private buttons(): void {
+    const landscape = this.landscape && this.isLandscape();
+    this.orientation.hidden = !this.preparing;
+    this.orientation.textContent = landscape
+      ? "Hold your phone in landscape while you get ready."
+      : "Turn your phone to landscape. If it stays upright, turn off rotation lock.";
     this.permission.hidden = this.usable;
     this.permission.disabled = !this.connected || !this.stream.active;
     this.calibration.hidden = !this.preparing;
     this.calibration.disabled = !this.connected || !this.usable;
     this.ready.hidden = !this.readyAvailable;
-    this.ready.disabled = !this.connected || (!this.isReady && (!this.usable || !this.calibrated));
+    this.ready.disabled =
+      !this.connected || (!this.isReady && (!this.usable || !this.calibrated || !landscape));
     this.ready.textContent = this.isReady ? "CANCEL" : "READY";
     this.ready.setAttribute("aria-pressed", String(this.isReady));
     this.actions.hidden = (!this.preparing && this.usable) || (!this.selected && !this.preparing);

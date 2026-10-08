@@ -32,9 +32,10 @@ removes it. The evidence labels are defined in
 
 ## Tilt Shift calibrated motion
 
-- `[PHYSICAL-PHONE]` Retest the first two-phone launch on iPhone and Android after the
-  calibration-wait repair: delay permission beyond three seconds, calibrate each phone,
-  confirm both control paddles, then verify later rounds reuse neutral without READY.
+- `[PHYSICAL-PHONE]` Owner Chrome trials on Android and iPhone: verify normal lobby Start
+  shows shared preparation, portrait blocks READY, both landscape holds permit READY,
+  rotation lock guidance is sufficient, portrait revokes READY, and all-player readiness
+  transfers neutral into gameplay. Delay permission and test preparation reconnect/cancel.
 - `[PHYSICAL-PHONE]` Owner trials on supported iPhone and Android browsers: record versions,
   comfortable sideways neutral, both holds, mirrored tilts, repeated full turns/reversal,
   screen autorotation, off-axis tolerance, denial, background/lock and permission recovery.
@@ -44,6 +45,14 @@ removes it. The evidence labels are defined in
   The initial gain is 1, with continuous mode and no extra smoothing.
 - `[EDITOR]` Owner inspection of the motion profile's units, valid ranges and launch errors.
 - `[EXPORTED-BUILD]` Calibrated control and lifecycle after readiness/phone integration.
+
+## Phone screen wake protection
+
+- `[PHYSICAL-PHONE]` Owner Chrome trials on Android and iPhone over trusted HTTPS: leave
+  onboarding, lobby, preparation, gameplay and results untouched beyond the phone's normal
+  screen timeout. Confirm the screen stays awake and Tilt Shift keeps sending input.
+  Check app switching and return, reload, low-power refusal and installed-app behavior.
+  Record device, OS and browser versions; synthetic locks do not establish OS behavior.
 
 ## Bubbles and Jellyfishes
 

@@ -90,6 +90,7 @@ test("generic capture scopes feedback, skips queued input and retires listeners 
     assert.deepEqual(messages.at(-1), { type: "motion_calibrate", subscription_id: "first" });
     const state = { calibrated: true, usable: true, capture_state: "live" };
     assert.equal(stream.feedback("old", state), false);
+    assert.equal(stream.feedback("first", { ...state, landscape: "portrait" }), false);
     assert.equal(stream.feedback("first", state), true);
     socket.bufferedAmount = 1;
     const before = messages.length;

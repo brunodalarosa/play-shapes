@@ -21,3 +21,7 @@ In this screen players can only press READY or CANCEL to toggle on/off their rea
 - A phone that already had onboarding open before the host presses **Start** may finish joining while this screen is open. The new player is added to the selected round as unready. The screen has no join QR; onboarding that was not already open cannot begin during this phase. The join window closes when the all-ready transition starts the minigame.
 - A player who disconnects while waiting remains in the round. Reconnecting restores the pre-minigame screen in an unready state, and that player must press **READY** again.
 - On the phone, show only one large **READY / CANCEL** toggle and its current ready state. Keep the preview and instructions on the shared display.
+- Tilt Shift also exposes motion permission and neutral calibration. Explain landscape
+  holding and unlocking rotation if needed; READY is blocked in portrait and cleared when
+  landscape eligibility is lost while waiting. Round readiness inside gameplay does not
+  replace this screen.
