@@ -27,9 +27,12 @@ func _run() -> void:
 		)
 	var start: Dictionary = host.begin_pre_minigame(TiltShiftSession.ID)
 	check(
-		start.accepted and start.direct_launch and host.readiness == null,
-		"Mapped Tilt Shift enters selected preparation without the all-player lobby gate",
+		start.accepted and not start.get("direct_launch", false) and host.readiness != null,
+		"Mapped Tilt Shift enters the shared all-player Pre-minigame gate",
 	)
+	for player: Dictionary in host.players():
+		_calibrate(host, String(player.player_id), 1)
+		check(host.readiness.set_ready(player, true).accepted, "Every lobby player confirms READY")
 	var presentation := TiltShiftPresentation.new()
 	root.add_child(presentation)
 	presentation.arena.clock = session.clock
@@ -37,7 +40,7 @@ func _run() -> void:
 	var launch: Dictionary = host.consume_minigame_launch(TiltShiftSession.ID)
 	check(
 		session.attach(presentation, launch.participants),
-		"Uncalibrated selected preparation attaches without prematurely starting play",
+		"Shared preparation transfers calibrated inputs into selected round preparation",
 	)
 	var controller := presentation.arena.controller
 	var protocol := session.protocol
@@ -61,7 +64,7 @@ func _run() -> void:
 	)
 	var first := selected[0]
 	var channel: MotionInputChannel = host.websocket.motion_channels[first]
-	MotionFixture.live(channel, 0, 1, 0)
+	MotionFixture.live(channel, 0, 2, 0)
 	channel.handle(
 		{ "player_id": first },
 		{ "type": "motion_calibrate", "subscription_id": channel.subscription_id },
@@ -183,6 +186,60 @@ func _initial_calibration(host: Node, session: TiltShiftSession) -> void:
 		for index: int in count:
 			host.player_registry.join_player(980 + index, "Player %d" % index, true, 0)
 		check(host.begin_pre_minigame(TiltShiftSession.ID).accepted, "Small roster prepares")
+		var participants: Array[Dictionary] = host.players()
+		var readiness: PreMinigameReadiness = host.readiness
+		for player: Dictionary in participants:
+			check(
+				not readiness.set_ready(player, true).accepted,
+				"Initial READY requires sensor permission and calibration",
+			)
+		_now = 65000
+		session.poll()
+		check(readiness.active, "Delayed permission cannot skip the Pre-minigame screen")
+		var first := String(participants[0].player_id)
+		_calibrate(host, first, 1, 0)
+		check(
+			session.motion.player_state(first).usable and not session.ready_for(first),
+			"Usable portrait capture cannot READY",
+		)
+		check(
+			not readiness.set_ready(participants[0], true).accepted,
+			"Crafted portrait READY is rejected by the host",
+		)
+		var channel: MotionInputChannel = host.websocket.motion_channels[first]
+		_now += 250
+		MotionFixture.live(channel, 0, 2, _now, -90)
+		session.motion.poll()
+		check(readiness.set_ready(participants[0], true).accepted, "Other landscape hold may READY")
+		_now += 250
+		MotionFixture.live(channel, 0, 3, _now, 180)
+		session.motion.poll()
+		session.poll()
+		check(not readiness.snapshot_for(first).ready, "Returning to portrait revokes READY")
+		_now += 250
+		MotionFixture.live(channel, 0, 4, _now, 270)
+		session.motion.poll()
+		check(not readiness.snapshot_for(first).ready, "Landscape recovery requires another READY")
+		check(readiness.set_ready(participants[0], true).accepted, "Recovered landscape may READY")
+		channel.reconnect()
+		session.poll()
+		check(not readiness.snapshot_for(first).ready, "Shared preparation reconnect clears READY")
+		MotionFixture.live(channel, 0, 1, _now)
+		session.motion.poll()
+		check(session.motion.inputs[first].calibrated, "Mapped reconnect retains neutral")
+		check(
+			readiness.set_ready(participants[0], true).accepted,
+			"Reconnected player confirms again",
+		)
+		for index: int in range(1, participants.size()):
+			_calibrate(host, String(participants[index].player_id), 1)
+			check(readiness.active, "One missing READY keeps the shared screen open")
+			var result := readiness.set_ready(participants[index], true)
+			check(result.accepted, "Each player confirms READY")
+		check(
+			readiness.transitioning and host.readiness == null,
+			"All players release the shared gate",
+		)
 		var presentation := TiltShiftPresentation.new()
 		root.add_child(presentation)
 		presentation.arena.clock = session.clock
@@ -193,55 +250,13 @@ func _initial_calibration(host: Node, session: TiltShiftSession) -> void:
 		var state := controller.snapshot()
 		check(
 			state.phase == &"preparing" and not state.panel_visible,
-			"Initial calibration skips both the participant panel and READY",
+			"Small roster skips only the factory participant panel after shared READY",
 		)
-		_now = 65000
-		presentation.arena.step(0, _now)
-		check(
-			controller.snapshot().phase == &"preparing" and presentation.arena.spawned_count == 0,
-			"Delayed permission cannot consume the countdown or start ball delivery",
-		)
-		var first := state.players[0].player_id
-		var channel: MotionInputChannel = host.websocket.motion_channels[first]
-		MotionFixture.live(channel, 0, 1, _now)
-		channel.handle(
-			{ "player_id": first },
-			{ "type": "motion_calibrate", "subscription_id": channel.subscription_id },
-			_now,
-		)
-		session.motion.poll()
-		presentation.arena.step(0, _now)
-		check(controller.snapshot().phase == &"preparing", "One calibrated phone cannot launch")
 		var wire := session.protocol.snapshot_for(first)
 		check(
-			wire.calibration_available and not wire.ready_available,
-			"Phone calibration stays available while READY stays hidden",
+			wire.calibration_available and not wire.ready_available and wire.landscape,
+			"Round preparation reports landscape without a second small-roster READY",
 		)
-		_now += 250
-		for player: TiltShiftState.Player in state.players:
-			channel = host.websocket.motion_channels[player.player_id]
-			MotionFixture.live(channel, 0, 2, _now)
-			channel.handle(
-				{ "player_id": player.player_id },
-				{ "type": "motion_calibrate", "subscription_id": channel.subscription_id },
-				_now,
-			)
-		controller.set_connected(first, false)
-		session.motion.poll()
-		presentation.arena.step(0, _now)
-		check(controller.snapshot().phase == &"preparing", "Disconnected calibration cannot launch")
-		controller.set_connected(first, true)
-		_now += 1250
-		var fresh_id: String = launch.participants[0].player_id
-		channel = host.websocket.motion_channels[fresh_id]
-		MotionFixture.live(channel, 25, 3, _now)
-		session.motion.poll()
-		presentation.arena.step(0, _now)
-		check(controller.snapshot().phase == &"preparing", "Stale calibrated input cannot launch")
-		_now += 250
-		for player: TiltShiftState.Player in state.players:
-			channel = host.websocket.motion_channels[player.player_id]
-			MotionFixture.live(channel, 0, 4, _now)
 		session.motion.poll()
 		presentation.arena.step(0, _now)
 		state = controller.snapshot()
@@ -285,3 +300,16 @@ func _initial_calibration(host: Node, session: TiltShiftSession) -> void:
 		await process_frame
 		for index: int in count:
 			host.player_registry.leave_connection(980 + index)
+
+
+func _calibrate(host: Node, player_id: String, sequence: int, screen_angle: float = 90) -> void:
+	var channel: MotionInputChannel = host.websocket.motion_channels[player_id]
+	check(
+		MotionFixture.live(channel, 0, sequence, _now, screen_angle),
+		"Preparation sample fits the authenticated channel budget",
+	)
+	channel.handle(
+		{ "player_id": player_id },
+		{ "type": "motion_calibrate", "subscription_id": channel.subscription_id },
+		_now,
+	)

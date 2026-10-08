@@ -141,8 +141,6 @@ func _start_minigame() -> void:
 	world.clear_all_input()
 	start_button.disabled = true
 	var path := "res://scenes/pre_minigame_screen.tscn"
-	if bool(result.get("direct_launch", false)):
-		path = SessionHost.minigame_scene_path(minigame_id)
 	var error := get_tree().change_scene_to_file(path)
 	if error != OK:
 		SessionHost.cancel_pre_minigame()

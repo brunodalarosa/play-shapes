@@ -2,6 +2,9 @@
 
 Decided by the project owner on 2026-10-07.
 
+The normal shared-screen bypass is superseded by
+[0032](0032-mandatory-pre-minigame-screen.md). The round calibration safeguard remains.
+
 ## Situation
 
 With two or four phones, decision 0030 skips the participant panel and READY. Starting

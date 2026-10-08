@@ -27,6 +27,7 @@ test("personalized guide validates bounded host data and rejects non-finite or f
     { generation: "" },
     { selected: "yes" },
     { ready_available: 1 },
+    { landscape: "yes" },
     { round_token: "" },
     { paddle_ids: [], selected: true },
     { paddle_ids: Array.from({ length: 6 }, (_, i) => String(i)) },
@@ -40,7 +41,9 @@ test("five host assignments still draw one canonical guide and obsolete snapshot
     Object.getOwnPropertyDescriptor(globalThis, key),
   ]);
   let slices = 0,
-    rotation = 0;
+    rotation = 0,
+    landscape = true,
+    resize;
   const context = {
     setTransform() {},
     clearRect() {},
@@ -56,7 +59,10 @@ test("five host assignments still draw one canonical guide and obsolete snapshot
   const element = () => ({
     hidden: false,
     disabled: false,
-    addEventListener() {},
+    handlers: {},
+    addEventListener(name, callback) {
+      this.handlers[name] = callback;
+    },
     setAttribute() {},
     clientWidth: 844,
     clientHeight: 390,
@@ -76,6 +82,9 @@ test("five host assignments still draw one canonical guide and obsolete snapshot
   };
   try {
     globalThis.ResizeObserver = class {
+      constructor(callback) {
+        resize = callback;
+      }
       observe() {}
     };
     globalThis.Image = class {
@@ -97,19 +106,51 @@ test("five host assignments still draw one canonical guide and obsolete snapshot
         ),
       }),
     });
-    const phone = new TiltShiftPhone(surface, stream, () => {});
+    const readyActions = [];
+    const phone = new TiltShiftPhone(
+      surface,
+      stream,
+      (ready) => readyActions.push(ready),
+      () => landscape,
+    );
     await new Promise((resolve) => setImmediate(resolve));
     phone.preparation(
       {
         generation: "shift",
         calibrated: true,
         usable: true,
+        landscape: true,
         capture_state: "live",
         angle_radians: 0,
         paddle_size: [0.1, 0.01],
       },
       false,
     );
+    assert.equal(elements.get("#tilt-ready").disabled, false);
+    landscape = false;
+    resize();
+    assert.equal(elements.get("#tilt-ready").disabled, true, "portrait viewport blocks READY");
+    elements.get("#tilt-ready").handlers.click();
+    assert.deepEqual(readyActions, [], "disabled readiness cannot send even a crafted click");
+    assert.match(elements.get("#tilt-orientation").textContent, /rotation lock/);
+    landscape = true;
+    resize();
+    assert.equal(elements.get("#tilt-ready").disabled, false, "rotating restores the action");
+    stream.controlState = {
+      calibrated: true,
+      usable: true,
+      landscape: false,
+      capture_state: "live",
+    };
+    phone.feedback();
+    assert.equal(
+      elements.get("#tilt-ready").disabled,
+      true,
+      "host portrait blocks a wide viewport",
+    );
+    stream.controlState.landscape = true;
+    phone.feedback();
+    assert.equal(elements.get("#tilt-ready").disabled, false);
     slices = 0;
     assert.equal(phone.snapshot(snapshot(["a", "b", "c", "d", "e"])), true);
     assert.equal(slices, 3, "exactly one beam uses three canonical cap/center slices");
@@ -136,11 +177,17 @@ test("five host assignments still draw one canonical guide and obsolete snapshot
         calibration_available: true,
         calibrated: true,
         usable: true,
+        landscape: false,
         ready: true,
       }),
       true,
     );
     assert.equal(elements.get("#tilt-ready").textContent, "CANCEL");
+    assert.equal(
+      elements.get("#tilt-ready").disabled,
+      false,
+      "CANCEL remains available in portrait",
+    );
     assert.equal(
       elements.get("#tilt-calibrate").disabled,
       false,
@@ -151,6 +198,7 @@ test("five host assignments still draw one canonical guide and obsolete snapshot
         generation: "next",
         calibrated: false,
         usable: false,
+        landscape: false,
         capture_state: "denied",
         angle_radians: 0,
         paddle_size: [0.1, 0.01],

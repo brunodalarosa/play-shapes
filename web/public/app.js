@@ -156,6 +156,91 @@ var PwaOnboarding = class {
   }
 };
 
+// build/screen_wake_lock.js
+function bindScreenWakeLock(page = document, target = window, wakeLock = navigator.wakeLock) {
+  let sentinel;
+  let pending = false;
+  let retry2 = false;
+  let suspended = false;
+  let stopped2 = false;
+  let generation = 0;
+  const visible = () => !stopped2 && !suspended && page.visibilityState === "visible";
+  const release = (lock) => {
+    if (lock && !lock.released)
+      void lock.release().catch(() => {
+      });
+  };
+  const request = async () => {
+    if (!wakeLock || !visible() || sentinel)
+      return;
+    if (pending) {
+      retry2 = true;
+      return;
+    }
+    pending = true;
+    const requestedGeneration = generation;
+    try {
+      const lock = await wakeLock.request("screen");
+      if (!visible() || requestedGeneration !== generation) {
+        release(lock);
+        return;
+      }
+      if (lock.released)
+        return;
+      sentinel = lock;
+      lock.addEventListener("release", () => {
+        if (sentinel === lock)
+          sentinel = void 0;
+      });
+    } catch {
+    } finally {
+      pending = false;
+      if (retry2) {
+        retry2 = false;
+        void request();
+      }
+    }
+  };
+  const retire = () => {
+    generation++;
+    retry2 = false;
+    release(sentinel);
+    sentinel = void 0;
+  };
+  const visibility = () => {
+    if (visible())
+      void request();
+    else
+      retire();
+  };
+  const hide = () => {
+    suspended = true;
+    retire();
+  };
+  const show = () => {
+    suspended = false;
+    void request();
+  };
+  const interact = () => {
+    void request();
+  };
+  page.addEventListener("visibilitychange", visibility);
+  page.addEventListener("pointerdown", interact);
+  page.addEventListener("keydown", interact);
+  target.addEventListener("pagehide", hide);
+  target.addEventListener("pageshow", show);
+  void request();
+  return () => {
+    stopped2 = true;
+    retire();
+    page.removeEventListener("visibilitychange", visibility);
+    page.removeEventListener("pointerdown", interact);
+    page.removeEventListener("keydown", interact);
+    target.removeEventListener("pagehide", hide);
+    target.removeEventListener("pageshow", show);
+  };
+}
+
 // build/motion_input.js
 var SENSOR_STALE_MSEC = 1e3;
 var numberOrNull = (value) => typeof value === "number" && Number.isFinite(value) ? value : null;
@@ -415,7 +500,7 @@ var MotionStream = class {
   feedback(subscriptionId, state) {
     if (subscriptionId !== this.subscription?.subscription_id)
       return false;
-    if (typeof state?.calibrated !== "boolean" || typeof state.usable !== "boolean" || typeof state.capture_state !== "string")
+    if (typeof state?.calibrated !== "boolean" || typeof state.usable !== "boolean" || state.landscape !== void 0 && typeof state.landscape !== "boolean" || typeof state.capture_state !== "string")
       return false;
     this.controlState = { ...state };
     this.onControlState?.({ ...state });
@@ -527,12 +612,20 @@ function validTiltSnapshot(value) {
   if (!value || typeof value !== "object")
     return false;
   const v2 = value;
-  return v2.type === "tilt_shift_snapshot" && typeof v2.generation === "string" && v2.generation.length > 0 && v2.generation.length <= 64 && Number.isSafeInteger(v2.sequence) && v2.sequence >= 0 && ["preparing", "countdown", "start", "active", "between_rounds", "finished"].includes(v2.phase) && Number.isInteger(v2.round) && v2.round >= 1 && v2.round <= 24 && (v2.team === 0 || v2.team === 1) && Number.isFinite(v2.angle_radians) && Array.isArray(v2.paddle_ids) && (v2.paddle_ids.length >= 1 || v2.selected === false) && v2.paddle_ids.length <= 5 && new Set(v2.paddle_ids).size === v2.paddle_ids.length && (v2.selected === void 0 || typeof v2.selected === "boolean") && (v2.round_token === void 0 || typeof v2.round_token === "string" && v2.round_token.length > 0 && v2.round_token.length <= 64) && [v2.ready, v2.ready_available, v2.calibration_available, v2.calibrated, v2.usable].every((flag) => flag === void 0 || typeof flag === "boolean") && v2.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) && Array.isArray(v2.paddle_size) && v2.paddle_size.length === 2 && v2.paddle_size.every((size) => Number.isFinite(size) && size > 0 && size <= 2);
+  return v2.type === "tilt_shift_snapshot" && typeof v2.generation === "string" && v2.generation.length > 0 && v2.generation.length <= 64 && Number.isSafeInteger(v2.sequence) && v2.sequence >= 0 && ["preparing", "countdown", "start", "active", "between_rounds", "finished"].includes(v2.phase) && Number.isInteger(v2.round) && v2.round >= 1 && v2.round <= 24 && (v2.team === 0 || v2.team === 1) && Number.isFinite(v2.angle_radians) && Array.isArray(v2.paddle_ids) && (v2.paddle_ids.length >= 1 || v2.selected === false) && v2.paddle_ids.length <= 5 && new Set(v2.paddle_ids).size === v2.paddle_ids.length && (v2.selected === void 0 || typeof v2.selected === "boolean") && (v2.round_token === void 0 || typeof v2.round_token === "string" && v2.round_token.length > 0 && v2.round_token.length <= 64) && [
+    v2.ready,
+    v2.ready_available,
+    v2.calibration_available,
+    v2.calibrated,
+    v2.usable,
+    v2.landscape
+  ].every((flag) => flag === void 0 || typeof flag === "boolean") && v2.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) && Array.isArray(v2.paddle_size) && v2.paddle_size.length === 2 && v2.paddle_size.every((size) => Number.isFinite(size) && size > 0 && size <= 2);
 }
 var TiltShiftPhone = class {
   surface;
   stream;
   sendReady;
+  isLandscape;
   canvas;
   context;
   actions;
@@ -540,6 +633,7 @@ var TiltShiftPhone = class {
   calibration;
   ready;
   state;
+  orientation;
   images = [];
   bounds = [];
   angle = 0;
@@ -554,13 +648,15 @@ var TiltShiftPhone = class {
   connected = false;
   usable = false;
   calibrated = false;
+  landscape = false;
   isReady = false;
   capture = "waiting";
   observer;
-  constructor(surface, stream, sendReady) {
+  constructor(surface, stream, sendReady, isLandscape = () => window.matchMedia("(orientation: landscape)").matches) {
     this.surface = surface;
     this.stream = stream;
     this.sendReady = sendReady;
+    this.isLandscape = isLandscape;
     this.canvas = surface.querySelector("canvas");
     this.context = this.canvas.getContext("2d");
     this.actions = surface.querySelector("#tilt-actions");
@@ -568,6 +664,7 @@ var TiltShiftPhone = class {
     this.calibration = surface.querySelector("#tilt-calibrate");
     this.ready = surface.querySelector("#tilt-ready");
     this.state = surface.querySelector("#tilt-state");
+    this.orientation = surface.querySelector("#tilt-orientation");
     this.permission.addEventListener("click", () => {
       this.permission.disabled = true;
       void this.stream.requestPermission().finally(() => this.buttons());
@@ -577,10 +674,15 @@ var TiltShiftPhone = class {
         this.calibration.disabled = true;
     });
     this.ready.addEventListener("click", () => {
+      if (this.ready.disabled)
+        return;
       this.ready.disabled = true;
       this.sendReady(!this.isReady, this.actionContext());
     });
-    this.observer = new ResizeObserver(() => this.draw());
+    this.observer = new ResizeObserver(() => {
+      this.buttons();
+      this.draw();
+    });
     this.observer.observe(this.canvas);
     void this.loadArt();
   }
@@ -608,6 +710,7 @@ var TiltShiftPhone = class {
     this.roundToken = void 0;
     this.usable = value.usable;
     this.calibrated = value.calibrated;
+    this.landscape = value.landscape === true;
     this.capture = value.capture_state;
     this.angle = value.angle_radians;
     if (Array.isArray(value.paddle_size) && value.paddle_size.length === 2 && value.paddle_size.every((size) => Number.isFinite(size) && size > 0))
@@ -641,6 +744,7 @@ var TiltShiftPhone = class {
       this.usable = value.usable;
     if (value.calibrated !== void 0)
       this.calibrated = value.calibrated;
+    this.landscape = value.landscape === true;
     this.connected = true;
     this.team = value.team;
     this.angle = value.angle_radians;
@@ -660,6 +764,7 @@ var TiltShiftPhone = class {
     this.capture = state.capture_state;
     this.usable = state.usable;
     this.calibrated = state.calibrated;
+    this.landscape = state.landscape === true;
     this.buttons();
   }
   disconnect() {
@@ -676,12 +781,15 @@ var TiltShiftPhone = class {
     return this.roundToken && this.generation ? { generation: this.generation, round_token: this.roundToken } : void 0;
   }
   buttons() {
+    const landscape = this.landscape && this.isLandscape();
+    this.orientation.hidden = !this.preparing;
+    this.orientation.textContent = landscape ? "Hold your phone in landscape while you get ready." : "Turn your phone to landscape. If it stays upright, turn off rotation lock.";
     this.permission.hidden = this.usable;
     this.permission.disabled = !this.connected || !this.stream.active;
     this.calibration.hidden = !this.preparing;
     this.calibration.disabled = !this.connected || !this.usable;
     this.ready.hidden = !this.readyAvailable;
-    this.ready.disabled = !this.connected || !this.isReady && (!this.usable || !this.calibrated);
+    this.ready.disabled = !this.connected || !this.isReady && (!this.usable || !this.calibrated || !landscape);
     this.ready.textContent = this.isReady ? "CANCEL" : "READY";
     this.ready.setAttribute("aria-pressed", String(this.isReady));
     this.actions.hidden = !this.preparing && this.usable || !this.selected && !this.preparing;
@@ -1726,6 +1834,7 @@ function colorOption(hex) {
 
 // build/app.js
 var status = document.querySelector("#status");
+bindScreenWakeLock();
 var connectionError = document.querySelector("#connection-error");
 var connectionErrors = [];
 function reportConnectionFailure(stage, endpoint, error) {

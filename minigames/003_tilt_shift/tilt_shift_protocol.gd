@@ -55,6 +55,7 @@ func snapshot_for(player_id: String) -> Dictionary:
 		"calibration_available": phase in ["preparing", "countdown", "start", "between_rounds"],
 		"calibrated": _motion.get(player_id, { }).get("calibrated", false),
 		"usable": _motion.get(player_id, { }).get("usable", false),
+		"landscape": _motion.get(player_id, { }).get("landscape", false),
 		"team": player.team,
 		"angle_radians": player.angle_radians,
 		"paddle_ids": Array(player.paddle_ids),

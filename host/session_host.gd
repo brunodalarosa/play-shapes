@@ -205,12 +205,6 @@ func begin_pre_minigame(minigame_id: StringName) -> Dictionary:
 		_ensure_tilt_shift()
 		if not tilt_shift.prepare(self, active_presets.tilt_shift):
 			return { "accepted": false, "reason": "Tilt Shift preparation could not start" }
-		if not active_presets.tilt_shift.layouts_by_round.is_empty():
-			var launch := prepare_minigame_launch(minigame_id)
-			if not launch.accepted:
-				tilt_shift.stop()
-				return launch
-			return { "accepted": true, "direct_launch": true }
 		can_ready = tilt_shift.ready_for
 		preparation = tilt_shift.preparation_for
 	readiness = PreMinigameReadiness.new(

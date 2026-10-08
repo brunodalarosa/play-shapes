@@ -4,6 +4,7 @@ import {
   bindControllerLifecycle,
 } from "./immersive.js";
 import { PwaOnboarding, isStandalone } from "./pwa.js";
+import { bindScreenWakeLock } from "./screen_wake_lock.js";
 import { MotionLabController } from "./motion_lab.js";
 import { MotionStream, type MotionControlState } from "./motion_stream.js";
 import { TiltShiftPhone, type Preparation } from "./003_tilt_shift/tilt_shift_phone.js";
@@ -25,6 +26,7 @@ import {
 } from "./character_selection.js";
 
 const status = document.querySelector<HTMLElement>("#status")!;
+bindScreenWakeLock();
 const connectionError = document.querySelector<HTMLElement>("#connection-error")!;
 const connectionErrors: { text: string; at: string; repeats: number }[] = [];
 

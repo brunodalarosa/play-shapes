@@ -50,8 +50,8 @@ Feedback and stop messages match their subscription generation.
 
 `TiltShiftMotionController.prepare(service, ids, profile)` starts capture and fresh
 per-player calibration state. `player_state(id)` exposes `capture_state`, `usable` and
-`calibrated`; `ready_for(id)` requires both usable capture and completed calibration.
-The readiness screen and its permission/calibration buttons are separate integration work.
+`calibrated` and `landscape`; `ready_for(id)` requires usable capture, completed calibration
+and a landscape display orientation. Portrait does not change the physical tilt calculation.
 
 After the actual arena starts, `activate(arena)` verifies its roster. Older single-layout
 profiles require every player to be ready before attachment. Mapped profiles allow capture
@@ -84,14 +84,14 @@ a new subscription receives fresh feedback. No per-frame angle snapshots are add
 ## Tilt Shift preparation lifecycle
 
 The normal catalog flow uses TiltShiftSession to keep the same motion consumer across
-the preparation-to-factory scene transition. Final joins from existing onboarding sockets
+the shared all-player Pre-minigame screen to factory transition. Final joins from existing onboarding sockets
 receive new isolated channels without resetting earlier players. Expired preparation
-participants lose their channels. READY is revoked when capture becomes stale or unusable.
+participants lose their channels. READY is revoked when capture becomes stale, unusable or portrait.
 
 Mapped-round resume clears readiness and keeps neutral and ownership. Calibration is
 allowed before/between active rounds and clears READY. Active play locks calibration.
 
-When the first round skips the participant panel and READY, the normal phone session waits
+After the shared screen, when the first round skips its participant panel and READY, the phone session waits
 in preparation until every selected player is connected with fresh calibrated input. This
 initial calibration wait has no timeout; permission and CALIBRATE remain available until
 the complete countdown starts. Later rounds reuse calibration and retain their panel rules.

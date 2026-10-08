@@ -115,6 +115,10 @@ func state(channel: MotionInputChannel, now: int) -> Dictionary:
 		"calibrated": calibrated,
 		"capture_state": String(capture),
 		"usable": capture == &"live",
+		"landscape": (
+			channel != null and not channel.latest.is_empty()
+			and is_equal_approx(fposmod(float(channel.latest.screen_angle), 180.0), 90.0)
+		),
 	}
 
 

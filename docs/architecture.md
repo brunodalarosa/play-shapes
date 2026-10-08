@@ -60,6 +60,8 @@ The reusable parts behind the lobby characters. Setup and reuse are in
 - `scenes/pre_minigame_screen.tscn` uses editable Bubbles content in
   `bubbles_pre_minigame_content.tres`, in the minigame's folder, and a curated gameplay capture
   in `assets/runtime/pre_minigame/bubbles_preview.png`.
+- Every normal catalog launch uses this screen. Journey requirements and plan warnings are
+  in [player journeys](player-journeys.md).
 
 ## Bubbles and Jellyfishes
 
@@ -170,11 +172,12 @@ beam visuals, one cosmetic operator per participant and host-derived score/time/
 feedback. The editor workshop gameplay preview uses that same presentation scene.
 
 `TiltShiftSession`, a SessionHost child, carries preparation into the gameplay wrapper,
-attaches mapped rounds directly, routes readiness and retires capture on results or exit.
+attaches mapped rounds after shared all-player readiness, routes round readiness and retires
+capture on results or exit.
 Preparation transitions remain in the round controller. `TiltShiftProtocol`
 copies accepted state into personalized snapshots. The catalog lists the normal
 2/4/6/8/10-player entry; the separately labeled F12 review uses simulated controls.
-See [decision 0030](decisions/0030-tilt-shift-round-preparation.md).
+See [player journeys](player-journeys.md).
 
 ## Characters
 
@@ -232,6 +235,8 @@ See [decision 0030](decisions/0030-tilt-shift-round-preparation.md).
   as a movement guide. Preview and instructions remain on the shared screen.
 - `web/src/squircle_v1.ts` draws manifest-owned front idle sheets in setup and in the player's
   personalized Bubbles snapshot.
+- `web/src/screen_wake_lock.ts` owns one visible-page wake lock across every phone screen,
+  independent of the active minigame or socket. It adds no host state or messages.
 - What the phone screens do is in [phone-client.md](phone-client.md).
 
 ## Tilt Shift

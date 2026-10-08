@@ -676,10 +676,14 @@ html.tilt-active main > :not(#tilt-shift) {
 #tilt-ready[aria-pressed="true"] {
   background: #f4bc82 !important;
 }
-#tilt-state {
+#tilt-state,
+#tilt-orientation {
   flex-basis: 100%;
   margin: 0;
   text-align: center;
+}
+#tilt-orientation {
+  color: #2d453c;
 }
 .tilt-phone-icon {
   display: none;

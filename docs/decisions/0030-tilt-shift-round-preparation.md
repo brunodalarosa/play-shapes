@@ -2,6 +2,9 @@
 
 Decided by the project owner on 2026-10-07.
 
+The normal launch bypass is superseded by
+[0032](0032-mandatory-pre-minigame-screen.md). Round preparation rules remain.
+
 ## Situation
 
 Alternating layouts need different participant counts and fair exposure history. A shared

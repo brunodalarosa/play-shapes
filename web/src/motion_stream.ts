@@ -5,6 +5,7 @@ export type MotionControlState = {
   calibrated: boolean;
   usable: boolean;
   capture_state: string;
+  landscape?: boolean;
   accepted?: boolean;
   reason?: string;
 };
@@ -93,6 +94,7 @@ export class MotionStream {
     if (
       typeof state?.calibrated !== "boolean" ||
       typeof state.usable !== "boolean" ||
+      (state.landscape !== undefined && typeof state.landscape !== "boolean") ||
       typeof state.capture_state !== "string"
     )
       return false;

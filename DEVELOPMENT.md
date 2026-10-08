@@ -6,6 +6,7 @@ none of them needs the others first.
 | Working on | Read |
 | --- | --- |
 | What exists today, running the project, joining from a phone | [docs/overview.md](docs/overview.md) |
+| Player-facing screen sequences, preparation and journey changes | [docs/player-journeys.md](docs/player-journeys.md) |
 | Which script or scene owns what | [docs/architecture.md](docs/architecture.md) |
 | Messages between phone and host, HTTP routes, limits | [docs/protocol.md](docs/protocol.md) |
 | Tests, the check command, evidence labels | [docs/verification.md](docs/verification.md) |
