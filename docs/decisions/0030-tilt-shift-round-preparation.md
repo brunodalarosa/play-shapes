@@ -17,6 +17,9 @@ The factory and workshop render the same controller phases. The local host can f
 phones cannot. Skipping the participant panel also skips READY. The panel clock starts on
 opening, regardless of connectivity, and never restarts after a disconnect.
 
+Decision [0031](0031-tilt-shift-initial-calibration.md) adds an initial calibration wait
+when normal phone sessions skip the first participant panel.
+
 Fair selection prefers an unplayed layout, then fewer rounds, with random ties. Layout
 Resources carry stable exposure identities and their own dimensions. History belongs to
 the playthrough, so editing Resources never stores runtime ownership or participation.

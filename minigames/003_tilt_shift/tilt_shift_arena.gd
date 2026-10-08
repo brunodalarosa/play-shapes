@@ -40,6 +40,7 @@ var placeholder_visible := true:
 func start_shift(
 	selected: TiltShiftTuning,
 	players: Array[TiltShiftState.Player],
+	wait_for_initial_motion: bool = false,
 ) -> TiltShiftState.Result:
 	if selected == null:
 		return TiltShiftState.rejected(&"invalid_tuning")
@@ -56,7 +57,7 @@ func start_shift(
 	controller.round_started.connect(_on_round_started)
 	controller.round_ended.connect(_on_round_ended)
 	controller.angle_changed.connect(_on_angle_changed)
-	var result := controller.start_shift(players, clock.call())
+	var result := controller.start_shift(players, clock.call(), wait_for_initial_motion)
 	if not result.accepted:
 		stop()
 	return result

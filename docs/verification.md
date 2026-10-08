@@ -172,6 +172,10 @@ start only what they need, so they stay fast.
   and `tilt_shift_round_arena_test.gd` cover all roster selections, layout exposure,
   sharing, automatic direction, READY/timeout/force, calibration and reconnect, fitted
   offscreen spawns and no pre-active delivery. Run `node tools/check.mjs tilt_shift`.
+- `tilt_shift_preparation_test.gd` also checks initial calibration waits for two/four phones,
+  delayed permission, disconnected/stale capture, accepted angles and later-round reuse.
+  The two-phone browser journey delays permission beyond the default countdown and keeps
+  the real three-second countdown, so it cannot hide the initial-calibration regression.
 - `web/tests/003_tilt_shift/phone.test.mjs` checks malformed/replayed snapshots and one
   canonical guide for five assignments. `web/e2e/tilt_shift_phones.spec.ts` uses the real
   boot/catalog/gameplay journey with 2/4/6/8/10 Chromium phones and synthetic sensor events.

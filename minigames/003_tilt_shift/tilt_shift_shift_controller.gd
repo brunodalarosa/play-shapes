@@ -63,6 +63,7 @@ var _phase_deadline := -1
 var _panel_visible := false
 var _auto_appearances := 0
 var _auto_direction := 1.0
+var _initial_motion_required := false
 
 
 func _init() -> void:
@@ -76,6 +77,7 @@ func set_random_seed(seed: int) -> void:
 func start_shift(
 	participants: Array[TiltShiftState.Player],
 	host_time_msec: int,
+	wait_for_initial_motion: bool = false,
 ) -> TiltShiftState.Result:
 	if _notifying or _phase not in [Phase.IDLE, Phase.FINISHED]:
 		return TiltShiftState.rejected(&"shift_already_running")
@@ -126,6 +128,7 @@ func start_shift(
 	_auto_appearances = 0
 	_scores = [0, 0]
 	_round_number = 0
+	_initial_motion_required = wait_for_initial_motion
 	_next_generation += 1
 	_generation = _next_generation
 	_begin_round(host_time_msec)
@@ -136,8 +139,12 @@ func advance(host_time_msec: int) -> TiltShiftState.Result:
 	if _notifying or _phase == Phase.IDLE or not _valid_time(host_time_msec):
 		return TiltShiftState.rejected(&"invalid_phase_or_time")
 	_last_time_msec = host_time_msec
-	if _phase == Phase.PREPARING and host_time_msec >= _phase_deadline:
-		_begin_countdown(_phase_deadline)
+	if _phase == Phase.PREPARING:
+		if _phase_deadline < 0:
+			if _selected_motion_ready():
+				_begin_countdown(host_time_msec)
+		elif host_time_msec >= _phase_deadline:
+			_begin_countdown(_phase_deadline)
 	if _phase == Phase.COUNTDOWN and host_time_msec >= _phase_deadline:
 		_set_phase(Phase.START, _phase_deadline, _content.flow.start_seconds)
 	if _phase == Phase.START and host_time_msec >= _phase_deadline:
@@ -343,6 +350,8 @@ func _begin_round(host_time_msec: int) -> void:
 	_phase = Phase.PREPARING
 	_phase_started = host_time_msec
 	_phase_deadline = host_time_msec + roundi(_content.flow.readiness_seconds * 1000.0)
+	if _initial_motion_required and _round_number == 1 and not _panel_visible:
+		_phase_deadline = -1
 	_notifying = true
 	round_prepared.emit(snapshot())
 	assignments_changed.emit(snapshot())
@@ -350,6 +359,9 @@ func _begin_round(host_time_msec: int) -> void:
 	if _content.layouts_by_round.is_empty():
 		_enter_active(host_time_msec)
 	elif _panel_visible:
+		phase_changed.emit(snapshot())
+	elif _initial_motion_required and _round_number == 1:
+		# Skipping READY must not consume the player's only chance to set a neutral.
 		phase_changed.emit(snapshot())
 	else:
 		_begin_countdown(host_time_msec)
@@ -384,6 +396,13 @@ func _select_participants(team: int, layout_id: String, capacity: int) -> Packed
 		_exposure[id][layout_id] = true
 		_total_rounds[id] = _total_rounds.get(id, 0) + 1
 	return result
+
+
+func _selected_motion_ready() -> bool:
+	for player: TiltShiftState.Player in _players:
+		if player.selected and (not player.connected or not _usable.get(player.player_id, false)):
+			return false
+	return true
 
 
 func set_motion_usable(player_id: String, usable: bool) -> void:

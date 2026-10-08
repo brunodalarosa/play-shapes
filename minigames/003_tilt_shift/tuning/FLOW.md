@@ -27,6 +27,11 @@ All selected READY, local force start or the panel deadline starts countdown. Di
 never restart its clock or a countdown already running. Calibration is allowed before
 active scoring and between rounds; reconnect preserves neutral.
 
+In normal phone play, a first round without the panel waits for all selected phones to have
+fresh calibrated input before starting its countdown. This initial wait has no deadline and
+does not expose READY. Later rounds retain calibration. Synthetic factory/workshop callers
+do not enable this phone-capture gate. Panel timeout and force behavior remain unchanged.
+
 The separately labeled F12 factory review uses ten synthetic players and
 host-authored demo input. It grants no real one-player launch exception.
 

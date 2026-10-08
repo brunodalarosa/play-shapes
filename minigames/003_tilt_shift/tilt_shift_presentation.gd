@@ -95,13 +95,14 @@ func _ready() -> void:
 func start_shift(
 	profile: TiltShiftTuning,
 	players: Array[TiltShiftState.Player],
+	wait_for_initial_motion: bool = false,
 ) -> TiltShiftState.Result:
 	if tuning == null:
 		return TiltShiftState.rejected(&"invalid_tuning")
 	var errors := tuning.validation_errors()
 	if not errors.is_empty():
 		return TiltShiftState.rejected(&"invalid_tuning", errors)
-	var result := arena.start_shift(profile, players)
+	var result := arena.start_shift(profile, players, wait_for_initial_motion)
 	if not result.accepted:
 		return result
 	_selected = (
