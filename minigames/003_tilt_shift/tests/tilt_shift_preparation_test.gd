@@ -169,8 +169,119 @@ func _run() -> void:
 	await process_frame
 	for index: int in 10:
 		host.player_registry.leave_connection(950 + index)
+	await _initial_calibration(host, session)
 	session.clock = Time.get_ticks_msec
 	session.motion.clock = Time.get_ticks_msec
 	session.set_process(true)
 	session.motion.set_process(true)
 	host.active_presets = original
+
+
+func _initial_calibration(host: Node, session: TiltShiftSession) -> void:
+	for count: int in [2, 4]:
+		_now = 0
+		for index: int in count:
+			host.player_registry.join_player(980 + index, "Player %d" % index, true, 0)
+		check(host.begin_pre_minigame(TiltShiftSession.ID).accepted, "Small roster prepares")
+		var presentation := TiltShiftPresentation.new()
+		root.add_child(presentation)
+		presentation.arena.clock = session.clock
+		presentation.arena.set_physics_process(false)
+		var launch: Dictionary = host.consume_minigame_launch(TiltShiftSession.ID)
+		check(session.attach(presentation, launch.participants), "Small roster attaches")
+		var controller := presentation.arena.controller
+		var state := controller.snapshot()
+		check(
+			state.phase == &"preparing" and not state.panel_visible,
+			"Initial calibration skips both the participant panel and READY",
+		)
+		_now = 65000
+		presentation.arena.step(0, _now)
+		check(
+			controller.snapshot().phase == &"preparing" and presentation.arena.spawned_count == 0,
+			"Delayed permission cannot consume the countdown or start ball delivery",
+		)
+		var first := state.players[0].player_id
+		var channel: MotionInputChannel = host.websocket.motion_channels[first]
+		MotionFixture.live(channel, 0, 1, _now)
+		channel.handle(
+			{ "player_id": first },
+			{ "type": "motion_calibrate", "subscription_id": channel.subscription_id },
+			_now,
+		)
+		session.motion.poll()
+		presentation.arena.step(0, _now)
+		check(controller.snapshot().phase == &"preparing", "One calibrated phone cannot launch")
+		var wire := session.protocol.snapshot_for(first)
+		check(
+			wire.calibration_available and not wire.ready_available,
+			"Phone calibration stays available while READY stays hidden",
+		)
+		_now += 250
+		for player: TiltShiftState.Player in state.players:
+			channel = host.websocket.motion_channels[player.player_id]
+			MotionFixture.live(channel, 0, 2, _now)
+			channel.handle(
+				{ "player_id": player.player_id },
+				{ "type": "motion_calibrate", "subscription_id": channel.subscription_id },
+				_now,
+			)
+		controller.set_connected(first, false)
+		session.motion.poll()
+		presentation.arena.step(0, _now)
+		check(controller.snapshot().phase == &"preparing", "Disconnected calibration cannot launch")
+		controller.set_connected(first, true)
+		_now += 1250
+		var fresh_id: String = launch.participants[0].player_id
+		channel = host.websocket.motion_channels[fresh_id]
+		MotionFixture.live(channel, 25, 3, _now)
+		session.motion.poll()
+		presentation.arena.step(0, _now)
+		check(controller.snapshot().phase == &"preparing", "Stale calibrated input cannot launch")
+		_now += 250
+		for player: TiltShiftState.Player in state.players:
+			channel = host.websocket.motion_channels[player.player_id]
+			MotionFixture.live(channel, 0, 4, _now)
+		session.motion.poll()
+		presentation.arena.step(0, _now)
+		state = controller.snapshot()
+		check(
+			state.phase == &"countdown" and state.phase_deadline_msec == _now + 3000,
+			"All selected calibrated phones receive the complete default countdown",
+		)
+		_now = state.phase_deadline_msec + 600
+		presentation.arena.step(0, _now)
+		check(controller.snapshot().phase == &"active", "Calibrated countdown enters active play")
+		for index: int in state.players.size():
+			var player := state.players[index]
+			channel = host.websocket.motion_channels[player.player_id]
+			MotionFixture.live(channel, 25 if index % 2 == 0 else -25, 5, _now)
+		session.motion.poll()
+		for player: TiltShiftState.Player in state.players:
+			var angle := controller.snapshot(player.player_id).players[0].angle_radians
+			check(absf(angle) > 0.1, "Each phone's tilt reaches its authoritative paddles")
+			check(
+				session.protocol.snapshot_for(player.player_id).angle_radians == angle,
+				"Each phone receives its accepted host angle",
+			)
+		_now = controller.snapshot().deadline_msec
+		presentation.arena.step(0, _now)
+		session.poll()
+		check(
+			controller.snapshot().round_number == 2 and controller.snapshot().phase == &"countdown",
+			"Unchanged later participants skip calibration, panel and READY",
+		)
+		for player: TiltShiftState.Player in state.players:
+			check(
+				session.motion.inputs[player.player_id].calibrated,
+				"Later rounds retain calibration",
+			)
+		host.send_players_to_lobby()
+		check(
+			host.websocket.motion_channels.is_empty(),
+			"Cancel retires initial calibration capture",
+		)
+		presentation.queue_free()
+		await process_frame
+		for index: int in count:
+			host.player_registry.leave_connection(980 + index)

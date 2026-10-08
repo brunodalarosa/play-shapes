@@ -81,7 +81,7 @@ for (const count of [2, 4, 6, 8, 10]) {
             wire.bytes += bytes;
             wire.updates++;
             wire.maximum = Math.max(wire.maximum, bytes);
-            if (value.selected) wire.angles.add(value.angle_radians);
+            if (value.selected && value.phase === "active") wire.angles.add(value.angle_radians);
           }),
         );
         await sensors(phone.page);
@@ -96,7 +96,22 @@ for (const count of [2, 4, 6, 8, 10]) {
           await expect(phone.page.locator("#tilt-ready")).toBeHidden();
         }
       }
-      await prepare(phones);
+      if (count === 2) {
+        await host.event(/^tilt phase=preparing round=1$/);
+        // A human may spend longer than the old countdown granting sensor permission.
+        await phones[0].page.waitForTimeout(5_000);
+        for (const phone of phones) {
+          await expect(phone.page.locator("#tilt-permission")).toBeVisible();
+          await expect(phone.page.locator("#tilt-calibrate")).toBeVisible();
+          await expect(phone.page.locator("#tilt-ready")).toBeHidden();
+        }
+        await prepare([phones[0]]);
+        await phones[1].page.waitForTimeout(4_000);
+        await expect(phones[1].page.locator("#tilt-calibrate")).toBeVisible();
+        await prepare(phones.slice(1));
+      } else {
+        await prepare(phones);
+      }
       await host.event(/^tilt phase=active round=1$/);
       let active = 0,
         waiting = 0;

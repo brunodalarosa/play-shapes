@@ -67,3 +67,4 @@ What was decided.
 | [0028](0028-tilt-shift-editor-workshop.md) | Tilt Shift edits isolated drafts and previews ordinary gameplay |
 | [0029](0029-tilt-shift-session.md) | Tilt Shift carries prepared calibration through its normal gameplay flow |
 | [0030](0030-tilt-shift-round-preparation.md) | Tilt Shift prepares selected players inside each mapped round |
+| [0031](0031-tilt-shift-initial-calibration.md) | Tilt Shift waits for initial calibration before a skipped-panel countdown |

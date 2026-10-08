@@ -149,6 +149,7 @@ func poll() -> void:
 			return
 	var new_round := _new_round
 	_new_round = false
+	var changed := PackedStringArray()
 	for player_id: String in inputs.keys():
 		var updated := inputs[player_id].update(_channels[player_id], now)
 		var state := player_state(player_id)
@@ -161,7 +162,11 @@ func poll() -> void:
 				return
 		if _locked:
 			_arena.controller.set_motion_usable(player_id, ready_for(player_id))
-		if _playing and (updated or new_round):
+		if updated or new_round:
+			changed.append(player_id)
+	# Angle acceptance can advance the countdown; first refresh every phone's readiness.
+	if _playing:
+		for player_id: String in changed:
 			_arena.controller.accept_angle(player_id, inputs[player_id].angle_radians, _token, now)
 			if _service == null:
 				return

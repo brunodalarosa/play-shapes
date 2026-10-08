@@ -53,8 +53,10 @@ per-player calibration state. `player_state(id)` exposes `capture_state`, `usabl
 `calibrated`; `ready_for(id)` requires both usable capture and completed calibration.
 The readiness screen and its permission/calibration buttons are separate integration work.
 
-After the actual arena starts, `activate(arena)` verifies its roster and requires each
-player to be ready. The consumer freezes neutral through the shift, including intermissions.
+After the actual arena starts, `activate(arena)` verifies its roster. Older single-layout
+profiles require every player to be ready before attachment. Mapped profiles allow capture
+and calibration inside round preparation. The consumer preserves neutral through the shift,
+including intermissions, unless the player deliberately recalibrates before active scoring.
 It sends host-owned unwrapped angles through the rules controller; all assigned paddles
 receive the same target. The existing physical limiter determines their confirmed poses.
 
@@ -88,6 +90,12 @@ participants lose their channels. READY is revoked when capture becomes stale or
 
 Mapped-round resume clears readiness and keeps neutral and ownership. Calibration is
 allowed before/between active rounds and clears READY. Active play locks calibration.
+
+When the first round skips the participant panel and READY, the normal phone session waits
+in preparation until every selected player is connected with fresh calibrated input. This
+initial calibration wait has no timeout; permission and CALIBRATE remain available until
+the complete countdown starts. Later rounds reuse calibration and retain their panel rules.
+
 Older shared-gate preparation retains its original neutral-reset policy.
 Host cancel, scene startup failure, results, debug replacement and return to the lobby retire
 the prepared consumer. The F12 factory review is explicitly simulated and creates no motion

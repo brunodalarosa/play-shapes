@@ -32,6 +32,9 @@ removes it. The evidence labels are defined in
 
 ## Tilt Shift calibrated motion
 
+- `[PHYSICAL-PHONE]` Retest the first two-phone launch on iPhone and Android after the
+  calibration-wait repair: delay permission beyond three seconds, calibrate each phone,
+  confirm both control paddles, then verify later rounds reuse neutral without READY.
 - `[PHYSICAL-PHONE]` Owner trials on supported iPhone and Android browsers: record versions,
   comfortable sideways neutral, both holds, mirrored tilts, repeated full turns/reversal,
   screen autorotation, off-axis tolerance, denial, background/lock and permission recovery.

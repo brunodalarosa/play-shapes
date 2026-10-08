@@ -104,7 +104,7 @@ func attach(presentation: TiltShiftPresentation, participants: Array) -> bool:
 		player.character_color = String(record.character_color)
 		player.connected = record.state == "connected"
 		players.append(player)
-	if not presentation.start_shift(profile, players).accepted:
+	if not presentation.start_shift(profile, players, true).accepted:
 		return false
 	if not motion.activate(presentation.arena):
 		presentation.stop()

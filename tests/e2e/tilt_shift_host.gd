@@ -43,7 +43,6 @@ func _start() -> void:
 	var selected: TiltShiftTuning = _host.active_presets.tilt_shift
 	selected.round_count = 2
 	selected.layouts_by_round.resize(2)
-	selected.flow.countdown_seconds = 6.0
 	selected.flow.start_seconds = 0.2
 	selected.flow.readiness_seconds = 30.0
 	selected.round_duration_seconds = 8
