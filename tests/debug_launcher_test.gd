@@ -112,7 +112,7 @@ func _run() -> void:
 		"Tilt Shift review is separate from real minigame launch",
 	):
 		return
-	var review_launched := launcher.launch(&"tilt_shift_review")
+	var review_launched: bool = launcher.launch(&"tilt_shift_review")
 	if not check(review_launched, "Simulated factory launches without phones"):
 		return
 	await scene_changed
