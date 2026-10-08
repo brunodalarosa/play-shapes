@@ -74,7 +74,10 @@ actual gameplay preview.
 
 The catalog now connects motion preparation and host-validated readiness to the factory,
 mapped rounds, cumulative results and return to the lobby.
-Each phone shows one team paddle as a tilt guide. Audio remains deferred; real-phone
+The default rounds alternate two authored layouts with fair participant selection,
+selected-player readiness, countdown and automatic neutral rotation. The workshop exposes
+runtime settings through a Tunables tab. Selected phones show one paddle; spectators wait.
+Audio remains deferred; real-phone
 accuracy, permission, comfort and owner readability/feel await trials.
 See [the rules contract](../minigames/003_tilt_shift/README.md).
 

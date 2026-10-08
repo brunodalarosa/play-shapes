@@ -5,7 +5,7 @@ signal selection_changed(kind: String, index: int)
 
 const Geometry := preload("res://addons/tilt_shift_workshop/workshop_geometry.gd")
 const Model := preload("res://addons/tilt_shift_workshop/workshop_model.gd")
-const COLORS: Array[Color] = [Color("ec9644"), Color("598df2"), Color("78684d")]
+const COLORS: Array[Color] = [Color("ec9644"), Color("598df2"), Color("929292")]
 
 var model: Model
 var mode: String = "paddle"
@@ -108,14 +108,16 @@ func _draw() -> void:
 		if paddle == null:
 			continue
 		var point := to_screen(paddle.position)
+		var dimensions := model.profile.paddle_layout.paddle_size(
+			paddle.team,
+			model.profile.physics,
+		)
 		if show_guides and not diagnostics.is_empty():
-			draw_arc(point, diagnostics.radius * scale, 0, TAU, 48, Color(0.45, 0.35, 0.25, 0.4))
+			var radius := dimensions.length() * 0.5
+			draw_arc(point, radius * scale, 0, TAU, 48, Color(0.45, 0.35, 0.25, 0.4))
 			var reflected := to_screen(Vector2(arena.x - paddle.position.x, paddle.position.y))
 			draw_circle(reflected, 3, Color("b09070"), false, 1)
-		var extent := Vector2(
-			model.profile.physics.paddle_length,
-			model.profile.physics.paddle_thickness,
-		) * scale
+		var extent := dimensions * scale
 		draw_rect(Rect2(point - extent * 0.5, extent), COLORS[clampi(paddle.team, 0, 2)])
 		if mode == "paddle" and index == selected:
 			draw_rect(
@@ -138,7 +140,7 @@ func _draw() -> void:
 		if mode == "basket" and index == selected:
 			draw_rect(box.grow(3), Color("332719"), false, 2)
 		_label(box.position + Vector2(2, 17), "%.3f" % opening.width, Color.WHITE, 12)
-	draw_rect(rect, Color("78684d"), false, 2)
+	draw_rect(rect, Color("929292"), false, 2)
 	_label(
 		Vector2(16, size.y - 14),
 		"Arena widths • grid %.3f • neighbor %.3f • green: clear vertical corridors"
@@ -179,11 +181,19 @@ func _pick(point: Vector2) -> int:
 	var position := to_arena(point)
 	if mode == "paddle":
 		var nearest := -1
-		var distance := maxf(14.0 / arena_rect().size.x, model.profile.physics.paddle_length * 0.5)
+		var distance := INF
 		for index: int in model.profile.paddle_layout.paddles.size():
 			var paddle: TiltShiftPaddle = model.profile.paddle_layout.paddles[index]
-			if paddle != null and paddle.position.distance_to(position) <= distance:
-				distance = paddle.position.distance_to(position)
+			if paddle == null:
+				continue
+			var dimensions := model.profile.paddle_layout.paddle_size(
+				paddle.team,
+				model.profile.physics,
+			)
+			var radius := maxf(14.0 / arena_rect().size.x, dimensions.length() * 0.5)
+			var gap := paddle.position.distance_to(position)
+			if gap <= radius and gap < distance:
+				distance = gap
 				nearest = index
 		return nearest
 	if absf(point.y - arena_rect().end.y) > 38:

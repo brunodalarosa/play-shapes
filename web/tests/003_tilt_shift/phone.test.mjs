@@ -25,6 +25,10 @@ test("personalized guide validates bounded host data and rejects non-finite or f
     { paddle_ids: ["a", "a"] },
     { phase: "lobby" },
     { generation: "" },
+    { selected: "yes" },
+    { ready_available: 1 },
+    { round_token: "" },
+    { paddle_ids: [], selected: true },
     { paddle_ids: Array.from({ length: 6 }, (_, i) => String(i)) },
   ])
     assert.equal(validTiltSnapshot({ ...snapshot(), ...mutation }), false);
@@ -117,6 +121,31 @@ test("five host assignments still draw one canonical guide and obsolete snapshot
     );
     assert.equal(phone.snapshot({ ...snapshot(), sequence: 0, angle_radians: 9 }), false);
     assert.equal(rotation, 2.5);
+    slices = 0;
+    assert.equal(phone.snapshot({ ...snapshot([]), sequence: 2, selected: false }), true);
+    assert.equal(elements.get("canvas").hidden, true, "waiting hides the movement guide");
+    assert.equal(slices, 0, "a spectator draws no paddle");
+    assert.equal(
+      phone.snapshot({
+        ...snapshot(),
+        sequence: 3,
+        phase: "preparing",
+        round_token: "2:1",
+        selected: true,
+        ready_available: true,
+        calibration_available: true,
+        calibrated: true,
+        usable: true,
+        ready: true,
+      }),
+      true,
+    );
+    assert.equal(elements.get("#tilt-ready").textContent, "CANCEL");
+    assert.equal(
+      elements.get("#tilt-calibrate").disabled,
+      false,
+      "recalibration remains available after READY",
+    );
     phone.preparation(
       {
         generation: "next",

@@ -1,5 +1,7 @@
 # Persistent Tilt Shift session
 
+Mapped profiles now use [decision 0030](0030-tilt-shift-round-preparation.md) for round readiness.
+
 Tilt Shift preparation acquires calibration before the shared screen changes into the
 factory scene. The same consumer must survive that transition and keep its neutral
 through gameplay reconnect, while cancel and later game selection retire it completely.

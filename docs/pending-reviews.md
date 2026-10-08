@@ -12,8 +12,10 @@ removes it. The evidence labels are defined in
   diagnostics. Automated Resource reload does not establish Inspector usability.
 - `[HUMAN-PLAY]` Owner tuning of duration/count and proximity, and strategic fairness
   of ownership variety after gameplay integration.
-- The future workshop must expose the same neighbor graph visually before editor
-  avoidance review is complete; this foundation exposes typed diagnostics only.
+- `[HUMAN-PLAY]` Owner approval of A/B selection, spectator cadence, shared-paddle variety
+  and neutral rotation across 2/4/6/8/10 players. Synthetic fairness is not strategic fairness.
+- `[EDITOR]` Owner usability review of Tunables, per-layout dimensions, round mappings,
+  field explanations and saving/applying the same profile to runtime and preview.
 
 ## Tilt Shift physics
 
@@ -49,7 +51,7 @@ removes it. The evidence labels are defined in
 ## Tilt Shift art
 
 - `[PHYSICAL-PHONE]` One-paddle guide readability on a real landscape phone across
-  every supported roster, including players who control five factory paddles.
+  every supported roster, including shared-paddle participants and spectator transitions.
 - `[HUMAN-PLAY]` Couch-distance readability of balls, paddles and basket openings,
   including different basket widths/counts and ten operator stations.
 - `[HUMAN-PLAY]` Both-side Squircle hand contact and lever travel when operating
@@ -115,7 +117,9 @@ changed. A pixel comparison with the previous sheets found nothing a viewer shou
   gameplay reconnect without neutral reset, lock/background/foreground and lobby cleanup.
   Record exact device, OS and browser versions. Synthetic Chromium events do not cover this.
 - `[HUMAN-PLAY]` One-paddle phone guide readability and responsiveness, the provisional
-  intermission, team recognition and fairness with the three- and five-opening presets.
+  countdown/START, participant panel, team waiting visuals and fairness with both layouts.
+- `[PHYSICAL-PHONE]` Selected-player READY/CANCEL, between-round recalibration, neutral
+  preservation on reconnect, timeout/force start and disconnected-angle holds.
 - `[EXPORTED-BUILD]` Physical-phone play against the Windows executable; desktop
   export/pack checks do not establish this real-device journey.
 - Audio selection, whistle playback and listening remain deferred.

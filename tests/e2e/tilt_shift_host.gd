@@ -7,6 +7,7 @@ var _started := false
 var _returned := false
 var _scene := ""
 var _round := 0
+var _phase := ""
 var _results_at := -1
 var _elapsed := 0.0
 var _players := 2
@@ -41,6 +42,10 @@ func _start() -> void:
 	_host.active_presets.bubbles.round_duration_seconds = 3.0
 	var selected: TiltShiftTuning = _host.active_presets.tilt_shift
 	selected.round_count = 2
+	selected.layouts_by_round.resize(2)
+	selected.flow.countdown_seconds = 6.0
+	selected.flow.start_seconds = 0.2
+	selected.flow.readiness_seconds = 30.0
 	selected.round_duration_seconds = 8
 	selected.flow.intermission_seconds = 0.25
 	selected.physics.ball_count = 12
@@ -85,6 +90,11 @@ func _process(delta: float) -> bool:
 			_round = state.round_number
 			print("E2E tilt round=%d" % _round)
 			_capture.call_deferred("round_%d" % _round)
+		var current_phase := "%s:%d" % [state.phase, state.round_number]
+		if current_phase != _phase:
+			_phase = current_phase
+			print("E2E tilt phase=%s round=%d" % [state.phase, state.round_number])
+			_capture.call_deferred("%s_%d" % [state.phase, state.round_number])
 		if state.phase == &"finished" and _results_at < 0:
 			_results_at = Time.get_ticks_msec()
 			print("E2E tilt results")

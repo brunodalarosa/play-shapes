@@ -56,6 +56,8 @@ func launch_eligible() -> bool:
 	var players: Array[Dictionary] = _host.players()
 	if players.size() not in [2, 4, 6, 8, 10]:
 		return false
+	if not profile.layouts_by_round.is_empty():
+		return true
 	for player: Dictionary in players:
 		if not ready_for(String(player.player_id)):
 			return false
@@ -78,7 +80,8 @@ func sync_players(players: Array[Dictionary]) -> void:
 		for player_id: String in motion.inputs:
 			var channel: MotionInputChannel = _host.websocket.motion_channels[player_id]
 			var current := channel.subscription_id
-			if _generations.has(player_id) and _generations[player_id] != current:
+			if profile.layouts_by_round.is_empty() and _generations.has(player_id) \
+					and _generations[player_id] != current:
 				motion.reset_preparation(player_id)
 			_generations[player_id] = current
 	elif _stage == &"playing" and is_instance_valid(_presentation):
@@ -109,43 +112,62 @@ func attach(presentation: TiltShiftPresentation, participants: Array) -> bool:
 	_presentation = presentation
 	_stage = &"playing"
 	protocol = TiltShiftProtocol.new(generation)
+	protocol.ready_action = _accept_ready
+	protocol.calibration_context = _calibration_allowed
 	var controller := presentation.arena.controller
+	controller.round_prepared.connect(_on_round_started)
+	controller.phase_changed.connect(_on_round_started)
+	controller.readiness_changed.connect(_on_round_started)
 	controller.round_started.connect(_on_round_started)
 	controller.round_ended.connect(_on_round_ended)
 	controller.shift_finished.connect(_on_finished)
 	controller.angle_changed.connect(_on_player)
 	controller.presence_changed.connect(_on_player)
 	protocol.apply_snapshot(controller.snapshot())
+	for player_id: String in motion.inputs:
+		protocol.apply_motion(player_id, motion.player_state(player_id))
 	_host.websocket.set_tilt_shift_protocol(protocol)
 	return true
 
 
 func _on_player(player: TiltShiftState.Player) -> void:
+	if _stage != &"playing" or protocol == null:
+		return
 	protocol.apply_player(player)
 	_dirty[player.player_id] = true
 
 
 func _on_round_started(state: TiltShiftState.Snapshot) -> void:
+	if _stage != &"playing" or protocol == null:
+		return
 	_next_round_at = -1
 	protocol.apply_snapshot(state)
 	_publish_all()
 
 
 func _on_round_ended(state: TiltShiftState.Snapshot) -> void:
+	if _stage != &"playing" or protocol == null:
+		return
 	protocol.apply_snapshot(state)
 	if state.phase == &"between_rounds":
-		_next_round_at = clock.call() + roundi(profile.flow.intermission_seconds * 1000.0)
+		var pause := 0.0 if state.reworked else profile.flow.intermission_seconds
+		_next_round_at = clock.call() + roundi(pause * 1000.0)
 	_publish_all()
 
 
 func _on_finished(state: TiltShiftState.Snapshot) -> void:
+	if _stage != &"playing" or protocol == null:
+		return
 	_stage = &"results"
 	_next_round_at = -1
 	protocol.apply_snapshot(state)
 	_publish_all()
 
 
-func _on_motion_state(player_id: String, _state: Dictionary) -> void:
+func _on_motion_state(player_id: String, state: Dictionary) -> void:
+	if _stage == &"playing" and protocol != null:
+		protocol.apply_motion(player_id, state)
+		_dirty[player_id] = true
 	if _stage == &"preparing":
 		_dirty[player_id] = true
 		if _host.readiness != null:
@@ -194,6 +216,9 @@ func stop() -> void:
 	_presentation = null
 	if is_instance_valid(motion):
 		motion.stop()
+	if protocol != null:
+		protocol.ready_action = Callable()
+		protocol.calibration_context = Callable()
 	protocol = null
 	profile = null
 	_generations.clear()
@@ -211,3 +236,30 @@ static func _ids(players: Array[Dictionary]) -> PackedStringArray:
 	for player: Dictionary in players:
 		result.append(String(player.player_id))
 	return result
+
+
+func _accept_ready(player_id: String, value: bool, token: String, now: int) -> bool:
+	if _stage != &"playing" or not is_instance_valid(_presentation):
+		return false
+	var controller := _presentation.arena.controller
+	controller.set_motion_usable(player_id, motion.ready_for(player_id))
+	return controller.set_ready(player_id, value, token, now).accepted
+
+
+func _calibration_allowed(token: String) -> bool:
+	if _stage != &"playing" or not is_instance_valid(_presentation):
+		return false
+	var state := _presentation.arena.controller.snapshot()
+	return (
+		state.round_token == token
+		and state.phase in [&"preparing", &"countdown", &"start", &"between_rounds"]
+	)
+
+
+func force_start(token: String, launch_generation: String) -> bool:
+	if (
+		launch_generation != generation or _stage != &"playing"
+		or not is_instance_valid(_presentation)
+	):
+		return false
+	return _presentation.arena.controller.force_start(token, clock.call()).accepted

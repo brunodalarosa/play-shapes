@@ -54,6 +54,11 @@ func _exercise(host: Node, count: int) -> void:
 	var selected: TiltShiftTuning = host.active_presets.tilt_shift.duplicate_deep(
 		Resource.DEEP_DUPLICATE_ALL,
 	)
+	selected.layouts_by_round.clear()
+	var legacy: TiltShiftPaddleLayout = load(
+		"res://minigames/003_tilt_shift/tuning/layouts/Mirrored.tres"
+	)
+	selected.paddle_layout = legacy.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
 	selected.round_count = 2
 	selected.baskets_by_round = [selected.baskets_by_round[0], THREE]
 	selected.physics.ball_count = 0

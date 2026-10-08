@@ -23,7 +23,10 @@ func refresh() -> void:
 	bins.resize(20)
 	bins.fill(0)
 	if model.profile.physics != null and model.profile.physics.validation_errors().is_empty():
-		var duration := roundi(model.profile.round_duration_seconds * 1000.0)
+		var duration := roundi(
+			(model.profile.round_duration_seconds - model.profile.physics.delivery_cutoff_seconds)
+			* 1000.0
+		)
 		schedule = TiltShiftDelivery.schedule(
 			model.profile.physics.ball_count,
 			model.profile.physics.delivery_curve,
@@ -63,12 +66,16 @@ func _draw() -> void:
 			(1.0 - curve[index].y / peak) * plot.size.y,
 		)
 		draw_line(a, b, Color("ec9644"), 2)
-	var duration: float = model.profile.round_duration_seconds * 1000.0
+	var duration: float = (
+		model.profile.round_duration_seconds - model.profile.physics.delivery_cutoff_seconds
+	) * 1000.0
 	for offset: int in schedule:
 		var x := plot.position.x + offset / duration * plot.size.x
 		draw_line(Vector2(x, plot.end.y), Vector2(x, plot.end.y + 5), Color("a9c7eb"))
 	var summary := "0%%–100%% • orange: relative intensity • blue: balls / %.2f s"
-	summary %= model.profile.round_duration_seconds / 20.0
+	summary %= (
+		model.profile.round_duration_seconds - model.profile.physics.delivery_cutoff_seconds
+	) / 20.0
 	draw_string(
 		get_theme_default_font(),
 		Vector2(12, size.y - 10),

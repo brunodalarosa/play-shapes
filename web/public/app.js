@@ -409,8 +409,8 @@ var MotionStream = class {
       this.input.suspend();
     this.tick();
   }
-  requestCalibration() {
-    return this.send({ type: "motion_calibrate" });
+  requestCalibration(context) {
+    return this.send({ type: "motion_calibrate", ...context });
   }
   feedback(subscriptionId, state) {
     if (subscriptionId !== this.subscription?.subscription_id)
@@ -527,7 +527,7 @@ function validTiltSnapshot(value) {
   if (!value || typeof value !== "object")
     return false;
   const v2 = value;
-  return v2.type === "tilt_shift_snapshot" && typeof v2.generation === "string" && v2.generation.length > 0 && v2.generation.length <= 64 && Number.isSafeInteger(v2.sequence) && v2.sequence >= 0 && ["active", "between_rounds", "finished"].includes(v2.phase) && Number.isInteger(v2.round) && v2.round >= 1 && v2.round <= 24 && (v2.team === 0 || v2.team === 1) && Number.isFinite(v2.angle_radians) && Array.isArray(v2.paddle_ids) && v2.paddle_ids.length >= 1 && v2.paddle_ids.length <= 5 && new Set(v2.paddle_ids).size === v2.paddle_ids.length && v2.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) && Array.isArray(v2.paddle_size) && v2.paddle_size.length === 2 && v2.paddle_size.every((size) => Number.isFinite(size) && size > 0 && size <= 2);
+  return v2.type === "tilt_shift_snapshot" && typeof v2.generation === "string" && v2.generation.length > 0 && v2.generation.length <= 64 && Number.isSafeInteger(v2.sequence) && v2.sequence >= 0 && ["preparing", "countdown", "start", "active", "between_rounds", "finished"].includes(v2.phase) && Number.isInteger(v2.round) && v2.round >= 1 && v2.round <= 24 && (v2.team === 0 || v2.team === 1) && Number.isFinite(v2.angle_radians) && Array.isArray(v2.paddle_ids) && (v2.paddle_ids.length >= 1 || v2.selected === false) && v2.paddle_ids.length <= 5 && new Set(v2.paddle_ids).size === v2.paddle_ids.length && (v2.selected === void 0 || typeof v2.selected === "boolean") && (v2.round_token === void 0 || typeof v2.round_token === "string" && v2.round_token.length > 0 && v2.round_token.length <= 64) && [v2.ready, v2.ready_available, v2.calibration_available, v2.calibrated, v2.usable].every((flag) => flag === void 0 || typeof flag === "boolean") && v2.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) && Array.isArray(v2.paddle_size) && v2.paddle_size.length === 2 && v2.paddle_size.every((size) => Number.isFinite(size) && size > 0 && size <= 2);
 }
 var TiltShiftPhone = class {
   surface;
@@ -548,6 +548,9 @@ var TiltShiftPhone = class {
   generation;
   sequence = -1;
   preparing = false;
+  readyAvailable = false;
+  selected = true;
+  roundToken;
   connected = false;
   usable = false;
   calibrated = false;
@@ -570,12 +573,12 @@ var TiltShiftPhone = class {
       void this.stream.requestPermission().finally(() => this.buttons());
     });
     this.calibration.addEventListener("click", () => {
-      if (this.stream.requestCalibration())
+      if (this.stream.requestCalibration(this.actionContext()))
         this.calibration.disabled = true;
     });
     this.ready.addEventListener("click", () => {
       this.ready.disabled = true;
-      this.sendReady(!this.isReady);
+      this.sendReady(!this.isReady, this.actionContext());
     });
     this.observer = new ResizeObserver(() => this.draw());
     this.observer.observe(this.canvas);
@@ -601,7 +604,8 @@ var TiltShiftPhone = class {
       return false;
     this.generation = value.generation;
     this.sequence = -1;
-    this.preparing = this.connected = true;
+    this.preparing = this.readyAvailable = this.selected = this.connected = true;
+    this.roundToken = void 0;
     this.usable = value.usable;
     this.calibrated = value.calibrated;
     this.capture = value.capture_state;
@@ -611,6 +615,9 @@ var TiltShiftPhone = class {
     this.isReady = ready;
     this.team = 2;
     this.surface.hidden = false;
+    this.canvas.hidden = false;
+    this.surface.setAttribute("data-waiting", "false");
+    this.surface.setAttribute("data-team", String(this.team));
     this.actions.hidden = false;
     this.buttons();
     this.draw();
@@ -625,12 +632,23 @@ var TiltShiftPhone = class {
       return false;
     this.generation = value.generation;
     this.sequence = value.sequence;
-    this.preparing = false;
+    this.preparing = value.calibration_available === true;
+    this.readyAvailable = value.ready_available === true;
+    this.selected = value.selected !== false;
+    this.roundToken = value.round_token;
+    this.isReady = value.ready === true;
+    if (value.usable !== void 0)
+      this.usable = value.usable;
+    if (value.calibrated !== void 0)
+      this.calibrated = value.calibrated;
     this.connected = true;
     this.team = value.team;
     this.angle = value.angle_radians;
     this.ratio = value.paddle_size[0] / value.paddle_size[1];
     this.surface.hidden = value.phase === "finished";
+    this.canvas.hidden = !this.selected;
+    this.surface.setAttribute("data-waiting", String(!this.selected));
+    this.surface.setAttribute("data-team", String(this.team));
     this.buttons();
     this.draw();
     return true;
@@ -654,16 +672,19 @@ var TiltShiftPhone = class {
     this.sequence = -1;
     this.preparing = this.connected = this.usable = false;
   }
+  actionContext() {
+    return this.roundToken && this.generation ? { generation: this.generation, round_token: this.roundToken } : void 0;
+  }
   buttons() {
     this.permission.hidden = this.usable;
     this.permission.disabled = !this.connected || !this.stream.active;
     this.calibration.hidden = !this.preparing;
-    this.calibration.disabled = !this.connected || !this.usable || this.isReady;
-    this.ready.hidden = !this.preparing;
+    this.calibration.disabled = !this.connected || !this.usable;
+    this.ready.hidden = !this.readyAvailable;
     this.ready.disabled = !this.connected || !this.isReady && (!this.usable || !this.calibrated);
     this.ready.textContent = this.isReady ? "CANCEL" : "READY";
     this.ready.setAttribute("aria-pressed", String(this.isReady));
-    this.actions.hidden = !this.preparing && this.usable;
+    this.actions.hidden = !this.preparing && this.usable || !this.selected && !this.preparing;
     const blocked = {
       insecure: "Motion needs a secure connection",
       unsupported: "Motion is unavailable",
@@ -676,7 +697,7 @@ var TiltShiftPhone = class {
     this.state.hidden = !this.state.textContent;
   }
   draw() {
-    if (this.surface.hidden)
+    if (this.surface.hidden || !this.selected)
       return;
     const width = this.canvas.clientWidth, height = this.canvas.clientHeight;
     const dpr = Math.min(devicePixelRatio || 1, 2);
@@ -1807,9 +1828,9 @@ window.addEventListener("pageshow", (event) => {
     socket?.close();
 });
 var tiltSurface = document.querySelector("#tilt-shift");
-var tiltPhone = new TiltShiftPhone(tiltSurface, gameplayMotion, (ready) => {
+var tiltPhone = new TiltShiftPhone(tiltSurface, gameplayMotion, (ready, context) => {
   if (socket?.readyState === WebSocket.OPEN)
-    socket.send(JSON.stringify({ type: "pre_minigame_ready", ready }));
+    socket.send(JSON.stringify(context ? { type: "tilt_shift_ready", ready, ...context } : { type: "pre_minigame_ready", ready }));
 });
 gameplayMotion.onControlState = () => tiltPhone.feedback();
 var motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);

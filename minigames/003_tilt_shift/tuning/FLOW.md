@@ -5,10 +5,13 @@ apply to a later shift. Existing motion, physics and rules profiles retain their
 
 | Field | Default | Range | Effect |
 | --- | --- | --- | --- |
-| Intermission seconds | 3 | 0–10 seconds | Time after an exclusive round cutoff before the next mapped round. No scoring occurs during this pause. |
+| Readiness seconds | 60 | 1–120 seconds | Deadline measured once from opening the selected-player panel, regardless of connectivity. |
+| Countdown seconds | 3 | 0.1–10 seconds | Centered countdown before START; ball delivery and scoring remain stopped. |
+| Start seconds | 0.6 | 0.1–2 seconds | Total centered START fade before the active round clock begins. |
+| Intermission seconds | 3 | 0–10 seconds | Compatibility pause for older single-layout profiles; mapped rounds enter preparation immediately. |
 | Phone updates Hz | 15 | 1–30 updates/s | Ceiling for coalesced personalized angle snapshots. Launch, round changes and resume also send immediate state. |
 
-The phone shows one canonical team paddle as a movement guide for every allocation.
+Selected phones show one canonical team paddle as a movement guide for every allocation.
 Its rotation comes from the last accepted host angle; it never runs local physics.
 The host's complete assignment list remains available for protocol checks and reconnect.
 
@@ -16,8 +19,15 @@ The default five-opening basket preset is unchanged. `ThreeOpenings.tres` provid
 a second mirrored preset for mapping selected rounds or workshop comparisons.
 Neither preset establishes strategic fairness without owner playtesting.
 
-The normal catalog path requires an even roster and fresh calibrated motion from every
-participant. The separately labeled F12 factory review uses ten synthetic players and
+The normal catalog path freezes an even roster, then prepares the selected participants.
+Round one opens the panel only with spectators; later rounds open it when the participant
+set changes. Otherwise both panel and READY are skipped. The host accepts READY only
+from selected players with fresh usable calibration. Recalibration clears READY.
+All selected READY, local force start or the panel deadline starts countdown. Disconnects
+never restart its clock or a countdown already running. Calibration is allowed before
+active scoring and between rounds; reconnect preserves neutral.
+
+The separately labeled F12 factory review uses ten synthetic players and
 host-authored demo input. It grants no real one-player launch exception.
 
 The browser flow tests write encoded downstream traffic and coordination callback costs

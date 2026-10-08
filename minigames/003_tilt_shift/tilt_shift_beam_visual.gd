@@ -11,8 +11,13 @@ var _label: Label
 
 
 func configure(paddle: TiltShiftPaddleBody, team: int, badge_size: float) -> void:
-	var path := "paddles/paddle_orange" if team == 0 else "paddles/paddle_blue"
+	var path: String = ["paddles/paddle_orange", "paddles/paddle_blue", "paddles/paddle_neutral"][
+		team
+	]
 	configure_surface(paddle, paddle.size, path)
+	if team == 2:
+		modulate = Color("aaaaaa")
+		return
 	_badge = TiltShiftArt.sprite("gameplay/player_badge", badge_size)
 	add_child(_badge)
 	_label = Label.new()

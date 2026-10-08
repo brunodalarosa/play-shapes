@@ -1,7 +1,7 @@
 @tool
 class_name TiltShiftPaddleAllocator
 extends RefCounted
-## Exact count-constrained separation on five paddles per team, only at round boundaries.
+## Exact count-constrained separation on bounded team paddles, only at round boundaries.
 
 
 class Search:
@@ -22,7 +22,7 @@ class Search:
 	func visit(index: int, conflicts: int) -> void:
 		if conflicts > minimum:
 			return
-		if index == 5:
+		if index == chosen.size():
 			_consider(conflicts)
 			return
 
@@ -41,8 +41,8 @@ class Search:
 
 	func _consider(conflicts: int) -> void:
 		var changes := 0
-		if previous.size() == 5:
-			for index: int in 5:
+		if previous.size() == chosen.size():
+			for index: int in chosen.size():
 				if previous[index] != ids[chosen[index]]:
 					changes += 1
 		if conflicts < minimum or (conflicts == minimum and changes > best_changes):
@@ -76,11 +76,11 @@ static func neighbors(
 	return result
 
 
-static func quotas(player_count: int, round_index: int) -> PackedInt32Array:
+static func quotas(player_count: int, round_index: int, paddle_count: int = 5) -> PackedInt32Array:
 	var result := PackedInt32Array()
 	result.resize(player_count)
-	result.fill(5 / player_count)
-	for extra: int in 5 % player_count:
+	result.fill(paddle_count / player_count)
+	for extra: int in paddle_count % player_count:
 		result[(round_index + extra) % player_count] += 1
 	return result
 
@@ -93,11 +93,15 @@ static func allocate(
 	random: RandomNumberGenerator,
 	previous := PackedStringArray(),
 ) -> TiltShiftState.Allocation:
-	if paddles.size() != 5 or player_ids.size() < 1 or player_ids.size() > 5 or round_index < 0:
+	if (
+		paddles.is_empty() or paddles.size() > 5 or player_ids.is_empty() \
+				or player_ids.size() > 5
+		or round_index < 0
+	):
 		return null
 	var result := TiltShiftState.Allocation.new()
 	result.player_ids = player_ids.duplicate()
-	result.counts = quotas(player_ids.size(), round_index)
+	result.counts = quotas(player_ids.size(), round_index, paddles.size())
 	for paddle: TiltShiftPaddle in paddles:
 		result.paddle_ids.append(paddle.paddle_id)
 
@@ -105,7 +109,7 @@ static func allocate(
 	search.ids = player_ids.duplicate()
 	search.quotas = result.counts
 	search.used.resize(player_ids.size())
-	search.chosen.resize(5)
+	search.chosen.resize(paddles.size())
 	search.previous = previous
 	search.random = random
 	for edge: TiltShiftState.Neighbor in graph:
@@ -115,10 +119,15 @@ static func allocate(
 			search.edges.append(Vector2i(mini(first, second), maxi(first, second)))
 
 	if player_ids.size() == 1:
-		result.owner_ids.resize(5)
+		result.owner_ids.resize(paddles.size())
 		result.owner_ids.fill(player_ids[0])
-	elif player_ids.size() == 5:
-		result.owner_ids = previous.duplicate() if previous.size() == 5 else player_ids.duplicate()
+	elif player_ids.size() == paddles.size():
+		result.owner_ids = (
+			previous.duplicate()
+			if previous.size() == paddles.size() \
+					and _same_players(previous, player_ids)
+			else player_ids.duplicate()
+		)
 	else:
 		search.visit(0, 0)
 		for owner: int in search.best:
@@ -131,3 +140,10 @@ static func allocate(
 			result.conflicts.append(TiltShiftState.copy_neighbor(edge))
 	result.minimum_conflicts = result.conflicts.size()
 	return result
+
+
+static func _same_players(first: PackedStringArray, second: PackedStringArray) -> bool:
+	for id: String in first:
+		if not second.has(id):
+			return false
+	return true

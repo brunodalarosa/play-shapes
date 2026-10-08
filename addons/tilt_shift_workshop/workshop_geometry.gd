@@ -11,13 +11,14 @@ static func inspect(profile: TiltShiftTuning, tolerance: float) -> Dictionary:
 	var size := profile.paddle_layout.arena_size
 	var paddles := profile.paddle_layout.paddles
 	var physics := profile.physics
-	var radius := Vector2(physics.paddle_length, physics.paddle_thickness).length() * 0.5
+	var radius := 0.0
 	var blocked: Array[Vector2] = []
 	for index: int in paddles.size():
 		var paddle := paddles[index]
 		if paddle == null or not paddle.position.is_finite():
 			warnings.append("Missing or non-finite paddle; repair before viewing guides.")
 			continue
+		radius = profile.paddle_layout.paddle_size(paddle.team, physics).length() * 0.5
 		var point := paddle.position
 		var wall := minf(minf(point.x, size.x - point.x), minf(point.y, size.y - point.y))
 		wall -= radius
@@ -36,19 +37,21 @@ static func inspect(profile: TiltShiftTuning, tolerance: float) -> Dictionary:
 			var other := paddles[second]
 			if other == null:
 				continue
+			var other_size := profile.paddle_layout.paddle_size(other.team, physics)
+			var other_radius := other_size.length() * 0.5
 			var distance := point.distance_to(other.position)
 			clearances.append(
 				{
 					"id": paddle.paddle_id,
 					"other": other.paddle_id,
-					"gap": distance - radius * 2.0,
+					"gap": distance - radius - other_radius,
 					"distance": distance,
 				}
 			)
-			if distance < radius * 2.0:
+			if distance < radius + other_radius:
 				warnings.append(
 					"%s / %s: swept overlap %.4f widths."
-					% [paddle.paddle_id, other.paddle_id, radius * 2.0 - distance]
+					% [paddle.paddle_id, other.paddle_id, radius + other_radius - distance]
 				)
 		blocked.append(
 			Vector2(

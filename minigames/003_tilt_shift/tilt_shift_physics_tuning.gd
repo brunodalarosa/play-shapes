@@ -18,19 +18,24 @@ var ball_count: int = 60
 ## Higher spreads entries; the ball radius must still fit within both walls.
 @export_range(0.0, 0.49, 0.01) var spawn_half_width: float = 0.40
 
+## Empty gap beyond the whole ball above the fitted visible top, in arena widths.
+@export_range(0.0, 0.5, 0.01) var spawn_height: float = 0.03
+## Lead time before scoring closes; the full ball budget uses the shortened window.
+@export_range(0.0, 300.0, 0.5) var delivery_cutoff_seconds: float = 0.0
+
 @export_group("Geometry and motion")
-## Circular ball radius. Default: 0.006 widths. Range: 0.003-0.02.
+## Circular ball radius. Default: 0.012 widths. Range: 0.003-0.02.
 @export_range(0.003, 0.02, 0.001)
-var ball_radius: float = 0.006
+var ball_radius: float = 0.012
 ## Paddle length. Default: 0.10 widths. Range: 0.02-0.20.
 @export_range(0.02, 0.20, 0.005) var paddle_length: float = 0.10
 ## Paddle thickness. Default: 0.01 widths. Range: 0.006-0.03.
 @export_range(0.006, 0.03, 0.001) var paddle_thickness: float = 0.01
-## Downward acceleration. Default: 0.4 widths/s². Range: 0-2.
+## Downward acceleration. Default: 0.18 widths/s². Range: 0-2.
 ## Higher accelerates free fall; this never changes the project's gravity.
-@export_range(0.0, 2.0, 0.05) var gravity: float = 0.4
-## Initial downward speed, separate from acceleration. Default: 0.1 widths/s. Range: 0-1.
-@export_range(0.0, 1.0, 0.05) var entry_speed: float = 0.1
+@export_range(0.0, 2.0, 0.01) var gravity: float = 0.18
+## Initial downward speed, separate from acceleration. Default: 0.05 widths/s. Range: 0-1.
+@export_range(0.0, 1.0, 0.01) var entry_speed: float = 0.05
 ## Maximum physical rotation speed. Default: 180 degrees/s. Range: 1-180.
 ## Unwrapped targets retain full turns; the actual pose approaches them without teleporting.
 @export_range(1.0, 180.0, 1.0) var rotation_speed_degrees: float = 180.0
@@ -51,6 +56,8 @@ var ball_friction: float = 0.2
 
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
+	_check_range(errors, spawn_height, 0.0, 0.5, "Spawn height")
+	_check_range(errors, delivery_cutoff_seconds, 0.0, 300.0, "Delivery cutoff")
 	_check_range(errors, spawn_half_width, 0.0, 0.49, "Spawn half width")
 	_check_range(errors, ball_radius, 0.003, 0.02, "Ball radius")
 	_check_range(errors, paddle_length, 0.02, 0.20, "Paddle length")

@@ -27,8 +27,9 @@ player ID is rejected. The raw sample/status schema is shared with the lab.
   Unknown/missing sample fields and non-finite/out-of-bound values are rejected.
 - `motion_status`: current subscription, capture/network diagnostics and transmission rate.
   At most five accepted status messages/s; the browser normally sends about four/s.
-- `motion_calibrate`: exactly `type` and current `subscription_id`. At most five requests/s.
-  The host consumer chooses its latest usable orientation; active calibration is rejected.
+- `motion_calibrate`: `type` and current `subscription_id`. At most five requests/s.
+  Mapped Tilt Shift rounds additionally require current `generation` and `round_token`.
+  The host chooses its latest usable orientation; active calibration is rejected.
 - `motion_control_state`: host feedback with current subscription and `control_state`,
   containing `calibrated`, `usable` and `capture_state`. Calibration replies also contain
   `accepted` and `reason`. Feedback contains no client-selected physical angle or identity.
@@ -145,21 +146,33 @@ During ready-up, a registered phone sends `{"type":"pre_minigame_ready","ready":
 
 ## Tilt Shift state
 
-Tilt Shift extends `pre_minigame_snapshot` with personalized `preparation` state:
-generation, calibrated/usable flags, capture state, host control angle and paddle size.
-The host checks fresh motion and calibration on READY and again at the final even-roster launch.
-Sensor status, samples and calibration retain their existing authenticated subscription messages.
+The mapped Tilt Shift journey freezes an even roster and opens the factory directly.
+Its round controller owns selected-player readiness; the shared all-player gate remains
+available for older single-layout profiles. Sensor status and samples use the existing
+authenticated subscriptions.
 
 `tilt_shift_snapshot` carries generation, increasing sequence, phase, round, team,
 accepted angle in radians, owned paddle IDs and physical paddle length/thickness.
-The phone shows one movement guide regardless of the number of IDs. No client-authored
+Mapped snapshots also carry `round_token`, `selected`, `ready`, `ready_available`,
+`calibration_available`, `calibrated` and `usable`. Phases include `preparing`, `countdown`,
+`start`, `active`, `between_rounds` and `finished`. Spectators have empty owned IDs and
+show a team waiting visual with no paddle guide. Selected phones show one guide.
+
+No client-authored
 angle, team, assignment or score message is accepted. Obsolete snapshot generations
 or sequences cannot replace the current phone view.
 
+`tilt_shift_ready` carries exactly `type`, current `generation`, `round_token` and Boolean
+`ready`. The connection supplies identity. Only selected players in a visible ready panel
+can change readiness. Fresh usable calibration is required; recalibration, disconnection
+or stale capture clears READY. Countdown start is final even if a player then disconnects.
+The panel timeout runs once from opening; force start is a local host action, not a message.
+
 Angle updates coalesce to the latest state at the selected flow ceiling, 15 Hz by default.
 Queued socket output skips that update rather than accumulating a backlog. Round and
-resume transitions send current state immediately. Calibration is locked throughout play;
-reconnect preserves the original neutral and does not recover unseen complete turns.
+resume transitions send current state immediately. Calibration is available before and
+between active rounds, including countdown and START; it is locked during scoring.
+Reconnect preserves neutral and does not recover unseen complete turns.
 
 ## Bubbles input
 

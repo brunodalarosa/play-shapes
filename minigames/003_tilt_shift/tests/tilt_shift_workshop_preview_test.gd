@@ -5,6 +5,7 @@ const DEFAULT := "res://minigames/003_tilt_shift/tuning/Default.tres"
 
 var _positions := PackedFloat32Array()
 var _catches: int = 0
+var _now := 0
 
 
 func _run() -> void:
@@ -88,12 +89,65 @@ func _run() -> void:
 	preview.queue_free()
 	await process_frame
 	await physics_frame
+	await _mapped_preview()
 	check(
 		FileAccess.get_sha256(DEFAULT) == disk_hash,
 		"Preview lifecycle leaves saved content unchanged",
 	)
 	var host := root.get_node_or_null("SessionHost")
 	check(host == null or not host.get("running"), "Preview never starts phone network services")
+
+
+func _mapped_preview() -> void:
+	var source: TiltShiftTuning = load(DEFAULT)
+	var preview := Preview.new()
+	preview.profile = source.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
+	preview.profile.physics.ball_count = 0
+	root.add_child(preview)
+	await process_frame
+	await process_frame
+	_now = Time.get_ticks_msec()
+	preview.arena.clock = func() -> int:
+		return _now
+	preview.arena.set_physics_process(false)
+	var state := preview.arena.controller.snapshot()
+	var selected := ""
+	var spectator := ""
+	for player: TiltShiftState.Player in state.players:
+		if player.selected:
+			selected = player.player_id
+		else:
+			spectator = player.player_id
+	check(preview.set_ready(selected, true), "Designer READY uses actual selected-player gate")
+	check(preview.recalibrate(selected), "Designer can recalibrate before active play")
+	check(
+		not preview.arena.controller.snapshot(selected).players[0].ready,
+		"Designer recalibration clears READY",
+	)
+	check(not preview.set_ready(spectator, true), "Designer spectator cannot confirm the gate")
+	for round_number: int in 3:
+		check(preview.force_start(), "Designer force enters ordinary countdown")
+		check(preview.arena.live_balls().is_empty(), "Preview preparation is delivery-free")
+		_now += 3600
+		preview.arena.step(0.016, _now)
+		check(not preview.recalibrate(selected), "Designer active calibration is locked")
+		if round_number == 2:
+			check(
+				preview.arena.controller.snapshot().auto_direction == -1,
+				"Preview repeated A reverses neutral rotation",
+			)
+		_now = preview.arena.controller.snapshot().deadline_msec
+		preview.arena.step(0, _now)
+		if round_number < 2:
+			check(preview.arena.start_next_round().accepted, "Designer advances the mapped journey")
+	check(preview.restart(), "Mapped preview restarts after preparation and active rounds")
+	check(
+		preview.arena.controller.snapshot().auto_direction == 1,
+		"Preview restart resets automatic direction history",
+	)
+	preview.stop()
+	preview.queue_free()
+	await process_frame
 
 
 func _record_spawn(ball: TiltShiftBall) -> void:

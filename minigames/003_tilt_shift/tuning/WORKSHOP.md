@@ -7,8 +7,9 @@ Tilt Shift profile from `Tuning/Active Presets.tres`; edits stay in an independe
 ## Edit geometry
 
 1. Choose **Edit paddles**, select a numbered paddle and drag its anchor. The selected
-   object's full stable ID, team and coordinates appear in the controls. There are ten
-   identities, with five paddles per team; the same layout stays selected for the shift.
+   object's full stable ID, team and coordinates appear in the controls. Choose the editing
+   layout separately from each round's mapping. A and B keep their own anchors and sizes;
+   grey markers are automatic neutral paddles.
 2. **Snap to grid** displays the grid and snaps both axes in arena-width units. The
    provisional position and width steps are `0.01` widths, or 10 physics units.
    Disable snapping for free placement; change the steps for finer work.
@@ -21,7 +22,7 @@ Tilt Shift profile from `Tuning/Active Presets.tres`; edits stay in an independe
 
 ![Paddle selection, snapping and independent guide/error reports](../../../docs/images/tilt-shift-workshop/paddles.png)
 
-The canvas uses a paper-colored board and Orange/Blue markers. Number labels identify
+The canvas uses a paper-colored board and Orange/Blue/grey markers. Number labels identify
 the array entries; selecting an entry exposes its stable identity. Swept circles are
 conservative complete-turn bounds, rather than the current paddle pose.
 
@@ -41,7 +42,7 @@ a basket adds it to that selector; choose it separately for each numbered round.
 
 Changing **Rounds per shift** exposes missing or stale mappings. Choose **Missing** to
 clear a round reference; remove surplus mappings explicitly with **Remove stale**.
-Changing the editing basket does not change a round assignment by itself.
+Changing the editing basket or layout does not change a round assignment by itself.
 
 ![A reopened profile with preserved basket edits](../../../docs/images/tilt-shift-workshop/baskets.png)
 
@@ -54,7 +55,8 @@ usable save or launch. Guide warnings remain separate from these errors.
 
 - **Content files → Load profile/layout/basket/physics** opens a named `.tres` file.
   Loading a profile replaces the entire draft; loading a layout or physics profile
-  replaces that selection. Unsaved replacements require a discard decision.
+  adds the layout to the draft library or replaces physics. Unsaved replacements require
+  a discard decision.
 - **Save usable…** writes validated named content below this minigame's `tuning/` folder.
   Save baskets/layouts separately to reuse them in another draft. Saving a profile
   captures all selected content and numbered-round references in a self-contained file.
@@ -67,19 +69,29 @@ usable save or launch. Guide warnings remain separate from these errors.
 
 Closing and reopening the editor does not save unsaved content automatically. Reload
 the named files with **Content files**. A saved profile preserves repeated references:
-rounds sharing one basket still share it after reload. Unassigned basket drafts must
+rounds sharing one basket or layout still share it after reload. Unassigned drafts must
 be saved separately; a profile stores the content selected by its numbered rounds.
 
 Profiles saved by the workshop embed copies of selected content. Editing a separately
 saved layout/basket later does not rewrite that profile. Load the revised component,
 assign it and save the profile again. This keeps previews and runtime launches reviewable.
 
-## Delivery and real physics preview
+## Tunables and real physics preview
 
-The controls expose total balls, optional position seed, spawn bounds, paddle/ball
-geometry, gravity, entry speed, rotation speed, friction and bounce. Use the progress/
+The **Tunables** tab exposes rules, motion, preparation timings, physics/delivery and
+presentation settings from the runtime Resources. Field tooltips explain effects, units
+and defaults; input ranges come from the same Resource metadata as the Inspector.
+Round layout/basket maps and independent player/neutral sizes are editable there too.
+**Geometry** retains snapped anchors, baskets and clearance diagnostics.
+
+![Runtime settings in the Tunables tab](../../../docs/images/tilt-shift-workshop/tunables.png)
+
+The controls expose total balls, optional position seed, offscreen spawn height,
+delivery cutoff, ball geometry, gravity, entry speed, rotation speed, friction and bounce.
+Use the progress/
 intensity point controls to edit the linear delivery curve; add or remove points explicitly.
-The graph shows relative intensity, scheduled delivery ticks and ball counts per time bin.
+The graph shows relative intensity, scheduled ticks and counts across the shortened
+delivery window, ending before the active scoring deadline.
 
 The budget remains independent of curve shape. Zero-intensity spans stay empty; a
 positive budget with an all-zero curve is invalid. A seed repeats entry positions,
@@ -88,9 +100,12 @@ not physics, input, scoring or strategic outcomes. See [the physics guide](PHYSI
 **Start / restart physics** copies the current profile and launches another Godot process.
 Preview runs the numbered round map, rather than an unassigned basket being edited.
 Select 2/4/6/8/10 designers to inspect ownership. Angle controls address synthetic players;
-every assigned paddle moves through the same host controller as gameplay.
+every selected paddle moves through the same host controller as gameplay. Designer
+READY/CANCEL, recalibration and force-start controls exercise actual preparation phases.
+Spectators keep idle stations and do not control paddles. Neutral rotation stays stopped
+until the active clock begins.
 
-![Actual gameplay arena and designer angle controls](../../../docs/images/tilt-shift-workshop/physics.png)
+![Runtime factory shared with the workshop preview](../../../docs/images/tilt-shift-workshop/physics.png)
 
 The preview uses native ball contacts, rotating paddle bodies, delivery curves, basket
 catches and exclusive deadlines. Angles are unwrapped: type repeated turns or use the
