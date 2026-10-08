@@ -84,8 +84,8 @@ export class MotionStream {
     this.tick();
   }
 
-  requestCalibration(): boolean {
-    return this.send({ type: "motion_calibrate" });
+  requestCalibration(context?: { generation: string; round_token: string }): boolean {
+    return this.send({ type: "motion_calibrate", ...context });
   }
 
   feedback(subscriptionId: string, state: MotionControlState): boolean {

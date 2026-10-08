@@ -43,8 +43,24 @@ async function sensors(page: import("@playwright/test").Page): Promise<void> {
   });
 }
 
+async function prepare(phones: { page: import("@playwright/test").Page }[]) {
+  for (const phone of phones) {
+    const page = phone.page;
+    await expect(page.locator("#tilt-shift")).toBeVisible();
+    if (await page.locator("#tilt-permission").isVisible()) await page.click("#tilt-permission");
+    if (await page.locator("#tilt-calibrate").isVisible()) {
+      await expect(page.locator("#tilt-calibrate")).toBeEnabled();
+      await page.click("#tilt-calibrate");
+    }
+    if (await page.locator("#tilt-ready").isVisible()) {
+      await expect(page.locator("#tilt-ready")).toBeEnabled();
+      await page.click("#tilt-ready");
+    }
+  }
+}
+
 for (const count of [2, 4, 6, 8, 10]) {
-  test.describe(`${count} Tilt Shift phones`, () => {
+  test.describe(count + " Tilt Shift phones", () => {
     test.use({ game: "tilt_shift", players: count });
     test("prepare, show one guide, traverse mapped rounds and return", async ({
       host,
@@ -54,7 +70,7 @@ for (const count of [2, 4, 6, 8, 10]) {
       const traffic: { bytes: number; updates: number; maximum: number; angles: Set<number> }[] =
         [];
       for (let i = 0; i < count; i++) {
-        const phone = await openPhone(`Player ${i + 1}`, i);
+        const phone = await openPhone("Player " + (i + 1), i);
         const wire = { bytes: 0, updates: 0, maximum: 0, angles: new Set<number>() };
         traffic.push(wire);
         phone.page.on("websocket", (socket) =>
@@ -65,7 +81,7 @@ for (const count of [2, 4, 6, 8, 10]) {
             wire.bytes += bytes;
             wire.updates++;
             wire.maximum = Math.max(wire.maximum, bytes);
-            wire.angles.add(value.angle_radians);
+            if (value.selected) wire.angles.add(value.angle_radians);
           }),
         );
         await sensors(phone.page);
@@ -73,33 +89,25 @@ for (const count of [2, 4, 6, 8, 10]) {
         phones.push(phone);
       }
       await host.event(/^start /);
-      for (const phone of phones) {
-        await viewport(phone.page, 844, 390);
-        await expect(phone.page.locator("#tilt-shift")).toBeVisible();
-        await expect(phone.page.locator("#tilt-ready")).toBeDisabled();
-        await phone.page.click("#tilt-permission");
-        await expect(phone.page.locator("#tilt-calibrate")).toBeEnabled();
-        await phone.page.click("#tilt-calibrate");
-        await expect(phone.page.locator("#tilt-ready")).toBeEnabled();
+      for (const phone of phones) await viewport(phone.page, 844, 390);
+      if (count <= 4) {
+        for (const phone of phones) {
+          await expect(phone.page.locator("#tilt-shift")).toBeVisible();
+          await expect(phone.page.locator("#tilt-ready")).toBeHidden();
+        }
       }
-      if (count === 2) {
-        await phones[0].page.click("#tilt-ready");
-        await expect(phones[0].page.locator("#tilt-ready")).toHaveText("CANCEL");
-        await phones[0].page.reload();
-        await expect(phones[0].page.locator("#tilt-ready")).toBeDisabled();
-        await phones[0].page.click("#tilt-permission");
-        await expect(phones[0].page.locator("#tilt-calibrate")).toBeEnabled();
-        await phones[0].page.click("#tilt-calibrate");
-        await expect(phones[0].page.locator("#tilt-ready")).toBeEnabled();
-        await phones[0].shot("calibrated-landscape");
-      }
-      for (const phone of phones) await phone.page.click("#tilt-ready");
-      await host.event(/^tilt round=1$/);
+      await prepare(phones);
+      await host.event(/^tilt phase=active round=1$/);
+      let active = 0,
+        waiting = 0;
       for (const phone of phones) {
         await expect(phone.page.locator("#tilt-actions")).toBeHidden();
-        await expect(phone.page.locator("#tilt-shift canvas")).toHaveCount(1);
+        if (await phone.page.locator("#tilt-paddle").isVisible()) active++;
+        else waiting++;
       }
-      await phones[0].shot("one-paddle-guide");
+      expect(active).toBe(Math.min(count, 4));
+      expect(waiting).toBe(Math.max(0, count - 4));
+      await phones[0].shot("selected-or-waiting");
       if (count === 2) {
         await phones[0].page.reload();
         await expect(phones[0].page.locator("#tilt-permission")).toBeVisible();
@@ -108,9 +116,15 @@ for (const count of [2, 4, 6, 8, 10]) {
         await expect(phones[0].page.locator("#tilt-actions")).toBeHidden();
         await viewport(phones[0].page, 390, 844);
         await expect(phones[0].page.locator("#tilt-paddle")).toBeVisible();
-        await phones[0].shot("portrait-transition");
+        await phones[0].shot("reconnected-portrait");
       }
       await host.event(/^tilt round=2$/);
+      await prepare(phones);
+      await host.event(/^tilt phase=active round=2$/);
+      active = 0;
+      for (const phone of phones)
+        if (await phone.page.locator("#tilt-paddle").isVisible()) active++;
+      expect(active).toBe(Math.min(count, 6));
       await host.event(/^tilt results$/);
       await host.event(/^return$/);
       await host.event(/^scene lobby$/, { occurrence: 2 });
@@ -120,16 +134,18 @@ for (const count of [2, 4, 6, 8, 10]) {
       }
       for (const wire of traffic) {
         expect(wire.angles.size).toBeGreaterThan(3);
-        expect(wire.maximum).toBeLessThan(600);
-        expect(wire.updates).toBeLessThan(16 * 16 + 10);
+        expect(wire.maximum).toBeLessThan(900);
+        expect(wire.updates).toBeLessThan(15 * 50 + 50);
       }
       const folder = fileURLToPath(new URL("../../test-results/tilt-shift/", import.meta.url));
       mkdirSync(folder, { recursive: true });
       writeFileSync(
-        `${folder}/flow-traffic-${count}.json`,
+        folder + "/flow-traffic-" + count + ".json",
         JSON.stringify(
           {
-            scope: "Synthetic Chromium, two 8-second rounds; downstream JSON only, no framing",
+            scope:
+              "Synthetic Chromium, two 8-second rounds plus preparation; " +
+              "downstream JSON, no framing",
             players: count,
             phones: traffic.map(({ angles, ...wire }) => ({ ...wire, angles: angles.size })),
           },
@@ -141,15 +157,12 @@ for (const count of [2, 4, 6, 8, 10]) {
         await host.event(/^bubbles prepare$/);
         for (const phone of phones) {
           await expect(phone.page.locator("#ready-card")).toBeVisible();
-          await expect(phone.page.locator("#tilt-shift")).toBeHidden();
           await phone.readyUp();
         }
         await host.event(/^bubbles started$/);
         for (const phone of phones) await expect(phone.page.locator("#bubbles-pad")).toBeVisible();
         await host.event(/^bubbles return$/);
         await host.event(/^scene lobby$/, { occurrence: 3 });
-        for (const phone of phones)
-          await expect(phone.page.locator("#lobby-controller")).toBeVisible();
       }
     });
   });

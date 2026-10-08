@@ -92,7 +92,7 @@ func _run() -> void:
 				and edge.second_id == draft.profile.paddle_layout.paddles[1].paddle_id:
 			vertical = true
 	check(vertical, "Neighbor guides include paddles above and below")
-	check(guides.clearances.size() == 55, "Ten wall and 45 pair clearances are inspectable")
+	check(guides.clearances.size() == 15, "Five wall and ten pair clearances are inspectable")
 	draft.profile.round_count = 5
 	check(
 		not draft.profile.validation_errors().is_empty(),
@@ -111,10 +111,44 @@ func _run() -> void:
 	)
 	_persistence(draft)
 	_delivery(draft)
+	_mapped_authoring(draft)
 	check(
 		FileAccess.get_sha256(DEFAULT) == hash_before,
 		"All draft operations leave saved defaults unchanged",
 	)
+
+
+func _mapped_authoring(draft: Model) -> void:
+	draft.load_profile(DEFAULT)
+	check(draft.layouts.size() == 2, "Workshop retains the A/B layout library")
+	draft.select_layout(1)
+	draft.begin_edit()
+	draft.profile.paddle_layout.player_length = 0.22
+	draft.end_edit()
+	check(
+		draft.profile.layouts_by_round[1].player_length == 0.22
+		and draft.profile.layouts_by_round[0].player_length == 0.20,
+		"Editing B changes its repeated map references without changing A",
+	)
+	draft.undo()
+	check(draft.profile.paddle_layout.player_length == 0.18, "Undo restores selected B dimensions")
+	var unmapped := TiltShiftPaddleLayout.new()
+	draft.layouts.append(unmapped)
+	draft.select_layout(2)
+	check(
+		draft.profile.validation_errors().is_empty(),
+		"An unassigned editing layout does not alter mapped launch validity",
+	)
+	var path := Model.DRAFTS.path_join("mapped-profile.tres")
+	check(draft.save_content(path, "profile", true) == OK, "Mapped draft saves")
+	check(draft.load_profile(path), "Mapped draft reloads")
+	check(draft.layouts.size() == 2, "Unassigned layout drafts are saved separately")
+	check(
+		draft.profile.layouts_by_round[0] == draft.profile.layouts_by_round[2]
+		and draft.profile.layouts_by_round[1] == draft.profile.layouts_by_round[3],
+		"A/B/A/B preserves shared identities after save and reload",
+	)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
 
 func _persistence(draft: Model) -> void:
@@ -213,8 +247,10 @@ func _delivery(draft: Model) -> void:
 	graph.setup(draft)
 	check(graph.schedule.size() == 37, "Workshop schedule retains the selected total budget")
 	var empty_gap := true
+	var cutoff := draft.profile.physics.delivery_cutoff_seconds
+	var duration := draft.profile.round_duration_seconds - cutoff
 	for offset: int in graph.schedule:
-		var progress := float(offset) / (draft.profile.round_duration_seconds * 1000.0)
+		var progress := float(offset) / (duration * 1000.0)
 		if progress > 0.2 and progress < 0.8:
 			empty_gap = false
 	check(empty_gap, "Workshop density uses the actual scheduler and preserves zero-intensity gaps")

@@ -168,6 +168,10 @@ start only what they need, so they stay fast.
   reconnect neutrality, mapped presets, results and cleanup. Run
   `node tools/check.mjs tilt_shift_flow minigame_flow pre_minigame_readiness` alongside
   the catalog and debug checks.
+- Mapped Tilt Shift rounds: `tilt_shift_journey_test.gd`, `tilt_shift_preparation_test.gd`
+  and `tilt_shift_round_arena_test.gd` cover all roster selections, layout exposure,
+  sharing, automatic direction, READY/timeout/force, calibration and reconnect, fitted
+  offscreen spawns and no pre-active delivery. Run `node tools/check.mjs tilt_shift`.
 - `web/tests/003_tilt_shift/phone.test.mjs` checks malformed/replayed snapshots and one
   canonical guide for five assignments. `web/e2e/tilt_shift_phones.spec.ts` uses the real
   boot/catalog/gameplay journey with 2/4/6/8/10 Chromium phones and synthetic sensor events.
@@ -190,11 +194,11 @@ start only what they need, so they stay fast.
   scoring mouths/front depth, accepted-control holds, cutoff,
   cleanup, remapped rounds and cumulative win/draw. Run
   `node tools/check.mjs tilt_shift_presentation tilt_shift_workshop_preview`.
-- Run `tilt_shift_presentation_visual_check.gd` without `--headless` for two/ten-player
-  FHD, ten-player HD and 4:3 captures, plus ten synthetic players and 300 balls over
-  45 seconds. The report measures arena, accepted-control and clock callback p95;
-  native physics, rendering, blink and badge callbacks are excluded. Presentation
-  adds zero phone messages. Readability and motion feel still need the owner.
+- Run `tilt_shift_presentation_visual_check.gd` without `--headless` for A/B preparation,
+  countdown, ten-player FHD/HD/4:3 and outcomes. It measures A with the 60-ball default
+  and B with a 300-ball stress budget, each for 45 seconds. Script p95 covers arena,
+  selected controls and presentation; native physics uses one-second engine maxima.
+  Transport and render costs are separate. Readability and motion feel need the owner.
 
 - Tilt Shift workshop: `tilt_shift_workshop_test.gd` and `tilt_shift_workshop_preview_test.gd`
   in the minigame's `tests/` folder cover deep-copy isolation, snapping, paired edits,
@@ -267,7 +271,7 @@ The helpers whose names start with `bubbles_` are in
 
 | Helper | What it saves | Folder |
 | --- | --- | --- |
-| `tilt_shift_presentation_visual_check` | Two/ten-player factory at FHD, ten-player HD and 4:3, and immediate shift outcome. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/presentation/` |
+| `tilt_shift_presentation_visual_check` | A/B preparation, countdown, ten-player FHD/HD/4:3 and outcomes; scoped 60/300-ball host costs. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/presentation/` |
 | `tilt_shift_physics_visual_check` | Three live-arena captures with ten synthetic players, repeated turns/reversal and 180 balls over eight seconds. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/physics/` |
 | `bubbles_player_visual_check` | One player bubble: small, grown, spinning, pop and re-form, and ten players. Components only, not a composed arena. | `bubbles-player/` |
 | `bubbles_animation_visual_check` | Player animation in order: small and maximum idle, held left drag, accepted swipe, slow held and released drag, charge glow and wobble, active spin, burst, reformed. | `bubbles-animation/` |

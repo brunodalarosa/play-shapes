@@ -46,18 +46,18 @@ func _test_mapping_and_ranges() -> void:
 func _test_paddle_validation() -> void:
 	var layout := TiltShiftFixtures.tuning().paddle_layout
 	layout.paddles.pop_back()
-	check(_contains(layout.validation_errors(), "exactly ten"), "Missing paddles fail before play")
+	check(_contains(layout.validation_errors(), "equal teams"), "Missing paddles fail before play")
 	layout = TiltShiftFixtures.tuning().paddle_layout
 	layout.paddles[0].paddle_id = layout.paddles[1].paddle_id
 	check(_contains(layout.validation_errors(), "duplicate paddle ID"), "Duplicate stable IDs fail")
 	layout = TiltShiftFixtures.tuning().paddle_layout
 	layout.paddles[0].team = TiltShiftTypes.Team.BLUE
-	check(
-		_contains(layout.validation_errors(), "five paddles to each team"),
-		"Unequal team paddles fail",
-	)
+	check(_contains(layout.validation_errors(), "equal teams"), "Unequal team paddles fail")
 	layout.paddles[0].team = TiltShiftTypes.Team.TRASH
-	check(_contains(layout.validation_errors(), "not trash"), "Paddles cannot belong to trash")
+	check(
+		_contains(layout.validation_errors(), "equal teams"),
+		"Neutral anchors cannot replace team capacity",
+	)
 	layout = TiltShiftFixtures.tuning().paddle_layout
 	layout.paddles[0].position = Vector2(2, -1)
 	check(_contains(layout.validation_errors(), "outside the arena"), "Out-of-bounds anchors fail")

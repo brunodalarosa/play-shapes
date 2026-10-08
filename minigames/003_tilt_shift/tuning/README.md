@@ -14,7 +14,7 @@ actual gameplay preview. See [the editor workshop workflow](WORKSHOP.md).
 | Round duration | 45 | Seconds, 1–300 | Higher allows more play before the immediate scoring cutoff. |
 | Round count | 4 | Integer, 1–24 | Higher lengthens a shift; edit the round mapping alongside it. |
 | Neighbor distance | 0.24 | Arena-width units, 0.01–2 | Higher asks the allocator to separate more nearby paddles. |
-| Paddle layout | `layouts/Mirrored.tres` | One selected Resource | Ten stable anchors in four rows, five per team. |
+| Layouts by round | `LayoutA`, `LayoutB`, `LayoutA`, `LayoutB` | One valid Resource per round | A has two paddles/team and one automatic grey paddle; B has three/team. |
 | Baskets by round | `baskets/FiveOpenings.tres` repeated four times | One valid entry per numbered round | Five touching openings cover the stage: Orange/Blue/trash/Orange/Blue. |
 
 Values are provisional. Owner play chooses duration, shift length and useful separation.
@@ -22,9 +22,9 @@ The profile selects `Physics.tres` for arena geometry, contact materials and del
 See [the physics field guide](PHYSICS.md). The selected `Motion.tres` profile supplies
 [calibrated motion tuning](MOTION.md). `Presentation.tres` controls the cosmetic factory
 view described in [the presentation contract](../README.md#factory-presentation).
-It is copied by the presentation at launch and does not alter frozen gameplay content.
+It is frozen with the profile at launch and does not alter scoring or physical dimensions.
 
-The selected `Flow.tres` controls intermission and phone update rate; see
+The selected `Flow.tres` controls preparation, countdown, START and phone update rate; see
 [flow tuning](FLOW.md). `ThreeOpenings.tres` supplies a distinct mirrored basket comparison
 alongside the unchanged five-opening default.
 
@@ -43,15 +43,26 @@ Balanced counts are mandatory; separation is optimized within them. Closeness st
 diagnostic and never moves a paddle. This graph does not certify swept collider clearance,
 physical routing or strategic fairness.
 
-## Numbered rounds and fairness cycles
+## Numbered rounds and fairness
 
-Entry zero selects round one. Exactly `round_count` non-null valid basket presets are
-required. A missing/surplus mapping fails before launch with expected and actual counts.
+Entry zero selects round one. Exactly `round_count` non-null valid basket presets and
+layouts are required. Layout exposure uses stable `layout_id`, independent of display name.
+References repeated across rounds share one editable layout. Distinct layout Resources
+must have distinct identities. Missing/surplus mappings fail before launch.
 
-Extra shares rotate over two rounds for two teammates, three for three teammates and
-four for four teammates. Complete cycles give equal cumulative shares. Partial cycles
-can leave players one extra-share round apart; the default four rounds do not complete
-the three-teammate cycle. Teams and paddle positions stay fixed throughout the shift.
+Select no more players per team than that layout has team paddles. Favor unplayed layouts,
+then fewer total rounds, then random ties. With ten players, A/B/A/B gives everyone two
+rounds; round two selects all six spectators from round one. One player/team plays only B.
+Smaller rosters share paddles: one teammate owns all; larger shares rotate by appearances
+of that layout. Balanced quotas minimize same-owner neighbors. Teams stay fixed for the
+shift, and anchors/team colors stay fixed within each authored layout.
+
+Layout A starts with player/automatic dimensions `0.20 × 0.016` widths. Layout B uses
+`0.18 × 0.016`. Each layout edits these independently. The neutral paddle begins at zero,
+turns at 45 degrees/s clockwise during active play and reverses at its next appearance.
+
+Older profiles with an empty layout map use `paddle_layout` and their original launch flow.
+The workshop imports that selection into an explicit repeated map for the new journey.
 
 ## Basket validity
 

@@ -10,6 +10,8 @@ const DRAFTS := "res://scratch/tilt_shift_workshop/"
 var profile: TiltShiftTuning
 var baskets: Array[TiltShiftBasketPreset] = []
 var basket_index: int = 0
+var layouts: Array[TiltShiftPaddleLayout] = []
+var layout_index: int = 0
 var source_path: String = ""
 var dirty: bool = false
 var snap_enabled: bool = true
@@ -28,6 +30,16 @@ func load_profile(path: String) -> bool:
 		last_error = "Select a Tilt Shift profile (.tres)."
 		return false
 	profile = content.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
+	layouts.clear()
+	if profile.layouts_by_round.is_empty() and profile.paddle_layout != null:
+		for index: int in profile.round_count:
+			profile.layouts_by_round.append(profile.paddle_layout)
+	for layout: TiltShiftPaddleLayout in profile.layouts_by_round:
+		if layout != null and not layouts.has(layout):
+			layouts.append(layout)
+	layout_index = 0
+	if not layouts.is_empty():
+		profile.paddle_layout = layouts[0]
 	baskets.clear()
 	for basket: TiltShiftBasketPreset in profile.baskets_by_round:
 		if basket != null and not baskets.has(basket):
@@ -43,6 +55,21 @@ func load_profile(path: String) -> bool:
 	last_error = ""
 	changed.emit()
 	return true
+
+
+func select_layout(index: int) -> void:
+	if index >= 0 and index < layouts.size():
+		layout_index = index
+		profile.paddle_layout = layouts[index]
+		changed.emit()
+
+
+func assign_layout_round(index: int, selected: int) -> void:
+	begin_edit()
+	while profile.layouts_by_round.size() <= index:
+		profile.layouts_by_round.append(null)
+	profile.layouts_by_round[index] = layouts[selected] if selected >= 0 else null
+	end_edit()
 
 
 func basket() -> TiltShiftBasketPreset:
@@ -69,6 +96,8 @@ func load_content(path: String, kind: String) -> bool:
 	var copy: Resource = content.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
 	match kind:
 		"layout":
+			layouts.append(copy)
+			layout_index = layouts.size() - 1
 			profile.paddle_layout = copy
 		"physics":
 			profile.physics = copy
@@ -177,7 +206,10 @@ func assign_round(index: int, preset_index: int) -> void:
 
 func remove_round_mapping(index: int) -> void:
 	begin_edit()
-	profile.baskets_by_round.remove_at(index)
+	if index < profile.baskets_by_round.size():
+		profile.baskets_by_round.remove_at(index)
+	if index < profile.layouts_by_round.size():
+		profile.layouts_by_round.remove_at(index)
 	end_edit()
 
 
@@ -238,6 +270,8 @@ func save_content(path: String, kind: String, draft: bool = false) -> Error:
 		return error
 	# Deep duplication clears external resource paths and preserves repeated references.
 	var saved: Resource = resource.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
+	if saved is TiltShiftTuning and not saved.layouts_by_round.is_empty():
+		saved.paddle_layout = saved.layouts_by_round[0]
 	error = ResourceSaver.save(saved, normalized)
 	if error != OK:
 		last_error = error_string(error)
@@ -260,13 +294,29 @@ func _capture() -> Dictionary:
 				else preset.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
 			)
 		)
-	return { "profile": copy, "baskets": library, "index": basket_index }
+	var layout_library: Array[TiltShiftPaddleLayout] = []
+	for layout: TiltShiftPaddleLayout in layouts:
+		var mapped := profile.layouts_by_round.find(layout)
+		var item: TiltShiftPaddleLayout = copy.layouts_by_round[mapped] if mapped >= 0 \
+				else layout.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
+		layout_library.append(item)
+	return {
+		"profile": copy,
+		"baskets": library,
+		"index": basket_index,
+		"layouts": layout_library,
+		"layout_index": layout_index,
+	}
 
 
 func _restore(state: Dictionary) -> void:
 	profile = state.profile
 	baskets.assign(state.baskets)
 	basket_index = state.index
+	layouts.assign(state.layouts)
+	layout_index = state.layout_index
+	if not layouts.is_empty():
+		profile.paddle_layout = layouts[layout_index]
 	dirty = true
 	_gesture.clear()
 	last_error = ""

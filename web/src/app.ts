@@ -236,9 +236,15 @@ window.addEventListener("pageshow", (event) => {
   if (event.persisted && activeGame === "tilt_shift") socket?.close();
 });
 const tiltSurface = document.querySelector<HTMLElement>("#tilt-shift")!;
-const tiltPhone = new TiltShiftPhone(tiltSurface, gameplayMotion, (ready) => {
+const tiltPhone = new TiltShiftPhone(tiltSurface, gameplayMotion, (ready, context) => {
   if (socket?.readyState === WebSocket.OPEN)
-    socket.send(JSON.stringify({ type: "pre_minigame_ready", ready }));
+    socket.send(
+      JSON.stringify(
+        context
+          ? { type: "tilt_shift_ready", ready, ...context }
+          : { type: "pre_minigame_ready", ready },
+      ),
+    );
 });
 gameplayMotion.onControlState = () => tiltPhone.feedback();
 const motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);

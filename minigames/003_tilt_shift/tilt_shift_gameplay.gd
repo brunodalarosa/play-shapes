@@ -31,6 +31,11 @@ func _ready() -> void:
 		_return_to_lobby.call_deferred()
 		return
 	presentation.arena.controller.shift_finished.connect(_show_return)
+	presentation.force_start_requested.connect(_force_start)
+
+
+func _force_start(token: String) -> void:
+	_host.tilt_shift.force_start(token, _host.tilt_shift.generation)
 
 
 func _show_return(_state: TiltShiftState.Snapshot) -> void:

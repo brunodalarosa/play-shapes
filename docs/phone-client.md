@@ -17,14 +17,17 @@ development error panel. The joystick and action button are in
 Preparation exposes Enable tilt, Set neutral and the host-confirmed READY/CANCEL action.
 Current usable orientation and completed calibration are required by the host. A browser
 without a permission enum may still provide valid samples; denial or absent samples block READY.
-The preview and play instructions remain on the shared screen.
+The selected-player panel remains on the shared screen. READY is shown only when that
+panel is open; skipping the panel skips READY as well. Calibration remains available
+before active play and between rounds, and clears an existing READY.
 
 Gameplay shows one canonical team paddle as a movement guide, even when that player owns
 several factory paddles. Its crop, center pivot, end-cap fitting and proportions match the
 shared beam; its angle comes from the host. There are no touch gameplay controls or score HUD.
-Landscape is preferred, with responsive portrait fallback and optional orientation lock.
+Spectators show a team-colored waiting visual with the guide hidden. Landscape is
+preferred, with responsive portrait fallback and optional orientation lock.
 
-Preparation reconnect clears READY and neutral. Gameplay reconnect retains neutral and
+Mapped-round reconnect clears READY and retains neutral. Gameplay reconnect retains neutral and
 shows only a temporary permission action if capture needs reacquisition. Results, cancel
 and lobby return retire capture and hide the guide. Returning from a cached page reconnects
 through the authenticated subscription before capture can resume.

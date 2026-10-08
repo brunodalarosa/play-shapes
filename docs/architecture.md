@@ -151,8 +151,9 @@ shared-screen scene is `bubbles_and_jellyfishes.tscn`.
 ## Tilt Shift rules
 
 `minigames/003_tilt_shift/tilt_shift_shift_controller.gd` owns equal teams, frozen
-shift content, rounds, deadlines, cumulative scores, ball resolution, assignments
-and held angles. The [rules contract](../minigames/003_tilt_shift/README.md)
+shift content, layout exposure history, participant selection, readiness, countdown,
+round deadlines, cumulative scores, ball resolution, assignments and held angles.
+The [rules contract](../minigames/003_tilt_shift/README.md)
 describes its typed host calls and signals for later consumers.
 
 The allocator returns inspectable neighbor/conflict diagnostics. Selected Resources
@@ -169,10 +170,11 @@ beam visuals, one cosmetic operator per participant and host-derived score/time/
 feedback. The editor workshop gameplay preview uses that same presentation scene.
 
 `TiltShiftSession`, a SessionHost child, carries preparation into the gameplay wrapper,
-sequences mapped rounds and retires capture on results or exit. `TiltShiftProtocol`
+attaches mapped rounds directly, routes readiness and retires capture on results or exit.
+Preparation transitions remain in the round controller. `TiltShiftProtocol`
 copies accepted state into personalized snapshots. The catalog lists the normal
 2/4/6/8/10-player entry; the separately labeled F12 review uses simulated controls.
-See [decision 0029](decisions/0029-tilt-shift-session.md).
+See [decision 0030](decisions/0030-tilt-shift-round-preparation.md).
 
 ## Characters
 

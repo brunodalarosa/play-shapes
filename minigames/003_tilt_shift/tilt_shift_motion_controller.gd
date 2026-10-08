@@ -80,16 +80,21 @@ func activate(arena: TiltShiftArena) -> bool:
 	if _locked or inputs.is_empty() or arena == null or arena.controller == null:
 		return false
 	var snapshot := arena.controller.snapshot()
-	if snapshot.phase != &"active" or snapshot.players.size() != inputs.size():
+	if snapshot.phase not in [&"active", &"preparing", &"countdown", &"start"] \
+			or snapshot.players.size() != inputs.size():
 		return false
 	for player: TiltShiftState.Player in snapshot.players:
-		if not inputs.has(player.player_id) or not ready_for(player.player_id):
+		if (
+			not inputs.has(player.player_id)
+			or (not snapshot.reworked and not ready_for(player.player_id))
+		):
 			return false
 	_arena = arena
 	_locked = true
 	_arena.stopped.connect(stop)
 	_arena.tree_exiting.connect(stop)
 	_arena.controller.shift_finished.connect(_on_finished)
+	_arena.controller.round_prepared.connect(_on_started)
 	_arena.controller.round_started.connect(_on_started)
 	_arena.controller.round_ended.connect(_on_ended)
 	_on_started(snapshot)
@@ -110,12 +115,21 @@ func player_state(player_id: String) -> Dictionary:
 func _calibrate(now: int, player_id: String) -> void:
 	if not inputs.has(player_id):
 		return
-	var accepted := not _locked and inputs[player_id].calibrate(_channels[player_id], now)
+	var permitted := not _locked
+	if _locked and is_instance_valid(_arena) and _arena.controller != null:
+		var snapshot := _arena.controller.snapshot()
+		permitted = (
+			snapshot.reworked
+			and snapshot.phase in [&"preparing", &"countdown", &"start", &"between_rounds"]
+		)
+		if permitted:
+			_arena.controller.invalidate_ready(player_id)
+	var accepted := permitted and inputs[player_id].calibrate(_channels[player_id], now)
 	var result := player_state(player_id)
 	result.accepted = accepted
 	result.reason = (
 		"active_calibration_locked"
-		if _locked
+		if not permitted
 		else ("calibrated" if accepted else result.capture_state)
 	)
 	_publish(player_id, result, true)
@@ -145,6 +159,8 @@ func poll() -> void:
 			_publish(player_id, state)
 			if _service == null:
 				return
+		if _locked:
+			_arena.controller.set_motion_usable(player_id, ready_for(player_id))
 		if _playing and (updated or new_round):
 			_arena.controller.accept_angle(player_id, inputs[player_id].angle_radians, _token, now)
 			if _service == null:
@@ -196,6 +212,8 @@ func stop() -> void:
 			var finish := _arena.controller.shift_finished
 			if finish.is_connected(_on_finished):
 				finish.disconnect(_on_finished)
+			if _arena.controller.round_prepared.is_connected(_on_started):
+				_arena.controller.round_prepared.disconnect(_on_started)
 			if _arena.controller.round_started.is_connected(_on_started):
 				_arena.controller.round_started.disconnect(_on_started)
 			if _arena.controller.round_ended.is_connected(_on_ended):

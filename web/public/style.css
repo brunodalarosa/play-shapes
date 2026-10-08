@@ -695,3 +695,10 @@ html.tilt-active main > :not(#tilt-shift) {
     display: block;
   }
 }
+#tilt-shift[data-waiting="true"][data-team="0"] {
+  background: radial-gradient(circle, #ffc37d 0 14%, #d67b37 15% 18%, #3b2c24 19%);
+}
+
+#tilt-shift[data-waiting="true"][data-team="1"] {
+  background: radial-gradient(circle, #b5d5ff 0 14%, #4c88df 15% 18%, #243345 19%);
+}

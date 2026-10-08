@@ -15,17 +15,22 @@ One coordinate unit is 1,000 physics-world units; viewport size never changes gr
 | Delivery curve | `(0, 1), (1, 1)` | 2–64 linear points | Progress from zero to one; finite nonnegative relative intensity. |
 | Use position seed / seed | Off / 1 | Boolean / integer | Repeat the position sequence when enabled. |
 | Spawn half width | 0.40 | 0–0.49 widths | Centered entry interval; ball edges must clear both walls. |
-| Ball radius | 0.006 | 0.003–0.02 widths | Circular collider and placeholder radius. |
+| Spawn height | 0.03 | 0–0.5 widths | Empty gap above the whole ball, beyond the fitted visible viewport top. |
+| Delivery cutoff | 6 | 0–300 seconds | Lead time before scoring closes; must leave room for the configured schedule. |
+| Ball radius | 0.012 | 0.003–0.02 widths | Circular collider and placeholder radius. |
 | Paddle length | 0.10 | 0.02–0.20 widths | Longer gives more contact surface and a larger swept disk. |
 | Paddle thickness | 0.01 | 0.006–0.03 widths | Physical rectangle and placeholder drawing. |
-| Gravity | 0.4 | 0–2 widths/s² | Downward acceleration; does not override project gravity. |
-| Entry speed | 0.1 | 0–1 widths/s | Initial velocity, independent of subsequent acceleration. |
+| Gravity | 0.18 | 0–2 widths/s² | Downward acceleration; does not override project gravity. |
+| Entry speed | 0.05 | 0–1 widths/s | Initial velocity, independent of subsequent acceleration. |
 | Rotation speed | 180 | 1–180 degrees/s | Maximum rate toward an unwrapped target, subject to the tip-step bound. |
 | Ball / paddle friction | 0.2 / 0.4 | 0–1 each | Lower slides more; the larger contacting value wins. |
 | Ball / paddle restitution | 0 / 0 | 0–1 each | Contact rebound includes both materials. |
 
 Invalid saved/script values fail launch validation rather than becoming live physics.
 Inspector ranges are input guidance; final density, contact and gravity choices need play.
+Player dimensions above are legacy fallback fields. Mapped layouts override them:
+A uses `0.20 × 0.016` widths and B `0.18 × 0.016`; neutral size is independent.
+The shipped preset selects a six-second cutoff; older resources without that field retain zero.
 
 ## Delivery and position randomness
 
@@ -34,14 +39,16 @@ segments. Integrate trapezoids and place each ball at a midpoint quantile of tot
 Changing the shape preserves the configured count; zero-intensity spans receive no balls.
 The schedule is available through `TiltShiftDelivery.schedule(count, points, duration_msec)`.
 
-Offsets use whole host milliseconds and are strictly less than the scoring deadline.
+Curve progress spans `round_duration_seconds - delivery_cutoff_seconds`. The full budget
+is integrated across that window; zero-intensity spans remain empty. Offsets use whole
+host milliseconds and are strictly less than its end and the scoring deadline.
 Reject positive counts with no positive curve weight, malformed points, or a positive
 span too narrow to contain a representable pre-deadline delivery. Zero-count rounds
 may use all-zero curves. The same profile applies to every round in a shift.
 
 At ordinary physics ticks, due deliveries occur on the first tick in a positive span.
 After a hitch, overdue deliveries wait through a zero span and can bunch together in the
-next positive span. The deadline discards anything still pending; there is no late catch-up
+next positive span. The delivery cutoff discards anything still pending; there is no late catch-up
 or guaranteed budget completion when the host stalls through the final positive span.
 
 The position generator is independent of team allocation. A supplied seed restarts its
@@ -72,7 +79,9 @@ Trash, misses and out-of-bounds removal never score, and handles cannot resolve 
 
 Deadline, next round, stop, restart and scene exit remove old balls. Their collisions are
 disabled before deferred node deletion; rule tokens independently block obsolete catches.
-Paddle anchors and dimensions remain frozen while floor arrangements change by round.
+Each mapped round rebuilds its frozen anchors, dimensions and floor during preparation.
+The active clock, automatic rotation and delivery begin only after countdown/START.
+Camera fitting supplies the visible top to the arena; walls extend beyond offscreen entry.
 
 ## Tested envelope and clearance diagnostics
 

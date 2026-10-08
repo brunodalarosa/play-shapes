@@ -86,7 +86,9 @@ the preparation-to-factory scene transition. Final joins from existing onboardin
 receive new isolated channels without resetting earlier players. Expired preparation
 participants lose their channels. READY is revoked when capture becomes stale or unusable.
 
-Preparation resume clears neutral and readiness; active resume keeps neutral and ownership.
+Mapped-round resume clears readiness and keeps neutral and ownership. Calibration is
+allowed before/between active rounds and clears READY. Active play locks calibration.
+Older shared-gate preparation retains its original neutral-reset policy.
 Host cancel, scene startup failure, results, debug replacement and return to the lobby retire
 the prepared consumer. The F12 factory review is explicitly simulated and creates no motion
 subscriptions. See [flow tuning](../minigames/003_tilt_shift/tuning/FLOW.md).

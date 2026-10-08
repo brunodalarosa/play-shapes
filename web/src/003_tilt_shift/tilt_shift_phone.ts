@@ -4,7 +4,14 @@ export type TiltSnapshot = {
   type: "tilt_shift_snapshot";
   generation: string;
   sequence: number;
-  phase: "active" | "between_rounds" | "finished";
+  phase: "preparing" | "countdown" | "start" | "active" | "between_rounds" | "finished";
+  round_token?: string;
+  selected?: boolean;
+  ready?: boolean;
+  ready_available?: boolean;
+  calibration_available?: boolean;
+  calibrated?: boolean;
+  usable?: boolean;
   round: number;
   team: 0 | 1;
   angle_radians: number;
@@ -29,16 +36,24 @@ export function validTiltSnapshot(value: unknown): value is TiltSnapshot {
     v.generation.length <= 64 &&
     Number.isSafeInteger(v.sequence) &&
     v.sequence >= 0 &&
-    ["active", "between_rounds", "finished"].includes(v.phase) &&
+    ["preparing", "countdown", "start", "active", "between_rounds", "finished"].includes(v.phase) &&
     Number.isInteger(v.round) &&
     v.round >= 1 &&
     v.round <= 24 &&
     (v.team === 0 || v.team === 1) &&
     Number.isFinite(v.angle_radians) &&
     Array.isArray(v.paddle_ids) &&
-    v.paddle_ids.length >= 1 &&
+    (v.paddle_ids.length >= 1 || v.selected === false) &&
     v.paddle_ids.length <= 5 &&
     new Set(v.paddle_ids).size === v.paddle_ids.length &&
+    (v.selected === undefined || typeof v.selected === "boolean") &&
+    (v.round_token === undefined ||
+      (typeof v.round_token === "string" &&
+        v.round_token.length > 0 &&
+        v.round_token.length <= 64)) &&
+    [v.ready, v.ready_available, v.calibration_available, v.calibrated, v.usable].every(
+      (flag) => flag === undefined || typeof flag === "boolean",
+    ) &&
     v.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) &&
     Array.isArray(v.paddle_size) &&
     v.paddle_size.length === 2 &&
@@ -62,6 +77,9 @@ export class TiltShiftPhone {
   private generation: string | undefined;
   private sequence = -1;
   private preparing = false;
+  private readyAvailable = false;
+  private selected = true;
+  private roundToken: string | undefined;
   private connected = false;
   private usable = false;
   private calibrated = false;
@@ -72,7 +90,10 @@ export class TiltShiftPhone {
   constructor(
     private surface: HTMLElement,
     private stream: MotionStream,
-    private sendReady: (ready: boolean) => void,
+    private sendReady: (
+      ready: boolean,
+      context?: { generation: string; round_token: string },
+    ) => void,
   ) {
     this.canvas = surface.querySelector<HTMLCanvasElement>("canvas")!;
     this.context = this.canvas.getContext("2d")!;
@@ -86,11 +107,11 @@ export class TiltShiftPhone {
       void this.stream.requestPermission().finally(() => this.buttons());
     });
     this.calibration.addEventListener("click", () => {
-      if (this.stream.requestCalibration()) this.calibration.disabled = true;
+      if (this.stream.requestCalibration(this.actionContext())) this.calibration.disabled = true;
     });
     this.ready.addEventListener("click", () => {
       this.ready.disabled = true;
-      this.sendReady(!this.isReady);
+      this.sendReady(!this.isReady, this.actionContext());
     });
     this.observer = new ResizeObserver(() => this.draw());
     this.observer.observe(this.canvas);
@@ -116,7 +137,8 @@ export class TiltShiftPhone {
     if (typeof value.usable !== "boolean" || typeof value.calibrated !== "boolean") return false;
     this.generation = value.generation;
     this.sequence = -1;
-    this.preparing = this.connected = true;
+    this.preparing = this.readyAvailable = this.selected = this.connected = true;
+    this.roundToken = undefined;
     this.usable = value.usable;
     this.calibrated = value.calibrated;
     this.capture = value.capture_state;
@@ -130,6 +152,9 @@ export class TiltShiftPhone {
     this.isReady = ready;
     this.team = 2;
     this.surface.hidden = false;
+    this.canvas.hidden = false;
+    this.surface.setAttribute("data-waiting", "false");
+    this.surface.setAttribute("data-team", String(this.team));
     this.actions.hidden = false;
     this.buttons();
     this.draw();
@@ -142,12 +167,21 @@ export class TiltShiftPhone {
     if (value.sequence < this.sequence) return false;
     this.generation = value.generation;
     this.sequence = value.sequence;
-    this.preparing = false;
+    this.preparing = value.calibration_available === true;
+    this.readyAvailable = value.ready_available === true;
+    this.selected = value.selected !== false;
+    this.roundToken = value.round_token;
+    this.isReady = value.ready === true;
+    if (value.usable !== undefined) this.usable = value.usable;
+    if (value.calibrated !== undefined) this.calibrated = value.calibrated;
     this.connected = true;
     this.team = value.team;
     this.angle = value.angle_radians;
     this.ratio = value.paddle_size[0] / value.paddle_size[1];
     this.surface.hidden = value.phase === "finished";
+    this.canvas.hidden = !this.selected;
+    this.surface.setAttribute("data-waiting", String(!this.selected));
+    this.surface.setAttribute("data-team", String(this.team));
     this.buttons();
     this.draw();
     return true;
@@ -174,16 +208,22 @@ export class TiltShiftPhone {
     this.preparing = this.connected = this.usable = false;
   }
 
+  private actionContext(): { generation: string; round_token: string } | undefined {
+    return this.roundToken && this.generation
+      ? { generation: this.generation, round_token: this.roundToken }
+      : undefined;
+  }
+
   private buttons(): void {
     this.permission.hidden = this.usable;
     this.permission.disabled = !this.connected || !this.stream.active;
     this.calibration.hidden = !this.preparing;
-    this.calibration.disabled = !this.connected || !this.usable || this.isReady;
-    this.ready.hidden = !this.preparing;
+    this.calibration.disabled = !this.connected || !this.usable;
+    this.ready.hidden = !this.readyAvailable;
     this.ready.disabled = !this.connected || (!this.isReady && (!this.usable || !this.calibrated));
     this.ready.textContent = this.isReady ? "CANCEL" : "READY";
     this.ready.setAttribute("aria-pressed", String(this.isReady));
-    this.actions.hidden = !this.preparing && this.usable;
+    this.actions.hidden = (!this.preparing && this.usable) || (!this.selected && !this.preparing);
     const blocked: Record<string, string> = {
       insecure: "Motion needs a secure connection",
       unsupported: "Motion is unavailable",
@@ -197,7 +237,7 @@ export class TiltShiftPhone {
   }
 
   private draw(): void {
-    if (this.surface.hidden) return;
+    if (this.surface.hidden || !this.selected) return;
     const width = this.canvas.clientWidth,
       height = this.canvas.clientHeight;
     const dpr = Math.min(devicePixelRatio || 1, 2);

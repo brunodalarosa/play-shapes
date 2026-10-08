@@ -355,6 +355,17 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			var channel := motion_channels.get(String(player.get("player_id", ""))) \
 					as MotionInputChannel
 			if channel != null:
+				var calibration: bool = message.get("type") == "motion_calibrate"
+				if (
+					calibration and _active_protocol != null
+					and _active_protocol.has_method("valid_calibration")
+				):
+					if not _active_protocol.valid_calibration(message):
+						return
+					message = {
+						"type": "motion_calibrate",
+						"subscription_id": message.get("subscription_id"),
+					}
 				channel.handle(player, message, Time.get_ticks_msec())
 		"join":
 			var may_join: bool = (
@@ -422,6 +433,14 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			}
 			if not result.accepted:
 				_send_rejection(peer, "error", result)
+		"tilt_shift_ready":
+			var player := _registry.player_for_connection(client.connection_id)
+			if _active_protocol != null and _active_protocol.has_method("handle_ready"):
+				_active_protocol.handle_ready(
+					String(player.get("player_id", "")),
+					message,
+					Time.get_ticks_msec(),
+				)
 		"pre_minigame_ready":
 			var player := _registry.player_for_connection(client.connection_id)
 			var ready_value: Variant = message.get("ready")

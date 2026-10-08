@@ -25,6 +25,7 @@ func _ready() -> void:
 	add_child(toolbar)
 	_button(toolbar, "Start / restart shift", restart)
 	_button(toolbar, "Stop / clear", stop)
+	_button(toolbar, "Force start", force_start)
 	_button(
 		toolbar,
 		"Next round",
@@ -46,6 +47,10 @@ func _ready() -> void:
 	frame.add_child(presentation)
 	arena = presentation.arena
 	viewport = presentation.viewport
+	presentation.force_start_requested.connect(
+		func(_token: String) -> void:
+			force_start(),
+	)
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size.x = 300
 	row.add_child(scroll)
@@ -73,6 +78,8 @@ func restart() -> bool:
 		_status.text = "Preview rejected: " + "\n".join(result.errors)
 		return false
 	_timings.clear()
+	arena.controller.round_prepared.connect(_round_prepared)
+	arena.controller.phase_changed.connect(_phase_changed)
 	_build_inputs()
 	return true
 
@@ -97,7 +104,7 @@ func set_angle(player_id: String, degrees: float) -> bool:
 		player_id,
 		deg_to_rad(degrees),
 		snapshot.round_token,
-		Time.get_ticks_msec(),
+		arena.clock.call(),
 	)
 	if result.accepted:
 		_angles[player_id] = degrees
@@ -105,6 +112,8 @@ func set_angle(player_id: String, degrees: float) -> bool:
 
 
 func _build_inputs() -> void:
+	if not is_inside_tree() or arena.controller == null:
+		return
 	for child: Node in _inputs.get_children():
 		_inputs.remove_child(child)
 		child.queue_free()
@@ -118,6 +127,27 @@ func _build_inputs() -> void:
 		]
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_inputs.add_child(label)
+		var ready_row := HBoxContainer.new()
+		_inputs.add_child(ready_row)
+		if player.selected:
+			_button(
+				ready_row,
+				"READY",
+				func() -> void:
+					set_ready(player.player_id, true),
+			)
+			_button(
+				ready_row,
+				"CANCEL",
+				func() -> void:
+					set_ready(player.player_id, false),
+			)
+		_button(
+			ready_row,
+			"Recalibrate",
+			func() -> void:
+				recalibrate(player.player_id),
+		)
 		var angle := SpinBox.new()
 		angle.min_value = -360
 		angle.max_value = 360
@@ -195,3 +225,45 @@ func _button(parent: Node, title: String, action: Callable) -> void:
 	button.text = title
 	parent.add_child(button)
 	button.pressed.connect(action)
+
+
+func _round_prepared(_state: TiltShiftState.Snapshot) -> void:
+	_build_inputs.call_deferred()
+
+
+func _phase_changed(_state: TiltShiftState.Snapshot) -> void:
+	_build_inputs.call_deferred()
+
+
+func set_ready(player_id: String, value: bool) -> bool:
+	if arena.controller == null:
+		return false
+	var state := arena.controller.snapshot()
+	arena.controller.set_motion_usable(player_id, true)
+	var result := arena.controller.set_ready(
+		player_id,
+		value,
+		state.round_token,
+		arena.clock.call(),
+	)
+	return result.accepted
+
+
+func force_start() -> bool:
+	if arena.controller == null:
+		return false
+	var token := arena.controller.snapshot().round_token
+	var result := arena.controller.force_start(token, arena.clock.call())
+	return result.accepted
+
+
+func recalibrate(player_id: String) -> bool:
+	if arena.controller == null:
+		return false
+	var state := arena.controller.snapshot()
+	if state.phase not in [&"preparing", &"countdown", &"start", &"between_rounds"]:
+		return false
+	arena.controller.invalidate_ready(player_id)
+	if state.phase != &"between_rounds":
+		set_angle(player_id, 0)
+	return true

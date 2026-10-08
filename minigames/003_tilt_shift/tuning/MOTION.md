@@ -37,8 +37,9 @@ before the output leaves its stop; there is no moving neutral or saturation rece
 
 Missing, stale or unusable orientation holds the accepted angle. On reconnect, keep neutral
 and choose the nearest equivalent phase on the old accumulated branch. A shortest-path
-correction can occur, but unseen complete turns are never recovered. No active recalibration
-is permitted, including between rounds. Leaving the shift discards calibration.
+correction can occur, but unseen complete turns are never recovered. Recalibration is
+available before active play and between mapped rounds, including countdown/START.
+It clears an existing READY. Active scoring locks calibration. Leaving the shift discards it.
 
 At exactly 180 degrees the direction is ambiguous, so hold and report it. Full-turn accuracy
 requires less than 180 degrees between usable samples. A continuity flag reports gaps;

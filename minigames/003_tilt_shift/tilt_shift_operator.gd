@@ -16,6 +16,7 @@ var _grip_path: String
 var _frame := -1
 var _blink_time := 0.0
 var _has_angle := false
+var _selected := true
 
 
 func configure(player: TiltShiftState.Player, selected: TiltShiftPresentationTuning) -> void:
@@ -70,7 +71,8 @@ func _ready() -> void:
 
 
 func apply_player(player: TiltShiftState.Player) -> void:
-	if _has_angle:
+	_selected = player.selected
+	if _has_angle and _selected:
 		var angle_delta := player.angle_radians - accepted_angle
 		var loop_angle := TAU * _tuning.turns_per_loop
 		loop_progress = fposmod(loop_progress + angle_delta / loop_angle, 1.0)
@@ -86,10 +88,16 @@ func pose_frame() -> int:
 
 func _process(delta: float) -> void:
 	_blink_time = fposmod(_blink_time + delta, 3.7)
+	if not _selected:
+		character.advance_playback(delta)
 	character.face_blink = _blink_time > 2.84 and _blink_time < 2.98
 
 
 func _update_pose() -> void:
+	if not _selected:
+		_frame = -1
+		character.play("idle", VIEW)
+		return
 	var frame := mini(int(loop_progress * int(_clip.frames)), int(_clip.frames) - 1)
 	if frame == _frame:
 		return
