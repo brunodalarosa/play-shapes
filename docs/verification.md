@@ -195,7 +195,8 @@ start only what they need, so they stay fast.
   exported boot, browser bundle, scenes and art. The release executable ignores external
   script drivers, so its startup/served-assets check is separate from this PCK journey.
 - `debug_launcher_test.gd` checks the separately labeled simulated factory, ten synthetic
-  operators, no registered phones/subscriptions, restart and clean lobby return.
+  operators, automatic readiness/countdown, active paddle motion and ball delivery across
+  every mapped round, results, no registered phones/subscriptions, restart and clean lobby return.
 
 - Tilt Shift factory: `tilt_shift_presentation_test.gd` in the minigame's `tests/`
   folder checks 2/4/6/8/10 players, actual collider sizes/transforms through turns and

@@ -29,6 +29,20 @@ func _process(delta: float) -> void:
 	_elapsed += delta
 	var controller := _factory.arena.controller
 	var state := controller.snapshot()
+	if state.phase == &"preparing":
+		# Synthetic operators have no phones to supply motion readiness or READY.
+		for player: TiltShiftState.Player in state.players:
+			if not player.selected:
+				continue
+			controller.set_motion_usable(player.player_id, true)
+			if state.panel_visible:
+				controller.set_ready(
+					player.player_id,
+					true,
+					state.round_token,
+					Time.get_ticks_msec(),
+				)
+		return
 	if state.phase != &"active":
 		return
 	for player: TiltShiftState.Player in state.players:
