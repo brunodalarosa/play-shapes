@@ -204,8 +204,8 @@ func _test_presentation() -> void:
 		"Saved production content selects sixty white and twenty dark blue balls",
 	)
 	check(
-		is_equal_approx(source.physics.ball_radius, 0.012 * 1.15),
-		"Default ball radius grows by 15%",
+		is_equal_approx(source.physics.ball_radius, 0.0138 * 1.15),
+		"Default ball radius grows another 15%",
 	)
 	var profile := TiltShiftFixtures.tuning(1)
 	profile.physics.ball_radius = source.physics.ball_radius
@@ -224,14 +224,20 @@ func _test_presentation() -> void:
 		var collider := ball.get_node("CollisionShape2D") as CollisionShape2D
 		var visual := ball.get_child(1) as Sprite2D
 		check(
-			is_equal_approx((collider.shape as CircleShape2D).radius, 13.8),
+			is_equal_approx((collider.shape as CircleShape2D).radius, 15.87),
 			"Both colliders use the enlarged radius",
 		)
 		check(visual != null, "Both ball types reuse the existing sprite")
-		check(
-			visual.modulate == (TiltShiftBall.NEGATIVE_TINT if value < 0 else Color.WHITE),
-			"Only negative ball sprites receive the exact dark blue tint",
-		)
+		if value < 0:
+			var material := visual.material as ShaderMaterial
+			check(material != null, "Negative balls use the white-rim sprite material")
+			check(
+				material.get_shader_parameter("ball_color") == Color("176dd1"),
+				"Negative ball shading uses the brighter blue",
+			)
+		else:
+			check(visual.material == null, "Positive sprites retain their original appearance")
+		check(visual.modulate == Color.WHITE, "Sprite modulation leaves the negative rim white")
 		var region := TiltShiftArt.bounds("gameplay/ball")
 		check(
 			is_equal_approx(visual.scale.x * maxf(region.size.x, region.size.y), ball.radius * 2),
@@ -315,6 +321,6 @@ func _test_tunable_controls() -> void:
 			"Negative curve controls preserve the positive curve",
 		)
 	var radius := panel.tunables.find_child("ball_radius", true, false) as SpinBox
-	check(is_equal_approx(radius.value, 0.0138), "Tunables retains the exact 15% radius increase")
+	check(is_equal_approx(radius.value, 0.01587), "Tunables retains the exact 15% radius increase")
 	panel.queue_free()
 	await process_frame

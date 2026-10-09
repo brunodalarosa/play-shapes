@@ -20,7 +20,7 @@ removes it. The evidence labels are defined in
 ## Tilt Shift physics
 
 - `[HUMAN-PLAY]` Owner review of the 20-ball negative delivery curve, smooth 70% peak,
-  one-point penalty, dark blue visibility and 15% larger ball contacts and routing.
+  one-point penalty, brighter blue/white-rim visibility and enlarged ball contacts and routing.
 - `[EDITOR]` Owner usability review of separate negative count/curve controls and graph
   in workshop Tunables, including save/apply and undo/redo.
 - `[EDITOR]` Owner inspection of the physics profile's units, delivery curve points,

@@ -38,9 +38,9 @@ var ball_count: int = 60
 @export_range(0.0, 300.0, 0.5) var delivery_cutoff_seconds: float = 0.0
 
 @export_group("Geometry and motion")
-## Shared circular ball radius. Default: 0.0138 widths. Range: 0.003-0.02.
-@export_range(0.003, 0.02, 0.0001)
-var ball_radius: float = 0.0138
+## Shared circular ball radius. Default: 0.01587 widths. Range: 0.003-0.02.
+@export_range(0.003, 0.02, 0.00001)
+var ball_radius: float = 0.01587
 ## Paddle length. Default: 0.10 widths. Range: 0.02-0.20.
 @export_range(0.02, 0.20, 0.005) var paddle_length: float = 0.10
 ## Paddle thickness. Default: 0.01 widths. Range: 0.006-0.03.

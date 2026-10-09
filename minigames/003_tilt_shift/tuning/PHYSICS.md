@@ -19,7 +19,7 @@ One coordinate unit is 1,000 physics-world units; viewport size never changes gr
 | Spawn half width | 0.40 | 0–0.49 widths | Centered entry interval; ball edges must clear both walls. |
 | Spawn height | 0.03 | 0–0.5 widths | Empty gap above the whole ball, beyond the fitted visible viewport top. |
 | Delivery cutoff | 6 | 0–300 seconds | Lead time before scoring closes; must leave room for the configured schedule. |
-| Ball radius | 0.0138 | 0.003–0.02 widths | Shared circular collider and sprite radius for both ball types. |
+| Ball radius | 0.01587 | 0.003–0.02 widths | Shared circular collider and sprite radius for both ball types. |
 | Paddle length | 0.10 | 0.02–0.20 widths | Longer gives more contact surface and a larger swept disk. |
 | Paddle thickness | 0.01 | 0.006–0.03 widths | Physical rectangle and placeholder drawing. |
 | Gravity | 0.18 | 0–2 widths/s² | Downward acceleration; does not override project gravity. |
@@ -91,7 +91,10 @@ do not create microscopic colliders or invalidate touching openings.
 The host registers a ball's immutable scoring value before creating its physics body.
 White balls award one point; dark blue balls remove one point from the catching team.
 Totals saturate between zero and the signed 64-bit integer maximum, without overflow.
-Negative sprites reuse the white-ball texture with a `#001a33` tint.
+
+Negative sprites reuse the white-ball texture with a `#176dd1` blue tint and white rim.
+Their shared material recolors the texture's dark rim while retaining the paper shading
+and alpha silhouette; the white outline does not enlarge the sprite beyond its collider.
 Trash, misses and out-of-bounds removal never score, and handles cannot resolve twice.
 
 Deadline, next round, stop, restart and scene exit remove old balls. Their collisions are

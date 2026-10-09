@@ -434,7 +434,7 @@ func _build_physics() -> void:
 	_number(_settings, "Position seed", physics, "position_seed", -1000000000, 1000000000, 1)
 	for field: Array in [
 		["Spawn half width", "spawn_half_width", 0, 0.49, 0.01],
-		["Ball radius", "ball_radius", 0.003, 0.02, 0.0001],
+		["Ball radius", "ball_radius", 0.003, 0.02, 0.00001],
 		["Paddle length", "paddle_length", 0.02, 0.2, 0.005],
 		["Paddle thickness", "paddle_thickness", 0.006, 0.03, 0.001],
 		["Gravity (widths/s²)", "gravity", 0, 2, 0.05],

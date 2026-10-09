@@ -2,7 +2,7 @@ class_name TiltShiftBall
 extends RigidBody2D
 ## Engine contacts with local acceleration; no global gravity or competing score.
 
-const NEGATIVE_TINT := Color("001a33")
+const NEGATIVE_TINT := Color("176dd1")
 
 var handle: TiltShiftState.BallHandle
 var score_value: int = 1
@@ -49,4 +49,5 @@ func _draw() -> void:
 		return
 	var color := NEGATIVE_TINT if score_value < 0 else Color("f4e6ad")
 	draw_circle(Vector2.ZERO, radius, color)
-	draw_arc(Vector2.ZERO, radius, 0, TAU, 24, Color("78684d"), 1.0, true)
+	var rim := Color.WHITE if score_value < 0 else Color("78684d")
+	draw_arc(Vector2.ZERO, radius, 0, TAU, 64, rim, 1.0, true)
