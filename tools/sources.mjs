@@ -18,9 +18,12 @@ export function repositoryFiles() {
   return listed.stdout.split("\n").filter((file) => file && existsSync(join(root, file)));
 }
 
-/** True for a GDScript file of the project; addons/ is vendored. */
+/** True for project GDScript, including the owned workshop; other addons stay excluded. */
 export function isGdscriptSource(file) {
-  return file.endsWith(".gd") && !file.startsWith("addons/");
+  return (
+    file.endsWith(".gd") &&
+    (!file.startsWith("addons/") || file.startsWith("addons/tilt_shift_workshop/"))
+  );
 }
 
 /** True for a GDScript test file: one in tests/ or in the tests/ folder of a minigame. */

@@ -61,6 +61,19 @@ one has, the `private-access` lint rule is turned back on for `tests/`
 After the input pipeline: bots that fill a game with players
 ([0008](decisions/0008-bots.md)).
 
+## Tilt Shift foundation
+
+Host rules and editable content exist for Tilt Shift: equal teams, balanced rotating
+paddle assignments, immediate deadlines and cumulative team scoring. A shared physics
+arena adds falling/colliding balls, full-turn paddles, basket catches and seeded delivery.
+
+Calibrated multiplayer motion has its host consumer and reusable browser stream, with
+per-player neutral, continuous turns, bounded comparison, reconnect policy and lifecycle.
+The editor workshop provides snapped content editing, geometry guides, named saves and
+actual gameplay preview. Readiness/phone presentation, production presentation and lobby
+launch remain outside this foundation. Real-phone accuracy and feel await owner trials.
+See [the rules contract](../minigames/003_tilt_shift/README.md).
+
 ## Backlog
 
 - The first release, `0.1.0`: decide where the project and the Windows package record the
@@ -94,3 +107,15 @@ its red error panel for the rest of the session. Two cases are known:
 
 Late input after a phase change should be dropped quietly. The end-to-end test avoids both
 cases on purpose; fixing the bug means removing those two waits.
+
+On Windows with Godot 4.7.2, `tilt_shift_rules_test` and `tilt_shift_motion_test` have exited with code
+`3221225477` during native shutdown after printing zero assertion failures. It also
+reproduces for the rules test in a fresh, fully imported copy of the rules-only commit. Treat that exit as
+a failed check, retain its log and report it separately from assertion results; its
+cause remains unresolved.
+
+On Windows, the browser bundle rewrite after the browser suite can fail with
+`The requested operation cannot be performed on a file with a user-mapped section open.`
+Preserving the generated file in an ignored folder and regenerating it permits the focused
+bundle check to pass, but the full run can reproduce the lock. Its cause remains unresolved;
+retain the failed full-run logs rather than calling the complete check passed.

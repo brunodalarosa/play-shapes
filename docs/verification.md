@@ -134,11 +134,13 @@ func _run() -> void:
   Disconnect the callback at the end of the test.
 - `tests/test_script_test.gd` tests the base with the small scripts in `tests/fixtures/`.
 
-Five scripts do not use the base:
+Six scripts do not use the base:
 
 - `pre_minigame_server.gd`, `motion_lab_server.gd` and `e2e/host.gd` in `tests/`, and
   `bubbles_phone_preview.gd` in the Bubbles `tests/` folder, are hosts that a browser test
   starts and stops. They never reach an end.
+- `tests/multiplayer_motion_server.gd` is the ten-socket calibrated-control fixture;
+  its browser test starts and stops it.
 - `standalone_build_editor_integration_test.gd` runs inside the editor, where freeing the
   tree would free the editor.
 
@@ -159,6 +161,46 @@ start only what they need, so they stay fast.
   the required runtime paths.
 
 ## Focused checks by area
+
+- Tilt Shift workshop: `tilt_shift_workshop_test.gd` and `tilt_shift_workshop_preview_test.gd`
+  in the minigame's `tests/` folder cover deep-copy isolation, snapping, paired edits,
+  undo/redo, fresh-process reload, draft versus usable saves, curve gaps and actual
+  gameplay preview cleanup/materials. Run `node tools/check.mjs tilt_shift_workshop`.
+- Run `node tools/verify_tilt_shift_workshop.mjs` with other project editors closed for
+  scripted drag/hit-testing, guide/error reports, save/close/reopen, mapped presets,
+  invalid launch rejection and separate preview-process start/restart/stop. Captures
+  and logs are under `test-results/tilt-shift/workshop/`; usability still needs the owner.
+- Run `tilt_shift_workshop_preview_visual_check.gd` in that folder without `--headless`
+  to capture and measure a 45-second, 300-ball preview with ten synthetic players.
+  Its reported p95 covers sampled arena script time, excluding native physics/rendering.
+
+- Calibrated Tilt Shift motion: `tilt_shift_motion_test.gd` in the minigame's `tests/`
+  folder, `web/tests/motion_stream.test.mjs` and `web/tests/multiplayer_motion_host.test.mjs`.
+  Cover repeated turns/reversal, calibration/gain, autorotation, capture failure states,
+  ten real sockets, forged identity/subscription, replaced-tab resume and arena teardown.
+- Run `tilt_shift_motion_cost_check.gd` in that folder for ten-stream host polling costs.
+  The browser stream test writes encoded traffic measurements. Their measurement scopes
+  and outputs are described in [MOTION.md](../minigames/003_tilt_shift/tuning/MOTION.md#measurement-boundaries).
+
+- Tilt Shift physics: `tilt_shift_delivery_test.gd`, `tilt_shift_arena_test.gd` and
+  `tilt_shift_physics_test.gd` in `minigames/003_tilt_shift/tests/`. The focused command
+  below includes curve counts/gaps, seed sequences, catches, exclusive cutoff, cleanup,
+  native material/pair contacts, acceleration, fast impacts, full turns and reversal.
+- Run `tilt_shift_physics_cost_check.gd` in that folder as a headless script for the
+  300-ball/45-second, ten-player profile and empty-arena baseline. It writes ignored
+  `test-results/tilt-shift/physics-cost.txt`. Engine timings are sampled one-second
+  maxima; script timings are per callback. See [measurement limits](../minigames/003_tilt_shift/tuning/PHYSICS.md#measurement-limits).
+
+- Tilt Shift rules: `tilt_shift_allocation_test.gd`, `tilt_shift_rules_test.gd` and
+  `tilt_shift_presets_test.gd` in `minigames/003_tilt_shift/tests/`. Run
+  `node tools/check.mjs tilt_shift tuning_presets` for fairness cycles, adversarial
+  graph optima, exclusive deadlines, resolution, identity and content validity.
+- Tilt Shift cost: run that folder's `tilt_shift_cost_check.gd` as a headless script.
+  It writes controller-only assignment/transition median, p95 and maximum to ignored
+  `test-results/tilt-shift/cost.txt`, with 20 warmups and 200 measured samples per case.
+  Cases include ten players and dense graphs; physics and phones are absent.
+  The same helper writes readable neighbor, ownership and unavoidable-conflict tables
+  to `test-results/tilt-shift/assignments.md` for synthetic four-round examples.
 
 - Local HTTPS: `godot --headless --path . --script tests/controller_tls_test.gd` generates
   disposable ignored fixture material. `node --test tests/tls.test.mjs` in `web/` verifies
@@ -189,6 +231,7 @@ The helpers whose names start with `bubbles_` are in
 
 | Helper | What it saves | Folder |
 | --- | --- | --- |
+| `tilt_shift_physics_visual_check` | Three live-arena captures with ten synthetic players, repeated turns/reversal and 180 balls over eight seconds. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/physics/` |
 | `bubbles_player_visual_check` | One player bubble: small, grown, spinning, pop and re-form, and ten players. Components only, not a composed arena. | `bubbles-player/` |
 | `bubbles_animation_visual_check` | Player animation in order: small and maximum idle, held left drag, accepted swipe, slow held and released drag, charge glow and wobble, active spin, burst, reformed. | `bubbles-animation/` |
 | `bubbles_creature_visual_check` | Creatures: entrance and warning, active creatures, white-blinking scatter. | `bubbles-creatures/` |

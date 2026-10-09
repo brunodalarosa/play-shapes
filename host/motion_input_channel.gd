@@ -3,6 +3,7 @@ extends RefCounted
 ## One authenticated, bounded live subscription. Host receipt time owns freshness.
 
 signal changed
+signal calibration_requested(now: int)
 
 const MAX_SEND_HZ := 30
 const STALE_MSEC := 1000
@@ -16,6 +17,8 @@ var transmitted_hz := 0.0
 var first_received_at := -1
 var _last_sequence := -1
 var _last_status_at := -1000
+var _last_calibration_at := -1000
+var _last_sample_at := -1000
 
 
 func begin(player_id: String) -> void:
@@ -33,6 +36,8 @@ func reconnect() -> void:
 	transmitted_hz = 0.0
 	_last_sequence = -1
 	_last_status_at = -1000
+	_last_calibration_at = -1000
+	_last_sample_at = -1000
 	changed.emit()
 
 
@@ -67,6 +72,12 @@ func handle(player: Dictionary, message: Dictionary, now: int) -> bool:
 		or message.get("subscription_id") != subscription_id or message.has("player_id")
 	):
 		return false
+	if message.get("type") == "motion_calibrate":
+		if message.size() != 2 or now - _last_calibration_at < 200:
+			return false
+		_last_calibration_at = now
+		calibration_requested.emit(now)
+		return true
 	if message.get("type") == "motion_status":
 		if (
 			now - _last_status_at < 200 or not _valid_diagnostics(message.get("diagnostics"))
@@ -87,12 +98,13 @@ func handle(player: Dictionary, message: Dictionary, now: int) -> bool:
 		or message.sequence != floor(message.sequence) or message.sequence <= _last_sequence
 	):
 		return false
-	if received_at >= 0 and now - received_at < int(1000.0 / MAX_SEND_HZ):
+	if now - _last_sample_at < ceili(1000.0 / MAX_SEND_HZ):
 		return false
 	var sample: Variant = message.get("sample")
 	if not sample is Dictionary or not _valid_sample(sample):
 		return false
 	_last_sequence = int(message.sequence)
+	_last_sample_at = now
 	latest = sample.duplicate(true)
 	received_at = now
 	if first_received_at < 0:

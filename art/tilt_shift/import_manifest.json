@@ -1,0 +1,975 @@
+{
+  "schema": "play-shapes.tilt-shift-art.v1",
+  "runtime_root": "assets/runtime/minigames/003",
+  "sources": {
+    "basket-parts-sheet.png": "4bb87901f31dcfc71c96cd2f6c0fc789c7228ef0da986333197ad91a5351d44c",
+    "blue-paper-backdrop.png": "56cdde4b37da786c384307fa42dfb4dbc766618ced71fa0e1c65a66e2d3c54b0",
+    "factory-parts-sheet.png": "634530fcb50757f0b3bef60339dbd3113b59dfd193d8bdfe0406b1e67af089d2",
+    "gameplay-sheet.png": "700121c7d23e431169f7304489b50998b54beb2a5fbb0ea04cc738c79197028f"
+  },
+  "alpha_cleanup": {
+    "core_threshold": 128,
+    "fringe_px": 2,
+    "alpha_remap": [
+      24,
+      250
+    ],
+    "transparent_rgb": [
+      0,
+      0,
+      0
+    ]
+  },
+  "import_policy": {
+    "compress/mode": 0,
+    "mipmaps/generate": true,
+    "process/fix_alpha_border": true,
+    "process/premult_alpha": false,
+    "detect_3d/compress_to": 0
+  },
+  "assets": [
+    {
+      "path": "environment/blue_paper_backdrop.png",
+      "source": "blue-paper-backdrop.png",
+      "size": [
+        1672,
+        941
+      ],
+      "padding_minimum": 0,
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "sha256": "56cdde4b37da786c384307fa42dfb4dbc766618ced71fa0e1c65a66e2d3c54b0"
+    },
+    {
+      "path": "paddles/paddle_orange.png",
+      "source": "gameplay-sheet.png",
+      "sheet_rect": [
+        0,
+        0,
+        768,
+        340
+      ],
+      "trim_in_rect": [
+        58,
+        135,
+        653,
+        142
+      ],
+      "paste_offset_px": [
+        10,
+        9
+      ],
+      "size": [
+        673,
+        160
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        336.5,
+        80.0
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        10,
+        9,
+        663,
+        151
+      ],
+      "canvas_group": "paddle",
+      "sha256": "d72bde9b727996603c8590f708a53984a9a7addc806453f2240bbbdb3959f5f6"
+    },
+    {
+      "path": "paddles/paddle_blue.png",
+      "source": "gameplay-sheet.png",
+      "sheet_rect": [
+        768,
+        0,
+        768,
+        340
+      ],
+      "trim_in_rect": [
+        57,
+        133,
+        654,
+        144
+      ],
+      "paste_offset_px": [
+        9,
+        8
+      ],
+      "size": [
+        673,
+        160
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        336.5,
+        80.0
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        9,
+        8,
+        663,
+        152
+      ],
+      "canvas_group": "paddle",
+      "sha256": "e508d315fccb6bb101eff5d435df788e13ca43b88372d811ef3be0c9b82a53ba"
+    },
+    {
+      "path": "paddles/paddle_neutral.png",
+      "source": "gameplay-sheet.png",
+      "sheet_rect": [
+        0,
+        340,
+        768,
+        340
+      ],
+      "trim_in_rect": [
+        57,
+        100,
+        657,
+        141
+      ],
+      "paste_offset_px": [
+        8,
+        9
+      ],
+      "size": [
+        673,
+        160
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        336.5,
+        80.0
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        9,
+        665,
+        150
+      ],
+      "canvas_group": "paddle",
+      "sha256": "3bd4a46c5396ef2903dc3c1e54f5bf48c6e9f3f5232eef0b48748bec90c2cc69"
+    },
+    {
+      "path": "gameplay/player_badge.png",
+      "source": "gameplay-sheet.png",
+      "sheet_rect": [
+        768,
+        340,
+        768,
+        340
+      ],
+      "trim_in_rect": [
+        262,
+        46,
+        245,
+        248
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        261,
+        264
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        130.5,
+        132.0
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        253,
+        256
+      ],
+      "sha256": "3a20e091673b7ef2e0476f536c1834225d9f0c1bcfcc5e80d7232f606370f52e"
+    },
+    {
+      "path": "gameplay/ball.png",
+      "source": "gameplay-sheet.png",
+      "sheet_rect": [
+        0,
+        680,
+        768,
+        344
+      ],
+      "trim_in_rect": [
+        268,
+        23,
+        232,
+        235
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        248,
+        251
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        124.0,
+        125.5
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        240,
+        243
+      ],
+      "sha256": "7aa506086a6b7424e41012aa0e35e8a50da7ec82ff66b44213aa23865e823083"
+    },
+    {
+      "path": "gameplay/falling_marks.png",
+      "source": "gameplay-sheet.png",
+      "sheet_rect": [
+        768,
+        680,
+        768,
+        344
+      ],
+      "trim_in_rect": [
+        311,
+        54,
+        133,
+        199
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        149,
+        215
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        74.5,
+        107.5
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        141,
+        207
+      ],
+      "sha256": "7123ea5c05f1ae1cecc175bb9b4231dfe97cecdecbd108486c7a0bfd62f75f79"
+    },
+    {
+      "path": "baskets/orange_back.png",
+      "source": "basket-parts-sheet.png",
+      "sheet_rect": [
+        0,
+        200,
+        430,
+        330
+      ],
+      "trim_in_rect": [
+        15,
+        37,
+        412,
+        255
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        428,
+        271
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        214.0,
+        135.5
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        420,
+        263
+      ],
+      "canvas_group": "basket",
+      "horizontal_cap_margins_px": [
+        64,
+        64
+      ],
+      "cap_margin_region": "visible_bounds_px",
+      "front_overlay_offset_px": [
+        0,
+        161
+      ],
+      "sha256": "5310187ae3188179610b04ca259048508ebdb2192bfda51e8bb603550e1ffb14"
+    },
+    {
+      "path": "baskets/blue_back.png",
+      "source": "basket-parts-sheet.png",
+      "sheet_rect": [
+        430,
+        200,
+        395,
+        330
+      ],
+      "trim_in_rect": [
+        2,
+        37,
+        391,
+        255
+      ],
+      "paste_offset_px": [
+        18,
+        8
+      ],
+      "size": [
+        428,
+        271
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        214.0,
+        135.5
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        18,
+        8,
+        409,
+        263
+      ],
+      "canvas_group": "basket",
+      "horizontal_cap_margins_px": [
+        64,
+        64
+      ],
+      "cap_margin_region": "visible_bounds_px",
+      "front_overlay_offset_px": [
+        0,
+        161
+      ],
+      "sha256": "0cc48d57c3d77e9c2e2e5d28dae357c6a9335d96d44f892deaea1dfa61a0c5e0"
+    },
+    {
+      "path": "baskets/trash_back.png",
+      "source": "basket-parts-sheet.png",
+      "sheet_rect": [
+        825,
+        200,
+        429,
+        330
+      ],
+      "trim_in_rect": [
+        3,
+        37,
+        411,
+        255
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        428,
+        271
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        214.0,
+        135.5
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        419,
+        263
+      ],
+      "canvas_group": "basket",
+      "horizontal_cap_margins_px": [
+        64,
+        64
+      ],
+      "cap_margin_region": "visible_bounds_px",
+      "front_overlay_offset_px": [
+        0,
+        161
+      ],
+      "sha256": "50821d38e923a7b15a7ac88552505c049ef20a2a430a57f991783e9a8590db0b"
+    },
+    {
+      "path": "baskets/orange_front.png",
+      "source": "basket-parts-sheet.png",
+      "sheet_rect": [
+        0,
+        570,
+        430,
+        245
+      ],
+      "trim_in_rect": [
+        17,
+        43,
+        407,
+        169
+      ],
+      "paste_offset_px": [
+        10,
+        8
+      ],
+      "size": [
+        428,
+        185
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        214.0,
+        92.5
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        10,
+        8,
+        417,
+        177
+      ],
+      "canvas_group": "basket",
+      "horizontal_cap_margins_px": [
+        64,
+        64
+      ],
+      "cap_margin_region": "visible_bounds_px",
+      "sha256": "944618ea2b33190fcd879f2b4a700dbf2a8062a51d22e382ab8e2d6210a5ea4f"
+    },
+    {
+      "path": "baskets/blue_front.png",
+      "source": "basket-parts-sheet.png",
+      "sheet_rect": [
+        430,
+        570,
+        395,
+        245
+      ],
+      "trim_in_rect": [
+        4,
+        43,
+        386,
+        169
+      ],
+      "paste_offset_px": [
+        21,
+        8
+      ],
+      "size": [
+        428,
+        185
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        214.0,
+        92.5
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        21,
+        8,
+        407,
+        177
+      ],
+      "canvas_group": "basket",
+      "horizontal_cap_margins_px": [
+        64,
+        64
+      ],
+      "cap_margin_region": "visible_bounds_px",
+      "sha256": "463351715168e945325165b9348d7d4c64a007bdc8f2a267938cdbaa2ab06956"
+    },
+    {
+      "path": "baskets/trash_front.png",
+      "source": "basket-parts-sheet.png",
+      "sheet_rect": [
+        825,
+        570,
+        429,
+        245
+      ],
+      "trim_in_rect": [
+        6,
+        43,
+        407,
+        168
+      ],
+      "paste_offset_px": [
+        10,
+        8
+      ],
+      "size": [
+        428,
+        184
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        214.0,
+        92.0
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        10,
+        8,
+        417,
+        176
+      ],
+      "canvas_group": "basket",
+      "horizontal_cap_margins_px": [
+        64,
+        64
+      ],
+      "cap_margin_region": "visible_bounds_px",
+      "sha256": "8315333d95d711f9ac12a6b1ea0ba8b28d38f9acc28b7288a0cac9693b6a7c16"
+    },
+    {
+      "path": "baskets/trash_badge.png",
+      "source": "basket-parts-sheet.png",
+      "sheet_rect": [
+        450,
+        860,
+        350,
+        320
+      ],
+      "trim_in_rect": [
+        40,
+        28,
+        273,
+        271
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        289,
+        287
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        144.5,
+        143.5
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        281,
+        279
+      ],
+      "sha256": "52584262a7d1a171981bf93c09f1438eb02e0e002dab3dcf3b2b9dba14051fb6"
+    },
+    {
+      "path": "environment/rail_left.png",
+      "source": "factory-parts-sheet.png",
+      "sheet_rect": [
+        40,
+        30,
+        220,
+        640
+      ],
+      "trim_in_rect": [
+        45,
+        27,
+        145,
+        593
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        161,
+        609
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        80.5,
+        304.5
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        153,
+        601
+      ],
+      "sha256": "57af9d2b0478e521a486b2be2339f2e61ada6ca2b3158e0ed20f4c164f27e4c7"
+    },
+    {
+      "path": "environment/rail_right.png",
+      "source": "factory-parts-sheet.png",
+      "sheet_rect": [
+        430,
+        30,
+        210,
+        640
+      ],
+      "trim_in_rect": [
+        28,
+        27,
+        144,
+        593
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        160,
+        609
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        80.0,
+        304.5
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        152,
+        601
+      ],
+      "sha256": "00cff58d94a2993b410bed31830e01456a9801f6c313e9317d8c554267412e19"
+    },
+    {
+      "path": "stations/station_base.png",
+      "source": "factory-parts-sheet.png",
+      "sheet_rect": [
+        660,
+        400,
+        400,
+        265
+      ],
+      "trim_in_rect": [
+        22,
+        33,
+        360,
+        188
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        376,
+        204
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        188.0,
+        102.0
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        368,
+        196
+      ],
+      "anchors_px": {
+        "socket_mount": [
+          189,
+          64
+        ]
+      },
+      "sha256": "d162218c6b4be0ec06641bc76eb26fccdce1613983ce545fb6327fba7c493c11"
+    },
+    {
+      "path": "stations/name_plate.png",
+      "source": "factory-parts-sheet.png",
+      "sheet_rect": [
+        1090,
+        480,
+        330,
+        190
+      ],
+      "trim_in_rect": [
+        24,
+        32,
+        276,
+        125
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        292,
+        141
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        146.0,
+        70.5
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        284,
+        133
+      ],
+      "sha256": "746d24670092cebb21c9406b36cd1d283e700978bfa6c2785c318babc05ee6aa"
+    },
+    {
+      "path": "stations/lever_shaft.png",
+      "source": "factory-parts-sheet.png",
+      "sheet_rect": [
+        200,
+        695,
+        155,
+        365
+      ],
+      "trim_in_rect": [
+        34,
+        18,
+        97,
+        322
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        113,
+        338
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        56,
+        282
+      ],
+      "pivot_normalized": [
+        0.49557522123893805,
+        0.834319526627219
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        105,
+        330
+      ],
+      "anchors_px": {
+        "rotation_pivot": [
+          56,
+          282
+        ],
+        "grip_mount": [
+          58,
+          30
+        ]
+      },
+      "sha256": "6e9186a5d260a1af693cb58304da9136016061b44a0dfafe2ac9282468e4ec70"
+    },
+    {
+      "path": "stations/grip_orange.png",
+      "source": "factory-parts-sheet.png",
+      "sheet_rect": [
+        460,
+        780,
+        250,
+        280
+      ],
+      "trim_in_rect": [
+        34,
+        48,
+        176,
+        205
+      ],
+      "paste_offset_px": [
+        10,
+        9
+      ],
+      "size": [
+        196,
+        224
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        98.0,
+        112.0
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        10,
+        9,
+        186,
+        214
+      ],
+      "anchors_px": {
+        "shaft_mount": [
+          98,
+          199
+        ],
+        "hand_contact": [
+          98,
+          97
+        ]
+      },
+      "canvas_group": "grip",
+      "sha256": "20114fa2f5b7fdcddde8a3c8857f654f3af0ee0898ac18152a681877277dcc36"
+    },
+    {
+      "path": "stations/grip_blue.png",
+      "source": "factory-parts-sheet.png",
+      "sheet_rect": [
+        775,
+        780,
+        250,
+        280
+      ],
+      "trim_in_rect": [
+        40,
+        46,
+        180,
+        208
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        196,
+        224
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        98.0,
+        112.0
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        188,
+        216
+      ],
+      "anchors_px": {
+        "shaft_mount": [
+          98,
+          200
+        ],
+        "hand_contact": [
+          98,
+          98
+        ]
+      },
+      "canvas_group": "grip",
+      "sha256": "ae94a22063fff153076619c8a85bcb18bc7c20ec1f33cc5810e7c607d3e99309"
+    },
+    {
+      "path": "stations/pivot_socket.png",
+      "source": "factory-parts-sheet.png",
+      "sheet_rect": [
+        1120,
+        790,
+        240,
+        265
+      ],
+      "trim_in_rect": [
+        34,
+        53,
+        180,
+        176
+      ],
+      "paste_offset_px": [
+        8,
+        8
+      ],
+      "size": [
+        196,
+        192
+      ],
+      "padding_minimum": 8,
+      "pivot_px": [
+        98.0,
+        96.0
+      ],
+      "pivot_normalized": [
+        0.5,
+        0.5
+      ],
+      "visible_bounds_px": [
+        8,
+        8,
+        188,
+        184
+      ],
+      "sha256": "8a4ef25d65ca16534346ba1e5f42eb3feff72ffae10ec798dbf211a5036eb2af"
+    }
+  ]
+}

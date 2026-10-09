@@ -6,11 +6,55 @@ the review is done, and record the device and browser versions in the pull reque
 removes it. The evidence labels are defined in
 [verification.md](verification.md#evidence-labels).
 
+## Tilt Shift rules
+
+- `[EDITOR]` Owner inspection of the rules profile, round mapping, geometry and neighbor
+  diagnostics. Automated Resource reload does not establish Inspector usability.
+- `[HUMAN-PLAY]` Owner tuning of duration/count and proximity, and strategic fairness
+  of ownership variety after gameplay integration.
+- The future workshop must expose the same neighbor graph visually before editor
+  avoidance review is complete; this foundation exposes typed diagnostics only.
+
+## Tilt Shift physics
+
+- `[EDITOR]` Owner inspection of the physics profile's units, linear curve points,
+  materials and launch errors. Script save/reload and editor import do not prove usability.
+- `[HUMAN-PLAY]` Owner tuning of density, curve shape, dimensions, gravity, entry speed,
+  friction and restitution; routing coverage, fairness and full-turn control feel.
+- `[PHYSICAL-PHONE]` Responsiveness and physical-angle presentation once motion/phone
+  integration uses the arena's confirmed pose rather than its requested target.
+- `[EXPORTED-BUILD]` Physics and cleanup in the integrated Windows minigame.
+- `[EDITOR]` Owner usability review of the workshop, guide measurements, snap/tolerance
+  preferences and save/preview workflow. Scripted editor checks and captures do not
+  establish usability. The workshop now consumes the actual runtime arena.
+
+## Tilt Shift calibrated motion
+
+- `[PHYSICAL-PHONE]` Owner trials on supported iPhone and Android browsers: record versions,
+  comfortable sideways neutral, both holds, mirrored tilts, repeated full turns/reversal,
+  screen autorotation, off-axis tolerance, denial, background/lock and permission recovery.
+- `[PHYSICAL-PHONE]` Ten-phone load, end-to-end sensor delay and reconnect correction with
+  neutral preserved. Synthetic traffic and CPU measurements do not establish these results.
+- `[HUMAN-PLAY]` Owner approval of gain, filtering needs and target-versus-collider lag.
+  The initial gain is 1, with continuous mode and no extra smoothing.
+- `[EDITOR]` Owner inspection of the motion profile's units, valid ranges and launch errors.
+- `[EXPORTED-BUILD]` Calibrated control and lifecycle after readiness/phone integration.
+
 ## Bubbles and Jellyfishes
 
 - `[HUMAN-PLAY]` The owner's two-phone play and game-feel review.
 - `[HUMAN-PLAY]` Couch-distance readability of the shared screen, the final audio mix, and
   the fairness of creature collisions and telegraphs.
+
+## Tilt Shift art
+
+- `[PHYSICAL-PHONE]` Paddle readability on a real landscape phone, including five
+  simultaneous assignments, when the phone presentation is integrated.
+- `[HUMAN-PLAY]` Couch-distance readability of balls, paddles and basket openings,
+  including different basket widths/counts and ten operator stations.
+- `[HUMAN-PLAY]` Both-side Squircle hand contact and lever travel when operating
+  animation consumes the documented art anchors.
+- `[EXPORTED-BUILD]` Run the integrated Tilt Shift presentation in a Windows package.
 
 ## Platform movement in the lobby
 

@@ -5,6 +5,7 @@ import {
 } from "./immersive.js";
 import { PwaOnboarding, isStandalone } from "./pwa.js";
 import { MotionLabController } from "./motion_lab.js";
+import { MotionStream, type MotionControlState } from "./motion_stream.js";
 import { controllerSocketUrl } from "./network_config.js";
 import { SquircleV1Canvas } from "./squircle_v1.js";
 import { GestureTrace, type Point } from "./002_bubbles_and_jellyfishes/bubbles_gesture.js";
@@ -141,6 +142,7 @@ type BubblesVisualTuning = {
 };
 type HostMessage = {
   subscription_id?: string;
+  control_state?: MotionControlState;
   send_hz?: number;
   stale_msec?: number;
   type?: string;
@@ -225,6 +227,7 @@ const lobbyControls = new LobbyControls(
   },
 );
 
+const gameplayMotion = new MotionStream(() => socket);
 const motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);
 const pwa = new PwaOnboarding(
   document.querySelector<HTMLElement>("#app-screen")!,
@@ -324,6 +327,7 @@ function setGameplaySurface(active: boolean): void {
 }
 
 function showJoin(message: string, focus = false): void {
+  gameplayMotion.stop();
   motionLab.stop();
   lobbyControls.deactivate();
   readyCard.hidden = true;
@@ -348,6 +352,7 @@ function showJoin(message: string, focus = false): void {
 }
 function showJoined(player: PublicPlayer, state = "Connected"): void {
   pwa.hide();
+  gameplayMotion.stop();
   motionLab.stop();
   readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
@@ -373,6 +378,7 @@ function showJoined(player: PublicPlayer, state = "Connected"): void {
 }
 
 function showReady(message: HostMessage): void {
+  gameplayMotion.stop();
   motionLab.stop();
   lobbyControls.deactivate();
   setGameplaySurface(false);
@@ -581,6 +587,7 @@ bubblesPad.addEventListener("keydown", (event) => {
 });
 
 function showBubbles(message: HostMessage): void {
+  gameplayMotion.stop();
   motionLab.stop();
   lobbyControls.deactivate();
   readyCard.hidden = true;
@@ -1062,6 +1069,7 @@ function rememberIdentity(message: HostMessage): boolean {
   return true;
 }
 function reconnect(): void {
+  gameplayMotion.stop();
   motionLab.disconnect();
   if (stopped || retry !== undefined) return;
   lobbyControls.deactivate();
@@ -1217,15 +1225,36 @@ async function connect(): Promise<void> {
           bubblesCard.hidden =
             true;
         status.hidden = true;
+        gameplayMotion.stop();
         motionLab.begin({
           subscription_id: message.subscription_id,
           send_hz: message.send_hz,
           stale_msec: message.stale_msec ?? 1000,
         });
-      } else if (message.type === "motion_stop") {
+      } else if (
+        message.type === "motion_subscribe" &&
+        joined &&
+        typeof message.subscription_id === "string" &&
+        typeof message.send_hz === "number"
+      ) {
         motionLab.stop();
-        if (joined) lobbyControls.activate();
+        lobbyControls.deactivate();
+        gameplayMotion.begin({
+          subscription_id: message.subscription_id,
+          send_hz: message.send_hz,
+          stale_msec: message.stale_msec ?? 1000,
+        });
+      } else if (message.type === "motion_control_state") {
+        if (typeof message.subscription_id === "string")
+          if (message.control_state)
+            gameplayMotion.feedback(message.subscription_id, message.control_state);
+      } else if (message.type === "motion_stop") {
+        if (typeof message.subscription_id === "string")
+          gameplayMotion.stop(message.subscription_id);
+        motionLab.stop(message.subscription_id);
+        if (joined && !gameplayMotion.active && !motionLab.active) lobbyControls.activate();
       } else if (message.type === "lobby") {
+        gameplayMotion.stop();
         motionLab.stop();
         setGameplaySurface(false);
         readyCard.hidden = true;
@@ -1244,6 +1273,7 @@ async function connect(): Promise<void> {
     peer.onclose = (event) => {
       clearTimeout(deadline);
       lobbyControls.deactivate();
+      gameplayMotion.stop();
       motionLab.disconnect();
       setGameplaySurface(false);
       if (socket === peer) socket = undefined;

@@ -337,98 +337,169 @@ var MotionInput = class {
   }
 };
 
-// build/motion_lab.js
-var MotionLabController = class {
-  panel;
-  button;
-  readings;
+// build/motion_stream.js
+var MotionStream = class {
   connection;
+  reading;
+  input;
+  maximumBufferedBytes;
   timer;
   subscription;
   sequence = 0;
   statusAt = -Infinity;
+  sampleAt = -Infinity;
   sent = 0;
   started = 0;
-  input = new MotionInput();
-  constructor(panel, button, readings, connection) {
-    this.panel = panel;
-    this.button = button;
-    this.readings = readings;
+  interval = 34;
+  statusState = "";
+  controlState;
+  onControlState;
+  constructor(connection, reading = () => {
+  }, input = new MotionInput(), maximumBufferedBytes = 0) {
     this.connection = connection;
-    button.addEventListener("click", () => {
-      button.disabled = true;
-      const request = this.input.requestPermission();
-      this.tick();
-      void request.finally(() => {
-        button.disabled = false;
-        this.tick();
-      });
-    });
-    document.addEventListener("visibilitychange", () => {
-      if (!this.subscription)
-        return;
-      if (document.hidden)
-        this.input.suspend();
-      else
-        this.input.resume();
-      this.tick();
-    });
-    window.addEventListener("pagehide", () => this.stop());
+    this.reading = reading;
+    this.input = input;
+    this.maximumBufferedBytes = maximumBufferedBytes;
   }
   get active() {
     return !!this.subscription;
   }
+  visibility = () => {
+    if (document.hidden)
+      this.input.suspend();
+    else
+      this.input.resume();
+    this.tick();
+  };
+  pagehide = () => {
+    this.stop();
+  };
   begin(subscription) {
     this.stop();
     this.subscription = subscription;
     this.sequence = this.sent = 0;
     this.started = performance.now();
-    this.statusAt = -Infinity;
-    this.panel.hidden = false;
-    this.button.disabled = false;
-    this.timer = setInterval(() => this.tick(), Math.ceil(1e3 / Math.max(1, Math.min(30, subscription.send_hz))));
+    this.statusAt = this.sampleAt = -Infinity;
+    this.statusState = "";
+    this.interval = Math.ceil(1e3 / Math.max(1, Math.min(30, subscription.send_hz)));
+    document.addEventListener("visibilitychange", this.visibility);
+    window.addEventListener("pagehide", this.pagehide);
+    this.timer = setInterval(() => this.tick(), this.interval);
     this.tick();
   }
-  stop() {
+  stop(subscriptionId) {
+    if (subscriptionId !== void 0 && subscriptionId !== this.subscription?.subscription_id)
+      return false;
     clearInterval(this.timer);
     this.timer = void 0;
     this.subscription = void 0;
+    this.controlState = void 0;
     this.input.stop();
-    this.panel.hidden = true;
+    document.removeEventListener("visibilitychange", this.visibility);
+    window.removeEventListener("pagehide", this.pagehide);
+    return true;
   }
-  disconnect() {
-    this.stop();
+  async requestPermission() {
+    if (!this.active)
+      return;
+    const request = this.input.requestPermission();
+    this.tick();
+    await request;
+    if (this.active && document.hidden)
+      this.input.suspend();
+    this.tick();
   }
-  diagnostics(socket2) {
-    return {
+  requestCalibration() {
+    return this.send({ type: "motion_calibrate" });
+  }
+  feedback(subscriptionId, state) {
+    if (subscriptionId !== this.subscription?.subscription_id)
+      return false;
+    if (typeof state?.calibrated !== "boolean" || typeof state.usable !== "boolean" || typeof state.capture_state !== "string")
+      return false;
+    this.controlState = { ...state };
+    this.onControlState?.({ ...state });
+    return true;
+  }
+  send(payload) {
+    const socket2 = this.connection();
+    if (!this.subscription || socket2?.readyState !== WebSocket.OPEN || socket2.bufferedAmount > this.maximumBufferedBytes)
+      return false;
+    socket2.send(JSON.stringify({ ...payload, subscription_id: this.subscription.subscription_id }));
+    return true;
+  }
+  tick() {
+    if (!this.subscription)
+      return;
+    const socket2 = this.connection();
+    const diagnostics = {
       ...this.input.capabilities(),
       page_protocol: location.protocol,
       hostname: location.hostname,
       websocket_protocol: socket2 ? new URL(socket2.url).protocol : location.protocol === "https:" ? "wss:" : "ws:",
       websocket_status: socket2?.readyState === WebSocket.OPEN ? "open" : "closed"
     };
+    const now = performance.now();
+    const transmittedHz = this.sent / Math.max((now - this.started) / 1e3, 1e-3);
+    if ((now - this.statusAt >= 250 || diagnostics.state !== this.statusState) && this.send({ type: "motion_status", diagnostics, transmitted_hz: transmittedHz })) {
+      this.statusAt = now;
+      this.statusState = diagnostics.state;
+    }
+    const sample = this.input.sample();
+    if (this.input.active && !document.hidden && diagnostics.state === "live" && now - this.sampleAt >= this.interval && this.send({ type: "motion_sample", sequence: this.sequence + 1, sample })) {
+      this.sequence++;
+      this.sent++;
+      this.sampleAt = now;
+    }
+    this.reading({
+      diagnostics,
+      sample,
+      transmittedHz: this.sent / Math.max((now - this.started) / 1e3, 1e-3)
+    });
+  }
+};
+
+// build/motion_lab.js
+var MotionLabController = class {
+  panel;
+  button;
+  stream;
+  constructor(panel, button, readings, connection) {
+    this.panel = panel;
+    this.button = button;
+    this.stream = new MotionStream(connection, (value) => {
+      readings.textContent = [
+        JSON.stringify(value.diagnostics, null, 2),
+        `Sent: ${value.transmittedHz.toFixed(1)} Hz`,
+        formatSample(value.sample)
+      ].join("\n");
+    }, new MotionInput(), 8191);
+    button.addEventListener("click", () => {
+      if (!this.active)
+        return;
+      button.disabled = true;
+      void this.stream.requestPermission().finally(() => {
+        button.disabled = false;
+      });
+    });
+  }
+  get active() {
+    return this.stream.active;
+  }
+  begin(subscription) {
+    this.stream.begin(subscription);
+    this.panel.hidden = false;
+    this.button.disabled = false;
+  }
+  stop(subscriptionId) {
+    if (this.stream.stop(subscriptionId))
+      this.panel.hidden = true;
+  }
+  disconnect() {
+    this.stop();
   }
   tick() {
-    if (!this.subscription)
-      return;
-    const socket2 = this.connection(), diagnostics = this.diagnostics(socket2), sample = this.input.sample();
-    const send = (payload) => {
-      if (socket2?.readyState !== WebSocket.OPEN || socket2.bufferedAmount >= 8192)
-        return false;
-      socket2.send(JSON.stringify({ ...payload, subscription_id: this.subscription.subscription_id }));
-      return true;
-    };
-    const transmittedHz = this.sent / Math.max((performance.now() - this.started) / 1e3, 1e-3);
-    if (performance.now() - this.statusAt >= 250 && send({ type: "motion_status", diagnostics, transmitted_hz: transmittedHz }))
-      this.statusAt = performance.now();
-    if (this.input.active && !document.hidden && diagnostics.state === "live" && send({ type: "motion_sample", sequence: ++this.sequence, sample }))
-      this.sent++;
-    const elapsedSeconds = Math.max((performance.now() - this.started) / 1e3, 1e-3);
-    this.readings.textContent = [
-      JSON.stringify(diagnostics, null, 2),
-      `Sent: ${(this.sent / elapsedSeconds).toFixed(1)} Hz`,
-      formatSample(sample)
-    ].join("\n");
+    this.stream.tick();
   }
 };
 function formatSample(sample) {
@@ -1552,6 +1623,7 @@ var lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJump
   store(STORAGE.inputSeq, String(inputSeq));
   socket.send(JSON.stringify({ ...action, input_seq: inputSeq }));
 });
+var gameplayMotion = new MotionStream(() => socket);
 var motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);
 var pwa = new PwaOnboarding(document.querySelector("#app-screen"), document.querySelector("#install-button"), document.querySelector("#install-guidance"), document.querySelector("#browser-button"), () => {
   selectionScreen.hidden = false;
@@ -1635,6 +1707,7 @@ function setGameplaySurface(active) {
   document.documentElement.classList.toggle("bubbles-active", next === "bubbles");
 }
 function showJoin(message, focus = false) {
+  gameplayMotion.stop();
   motionLab.stop();
   lobbyControls.deactivate();
   readyCard.hidden = true;
@@ -1660,6 +1733,7 @@ function showJoin(message, focus = false) {
 }
 function showJoined(player, state = "Connected") {
   pwa.hide();
+  gameplayMotion.stop();
   motionLab.stop();
   readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
@@ -1684,6 +1758,7 @@ function showJoined(player, state = "Connected") {
   status.hidden = true;
 }
 function showReady(message) {
+  gameplayMotion.stop();
   motionLab.stop();
   lobbyControls.deactivate();
   setGameplaySurface(false);
@@ -1878,6 +1953,7 @@ bubblesPad.addEventListener("keydown", (event) => {
   }
 });
 function showBubbles(message) {
+  gameplayMotion.stop();
   motionLab.stop();
   lobbyControls.deactivate();
   readyCard.hidden = true;
@@ -2174,6 +2250,7 @@ function rememberIdentity(message) {
   return true;
 }
 function reconnect() {
+  gameplayMotion.stop();
   motionLab.disconnect();
   if (stopped || retry !== void 0)
     return;
@@ -2295,16 +2372,33 @@ async function connect() {
         document.documentElement.classList.remove("ready-active");
         selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = readyCard.hidden = bubblesCard.hidden = true;
         status.hidden = true;
+        gameplayMotion.stop();
         motionLab.begin({
           subscription_id: message.subscription_id,
           send_hz: message.send_hz,
           stale_msec: message.stale_msec ?? 1e3
         });
-      } else if (message.type === "motion_stop") {
+      } else if (message.type === "motion_subscribe" && joined && typeof message.subscription_id === "string" && typeof message.send_hz === "number") {
         motionLab.stop();
-        if (joined)
+        lobbyControls.deactivate();
+        gameplayMotion.begin({
+          subscription_id: message.subscription_id,
+          send_hz: message.send_hz,
+          stale_msec: message.stale_msec ?? 1e3
+        });
+      } else if (message.type === "motion_control_state") {
+        if (typeof message.subscription_id === "string") {
+          if (message.control_state)
+            gameplayMotion.feedback(message.subscription_id, message.control_state);
+        }
+      } else if (message.type === "motion_stop") {
+        if (typeof message.subscription_id === "string")
+          gameplayMotion.stop(message.subscription_id);
+        motionLab.stop(message.subscription_id);
+        if (joined && !gameplayMotion.active && !motionLab.active)
           lobbyControls.activate();
       } else if (message.type === "lobby") {
+        gameplayMotion.stop();
         motionLab.stop();
         setGameplaySurface(false);
         readyCard.hidden = true;
@@ -2324,6 +2418,7 @@ async function connect() {
     peer.onclose = (event) => {
       clearTimeout(deadline);
       lobbyControls.deactivate();
+      gameplayMotion.stop();
       motionLab.disconnect();
       setGameplaySurface(false);
       if (socket === peer)

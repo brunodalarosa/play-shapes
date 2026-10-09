@@ -148,6 +148,25 @@ shared-screen scene is `bubbles_and_jellyfishes.tscn`.
   Bubbles snapshots. The messages are in [protocol.md](protocol.md#bubbles-input).
 - The browser never supplies a player ID or host time.
 
+## Tilt Shift rules
+
+`minigames/003_tilt_shift/tilt_shift_shift_controller.gd` owns equal teams, frozen
+shift content, rounds, deadlines, cumulative scores, ball resolution, assignments
+and held angles. The [rules contract](../minigames/003_tilt_shift/README.md)
+describes its typed host calls and signals for later consumers.
+
+The allocator returns inspectable neighbor/conflict diagnostics. Selected Resources
+are in the [field guide](../minigames/003_tilt_shift/tuning/README.md).
+
+`TiltShiftArena` owns shared physics and delivery beneath its rules controller.
+`TiltShiftMotionController` owns capture preparation, calibration and active-consumer
+lifecycle; each `TiltShiftTiltInput` holds one player's neutral and continuous input.
+It consumes WebsocketService's keyed raw channels and supplies validated host angles
+to the rules. See [motion input](motion-input.md#tilt-shift-control).
+
+Readiness integration, workshop UI, phone presentation and catalog/lobby launch remain
+future work. The shared arena and motion consumer are callable host components.
+
 ## Characters
 
 - `characters/character_selection.gd` normalizes missing and legacy shapes to Squircle while
@@ -204,6 +223,18 @@ shared-screen scene is `bubbles_and_jellyfishes.tscn`.
 - `web/src/squircle_v1.ts` draws manifest-owned front idle sheets in setup and in the player's
   personalized Bubbles snapshot.
 - What the phone screens do is in [phone-client.md](phone-client.md).
+
+## Tilt Shift
+
+Tilt Shift's [host contract](../minigames/003_tilt_shift/README.md) describes its separate
+rules controller and shared gameplay/preview physics arena. The arena owns live bodies and
+delivery; its controller owns rounds, assignments, deadlines and scores. Physics snapshots
+copy the launch-frozen selected profile; no extra autoload or network message is involved.
+
+`addons/tilt_shift_workshop/` owns editor-only deep-copied drafts and geometry guides.
+Its separate preview process runs the same arena/controller with designer input; it
+does not start phone services. [The workshop guide](../minigames/003_tilt_shift/tuning/WORKSHOP.md)
+describes saving, explicit active selection and preview isolation.
 
 ## Assets, addons and tests
 

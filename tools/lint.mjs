@@ -23,7 +23,7 @@ const RULES_OFF_IN_TESTS = ["private-access"];
 
 const USAGE = `Usage: node tools/lint.mjs
 
-Lints every GDScript file outside addons/ with the pinned GDScript formatter's
+Lints project GDScript, including the owned Tilt Shift workshop addon, with the formatter's
 linter, and the TypeScript and JavaScript sources of web/ and tools/ with
 ESLint. Reports lines over ${LINE_LENGTH} characters in all of them, and in
 the hand-written CSS. Prints one finding per line and fails when

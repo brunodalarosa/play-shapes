@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="TiltShiftTuning" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://minigames/003_tilt_shift/tilt_shift_tuning.gd" id="1"]
+[ext_resource type="Resource" path="res://minigames/003_tilt_shift/tuning/layouts/Mirrored.tres" id="2"]
+[ext_resource type="Resource" path="res://minigames/003_tilt_shift/tuning/baskets/FiveOpenings.tres" id="3"]
+[ext_resource type="Resource" path="res://minigames/003_tilt_shift/tuning/Physics.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+round_duration_seconds = 45.0
+round_count = 4
+neighbor_distance = 0.24
+physics = ExtResource("4")
+paddle_layout = ExtResource("2")
+baskets_by_round = Array[Resource]([ExtResource("3"), ExtResource("3"), ExtResource("3"), ExtResource("3")])
