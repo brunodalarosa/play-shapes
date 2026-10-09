@@ -96,6 +96,10 @@ interpolation between points. Each graph shows relative intensity, scheduled tic
 counts using the runtime scheduler. The positive graph spans the shortened delivery window;
 the negative graph spans the full round. Counts and curves participate in undo/redo and saves.
 
+**Negative ball color** selects the opaque fill tint with a color picker in Tunables.
+The white outline is independent. The color is saved with physics content and participates
+in undo/redo; preview or runtime restart applies the selected profile.
+
 The budget remains independent of curve shape. Zero-intensity spans stay empty; a
 positive budget with an all-zero curve is invalid. A seed repeats entry positions,
 not physics, input, scoring or strategic outcomes. See [the physics guide](PHYSICS.md).

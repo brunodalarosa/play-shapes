@@ -209,6 +209,7 @@ func _test_presentation() -> void:
 	)
 	var profile := TiltShiftFixtures.tuning(1)
 	profile.physics.ball_radius = source.physics.ball_radius
+	profile.physics.negative_ball_color = Color("3498db")
 	profile.physics.negative_ball_count = 20
 	var presentation := TiltShiftPresentation.new()
 	root.add_child(presentation)
@@ -219,6 +220,7 @@ func _test_presentation() -> void:
 		presentation.start_shift(profile, TiltShiftFixtures.players(2)).accepted,
 		"Tint fixture launches",
 	)
+	profile.physics.negative_ball_color = Color.RED
 	for value: int in [1, -1]:
 		var ball := presentation.arena._spawn(0, value)
 		var collider := ball.get_node("CollisionShape2D") as CollisionShape2D
@@ -232,8 +234,8 @@ func _test_presentation() -> void:
 			var material := visual.material as ShaderMaterial
 			check(material != null, "Negative balls use the white-rim sprite material")
 			check(
-				material.get_shader_parameter("ball_color") == Color("176dd1"),
-				"Negative ball shading uses the brighter blue",
+				material.get_shader_parameter("ball_color") == Color("3498db"),
+				"Negative ball shading uses the selected tint tunable",
 			)
 		else:
 			check(visual.material == null, "Positive sprites retain their original appearance")
@@ -243,6 +245,19 @@ func _test_presentation() -> void:
 			is_equal_approx(visual.scale.x * maxf(region.size.x, region.size.y), ball.radius * 2),
 			"Shared sprite dimensions follow the enlarged collider",
 		)
+	presentation.stop()
+	await process_frame
+	check(
+		presentation.start_shift(profile, TiltShiftFixtures.players(2)).accepted,
+		"A fresh shift accepts edited color tunables",
+	)
+	var recolored := presentation.arena._spawn(0, -1)
+	var recolored_visual := recolored.get_child(1) as Sprite2D
+	var recolored_material := recolored_visual.material as ShaderMaterial
+	check(
+		recolored_material.get_shader_parameter("ball_color") == Color.RED,
+		"Restart applies the new tint even when the sprite material is reused",
+	)
 	presentation.stop()
 	presentation.queue_free()
 	await process_frame
@@ -254,11 +269,13 @@ func _test_workshop() -> void:
 	var original := model.profile.physics.negative_delivery_curve.duplicate()
 	model.begin_edit()
 	model.profile.physics.negative_ball_count = 31
+	model.profile.physics.negative_ball_color = Color("3498db")
 	model.profile.physics.negative_delivery_curve[3] = Vector2(0.6, 1)
 	model.end_edit()
 	model.undo()
 	check(
 		model.profile.physics.negative_ball_count == 20
+		and model.profile.physics.negative_ball_color.is_equal_approx(Color("176dd1"))
 		and model.profile.physics.negative_delivery_curve == original,
 		"Undo restores negative count and curve together",
 	)
@@ -280,6 +297,7 @@ func _test_workshop() -> void:
 	var reloaded := saved as TiltShiftTuning
 	check(
 		reloaded.physics.negative_ball_count == 31
+		and reloaded.physics.negative_ball_color.is_equal_approx(Color("3498db"))
 		and reloaded.physics.negative_delivery_curve
 		== model.profile.physics.negative_delivery_curve,
 		"Negative count and curve survive a fresh Resource reload",
@@ -322,5 +340,14 @@ func _test_tunable_controls() -> void:
 		)
 	var radius := panel.tunables.find_child("ball_radius", true, false) as SpinBox
 	check(is_equal_approx(radius.value, 0.01587), "Tunables retains the exact 15% radius increase")
+	var picker := panel.tunables.find_child("negative_ball_color", true, false) as ColorPickerButton
+	if check(picker != null, "Tunables exposes the negative ball color picker"):
+		picker.color = Color("3498db")
+		picker.color_changed.emit(picker.color)
+		check(
+			panel.model.profile.physics.negative_ball_color == picker.color
+			and not picker.edit_alpha,
+			"Color picker edits the saved opaque negative tint",
+		)
 	panel.queue_free()
 	await process_frame

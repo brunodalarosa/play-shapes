@@ -12,6 +12,8 @@ var ball_count: int = 60
 @export var delivery_curve: PackedVector2Array = PackedVector2Array([Vector2(0, 1), Vector2(1, 1)])
 ## Negative balls per round, independent of curve shape. Default: 20. Range: 0-1000.
 @export_range(0, 1000, 1) var negative_ball_count: int = 20
+## Negative ball fill tint; the white outline is independent. Default: #176dd1.
+@export_color_no_alpha var negative_ball_color: Color = Color("176dd1")
 ## Smooth progress/intensity points across the full round; zero spans remain empty.
 ## Default: starts at 20%, rises gently, peaks at 70%, and stops at 90%.
 @export var negative_delivery_curve: PackedVector2Array = PackedVector2Array(
@@ -70,6 +72,10 @@ var ball_friction: float = 0.2
 
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
+	for channel: float in [negative_ball_color.r, negative_ball_color.g, negative_ball_color.b]:
+		_check_range(errors, channel, 0.0, 1.0, "Negative ball color")
+	if not is_equal_approx(negative_ball_color.a, 1.0):
+		errors.append("Tilt Shift physics: negative ball color must be opaque.")
 	_check_range(errors, spawn_height, 0.0, 0.5, "Spawn height")
 	_check_range(errors, delivery_cutoff_seconds, 0.0, 300.0, "Delivery cutoff")
 	_check_range(errors, spawn_half_width, 0.0, 0.49, "Spawn half width")

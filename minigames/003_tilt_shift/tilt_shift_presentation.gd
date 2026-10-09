@@ -331,7 +331,7 @@ func _on_ball_spawned(ball: TiltShiftBall) -> void:
 		if _negative_ball_material == null:
 			_negative_ball_material = ShaderMaterial.new()
 			_negative_ball_material.shader = NEGATIVE_BALL_SHADER
-			_negative_ball_material.set_shader_parameter("ball_color", TiltShiftBall.NEGATIVE_TINT)
+		_negative_ball_material.set_shader_parameter("ball_color", ball.negative_tint)
 		visual.material = _negative_ball_material
 	ball.z_index = 2
 	ball.add_child(visual)

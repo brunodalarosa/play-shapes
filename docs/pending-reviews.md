@@ -21,7 +21,7 @@ removes it. The evidence labels are defined in
 
 - `[HUMAN-PLAY]` Owner review of the 20-ball negative delivery curve, smooth 70% peak,
   one-point penalty, brighter blue/white-rim visibility and enlarged ball contacts and routing.
-- `[EDITOR]` Owner usability review of separate negative count/curve controls and graph
+- `[EDITOR]` Owner usability review of negative color picker, separate count/curve controls and graph
   in workshop Tunables, including save/apply and undo/redo.
 - `[EDITOR]` Owner inspection of the physics profile's units, delivery curve points,
   materials and launch errors. Script save/reload and editor import do not prove usability.

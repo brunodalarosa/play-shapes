@@ -1,16 +1,16 @@
 @tool
 extends RefCounted
-## Scalar controls derive their ranges and documentation from the runtime Resources.
+## Editable controls derive their ranges and documentation from the runtime Resources.
 
 
-static func scalar_properties(resource: Resource) -> Array[Dictionary]:
+static func editable_properties(resource: Resource) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for property: Dictionary in resource.get_property_list():
 		if (
 			property.usage & PROPERTY_USAGE_SCRIPT_VARIABLE
 			and property.usage & PROPERTY_USAGE_EDITOR
 		):
-			if property.type in [TYPE_INT, TYPE_FLOAT, TYPE_BOOL]:
+			if property.type in [TYPE_INT, TYPE_FLOAT, TYPE_BOOL, TYPE_COLOR]:
 				result.append(property)
 	return result
 

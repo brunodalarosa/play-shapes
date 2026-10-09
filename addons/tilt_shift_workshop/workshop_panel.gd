@@ -765,7 +765,7 @@ func _rebuild_tunables() -> void:
 func _build_resource_tunables(resource: Resource) -> void:
 	if resource == null:
 		return
-	for property: Dictionary in Tunables.scalar_properties(resource):
+	for property: Dictionary in Tunables.editable_properties(resource):
 		var key: String = property.name
 		var label: String = key.capitalize()
 		if key == "ball_count":
@@ -783,6 +783,24 @@ func _build_resource_tunables(resource: Resource) -> void:
 					model.end_edit(),
 			)
 			control = toggle
+		elif property.type == TYPE_COLOR:
+			var row := HBoxContainer.new()
+			tunables.add_child(row)
+			var caption := Label.new()
+			caption.text = label
+			row.add_child(caption)
+			var picker := ColorPickerButton.new()
+			picker.edit_alpha = false
+			picker.color = resource.get(key)
+			picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			row.add_child(picker)
+			picker.color_changed.connect(
+				func(value: Color) -> void:
+					model.begin_edit()
+					resource.set(key, value)
+					model.end_edit(),
+			)
+			control = picker
 		else:
 			var range_values := Tunables.range_values(property)
 			control = _number(

@@ -13,6 +13,7 @@ One coordinate unit is 1,000 physics-world units; viewport size never changes gr
 | --- | --- | --- | --- |
 | Ball count | 60 | 0–1,000 per round | Positive balls, independent of curve shape. |
 | Negative ball count | 20 | 0–1,000 per round | Additional negative balls; zero disables them. |
+| Negative ball color | `#176dd1` | Opaque RGB | Editable fill tint; the outline stays white. |
 | Delivery curve | `(0, 1), (1, 1)` | 2–64 linear points | Progress from zero to one; finite nonnegative relative intensity. |
 | Negative delivery curve | Zero through 20%, peak at 70%, zero from 90% | 2–64 smooth points | Full-round progress; finite nonnegative relative intensity. |
 | Use position seed / seed | Off / 1 | Boolean / integer | Repeat the position sequence when enabled. |
@@ -92,7 +93,9 @@ The host registers a ball's immutable scoring value before creating its physics 
 White balls award one point; dark blue balls remove one point from the catching team.
 Totals saturate between zero and the signed 64-bit integer maximum, without overflow.
 
-Negative sprites reuse the white-ball texture with a `#176dd1` blue tint and white rim.
+Negative sprites reuse the white-ball texture with an editable fill tint, initially
+`#176dd1`, and white rim. Select the tint in the physics Inspector or workshop Tunables;
+restart the shift to apply it to the frozen runtime profile.
 Their shared material recolors the texture's dark rim while retaining the paper shading
 and alpha silhouette; the white outline does not enlarge the sprite beyond its collider.
 Trash, misses and out-of-bounds removal never score, and handles cannot resolve twice.
