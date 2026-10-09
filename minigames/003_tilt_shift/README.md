@@ -52,11 +52,13 @@ host time remains monotonic.
 
 A catch at `time >= deadline_msec` is rejected even when its callback precedes `advance`.
 Both use the same finish operation. Round end occurs once; the last round also emits
-one shift end. Scores carry across rounds. Highest total wins; a tie has `is_draw = true`
+one shift end. White catches add one point; dark blue catches subtract one, with totals
+clamped between zero and the signed 64-bit maximum. Scores carry across rounds.
+Highest total wins; a tie has `is_draw = true`
 and `winner = -1`.
 
 Every shift generation/round has a new opaque token. Ball indices are local to it;
-resolution status is a packed byte array cleared at round end. Old handles cannot score
+Resolution status and host-owned scoring values are cleared at round end. Old handles cannot score
 later, even before physics deletes the old nodes. Memory grows with this round's
 registrations; the later delivery system must enforce its ball budget.
 

@@ -120,6 +120,10 @@ func _build() -> void:
 	graph = Graph.new()
 	graph.setup(model)
 	visual.add_child(graph)
+	var negative_graph := Graph.new()
+	negative_graph.negative = true
+	negative_graph.setup(model)
+	visual.add_child(negative_graph)
 	var preview := HFlowContainer.new()
 	visual.add_child(preview)
 	_button(preview, "Start / restart physics", _start_preview)
@@ -416,7 +420,8 @@ func _build_physics() -> void:
 	if physics == null:
 		_heading(_settings, "Load a physics Resource to edit this draft.")
 		return
-	_number(_settings, "Total balls / round", physics, "ball_count", 0, 1000, 1)
+	_number(_settings, "Positive balls / round", physics, "ball_count", 0, 1000, 1)
+	_number(_settings, "Negative balls / round", physics, "negative_ball_count", 0, 1000, 1)
 	_toggle(
 		_settings,
 		"Use position seed",
@@ -429,7 +434,7 @@ func _build_physics() -> void:
 	_number(_settings, "Position seed", physics, "position_seed", -1000000000, 1000000000, 1)
 	for field: Array in [
 		["Spawn half width", "spawn_half_width", 0, 0.49, 0.01],
-		["Ball radius", "ball_radius", 0.003, 0.02, 0.001],
+		["Ball radius", "ball_radius", 0.003, 0.02, 0.00001],
 		["Paddle length", "paddle_length", 0.02, 0.2, 0.005],
 		["Paddle thickness", "paddle_thickness", 0.006, 0.03, 0.001],
 		["Gravity (widths/s²)", "gravity", 0, 2, 0.05],
@@ -442,27 +447,32 @@ func _build_physics() -> void:
 	]:
 		_number(_settings, field[0], physics, field[1], field[2], field[3], field[4])
 	_build_curve(_settings)
+	_build_curve(_settings, "negative_delivery_curve")
 
 
-func _build_curve(parent: Node) -> void:
+func _build_curve(parent: Node, key: String = "delivery_curve") -> void:
 	var physics := model.profile.physics
-	_heading(parent, "Curve: progress 0–1 / relative intensity ≥0")
-	for index: int in physics.delivery_curve.size():
+	var kind := "Negative smooth" if key == "negative_delivery_curve" else "Positive linear"
+	_heading(parent, kind + " curve: progress 0–1 / relative intensity ≥0")
+	var points: PackedVector2Array = physics.get(key)
+	for index: int in points.size():
 		var row := HBoxContainer.new()
 		parent.add_child(row)
 		for axis: int in 2:
 			var point := SpinBox.new()
 			point.min_value = 0
 			point.max_value = 1 if axis == 0 else 100
-			point.step = 0.01 if axis == 0 else 0.1
-			point.value = physics.delivery_curve[index][axis]
+			point.step = 0.01
+			point.value = points[index][axis]
 			row.add_child(point)
 			point.value_changed.connect(
 				func(value: float) -> void:
 					model.begin_edit()
-					var changed := physics.delivery_curve[index]
+					var curve: PackedVector2Array = physics.get(key)
+					var changed := curve[index]
 					changed[axis] = value
-					physics.delivery_curve[index] = changed
+					curve[index] = changed
+					physics.set(key, curve)
 					model.end_edit(),
 			)
 		_button(
@@ -470,7 +480,9 @@ func _build_curve(parent: Node) -> void:
 			"Remove",
 			func() -> void:
 				model.begin_edit()
-				physics.delivery_curve.remove_at(index)
+				var curve: PackedVector2Array = physics.get(key)
+				curve.remove_at(index)
+				physics.set(key, curve)
 				model.end_edit()
 				_rebuild_settings(),
 		)
@@ -479,8 +491,10 @@ func _build_curve(parent: Node) -> void:
 		"Add curve point",
 		func() -> void:
 			model.begin_edit()
-			physics.delivery_curve.append(Vector2(0.5, 1))
-			physics.delivery_curve.sort()
+			var curve: PackedVector2Array = physics.get(key)
+			curve.append(Vector2(0.5, 1))
+			curve.sort()
+			physics.set(key, curve)
 			model.end_edit()
 			_rebuild_settings(),
 	)
@@ -530,7 +544,8 @@ func _refresh() -> void:
 	var first := graph.schedule[0] / 1000.0 if not graph.schedule.is_empty() else 0.0
 	var last := graph.schedule[-1] / 1000.0 if not graph.schedule.is_empty() else 0.0
 	report.append(
-		"Scheduled %d balls, first %.3f s / last %.3f s." % [graph.schedule.size(), first, last]
+		"Scheduled %d positive balls, first %.3f s / last %.3f s."
+		% [graph.schedule.size(), first, last]
 	)
 	warnings.text = "\n".join(report)
 
@@ -737,6 +752,7 @@ func _rebuild_tunables() -> void:
 		_heading(tunables, entry[0])
 		_build_resource_tunables(entry[1])
 	_build_curve(tunables)
+	_build_curve(tunables, "negative_delivery_curve")
 	_build_tunable_maps()
 	for layout: TiltShiftPaddleLayout in model.layouts:
 		_heading(tunables, layout.preset_name)
@@ -749,9 +765,11 @@ func _rebuild_tunables() -> void:
 func _build_resource_tunables(resource: Resource) -> void:
 	if resource == null:
 		return
-	for property: Dictionary in Tunables.scalar_properties(resource):
+	for property: Dictionary in Tunables.editable_properties(resource):
 		var key: String = property.name
 		var label: String = key.capitalize()
+		if key == "ball_count":
+			label = "Positive ball count"
 		var control: Control
 		if property.type == TYPE_BOOL:
 			var toggle := CheckBox.new()
@@ -765,6 +783,24 @@ func _build_resource_tunables(resource: Resource) -> void:
 					model.end_edit(),
 			)
 			control = toggle
+		elif property.type == TYPE_COLOR:
+			var row := HBoxContainer.new()
+			tunables.add_child(row)
+			var caption := Label.new()
+			caption.text = label
+			row.add_child(caption)
+			var picker := ColorPickerButton.new()
+			picker.edit_alpha = false
+			picker.color = resource.get(key)
+			picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			row.add_child(picker)
+			picker.color_changed.connect(
+				func(value: Color) -> void:
+					model.begin_edit()
+					resource.set(key, value)
+					model.end_edit(),
+			)
+			control = picker
 		else:
 			var range_values := Tunables.range_values(property)
 			control = _number(

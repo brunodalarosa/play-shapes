@@ -12,6 +12,8 @@ const WALL_THICKNESS := 20.0
 var controller: TiltShiftShiftController
 var clock: Callable = Time.get_ticks_msec
 var spawned_count: int = 0
+var positive_spawned_count: int = 0
+var negative_spawned_count: int = 0
 var peak_live_balls: int = 0
 var position_seed_used: int = 0
 var last_step_usec: int = 0
@@ -22,6 +24,9 @@ var _balls: Array[TiltShiftBall] = []
 var _floor: Array[StaticBody2D] = []
 var _walls: Array[StaticBody2D] = []
 var _schedule := PackedInt32Array()
+var _negative_schedule := PackedInt32Array()
+var _next_negative_delivery: int = 0
+var _round_duration: int = 0
 var _next_delivery: int = 0
 var _active: bool = false
 var visible_top: float = 0.0
@@ -85,6 +90,7 @@ func stop() -> void:
 	_snapshot = null
 	_profile = null
 	_schedule.clear()
+	_negative_schedule.clear()
 	queue_redraw()
 
 
@@ -154,6 +160,18 @@ func step(delta: float, host_time_msec: int) -> void:
 			if not _active or _snapshot.round_token != round_token:
 				return
 			_next_delivery += 1
+	var negative_weight := TiltShiftDelivery.intensity(
+		_profile.negative_delivery_curve,
+		float(elapsed) / _round_duration,
+		true,
+	)
+	if negative_weight > 0.0:
+		while _next_negative_delivery < _negative_schedule.size() \
+				and _negative_schedule[_next_negative_delivery] <= elapsed:
+			_spawn(host_time_msec, -1)
+			if not _active or _snapshot.round_token != round_token:
+				return
+			_next_negative_delivery += 1
 	last_step_usec = Time.get_ticks_usec() - began
 
 
@@ -224,7 +242,17 @@ func _on_round_started(snapshot: TiltShiftState.Snapshot) -> void:
 		_delivery_duration,
 	)
 	_next_delivery = 0
+	_round_duration = snapshot.deadline_msec - snapshot.started_at_msec
+	_negative_schedule = TiltShiftDelivery.schedule(
+		_profile.negative_ball_count,
+		_profile.negative_delivery_curve,
+		_round_duration,
+		true,
+	)
+	_next_negative_delivery = 0
 	spawned_count = 0
+	positive_spawned_count = 0
+	negative_spawned_count = 0
 	_active = true
 	queue_redraw()
 
@@ -240,14 +268,19 @@ func _on_angle_changed(player: TiltShiftState.Player) -> void:
 			paddle.target_angle = player.angle_radians
 
 
-func _spawn(host_time_msec: int) -> TiltShiftBall:
-	if not _active or spawned_count >= _profile.ball_count:
+func _spawn(host_time_msec: int, score_value: int = 1) -> TiltShiftBall:
+	if not _active or score_value not in [-1, 1]:
 		return null
-	var registration := controller.register_ball(_snapshot.round_token, host_time_msec)
+	if score_value > 0 and positive_spawned_count >= _profile.ball_count:
+		return null
+	if score_value < 0 and negative_spawned_count >= _profile.negative_ball_count:
+		return null
+	var registration := controller.register_ball(_snapshot.round_token, host_time_msec, score_value)
 	if not registration.accepted:
 		return null
 	var ball := TiltShiftBall.new()
 	ball.handle = registration.ball
+	ball.score_value = score_value
 	ball.configure(_profile, WORLD_UNITS)
 	ball.placeholder_visible = placeholder_visible
 	var center := _snapshot.paddle_layout.arena_size.x * 0.5
@@ -260,6 +293,10 @@ func _spawn(host_time_msec: int) -> TiltShiftBall:
 	add_child(ball)
 	_balls.append(ball)
 	spawned_count += 1
+	if score_value < 0:
+		negative_spawned_count += 1
+	else:
+		positive_spawned_count += 1
 	peak_live_balls = maxi(peak_live_balls, _balls.size())
 	ball_spawned.emit(ball)
 	return ball

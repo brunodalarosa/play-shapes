@@ -2,6 +2,8 @@ class_name TiltShiftPresentation
 extends Control
 ## Shared-screen visuals. Rules and physics remain owned by the existing arena.
 
+const NEGATIVE_BALL_SHADER := preload("res://minigames/003_tilt_shift/negative_ball.gdshader")
+
 signal force_start_requested(round_token: String)
 
 signal round_feedback(snapshot: TiltShiftState.Snapshot)
@@ -14,6 +16,7 @@ var arena: TiltShiftArena
 var viewport: SubViewport
 var round_end_count := 0
 var last_process_usec := 0
+var _negative_ball_material: ShaderMaterial
 var _camera: Camera2D
 var _decor: Node2D
 var _orange: Label
@@ -324,6 +327,12 @@ func _on_ball_spawned(ball: TiltShiftBall) -> void:
 	var region := TiltShiftArt.bounds("gameplay/ball")
 	var width := ball.radius * 2.0 * region.size.x / maxf(region.size.x, region.size.y)
 	var visual := TiltShiftArt.sprite("gameplay/ball", width)
+	if ball.score_value < 0:
+		if _negative_ball_material == null:
+			_negative_ball_material = ShaderMaterial.new()
+			_negative_ball_material.shader = NEGATIVE_BALL_SHADER
+		_negative_ball_material.set_shader_parameter("ball_color", ball.negative_tint)
+		visual.material = _negative_ball_material
 	ball.z_index = 2
 	ball.add_child(visual)
 

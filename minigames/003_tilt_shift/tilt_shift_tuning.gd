@@ -88,6 +88,14 @@ func validation_errors() -> PackedStringArray:
 				errors.append(
 					"Tilt Shift delivery: curve cannot fit deliveries before the deadline."
 				)
+			var negative := TiltShiftDelivery.schedule(
+				physics.negative_ball_count,
+				physics.negative_delivery_curve,
+				roundi(round_duration_seconds * 1000.0),
+				true,
+			)
+			if negative.size() != physics.negative_ball_count:
+				errors.append("Tilt Shift negative delivery: curve cannot fit before the deadline.")
 		for index: int in round_count:
 			var layout := layout_for(index)
 			if layout != null and layout.arena_size.is_finite():

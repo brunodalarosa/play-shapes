@@ -205,8 +205,9 @@ start only what they need, so they stay fast.
   cleanup, remapped rounds and cumulative win/draw. Run
   `node tools/check.mjs tilt_shift_presentation tilt_shift_workshop_preview`.
 - Run `tilt_shift_presentation_visual_check.gd` without `--headless` for A/B preparation,
-  countdown, ten-player FHD/HD/4:3 and outcomes. It measures A with the 60-ball default
-  and B with a 300-ball stress budget, each for 45 seconds. Script p95 covers arena,
+  countdown, ten-player FHD/HD/4:3 and outcomes. It measures A with 60 positive balls
+  and B with 300 positive balls, each plus the selected negative budget, for 45 seconds.
+  The default totals are 80 and 320. Script p95 covers arena,
   selected controls and presentation; native physics uses one-second engine maxima.
   Transport and render costs are separate. Readability and motion feel need the owner.
 
@@ -234,6 +235,9 @@ start only what they need, so they stay fast.
   `tilt_shift_physics_test.gd` in `minigames/003_tilt_shift/tests/`. The focused command
   below includes curve counts/gaps, seed sequences, catches, exclusive cutoff, cleanup,
   native material/pair contacts, acceleration, fast impacts, full turns and reversal.
+- `tilt_shift_negative_balls_test.gd` checks independent delivery counts, smooth integrated
+  density, full-round 20%/70%/90% timing, hitches, penalties, score saturation, stale handles,
+  enlarged colliders/sprites, tint, and workshop undo/redo, isolated edits and reload.
 - The arena test samples 201 crossings across the default continuous basket row,
   including shared rims and stage edges; all resolve exactly once to a basket.
 - Run `tilt_shift_physics_cost_check.gd` in that folder as a headless script for the
@@ -281,7 +285,7 @@ The helpers whose names start with `bubbles_` are in
 
 | Helper | What it saves | Folder |
 | --- | --- | --- |
-| `tilt_shift_presentation_visual_check` | A/B preparation, countdown, ten-player FHD/HD/4:3 and outcomes; scoped 60/300-ball host costs. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/presentation/` |
+| `tilt_shift_presentation_visual_check` | A/B preparation, countdown, ten-player FHD/HD/4:3, mixed balls and outcomes; scoped 80/320-ball host costs. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/presentation/` |
 | `tilt_shift_physics_visual_check` | Three live-arena captures with ten synthetic players, repeated turns/reversal and 180 balls over eight seconds. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/physics/` |
 | `bubbles_player_visual_check` | One player bubble: small, grown, spinning, pop and re-form, and ten players. Components only, not a composed arena. | `bubbles-player/` |
 | `bubbles_animation_visual_check` | Player animation in order: small and maximum idle, held left drag, accepted swipe, slow held and released drag, charge glow and wobble, active spin, burst, reformed. | `bubbles-animation/` |

@@ -86,12 +86,19 @@ Round layout/basket maps and independent player/neutral sizes are editable there
 
 ![Runtime settings in the Tunables tab](../../../docs/images/tilt-shift-workshop/tunables.png)
 
-The controls expose total balls, optional position seed, offscreen spawn height,
+The controls expose separate positive and negative ball counts, optional position seed, offscreen spawn height,
 delivery cutoff, ball geometry, gravity, entry speed, rotation speed, friction and bounce.
 Use the progress/
 intensity point controls to edit the linear delivery curve; add or remove points explicitly.
-The graph shows relative intensity, scheduled ticks and counts across the shortened
-delivery window, ending before the active scoring deadline.
+
+Negative delivery has separate point controls in Geometry and Tunables, with smooth
+interpolation between points. Each graph shows relative intensity, scheduled ticks and
+counts using the runtime scheduler. The positive graph spans the shortened delivery window;
+the negative graph spans the full round. Counts and curves participate in undo/redo and saves.
+
+**Negative ball color** selects the opaque fill tint with a color picker in Tunables.
+The white outline is independent. The color is saved with physics content and participates
+in undo/redo; preview or runtime restart applies the selected profile.
 
 The budget remains independent of curve shape. Zero-intensity spans stay empty; a
 positive budget with an all-zero curve is invalid. A seed repeats entry positions,
