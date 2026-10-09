@@ -23,6 +23,7 @@ enum Phase {
 	COUNTDOWN,
 	START,
 }
+const MAX_SCORE: int = 9223372036854775807
 const PHASE_NAMES: Array[StringName] = [
 	&"idle",
 	&"active",
@@ -51,6 +52,7 @@ var _last_time_msec: int = -1
 var _started_at_msec: int = -1
 var _deadline_msec: int = -1
 var _balls := PackedByteArray()
+var _ball_values := PackedInt32Array()
 var _notifying: bool = false
 var _random := RandomNumberGenerator.new()
 var _exposure: Dictionary[String, Dictionary] = { }
@@ -162,13 +164,20 @@ func start_next_round(host_time_msec: int) -> TiltShiftState.Result:
 	return TiltShiftState.accepted()
 
 
-func register_ball(round_token: String, host_time_msec: int) -> TiltShiftState.Result:
+func register_ball(
+	round_token: String,
+	host_time_msec: int,
+	score_value: int = 1,
+) -> TiltShiftState.Result:
+	if score_value not in [-1, 1]:
+		return TiltShiftState.rejected(&"invalid_ball_value")
 	if not _settle_active(round_token, host_time_msec):
 		return TiltShiftState.rejected(&"inactive_or_stale_round")
 	var handle := TiltShiftState.BallHandle.new()
 	handle.round_token = _round_token
 	handle.index = _balls.size()
 	_balls.append(0)
+	_ball_values.append(score_value)
 	return TiltShiftState.accepted(handle)
 
 
@@ -186,7 +195,12 @@ func resolve_ball(
 		return TiltShiftState.rejected(&"unknown_basket")
 	_balls[handle.index] = 1
 	if TiltShiftTypes.is_player_team(basket.team):
-		_scores[basket.team] += 1
+		var value := _ball_values[handle.index]
+		# Check the upper bound before addition, since overflowing cannot be clamped afterward.
+		if value < 0:
+			_scores[basket.team] = maxi(0, _scores[basket.team] - 1)
+		elif _scores[basket.team] < MAX_SCORE:
+			_scores[basket.team] += 1
 		_notifying = true
 		score_changed.emit(snapshot())
 		_notifying = false
@@ -291,6 +305,7 @@ func _begin_round(host_time_msec: int) -> void:
 	_deadline_msec = -1
 	_last_time_msec = host_time_msec
 	_balls.clear()
+	_ball_values.clear()
 	var layout := _content.layout_for(_round_number - 1)
 	_neighbors = TiltShiftPaddleAllocator.neighbors(layout, _content.neighbor_distance)
 	var previous_selected := _selected_ids.duplicate()
@@ -480,6 +495,7 @@ func _enter_active(now: int) -> void:
 
 func _finish_round() -> void:
 	_balls.clear()
+	_ball_values.clear()
 	_phase = Phase.FINISHED if _round_number == _content.round_count else Phase.BETWEEN_ROUNDS
 	_notifying = true
 	round_ended.emit(snapshot())

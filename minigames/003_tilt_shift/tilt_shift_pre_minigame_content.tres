@@ -8,5 +8,5 @@ script = ExtResource("1")
 title = "Tilt Shift"
 preview = ExtResource("2")
 controls = "Hold your phone in landscape. Turn off rotation lock if needed. Enable tilt, set neutral, then READY."
-win_condition = "Your team's baskets score points. Highest shift total wins."
+win_condition = "White balls add 1 point. Dark blue balls remove 1, down to zero. Highest shift total wins."
 hints = "Assignments change each round. Scoring stops with the timer."

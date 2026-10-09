@@ -92,14 +92,18 @@ func _measure(layout_index: int, balls: int) -> String:
 			root.size = Vector2i(1920, 1080)
 			root.content_scale_size = root.size
 			stage = 3
+		elif stage == 3 and elapsed > 30000:
+			await _capture(suffix + "-mixed-balls.png")
+			stage = 4
 	await _capture(suffix + "-result.png")
-	check(presentation.arena.spawned_count == balls, "Mapped factory delivers the complete budget")
+	var total := balls + profile.physics.negative_ball_count
+	check(presentation.arena.spawned_count == total, "Mapped factory delivers the complete budget")
 	check(presentation.arena.live_balls().is_empty(), "Deadline clears visual ball bodies")
 	physics_peaks.sort()
 	var report := "%s; ten-player roster; %d selected; %d balls; 45 seconds.\n" % [
 		suffix,
 		driver.players.size(),
-		balls,
+		total,
 	]
 	report += "Arena script p95: %d us; input p95: %d us; presentation p95: %d us.\n" % [
 		_p95(arena_times),

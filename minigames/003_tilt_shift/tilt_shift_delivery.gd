@@ -1,7 +1,7 @@
 @tool
 class_name TiltShiftDelivery
 extends RefCounted
-## Exact trapezoid integration and midpoint quantiles of a linear intensity profile.
+## Exact integration and midpoint quantiles for linear or smoothstep intensity profiles.
 
 
 static func total_weight(points: PackedVector2Array) -> float:
@@ -13,12 +13,15 @@ static func total_weight(points: PackedVector2Array) -> float:
 	return total
 
 
-static func intensity(points: PackedVector2Array, progress: float) -> float:
+static func intensity(points: PackedVector2Array, progress: float, smooth: bool = false) -> float:
 	for index: int in range(1, points.size()):
 		var a := points[index - 1]
 		var b := points[index]
 		if progress >= a.x and progress <= b.x:
-			return lerpf(a.y, b.y, (progress - a.x) / (b.x - a.x))
+			var fraction := (progress - a.x) / (b.x - a.x)
+			if smooth:
+				fraction = fraction * fraction * (3.0 - 2.0 * fraction)
+			return lerpf(a.y, b.y, fraction)
 	return 0.0
 
 
@@ -26,6 +29,7 @@ static func schedule(
 	count: int,
 	points: PackedVector2Array,
 	duration_msec: int,
+	smooth: bool = false,
 ) -> PackedInt32Array:
 	var result := PackedInt32Array()
 	if count <= 0 or points.size() < 2 or duration_msec <= 0:
@@ -52,15 +56,23 @@ static func schedule(
 		for iteration: int in 48:
 			var middle := (low + high) * 0.5
 			var area := a.y * middle + slope * middle * middle * 0.5
+			if smooth:
+				var fraction := middle / (b.x - a.x)
+				# Integrate smoothstep exactly; segment weight still equals its trapezoid.
+				var integral := fraction * fraction * fraction * (1.0 - fraction * 0.5)
+				area = a.y * middle + (b.y - a.y) * (b.x - a.x) * integral
 			if area < target - consumed:
 				low = middle
 			else:
 				high = middle
 		var progress := a.x + (low + high) * 0.5
 		var offset := mini(duration_msec - 1, floori(progress * duration_msec))
-		if intensity(points, float(offset) / duration_msec) <= 0.0:
+		if intensity(points, float(offset) / duration_msec, smooth) <= 0.0:
 			offset += 1
-		if offset >= duration_msec or intensity(points, float(offset) / duration_msec) <= 0.0:
+		if (
+			offset >= duration_msec
+			or intensity(points, float(offset) / duration_msec, smooth) <= 0.0
+		):
 			return PackedInt32Array()
 		result.append(offset)
 	return result

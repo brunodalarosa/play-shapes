@@ -22,6 +22,7 @@ static func tuning(rounds: int = 4) -> TiltShiftTuning:
 		"res://minigames/003_tilt_shift/tuning/layouts/Mirrored.tres"
 	)
 	result.paddle_layout = layout.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
+	result.physics.negative_ball_count = 0
 	result.physics.ball_radius = 0.006
 	result.physics.gravity = 0.4
 	result.physics.entry_speed = 0.1

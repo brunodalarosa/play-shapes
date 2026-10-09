@@ -88,6 +88,8 @@ func _run() -> void:
 		[
 			"ball_count",
 			"delivery_curve",
+			"negative_ball_count",
+			"negative_delivery_curve",
 			"use_position_seed",
 			"position_seed",
 			"spawn_half_width",

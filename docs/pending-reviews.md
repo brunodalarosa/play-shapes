@@ -19,7 +19,11 @@ removes it. The evidence labels are defined in
 
 ## Tilt Shift physics
 
-- `[EDITOR]` Owner inspection of the physics profile's units, linear curve points,
+- `[HUMAN-PLAY]` Owner review of the 20-ball negative delivery curve, smooth 70% peak,
+  one-point penalty, dark blue visibility and 15% larger ball contacts and routing.
+- `[EDITOR]` Owner usability review of separate negative count/curve controls and graph
+  in workshop Tunables, including save/apply and undo/redo.
+- `[EDITOR]` Owner inspection of the physics profile's units, delivery curve points,
   materials and launch errors. Script save/reload and editor import do not prove usability.
 - `[HUMAN-PLAY]` Owner tuning of density, curve shape, dimensions, gravity, entry speed,
   friction and restitution; routing coverage, fairness and full-turn control feel.

@@ -5,11 +5,13 @@
 [resource]
 script = ExtResource("1")
 ball_count = 60
+negative_ball_count = 20
+negative_delivery_curve = PackedVector2Array(0, 0, 0.2, 0, 0.35, 0.15, 0.7, 1, 0.9, 0, 1, 0)
 delivery_curve = PackedVector2Array(0, 1, 1, 1)
 use_position_seed = false
 position_seed = 1
 spawn_half_width = 0.4
-ball_radius = 0.012
+ball_radius = 0.0138
 paddle_length = 0.1
 paddle_thickness = 0.01
 gravity = 0.18

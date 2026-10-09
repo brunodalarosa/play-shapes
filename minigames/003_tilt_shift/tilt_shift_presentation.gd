@@ -324,6 +324,8 @@ func _on_ball_spawned(ball: TiltShiftBall) -> void:
 	var region := TiltShiftArt.bounds("gameplay/ball")
 	var width := ball.radius * 2.0 * region.size.x / maxf(region.size.x, region.size.y)
 	var visual := TiltShiftArt.sprite("gameplay/ball", width)
+	if ball.score_value < 0:
+		visual.modulate = TiltShiftBall.NEGATIVE_TINT
 	ball.z_index = 2
 	ball.add_child(visual)
 

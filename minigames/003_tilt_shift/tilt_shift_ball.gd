@@ -2,7 +2,10 @@ class_name TiltShiftBall
 extends RigidBody2D
 ## Engine contacts with local acceleration; no global gravity or competing score.
 
+const NEGATIVE_TINT := Color("001a33")
+
 var handle: TiltShiftState.BallHandle
+var score_value: int = 1
 var previous_position := Vector2.ZERO
 var acceleration: float = 400.0
 var radius: float = 6.0
@@ -44,5 +47,6 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 func _draw() -> void:
 	if not placeholder_visible:
 		return
-	draw_circle(Vector2.ZERO, radius, Color("f4e6ad"))
+	var color := NEGATIVE_TINT if score_value < 0 else Color("f4e6ad")
+	draw_circle(Vector2.ZERO, radius, color)
 	draw_arc(Vector2.ZERO, radius, 0, TAU, 24, Color("78684d"), 1.0, true)
