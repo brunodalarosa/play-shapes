@@ -10,6 +10,7 @@ import {
 } from "@playwright/test";
 import { spawn, type ChildProcess } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
 const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const HTTP_PORT = 18200;
@@ -31,7 +32,7 @@ export class Host {
   private process?: ChildProcess;
   private exit?: string;
 
-  async start(players: number, testInfo: TestInfo): Promise<void> {
+  async start(players: number, testInfo: TestInfo, game = "bubbles"): Promise<void> {
     // A host left running by a person would answer instead of this one.
     const busy = await fetch(`${this.url}session.json`, { signal: AbortSignal.timeout(500) }).then(
       () => true,
@@ -42,14 +43,16 @@ export class Host {
     );
 
     const windowed = process.env.E2E_WINDOWED === "1";
+    const exported = process.env.E2E_EXPORTED_PACK;
+    const script = game === "tilt_shift" ? "tilt_shift_host.gd" : "host.gd";
     const args = [
       ...(windowed ? [] : ["--headless"]),
-      "--path",
-      ROOT,
+      ...(exported ? ["--main-pack", exported] : ["--path", ROOT]),
       "--script",
-      "res://tests/e2e/host.gd",
+      exported ? join(ROOT, "tests", "e2e", script) : `res://tests/e2e/${script}`,
     ];
     this.process = spawn(process.env.GODOT_BIN || "godot", args, {
+      cwd: exported ? dirname(exported) : ROOT,
       windowsHide: true,
       env: {
         ...process.env,
@@ -57,6 +60,7 @@ export class Host {
         E2E_ROUND: process.env.E2E_ROUND === "full" ? "full" : "quick",
         E2E_HTTP_PORT: String(HTTP_PORT),
         E2E_HOST_CAPTURES: windowed ? testInfo.outputPath("host") : "",
+        E2E_REPORT_FOLDER: join(ROOT, "test-results", "tilt-shift"),
         PLAY_SHAPES_NETWORK_CONFIG: "off",
       },
     });
@@ -244,20 +248,22 @@ async function centerOf(locator: Locator): Promise<{ x: number; y: number }> {
 }
 
 type Fixtures = {
+  game: string;
   players: number;
   host: Host;
   openPhone: (name: string, color: number) => Promise<Phone>;
 };
 
 export const test = base.extend<Fixtures>({
+  game: ["bubbles", { option: true }],
   players: [2, { option: true }],
 
-  host: async ({ players }, use, testInfo) => {
+  host: async ({ players, game }, use, testInfo) => {
     const host = new Host();
 
     // Stops the host even when it never became ready, so no Godot process is left behind.
     try {
-      await host.start(players, testInfo);
+      await host.start(players, testInfo, game);
       await use(host);
     } finally {
       await host.stop(testInfo);

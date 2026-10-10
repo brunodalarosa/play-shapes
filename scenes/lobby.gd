@@ -140,7 +140,8 @@ func _start_minigame() -> void:
 		return
 	world.clear_all_input()
 	start_button.disabled = true
-	var error := get_tree().change_scene_to_file("res://scenes/pre_minigame_screen.tscn")
+	var path := "res://scenes/pre_minigame_screen.tscn"
+	var error := get_tree().change_scene_to_file(path)
 	if error != OK:
 		SessionHost.cancel_pre_minigame()
 		SessionHost.set_accepting_new_players(true)

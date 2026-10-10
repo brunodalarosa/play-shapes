@@ -10,7 +10,12 @@ const EXECUTABLE_NAME := "Play Shapes.exe"
 const PACK_NAME := "Play Shapes.pck"
 const METADATA_NAME := "build-info.json"
 const ZIP_RELATIVE := "builds/standalone/Play-Shapes-windows-x86_64.zip"
-const INCLUDE_FILTER := "web/public/*.html,web/public/*.webmanifest,web/public/*.css,web/public/*.js,web/public/platform_input_settings.json,assets/runtime/animated_characters/squircle/v1/manifest.json"
+const INCLUDE_FILTER := (
+	"web/public/*.html,web/public/*.webmanifest,web/public/*.css,web/public/*.js,"
+	+ "web/public/platform_input_settings.json,"
+	+ "assets/runtime/animated_characters/squircle/v1/manifest.json,"
+	+ "assets/runtime/minigames/003/manifest.json"
+)
 const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,addons/tilt_shift_workshop/**,scratch/**,comparisons/**,docs/images/tilt-shift-workshop/**,local/**,*.local.json,*.pem,*.key,*.crt,*.cer,*.der,*.p12,*.pfx,art/**,builds/**,opencode.json,tools/**,tests/**,minigames/*/tests/**,test-results/**,web/package.json,web/package-lock.json,web/tsconfig.json,web/node_modules/**,web/src/**,web/tests/**"
 const REQUIRED_BROWSER_PATHS := [
 	"web/public/platform_input_settings.json",
@@ -23,6 +28,20 @@ const REQUIRED_BROWSER_PATHS := [
 	"web/public/style.css",
 ]
 const REQUIRED_RUNTIME_PATHS := [
+	"minigames/003_tilt_shift/tilt_shift_gameplay.tscn",
+	"minigames/003_tilt_shift/tilt_shift_minigame.tres",
+	"minigames/003_tilt_shift/tilt_shift_pre_minigame_content.tres",
+	"minigames/003_tilt_shift/tilt_shift_session.gd",
+	"minigames/003_tilt_shift/tilt_shift_protocol.gd",
+	"minigames/003_tilt_shift/tuning/Flow.tres",
+	"minigames/003_tilt_shift/tuning/baskets/ThreeOpenings.tres",
+	"assets/runtime/pre_minigame/tilt_shift_preview.png",
+	"assets/runtime/minigames/003/paddles/paddle_orange.png",
+	"assets/runtime/minigames/003/paddles/paddle_blue.png",
+	"assets/runtime/minigames/003/paddles/paddle_neutral.png",
+	"debug/tilt_shift_review.tscn",
+	"assets/runtime/minigames/003/manifest.json",
+	"minigames/003_tilt_shift/tilt_shift_presentation.tscn",
 	"web/public/platform_input_settings.json",
 	"debug/motion_lab/motion_lab.tscn",
 	"debug/motion_lab/motion_lab.gd",

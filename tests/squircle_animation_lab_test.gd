@@ -32,8 +32,9 @@ func _run() -> void:
 		)
 	)
 	if not check(
-		manifest.clips.size() == 10 and lab.get("_clips").size() == manifest.clips.size()
-		and lab.get("_actions").has("look_up") and lab.get("_actions").has("crouch"),
+		manifest.clips.size() == 12 and lab.get("_clips").size() == manifest.clips.size()
+		and lab.get("_actions").has("look_up") and lab.get("_actions").has("crouch")
+		and lab.get("_actions").has("lever_pull"),
 		"All motion and held clip/view pairs are available from the manifest",
 	):
 		return

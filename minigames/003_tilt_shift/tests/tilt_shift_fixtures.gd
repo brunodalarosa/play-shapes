@@ -17,6 +17,16 @@ static func players(count: int) -> Array[TiltShiftState.Player]:
 static func tuning(rounds: int = 4) -> TiltShiftTuning:
 	var default_preset: TiltShiftTuning = load("res://minigames/003_tilt_shift/tuning/Default.tres")
 	var result: TiltShiftTuning = default_preset.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
+	result.layouts_by_round.clear()
+	var layout: TiltShiftPaddleLayout = load(
+		"res://minigames/003_tilt_shift/tuning/layouts/Mirrored.tres"
+	)
+	result.paddle_layout = layout.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
+	result.physics.negative_ball_count = 0
+	result.physics.ball_radius = 0.006
+	result.physics.gravity = 0.4
+	result.physics.entry_speed = 0.1
+	result.physics.delivery_cutoff_seconds = 0.0
 	result.round_duration_seconds = 1.0
 	result.round_count = rounds
 	var basket := result.baskets_by_round[0]

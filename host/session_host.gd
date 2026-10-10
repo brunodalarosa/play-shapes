@@ -19,6 +19,8 @@ var player_registry: PlayerRegistry
 var accepting_new_players: bool = false
 var _pending_minigame_launch: Dictionary = { }
 var readiness: PreMinigameReadiness
+var tilt_shift: Node
+const TILT_SHIFT_ID := &"tilt_shift"
 
 
 func _ready() -> void:
@@ -112,6 +114,7 @@ func addresses() -> PackedStringArray:
 
 
 func stop() -> void:
+	_stop_tilt_shift()
 	http.stop()
 	websocket.stop()
 	running = false
@@ -142,6 +145,8 @@ func minigame_availability(minigame_id: StringName, allow_one_player_debug := fa
 
 	var player_count := players().size()
 	if allow_one_player_debug:
+		if not minigame.one_player_debug:
+			return { "available": false, "reason": "This minigame has no one-player mode" }
 		if player_count != 1:
 			return { "available": false, "reason": "Requires exactly one registered player" }
 	elif player_count < 2:
@@ -149,6 +154,15 @@ func minigame_availability(minigame_id: StringName, allow_one_player_debug := fa
 	if player_count > minigame.max_players:
 		var limit := [minigame.display_name, minigame.max_players]
 		return { "available": false, "reason": "%s supports up to %d players" % limit }
+	if (
+		not minigame.allowed_player_counts.is_empty()
+		and player_count not in minigame.allowed_player_counts
+	):
+		var counts: Array[String] = []
+		for count: int in minigame.allowed_player_counts:
+			counts.append(str(count))
+		var reason := "%s requires %s players" % [minigame.display_name, ", ".join(counts)]
+		return { "available": false, "reason": reason }
 	return { "available": true, "reason": "" }
 
 
@@ -184,11 +198,25 @@ func begin_pre_minigame(minigame_id: StringName) -> Dictionary:
 	var availability := minigame_availability(minigame_id)
 	if not bool(availability.available):
 		return { "accepted": false, "reason": availability.reason }
+	_stop_tilt_shift()
+	var can_ready := Callable()
+	var preparation := Callable()
+	if minigame_id == TILT_SHIFT_ID:
+		_ensure_tilt_shift()
+		if not tilt_shift.prepare(self, active_presets.tilt_shift):
+			return { "accepted": false, "reason": "Tilt Shift preparation could not start" }
+		can_ready = tilt_shift.ready_for
+		preparation = tilt_shift.preparation_for
 	readiness = PreMinigameReadiness.new(
 		minigame_id,
 		players(),
 		func() -> bool:
-			return bool(minigame_availability(minigame_id).available),
+			return (
+				bool(minigame_availability(minigame_id).available)
+				and (minigame_id != TILT_SHIFT_ID or tilt_shift.launch_eligible())
+			),
+		can_ready,
+		preparation,
 	)
 	readiness.changed.connect(_on_readiness_changed)
 	readiness.launch_requested.connect(_on_readiness_launch)
@@ -205,6 +233,8 @@ func cancel_pre_minigame() -> void:
 
 
 func _on_readiness_changed(snapshot: Dictionary) -> void:
+	if readiness != null and readiness.minigame_id == TILT_SHIFT_ID:
+		tilt_shift.sync_players(players())
 	readiness_changed.emit(snapshot)
 
 
@@ -221,6 +251,7 @@ func _on_readiness_launch(minigame_id: StringName, participants: Array[Dictionar
 
 
 func _on_readiness_canceled() -> void:
+	_stop_tilt_shift()
 	websocket.end_pre_minigame()
 	readiness = null
 	readiness_canceled.emit()
@@ -240,9 +271,14 @@ func clear_minigame_launch(minigame_id: StringName = &"") -> void:
 		or StringName(_pending_minigame_launch.get("minigame_id", &"")) == minigame_id
 	):
 		_pending_minigame_launch = { }
+		if minigame_id.is_empty() or minigame_id == TILT_SHIFT_ID:
+			_stop_tilt_shift()
 
 
 func send_players_to_lobby() -> void:
+	if readiness != null and readiness.active:
+		readiness.cancel()
+	_stop_tilt_shift()
 	if websocket != null:
 		websocket.send_lobby_state()
 
@@ -250,6 +286,20 @@ func send_players_to_lobby() -> void:
 func register_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
 	if websocket != null:
 		websocket.set_lobby_controller(controller)
+
+
+func _ensure_tilt_shift() -> void:
+	if tilt_shift != null:
+		return
+	# Catalog listing and ordinary lobby play must not load the factory's scene dependencies.
+	var script := load("res://minigames/003_tilt_shift/tilt_shift_session.gd") as Script
+	tilt_shift = script.new()
+	add_child(tilt_shift)
+
+
+func _stop_tilt_shift() -> void:
+	if tilt_shift != null:
+		tilt_shift.stop()
 
 
 func unregister_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
@@ -269,6 +319,8 @@ func unregister_bubbles_controller(controller: BubblesRoundController) -> void:
 
 func _on_players_changed() -> void:
 	var public_players := player_registry.public_players()
+	if tilt_shift != null:
+		tilt_shift.sync_players(public_players)
 	if readiness != null:
 		readiness.sync_players(public_players)
 	players_changed.emit(public_players)

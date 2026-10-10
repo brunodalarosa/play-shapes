@@ -60,6 +60,8 @@ The reusable parts behind the lobby characters. Setup and reuse are in
 - `scenes/pre_minigame_screen.tscn` uses editable Bubbles content in
   `bubbles_pre_minigame_content.tres`, in the minigame's folder, and a curated gameplay capture
   in `assets/runtime/pre_minigame/bubbles_preview.png`.
+- Every normal catalog launch uses this screen. Journey requirements and plan warnings are
+  in [player journeys](player-journeys.md).
 
 ## Bubbles and Jellyfishes
 
@@ -151,8 +153,9 @@ shared-screen scene is `bubbles_and_jellyfishes.tscn`.
 ## Tilt Shift rules
 
 `minigames/003_tilt_shift/tilt_shift_shift_controller.gd` owns equal teams, frozen
-shift content, rounds, deadlines, cumulative scores, ball resolution, assignments
-and held angles. The [rules contract](../minigames/003_tilt_shift/README.md)
+shift content, layout exposure history, participant selection, readiness, countdown,
+round deadlines, cumulative scores, ball resolution, assignments and held angles.
+The [rules contract](../minigames/003_tilt_shift/README.md)
 describes its typed host calls and signals for later consumers.
 
 The allocator returns inspectable neighbor/conflict diagnostics. Selected Resources
@@ -164,8 +167,17 @@ lifecycle; each `TiltShiftTiltInput` holds one player's neutral and continuous i
 It consumes WebsocketService's keyed raw channels and supplies validated host angles
 to the rules. See [motion input](motion-input.md#tilt-shift-control).
 
-Readiness integration, workshop UI, phone presentation and catalog/lobby launch remain
-future work. The shared arena and motion consumer are callable host components.
+`TiltShiftPresentation` wraps the arena with imported factory artwork, physical-body
+beam visuals, one cosmetic operator per participant and host-derived score/time/result
+feedback. The editor workshop gameplay preview uses that same presentation scene.
+
+`TiltShiftSession`, a SessionHost child, carries preparation into the gameplay wrapper,
+attaches mapped rounds after shared all-player readiness, routes round readiness and retires
+capture on results or exit.
+Preparation transitions remain in the round controller. `TiltShiftProtocol`
+copies accepted state into personalized snapshots. The catalog lists the normal
+2/4/6/8/10-player entry; the separately labeled F12 review uses simulated controls.
+See [player journeys](player-journeys.md).
 
 ## Characters
 
@@ -218,10 +230,13 @@ future work. The shared arena and motion consumer are callable host components.
   [browser-build.md](browser-build.md).
 - The phone onboarding keeps the socket available while players choose a Squircle color and
   enter a name. The host creates the player record only on the final join submission.
-- Ready-up shows one host-confirmed READY/CANCEL toggle, without gameplay controls, preview or
-  booklet.
+- Ordinary ready-up shows one host-confirmed READY/CANCEL toggle. Tilt Shift additionally
+  exposes permission and neutral calibration; its phone shows one canonical team paddle
+  as a movement guide. Preview and instructions remain on the shared screen.
 - `web/src/squircle_v1.ts` draws manifest-owned front idle sheets in setup and in the player's
   personalized Bubbles snapshot.
+- `web/src/screen_wake_lock.ts` owns one visible-page wake lock across every phone screen,
+  independent of the active minigame or socket. It adds no host state or messages.
 - What the phone screens do is in [phone-client.md](phone-client.md).
 
 ## Tilt Shift

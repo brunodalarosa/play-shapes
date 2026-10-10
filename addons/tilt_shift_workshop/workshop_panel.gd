@@ -17,6 +17,9 @@ var warnings: RichTextLabel
 var errors: RichTextLabel
 var preview_status: Label
 var _settings: VBoxContainer
+var tunables: VBoxContainer
+var tabs: TabContainer
+const Tunables := preload("res://addons/tilt_shift_workshop/workshop_tunables.gd")
 var _selection: VBoxContainer
 var _file_dialog: FileDialog
 var _confirm: ConfirmationDialog
@@ -117,6 +120,10 @@ func _build() -> void:
 	graph = Graph.new()
 	graph.setup(model)
 	visual.add_child(graph)
+	var negative_graph := Graph.new()
+	negative_graph.negative = true
+	negative_graph.setup(model)
+	visual.add_child(negative_graph)
 	var preview := HFlowContainer.new()
 	visual.add_child(preview)
 	_button(preview, "Start / restart physics", _start_preview)
@@ -141,14 +148,26 @@ func _build() -> void:
 	)
 	preview_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	visual.add_child(preview_status)
+	tabs = TabContainer.new()
+	tabs.custom_minimum_size.x = 390
+	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	split.add_child(tabs)
 	var scroll := ScrollContainer.new()
+	scroll.name = "Geometry"
 	scroll.custom_minimum_size.x = 370
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	split.add_child(scroll)
+	tabs.add_child(scroll)
 	_settings = VBoxContainer.new()
 	_settings.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(_settings)
+	var tuning_scroll := ScrollContainer.new()
+	tuning_scroll.name = "Tunables"
+	tuning_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tabs.add_child(tuning_scroll)
+	tunables = VBoxContainer.new()
+	tunables.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tuning_scroll.add_child(tunables)
 	_rebuild_settings()
 	var reports := HBoxContainer.new()
 	reports.custom_minimum_size.y = 140
@@ -222,6 +241,17 @@ func _rebuild_settings() -> void:
 	_settings.add_child(_selection)
 	_rebuild_selection()
 	_heading(_settings, "Named content and rounds")
+	var layouts := OptionButton.new()
+	for layout: TiltShiftPaddleLayout in model.layouts:
+		layouts.add_item(layout.preset_name)
+	layouts.select(model.layout_index)
+	_settings.add_child(layouts)
+	layouts.item_selected.connect(
+		func(index: int) -> void:
+			model.select_layout(index)
+			canvas.selected = -1
+			_rebuild_settings(),
+	)
 	if model.profile.paddle_layout != null:
 		_text(_settings, "Layout name", model.profile.paddle_layout, "preset_name")
 	var baskets := OptionButton.new()
@@ -259,7 +289,10 @@ func _rebuild_settings() -> void:
 		func(_value: float) -> void:
 			_rebuild_settings.call_deferred(),
 	)
-	var mappings := maxi(model.profile.round_count, model.profile.baskets_by_round.size())
+	var mappings := maxi(
+		model.profile.round_count,
+		maxi(model.profile.baskets_by_round.size(), model.profile.layouts_by_round.size()),
+	)
 	for index: int in mappings:
 		var row := HBoxContainer.new()
 		_settings.add_child(row)
@@ -269,6 +302,18 @@ func _rebuild_settings() -> void:
 			" (stale)" if index >= model.profile.round_count else "",
 		]
 		row.add_child(label)
+		var layout_choice := OptionButton.new()
+		layout_choice.name = "LayoutRound_%d" % (index + 1)
+		layout_choice.add_item("Missing", -1)
+		for layout_index: int in model.layouts.size():
+			layout_choice.add_item(model.layouts[layout_index].preset_name, layout_index)
+		if index < model.profile.layouts_by_round.size():
+			layout_choice.select(model.layouts.find(model.profile.layouts_by_round[index]) + 1)
+		row.add_child(layout_choice)
+		layout_choice.item_selected.connect(
+			func(selected: int) -> void:
+				model.assign_layout_round(index, selected - 1),
+		)
 		var choice := OptionButton.new()
 		choice.name = "Round_%d" % (index + 1)
 		choice.add_item("Missing", -1)
@@ -291,6 +336,7 @@ func _rebuild_settings() -> void:
 					_rebuild_settings(),
 			)
 	_build_physics()
+	_rebuild_tunables()
 
 
 func _rebuild_selection() -> void:
@@ -374,7 +420,8 @@ func _build_physics() -> void:
 	if physics == null:
 		_heading(_settings, "Load a physics Resource to edit this draft.")
 		return
-	_number(_settings, "Total balls / round", physics, "ball_count", 0, 1000, 1)
+	_number(_settings, "Positive balls / round", physics, "ball_count", 0, 1000, 1)
+	_number(_settings, "Negative balls / round", physics, "negative_ball_count", 0, 1000, 1)
 	_toggle(
 		_settings,
 		"Use position seed",
@@ -387,7 +434,7 @@ func _build_physics() -> void:
 	_number(_settings, "Position seed", physics, "position_seed", -1000000000, 1000000000, 1)
 	for field: Array in [
 		["Spawn half width", "spawn_half_width", 0, 0.49, 0.01],
-		["Ball radius", "ball_radius", 0.003, 0.02, 0.001],
+		["Ball radius", "ball_radius", 0.003, 0.02, 0.00001],
 		["Paddle length", "paddle_length", 0.02, 0.2, 0.005],
 		["Paddle thickness", "paddle_thickness", 0.006, 0.03, 0.001],
 		["Gravity (widths/s²)", "gravity", 0, 2, 0.05],
@@ -399,23 +446,33 @@ func _build_physics() -> void:
 		["Paddle bounce (high: rebound)", "paddle_bounce", 0, 1, 0.05],
 	]:
 		_number(_settings, field[0], physics, field[1], field[2], field[3], field[4])
-	_heading(_settings, "Curve: progress 0–1 / relative intensity ≥0")
-	for index: int in physics.delivery_curve.size():
+	_build_curve(_settings)
+	_build_curve(_settings, "negative_delivery_curve")
+
+
+func _build_curve(parent: Node, key: String = "delivery_curve") -> void:
+	var physics := model.profile.physics
+	var kind := "Negative smooth" if key == "negative_delivery_curve" else "Positive linear"
+	_heading(parent, kind + " curve: progress 0–1 / relative intensity ≥0")
+	var points: PackedVector2Array = physics.get(key)
+	for index: int in points.size():
 		var row := HBoxContainer.new()
-		_settings.add_child(row)
+		parent.add_child(row)
 		for axis: int in 2:
 			var point := SpinBox.new()
 			point.min_value = 0
 			point.max_value = 1 if axis == 0 else 100
-			point.step = 0.01 if axis == 0 else 0.1
-			point.value = physics.delivery_curve[index][axis]
+			point.step = 0.01
+			point.value = points[index][axis]
 			row.add_child(point)
 			point.value_changed.connect(
 				func(value: float) -> void:
 					model.begin_edit()
-					var changed := physics.delivery_curve[index]
+					var curve: PackedVector2Array = physics.get(key)
+					var changed := curve[index]
 					changed[axis] = value
-					physics.delivery_curve[index] = changed
+					curve[index] = changed
+					physics.set(key, curve)
 					model.end_edit(),
 			)
 		_button(
@@ -423,17 +480,21 @@ func _build_physics() -> void:
 			"Remove",
 			func() -> void:
 				model.begin_edit()
-				physics.delivery_curve.remove_at(index)
+				var curve: PackedVector2Array = physics.get(key)
+				curve.remove_at(index)
+				physics.set(key, curve)
 				model.end_edit()
 				_rebuild_settings(),
 		)
 	_button(
-		_settings,
+		parent,
 		"Add curve point",
 		func() -> void:
 			model.begin_edit()
-			physics.delivery_curve.append(Vector2(0.5, 1))
-			physics.delivery_curve.sort()
+			var curve: PackedVector2Array = physics.get(key)
+			curve.append(Vector2(0.5, 1))
+			curve.sort()
+			physics.set(key, curve)
 			model.end_edit()
 			_rebuild_settings(),
 	)
@@ -483,7 +544,8 @@ func _refresh() -> void:
 	var first := graph.schedule[0] / 1000.0 if not graph.schedule.is_empty() else 0.0
 	var last := graph.schedule[-1] / 1000.0 if not graph.schedule.is_empty() else 0.0
 	report.append(
-		"Scheduled %d balls, first %.3f s / last %.3f s." % [graph.schedule.size(), first, last]
+		"Scheduled %d positive balls, first %.3f s / last %.3f s."
+		% [graph.schedule.size(), first, last]
 	)
 	warnings.text = "\n".join(report)
 
@@ -607,13 +669,16 @@ func _number(
 	value.min_value = minimum
 	value.max_value = maximum
 	value.step = step
-	value.value = float(owner.get(property))
+	var property_path := NodePath(property)
+	value.value = float(owner.get_indexed(property_path))
 	row.add_child(value)
 	value.value_changed.connect(
 		func(next: float) -> void:
 			if content:
 				model.begin_edit()
-			owner.set(property, int(next) if typeof(owner.get(property)) == TYPE_INT else next)
+			var integer := typeof(owner.get_indexed(property_path)) == TYPE_INT
+			var changed: Variant = int(next) if integer else next
+			owner.set_indexed(property_path, changed)
 			if content:
 				model.end_edit()
 			else:
@@ -671,3 +736,112 @@ func _report(parent: Node) -> RichTextLabel:
 	report.custom_minimum_size = Vector2(300, 140)
 	parent.add_child(report)
 	return report
+
+
+func _rebuild_tunables() -> void:
+	for child: Node in tunables.get_children():
+		tunables.remove_child(child)
+		child.queue_free()
+	for entry: Array in [
+		["Rules", model.profile],
+		["Motion", model.profile.motion],
+		["Flow", model.profile.flow],
+		["Physics and delivery", model.profile.physics],
+		["Presentation", model.profile.presentation],
+	]:
+		_heading(tunables, entry[0])
+		_build_resource_tunables(entry[1])
+	_build_curve(tunables)
+	_build_curve(tunables, "negative_delivery_curve")
+	_build_tunable_maps()
+	for layout: TiltShiftPaddleLayout in model.layouts:
+		_heading(tunables, layout.preset_name)
+		_build_resource_tunables(layout)
+		_text(tunables, "Exposure identity", layout, "layout_id")
+		_number(tunables, "Arena width (width units)", layout, "arena_size:x", 0.1, 2.0, 0.01)
+		_number(tunables, "Arena height (width units)", layout, "arena_size:y", 0.1, 2.0, 0.01)
+
+
+func _build_resource_tunables(resource: Resource) -> void:
+	if resource == null:
+		return
+	for property: Dictionary in Tunables.editable_properties(resource):
+		var key: String = property.name
+		var label: String = key.capitalize()
+		if key == "ball_count":
+			label = "Positive ball count"
+		var control: Control
+		if property.type == TYPE_BOOL:
+			var toggle := CheckBox.new()
+			toggle.text = label
+			toggle.button_pressed = bool(resource.get(key))
+			tunables.add_child(toggle)
+			toggle.toggled.connect(
+				func(value: bool) -> void:
+					model.begin_edit()
+					resource.set(key, value)
+					model.end_edit(),
+			)
+			control = toggle
+		elif property.type == TYPE_COLOR:
+			var row := HBoxContainer.new()
+			tunables.add_child(row)
+			var caption := Label.new()
+			caption.text = label
+			row.add_child(caption)
+			var picker := ColorPickerButton.new()
+			picker.edit_alpha = false
+			picker.color = resource.get(key)
+			picker.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			row.add_child(picker)
+			picker.color_changed.connect(
+				func(value: Color) -> void:
+					model.begin_edit()
+					resource.set(key, value)
+					model.end_edit(),
+			)
+			control = picker
+		else:
+			var range_values := Tunables.range_values(property)
+			control = _number(
+				tunables,
+				label,
+				resource,
+				key,
+				range_values.x,
+				range_values.y,
+				range_values.z,
+			)
+		control.name = key
+		control.tooltip_text = Tunables.help(resource, key)
+		if resource == model.profile and key == "round_count":
+			(control as SpinBox).value_changed.connect(
+				func(_value: float) -> void:
+					_rebuild_settings.call_deferred(),
+			)
+
+
+func _build_tunable_maps() -> void:
+	_heading(tunables, "Round layout and basket mappings")
+	var mappings := maxi(model.profile.round_count, model.profile.layouts_by_round.size())
+	for index: int in mappings:
+		_heading(tunables, "Round %d" % (index + 1))
+		for kind: String in ["layout", "basket"]:
+			var choice := OptionButton.new()
+			choice.add_item("Missing", -1)
+			var library: Array = model.layouts if kind == "layout" else model.baskets
+			var assigned: Array = model.profile.layouts_by_round
+			if kind == "basket":
+				assigned = model.profile.baskets_by_round
+			for item: Resource in library:
+				choice.add_item(item.preset_name)
+			if index < assigned.size():
+				choice.select(library.find(assigned[index]) + 1)
+			choice.item_selected.connect(
+				func(selected: int) -> void:
+					if kind == "layout":
+						model.assign_layout_round(index, selected - 1)
+					else:
+						model.assign_round(index, selected - 1),
+			)
+			tunables.add_child(choice)

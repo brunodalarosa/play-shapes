@@ -12,6 +12,8 @@ const WALL_THICKNESS := 20.0
 var controller: TiltShiftShiftController
 var clock: Callable = Time.get_ticks_msec
 var spawned_count: int = 0
+var positive_spawned_count: int = 0
+var negative_spawned_count: int = 0
 var peak_live_balls: int = 0
 var position_seed_used: int = 0
 var last_step_usec: int = 0
@@ -22,30 +24,45 @@ var _balls: Array[TiltShiftBall] = []
 var _floor: Array[StaticBody2D] = []
 var _walls: Array[StaticBody2D] = []
 var _schedule := PackedInt32Array()
+var _negative_schedule := PackedInt32Array()
+var _next_negative_delivery: int = 0
+var _round_duration: int = 0
 var _next_delivery: int = 0
 var _active: bool = false
+var visible_top: float = 0.0
+var _delivery_duration: int = 0
 var _positions := RandomNumberGenerator.new()
+var placeholder_visible := true:
+	set(value):
+		placeholder_visible = value
+		for paddle: TiltShiftPaddleBody in _paddles:
+			paddle.placeholder_visible = value
+		for ball: TiltShiftBall in _balls:
+			ball.placeholder_visible = value
+		queue_redraw()
 
 
 func start_shift(
 	selected: TiltShiftTuning,
 	players: Array[TiltShiftState.Player],
+	wait_for_initial_motion: bool = false,
 ) -> TiltShiftState.Result:
 	if selected == null:
 		return TiltShiftState.rejected(&"invalid_tuning")
 	var errors := selected.validation_errors()
 	if not errors.is_empty():
 		return TiltShiftState.rejected(&"invalid_tuning", errors)
-	if _active or controller != null and controller.snapshot().phase == &"between_rounds":
+	if controller != null and controller.snapshot().phase not in [&"idle", &"finished"]:
 		return TiltShiftState.rejected(&"shift_already_running")
 	stop()
 	controller = TiltShiftShiftController.new()
 	controller.tuning = selected
 	add_child(controller)
+	controller.round_prepared.connect(_on_round_prepared)
 	controller.round_started.connect(_on_round_started)
 	controller.round_ended.connect(_on_round_ended)
 	controller.angle_changed.connect(_on_angle_changed)
-	var result := controller.start_shift(players, clock.call())
+	var result := controller.start_shift(players, clock.call(), wait_for_initial_motion)
 	if not result.accepted:
 		stop()
 	return result
@@ -73,6 +90,7 @@ func stop() -> void:
 	_snapshot = null
 	_profile = null
 	_schedule.clear()
+	_negative_schedule.clear()
 	queue_redraw()
 
 
@@ -84,20 +102,24 @@ func paddle_bodies() -> Array[TiltShiftPaddleBody]:
 	return _paddles.duplicate()
 
 
+func floor_bodies() -> Array[StaticBody2D]:
+	return _floor.duplicate()
+
+
 ## Signed swept clearances, in arena units. Negative values are diagnostics, not auto edits.
 func swept_clearances() -> PackedFloat32Array:
 	var values := PackedFloat32Array()
 	if _snapshot == null:
 		return values
-	var radius := Vector2(_profile.paddle_length, _profile.paddle_thickness).length() * 0.5
 	for index: int in _paddles.size():
+		var radius := _paddles[index].size.length() * 0.5 / WORLD_UNITS
 		var position := _paddles[index].position / WORLD_UNITS
 		var size := _snapshot.paddle_layout.arena_size
 		values.append(minf(minf(position.x, size.x - position.x), position.y) - radius)
 		values.append(size.y - position.y - radius)
 		for other: int in range(index + 1, _paddles.size()):
 			var distance := position.distance_to(_paddles[other].position / WORLD_UNITS)
-			values.append(distance - radius * 2.0)
+			values.append(distance - radius - _paddles[other].size.length() * 0.5 / WORLD_UNITS)
 	return values
 
 
@@ -114,17 +136,23 @@ func step(delta: float, host_time_msec: int) -> void:
 	var began := Time.get_ticks_usec()
 	if controller == null or not is_finite(delta) or delta < 0.0 or delta > 0.05:
 		return
-	if not controller.advance(host_time_msec).accepted or not _active:
+	if not controller.advance(host_time_msec).accepted or _snapshot == null:
 		return
 	var round_token := _snapshot.round_token
 	for paddle: TiltShiftPaddleBody in _paddles:
-		paddle.advance_pose(delta)
+		paddle.advance_pose(delta, _active)
+	if not _active:
+		return
 	_observe_balls(host_time_msec)
 	if not _active or _snapshot.round_token != round_token:
 		return
 	var elapsed := host_time_msec - _snapshot.started_at_msec
-	var duration := _snapshot.deadline_msec - _snapshot.started_at_msec
-	var weight := TiltShiftDelivery.intensity(_profile.delivery_curve, float(elapsed) / duration)
+	var weight := 0.0
+	if _delivery_duration > 0 and elapsed < _delivery_duration:
+		weight = TiltShiftDelivery.intensity(
+			_profile.delivery_curve,
+			float(elapsed) / _delivery_duration,
+		)
 	if weight > 0.0:
 		while _next_delivery < _schedule.size() and _schedule[_next_delivery] <= elapsed:
 			_spawn(host_time_msec)
@@ -132,11 +160,31 @@ func step(delta: float, host_time_msec: int) -> void:
 			if not _active or _snapshot.round_token != round_token:
 				return
 			_next_delivery += 1
+	var negative_weight := TiltShiftDelivery.intensity(
+		_profile.negative_delivery_curve,
+		float(elapsed) / _round_duration,
+		true,
+	)
+	if negative_weight > 0.0:
+		while _next_negative_delivery < _negative_schedule.size() \
+				and _negative_schedule[_next_negative_delivery] <= elapsed:
+			_spawn(host_time_msec, -1)
+			if not _active or _snapshot.round_token != round_token:
+				return
+			_next_negative_delivery += 1
 	last_step_usec = Time.get_ticks_usec() - began
 
 
-func _on_round_started(snapshot: TiltShiftState.Snapshot) -> void:
+func _on_round_prepared(snapshot: TiltShiftState.Snapshot) -> void:
+	if not snapshot.reworked:
+		return
+	_active = false
 	_clear_balls()
+	for body: Node in _paddles + _walls + _floor:
+		_retire_body(body)
+	_paddles.clear()
+	_walls.clear()
+	_floor.clear()
 	_snapshot = snapshot
 	_profile = snapshot.physics
 	if snapshot.round_number == 1:
@@ -145,22 +193,66 @@ func _on_round_started(snapshot: TiltShiftState.Snapshot) -> void:
 			_positions.seed = _profile.position_seed
 		position_seed_used = _positions.seed
 		peak_live_balls = 0
+	spawned_count = 0
+	for paddle: TiltShiftPaddle in snapshot.paddle_layout.paddles:
+		var body := TiltShiftPaddleBody.new()
+		body.configure(
+			paddle,
+			_profile,
+			WORLD_UNITS,
+			snapshot.paddle_layout,
+			snapshot.auto_direction,
+		)
+		body.placeholder_visible = placeholder_visible
+		add_child(body)
+		_paddles.append(body)
+	_build_walls()
+	_build_floor()
+	for player: TiltShiftState.Player in snapshot.players:
+		_on_angle_changed(player)
+	queue_redraw()
+
+
+func _on_round_started(snapshot: TiltShiftState.Snapshot) -> void:
+	_clear_balls()
+	_snapshot = snapshot
+	_profile = snapshot.physics
+	if snapshot.round_number == 1 and not snapshot.reworked:
+		_positions.randomize()
+		if _profile.use_position_seed:
+			_positions.seed = _profile.position_seed
+		position_seed_used = _positions.seed
+		peak_live_balls = 0
 		for paddle: TiltShiftPaddle in snapshot.paddle_layout.paddles:
 			var body := TiltShiftPaddleBody.new()
 			body.configure(paddle, _profile, WORLD_UNITS)
+			body.placeholder_visible = placeholder_visible
 			add_child(body)
 			_paddles.append(body)
 		_build_walls()
 	for player: TiltShiftState.Player in snapshot.players:
 		_on_angle_changed(player)
-	_build_floor()
+	if not snapshot.reworked:
+		_build_floor()
+	_delivery_duration = snapshot.deadline_msec - snapshot.started_at_msec \
+			- roundi(_profile.delivery_cutoff_seconds * 1000.0)
 	_schedule = TiltShiftDelivery.schedule(
 		_profile.ball_count,
 		_profile.delivery_curve,
-		snapshot.deadline_msec - snapshot.started_at_msec,
+		_delivery_duration,
 	)
 	_next_delivery = 0
+	_round_duration = snapshot.deadline_msec - snapshot.started_at_msec
+	_negative_schedule = TiltShiftDelivery.schedule(
+		_profile.negative_ball_count,
+		_profile.negative_delivery_curve,
+		_round_duration,
+		true,
+	)
+	_next_negative_delivery = 0
 	spawned_count = 0
+	positive_spawned_count = 0
+	negative_spawned_count = 0
 	_active = true
 	queue_redraw()
 
@@ -176,22 +268,35 @@ func _on_angle_changed(player: TiltShiftState.Player) -> void:
 			paddle.target_angle = player.angle_radians
 
 
-func _spawn(host_time_msec: int) -> TiltShiftBall:
-	if not _active or spawned_count >= _profile.ball_count:
+func _spawn(host_time_msec: int, score_value: int = 1) -> TiltShiftBall:
+	if not _active or score_value not in [-1, 1]:
 		return null
-	var registration := controller.register_ball(_snapshot.round_token, host_time_msec)
+	if score_value > 0 and positive_spawned_count >= _profile.ball_count:
+		return null
+	if score_value < 0 and negative_spawned_count >= _profile.negative_ball_count:
+		return null
+	var registration := controller.register_ball(_snapshot.round_token, host_time_msec, score_value)
 	if not registration.accepted:
 		return null
 	var ball := TiltShiftBall.new()
 	ball.handle = registration.ball
+	ball.score_value = score_value
 	ball.configure(_profile, WORLD_UNITS)
+	ball.placeholder_visible = placeholder_visible
 	var center := _snapshot.paddle_layout.arena_size.x * 0.5
 	var horizontal := _positions.randf_range(-_profile.spawn_half_width, _profile.spawn_half_width)
-	ball.position = Vector2(center + horizontal, _profile.ball_radius) * WORLD_UNITS
+	var spawn_y := _profile.ball_radius * WORLD_UNITS
+	if _snapshot.reworked:
+		spawn_y = visible_top - (_profile.spawn_height + _profile.ball_radius) * WORLD_UNITS
+	ball.position = Vector2((center + horizontal) * WORLD_UNITS, spawn_y)
 	ball.previous_position = ball.position
 	add_child(ball)
 	_balls.append(ball)
 	spawned_count += 1
+	if score_value < 0:
+		negative_spawned_count += 1
+	else:
+		positive_spawned_count += 1
 	peak_live_balls = maxi(peak_live_balls, _balls.size())
 	ball_spawned.emit(ball)
 	return ball
@@ -208,10 +313,15 @@ func _observe_balls(host_time_msec: int) -> void:
 		if previous.y < height and current.y >= height:
 			var fraction := (height - previous.y) / (current.y - previous.y)
 			var crossing := lerpf(previous.x, current.x, fraction)
+			# A continuous basket row has shared rims, not gaps. Its center decides which
+			# basket catches a straddling ball; gapped presets still require a full fit.
+			var fit_radius := 0.0 if _floor.is_empty() else ball.radius
+			var tolerance := TiltShiftBasketPreset.REFLECTION_TOLERANCE * WORLD_UNITS
 			for basket: TiltShiftBasketOpening in _snapshot.basket_preset.openings:
 				var left := (basket.center - basket.width * 0.5) * WORLD_UNITS
 				var right := (basket.center + basket.width * 0.5) * WORLD_UNITS
-				if crossing - ball.radius >= left and crossing + ball.radius <= right:
+				if crossing - fit_radius >= left - tolerance \
+						and crossing + fit_radius <= right + tolerance:
 					_resolve(ball, basket.basket_id, host_time_msec)
 					break
 		if ball.resolved:
@@ -219,7 +329,8 @@ func _observe_balls(host_time_msec: int) -> void:
 		if (
 			not current.is_finite() or current.x < -ball.radius or current.x > width + ball.radius \
 					or current.y > height + ball.radius * 2.0
-			or current.y < -height
+			or current.y
+			< minf(-height, visible_top - (_profile.spawn_height + 0.1) * WORLD_UNITS - height)
 		):
 			_resolve(ball, "", host_time_msec)
 		else:
@@ -265,19 +376,32 @@ func _wall(position: Vector2, size: Vector2) -> StaticBody2D:
 	var shape := RectangleShape2D.new()
 	shape.size = size
 	var collider := CollisionShape2D.new()
+	collider.name = "CollisionShape2D"
 	collider.shape = shape
 	body.add_child(collider)
 	add_child(body)
 	return body
 
 
+func set_visible_top(value: float) -> void:
+	if not is_finite(value) or is_equal_approx(value, visible_top):
+		return
+	visible_top = value
+	if _snapshot != null:
+		for body: StaticBody2D in _walls:
+			_retire_body(body)
+		_walls.clear()
+		_build_walls()
+
+
 func _build_walls() -> void:
 	var size := _snapshot.paddle_layout.arena_size * WORLD_UNITS
+	var top := minf(0, visible_top - (_profile.spawn_height + 0.1) * WORLD_UNITS)
 	for horizontal: float in [-WALL_THICKNESS * 0.5, size.x + WALL_THICKNESS * 0.5]:
 		_walls.append(
 			_wall(
-				Vector2(horizontal, size.y * 0.5),
-				Vector2(WALL_THICKNESS, size.y + WALL_THICKNESS),
+				Vector2(horizontal, (size.y + top) * 0.5),
+				Vector2(WALL_THICKNESS, size.y - top + WALL_THICKNESS),
 			)
 		)
 
@@ -301,7 +425,7 @@ func _build_floor() -> void:
 
 
 func _floor_segment(left: float, right: float, height: float) -> void:
-	if right <= left:
+	if right - left <= TiltShiftBasketPreset.REFLECTION_TOLERANCE * WORLD_UNITS:
 		return
 	_floor.append(
 		_wall(
@@ -312,7 +436,7 @@ func _floor_segment(left: float, right: float, height: float) -> void:
 
 
 func _draw() -> void:
-	if _snapshot == null:
+	if _snapshot == null or not placeholder_visible:
 		return
 	var size := _snapshot.paddle_layout.arena_size * WORLD_UNITS
 	draw_rect(Rect2(Vector2.ZERO, size), Color("ede5d5"))

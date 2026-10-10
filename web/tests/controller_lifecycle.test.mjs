@@ -49,7 +49,11 @@ async function withController(
 ) {
   const elements = new Map();
   const el = (selector) => {
-    if (!elements.has(selector)) elements.set(selector, new Element());
+    if (!elements.has(selector)) {
+      const element = new Element();
+      element.querySelector = el;
+      elements.set(selector, element);
+    }
     return elements.get(selector);
   };
   const root = new Element();
@@ -114,6 +118,10 @@ async function withController(
     Image: class {
       complete = false;
       naturalWidth = 0;
+      addEventListener() {}
+    },
+    ResizeObserver: class {
+      observe() {}
     },
     requestAnimationFrame() {},
     addEventListener: window.addEventListener.bind(window),
@@ -124,6 +132,17 @@ async function withController(
         status: 503,
         statusText: "Service Unavailable",
         json: async () => {
+          if (path === "/tilt-shift/manifest.json")
+            return {
+              assets: Object.fromEntries(
+                ["orange", "blue", "neutral"].map((team) => [
+                  `paddles/paddle_${team}.png`,
+                  {
+                    visible_bounds_px: [10, 9, 663, 151],
+                  },
+                ]),
+              ),
+            };
           if (path !== "/session.json") return { resolution: [256, 256], clips: [] };
           if (failure === "json") throw new SyntaxError("Unexpected token < in JSON");
           return {

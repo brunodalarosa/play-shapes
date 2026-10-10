@@ -5,13 +5,13 @@ var profile: TiltShiftTuning
 var roster: int = 10
 var arena: TiltShiftArena
 var viewport: SubViewport
+var presentation: TiltShiftPresentation
 var _status: Label
 var _inputs: VBoxContainer
 var _angles: Dictionary = { }
 var _elapsed: float = 0.0
 var _sample_elapsed: float = 0.0
 var _timings := PackedInt32Array()
-var _camera: Camera2D
 var _players: Array[TiltShiftState.Player] = []
 
 
@@ -25,6 +25,7 @@ func _ready() -> void:
 	add_child(toolbar)
 	_button(toolbar, "Start / restart shift", restart)
 	_button(toolbar, "Stop / clear", stop)
+	_button(toolbar, "Force start", force_start)
 	_button(
 		toolbar,
 		"Next round",
@@ -38,21 +39,18 @@ func _ready() -> void:
 	var row := HSplitContainer.new()
 	row.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	add_child(row)
-	var frame := SubViewportContainer.new()
+	var frame := Control.new()
 	frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	frame.stretch = true
 	row.add_child(frame)
-	viewport = SubViewport.new()
-	viewport.size = Vector2i(800, 600)
-	viewport.world_2d = World2D.new()
-	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
-	frame.add_child(viewport)
-	arena = TiltShiftArena.new()
-	viewport.add_child(arena)
-	_camera = Camera2D.new()
-	viewport.add_child(_camera)
-	frame.resized.connect(_fit_camera)
+	presentation = TiltShiftPresentation.new()
+	frame.add_child(presentation)
+	arena = presentation.arena
+	viewport = presentation.viewport
+	presentation.force_start_requested.connect(
+		func(_token: String) -> void:
+			force_start(),
+	)
 	var scroll := ScrollContainer.new()
 	scroll.custom_minimum_size.x = 300
 	row.add_child(scroll)
@@ -72,15 +70,17 @@ func restart() -> bool:
 		var player := TiltShiftState.Player.new()
 		player.player_id = "designer_%d" % index
 		player.player_name = "Designer %d" % (index + 1)
+		player.character_color = String(CharacterSelection.COLORS[index % 10].hex)
 		player.seat = index + 1
 		_players.append(player)
-	var result := arena.start_shift(profile, _players)
+	var result := presentation.start_shift(profile, _players)
 	if not result.accepted:
 		_status.text = "Preview rejected: " + "\n".join(result.errors)
 		return false
 	_timings.clear()
+	arena.controller.round_prepared.connect(_round_prepared)
+	arena.controller.phase_changed.connect(_phase_changed)
 	_build_inputs()
-	_fit_camera()
 	return true
 
 
@@ -104,7 +104,7 @@ func set_angle(player_id: String, degrees: float) -> bool:
 		player_id,
 		deg_to_rad(degrees),
 		snapshot.round_token,
-		Time.get_ticks_msec(),
+		arena.clock.call(),
 	)
 	if result.accepted:
 		_angles[player_id] = degrees
@@ -112,6 +112,8 @@ func set_angle(player_id: String, degrees: float) -> bool:
 
 
 func _build_inputs() -> void:
+	if not is_inside_tree() or arena.controller == null:
+		return
 	for child: Node in _inputs.get_children():
 		_inputs.remove_child(child)
 		child.queue_free()
@@ -125,6 +127,27 @@ func _build_inputs() -> void:
 		]
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_inputs.add_child(label)
+		var ready_row := HBoxContainer.new()
+		_inputs.add_child(ready_row)
+		if player.selected:
+			_button(
+				ready_row,
+				"READY",
+				func() -> void:
+					set_ready(player.player_id, true),
+			)
+			_button(
+				ready_row,
+				"CANCEL",
+				func() -> void:
+					set_ready(player.player_id, false),
+			)
+		_button(
+			ready_row,
+			"Recalibrate",
+			func() -> void:
+				recalibrate(player.player_id),
+		)
 		var angle := SpinBox.new()
 		angle.min_value = -360
 		angle.max_value = 360
@@ -152,15 +175,6 @@ func _build_inputs() -> void:
 			func() -> void:
 				angle.value += 360,
 		)
-
-
-func _fit_camera() -> void:
-	if profile == null or not is_instance_valid(viewport):
-		return
-	var extent := profile.paddle_layout.arena_size * TiltShiftArena.WORLD_UNITS
-	_camera.position = extent * 0.5 + Vector2(0, 15)
-	var zoom := minf(viewport.size.x / (extent.x + 40), viewport.size.y / (extent.y + 60))
-	_camera.zoom = Vector2.ONE * zoom
 
 
 func _process(delta: float) -> void:
@@ -211,3 +225,45 @@ func _button(parent: Node, title: String, action: Callable) -> void:
 	button.text = title
 	parent.add_child(button)
 	button.pressed.connect(action)
+
+
+func _round_prepared(_state: TiltShiftState.Snapshot) -> void:
+	_build_inputs.call_deferred()
+
+
+func _phase_changed(_state: TiltShiftState.Snapshot) -> void:
+	_build_inputs.call_deferred()
+
+
+func set_ready(player_id: String, value: bool) -> bool:
+	if arena.controller == null:
+		return false
+	var state := arena.controller.snapshot()
+	arena.controller.set_motion_usable(player_id, true)
+	var result := arena.controller.set_ready(
+		player_id,
+		value,
+		state.round_token,
+		arena.clock.call(),
+	)
+	return result.accepted
+
+
+func force_start() -> bool:
+	if arena.controller == null:
+		return false
+	var token := arena.controller.snapshot().round_token
+	var result := arena.controller.force_start(token, arena.clock.call())
+	return result.accepted
+
+
+func recalibrate(player_id: String) -> bool:
+	if arena.controller == null:
+		return false
+	var state := arena.controller.snapshot()
+	if state.phase not in [&"preparing", &"countdown", &"start", &"between_rounds"]:
+		return false
+	arena.controller.invalidate_ready(player_id)
+	if state.phase != &"between_rounds":
+		set_angle(player_id, 0)
+	return true

@@ -70,8 +70,15 @@ arena adds falling/colliding balls, full-turn paddles, basket catches and seeded
 Calibrated multiplayer motion has its host consumer and reusable browser stream, with
 per-player neutral, continuous turns, bounded comparison, reconnect policy and lifecycle.
 The editor workshop provides snapped content editing, geometry guides, named saves and
-actual gameplay preview. Readiness/phone presentation, production presentation and lobby
-launch remain outside this foundation. Real-phone accuracy and feel await owner trials.
+actual gameplay preview.
+
+The catalog now connects motion preparation and host-validated readiness to the factory,
+mapped rounds, cumulative results and return to the lobby.
+The default rounds alternate two authored layouts with fair participant selection,
+selected-player readiness, countdown and automatic neutral rotation. The workshop exposes
+runtime settings through a Tunables tab. Selected phones show one paddle; spectators wait.
+Audio remains deferred; real-phone
+accuracy, permission, comfort and owner readability/feel await trials.
 See [the rules contract](../minigames/003_tilt_shift/README.md).
 
 ## Backlog

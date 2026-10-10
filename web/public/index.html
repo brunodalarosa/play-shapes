@@ -138,6 +138,17 @@
         <p>Developer diagnostics. Move this phone and watch the host preview.</p>
         <pre id="motion-readings" aria-label="Live sensor diagnostics"></pre>
       </section>
+      <section id="tilt-shift" aria-label="Tilt Shift movement guide" hidden>
+        <canvas id="tilt-paddle" aria-label="Your team paddle follows accepted tilt"></canvas>
+        <div id="tilt-actions" hidden>
+          <span class="tilt-phone-icon" aria-label="Hold your phone sideways">↻</span>
+          <p id="tilt-orientation" role="status" hidden></p>
+          <p id="tilt-state" role="status" hidden></p>
+          <button id="tilt-permission" type="button">ENABLE TILT</button>
+          <button id="tilt-calibrate" type="button">SET NEUTRAL</button>
+          <button id="tilt-ready" type="button" aria-pressed="false">READY</button>
+        </div>
+      </section>
       <noscript>Enable JavaScript to connect to the game.</noscript>
       <p class="footnote">Keep this page open while you play.</p>
     </main>

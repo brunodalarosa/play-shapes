@@ -17,6 +17,7 @@ var _locked: bool = false
 var _token: String = ""
 var _playing: bool = false
 var _new_round: bool = false
+var _profile: TiltShiftMotionTuning
 
 
 func prepare(
@@ -30,6 +31,7 @@ func prepare(
 	if not service.begin_multiplayer_motion(player_ids):
 		return false
 	_service = service
+	_profile = selected.duplicate() as TiltShiftMotionTuning
 	_service.motion_session_ended.connect(_on_session_ended)
 	for player_id: String in player_ids:
 		var channel := service.motion_channels[player_id]
@@ -41,20 +43,58 @@ func prepare(
 	return true
 
 
+func sync_roster(player_ids: PackedStringArray) -> void:
+	if _locked or _service == null:
+		return
+	for player_id: String in inputs.keys():
+		if player_id in player_ids:
+			continue
+		_channels[player_id].calibration_requested.disconnect(_callbacks[player_id])
+		_service.remove_multiplayer_motion(player_id)
+		inputs.erase(player_id)
+		_channels.erase(player_id)
+		_callbacks.erase(player_id)
+		_states.erase(player_id)
+		_feedback_at.erase(player_id)
+		_generations.erase(player_id)
+	for player_id: String in player_ids:
+		if inputs.has(player_id):
+			continue
+		var channel := _service.add_multiplayer_motion(player_id)
+		if channel == null:
+			continue
+		_channels[player_id] = channel
+		inputs[player_id] = TiltShiftTiltInput.new(_profile)
+		var callback := _calibrate.bind(player_id)
+		_callbacks[player_id] = callback
+		channel.calibration_requested.connect(callback)
+
+
+func reset_preparation(player_id: String) -> void:
+	if not _locked and inputs.has(player_id):
+		inputs[player_id] = TiltShiftTiltInput.new(_profile)
+		_states.erase(player_id)
+
+
 func activate(arena: TiltShiftArena) -> bool:
 	if _locked or inputs.is_empty() or arena == null or arena.controller == null:
 		return false
 	var snapshot := arena.controller.snapshot()
-	if snapshot.phase != &"active" or snapshot.players.size() != inputs.size():
+	if snapshot.phase not in [&"active", &"preparing", &"countdown", &"start"] \
+			or snapshot.players.size() != inputs.size():
 		return false
 	for player: TiltShiftState.Player in snapshot.players:
-		if not inputs.has(player.player_id) or not ready_for(player.player_id):
+		if (
+			not inputs.has(player.player_id)
+			or (not snapshot.reworked and not ready_for(player.player_id))
+		):
 			return false
 	_arena = arena
 	_locked = true
 	_arena.stopped.connect(stop)
 	_arena.tree_exiting.connect(stop)
 	_arena.controller.shift_finished.connect(_on_finished)
+	_arena.controller.round_prepared.connect(_on_started)
 	_arena.controller.round_started.connect(_on_started)
 	_arena.controller.round_ended.connect(_on_ended)
 	_on_started(snapshot)
@@ -63,7 +103,10 @@ func activate(arena: TiltShiftArena) -> bool:
 
 func ready_for(player_id: String) -> bool:
 	var state := player_state(player_id)
-	return bool(state.get("calibrated", false)) and bool(state.get("usable", false))
+	return (
+		bool(state.get("calibrated", false)) and bool(state.get("usable", false))
+		and bool(state.get("landscape", false))
+	)
 
 
 func player_state(player_id: String) -> Dictionary:
@@ -75,12 +118,21 @@ func player_state(player_id: String) -> Dictionary:
 func _calibrate(now: int, player_id: String) -> void:
 	if not inputs.has(player_id):
 		return
-	var accepted := not _locked and inputs[player_id].calibrate(_channels[player_id], now)
+	var permitted := not _locked
+	if _locked and is_instance_valid(_arena) and _arena.controller != null:
+		var snapshot := _arena.controller.snapshot()
+		permitted = (
+			snapshot.reworked
+			and snapshot.phase in [&"preparing", &"countdown", &"start", &"between_rounds"]
+		)
+		if permitted:
+			_arena.controller.invalidate_ready(player_id)
+	var accepted := permitted and inputs[player_id].calibrate(_channels[player_id], now)
 	var result := player_state(player_id)
 	result.accepted = accepted
 	result.reason = (
 		"active_calibration_locked"
-		if _locked
+		if not permitted
 		else ("calibrated" if accepted else result.capture_state)
 	)
 	_publish(player_id, result, true)
@@ -100,6 +152,7 @@ func poll() -> void:
 			return
 	var new_round := _new_round
 	_new_round = false
+	var changed := PackedStringArray()
 	for player_id: String in inputs.keys():
 		var updated := inputs[player_id].update(_channels[player_id], now)
 		var state := player_state(player_id)
@@ -110,7 +163,13 @@ func poll() -> void:
 			_publish(player_id, state)
 			if _service == null:
 				return
-		if _playing and (updated or new_round):
+		if _locked:
+			_arena.controller.set_motion_usable(player_id, ready_for(player_id))
+		if updated or new_round:
+			changed.append(player_id)
+	# Angle acceptance can advance the countdown; first refresh every phone's readiness.
+	if _playing:
+		for player_id: String in changed:
 			_arena.controller.accept_angle(player_id, inputs[player_id].angle_radians, _token, now)
 			if _service == null:
 				return
@@ -161,6 +220,8 @@ func stop() -> void:
 			var finish := _arena.controller.shift_finished
 			if finish.is_connected(_on_finished):
 				finish.disconnect(_on_finished)
+			if _arena.controller.round_prepared.is_connected(_on_started):
+				_arena.controller.round_prepared.disconnect(_on_started)
 			if _arena.controller.round_started.is_connected(_on_started):
 				_arena.controller.round_started.disconnect(_on_started)
 			if _arena.controller.round_ended.is_connected(_on_ended):

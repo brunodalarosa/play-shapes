@@ -131,7 +131,7 @@ func _test_rejections_and_seeds() -> void:
 		seeded.start_shift(TiltShiftFixtures.players(10), 0)
 		var value := ""
 		for player: TiltShiftState.Player in seeded.snapshot().players:
-			value += "%s:%d:%s;" % [player.player_id, player.team, player.paddle_ids[0]]
+			value += "%s:%d:%s;" % [player.player_id, player.team, ",".join(player.paddle_ids)]
 		signatures.append(value)
 	check(
 		signatures[0] == signatures[1],

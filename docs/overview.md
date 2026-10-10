@@ -9,13 +9,18 @@ repository.
   JavaScript clients over local HTTP and WebSockets.
 - The lobby opens a shared ready screen for **Bubbles and Jellyfishes** with 2–10 registered
   players. Bubbles starts after every current participant is ready.
+- **Tilt Shift** supports 2/4/6/8/10 players. Each phone enables motion, sets a comfortable
+  landscape neutral and confirms READY on the shared Pre-minigame screen before launch.
+  One team paddle on each phone mirrors
+  the host's accepted angle throughout the factory rounds.
 - Registered players appear as Squircle v1 characters in the Playground lobby. Each steers
   their character from a portrait phone stick and a release-action button. Near-vertical input
   reaches or crouches, and FALL descends Open supports.
 - Squircle v1 is also the character in Minigame 002 and in phone setup.
 - F12 opens the debug menu: a one-real-player Bubbles scenario, the Squircle Animation Lab,
-  and the Gyroscope and Accelerometer Lab. It creates no simulated player. Bubbles labels its
-  debug round on the host and the phone.
+  the Gyroscope and Accelerometer Lab, and a Tilt Shift factory with explicitly simulated
+  controls. The factory review creates ten synthetic operators without registering phones.
+  Bubbles labels its debug round on the host and the phone.
 - The host defaults to a responsive 1920×1080 GL Compatibility presentation.
 - **Project > Tools > Build Standalone Host** creates a portable Windows x86_64 release ZIP.
   There is no Linux build.
@@ -60,8 +65,8 @@ type the displayed URL, on a phone on the same LAN.
 ## Starting a round
 
 - Normal play starts with 2–10 registered players. Choose a minigame from the lobby dropdown
-  before starting.
+  before starting. Tilt Shift requires an even roster and calibrated motion from everyone.
 - For debug, register exactly one phone, press F12, and choose the matching one-player
-  scenario.
+  Bubbles scenario. The separately labeled Tilt Shift factory review needs no phones.
 - Restart and lobby return preserve the running `SessionHost`, the player registry and the
   LAN services.

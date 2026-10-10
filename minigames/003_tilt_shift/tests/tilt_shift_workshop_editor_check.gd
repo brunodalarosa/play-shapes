@@ -56,6 +56,24 @@ func _run() -> void:
 		get_tree().quit(0 if _failures == 0 else 1)
 		return
 	await get_tree().create_timer(0.5).timeout
+	var gravity: SpinBox = _panel.tunables.find_child("gravity", true, false)
+	var ready_timeout: SpinBox = _panel.tunables.find_child("readiness_seconds", true, false)
+	_require(
+		gravity != null and ready_timeout != null and not gravity.tooltip_text.is_empty(),
+		"Tunables tab exposes physics, readiness and their runtime field explanations",
+	)
+	gravity.value = 0.25
+	_require(
+		is_equal_approx(_panel.model.profile.physics.gravity, 0.25),
+		"Tunables edits update the same profile used by preview and save",
+	)
+	(_panel.tunables.get_parent().get_parent() as TabContainer).current_tab = 1
+	await _capture("tunables.png")
+	(_panel.tunables.get_parent().get_parent() as TabContainer).current_tab = 0
+	_panel.model.undo()
+	_panel._rebuild_settings()
+	await get_tree().process_frame
+	await get_tree().process_frame
 	var canvas := _panel.canvas
 	var original := _panel.model.profile.paddle_layout.paddles[0].position
 	var start := canvas.to_screen(original) + canvas.global_position
@@ -71,14 +89,19 @@ func _run() -> void:
 	_panel.canvas.mode = "basket"
 	_panel._rebuild_settings()
 	await get_tree().process_frame
-	start = canvas.to_screen(Vector2(0.16, _panel.model.profile.paddle_layout.arena_size.y))
+	start = canvas.to_screen(
+		Vector2(
+			_panel.model.basket().openings[0].center,
+			_panel.model.profile.paddle_layout.arena_size.y,
+		),
+	)
 	start += canvas.global_position + Vector2(0, 12)
-	end = canvas.to_screen(Vector2(0.20, _panel.model.profile.paddle_layout.arena_size.y))
+	end = canvas.to_screen(Vector2(0.14, _panel.model.profile.paddle_layout.arena_size.y))
 	end += canvas.global_position + Vector2(0, 12)
 	await _drag(start, end)
 	_require(
-		is_equal_approx(_panel.model.basket().openings[0].center, 0.20)
-		and is_equal_approx(_panel.model.basket().openings[4].center, 0.80),
+		is_equal_approx(_panel.model.basket().openings[0].center, 0.14)
+		and is_equal_approx(_panel.model.basket().openings[4].center, 0.86),
 		"Editor dragging retains the stable reflected basket pair",
 	)
 	_panel.model.begin_edit()

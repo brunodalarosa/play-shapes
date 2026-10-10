@@ -160,6 +160,9 @@ for clip in args.clips:
             record['sequence'].append({'frame': frame, 'time_seconds': (frame-1)/24,
                                        'colorable': base_path.as_posix(), 'face_mask': mask_path.as_posix(),
                                        'face_corners_px': corners, 'feet': feet})
+            if clip == 'lever_pull':
+                wrist = bpy.data.objects[CONTROLS['Hand.R']].matrix_world.translation
+                record['sequence'][-1]['hand_center_px'] = project(wrist)
             print(f'SQUIRCLE_FRAME {clip} {view} {frame}/{spec["frames"]}', flush=True)
         manifest['clips'].append(record)
         (out/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n', encoding='utf-8')

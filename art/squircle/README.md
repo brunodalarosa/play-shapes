@@ -1,8 +1,8 @@
 # Squircle canonical source
 
 `squircle-animated.blend` is the current editable Squircle v1 model and saved
-idle/walk/run and look-up/crouch source. This folder contains current authoring, export and review
-resources. Temporary variants and version comparisons belong in ignored
+idle/walk/run, look-up/crouch and lever-pull source. This folder contains current authoring,
+export and review resources. Temporary variants and version comparisons belong in ignored
 `scratch/` or `comparisons/`; do not commit them.
 
 The shared game assets live in `assets/runtime/animated_characters/squircle/v1/`.
@@ -18,11 +18,12 @@ The export scripts find the scene, the actions and the face images by name, so a
 rename there needs the same change in the scripts:
 
 - Scene: `Squircle Animation Studio`.
-- Select `Animation.Controls`; choose `Squircle | Idle`, `Squircle | Walk` or
-  `Squircle | Run`, or `Squircle | Look Up` / `Squircle | Crouch` in Dope Sheet > Action Editor.
-- Timeline ends: 48, 24 or 16, all at 24 fps. Space plays; Numpad 0 shows the camera.
+- Select `Animation.Controls`; choose `Squircle | Idle`, `Squircle | Walk`,
+  `Squircle | Run`, `Squircle | Look Up`, `Squircle | Crouch` or `Squircle | Lever Pull`
+  in Dope Sheet > Action Editor.
+- Timeline ends: 48, 24, 16 or 9, all at 24 fps. Space plays; Numpad 0 shows the camera.
 - Pose Mode edits the five independent body/hand/foot controls. The face follows
-  the body. All actions have fake users and linear interpolation. Locomotion has
+  the body. All actions have fake users and linear interpolation. Looping motion has
   cyclic modifiers; key N+1 repeats key 1 and is never exported. Held stances have
   constant extrapolation and no cycles: frames 1–9 enter, frame 9 sustains, and
   reverse playback releases. Feet stay identical to idle frame 1 throughout.
@@ -44,6 +45,21 @@ property `Hand diameter m`. Save and regenerate the complete export below.
 | Run | 1–16 | 2/3 s | 3.60 m/s | 37.5% stance, flight and opposing hand swing |
 | Look up | 1–9 | 1/3 s entry/release, indefinite hold | 0 | Both soles planted |
 | Crouch | 1–9 | 1/3 s entry/release, indefinite hold | 0 | Both soles planted |
+| Lever pull | 1–24 | 1 s loop | 0 | Both soles planted |
+
+### Lever pull
+
+`Squircle | Lever Pull` moves only `Hand.R`: frame 1 is idle, frame 5 reaches forward
+and up, frame 13 pulls down, frame 21 returns up, and frame 25 repeats frame 1.
+Only frames 1–24 are exported. Smoothstep-spaced linear keys ease each movement;
+cyclic modifiers make the source loop. Body, left hand and feet stay at idle frame 1.
+
+The reached wrist center is (1.68, −0.65, 1.95) m and the pulled center is
+(1.68, −0.65, 1.10) m. Edit `Hand.R` in Pose Mode to tune travel and keep frame 25
+identical to frame 1. Scene properties prefixed `Lever` record timing and travel.
+The manifest exposes `lever_pull` as ordinary looping playback in both existing
+views. F12 > Animation Lab > Action > Lever Pull plays it with tint and natural blinking.
+Station contact and game-state binding are separate from this standalone gesture.
 
 ### Held-pose tuning and playback
 
@@ -86,7 +102,7 @@ Run from this folder, using Blender and Python with Pillow/NumPy:
 `export/` holds the raw colorable/mask sequences, expressions and frame manifest.
 `make_previews.py` packs sheets, independent neutral/blink faces, motion loops,
 palette and layer reviews, and `review-data.js`. `sync_runtime.py` checks the saved
-source hash and complete action/view frame sequences, then copies the 30 current
+source hash and complete action/view frame sequences, then copies the 36 current
 runtime sheets and writes the runtime manifest and `runtime-sync.json`.
 Packing and synchronization replace generated images atomically, so a failed
 write leaves the previous asset intact and Windows preview readers can stay open.
@@ -142,6 +158,11 @@ three-quarter (128, 203.292557). Forward is -Y; root travel is
 `-speed × elapsed_seconds` along Y. The optional shadow catcher is disabled;
 game scenes supply ground shadows. Sheets have eight columns in row-major order;
 blank trailing cells are never animation frames.
+
+Lever Pull additionally exports each right wrist's projected `hand_center_px` in the
+same tile coordinates. Runtime clips publish the ordered `hand_centers_px` array.
+Factory operators use these points for cosmetic grip contact while seeking existing
+frames; this metadata adds no new render or alternate character library.
 
 Colorable layers include body, hands, feet, shading and self-occlusion with the face
 hidden. Display-space blue-basis tint preserves highlights across all five parts.

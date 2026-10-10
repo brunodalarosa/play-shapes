@@ -222,11 +222,31 @@ def build():
         "assets": entries,
     }
     (ART / "import_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    runtime_metadata(manifest)
     print(f"TILT_SHIFT_ART_BUILT: {len(entries)} textures")
+
+
+def runtime_metadata(manifest=None):
+    """Publish only geometry needed by runtime consumers, without source paths."""
+    if manifest is None:
+        manifest = json.loads((ART / "import_manifest.json").read_text(encoding="utf-8"))
+    data = presentation_metadata(manifest)
+    (RUNTIME / "manifest.json").write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def presentation_metadata(manifest):
+    keys = ("size", "visible_bounds_px", "pivot_px", "anchors_px",
+            "horizontal_cap_margins_px", "front_overlay_offset_px")
+    assets = {entry["path"]: {key: entry[key] for key in keys if key in entry}
+              for entry in manifest["assets"]}
+    return {"schema": "play-shapes.tilt-shift-presentation.v1", "assets": assets,
+            "basket_mouth_px": [76, 352, 169], "basket_canvas_region_x": [8, 420]}
 
 
 def check():
     manifest = json.loads((ART / "import_manifest.json").read_text(encoding="utf-8"))
+    runtime = json.loads((RUNTIME / "manifest.json").read_text(encoding="utf-8"))
+    assert runtime == presentation_metadata(manifest), "Runtime art geometry is stale"
     expected = {entry["path"] for entry in manifest["assets"]}
     actual = {path.relative_to(RUNTIME).as_posix() for path in RUNTIME.rglob("*.png")}
     assert actual == expected, "Runtime inventory differs from the manifest"
@@ -319,6 +339,7 @@ def review():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=["build", "imports", "check", "review"])
+    parser.add_argument("command", choices=["build", "imports", "check", "review", "metadata"])
     args = parser.parse_args()
-    {"build": build, "imports": imports, "check": check, "review": review}[args.command]()
+    {"build": build, "imports": imports, "check": check, "review": review,
+     "metadata": runtime_metadata}[args.command]()

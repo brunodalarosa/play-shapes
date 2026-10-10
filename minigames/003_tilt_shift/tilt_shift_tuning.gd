@@ -22,21 +22,49 @@ var round_duration_seconds: float = 45.0:
 		neighbor_distance = clampf(value, 0.01, 2.0)
 
 @export_group("Selected content")
+@export var flow: TiltShiftFlowTuning = preload("res://minigames/003_tilt_shift/tuning/Flow.tres")
 ## Selected calibrated phone control profile. Frozen by the motion consumer at preparation.
-@export
-var motion: TiltShiftMotionTuning = preload("res://minigames/003_tilt_shift/tuning/Motion.tres")
+@export var motion: TiltShiftMotionTuning = preload(
+	"res://minigames/003_tilt_shift/tuning/Motion.tres"
+)
 ## Selected arena physics and delivery profile, frozen with the rules at launch.
 @export var physics: TiltShiftPhysicsTuning = preload(
 	"res://minigames/003_tilt_shift/tuning/Physics.tres"
 )
-## One ten-paddle layout for the entire shift. Positions and teams stay fixed between rounds.
+## Compatibility layout for profiles without a numbered layout map.
 @export var paddle_layout: TiltShiftPaddleLayout
+## Array entry zero selects round one. Empty maps load older single-layout profiles.
+@export var layouts_by_round: Array[TiltShiftPaddleLayout] = []
+## Factory settings frozen with gameplay and editable in the workshop.
+@export var presentation: TiltShiftPresentationTuning = preload(
+	"res://minigames/003_tilt_shift/tuning/Presentation.tres"
+)
 ## Array entry zero selects round one. Exactly round_count valid mirrored presets are required.
 @export var baskets_by_round: Array[TiltShiftBasketPreset] = []
 
 
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
+	if presentation == null:
+		errors.append("Tilt Shift: select a presentation profile.")
+	else:
+		errors.append_array(presentation.validation_errors())
+	if not layouts_by_round.is_empty():
+		if layouts_by_round.size() != round_count:
+			errors.append("Tilt Shift: map exactly one paddle layout per round.")
+		var identities: Dictionary[String, TiltShiftPaddleLayout] = { }
+		for layout: TiltShiftPaddleLayout in layouts_by_round:
+			if layout == null:
+				errors.append("Tilt Shift: replace a missing round layout.")
+				continue
+			errors.append_array(layout.validation_errors())
+			if identities.has(layout.layout_id) and identities[layout.layout_id] != layout:
+				errors.append("Tilt Shift: distinct layouts need distinct exposure identities.")
+			identities[layout.layout_id] = layout
+	if flow == null:
+		errors.append("Tilt Shift: select a flow profile.")
+	else:
+		errors.append_array(flow.validation_errors())
 	if motion == null:
 		errors.append("Tilt Shift: select a motion control profile.")
 	else:
@@ -48,7 +76,9 @@ func validation_errors() -> PackedStringArray:
 	else:
 		errors.append_array(physics.validation_errors())
 		if errors.is_empty():
-			var duration := roundi(round_duration_seconds * 1000.0)
+			var duration := roundi(
+				(round_duration_seconds - physics.delivery_cutoff_seconds) * 1000.0
+			)
 			var deliveries := TiltShiftDelivery.schedule(
 				physics.ball_count,
 				physics.delivery_curve,
@@ -58,13 +88,25 @@ func validation_errors() -> PackedStringArray:
 				errors.append(
 					"Tilt Shift delivery: curve cannot fit deliveries before the deadline."
 				)
-		if paddle_layout != null and paddle_layout.arena_size.is_finite():
-			var half_width := paddle_layout.arena_size.x * 0.5
-			if physics.spawn_half_width + physics.ball_radius > half_width:
-				errors.append("Tilt Shift delivery: symmetric spawn bounds must clear both walls.")
-	if paddle_layout == null:
+			var negative := TiltShiftDelivery.schedule(
+				physics.negative_ball_count,
+				physics.negative_delivery_curve,
+				roundi(round_duration_seconds * 1000.0),
+				true,
+			)
+			if negative.size() != physics.negative_ball_count:
+				errors.append("Tilt Shift negative delivery: curve cannot fit before the deadline.")
+		for index: int in round_count:
+			var layout := layout_for(index)
+			if layout != null and layout.arena_size.is_finite():
+				var half_width := layout.arena_size.x * 0.5
+				if physics.spawn_half_width + physics.ball_radius > half_width:
+					errors.append(
+						"Tilt Shift delivery: symmetric spawn bounds must clear both walls."
+					)
+	if paddle_layout == null and layouts_by_round.is_empty():
 		errors.append("Tilt Shift: select a paddle layout.")
-	else:
+	elif layouts_by_round.is_empty():
 		errors.append_array(paddle_layout.validation_errors())
 	if baskets_by_round.size() != round_count:
 		errors.append(
@@ -78,9 +120,10 @@ func validation_errors() -> PackedStringArray:
 			continue
 		for error: String in basket.validation_errors():
 			errors.append("Tilt Shift round %d: %s" % [index + 1, error])
+		var layout := layout_for(index)
 		if (
-			paddle_layout != null
-			and absf(basket.arena_width - paddle_layout.arena_size.x) \
+			layout != null
+			and absf(basket.arena_width - layout.arena_size.x) \
 					> TiltShiftBasketPreset.REFLECTION_TOLERANCE
 		):
 			errors.append(
@@ -88,3 +131,9 @@ func validation_errors() -> PackedStringArray:
 				% (index + 1)
 			)
 	return errors
+
+
+func layout_for(index: int) -> TiltShiftPaddleLayout:
+	if layouts_by_round.is_empty():
+		return paddle_layout
+	return layouts_by_round[index] if index >= 0 and index < layouts_by_round.size() else null

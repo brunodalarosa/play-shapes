@@ -43,7 +43,7 @@ func validation_errors() -> PackedStringArray:
 			if (
 				other != null
 				and absf(opening.center - other.center) \
-						< (opening.width + other.width) * 0.5
+						< (opening.width + other.width) * 0.5 - REFLECTION_TOLERANCE
 			):
 				errors.append(
 					"%s: baskets %s and %s overlap."

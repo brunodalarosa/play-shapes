@@ -51,6 +51,12 @@ rectangles, trimming, paste offsets, contact points, pivots and output hashes.
 The check rebuilds pixels in memory, compares them with the committed textures,
 checks visible RGB against the masters, and verifies the Godot import settings.
 
+`build` also publishes source-free geometry to the runtime `manifest.json`. Run
+`python tools/assets/prepare_tilt_shift_art.py metadata` to refresh geometry without
+re-extracting images. The check verifies both manifests agree. Runtime calibration
+defines the basket inner mouth at x=76..352, y=169 and the shared layer region x=8..420;
+both front and back use one horizontal transform when fitted to scoring openings.
+
 ## Preview and verification
 
 ```powershell
@@ -80,5 +86,5 @@ the absolute PCK and import-manifest paths. This isolates the pack from the
 checkout so missing exported textures cannot be loaded from source files.
 
 The helper checks every import remap, packed texture and loaded dimensions,
-and rejects source masters in the pack. Pack inspection is automated evidence;
+and runtime geometry, and rejects source masters in the pack. Pack inspection is automated evidence;
 an exported Windows package still needs to run before claiming build evidence.

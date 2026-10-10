@@ -12,6 +12,8 @@ class Player:
 	var seat: int = 1
 	var team: int = -1
 	var connected: bool = true
+	var ready: bool = false
+	var selected: bool = false
 	var angle_radians: float = 0.0
 	var paddle_ids := PackedStringArray()
 
@@ -57,6 +59,11 @@ class Snapshot:
 	var paddle_layout: TiltShiftPaddleLayout
 	var basket_preset: TiltShiftBasketPreset
 	var physics: TiltShiftPhysicsTuning
+	var panel_visible: bool = false
+	var phase_started_msec: int = -1
+	var phase_deadline_msec: int = -1
+	var auto_direction: float = 1.0
+	var reworked: bool = false
 
 
 class Result:
@@ -82,6 +89,8 @@ static func copy_player(source: Player) -> Player:
 	result.seat = source.seat
 	result.team = source.team
 	result.connected = source.connected
+	result.ready = source.ready
+	result.selected = source.selected
 	result.angle_radians = source.angle_radians
 	result.paddle_ids = source.paddle_ids.duplicate()
 	return result

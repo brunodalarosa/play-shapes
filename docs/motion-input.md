@@ -50,11 +50,13 @@ Feedback and stop messages match their subscription generation.
 
 `TiltShiftMotionController.prepare(service, ids, profile)` starts capture and fresh
 per-player calibration state. `player_state(id)` exposes `capture_state`, `usable` and
-`calibrated`; `ready_for(id)` requires both usable capture and completed calibration.
-The readiness screen and its permission/calibration buttons are separate integration work.
+`calibrated` and `landscape`; `ready_for(id)` requires usable capture, completed calibration
+and a landscape display orientation. Portrait does not change the physical tilt calculation.
 
-After the actual arena starts, `activate(arena)` verifies its roster and requires each
-player to be ready. The consumer freezes neutral through the shift, including intermissions.
+After the actual arena starts, `activate(arena)` verifies its roster. Older single-layout
+profiles require every player to be ready before attachment. Mapped profiles allow capture
+and calibration inside round preparation. The consumer preserves neutral through the shift,
+including intermissions, unless the player deliberately recalibrates before active scoring.
 It sends host-owned unwrapped angles through the rules controller; all assigned paddles
 receive the same target. The existing physical limiter determines their confirmed poses.
 
@@ -78,6 +80,26 @@ accuracy and comfortable off-axis motion remain pending human trials.
 channels, listeners and calibration. A later preparation starts fresh. The consumer emits
 state-change feedback at most five times/s, plus calibration replies limited to five/s;
 a new subscription receives fresh feedback. No per-frame angle snapshots are added.
+
+## Tilt Shift preparation lifecycle
+
+The normal catalog flow uses TiltShiftSession to keep the same motion consumer across
+the shared all-player Pre-minigame screen to factory transition. Final joins from existing onboarding sockets
+receive new isolated channels without resetting earlier players. Expired preparation
+participants lose their channels. READY is revoked when capture becomes stale, unusable or portrait.
+
+Mapped-round resume clears readiness and keeps neutral and ownership. Calibration is
+allowed before/between active rounds and clears READY. Active play locks calibration.
+
+After the shared screen, when the first round skips its participant panel and READY, the phone session waits
+in preparation until every selected player is connected with fresh calibrated input. This
+initial calibration wait has no timeout; permission and CALIBRATE remain available until
+the complete countdown starts. Later rounds reuse calibration and retain their panel rules.
+
+Older shared-gate preparation retains its original neutral-reset policy.
+Host cancel, scene startup failure, results, debug replacement and return to the lobby retire
+the prepared consumer. The F12 factory review is explicitly simulated and creates no motion
+subscriptions. See [flow tuning](../minigames/003_tilt_shift/tuning/FLOW.md).
 
 ## Units and axes
 

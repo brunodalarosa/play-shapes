@@ -156,6 +156,91 @@ var PwaOnboarding = class {
   }
 };
 
+// build/screen_wake_lock.js
+function bindScreenWakeLock(page = document, target = window, wakeLock = navigator.wakeLock) {
+  let sentinel;
+  let pending = false;
+  let retry2 = false;
+  let suspended = false;
+  let stopped2 = false;
+  let generation = 0;
+  const visible = () => !stopped2 && !suspended && page.visibilityState === "visible";
+  const release = (lock) => {
+    if (lock && !lock.released)
+      void lock.release().catch(() => {
+      });
+  };
+  const request = async () => {
+    if (!wakeLock || !visible() || sentinel)
+      return;
+    if (pending) {
+      retry2 = true;
+      return;
+    }
+    pending = true;
+    const requestedGeneration = generation;
+    try {
+      const lock = await wakeLock.request("screen");
+      if (!visible() || requestedGeneration !== generation) {
+        release(lock);
+        return;
+      }
+      if (lock.released)
+        return;
+      sentinel = lock;
+      lock.addEventListener("release", () => {
+        if (sentinel === lock)
+          sentinel = void 0;
+      });
+    } catch {
+    } finally {
+      pending = false;
+      if (retry2) {
+        retry2 = false;
+        void request();
+      }
+    }
+  };
+  const retire = () => {
+    generation++;
+    retry2 = false;
+    release(sentinel);
+    sentinel = void 0;
+  };
+  const visibility = () => {
+    if (visible())
+      void request();
+    else
+      retire();
+  };
+  const hide = () => {
+    suspended = true;
+    retire();
+  };
+  const show = () => {
+    suspended = false;
+    void request();
+  };
+  const interact = () => {
+    void request();
+  };
+  page.addEventListener("visibilitychange", visibility);
+  page.addEventListener("pointerdown", interact);
+  page.addEventListener("keydown", interact);
+  target.addEventListener("pagehide", hide);
+  target.addEventListener("pageshow", show);
+  void request();
+  return () => {
+    stopped2 = true;
+    retire();
+    page.removeEventListener("visibilitychange", visibility);
+    page.removeEventListener("pointerdown", interact);
+    page.removeEventListener("keydown", interact);
+    target.removeEventListener("pagehide", hide);
+    target.removeEventListener("pageshow", show);
+  };
+}
+
 // build/motion_input.js
 var SENSOR_STALE_MSEC = 1e3;
 var numberOrNull = (value) => typeof value === "number" && Number.isFinite(value) ? value : null;
@@ -409,13 +494,13 @@ var MotionStream = class {
       this.input.suspend();
     this.tick();
   }
-  requestCalibration() {
-    return this.send({ type: "motion_calibrate" });
+  requestCalibration(context) {
+    return this.send({ type: "motion_calibrate", ...context });
   }
   feedback(subscriptionId, state) {
     if (subscriptionId !== this.subscription?.subscription_id)
       return false;
-    if (typeof state?.calibrated !== "boolean" || typeof state.usable !== "boolean" || typeof state.capture_state !== "string")
+    if (typeof state?.calibrated !== "boolean" || typeof state.usable !== "boolean" || state.landscape !== void 0 && typeof state.landscape !== "boolean" || typeof state.capture_state !== "string")
       return false;
     this.controlState = { ...state };
     this.onControlState?.({ ...state });
@@ -521,6 +606,228 @@ function formatSample(sample) {
     "null = unavailable"
   ].join("\n");
 }
+
+// build/003_tilt_shift/tilt_shift_phone.js
+function validTiltSnapshot(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  const v2 = value;
+  return v2.type === "tilt_shift_snapshot" && typeof v2.generation === "string" && v2.generation.length > 0 && v2.generation.length <= 64 && Number.isSafeInteger(v2.sequence) && v2.sequence >= 0 && ["preparing", "countdown", "start", "active", "between_rounds", "finished"].includes(v2.phase) && Number.isInteger(v2.round) && v2.round >= 1 && v2.round <= 24 && (v2.team === 0 || v2.team === 1) && Number.isFinite(v2.angle_radians) && Array.isArray(v2.paddle_ids) && (v2.paddle_ids.length >= 1 || v2.selected === false) && v2.paddle_ids.length <= 5 && new Set(v2.paddle_ids).size === v2.paddle_ids.length && (v2.selected === void 0 || typeof v2.selected === "boolean") && (v2.round_token === void 0 || typeof v2.round_token === "string" && v2.round_token.length > 0 && v2.round_token.length <= 64) && [
+    v2.ready,
+    v2.ready_available,
+    v2.calibration_available,
+    v2.calibrated,
+    v2.usable,
+    v2.landscape
+  ].every((flag) => flag === void 0 || typeof flag === "boolean") && v2.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) && Array.isArray(v2.paddle_size) && v2.paddle_size.length === 2 && v2.paddle_size.every((size) => Number.isFinite(size) && size > 0 && size <= 2);
+}
+var TiltShiftPhone = class {
+  surface;
+  stream;
+  sendReady;
+  isLandscape;
+  canvas;
+  context;
+  actions;
+  permission;
+  calibration;
+  ready;
+  state;
+  orientation;
+  images = [];
+  bounds = [];
+  angle = 0;
+  ratio = 6;
+  team = 2;
+  generation;
+  sequence = -1;
+  preparing = false;
+  readyAvailable = false;
+  selected = true;
+  roundToken;
+  connected = false;
+  usable = false;
+  calibrated = false;
+  landscape = false;
+  isReady = false;
+  capture = "waiting";
+  observer;
+  constructor(surface, stream, sendReady, isLandscape = () => window.matchMedia("(orientation: landscape)").matches) {
+    this.surface = surface;
+    this.stream = stream;
+    this.sendReady = sendReady;
+    this.isLandscape = isLandscape;
+    this.canvas = surface.querySelector("canvas");
+    this.context = this.canvas.getContext("2d");
+    this.actions = surface.querySelector("#tilt-actions");
+    this.permission = surface.querySelector("#tilt-permission");
+    this.calibration = surface.querySelector("#tilt-calibrate");
+    this.ready = surface.querySelector("#tilt-ready");
+    this.state = surface.querySelector("#tilt-state");
+    this.orientation = surface.querySelector("#tilt-orientation");
+    this.permission.addEventListener("click", () => {
+      this.permission.disabled = true;
+      void this.stream.requestPermission().finally(() => this.buttons());
+    });
+    this.calibration.addEventListener("click", () => {
+      if (this.stream.requestCalibration(this.actionContext()))
+        this.calibration.disabled = true;
+    });
+    this.ready.addEventListener("click", () => {
+      if (this.ready.disabled)
+        return;
+      this.ready.disabled = true;
+      this.sendReady(!this.isReady, this.actionContext());
+    });
+    this.observer = new ResizeObserver(() => {
+      this.buttons();
+      this.draw();
+    });
+    this.observer.observe(this.canvas);
+    void this.loadArt();
+  }
+  async loadArt() {
+    const response = await fetch("/tilt-shift/manifest.json");
+    if (!response.ok)
+      throw new Error("Tilt Shift artwork metadata could not load");
+    const manifest = await response.json();
+    for (const name of ["orange", "blue", "neutral"]) {
+      const image = new Image();
+      image.src = `/tilt-shift/paddle_${name}.png`;
+      this.images.push(image);
+      this.bounds.push(manifest.assets[`paddles/paddle_${name}.png`].visible_bounds_px);
+      image.addEventListener("load", () => this.draw());
+    }
+  }
+  preparation(value, ready) {
+    if (typeof value?.generation !== "string" || !Number.isFinite(value.angle_radians))
+      return false;
+    if (typeof value.usable !== "boolean" || typeof value.calibrated !== "boolean")
+      return false;
+    this.generation = value.generation;
+    this.sequence = -1;
+    this.preparing = this.readyAvailable = this.selected = this.connected = true;
+    this.roundToken = void 0;
+    this.usable = value.usable;
+    this.calibrated = value.calibrated;
+    this.landscape = value.landscape === true;
+    this.capture = value.capture_state;
+    this.angle = value.angle_radians;
+    if (Array.isArray(value.paddle_size) && value.paddle_size.length === 2 && value.paddle_size.every((size) => Number.isFinite(size) && size > 0))
+      this.ratio = value.paddle_size[0] / value.paddle_size[1];
+    this.isReady = ready;
+    this.team = 2;
+    this.surface.hidden = false;
+    this.canvas.hidden = false;
+    this.surface.setAttribute("data-waiting", "false");
+    this.surface.setAttribute("data-team", String(this.team));
+    this.actions.hidden = false;
+    this.buttons();
+    this.draw();
+    return true;
+  }
+  snapshot(value) {
+    if (!validTiltSnapshot(value))
+      return false;
+    if (this.generation !== void 0 && value.generation !== this.generation)
+      return false;
+    if (value.sequence < this.sequence)
+      return false;
+    this.generation = value.generation;
+    this.sequence = value.sequence;
+    this.preparing = value.calibration_available === true;
+    this.readyAvailable = value.ready_available === true;
+    this.selected = value.selected !== false;
+    this.roundToken = value.round_token;
+    this.isReady = value.ready === true;
+    if (value.usable !== void 0)
+      this.usable = value.usable;
+    if (value.calibrated !== void 0)
+      this.calibrated = value.calibrated;
+    this.landscape = value.landscape === true;
+    this.connected = true;
+    this.team = value.team;
+    this.angle = value.angle_radians;
+    this.ratio = value.paddle_size[0] / value.paddle_size[1];
+    this.surface.hidden = value.phase === "finished";
+    this.canvas.hidden = !this.selected;
+    this.surface.setAttribute("data-waiting", String(!this.selected));
+    this.surface.setAttribute("data-team", String(this.team));
+    this.buttons();
+    this.draw();
+    return true;
+  }
+  feedback() {
+    const state = this.stream.controlState;
+    if (!state)
+      return;
+    this.capture = state.capture_state;
+    this.usable = state.usable;
+    this.calibrated = state.calibrated;
+    this.landscape = state.landscape === true;
+    this.buttons();
+  }
+  disconnect() {
+    this.connected = this.usable = false;
+    this.buttons();
+  }
+  hide() {
+    this.surface.hidden = true;
+    this.generation = void 0;
+    this.sequence = -1;
+    this.preparing = this.connected = this.usable = false;
+  }
+  actionContext() {
+    return this.roundToken && this.generation ? { generation: this.generation, round_token: this.roundToken } : void 0;
+  }
+  buttons() {
+    const landscape = this.landscape && this.isLandscape();
+    this.orientation.hidden = !this.preparing;
+    this.orientation.textContent = landscape ? "Hold your phone in landscape while you get ready." : "Turn your phone to landscape. If it stays upright, turn off rotation lock.";
+    this.permission.hidden = this.usable;
+    this.permission.disabled = !this.connected || !this.stream.active;
+    this.calibration.hidden = !this.preparing;
+    this.calibration.disabled = !this.connected || !this.usable;
+    this.ready.hidden = !this.readyAvailable;
+    this.ready.disabled = !this.connected || !this.isReady && (!this.usable || !this.calibrated || !landscape);
+    this.ready.textContent = this.isReady ? "CANCEL" : "READY";
+    this.ready.setAttribute("aria-pressed", String(this.isReady));
+    this.actions.hidden = !this.preparing && this.usable || !this.selected && !this.preparing;
+    const blocked = {
+      insecure: "Motion needs a secure connection",
+      unsupported: "Motion is unavailable",
+      denied: "Motion access was denied",
+      error: "Motion access could not start",
+      unavailable: "Motion is unavailable",
+      degenerate_orientation: "Hold the screen toward you"
+    };
+    this.state.textContent = this.preparing && !this.usable ? blocked[this.capture] ?? "" : "";
+    this.state.hidden = !this.state.textContent;
+  }
+  draw() {
+    if (this.surface.hidden || !this.selected)
+      return;
+    const width = this.canvas.clientWidth, height = this.canvas.clientHeight;
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    this.canvas.width = Math.round(width * dpr);
+    this.canvas.height = Math.round(height * dpr);
+    const ctx = this.context;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    const image = this.images[this.team], bounds = this.bounds[this.team];
+    if (!image?.complete || !image.naturalWidth || !bounds)
+      return;
+    const length = Math.min(width, height) * 0.82, thickness = length / this.ratio;
+    const [sx, sy, right, bottom] = bounds;
+    const sw = right - sx, sh = bottom - sy;
+    const capPx = Math.min(96, sw * 0.25), cap = Math.min(capPx * thickness / sh, length * 0.25);
+    ctx.translate(width / 2, height / 2);
+    ctx.rotate(this.angle);
+    ctx.drawImage(image, sx, sy, capPx, sh, -length / 2, -thickness / 2, cap, thickness);
+    ctx.drawImage(image, sx + capPx, sy, sw - 2 * capPx, sh, -length / 2 + cap, -thickness / 2, length - 2 * cap, thickness);
+    ctx.drawImage(image, right - capPx, sy, capPx, sh, length / 2 - cap, -thickness / 2, cap, thickness);
+  }
+};
 
 // build/network_config.js
 function controllerSocketUrl(config, pageUrl) {
@@ -1527,6 +1834,7 @@ function colorOption(hex) {
 
 // build/app.js
 var status = document.querySelector("#status");
+bindScreenWakeLock();
 var connectionError = document.querySelector("#connection-error");
 var connectionErrors = [];
 function reportConnectionFailure(stage, endpoint, error) {
@@ -1624,13 +1932,23 @@ var lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJump
   socket.send(JSON.stringify({ ...action, input_seq: inputSeq }));
 });
 var gameplayMotion = new MotionStream(() => socket);
+window.addEventListener("pageshow", (event) => {
+  if (event.persisted && activeGame === "tilt_shift")
+    socket?.close();
+});
+var tiltSurface = document.querySelector("#tilt-shift");
+var tiltPhone = new TiltShiftPhone(tiltSurface, gameplayMotion, (ready, context) => {
+  if (socket?.readyState === WebSocket.OPEN)
+    socket.send(JSON.stringify(context ? { type: "tilt_shift_ready", ready, ...context } : { type: "pre_minigame_ready", ready }));
+});
+gameplayMotion.onControlState = () => tiltPhone.feedback();
 var motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);
 var pwa = new PwaOnboarding(document.querySelector("#app-screen"), document.querySelector("#install-button"), document.querySelector("#install-guidance"), document.querySelector("#browser-button"), () => {
   selectionScreen.hidden = false;
   nextButton.focus();
   void requestImmersiveMode();
 });
-for (const surface of [lobbyController, bubblesPad, readyCard])
+for (const surface of [lobbyController, bubblesPad, readyCard, tiltSurface])
   protectControllerSurface(surface);
 bindControllerLifecycle(() => cancelBubblesPointer());
 function stored(key) {
@@ -1684,8 +2002,10 @@ for (const option of CHARACTER_COLORS) {
   colorGrid.append(button);
 }
 refreshSelectionUi();
-function setGameplaySurface(active) {
-  const next = active ? "bubbles" : null;
+function setGameplaySurface(active, game = "bubbles") {
+  const next = active ? game : null;
+  if (next !== "tilt_shift")
+    tiltPhone.hide();
   if (activeGame !== next) {
     cancelBubblesPointer();
     if (next === null) {
@@ -1696,7 +2016,8 @@ function setGameplaySurface(active) {
     } else if (document.fullscreenElement) {
       try {
         const orientation = screen.orientation;
-        void Promise.resolve(orientation?.lock?.("portrait")).catch(() => {
+        const direction = next === "tilt_shift" ? "landscape" : "portrait";
+        void Promise.resolve(orientation?.lock?.(direction)).catch(() => {
         });
       } catch {
       }
@@ -1705,6 +2026,7 @@ function setGameplaySurface(active) {
   }
   document.documentElement.classList.toggle("gameplay-active", active);
   document.documentElement.classList.toggle("bubbles-active", next === "bubbles");
+  document.documentElement.classList.toggle("tilt-active", next === "tilt_shift");
 }
 function showJoin(message, focus = false) {
   gameplayMotion.stop();
@@ -1758,6 +2080,11 @@ function showJoined(player, state = "Connected") {
   status.hidden = true;
 }
 function showReady(message) {
+  if (message.minigame_id === "tilt_shift" && message.preparation) {
+    showTiltSurface();
+    tiltPhone.preparation(message.preparation, message.ready === true);
+    return;
+  }
   gameplayMotion.stop();
   motionLab.stop();
   lobbyControls.deactivate();
@@ -1776,6 +2103,19 @@ function showReady(message) {
   readyButton.setAttribute("aria-label", isReady ? "Cancel ready status" : "Ready up");
   readyButton.disabled = false;
   status.hidden = true;
+}
+function showTiltSurface() {
+  motionLab.stop();
+  lobbyControls.deactivate();
+  setGameplaySurface(true, "tilt_shift");
+  selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = true;
+  bubblesCard.hidden = readyCard.hidden = true;
+  document.documentElement.classList.remove("ready-active");
+  status.hidden = true;
+}
+function showTilt(message) {
+  if (tiltPhone.snapshot(message))
+    showTiltSurface();
 }
 readyButton.addEventListener("click", () => {
   if (!socket || socket.readyState !== WebSocket.OPEN)
@@ -2324,7 +2664,9 @@ async function connect() {
         connectionError.textContent = "";
         clearTimeout(deadline);
         if (message.resume_status === "resumed" && rememberIdentity(message)) {
-          if (message.gameplay?.type === "bubbles_snapshot")
+          if (message.gameplay?.type === "tilt_shift_snapshot")
+            showTilt(message.gameplay);
+          else if (message.gameplay?.type === "bubbles_snapshot")
             showBubbles(message.gameplay);
           else if (message.gameplay?.type === "pre_minigame_snapshot")
             showReady(message.gameplay);
@@ -2366,6 +2708,8 @@ async function connect() {
         showBubbles(message);
       else if (message.type === "pre_minigame_snapshot")
         showReady(message);
+      else if (message.type === "tilt_shift_snapshot")
+        showTilt(message);
       else if (message.type === "motion_lab" && joined && typeof message.subscription_id === "string" && typeof message.send_hz === "number") {
         lobbyControls.deactivate();
         setGameplaySurface(false);
@@ -2386,6 +2730,7 @@ async function connect() {
           send_hz: message.send_hz,
           stale_msec: message.stale_msec ?? 1e3
         });
+        tiltPhone.feedback();
       } else if (message.type === "motion_control_state") {
         if (typeof message.subscription_id === "string") {
           if (message.control_state)
@@ -2395,7 +2740,7 @@ async function connect() {
         if (typeof message.subscription_id === "string")
           gameplayMotion.stop(message.subscription_id);
         motionLab.stop(message.subscription_id);
-        if (joined && !gameplayMotion.active && !motionLab.active)
+        if (joined && activeGame === null && readyCard.hidden && !gameplayMotion.active && !motionLab.active)
           lobbyControls.activate();
       } else if (message.type === "lobby") {
         gameplayMotion.stop();
@@ -2420,7 +2765,10 @@ async function connect() {
       lobbyControls.deactivate();
       gameplayMotion.stop();
       motionLab.disconnect();
-      setGameplaySurface(false);
+      if (activeGame === "tilt_shift")
+        tiltPhone.disconnect();
+      else
+        setGameplaySurface(false);
       if (socket === peer)
         socket = void 0;
       if (event.code === 4e3) {

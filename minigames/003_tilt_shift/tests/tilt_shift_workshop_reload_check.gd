@@ -25,7 +25,7 @@ func _initialize() -> void:
 				and first.openings[0].team == 0
 		and first.openings[4].team == 1
 	) \
-			and is_equal_approx(first.openings[0].center, 0.16) \
-			and profile.paddle_layout.paddles.size() == 10
+			and is_equal_approx(first.openings[0].center, 0.10) \
+			and profile.paddle_layout.paddles.size() == 5
 	print("Workshop fresh-process reload: ", valid)
 	quit(0 if valid else 1)
