@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// "full" plays Bubbles with every default, a 90 s round; "quick" shortens only the round.
+// Full coverage adds larger Tilt Shift rosters and keeps the 90 s Bubbles round.
 const fullRound = process.env.E2E_ROUND === "full";
 
 export default defineConfig({
@@ -10,6 +10,7 @@ export default defineConfig({
   workers: 1,
   fullyParallel: false,
   retries: 0,
+  grepInvert: fullRound ? undefined : /@full/,
   forbidOnly: true,
   timeout: fullRound ? 6 * 60_000 : 3 * 60_000,
   expect: { timeout: 30_000 },
