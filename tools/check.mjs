@@ -15,6 +15,7 @@ import {
   webDirectory,
 } from "./environment.mjs";
 import { godotFailureLines, withoutLevel } from "./godot_output.mjs";
+import { includeGodotTest } from "./check_selection.mjs";
 
 const logDirectory = join(root, "test-results", "check");
 const GODOT_TIMEOUT_MSEC = 180_000;
@@ -28,13 +29,13 @@ const USAGE = `Usage: node tools/check.mjs [--full] [--release] [filter ...]
 
 Runs the Godot test scripts, the format, lint and document checks, the tests
 of these tools, the browser type check and tests, verifies that web/public
-matches a fresh build, then plays a round with two emulated phones against the
+matches a fresh build, then plays Bubbles and Tilt Shift with two emulated phones against the
 real host.
 
   filter      Run only checks whose name contains one of the filters,
               for example "bubbles", "web" or "e2e".
-  --full      Play the end-to-end round with every default, a full-length
-              round, instead of a shortened one.
+  --full      Add larger Tilt Shift phone rosters, workshop preview and
+              extended rotation contacts; play Bubbles at full length.
   --release   Also run the Windows export test. Needs Godot export templates.
 `;
 
@@ -80,14 +81,14 @@ function godotTestFolders() {
 }
 
 /** Lists the test scripts in those folders, by name. */
-function godotTests(includeRelease) {
+function godotTests(full, release) {
   return godotTestFolders()
     .flatMap((folder) =>
       readdirSync(join(root, folder))
         .filter((file) => file.endsWith("_test.gd") || file === "foundation.gd")
         .map((file) => ({ name: file.slice(0, -".gd".length), script: `res://${folder}/${file}` })),
     )
-    .filter(({ name }) => includeRelease || !(name in RELEASE_TESTS))
+    .filter(({ name }) => includeGodotTest(name, { full, release }))
     .sort((a, b) => (a.name < b.name ? -1 : 1));
 }
 
@@ -247,7 +248,7 @@ async function main() {
   const failures = [];
   const summary = [];
 
-  const selectedTests = godotTests(release).filter(({ name }) => selected(name));
+  const selectedTests = godotTests(full, release).filter(({ name }) => selected(name));
   let godotPassed = 0;
   for (const test of selectedTests) {
     const blocked = test.name in RELEASE_TESTS ? missingExportTemplates() : "";

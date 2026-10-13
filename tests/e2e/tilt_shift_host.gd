@@ -14,11 +14,6 @@ var _players := 2
 var _captures := ""
 var _start_at := -1
 var _costs: Array[int] = []
-var _bubbles_at := -1
-var _bubbles_started := false
-var _bubbles_seen := false
-var _bubbles_returned := false
-var _bubbles_results_at := -1
 
 
 func _initialize() -> void:
@@ -39,7 +34,6 @@ func _start() -> void:
 	_host.settings.http_port = int(OS.get_environment("E2E_HTTP_PORT"))
 	_host.settings.websocket_port = _host.settings.http_port + 1
 	_host.active_presets = _host.active_presets.duplicate_deep(Resource.DEEP_DUPLICATE_ALL)
-	_host.active_presets.bubbles.round_duration_seconds = 3.0
 	var selected: TiltShiftTuning = _host.active_presets.tilt_shift
 	selected.round_count = 2
 	selected.layouts_by_round.resize(2)
@@ -68,6 +62,9 @@ func _process(delta: float) -> bool:
 		return false
 	if current_scene.scene_file_path != _scene:
 		_scene = current_scene.scene_file_path
+		if _returned and _scene == "res://scenes/lobby.tscn":
+			if not _host.websocket.motion_channels.is_empty():
+				push_error("Tilt Shift capture survived lobby return")
 		print("E2E scene %s" % _scene.get_file().get_basename())
 		_capture.call_deferred(_scene.get_file().get_basename())
 	if _scene == "res://scenes/lobby.tscn" and not _started and _host.players().size() == _players:
@@ -103,40 +100,7 @@ func _process(delta: float) -> bool:
 			_returned = true
 			game.return_button.pressed.emit()
 			print("E2E return")
-			_bubbles_at = Time.get_ticks_msec() + 2000
-	if _returned and _players == 2:
-		_watch_next_game()
 	return false
-
-
-func _watch_next_game() -> void:
-	if current_scene == null:
-		return
-	if (
-		_scene == "res://scenes/lobby.tscn" and not _bubbles_started
-		and Time.get_ticks_msec() >= _bubbles_at
-	):
-		_bubbles_started = true
-		if not _host.websocket.motion_channels.is_empty():
-			push_error("Tilt Shift capture survived lobby return")
-		current_scene.minigame_selector.select(0)
-		current_scene.minigame_selector.item_selected.emit(0)
-		current_scene.start_button.pressed.emit()
-		print("E2E bubbles prepare")
-		return
-	var controller: BubblesRoundController = current_scene.get("controller")
-	if controller == null:
-		return
-	if not _bubbles_seen:
-		_bubbles_seen = true
-		print("E2E bubbles started")
-	if controller.phase_name() == &"results":
-		if _bubbles_results_at < 0:
-			_bubbles_results_at = Time.get_ticks_msec()
-		if Time.get_ticks_msec() - _bubbles_results_at > 1000 and not _bubbles_returned:
-			_bubbles_returned = true
-			current_scene.get_node("Hud/Results/ReturnToLobby").pressed.emit()
-			print("E2E bubbles return")
 
 
 func _report_cost() -> void:

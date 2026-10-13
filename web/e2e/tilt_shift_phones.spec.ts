@@ -81,7 +81,7 @@ async function prepare(phones: { page: import("@playwright/test").Page }[]) {
 }
 
 for (const count of [2, 4, 6, 8, 10]) {
-  test.describe(count + " Tilt Shift phones", () => {
+  test.describe(count + " Tilt Shift phones", { tag: count === 2 ? [] : ["@full"] }, () => {
     test.use({ game: "tilt_shift", players: count });
     test("prepare, show one guide, traverse mapped rounds and return", async ({
       host,
@@ -218,17 +218,6 @@ for (const count of [2, 4, 6, 8, 10]) {
           2,
         ),
       );
-      if (count === 2) {
-        await host.event(/^bubbles prepare$/);
-        for (const phone of phones) {
-          await expect(phone.page.locator("#ready-card")).toBeVisible();
-          await phone.readyUp();
-        }
-        await host.event(/^bubbles started$/);
-        for (const phone of phones) await expect(phone.page.locator("#bubbles-pad")).toBeVisible();
-        await host.event(/^bubbles return$/);
-        await host.event(/^scene lobby$/, { occurrence: 3 });
-      }
     });
   });
 }

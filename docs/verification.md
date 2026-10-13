@@ -1,6 +1,6 @@
 # Verification
 
-How to check a change: the one command that runs every automated check, the end-to-end test,
+How to check a change: the command for default and full automated coverage, end-to-end journeys,
 the render helpers a person inspects, and the labels that say what kind of evidence a check
 gives.
 
@@ -30,7 +30,7 @@ node tools/check.mjs
 
 This is the default `[AUTO]` check. In order, it runs:
 
-1. Every `*_test.gd` script in `tests/` and in the `tests/` folder of each minigame, and
+1. Default `*_test.gd` scripts in `tests/` and in the `tests/` folder of each minigame, and
    `tests/foundation.gd`, each in its own headless Godot process. New test scripts are picked
    up by name. [Test scripts](#test-scripts) says how
    one is written.
@@ -41,7 +41,12 @@ This is the default `[AUTO]` check. In order, it runs:
    end-to-end test files.
 5. `npm test` in `web/`.
 6. A rebuild of the browser bundle, which fails if `web/public/` changed.
-7. The end-to-end test described below.
+7. The two-phone Bubbles and Tilt Shift end-to-end journeys described below.
+
+`--full` adds the 4/6/8/10-phone Tilt Shift journeys, `tilt_shift_workshop_preview_test.gd`
+and `tilt_shift_rotation_contact_test.gd`. The default retains the shorter Tilt Shift
+physics checks. Full coverage also keeps the full-length Bubbles round; Windows export
+remains a separate `--release` option. Name filters do not override these coverage options.
 
 How it reports:
 
@@ -56,7 +61,7 @@ Options and single runs:
 
 ```powershell
 node tools/check.mjs bubbles web-tests   # only checks whose name contains a filter
-node tools/check.mjs --full              # end-to-end round with every default
+node tools/check.mjs --full              # extended coverage and full-length Bubbles
 node tools/check.mjs --release           # also run the Windows export test
 godot --headless --path . --script res://tests/player_registry_test.gd   # one script, full output
 godot --headless --editor --path . --quit-after 30                        # editor import scan
@@ -94,6 +99,11 @@ The host side is `tests/e2e/host.gd`:
 The test fails on a missing step, a phone without an accepted swipe, a page error, a visible
 phone error panel, or a host `ERROR` line.
 
+`web/e2e/tilt_shift_phones.spec.ts` also runs the real boot/catalog/gameplay journey with
+synthetic sensors. Its two-phone scenario runs by default, including delayed permission,
+portrait readiness revocation and reconnect; it ends after Tilt Shift returns to the lobby.
+The 4/6/8/10-phone scenarios carry the `@full` tag and run only with full coverage.
+
 - Each phone saves a screenshot per step in `test-results/e2e/`, with a Playwright trace when
   the test fails.
 - It is `[AUTO]` evidence from desktop Chromium. It never stands in for `[PHYSICAL-PHONE]`.
@@ -101,6 +111,7 @@ phone error panel, or a host `ERROR` line.
 ```powershell
 cd web
 npm run e2e                                    # the test alone
+$env:E2E_ROUND = "full"; npm run e2e; Remove-Item env:E2E_ROUND   # all journeys, full Bubbles
 $env:E2E_WINDOWED = "1"; npm run e2e; Remove-Item env:E2E_WINDOWED   # show the host and save its screenshots
 npx playwright show-trace ../test-results/e2e/<test>/trace.zip    # inspect a failure
 cd ..
@@ -184,7 +195,8 @@ start only what they need, so they stay fast.
 - `web/tests/003_tilt_shift/phone.test.mjs` checks malformed/replayed snapshots and one
   canonical guide for five assignments. `web/e2e/tilt_shift_phones.spec.ts` uses the real
   boot/catalog/gameplay journey with 2/4/6/8/10 Chromium phones and synthetic sensor events.
-  It is included in the consolidated check. Traffic and coordination costs are described
+  Two phones run in the default check; the other rosters require `--full`.
+  Traffic and coordination costs are described
   in [flow tuning](../minigames/003_tilt_shift/tuning/FLOW.md).
 - `E2E_WINDOWED=1` enables real-host captures for those scenarios. It does not supply
   physical-phone evidence. The quick Tilt Shift fixture maps two eight-second rounds;
@@ -203,7 +215,7 @@ start only what they need, so they stay fast.
   reversal, selected colors, label-free inward-facing operators, colored scores,
   scoring mouths/front depth, accepted-control holds, cutoff,
   cleanup, remapped rounds and cumulative win/draw. Run
-  `node tools/check.mjs tilt_shift_presentation tilt_shift_workshop_preview`.
+  `node tools/check.mjs --full tilt_shift_presentation tilt_shift_workshop_preview`.
 - Run `tilt_shift_presentation_visual_check.gd` without `--headless` for A/B preparation,
   countdown, ten-player FHD/HD/4:3 and outcomes. It measures A with 60 positive balls
   and B with 300 positive balls, each plus the selected negative budget, for 45 seconds.
@@ -214,7 +226,8 @@ start only what they need, so they stay fast.
 - Tilt Shift workshop: `tilt_shift_workshop_test.gd` and `tilt_shift_workshop_preview_test.gd`
   in the minigame's `tests/` folder cover deep-copy isolation, snapping, paired edits,
   undo/redo, fresh-process reload, draft versus usable saves, curve gaps and actual
-  gameplay preview cleanup/materials. Run `node tools/check.mjs tilt_shift_workshop`.
+  gameplay preview cleanup/materials. Run `node tools/check.mjs --full tilt_shift_workshop`
+  to include the live preview. Without `--full`, only the workshop model checks run.
 - Run `node tools/verify_tilt_shift_workshop.mjs` with other project editors closed for
   scripted drag/hit-testing, guide/error reports, save/close/reopen, mapped presets,
   invalid launch rejection and separate preview-process start/restart/stop. Captures
@@ -232,9 +245,10 @@ start only what they need, so they stay fast.
   and outputs are described in [MOTION.md](../minigames/003_tilt_shift/tuning/MOTION.md#measurement-boundaries).
 
 - Tilt Shift physics: `tilt_shift_delivery_test.gd`, `tilt_shift_arena_test.gd` and
-  `tilt_shift_physics_test.gd` in `minigames/003_tilt_shift/tests/`. The focused command
-  below includes curve counts/gaps, seed sequences, catches, exclusive cutoff, cleanup,
-  native material/pair contacts, acceleration, fast impacts, full turns and reversal.
+  `tilt_shift_physics_test.gd` in `minigames/003_tilt_shift/tests/` cover curve counts/gaps,
+  seed sequences, catches, exclusive cutoff, cleanup, native material/pair contacts,
+  acceleration and fast impacts. `tilt_shift_rotation_contact_test.gd` adds extended
+  full turns and reversal with `node tools/check.mjs --full tilt_shift_rotation_contact`.
 - `tilt_shift_negative_balls_test.gd` checks independent delivery counts, smooth integrated
   density, full-round 20%/70%/90% timing, hitches, penalties, score saturation, stale handles,
   enlarged colliders/sprites, tint, and workshop undo/redo, isolated edits and reload.
