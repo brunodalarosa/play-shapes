@@ -6,6 +6,15 @@ the review is done, and record the device and browser versions in the pull reque
 removes it. The evidence labels are defined in
 [verification.md](verification.md#evidence-labels).
 
+## Playground plaza cafe
+
+- Owner visual approval of the [cafe source and preview renders](../art/playground_plaza/cafe/README.md):
+  facade and cup readability, flat roof silhouette, shallow decorative trim and low-poly finish.
+  Automated source/export checks and Blender renders do not establish creative approval.
+- After separate scene integration, `[GODOT-RUNTIME]` material and final-camera inspection,
+  and `[HUMAN-PLAY]` roof reachability, ten-player readability and game feel. No Godot import
+  or gameplay evidence is supplied by the standalone model delivery.
+
 ## Tilt Shift rules
 
 - `[EDITOR]` Owner inspection of the rules profile, round mapping, geometry and neighbor
