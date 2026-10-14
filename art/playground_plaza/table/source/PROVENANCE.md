@@ -20,12 +20,17 @@ The original two connected components become `Tabletop` and `Pedestal and Base`.
 Uniform scaling normalizes tabletop width to 4.25. After shifting the base to ground,
 the straight pedestal collar between original Y heights 0.247605 and 0.320399 is
 extended by approximately 0.487797. The upper pedestal and complete tabletop move up
-by that amount; the remaining geometry retains its uniformly scaled source shape.
+by that amount.
+
+The stem from original Y height 0.247605 upward is narrowed to 50% of
+its normalized width and depth. The foot below that collar retains its source shape,
+and every vertex keeps its height from the initial adaptation. Support normals are refreshed.
 The tabletop top is at height 3 and its thickness remains approximately 0.252256.
 
 The source Wood material is replaced with golden-yellow tabletop and charcoal
 pedestal/base materials. No braces, new shape details, textures or collision are added.
-The exporter checks the source hashes and adapted geometry against the original vertices.
+The exporter checks the source hashes and adapted geometry against the original vertices,
+including the stem reduction and preserved tabletop, foot and heights.
 
 ## License evidence
 

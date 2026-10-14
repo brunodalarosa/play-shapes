@@ -15,6 +15,8 @@ SOURCE = DIRECTORY / "cafe-table.blend"
 EXPORT = DIRECTORY / "export" / "cafe-table.glb"
 REPORT = DIRECTORY / "export" / "verification.json"
 TOLERANCE = 0.0001
+STEM_HORIZONTAL_SCALE = 0.5
+STEM_ORIGINAL_HEIGHT = 0.247604
 
 
 def require(condition, message):
@@ -105,18 +107,25 @@ def original_geometry():
     require(extension > 0, "Pedestal must be taller than normalized original")
     expected = {}
     for name, vertices in (("Tabletop", top), ("Pedestal and Base", support)):
-        expected[name] = [Vector((x * scale, -z * scale,
-                                 (y - ground) * scale
-                                 + (extension if name == "Tabletop" or y >= .320398 else 0)))
-                          for x, y, z in vertices]
+        expected[name] = []
+        for x, y, z in vertices:
+            horizontal = scale
+            if name == "Pedestal and Base" and y >= STEM_ORIGINAL_HEIGHT:
+                horizontal *= STEM_HORIZONTAL_SCALE
+            point = Vector((x * horizontal, -z * horizontal, (y - ground) * scale))
+            if name == "Tabletop" or y >= .320398:
+                point.z += extension
+            expected[name].append(point)
     require(len(top) == 120 and len(support) == 180, "Source components changed")
     return expected, {
         "original_hashes": hashes, "uniform_scale": scale,
         "normalized_original_height": height, "pedestal_extension": extension,
         "tabletop_thickness": (max(p[1] for p in top) - min(p[1] for p in top)) * scale,
         "extended_original_ring_heights": [.247605, .320399],
-        "preservation": "All vertices match the uniformly normalized original; only the upper "
-                        "pedestal and complete tabletop are translated upward",
+        "stem_horizontal_scale": STEM_HORIZONTAL_SCALE,
+        "stem_first_original_ring_height": .247605,
+        "preservation": "Source-derived positions preserve tabletop, foot and all heights; "
+                        "the extended stem is halved in both horizontal axes",
     }
 
 
@@ -279,8 +288,9 @@ def main():
         "exported_mesh_surfaces": surfaces, "gltf_orientation": "Y up; ground-centered origin",
         "evidence": "AUTO: Blender source and GLB round trip; no Godot import/runtime evidence",
         "checks": ["approved OBJ/MTL hashes", "closed positive-volume geometry",
-                   "no degenerate faces", "all original vertices preserved after normalization",
-                   "only straight pedestal collar extended", "tabletop and base shapes preserved",
+                   "no degenerate faces", "source-derived vertex preservation",
+                   "straight pedestal collar extended", "stem width and depth halved",
+                   "tabletop, foot and all vertex heights preserved",
                    "flat broad top at height 3 with original normalized thickness",
                    "grounded base", "applied transforms", "two materials and mesh surfaces",
                    "approved golden-yellow and charcoal colors", "no external dependencies",

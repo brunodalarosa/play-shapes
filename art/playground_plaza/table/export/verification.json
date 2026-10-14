@@ -1,8 +1,8 @@
 {
   "result": "PASS",
   "blender_version": "5.2.2 LTS",
-  "source_sha256": "e8a86fb4b0d0e749e87105a1c3320cccd9aecbfaa89d69562b1337bb51cd8e00",
-  "export_sha256": "03f21a911fa37d2d0751d156937b418b33811021d9a717f094941b3c734d9d99",
+  "source_sha256": "1e0068728f40dfee2889528bcc505654b81a4a8277552c5882796c2e54f14ffc",
+  "export_sha256": "8fa044dbcfa23bf749b5c12e18de81ea7500eb87d2bca277b40b126ae3371ee2",
   "export_bytes": 18960,
   "adaptation": {
     "original_hashes": {
@@ -17,7 +17,9 @@
       0.247605,
       0.320399
     ],
-    "preservation": "All vertices match the uniformly normalized original; only the upper pedestal and complete tabletop are translated upward"
+    "stem_horizontal_scale": 0.5,
+    "stem_first_original_ring_height": 0.247605,
+    "preservation": "Source-derived positions preserve tabletop, foot and all heights; the extended stem is halved in both horizontal axes"
   },
   "source_geometry_blender_xyz": {
     "minimum": [
@@ -97,9 +99,10 @@
     "approved OBJ/MTL hashes",
     "closed positive-volume geometry",
     "no degenerate faces",
-    "all original vertices preserved after normalization",
-    "only straight pedestal collar extended",
-    "tabletop and base shapes preserved",
+    "source-derived vertex preservation",
+    "straight pedestal collar extended",
+    "stem width and depth halved",
+    "tabletop, foot and all vertex heights preserved",
     "flat broad top at height 3 with original normalized thickness",
     "grounded base",
     "applied transforms",

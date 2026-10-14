@@ -1,7 +1,7 @@
 # Playground plaza cafe table
 
 Editable variant of the supplied Quaternius round table with a taller pedestal,
-golden-yellow tabletop and charcoal support/base. The self-contained GLB is for
+slimmer stem, golden-yellow tabletop and charcoal support/base. The self-contained GLB is for
 later Godot integration; the running game does not load this asset.
 
 ## Files
@@ -22,8 +22,10 @@ Godot import and standalone builds. There are no colliders, runtime bindings or 
 
 The tabletop is 4.25 wide and deep, with a broad flat top at height 3 and thickness
 approximately 0.252256 in normalized authoring units. Its original 20-sided outline,
-edge profile and foot geometry remain intact after uniform scaling. Only the original
-straight pedestal collar is lengthened, by approximately 0.487797 units.
+edge profile and foot geometry remain intact after uniform scaling. The original
+straight pedestal collar is lengthened by approximately 0.487797 units. The full stem
+profile from that lower collar upward is 50% narrower in both horizontal axes than
+the first adapted version. All vertex heights remain unchanged; the foot retains its width.
 
 One planning character height is 1. These dimensions do not prescribe the existing
 character's world scale, collision height, jump reach or final-camera composition.
@@ -37,9 +39,9 @@ materials: golden yellow `#F4B940` and charcoal `#30333B`, respectively.
 ## Editing and export
 
 Open the source and edit the named parts under `Cafe Table Asset`. The root, collection
-and part names are used by the export checks. The original OBJ normals and component
-geometry are retained. The separate `Review Studio - Not Exported` collection holds
-the inspection camera, ground and lights.
+and part names are used by the export checks. Tabletop and foot geometry are retained;
+the narrowed support has refreshed normals. The separate `Review Studio - Not Exported`
+collection holds the inspection camera, ground and lights.
 
 Run these from this directory with Blender's executable assigned to `$blender`:
 
@@ -53,7 +55,7 @@ Save edits before export. The exporter opens the saved source, exports only the 
 collection and imports the GLB into a disposable scene. It never saves that scene
 over the source and does not change a live Blender session.
 
-The verifier requires the approved dimensions, palette and original shape preservation.
+The verifier requires the approved dimensions, palette, stem reduction and preserved top/foot.
 A later change to these delivery constraints must update the checks and documentation
 together. Keep the pinned original OBJ/MTL unchanged.
 
