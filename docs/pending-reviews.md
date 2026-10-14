@@ -6,6 +6,17 @@ the review is done, and record the device and browser versions in the pull reque
 removes it. The evidence labels are defined in
 [verification.md](verification.md#evidence-labels).
 
+## Playground plaza billboard
+
+- Owner visual approval of the
+  [billboard source and previews](../art/playground_plaza/billboard/README.md):
+  square display, frame proportions, grounded support silhouette and low-poly finish.
+  Automated source/export checks and Blender renders do not establish creative approval.
+- After separate scene integration, `[GODOT-RUNTIME]` materials, display mapping and high,
+  horizontally centered placement at the final camera; `[PHYSICAL-PHONE]` QR scanning at
+  actual viewing distance; and `[HUMAN-PLAY]` ten-player readability. Integrated rendering
+  performance remains unmeasured. No Godot import or gameplay evidence is supplied here.
+
 ## Playground plaza cafe
 
 - Owner visual approval of the [cafe source and preview renders](../art/playground_plaza/cafe/README.md):
