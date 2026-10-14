@@ -1,0 +1,114 @@
+{
+  "result": "PASS",
+  "blender_version": "5.2.2 LTS",
+  "source_sha256": "e8a86fb4b0d0e749e87105a1c3320cccd9aecbfaa89d69562b1337bb51cd8e00",
+  "export_sha256": "03f21a911fa37d2d0751d156937b418b33811021d9a717f094941b3c734d9d99",
+  "export_bytes": 18960,
+  "adaptation": {
+    "original_hashes": {
+      "Table_RoundSmall.obj": "7e95bb32fe64438ff90e4f25407acf86ebd6173405da99fe0c150b9121bdbece",
+      "Table_RoundSmall.mtl": "f9cf420bec3be1dcebf8294fb1fa28fecd75a5c61069c77b898136ebe4efe060"
+    },
+    "uniform_scale": 2.189606530282516,
+    "normalized_original_height": 2.512203449995569,
+    "pedestal_extension": 0.4877965500044308,
+    "tabletop_thickness": 0.2522558099277274,
+    "extended_original_ring_heights": [
+      0.247605,
+      0.320399
+    ],
+    "preservation": "All vertices match the uniformly normalized original; only the upper pedestal and complete tabletop are translated upward"
+  },
+  "source_geometry_blender_xyz": {
+    "minimum": [
+      -2.125,
+      -2.124999761581421,
+      0.0
+    ],
+    "maximum": [
+      2.125,
+      2.125,
+      3.0
+    ],
+    "triangles": 592,
+    "mesh_count": 2,
+    "triangles_by_object": {
+      "Tabletop": 236,
+      "Pedestal and Base": 356
+    }
+  },
+  "round_trip_geometry_blender_xyz": {
+    "minimum": [
+      -2.125,
+      -2.124999761581421,
+      0.0
+    ],
+    "maximum": [
+      2.125,
+      2.125,
+      3.0
+    ],
+    "triangles": 592,
+    "mesh_count": 2,
+    "triangles_by_object": {
+      "Pedestal and Base": 356,
+      "Tabletop": 236
+    }
+  },
+  "materials": {
+    "Tabletop Golden Yellow": {
+      "color": [
+        0.9046611785888672,
+        0.48514994978904724,
+        0.05126945674419403,
+        1.0
+      ],
+      "roughness": 0.7200000286102295,
+      "metallic": 0.0
+    },
+    "Pedestal Charcoal": {
+      "color": [
+        0.02955683507025242,
+        0.03310476616024971,
+        0.04373503103852272,
+        1.0
+      ],
+      "roughness": 0.7200000286102295,
+      "metallic": 0.0
+    }
+  },
+  "flat_top_area": 13.954039573669434,
+  "gltf_world_bounds_xyz": {
+    "minimum": [
+      -2.125,
+      0.0,
+      -2.125
+    ],
+    "maximum": [
+      2.125,
+      3.0,
+      2.124999761581421
+    ]
+  },
+  "exported_mesh_surfaces": 2,
+  "gltf_orientation": "Y up; ground-centered origin",
+  "evidence": "AUTO: Blender source and GLB round trip; no Godot import/runtime evidence",
+  "checks": [
+    "approved OBJ/MTL hashes",
+    "closed positive-volume geometry",
+    "no degenerate faces",
+    "all original vertices preserved after normalization",
+    "only straight pedestal collar extended",
+    "tabletop and base shapes preserved",
+    "flat broad top at height 3 with original normalized thickness",
+    "grounded base",
+    "applied transforms",
+    "two materials and mesh surfaces",
+    "approved golden-yellow and charcoal colors",
+    "no external dependencies",
+    "no review objects in export",
+    "decoded GLB bounds and Y-up orientation",
+    "round-trip geometry preservation, names, bounds, triangles and materials"
+  ],
+  "license_status": "Pack-specific license evidence unresolved; publication pending"
+}

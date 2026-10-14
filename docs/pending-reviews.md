@@ -6,6 +6,18 @@ the review is done, and record the device and browser versions in the pull reque
 removes it. The evidence labels are defined in
 [verification.md](verification.md#evidence-labels).
 
+## Playground plaza cafe table
+
+- Owner visual approval of the
+  [adapted table source and previews](../art/playground_plaza/table/README.md):
+  taller pedestal, preserved round top and base, golden-yellow/charcoal palette and
+  near-frontal silhouette. Automated source/export checks do not establish creative approval.
+- After separate scene integration, `[GODOT-RUNTIME]` materials and final-camera inspection,
+  and `[HUMAN-PLAY]` middle-tier reachability, ten-player readability and game feel.
+  Integrated rendering performance remains unmeasured; no import/gameplay evidence is supplied.
+- Before publication, resolve the pack-specific license evidence recorded in
+  [table provenance](../art/playground_plaza/table/source/PROVENANCE.md).
+
 ## Playground plaza billboard
 
 - Owner visual approval of the
