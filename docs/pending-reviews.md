@@ -8,11 +8,6 @@ removes it. The evidence labels are defined in
 
 ## Playground plaza cafe table
 
-- Owner visual approval of the
-  [adapted table source and previews](../art/playground_plaza/table/README.md):
-  taller pedestal with a 50% narrower stem, preserved round top and foot,
-  golden-yellow/charcoal palette and near-frontal silhouette.
-  Automated source/export checks do not establish creative approval.
 - After separate scene integration, `[GODOT-RUNTIME]` materials and final-camera inspection,
   and `[HUMAN-PLAY]` middle-tier reachability, ten-player readability and game feel.
   Integrated rendering performance remains unmeasured; no import/gameplay evidence is supplied.

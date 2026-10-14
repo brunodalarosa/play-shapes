@@ -74,8 +74,9 @@ Near-frontal renders use an orthographic camera with a gentle downward tilt.
 The studio uses the Standard view transform at exposure -1.5 to retain the palette's
 saturation in inspection previews; final Godot lighting remains a later scene decision.
 
-Renders establish technical composition, not owner acceptance. Visual review, final-camera
-readability, middle-tier reachability, ten-player play and game feel remain pending in
+The owner approved the revised table's visual result on 2026-10-13, including its
+50% narrower stem and retained height, tabletop and foot. Final-camera readability,
+middle-tier reachability, ten-player play and game feel remain pending in
 [pending reviews](../../../docs/pending-reviews.md#playground-plaza-cafe-table).
 Godot import, collisions, scene conversion and gameplay changes are outside this delivery.
 Pack-specific license evidence must be resolved before publication.
