@@ -92,9 +92,17 @@ func _check_framing(size: Vector2i) -> void:
 	var screen := Rect2(Vector2.ZERO, Vector2(size))
 	for landing: PlazaLanding in world.landings():
 		var span := landing.plane_span()
-		# The ground runs past the screen edges; its walkable middle must be visible.
-		var inset := 6.0 if landing.name == &"GroundLanding" else 0.0
-		for x: float in [span.position.x + inset, span.end.x - inset]:
+		if landing.name == &"GroundLanding":
+			# The ground runs past the side walls, which keep characters in view instead.
+			var ground := world.surface_named("GroundLanding").world_bounds()
+			var walls := world.get_node("Simulation/PlatformSurfaces")
+			check(
+				ground.position.x < (walls.get_node("LeftWall") as Node2D).position.x
+				and ground.end.x > (walls.get_node("RightWall") as Node2D).position.x,
+				"The ground reaches both side walls at %s" % size,
+			)
+			continue
+		for x: float in [span.position.x, span.end.x]:
 			for height: float in [0.0, 1.0]:
 				var point := world.camera.unproject_position(
 					Vector3(x, span.position.y + height, 0.0)

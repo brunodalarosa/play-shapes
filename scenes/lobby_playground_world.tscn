@@ -195,7 +195,7 @@ cast_shadow = 0
 
 [node name="GroundLanding" type="Node3D" parent="Plaza"]
 script = ExtResource("landing")
-width = 23.0
+width = 40.0
 drop_rule = 1
 
 [node name="RearWall" type="MeshInstance3D" parent="Plaza"]

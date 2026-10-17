@@ -13,6 +13,13 @@ const PIXELS_PER_UNIT := 96.0
 ## Landing collision depth below its top, plane pixels.
 const LANDING_THICKNESS := 10.0
 const PLATFORM_LAYER := 128
+## Half the width of a lobby body: the capsule radius in lobby_squircle.tscn, plane pixels.
+const BODY_HALF_WIDTH := 23.0
+const WALL_THICKNESS := 40.0
+## Walls run from below the ground to far above the highest jump, plane pixels.
+const WALL_SPAN := Vector2(-40.0, 5.0) * PIXELS_PER_UNIT
+## Height at which the walls meet the screen edges, world units: mid-way up the play area.
+const WALL_FIT_HEIGHT := 3.0
 
 ## Movement preset. Empty uses the active lobby preset.
 @export var movement: LobbyMovementTuning
@@ -38,6 +45,10 @@ func _ready() -> void:
 		movement = presets.lobby_movement
 	for landing: PlazaLanding in landings():
 		_surfaces.add_child(_surface_for(landing))
+	for wall_name: String in ["LeftWall", "RightWall"]:
+		_surfaces.add_child(_wall(wall_name))
+	get_viewport().size_changed.connect(fit_walls)
+	fit_walls()
 
 
 static func to_plane(point: Vector3) -> Vector2:
@@ -57,6 +68,18 @@ func landings() -> Array[PlazaLanding]:
 
 func surface_named(surface_name: String) -> PlatformSurface:
 	return _surfaces.get_node_or_null(surface_name) as PlatformSurface
+
+
+## Places the invisible side walls so a body stops with its centre on the screen edge: half of
+## it may leave the view, never all of it.
+func fit_walls() -> void:
+	var view := get_viewport().get_visible_rect().size
+	var fit_y := camera.unproject_position(Vector3(0.0, WALL_FIT_HEIGHT, 0.0)).y
+	var stop := BODY_HALF_WIDTH + WALL_THICKNESS * 0.5
+	var left := to_plane(_on_action_plane(Vector2(0.0, fit_y))).x
+	var right := to_plane(_on_action_plane(Vector2(view.x, fit_y))).x
+	(_surfaces.get_node("LeftWall") as Node2D).position.x = left - stop
+	(_surfaces.get_node("RightWall") as Node2D).position.x = right + stop
 
 
 func spawn_point(seat: int) -> Vector2:
@@ -184,6 +207,26 @@ func _surface_for(landing: PlazaLanding) -> PlatformSurface:
 	shape.position = to_plane(landing.global_position) + Vector2(0.0, LANDING_THICKNESS * 0.5)
 	surface.add_child(shape)
 	return surface
+
+
+func _on_action_plane(screen_point: Vector2) -> Vector3:
+	var origin := camera.project_ray_origin(screen_point)
+	var direction := camera.project_ray_normal(screen_point)
+	return origin + direction * (-origin.z / direction.z)
+
+
+func _wall(wall_name: String) -> StaticBody2D:
+	var wall := StaticBody2D.new()
+	wall.name = wall_name
+	wall.collision_layer = PLATFORM_LAYER
+	wall.collision_mask = 0
+	var shape := CollisionShape2D.new()
+	var rectangle := RectangleShape2D.new()
+	rectangle.size = Vector2(WALL_THICKNESS, WALL_SPAN.y - WALL_SPAN.x)
+	shape.shape = rectangle
+	shape.position.y = (WALL_SPAN.x + WALL_SPAN.y) * 0.5
+	wall.add_child(shape)
+	return wall
 
 
 func _rejected(code: String) -> Dictionary:

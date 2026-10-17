@@ -32,6 +32,9 @@ Messages and limits are in [protocol.md](protocol.md).
   - `Simulation` is a hidden 2D plane, 96 pixels per unit, where the world builds one one-way
     `PlatformSurface` per landing on physics layer 8 (bit 128). Characters use layer 9
     (bit 256). See [decision 0033](decisions/0033-plaza-lobby-plane-simulation.md).
+  - Two invisible side walls on the same layer keep characters in view. `fit_walls()` places
+    them from the camera whenever the view resizes, so a character stops with its centre on
+    the screen edge, half out of view. The ground runs past both walls.
   - `scenes/plaza_billboard.*` draws the logo and the live join QR in a `SubViewport` that
     renders only when they change, shown unshaded on the billboard's `Display` surface.
 - `scenes/lobby_playground_world.gd` reconciles registered players to ten seat-indexed
