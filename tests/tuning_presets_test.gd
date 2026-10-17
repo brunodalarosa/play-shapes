@@ -6,6 +6,7 @@ const BubblesTuningScript := preload(
 	"res://minigames/002_bubbles_and_jellyfishes/bubbles_tuning.gd"
 )
 const NetworkingTuningScript := preload("res://Tuning/Shared/networking_tuning.gd")
+const LobbyMovementTuningScript := preload("res://Tuning/Shared/lobby_movement_tuning.gd")
 const ActivePresetsScript := preload("res://Tuning/active_presets.gd")
 
 
@@ -109,7 +110,12 @@ func _run() -> void:
 		return
 	if not _check_tooltip_contract(
 		"res://Tuning/active_presets.gd",
-		["bubbles", "tilt_shift", "networking"],
+		["bubbles", "tilt_shift", "networking", "lobby_movement"],
+	):
+		return
+	if not _check_tooltip_contract(
+		"res://Tuning/Shared/lobby_movement_tuning.gd",
+		["move_speed", "acceleration", "gravity", "jump_height"],
 	):
 		return
 
@@ -120,7 +126,8 @@ func _run() -> void:
 	if not check(
 		preset_paths.has("res://Tuning/Active Presets.tres")
 		and preset_paths.has("res://minigames/002_bubbles_and_jellyfishes/tuning/Default.tres")
-		and preset_paths.has("res://Tuning/Shared/Networking/Default.tres"),
+		and preset_paths.has("res://Tuning/Shared/Networking/Default.tres")
+		and preset_paths.has("res://Tuning/Shared/Lobby/Default.tres"),
 		"Default presets and Active Presets are discovered",
 	):
 		return
@@ -199,9 +206,25 @@ func _run() -> void:
 	):
 		return
 
+	var movement: Resource = LobbyMovementTuningScript.new()
+	movement.jump_height = 100.0
+	movement.gravity = 0.0
+	if not check(
+		movement.jump_height == 8.0 and movement.gravity == 4.0,
+		"Lobby movement individual values clamp to safe ranges",
+	):
+		return
+	movement.move_speed = 8.0
+	movement.acceleration = 4.0
+	if not check(
+		movement.validation_errors().size() == 1,
+		"Lobby movement rejects acceleration slower than one second to top speed",
+	):
+		return
+
 	var active: Resource = ActivePresetsScript.new()
 	if not check(
-		active.validation_errors().size() == 3,
+		active.validation_errors().size() == 4,
 		"Active selector rejects missing preset references",
 	):
 		return

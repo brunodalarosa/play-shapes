@@ -17,6 +17,9 @@ var bubbles: BubblesTuning
 @export
 var networking: NetworkingTuning
 
+## Active Playground lobby movement preset. Default values are provisional, pending owner play.
+@export var lobby_movement: LobbyMovementTuning
+
 
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
@@ -32,4 +35,8 @@ func validation_errors() -> PackedStringArray:
 		errors.append("Active Presets: Networking preset is missing.")
 	else:
 		errors.append_array(networking.validation_errors())
+	if lobby_movement == null:
+		errors.append("Active Presets: Lobby movement preset is missing.")
+	else:
+		errors.append_array(lobby_movement.validation_errors())
 	return errors
