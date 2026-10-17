@@ -20,22 +20,17 @@ func _run() -> void:
 	var second_character := world.character_for(second_id)
 	check(
 		first_character != null and second_character != null
-		and first_character != second_character and first_character.spawn_point == Vector2(218, 400)
-		and second_character.spawn_point == Vector2(555, 400),
+		and first_character != second_character
+		and first_character.spawn_point == world.spawn_point(1) and second_character.spawn_point
+		== world.spawn_point(2),
 		"Players get distinct seat anchors and one character each",
 	)
 	check(
 		first.player.character_shape == "squircle" and second.player.character_shape == "squircle"
-		and first_character.get_node("Nameplate").text == "First"
-		and (first_character.get_node("SquircleV1Playback/Colorable") as Sprite2D)
-		.texture
-		.resource_path
-		== "res://assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png"
-		and (first_character.get_node("SquircleV1Playback/Colorable") as Sprite2D)
-		.material
-		.get_shader_parameter("player_color")
-		== Color("#EC407A"),
-		"Lobby Squircle v1 uses the name and registered tint",
+		and first_character.visual.nameplate.text == "First"
+		and first_character.visual.player_color == Color("#EC407A")
+		and second_character.visual.player_color == Color("#00ACC1"),
+		"Each lobby Squircle shows its player's name and registered tint",
 	)
 	check(
 		first_character.collision_layer == 256 and first_character.collision_mask == 384,
@@ -43,7 +38,7 @@ func _run() -> void:
 	)
 	for unused: int in 5:
 		await physics_frame
-	check(first_character.is_on_floor(), "Spawned character lands on the first shelf")
+	check(first_character.is_on_floor(), "Spawned character lands on the plaza ground")
 	var first_player := registry.player_for_connection(100)
 	var second_player := registry.player_for_connection(101)
 	check(not world.handle_input({ }, {
@@ -80,7 +75,7 @@ func _run() -> void:
 	await physics_frame
 	check(
 		first_character.motor.presentation_action() == "look_up"
-		and first_character.get_node("SquircleV1Playback").get("_clip_key") == "look_up-front",
+		and first_character.visual.action == "look_up",
 		"Grounded up uses the approved held pose",
 	)
 	world.reset_sequence(first_id)
@@ -122,11 +117,8 @@ func _run() -> void:
 		"The host advances characters in opposite directions independently",
 	)
 	check(
-		(first_character.get_node("SquircleV1Playback/Face") as Sprite2D).flip_h
-		and not (second_character.get_node("SquircleV1Playback/Face") as Sprite2D).flip_h
-		and (first_character.get_node("SquircleV1Playback/Colorable") as Sprite2D).flip_h
-		== (first_character.get_node("SquircleV1Playback/Face") as Sprite2D).flip_h,
-		"Three-quarter body and face point in the direction of travel",
+		first_character.visual.facing_yaw() > 0.0 and second_character.visual.facing_yaw() < 0.0,
+		"Each Squircle turns toward its direction of travel",
 	)
 	check(
 		world.handle_input(first_player, {
@@ -184,18 +176,17 @@ func _run() -> void:
 	for index: int in range(2, 10):
 		registry.join_player(100 + index + 1, "Player %d" % index, true, now)
 	check(
-		world.get_node("CharactersFrontOfPanels").get_child_count() == 10,
+		world.get_node("Characters").get_child_count() == 10
+		and world.get_node("Simulation/Bodies").get_child_count() == 10,
 		"All ten registered seats spawn a character",
 	)
 	registry.leave_connection(101)
 	await process_frame
 	var replacement := registry.join_player(200, "Replacement", true, now)
+	var replacement_character := world.character_for(String(replacement.player.player_id))
 	check(
 		replacement.accepted and replacement.player.seat == 2
-		and world.character_for(String(replacement.player.player_id)).spawn_point == Vector2(
-			555,
-			400,
-		),
+		and replacement_character.spawn_point == world.spawn_point(2),
 		"A released seat reuses its anchor without overlapping an occupied seat",
 	)
 	first_character.position.y = first_character.motor.fall_reset_y + 10.0

@@ -18,23 +18,28 @@ Messages and limits are in [protocol.md](protocol.md).
 
 ## Lobby
 
-- `scenes/lobby.*` places the live QR and address controls, and minigame selection and start,
-  on the Playground's board and calendar.
+- `scenes/lobby.*` holds the address picker, Refresh, Copy, the join address, the minigame
+  selector and Start in `ControlPanel`, a container panel 32 pixels in from the bottom-right
+  corner. It hands the join URL to the billboard.
   - There is no visible roster. `SessionHost.players_changed` still refreshes the shared 2–10
     player launch gate.
-  - The FHD control positions and the `PanelBackings` sprite transforms are the main UI tuning
-    points. Godot's `canvas_items` stretch scales them to the 1152×648 host size.
-- `scenes/lobby_playground_world.tscn` is the reusable 1920×1080 toy-shelf world.
-  - It imports selected layers, props, a blank QR board and calendar, and a separate logo under
-    `assets/runtime/lobby_playground/`.
-  - `PanelBackings` sits behind `CharactersFrontOfPanels`. Characters draw over the live QR and
-    the other lobby controls, while `Foreground` draws over characters.
-  - One-way shelves and block tops use physics layer 8 (bit 128). Characters use layer 9
-    (bit 256) and mask both layers.
+- `scenes/lobby_playground_world.tscn` is the 3D café plaza, laid out from the approved
+  mockup with the models in `assets/runtime/playground_plaza/`. Its fixed `Camera3D` frames
+  the plaza with a gentle downward tilt.
+  - Characters move on the action plane at depth zero. One world unit is one character height.
+  - Each landing is a `PlazaLanding` marker inside its prop: the ground (Closed), three chair
+    seats, two tabletops and the café roof (Open). Moving a prop moves its landing.
+  - `Simulation` is a hidden 2D plane, 96 pixels per unit, where the world builds one one-way
+    `PlatformSurface` per landing on physics layer 8 (bit 128). Characters use layer 9
+    (bit 256). See [decision 0033](decisions/0033-plaza-lobby-plane-simulation.md).
+  - `scenes/plaza_billboard.*` draws the logo and the live join QR in a `SubViewport` that
+    renders only when they change, shown unshaded on the billboard's `Display` surface.
 - `scenes/lobby_playground_world.gd` reconciles registered players to ten seat-indexed
-  `FutureCharacterAnchors`.
-- `characters/lobby_squircle.tscn` composes the shared `PlatformMotor` with Squircle playback,
-  the player lifecycle and a nameplate.
+  `SpawnPoints` and places each body's 3D Squircle every frame.
+- `characters/lobby_squircle.tscn` is the host body: the shared `PlatformMotor`, a capsule and
+  the player lifecycle. It drives its `Squircle3D` and frees it on exit.
+- `Tuning/Shared/Lobby/Default.tres` holds the movement preset, in character heights, selected
+  in `Active Presets.tres`.
 
 ## Platform movement
 
@@ -184,12 +189,16 @@ See [player journeys](player-journeys.md).
 - `characters/character_selection.gd` normalizes missing and legacy shapes to Squircle while
   preserving selected colors. `web/src/character_selection.ts` offers colors and sends
   `squircle`.
-- `characters/squircle_v1_playback.tscn` plays manifest-owned sheets in the lobby, Bubbles and
-  results.
+- `characters/squircle_3d.tscn` is the real-time Squircle used by the Playground lobby: the
+  exported rig and clips, the player tint, natural blinking, held stances, turning toward
+  travel and a nameplate.
+- `characters/squircle_v1_playback.tscn` plays manifest-owned sheets in the ready screen,
+  Bubbles and results.
 - The canonical editable model and actions are in `art/squircle/squircle-animated.blend`.
   30 runtime sheets and their frame and anchor manifest live in
-  `assets/runtime/animated_characters/squircle/v1/`. The Playground lobby, the Bubbles shared
-  screen and the phone consume that same v1 set.
+  `assets/runtime/animated_characters/squircle/v1/`. The Bubbles shared screen, the ready
+  screen and the phone consume that same v1 set. `art/squircle/export_glb.py` exports the
+  rigged model to `model/` in that folder.
 - After exporting and packing, run `art/squircle/sync_runtime.py` to refresh the runtime set.
   See the [source workflow and pose tuning](../art/squircle/README.md).
 

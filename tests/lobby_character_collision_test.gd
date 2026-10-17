@@ -2,6 +2,7 @@ extends TestScript
 ## Two real lobby bodies must block each other and rebound after a top landing.
 
 const WORLD: PackedScene = preload("res://scenes/lobby_playground_world.tscn")
+const CLEAR_GROUND_X := -384.0
 
 
 func _run() -> void:
@@ -18,10 +19,13 @@ func _run() -> void:
 	var target := world.character_for(String(second.player.player_id))
 	for unused: int in 6:
 		await physics_frame
-	check(mover.is_on_floor() and target.is_on_floor(), "Both players start on the shelf")
+	check(mover.is_on_floor() and target.is_on_floor(), "Both players start on the ground")
 
-	# Freeze one player so the moving body has a stable collision target.
+	# Freeze one player so the moving body has a stable collision target, on open ground
+	# between the café and the first chair where no landing overhangs the bounce.
 	target.set_connected(false)
+	target.position.x = CLEAR_GROUND_X
+	target.spawn_point = target.position
 	mover.position = target.position + Vector2(-100.0, 0.0)
 	mover.velocity = Vector2.ZERO
 	for unused: int in 35:

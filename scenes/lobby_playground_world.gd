@@ -1,15 +1,66 @@
 class_name LobbyPlaygroundWorld
-extends Node2D
-## Reconciles host registry records into one character per player identity.
+extends Node3D
+## The Playground plaza. Reconciles host registry records into one character per player
+## identity. Bodies simulate on a hidden 2D action plane, where one-way landings, FALL and
+## player bounce already exist; each body's 3D Squircle mirrors it in the plaza at depth zero.
 
 const CHARACTER: PackedScene = preload("res://characters/lobby_squircle.tscn")
+const VISUAL: PackedScene = preload("res://characters/squircle_3d.tscn")
+const ACTIVE_PRESETS: ActivePresets = preload("res://Tuning/Active Presets.tres")
 const MAX_SEQUENCE := 9007199254740991.0
+## Plane pixels per world unit. One unit is one character height, the motor's 96-pixel body.
+const PIXELS_PER_UNIT := 96.0
+## Landing collision depth below its top, plane pixels.
+const LANDING_THICKNESS := 10.0
+const PLATFORM_LAYER := 128
+
+## Movement preset. Empty uses the active lobby preset.
+@export var movement: LobbyMovementTuning
+## A body falling this far below the ground, in world units, respawns.
+@export var fall_reset_depth: float = 3.0
 
 var _characters: Dictionary = { }
 var _last_sequence: Dictionary = { }
 
-@onready var _anchors: Node2D = $FutureCharacterAnchors
-@onready var _character_layer: Node2D = $CharactersFrontOfPanels
+@onready var billboard: PlazaBillboard = $Plaza/Billboard
+@onready var camera: Camera3D = $Camera3D
+@onready var _spawn_points: Node3D = $SpawnPoints
+@onready var _visuals: Node3D = $Characters
+@onready var _surfaces: Node2D = $Simulation/PlatformSurfaces
+@onready var _bodies: Node2D = $Simulation/Bodies
+
+
+func _ready() -> void:
+	if movement == null:
+		# Looked up by path: scripts compiled before autoloads register cannot name SessionHost.
+		var host := get_node_or_null(^"/root/SessionHost")
+		var presets: ActivePresets = host.active_presets if host != null else ACTIVE_PRESETS
+		movement = presets.lobby_movement
+	for landing: PlazaLanding in landings():
+		_surfaces.add_child(_surface_for(landing))
+
+
+static func to_plane(point: Vector3) -> Vector2:
+	return Vector2(point.x, -point.y) * PIXELS_PER_UNIT
+
+
+static func to_world(point: Vector2) -> Vector3:
+	return Vector3(point.x, -point.y, 0.0) / PIXELS_PER_UNIT
+
+
+func landings() -> Array[PlazaLanding]:
+	var found: Array[PlazaLanding] = []
+	for node: Node in $Plaza.find_children("*", "PlazaLanding", true, false):
+		found.append(node as PlazaLanding)
+	return found
+
+
+func surface_named(surface_name: String) -> PlatformSurface:
+	return _surfaces.get_node_or_null(surface_name) as PlatformSurface
+
+
+func spawn_point(seat: int) -> Vector2:
+	return to_plane((_spawn_points.get_child(seat - 1) as Node3D).global_position)
 
 
 func reconcile(players: Array[Dictionary]) -> void:
@@ -17,15 +68,13 @@ func reconcile(players: Array[Dictionary]) -> void:
 	for player: Dictionary in players:
 		var player_id := String(player.player_id)
 		var seat := int(player.seat)
-		if seat < 1 or seat > _anchors.get_child_count():
+		if seat < 1 or seat > _spawn_points.get_child_count():
 			continue
 		present[player_id] = true
 		var character := _characters.get(player_id) as LobbySquircle
 		if character == null:
-			character = CHARACTER.instantiate() as LobbySquircle
-			character.configure(player, (_anchors.get_child(seat - 1) as Marker2D).position)
+			character = _spawn(player, seat)
 			_characters[player_id] = character
-			_character_layer.add_child(character)
 		else:
 			character.refresh_player(player)
 		if String(player.state) != "connected":
@@ -91,6 +140,50 @@ func handle_input(player: Dictionary, message: Dictionary, now_msec: int) -> Dic
 	if action == "fall":
 		return { "accepted": true, "dropped": character.motor.request_fall() }
 	return { "accepted": true }
+
+
+func _process(_delta: float) -> void:
+	for character: LobbySquircle in _characters.values():
+		var visual := character.visual
+		visual.position = to_world(character.position)
+		visual.set_travel(character.velocity.x / PIXELS_PER_UNIT)
+
+
+func _spawn(player: Dictionary, seat: int) -> LobbySquircle:
+	var visual := VISUAL.instantiate() as Squircle3D
+	_visuals.add_child(visual)
+	var character := CHARACTER.instantiate() as LobbySquircle
+	_apply_movement(character.get_node("PlatformMotor") as PlatformMotor)
+	character.configure(player, spawn_point(seat), visual)
+	_bodies.add_child(character)
+	visual.position = to_world(character.position)
+	return character
+
+
+func _apply_movement(motor: PlatformMotor) -> void:
+	motor.move_speed = movement.move_speed * PIXELS_PER_UNIT
+	motor.acceleration = movement.acceleration * PIXELS_PER_UNIT
+	motor.gravity = movement.gravity * PIXELS_PER_UNIT
+	motor.jump_impulse = movement.jump_impulse() * PIXELS_PER_UNIT
+	motor.fall_reset_y = fall_reset_depth * PIXELS_PER_UNIT
+
+
+func _surface_for(landing: PlazaLanding) -> PlatformSurface:
+	var surface := PlatformSurface.new()
+	# Landings share a node name inside their props, so the surface takes the prop's name.
+	surface.name = landing.get_parent().name if landing.name == &"Landing" else landing.name
+	surface.drop_rule = landing.drop_rule
+	surface.collision_layer = PLATFORM_LAYER
+	surface.collision_mask = 0
+	var shape := CollisionShape2D.new()
+	shape.name = "LandingTop"
+	var rectangle := RectangleShape2D.new()
+	rectangle.size = Vector2(landing.width * PIXELS_PER_UNIT, LANDING_THICKNESS)
+	shape.shape = rectangle
+	shape.one_way_collision = landing.one_way
+	shape.position = to_plane(landing.global_position) + Vector2(0.0, LANDING_THICKNESS * 0.5)
+	surface.add_child(shape)
+	return surface
 
 
 func _rejected(code: String) -> Dictionary:

@@ -1,7 +1,6 @@
 extends Control
 
 @onready var address_picker: OptionButton = %AddressPicker
-@onready var qr: QRCodeRect = %JoinQR
 @onready var join_address: Label = %JoinAddress
 @onready var minigame_selector: OptionButton = %MinigameSelector
 @onready var start_button: Button = %StartMinigame
@@ -44,8 +43,7 @@ func _refresh_addresses() -> void:
 	for address: String in addresses:
 		address_picker.add_item(address)
 	if addresses.is_empty():
-		qr.hide()
-		%JoinQRBackground.hide()
+		world.billboard.show_no_address()
 		%Copy.disabled = true
 		%Instructions.text = "Connect this PC to your local network, then refresh."
 		join_address.text = "No LAN address. Connect to Wi-Fi and refresh."
@@ -57,10 +55,7 @@ func _refresh_addresses() -> void:
 
 func _select_address(index: int) -> void:
 	join_address.text = SessionHost.join_url(address_picker.get_item_text(index))
-	qr.data = join_address.text.to_utf8_buffer()
-	qr.update()
-	qr.show()
-	%JoinQRBackground.show()
+	world.billboard.show_join_url(join_address.text)
 	%Instructions.text = "Connect your phone to the same network, then scan."
 	%Copy.disabled = false
 

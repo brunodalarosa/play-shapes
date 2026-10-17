@@ -25,7 +25,7 @@ func _run() -> void:
 	var lobby: Control = load("res://scenes/lobby.tscn").instantiate()
 	root.add_child(lobby)
 	await process_frame
-	var qr: QRCodeRect = lobby.get_node("%JoinQR")
+	var qr: QRCodeRect = lobby.get("world").billboard.qr
 	qr.data = "http://192.168.1.50:8080".to_utf8_buffer()
 	qr.update()
 	DirAccess.make_dir_recursive_absolute("res://test-results")

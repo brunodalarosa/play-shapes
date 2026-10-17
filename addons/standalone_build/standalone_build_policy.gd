@@ -14,7 +14,8 @@ const INCLUDE_FILTER := (
 	"web/public/*.html,web/public/*.webmanifest,web/public/*.css,web/public/*.js,"
 	+ "web/public/platform_input_settings.json,"
 	+ "assets/runtime/animated_characters/squircle/v1/manifest.json,"
-	+ "assets/runtime/minigames/003/manifest.json"
+	+ "assets/runtime/minigames/003/manifest.json,"
+	+ "assets/runtime/playground_plaza/*/License.txt"
 )
 const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,addons/tilt_shift_workshop/**,scratch/**,comparisons/**,docs/images/tilt-shift-workshop/**,local/**,*.local.json,*.pem,*.key,*.crt,*.cer,*.der,*.p12,*.pfx,art/**,builds/**,opencode.json,tools/**,tests/**,minigames/*/tests/**,test-results/**,web/package.json,web/package-lock.json,web/tsconfig.json,web/node_modules/**,web/src/**,web/tests/**"
 const REQUIRED_BROWSER_PATHS := [
@@ -64,7 +65,27 @@ const REQUIRED_RUNTIME_PATHS := [
 	"characters/squircle_v1_playback.gd",
 	"characters/lobby_squircle.tscn",
 	"characters/lobby_squircle.gd",
+	"characters/squircle_3d.tscn",
+	"characters/squircle_3d.gd",
+	"scenes/lobby_playground_world.tscn",
 	"scenes/lobby_playground_world.gd",
+	"scenes/plaza_landing.gd",
+	"scenes/plaza_billboard.tscn",
+	"scenes/plaza_billboard.gd",
+	"Tuning/Shared/Lobby/Default.tres",
+	"Tuning/Shared/lobby_movement_tuning.gd",
+	"assets/runtime/animated_characters/squircle/v1/model/squircle.glb",
+	"assets/runtime/animated_characters/squircle/v1/model/face-neutral.png",
+	"assets/runtime/animated_characters/squircle/v1/model/face-blink.png",
+	"assets/runtime/playground_plaza/cafe/cafe.glb",
+	"assets/runtime/playground_plaza/billboard/billboard.glb",
+	"assets/runtime/playground_plaza/table/cafe-table.glb",
+	"assets/runtime/playground_plaza/chair/chair_A.gltf",
+	"assets/runtime/playground_plaza/chair/License.txt",
+	"assets/runtime/playground_plaza/tree/Tree_2_E_Color1.gltf",
+	"assets/runtime/playground_plaza/tree/License.txt",
+	"assets/runtime/playground_plaza/potted_plant/bush.gltf",
+	"assets/runtime/playground_plaza/potted_plant/License.txt",
 	"assets/runtime/animated_characters/squircle/v1/manifest.json",
 	"assets/runtime/animated_characters/squircle/v1/render_tint.gdshader",
 	"assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png",

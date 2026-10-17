@@ -1,0 +1,81 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scenes/plaza_billboard.gd" id="1"]
+[ext_resource type="PackedScene" path="res://assets/runtime/playground_plaza/billboard/billboard.glb" id="2"]
+[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/play_shapes_logo.png" id="3"]
+[ext_resource type="Script" path="res://addons/kenyoni/qr_code/qr_code_rect.gd" id="4"]
+
+[sub_resource type="StyleBoxFlat" id="qr_background"]
+bg_color = Color(1, 1, 1, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="PlazaBillboard" type="Node3D"]
+script = ExtResource("1")
+
+[node name="Model" parent="." instance=ExtResource("2")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0, 0)
+
+[node name="Screen" type="SubViewport" parent="."]
+disable_3d = true
+size = Vector2i(1024, 1024)
+render_target_update_mode = 1
+
+[node name="Content" type="ColorRect" parent="Screen"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.97, 0.93, 0.85, 1)
+
+[node name="Layout" type="VBoxContainer" parent="Screen/Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 56.0
+offset_top = 48.0
+offset_right = -56.0
+offset_bottom = -56.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 28
+
+[node name="Logo" type="TextureRect" parent="Screen/Content/Layout"]
+custom_minimum_size = Vector2(0, 250)
+layout_mode = 2
+texture = ExtResource("3")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="JoinQRBackground" type="PanelContainer" parent="Screen/Content/Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(640, 640)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("qr_background")
+
+[node name="JoinQR" type="TextureRect" parent="Screen/Content/Layout/JoinQRBackground"]
+unique_name_in_owner = true
+layout_mode = 2
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+script = ExtResource("4")
+mode = 4
+quiet_zone_size = 4
+
+[node name="NoAddress" type="Label" parent="Screen/Content/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.11, 0.2, 0.31, 1)
+theme_override_font_sizes/font_size = 56
+text = "Connect this PC to Wi-Fi to show the join code."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3

@@ -69,3 +69,4 @@ What was decided.
 | [0030](0030-tilt-shift-round-preparation.md) | Tilt Shift prepares selected players inside each mapped round |
 | [0031](0031-tilt-shift-initial-calibration.md) | Tilt Shift waits for initial calibration before a skipped-panel countdown |
 | [0032](0032-mandatory-pre-minigame-screen.md) | Every normal minigame starts at the shared Pre-minigame screen |
+| [0033](0033-plaza-lobby-plane-simulation.md) | The 3D Playground lobby simulates its characters on a 2D plane |

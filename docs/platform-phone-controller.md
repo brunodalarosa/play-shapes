@@ -179,8 +179,8 @@ and client-supplied identity, support or grounding fields have no authority.
   - Keep the authored `CollisionShape2D` geometry and the one-way settings.
   - Choose **Drop Rule: Open/Closed** in the Inspector. Closed affects deliberate FALL only;
     it does not make the surface solid from below.
-  - In the Playground, `BottomShelf` is Closed and all ten raised shelves and block tops are
-    Open. Select `PlatformSurfaces/<name>` to change just that rule.
+  - In the Playground, the ground is Closed and the chair seats, tabletops and café roof are
+    Open. Select a prop's `Landing` marker to change just that rule.
 - `components/platform_motor.gd` is a child of any `CharacterBody2D` with ordinary collision
   shapes.
   - The parent owns the geometry and layers. The motor owns physics, axes, input expiry, jump
@@ -233,8 +233,9 @@ Its host configuration and its browser constructor must share settings, not tune
 | `drop_clearance` | 4 px | Extra full-body clearance below support bounds. |
 | `drop_speed` | 80 px/s | Initial downward speed; lower platforms remain collidable. |
 
-- The movement, jump, gravity and bounce values live on `LobbySquircle/PlatformMotor`. The
-  visual scale stays on `LobbySquircle`.
+- The Playground's speed, acceleration, gravity and jump height live in
+  `Tuning/Shared/Lobby/Default.tres`, in character heights. Bounce stays on
+  `LobbySquircle/PlatformMotor`.
 - A short timeout can stop a slow drop early. A longer timeout still excludes only one
   support.
 - Disconnect or resume, expiry, component or scene exit and respawn clear transient contact

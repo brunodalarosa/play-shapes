@@ -61,6 +61,16 @@ one has, the `private-access` lint rule is turned back on for `tests/`
 After the input pipeline: bots that fill a game with players
 ([0008](decisions/0008-bots.md)).
 
+## The 3D rework
+
+The game is being rebuilt with 3D assets, starting with the Playground lobby. The lobby is a
+3D café plaza where real-time Squircles move on one plane with the unchanged phone controls
+([0033](decisions/0033-plaza-lobby-plane-simulation.md)). The ready screen, the minigames and
+phone setup still use the Squircle sheets, and are rebuilt afterwards.
+
+The 2D painted-room art in `assets/runtime/lobby_playground/` is unused apart from the logo,
+and is removed once the plaza is approved.
+
 ## Tilt Shift foundation
 
 Host rules and editable content exist for Tilt Shift: equal teams, balanced rotating

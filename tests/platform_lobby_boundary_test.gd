@@ -25,6 +25,9 @@ func _run() -> void:
 	world.reconcile(players)
 	var first := world.character_for("first")
 	var second := world.character_for("second")
+	# The ground is Closed, so FALL starts from an Open tabletop above clear ground.
+	var table_top := world.surface_named("TableLeft").world_bounds().position.y
+	first.position = Vector2(0.0, table_top)
 	for index: int in 5:
 		await physics_frame
 		await process_frame
@@ -58,13 +61,13 @@ func _run() -> void:
 		await physics_frame
 		await process_frame
 	check(
-		absf(first.position.y - 675.0) < 1.0 and absf(second.position.y - 400.0) < 1.0,
+		absf(first.position.y) < 1.0 and absf(second.position.y) < 1.0,
 		"Playground FALL descends one actual support without disturbing another player",
 	)
 	release.input_seq = 3
 	check(
 		not world.handle_input(players[0], release, Time.get_ticks_msec()).dropped,
-		"Repeated held FALL cannot bypass next shelf",
+		"Repeated held FALL cannot bypass the ground",
 	)
 	for invalid: Variant in [0, -1, 1.5, NAN, INF, 9007199254740992.0, "4", null]:
 		release.input_seq = invalid
@@ -95,8 +98,11 @@ func _run() -> void:
 		and first.get_collision_exceptions().is_empty(),
 		"Resume clears stance, queued actions and collision exceptions",
 	)
-	await physics_frame
-	await process_frame
+	first.position = Vector2(0.0, table_top)
+	first.velocity = Vector2.ZERO
+	for index: int in 3:
+		await physics_frame
+		await process_frame
 	release.input_seq = 1
 	check(
 		world.handle_input(players[0], release, Time.get_ticks_msec()).dropped,

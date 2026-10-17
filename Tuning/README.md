@@ -8,6 +8,7 @@ the relevant consumer; there is intentionally no runtime tuning UI.
 
 - Bubbles and jellyfishes: `minigames/002_bubbles_and_jellyfishes/tuning/Default.tres`, in the minigame's own folder, is the provisional umbrella profile for round rules, gesture recognition, and values used by the arena systems. See [its field guide](../minigames/002_bubbles_and_jellyfishes/tuning/README.md). Select a named copy in `Active Presets.tres` and relaunch before comparing feel.
 - Networking/session: `Shared/Networking/Default.tres` owns host-only listener, capacity, timeout, and reconnect behavior.
+- Playground lobby movement: `Shared/Lobby/Default.tres` sets speed, acceleration, gravity and jump height in character heights. The jump must still reach the café roof from a tabletop; `tests/lobby_plaza_reachability_test.gd` checks the active preset.
 - Default recovery: assign the appropriate `Default.tres` back into `Active Presets.tres`, save, and relaunch.
 - Named comparison: duplicate `Default.tres` beside it, use a descriptive name such as `Generous.tres` or `Experimental_2026-09-14.tres`, change one logical group, assign it through `Active Presets.tres`, and commit it. Every committed `.tres` below `Tuning/` or in a minigame's `tuning/` folder is validated.
 - Experiment record: copy `Experiments/EXPERIMENT_TEMPLATE.md`; record the preset, hypothesis, conditions, observations, and human decision separately from the asset.
@@ -23,7 +24,7 @@ See [the field guide](../minigames/003_tilt_shift/tuning/README.md).
 
 ## Shared category map
 
-The approved shared categories are Input and phone controls, UI and presentation, Audio and haptics, Accessibility, Networking and session behavior, Camera, and Browser/platform behavior. Only Networking currently has shared Godot values, so empty placeholder Resources are not created. Add a category asset when a concrete implemented value needs it.
+The approved shared categories are Input and phone controls, UI and presentation, Audio and haptics, Accessibility, Networking and session behavior, Camera, and Browser/platform behavior. Networking and the Playground lobby's movement have shared Godot values, so empty placeholder Resources are not created. Add a category asset when a concrete implemented value needs it.
 
 Browser fetch timeout (5 seconds), WebSocket deadline (about 7 seconds), and retry delay (2 seconds) remain platform-local in `web/src/app.ts`. They are browser transport/presentation behavior and no current host rule needs them synchronized. `Active Presets.tres` therefore does not send a tuning payload to phones.
 

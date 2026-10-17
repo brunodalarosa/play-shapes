@@ -307,6 +307,8 @@ The helpers whose names start with `bubbles_` are in
 | `bubbles_creature_motion_visual_check` | Creature telegraphs in order: the offscreen bubble burst before reveal, the fish entering from that origin, pufferfish jiggle, warning off, jellyfish breathing. | `bubbles-telegraphs/` |
 | `bubbles_presentation_visual_check` | The shared screen: empty, entrance, ten players at FHD and HD, warning on and off, final timer, tied results, two-player maximum bubble. | `bubbles-presentation/` |
 | `pre_minigame_visual_check` | The ready screen with two and ten players at 1920×1080 and 1280×720. | `pre-minigame/` |
+| `lobby_playground_world_visual_check` | The plaza lobby empty, and with ten players on the ground and every landing tier, some walking, crouching and looking up. | `lobby-playground-world/` |
+| `lobby_layout_visual_check` | The lobby before and after two players join, and a character jumping in front of the billboard QR. | `lobby-layout/` |
 | `bubbles_viewport_visual_check` | Player-bubble edge contact at 1920×1080 and 1280×720. | `bubbles-viewport/` |
 | `motion_lab_visual_check` | A synthetic desktop capture of the motion lab. Not physical sensor evidence. | `motion-lab/` |
 

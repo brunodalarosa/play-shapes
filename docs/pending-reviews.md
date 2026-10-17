@@ -6,6 +6,19 @@ the review is done, and record the device and browser versions in the pull reque
 removes it. The evidence labels are defined in
 [verification.md](verification.md#evidence-labels).
 
+## Playground plaza lobby
+
+- `[GODOT-RUNTIME]` and owner visual review of the running plaza against the approved mockup:
+  composition, colors, lighting, the Squircle's scale beside the props, and the nameplates.
+  Captures are in `test-results/lobby-playground-world/`.
+- `[HUMAN-PLAY]` Movement feel with the new jump height, roof reachability from the tables,
+  jump corridors, ten-player readability and game feel.
+- The bottom-right control panel covers the right-hand chair and part of the right table at
+  16:9. Owner decision: keep, shrink, or shift the furniture left.
+- `[PHYSICAL-PHONE]` Scanning the billboard QR from the couch at real viewing distance.
+- `[GODOT-RUNTIME]` Host frame time with ten players on the target PC. Not yet measured.
+- `[EXPORTED-BUILD]` The Windows package opens the plaza with every model and license.
+
 ## Playground plaza cafe table
 
 - After separate scene integration, `[GODOT-RUNTIME]` materials and final-camera inspection,
@@ -129,8 +142,8 @@ removes it. The evidence labels are defined in
 
 - The sector widths and the gesture that re-arms FALL.
 - Drop speed and clearance, and behavior on stacked surfaces and at edges.
-- Two players on one Open surface: drop one to the next surface, then check that
-  `BottomShelf` rejects FALL.
+- Two players on one Open surface: drop one to the next surface, then check that the
+  ground rejects FALL.
 - Set another platform to Closed in the Inspector and check it alone changes.
 - Feet stay grounded, and characters still interact as before.
 
@@ -149,8 +162,8 @@ removes it. The evidence labels are defined in
 The sheets were rendered again on another machine after the names inside the Blender source
 changed. A pixel comparison with the previous sheets found nothing a viewer should notice.
 
-- `[GODOT-RUNTIME]` A look at the Squircle in the lobby and in the F12 Animation Lab, in every
-  clip and both views.
+- `[GODOT-RUNTIME]` A look at the Squircle sheets in the ready screen and in the F12 Animation
+  Lab, in every clip and both views.
 - The source opened in Blender by someone who edits it: the scene, the actions and the face
   images are found under their new names. No evidence label covers Blender.
 

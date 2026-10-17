@@ -31,12 +31,13 @@ SHA-256 of each unchanged model:
 - `potted_plant/bush.gltf`:
   `b1de478b23e6bcfd08d6c070440582195839f66dfd3afc123118fb6298483183`
 
-## Integration boundary
+## Runtime copies
 
-`art/.gdignore` excludes these sources from Godot's asset importer. No running scene
-references these models. Their scene scale, orientation, collision, landing surfaces,
-materials in Godot and final-camera readability still need to be fitted and checked
-during scene integration. Keep one shared copy of each prop for reuse.
+`art/.gdignore` excludes these sources from Godot's asset importer. The Playground lobby
+loads byte-identical copies from `assets/runtime/playground_plaza/`: the three exported GLBs
+and the three KayKit models with their buffers, textures and licenses. After re-exporting a
+model here, copy it there too.
 
-The files add no host frame work or phone messages while uninstantiated. A completed
-file copy and matching hashes establish source delivery, not a playable plaza.
+The lobby scene places, scales and orients every prop; the models themselves are unchanged.
+Collision comes from landing markers in that scene, not from the meshes. See
+[architecture.md](../../docs/architecture.md#lobby).
