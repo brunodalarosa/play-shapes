@@ -33,9 +33,10 @@ Squircle 3D model and its animations, while the phone controls stay exactly as t
 
 - Ready-made assets first; author new ones only when strictly necessary.
 - The lobby validates the approach. The minigames are rebuilt afterwards, not now.
-- The note asks for every commit to go to `feature/3d-low-poly-project-rework`. This worktree's
-  branch is `feature/claude-3d-rework-attempt`, cut from it at `2f0b432`, and a separate Codex
-  worktree sits on the same commit. Ask the owner where a commit belongs before making one.
+- The note asks for every commit to go to `feature/3d-low-poly-project-rework`. That rule does
+  not apply to this attempt: the owner has said to commit to `feature/claude-3d-rework-attempt`,
+  this worktree's branch, cut from the rework branch at `2f0b432`. A separate Codex worktree
+  sits on the same commit.
 
 ### What already exists for it
 
