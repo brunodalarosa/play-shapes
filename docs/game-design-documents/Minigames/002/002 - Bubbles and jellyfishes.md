@@ -1,10 +1,25 @@
 ## Player facing name
+
 Bubbles and jellyfishes
+
 ## Overview
-In this underwater minigame the shape characters stays are always inside bubbles, they move around the level with the help of the player that inputs directional force to push the bubble to a direction using swipe controls on their phone. The main objective is to capture as many jellyfishes as possible within the time limit. Captured jellyfishes are trapped inside the player bubble, which gradually increase the bubble size. Players capture jellyfishes simply by colliding with them, so having a bigger bubble means it's easier to capture even more jellyfishes. The bubble stops growing at its maximum visual size, but the player can keep collecting and scoring jellyfishes without a maximum amount. However, jellyfishes aren't the only sea creature in this ocean: Pufferfishes will float around the level, spawning outside the viewport and drifting from one side to the other. If a player bubble collides with a puffer fish they will pop their bubble, including while the player is spinning. The player loses all captured jellyfishes when their bubble pops. A tunable ratio of those jellyfishes is scattered around the pop location so any nearby player, including the player who popped, may recollect them; the rest disappear immediately. A new bubble rapidly forms around the player's shape character. During a tunable invulnerability period the character blinks white, cannot collect jellyfishes, and cannot be popped again. After spawning jellyfishes will wander the level. Players can also bump into each other, which pushes each other to opposite directions. If a player is spinning their bubble however they won't move when bumping into another player and instead shove the other bubble with a tunable amount of additional force. Spinning never pops another player's bubble, and a spinning player otherwise collects jellyfishes and collides with hazards normally. The spinning bubble move has a cooldown.
+
+In this underwater minigame the shape characters stays are always inside bubbles, they move around the level with the help of the player that inputs directional force to push the bubble to a direction using swipe controls on their phone. The main objective is to capture as many jellyfishes as possible within the time limit. Captured jellyfishes are trapped inside the player bubble, which gradually increase the bubble size.
+
+Players capture jellyfishes simply by colliding with them, so having a bigger bubble means it's easier to capture even more jellyfishes. The bubble stops growing at its maximum visual size, but the player can keep collecting and scoring jellyfishes without a maximum amount. However, jellyfishes aren't the only sea creature in this ocean: Pufferfishes will float around the level, spawning outside the viewport and drifting from one side to the other.
+
+If a player bubble collides with a puffer fish they will pop their bubble, including while the player is spinning. The player loses all captured jellyfishes when their bubble pops. A tunable ratio of those jellyfishes is scattered around the pop location so any nearby player, including the player who popped, may recollect them; the rest disappear immediately. A new bubble rapidly forms around the player's shape character.
+
+During a tunable invulnerability period the character blinks white, cannot collect jellyfishes, and cannot be popped again. After spawning jellyfishes will wander the level. Players can also bump into each other, which pushes each other to opposite directions. If a player is spinning their bubble however they won't move when bumping into another player and instead shove the other bubble with a tunable amount of additional force.
+
+Spinning never pops another player's bubble, and a spinning player otherwise collects jellyfishes and collides with hazards normally. The spinning bubble move has a cooldown.
+
 ## Stop condition
+
 Fixed time duration.
+
 ## Minigame journey
+
 1. On the normal host-selected path, the shared [[docs/game-design-documents/Player journeys/Pre-minigame screen]] presents the preview and instruction booklet. After all players in the selected round are ready, the characters automatically enter the viewport from the left and right sides of the screen and get to their starting positions. The positions are randomly assigned while keeping the same distance from each other. Player collision and player input remain disabled during this entrance. There is no separate in-game instruction card on normal or F12 debug launches.
 2. A 3-second countdown plays before the start of the minigame. A tunable starting population of jellyfishes is placed before controls unlock. Player collision and input remain disabled until `GO`.
 3. Players inputs are enabled.
@@ -12,34 +27,75 @@ Fixed time duration.
 5. Pufferfishes start to spawn outside the viewport and drift across it once before leaving and despawning (any direction: from up to down, from down to up, side to side and diagonally as well). An optional edge warning telegraphs their entry path.
 6. The minigame ends when the time duration reaches 0. Gameplay freezes immediately and the host preserves that exact score snapshot before another collision can resolve.
 ## Shared-screen presentation
-Underwater 2D level built from several layered environment assets with gentle parallax and ambient motion. There are no visible boundaries in any corner of the screen, however bumping into any corner will push the player's bubble in the opposite direction, the level is contained in invisible walls that only collide with players, not with NPCs (Jellyfishes, pufferfishes). Jellyfishes may wander out of the arena and despawn. Pufferfishes cross the arena once, leave, and despawn. NPCs pass through one another; pufferfishes collide only with vulnerable player bubbles. Each bubble is a code/shader-built translucent circle that scales cleanly. Its collision radius grows with its visual size, increasing both its collection reach and exposure to pufferfish. Only a capped number of the captured jellyfishes are rendered inside each bubble even when the authoritative count continues higher. Jellyfish and pufferfish use imported static source art with code-driven motion. Bubble popping, re-forming, NPC motion, and other effects use code-driven animation rather than imported VFX sprite sheets. A readable player name follows each bubble; the shared screen does not show live numeric scores. A timer at the top center shows the remaining whole seconds. During the final 10 seconds, progressively larger pulses emphasize each remaining second, with especially strong `3`, `2`, and `1` beats. The emphasis does not depend on color alone.
+
+Underwater 2D level built from several layered environment assets with gentle parallax and ambient motion. There are no visible boundaries in any corner of the screen, however bumping into any corner will push the player's bubble in the opposite direction, the level is contained in invisible walls that only collide with players, not with NPCs (Jellyfishes, pufferfishes). Jellyfishes may wander out of the arena and despawn. Pufferfishes cross the arena once, leave, and despawn.
+
+NPCs pass through one another; pufferfishes collide only with vulnerable player bubbles. Each bubble is a code/shader-built translucent circle that scales cleanly. Its collision radius grows with its visual size, increasing both its collection reach and exposure to pufferfish. Only a capped number of the captured jellyfishes are rendered inside each bubble even when the authoritative count continues higher. Jellyfish and pufferfish use imported static source art with code-driven motion.
+
+Bubble popping, re-forming, NPC motion, and other effects use code-driven animation rather than imported VFX sprite sheets. A readable player name follows each bubble; the shared screen does not show live numeric scores. A timer at the top center shows the remaining whole seconds. During the final 10 seconds, progressively larger pulses emphasize each remaining second, with especially strong `3`, `2`, and `1` beats. The emphasis does not depend on color alone.
+
 Every character in the level keeps facing the player.
-While a finger drags on the phone, the shared-screen bubble stretches toward the coarse drag direction without moving its collider. The stretch settles when the tunable swipe hold limit passes, even if the finger remains down, to show that the movement opportunity has expired. Circular spin charge adds a faint inner glow that brightens with progress and a continuous bubble wobble; it does not turn the character. Releasing the finger also settles any live deformation. An accepted quick swipe then applies its directional impulse and character push. A touch held longer than the tunable swipe limit produces no impulse. This limit applies only to swipes; a completed spin may take longer.
+
+While a finger drags on the phone, the shared-screen bubble stretches toward the coarse drag direction without moving its collider. The stretch settles when the tunable swipe hold limit passes, even if the finger remains down, to show that the movement opportunity has expired. Circular spin charge adds a faint inner glow that brightens with progress and a continuous bubble wobble; it does not turn the character. Releasing the finger also settles any live deformation.
+
+An accepted quick swipe then applies its directional impulse and character push. A touch held longer than the tunable swipe limit produces no impulse. This limit applies only to swipes; a completed spin may take longer.
+
 [[Wireframe_shared_screen.png]] is a wireframe for the shared screen presentation and [[Wireframe_shared_screen captions]] explains the captions in the wireframe.
+
 ## Phone controls
+
 Phone in portrait mode. Each minigame owns its phone-orientation requirement; entering this minigame requests portrait orientation, and leaving it restores the orientation required by the next lobby or minigame state.
+
 Swipe controls. 
-Swiping in the input area in any direction applies a fixed-strength impulse on release only when the host-measured touch duration is within the tunable swipe limit. Longer drags stretch the shared-screen bubble until that limit, then the stretch settles and release applies no movement impulse. Swiping farther or faster than the minimum recognition threshold does not add more impulse, so short, quick swipes are most effective. Repeated swipes cannot accelerate the bubble beyond a tunable maximum speed. Without new impulses, tunable water drag gradually slows the bubble. Colliding with an invisible wall makes the bubble bounce away according to tunable wall bounciness.
+
+Swiping in the input area in any direction applies a fixed-strength impulse on release only when the host-measured touch duration is within the tunable swipe limit. Longer drags stretch the shared-screen bubble until that limit, then the stretch settles and release applies no movement impulse. Swiping farther or faster than the minimum recognition threshold does not add more impulse, so short, quick swipes are most effective.
+
+Repeated swipes cannot accelerate the bubble beyond a tunable maximum speed. Without new impulses, tunable water drag gradually slows the bubble. Colliding with an invisible wall makes the bubble bounce away according to tunable wall bounciness.
+
 Spinning move: drawing the required circles in one uninterrupted touch gesture charges the spinning move. Clockwise and counterclockwise circles both count. Movement while drawing the circles does not produce directional impulses, and incomplete charge is discarded rather than retained between gestures. Once fully charged, lifting the finger activates the spin. Any momentum from previous impulses is kept, and the player may use directional swipes during the active spin.
+
 ## Phone presentation
-On the phone the player will see a replica of their character's bubble, rendering captured jellyfishes only up to the same visual cap used on the shared screen. On the top of the screen the exact number of currently captured jellyfishes is displayed. The round timer remains exclusive to the shared screen. To accommodate the increasing size of the bubble the camera will zoom out progressively. A circular meter around the bubble communicates spin charge while the player draws circles, then communicates the move's cooldown after the active spin. Where browser support permits, optional haptic feedback reinforces jellyfish collection, the player's bubble popping, and spin activation; gameplay never depends on vibration.
+
+On the phone the player will see a replica of their character's bubble, rendering captured jellyfishes only up to the same visual cap used on the shared screen. On the top of the screen the exact number of currently captured jellyfishes is displayed. The round timer remains exclusive to the shared screen. To accommodate the increasing size of the bubble the camera will zoom out progressively.
+
+A circular meter around the bubble communicates spin charge while the player draws circles, then communicates the move's cooldown after the active spin. Where browser support permits, optional haptic feedback reinforces jellyfish collection, the player's bubble popping, and spin activation; gameplay never depends on vibration.
+
 The whole screen is the input area, even the label on top.
+
 ## Character appearance
+
 The shared screen and phone use the approved Squircle v1 rendered character sprites. Every player has the same Squircle body silhouette; the selected color tint distinguishes players. Keep the character readable inside the bubble and mirror its host-owned visual state on the phone.
+
 [[Wireframe_phone_screen.png]] is a wireframe for the phone screen presentation.
+
 ## Difficulty progression
+
 The spawn rate of pufferfishes increases as time goes on. The spawn rate of jellyfishes follows a wave pattern, alternating randomized high- and low-spawn periods whose rates and durations remain within tunable ranges. A tunable maximum limits how many free jellyfishes may be active simultaneously.
+
 ## Round ending and ranking
+
 Round ends when the time duration ends. The host freezes gameplay immediately at zero and ranks players using their current number of captured jellyfishes in that final snapshot. Players with the same count share the same rank.
+
 ## Results
+
 Show every player in ranking order with their rank, name, shape character, and final jellyfish count. No elaborate winner celebration is required for the first implementation.
+
 ## Lobby and debug flow
+
 Normal play starts Bubbles and Jellyfishes from the lobby through [[docs/game-design-documents/Player journeys/Pre-minigame screen]]. `Return to lobby` preserves registered players. The F12 debug launcher provides a separate one-real-player Bubbles and Jellyfishes scenario that bypasses the pre-minigame screen. A polished minigame menu, automatic playlist, and random selection are deferred.
+
 ## Audio and feedback
+
 A single background music track plays throughout the minigame for the first implementation. The minimum sound set covers jellyfish collection, bubble pop, bubble re-forming, spin fully charged, spin activation, player collision/shove, countdown beats, and the final seconds. The pufferfish entry warning is visual only. Neither the shared screen nor phone uses screen shake.
+
 ## Asset requirements
-All imagery in the wireframes is placeholder reference only and is not approved runtime art. The minigame requires separately supplied and imported layered underwater environment art, jellyfish art, and pufferfish art. Jellyfish and pufferfish may use static source images because their motion is procedural. The scalable bubble, pop/re-form effects, circular meters, pufferfish warning, timer treatment, and results UI are code-built and require no imported visual assets. The shared instruction booklet belongs to [[docs/game-design-documents/Player journeys/Pre-minigame screen]]. Audio requires one separately supplied and imported background music track plus a supplied and imported SFX set covering the cues listed above.
+
+All imagery in the wireframes is placeholder reference only and is not approved runtime art. The minigame requires separately supplied and imported layered underwater environment art, jellyfish art, and pufferfish art. Jellyfish and pufferfish may use static source images because their motion is procedural. The scalable bubble, pop/re-form effects, circular meters, pufferfish warning, timer treatment, and results UI are code-built and require no imported visual assets.
+
+The shared instruction booklet belongs to [[docs/game-design-documents/Player journeys/Pre-minigame screen]]. Audio requires one separately supplied and imported background music track plus a supplied and imported SFX set covering the cues listed above.
+
 ## Designer-tunable values
+
 * Minigame time duration
 * Starting size of the bubble
 * Max size of the bubble

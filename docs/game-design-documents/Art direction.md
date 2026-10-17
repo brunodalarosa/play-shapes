@@ -4,6 +4,7 @@ Art Direction Keywords: Low Poly · Graphic Simplicity · Toy-Like Charm · Bold
 Create a bright, playful, and approachable 3D world where familiar everyday objects become the foundation for unexpected adventures.
 The visual identity combines simple low-poly geometry, bold energetic colors, exaggerated proportions, and toy-like aesthetics to create an instantly recognizable and visually engaging experience.
 The world should feel welcoming, cheerful, and full of personality, using visual humor and playful surrealism to transform ordinary objects and environments into extraordinary experiences.
+
 Core Vision:
 A bright, playful world where everyday objects come together to create new adventures.
 2. Core Art Direction Principles
@@ -47,7 +48,9 @@ The primary shape language should be built around recognizable geometric primiti
 - Simple faceted organic forms
 Complex objects should be constructed from combinations of these primitives whenever possible.
 Design Rule: Simple geometry should create memorable silhouettes without relying on intricate mesh details.
+
 3.2 Color Palette
+
 The primary palette consists of bold, saturated colors:
 Color	Visual Role
 Red	Vibrant, high-energy accents
@@ -113,12 +116,16 @@ Each object should be immediately recognizable through its silhouette, proportio
 6. Art Direction Opportunities
 Curated Prop Variety
 A thoughtfully chosen set of everyday objects can create visual richness without overwhelming the scene.
+
 Visual Humor
 Unexpected combinations and exaggerated scale can produce delightful and memorable situations.
+
 Accessible, Cheerful Worldbuilding
 Familiar environments feel new and inviting through colorful, simplified presentation.
+
 Strong Gameplay Readability
 Bold shapes, clear silhouettes, and high contrast help players identify and understand objects and environments.
+
 Low-Poly Production Efficiency
 Simple forms support efficient asset creation, iteration, reuse, and expansion of the game world.
 7. Art Direction Validation Criteria

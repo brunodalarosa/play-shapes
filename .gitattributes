@@ -5,3 +5,10 @@ addons/kenyoni/** linguist-vendored
 assets/Kenney_Shape_Characters/License.txt -text
 assets/Kenney_Shape_Characters/Vector/overview.svg -text
 assets/Kenney_Shape_Characters/Vector/overview.swf -text
+art/playground_plaza/chair/** -text
+art/playground_plaza/tree/** -text
+art/playground_plaza/potted_plant/** -text
+# Retain upstream license spacing verbatim.
+art/playground_plaza/chair/License.txt -whitespace
+art/playground_plaza/tree/License.txt -whitespace
+art/playground_plaza/potted_plant/License.txt -whitespace

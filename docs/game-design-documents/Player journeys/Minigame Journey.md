@@ -5,4 +5,4 @@ Every minigame player journey consist of three 3 chapters:
 
 The Pre-minigame screen is mandatory in every normal launch, including minigames with
 readiness checks inside gameplay. Debug flows are exceptions. No skip setting exists.
-See [player journey implementation guidance](player-journeys.md).
+See [player journey implementation guidance](../../player-journeys.md).

@@ -56,7 +56,7 @@ Results stay on the host until Return to lobby. Audio is currently deferred.
 Selected Resources control duration, mapped basket presets, ball count and delivery
 curve, motion gain, continuous or bounded input, physical materials and preparation.
 The workshop's Tunables tab edits the same Resources used by preview and runtime.
-See the [field guide](minigames/003_tilt_shift/tuning/README.md).
+See the [field guide](../../../minigames/003_tilt_shift/tuning/README.md).
 
 Real phones and owner playtests determine comfort, responsiveness, full-turn tracking,
 readability, strategic fairness and final tuning. Synthetic inputs and runtime captures
