@@ -87,6 +87,21 @@ In the game, `SquircleV1Playback` plays these stances:
 - The external absolute clock remains available for looping locomotion.
 - Tint and face/blink controls remain independent.
 
+## Real-time model
+
+`export_glb.py` exports the saved source as a rigged GLB for 3D scenes. In memory only, it
+parents each mesh to its control bone in rest pose and names the clips `idle`, `walk`, `run`,
+`look_up`, `crouch` and `lever_pull`. The source file is not saved.
+
+```powershell
+& $blender --background squircle-animated.blend --python-exit-code 1 --python export_glb.py
+```
+
+It writes `squircle.glb`, the two face images and `model.json`, with the source and GLB hashes,
+to `assets/runtime/animated_characters/squircle/v1/model/`. The GLB embeds no materials:
+`Squircle3D` applies the player tint and the face images in Godot. Imported clips end on their
+last key, so `Squircle3D` sets each loop's length to its frame count at 24 fps.
+
 ## Export and synchronize
 
 Run from this folder, using Blender and Python with Pillow/NumPy:
