@@ -15,7 +15,7 @@ repository.
   the host's accepted angle throughout the factory rounds.
 - Registered players appear as 3D Squircles in the Playground lobby, a café plaza viewed from
   the side. Each steers their character from a portrait phone stick and a release-action
-  button. The billboard shows the join QR; the lobby controls are in the bottom-right panel. Near-vertical input
+  button. The billboard shows the join QR; the lobby controls are in the top-right panel. Near-vertical input
   reaches or crouches, and FALL descends Open supports.
 - Squircle v1 is also the character in Minigame 002 and in phone setup.
 - F12 opens the debug menu: a one-real-player Bubbles scenario, the Squircle Animation Lab,

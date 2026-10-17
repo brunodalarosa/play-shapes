@@ -13,8 +13,8 @@ removes it. The evidence labels are defined in
   Captures are in `test-results/lobby-playground-world/`.
 - `[HUMAN-PLAY]` Movement feel with the new jump height, roof reachability from the tables,
   jump corridors, ten-player readability and game feel.
-- The bottom-right control panel covers the right-hand chair and part of the right table at
-  16:9. Owner decision: keep, shrink, or shift the furniture left.
+- The soft sunset lighting, the extra trees and plants, the angled chairs and the larger
+  billboard set further back, at the real camera.
 - `[PHYSICAL-PHONE]` Scanning the billboard QR from the couch at real viewing distance.
 - `[GODOT-RUNTIME]` Host frame time with ten players on the target PC. Not yet measured.
 - `[EXPORTED-BUILD]` The Windows package opens the plaza with every model and license.

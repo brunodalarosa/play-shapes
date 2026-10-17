@@ -19,7 +19,7 @@ Messages and limits are in [protocol.md](protocol.md).
 ## Lobby
 
 - `scenes/lobby.*` holds the address picker, Refresh, Copy, the join address, the minigame
-  selector and Start in `ControlPanel`, a container panel 32 pixels in from the bottom-right
+  selector and Start in `ControlPanel`, a container panel 32 pixels in from the top-right
   corner. It hands the join URL to the billboard.
   - There is no visible roster. `SessionHost.players_changed` still refreshes the shared 2–10
     player launch gate.

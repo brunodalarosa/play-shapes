@@ -1,5 +1,5 @@
 extends TestScript
-## The lobby controls sit in one padded bottom-right panel at both 16:9 host sizes, and the
+## The lobby controls sit in one padded top-right panel at both 16:9 host sizes, and the
 ## billboard carries the live join QR.
 
 const SIZES: Array[Vector2i] = [Vector2i(1920, 1080), Vector2i(1280, 720)]
@@ -35,9 +35,9 @@ func _check_size(size: Vector2i) -> bool:
 	var area := panel.get_global_rect()
 	if not check(
 		canvas.encloses(area) and canvas.end.x - area.end.x >= MIN_PADDING
-		and canvas.end.y - area.end.y >= MIN_PADDING
-		and area.position.x > canvas.size.x * 0.5 and area.position.y > canvas.size.y * 0.4,
-		"The control panel sits in the bottom-right corner, clear of the edges at %s" % size,
+		and area.position.y >= MIN_PADDING and area.position.x > canvas.size.x * 0.5
+		and area.end.y < canvas.size.y * 0.6,
+		"The control panel sits in the top-right corner, clear of the edges at %s" % size,
 	):
 		return false
 	for name: String in CONTROLS:
@@ -56,9 +56,8 @@ func _check_size(size: Vector2i) -> bool:
 
 	var world: LobbyPlaygroundWorld = lobby.world
 	var camera := world.camera
-	var billboard_top := camera.unproject_position(
-		world.billboard.global_position + Vector3.UP * 11.0
-	)
+	# The board's top edge in the model, above its own origin.
+	var billboard_top := camera.unproject_position(world.billboard.to_global(Vector3.UP * 11.0))
 	var roof := world.surface_named("Cafe").world_bounds()
 	var roof_end := camera.unproject_position(LobbyPlaygroundWorld.to_world(roof.end))
 	var covers_landmark := area.has_point(billboard_top) or area.has_point(roof_end)

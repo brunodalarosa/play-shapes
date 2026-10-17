@@ -18,8 +18,8 @@ extends Resource
 @export_range(4.0, 40.0, 0.01, "suffix:H/s²") var gravity: float = 14.06:
 	set(value):
 		gravity = clampf(value, 4.0, 40.0)
-## Height of a standing jump's apex above its start, in heights. The café roof needs about 3.6
-## from a tabletop. Higher reaches more; lower may strand the roof. Default: 4. Safe range: 1-8.
+## Height of a standing jump's apex above its start, in heights. The café roof is 3.2 above a
+## tabletop. Higher reaches more; lower may strand the roof. Default: 4. Safe range: 1-8.
 @export_range(1.0, 8.0, 0.05, "suffix:H") var jump_height: float = 4.0:
 	set(value):
 		jump_height = clampf(value, 1.0, 8.0)

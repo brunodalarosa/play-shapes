@@ -30,22 +30,22 @@ roughness = 1.0
 metallic_specular = 0.1
 
 [sub_resource type="StandardMaterial3D" id="m_park"]
-albedo_color = Color(0.435, 0.682, 0.298, 1)
+albedo_color = Color(0.447, 0.663, 0.298, 1)
 roughness = 1.0
 metallic_specular = 0.1
 
 [sub_resource type="StandardMaterial3D" id="m_water"]
-albedo_color = Color(0.247, 0.561, 0.816, 1)
+albedo_color = Color(0.290, 0.525, 0.784, 1)
 roughness = 1.0
 metallic_specular = 0.1
 
 [sub_resource type="StandardMaterial3D" id="m_hill_near"]
-albedo_color = Color(0.373, 0.502, 0.769, 1)
+albedo_color = Color(0.416, 0.486, 0.753, 1)
 roughness = 1.0
 metallic_specular = 0.1
 
 [sub_resource type="StandardMaterial3D" id="m_hill_far"]
-albedo_color = Color(0.525, 0.627, 0.839, 1)
+albedo_color = Color(0.604, 0.596, 0.812, 1)
 roughness = 1.0
 metallic_specular = 0.1
 
@@ -63,15 +63,15 @@ metallic_specular = 0.1
 albedo_color = Color(1.000, 1.000, 1.000, 1)
 roughness = 1.0
 emission_enabled = true
-emission = Color(0.875, 0.914, 0.969, 1)
-emission_energy_multiplier = 0.35
+emission = Color(1.000, 0.839, 0.753, 1)
+emission_energy_multiplier = 0.4
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_material"]
-sky_top_color = Color(0.184, 0.525, 0.902, 1)
-sky_horizon_color = Color(0.663, 0.839, 0.969, 1)
-sky_curve = 0.12
-ground_bottom_color = Color(0.663, 0.839, 0.969, 1)
-ground_horizon_color = Color(0.663, 0.839, 0.969, 1)
+sky_top_color = Color(0.227, 0.471, 0.824, 1)
+sky_horizon_color = Color(0.965, 0.784, 0.627, 1)
+sky_curve = 0.16
+ground_bottom_color = Color(0.918, 0.722, 0.580, 1)
+ground_horizon_color = Color(0.965, 0.784, 0.627, 1)
 sun_angle_max = 20.0
 
 [sub_resource type="Sky" id="sky"]
@@ -82,7 +82,7 @@ background_mode = 2
 sky = SubResource("sky")
 ambient_light_source = 3
 ambient_light_sky_contribution = 0.8
-ambient_light_energy = 0.42
+ambient_light_energy = 0.45
 reflected_light_source = 1
 
 [sub_resource type="BoxMesh" id="ground"]
@@ -141,9 +141,9 @@ fov = 32.0
 far = 400.0
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
-rotation = Vector3(-0.907571, -0.558505, 0)
-light_color = Color(1.000, 0.957, 0.886, 1)
-light_energy = 0.95
+rotation = Vector3(-0.488692, -0.663225, 0)
+light_color = Color(1.000, 0.812, 0.620, 1)
+light_energy = 1.1
 shadow_enabled = true
 shadow_opacity = 0.55
 shadow_blur = 1.5
@@ -219,65 +219,71 @@ script = ExtResource("landing")
 width = 6.8
 
 [node name="ChairLeft" type="Node3D" parent="Plaza"]
-position = Vector3(-2.9, 0, 0)
+position = Vector3(-3, 0, 0)
 
 [node name="Model" parent="Plaza/ChairLeft" instance=ExtResource("chair")]
-position = Vector3(0, 0, -0.75)
-scale = Vector3(2.7, 2.7, 2.7)
+position = Vector3(0, 0, -0.55)
+rotation = Vector3(0, 0.5236, 0)
+scale = Vector3(2.3, 2.3, 2.3)
 
 [node name="Landing" type="Node3D" parent="Plaza/ChairLeft"]
-position = Vector3(0, 1.35, 0)
+position = Vector3(0, 1.15, 0)
 script = ExtResource("landing")
-width = 1.6
+width = 1.4
 
 [node name="ChairMiddle" type="Node3D" parent="Plaza"]
-position = Vector3(3, 0, 0)
+position = Vector3(3.1, 0, 0)
 
 [node name="Model" parent="Plaza/ChairMiddle" instance=ExtResource("chair")]
-position = Vector3(0, 0, -0.75)
-scale = Vector3(2.7, 2.7, 2.7)
+position = Vector3(0, 0, -0.55)
+rotation = Vector3(0, -0.5236, 0)
+scale = Vector3(2.3, 2.3, 2.3)
 
 [node name="Landing" type="Node3D" parent="Plaza/ChairMiddle"]
-position = Vector3(0, 1.35, 0)
+position = Vector3(0, 1.15, 0)
 script = ExtResource("landing")
-width = 1.6
+width = 1.4
 
 [node name="ChairRight" type="Node3D" parent="Plaza"]
-position = Vector3(8.4, 0, 0)
+position = Vector3(9.2, 0, 0)
 
 [node name="Model" parent="Plaza/ChairRight" instance=ExtResource("chair")]
-position = Vector3(0, 0, -0.75)
-scale = Vector3(2.7, 2.7, 2.7)
+position = Vector3(0, 0, -0.55)
+rotation = Vector3(0, -0.5236, 0)
+scale = Vector3(2.3, 2.3, 2.3)
 
 [node name="Landing" type="Node3D" parent="Plaza/ChairRight"]
-position = Vector3(0, 1.35, 0)
+position = Vector3(0, 1.15, 0)
 script = ExtResource("landing")
-width = 1.6
+width = 1.4
 
 [node name="TableLeft" type="Node3D" parent="Plaza"]
 position = Vector3(0, 0, 0)
 
 [node name="Model" parent="Plaza/TableLeft" instance=ExtResource("table")]
-position = Vector3(0, 0, -1)
+position = Vector3(0, 0, -1.1)
+scale = Vector3(1.1, 1.1, 1.1)
 
 [node name="Landing" type="Node3D" parent="Plaza/TableLeft"]
-position = Vector3(0, 3, 0)
+position = Vector3(0, 3.3, 0)
 script = ExtResource("landing")
-width = 3.6
+width = 3.9
 
 [node name="TableRight" type="Node3D" parent="Plaza"]
-position = Vector3(5.9, 0, 0)
+position = Vector3(6.2, 0, 0)
 
 [node name="Model" parent="Plaza/TableRight" instance=ExtResource("table")]
-position = Vector3(0, 0, -1)
+position = Vector3(0, 0, -1.1)
+scale = Vector3(1.1, 1.1, 1.1)
 
 [node name="Landing" type="Node3D" parent="Plaza/TableRight"]
-position = Vector3(0, 3, 0)
+position = Vector3(0, 3.3, 0)
 script = ExtResource("landing")
-width = 3.6
+width = 3.9
 
 [node name="Billboard" parent="Plaza" instance=ExtResource("billboard")]
-position = Vector3(0.3, 0, -7)
+position = Vector3(0.3, -1.2, -12.5)
+scale = Vector3(1.25, 1.25, 1.25)
 
 [node name="Scenery" type="Node3D" parent="Plaza"]
 
@@ -291,13 +297,65 @@ position = Vector3(11.4, 0, -3.2)
 rotation = Vector3(0, -0.610865, 0)
 scale = Vector3(0.9, 0.9, 0.9)
 
-[node name="PlantLeft" parent="Plaza/Scenery" instance=ExtResource("plant")]
-position = Vector3(-11, 0, -0.45)
+[node name="Plant1" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-11.25, 0, -0.3)
+rotation = Vector3(0, 0, 0)
+scale = Vector3(4.5, 4.5, 4.5)
+
+[node name="Plant2" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-10.55, 0, -0.3)
+rotation = Vector3(0, 0.6981, 0)
+scale = Vector3(3.2, 3.2, 3.2)
+
+[node name="Plant3" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-9.6, 0, -0.3)
+rotation = Vector3(0, 1.309, 0)
+scale = Vector3(3.6, 3.6, 3.6)
+
+[node name="Plant4" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-7.9, 0, -0.3)
+rotation = Vector3(0, 0.2618, 0)
+scale = Vector3(3.2, 3.2, 3.2)
+
+[node name="Plant5" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-6.85, 0, -0.3)
+rotation = Vector3(0, 1.0472, 0)
 scale = Vector3(4, 4, 4)
 
-[node name="PlantRight" parent="Plaza/Scenery" instance=ExtResource("plant")]
-position = Vector3(-4.7, 0, -0.45)
-scale = Vector3(4, 4, 4)
+[node name="Plant6" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-4.7, 0, -0.3)
+rotation = Vector3(0, 0.4363, 0)
+scale = Vector3(4.5, 4.5, 4.5)
+
+[node name="Plant7" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-4.05, 0, -0.3)
+rotation = Vector3(0, 1.3963, 0)
+scale = Vector3(3, 3, 3)
+
+[node name="WallTree1" parent="Plaza/Scenery" instance=ExtResource("tree")]
+position = Vector3(-13.5, 0, -7)
+rotation = Vector3(0, 0.8727, 0)
+scale = Vector3(0.7, 0.7, 0.7)
+
+[node name="WallTree2" parent="Plaza/Scenery" instance=ExtResource("tree")]
+position = Vector3(-8.2, 0, -7.6)
+rotation = Vector3(0, 2.4435, 0)
+scale = Vector3(0.6, 0.6, 0.6)
+
+[node name="WallTree3" parent="Plaza/Scenery" instance=ExtResource("tree")]
+position = Vector3(5.6, 0, -7.4)
+rotation = Vector3(0, 3.6652, 0)
+scale = Vector3(0.55, 0.55, 0.55)
+
+[node name="WallTree4" parent="Plaza/Scenery" instance=ExtResource("tree")]
+position = Vector3(8.6, 0, -6.8)
+rotation = Vector3(0, 5.236, 0)
+scale = Vector3(0.65, 0.65, 0.65)
+
+[node name="WallTree5" parent="Plaza/Scenery" instance=ExtResource("tree")]
+position = Vector3(14, 0, -7.8)
+rotation = Vector3(0, 1.6581, 0)
+scale = Vector3(0.75, 0.75, 0.75)
 
 [node name="Backdrop" type="Node3D" parent="."]
 
@@ -390,6 +448,126 @@ scale = Vector3(0.68, 0.68, 0.68)
 position = Vector3(43.13, -0.25, -12.88)
 rotation = Vector3(0, 3.735, 0)
 scale = Vector3(0.66, 0.66, 0.66)
+
+[node name="Grove17" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-51.76, -0.25, -23.11)
+rotation = Vector3(0, 5.936, 0)
+scale = Vector3(0.79, 0.79, 0.79)
+
+[node name="Grove18" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-47.68, -0.25, -24.98)
+rotation = Vector3(0, 4.408, 0)
+scale = Vector3(0.52, 0.52, 0.52)
+
+[node name="Grove19" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-42.76, -0.25, -27.94)
+rotation = Vector3(0, 1.788, 0)
+scale = Vector3(0.79, 0.79, 0.79)
+
+[node name="Grove20" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-39.14, -0.25, -25.02)
+rotation = Vector3(0, 2.901, 0)
+scale = Vector3(0.51, 0.51, 0.51)
+
+[node name="Grove21" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-35.4, -0.25, -20.05)
+rotation = Vector3(0, 4.827, 0)
+scale = Vector3(0.52, 0.52, 0.52)
+
+[node name="Grove22" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-31.11, -0.25, -21.23)
+rotation = Vector3(0, 5.475, 0)
+scale = Vector3(0.64, 0.64, 0.64)
+
+[node name="Grove23" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-26.86, -0.25, -23.04)
+rotation = Vector3(0, 5.55, 0)
+scale = Vector3(0.69, 0.69, 0.69)
+
+[node name="Grove24" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-20.24, -0.25, -26.78)
+rotation = Vector3(0, 2.609, 0)
+scale = Vector3(0.6, 0.6, 0.6)
+
+[node name="Grove25" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-17.22, -0.25, -26.96)
+rotation = Vector3(0, 0.948, 0)
+scale = Vector3(0.84, 0.84, 0.84)
+
+[node name="Grove26" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-13.37, -0.25, -21.09)
+rotation = Vector3(0, 3.047, 0)
+scale = Vector3(0.58, 0.58, 0.58)
+
+[node name="Grove27" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-7.73, -0.25, -21.36)
+rotation = Vector3(0, 2.632, 0)
+scale = Vector3(0.5, 0.5, 0.5)
+
+[node name="Grove28" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-3.99, -0.25, -24.1)
+rotation = Vector3(0, 4.338, 0)
+scale = Vector3(0.83, 0.83, 0.83)
+
+[node name="Grove29" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(0.85, -0.25, -24.56)
+rotation = Vector3(0, 0.339, 0)
+scale = Vector3(0.74, 0.74, 0.74)
+
+[node name="Grove30" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(6.4, -0.25, -26.02)
+rotation = Vector3(0, 5.013, 0)
+scale = Vector3(0.81, 0.81, 0.81)
+
+[node name="Grove31" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(9.28, -0.25, -22.59)
+rotation = Vector3(0, 3.985, 0)
+scale = Vector3(0.54, 0.54, 0.54)
+
+[node name="Grove32" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(12.69, -0.25, -19.61)
+rotation = Vector3(0, 1.02, 0)
+scale = Vector3(0.57, 0.57, 0.57)
+
+[node name="Grove33" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(17.92, -0.25, -19.47)
+rotation = Vector3(0, 0.95, 0)
+scale = Vector3(0.5, 0.5, 0.5)
+
+[node name="Grove34" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(21.6, -0.25, -22.27)
+rotation = Vector3(0, 5.494, 0)
+scale = Vector3(0.51, 0.51, 0.51)
+
+[node name="Grove35" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(27.54, -0.25, -20.34)
+rotation = Vector3(0, 2.183, 0)
+scale = Vector3(0.59, 0.59, 0.59)
+
+[node name="Grove36" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(31.19, -0.25, -20.11)
+rotation = Vector3(0, 6.24, 0)
+scale = Vector3(0.8, 0.8, 0.8)
+
+[node name="Grove37" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(35.9, -0.25, -23.35)
+rotation = Vector3(0, 0.642, 0)
+scale = Vector3(0.53, 0.53, 0.53)
+
+[node name="Grove38" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(39.93, -0.25, -21.38)
+rotation = Vector3(0, 1.014, 0)
+scale = Vector3(0.79, 0.79, 0.79)
+
+[node name="Grove39" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(43.37, -0.25, -27.56)
+rotation = Vector3(0, 0.921, 0)
+scale = Vector3(0.68, 0.68, 0.68)
+
+[node name="Grove40" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(49.33, -0.25, -19.24)
+rotation = Vector3(0, 6.148, 0)
+scale = Vector3(0.68, 0.68, 0.68)
 
 [node name="Block1" type="MeshInstance3D" parent="Backdrop"]
 position = Vector3(-24, 2, -58)

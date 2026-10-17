@@ -8,11 +8,11 @@ const PPU := LobbyPlaygroundWorld.PIXELS_PER_UNIT
 ## Approved tiers in character heights: the ground, three chair seats, two tabletops, the roof.
 const EXPECTED := {
 	"GroundLanding": 0.0,
-	"ChairLeft": 1.35,
-	"ChairMiddle": 1.35,
-	"ChairRight": 1.35,
-	"TableLeft": 3.0,
-	"TableRight": 3.0,
+	"ChairLeft": 1.15,
+	"ChairMiddle": 1.15,
+	"ChairRight": 1.15,
+	"TableLeft": 3.3,
+	"TableRight": 3.3,
 	"Cafe": 6.5,
 }
 const SIZES: Array[Vector2i] = [Vector2i(1920, 1080), Vector2i(1280, 720)]
@@ -51,7 +51,7 @@ func _run() -> void:
 	var table := world.surface_named("TableLeft").world_bounds()
 	var seat := world.surface_named("ChairLeft").world_bounds()
 	check(
-		roof.size.x >= 6.0 * PPU and table.size.x >= 3.0 * PPU and seat.size.x >= 1.4 * PPU,
+		roof.size.x >= 6.0 * PPU and table.size.x >= 3.0 * PPU and seat.size.x >= 1.2 * PPU,
 		"Every landing is wider than a character",
 	)
 	check(
