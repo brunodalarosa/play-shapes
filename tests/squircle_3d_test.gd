@@ -30,13 +30,14 @@ func _run() -> void:
 	squircle.player_color = Color("#43A047")
 	var tinted := 0
 	for mesh: MeshInstance3D in squircle.find_children("*", "MeshInstance3D", true, false):
-		var material := mesh.material_override as StandardMaterial3D
+		var material := mesh.material_override as ShaderMaterial
 		if mesh.name == "Face":
 			check(
-				material != null and material.shading_mode == BaseMaterial3D.SHADING_MODE_UNSHADED,
+				material != null and material.shader == Squircle3D.FACE_SHADER
+				and material.get_shader_parameter("face") == Squircle3D.FACE_NEUTRAL,
 				"The face keeps its untinted artwork",
 			)
-		elif material != null and material.albedo_color == Color("#43A047"):
+		elif material != null and material.get_shader_parameter("player_color") == Color("#43A047"):
 			tinted += 1
 	check(tinted == 5, "Body, both hands and both feet take the player tint")
 

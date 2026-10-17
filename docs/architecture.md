@@ -192,6 +192,11 @@ See [player journeys](player-journeys.md).
 - `characters/squircle_3d.tscn` is the real-time Squircle used by the Playground lobby: the
   exported rig and clips, the player tint, natural blinking, held stances, turning toward
   travel and a nameplate.
+  - Its shaders, `squircle_tint` and `squircle_face`, draw the character in front of any
+    scenery within `front_push` (2 units) of it. Each vertex moves toward the camera along
+    its view ray, so its place on screen and the character's own layering are unchanged.
+    Shadow passes are left alone. Nothing in the plaza may stand in front of a character
+    within that distance.
 - `characters/squircle_v1_playback.tscn` plays manifest-owned sheets in the ready screen,
   Bubbles and results.
 - The canonical editable model and actions are in `art/squircle/squircle-animated.blend`.

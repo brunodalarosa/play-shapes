@@ -25,6 +25,8 @@ const FACE_NEUTRAL: Texture2D = preload(
 const FACE_BLINK: Texture2D = preload(
 	"res://assets/runtime/animated_characters/squircle/v1/model/face-blink.png"
 )
+const TINT_SHADER: Shader = preload("res://characters/squircle_tint.gdshader")
+const FACE_SHADER: Shader = preload("res://characters/squircle_face.gdshader")
 
 static var _tints: Dictionary = { }
 static var _faces: Dictionary = { }
@@ -201,27 +203,20 @@ static func _prepare_library(player: AnimationPlayer) -> void:
 				animation.length = (frames - 1) / CLIP_FPS
 
 
-static func _tint_material(color: Color) -> StandardMaterial3D:
+static func _tint_material(color: Color) -> ShaderMaterial:
 	var key := color.to_html(false)
 	if not _tints.has(key):
-		var material := StandardMaterial3D.new()
-		material.albedo_color = color
-		material.roughness = 0.32
-		material.metallic_specular = 0.5
-		material.rim_enabled = true
-		material.rim = 0.25
-		material.rim_tint = 0.6
+		var material := ShaderMaterial.new()
+		material.shader = TINT_SHADER
+		material.set_shader_parameter("player_color", color)
 		_tints[key] = material
 	return _tints[key]
 
 
-static func _face_material(blink: bool) -> StandardMaterial3D:
+static func _face_material(blink: bool) -> ShaderMaterial:
 	if not _faces.has(blink):
-		var material := StandardMaterial3D.new()
-		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
-		material.alpha_scissor_threshold = 0.5
-		material.albedo_texture = FACE_BLINK if blink else FACE_NEUTRAL
-		material.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		var material := ShaderMaterial.new()
+		material.shader = FACE_SHADER
+		material.set_shader_parameter("face", FACE_BLINK if blink else FACE_NEUTRAL)
 		_faces[blink] = material
 	return _faces[blink]

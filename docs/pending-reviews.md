@@ -15,6 +15,9 @@ removes it. The evidence labels are defined in
   jump corridors, ten-player readability and game feel.
 - The soft sunset lighting, the extra trees and plants, the angled chairs and the larger
   billboard set further back, at the real camera.
+- `[HUMAN-PLAY]` Characters drawn in front of chairs, tables and the café instead of
+  clipping into them, including while jumping up through or falling through a landing.
+  Owner decision whether this replaces true depth layering.
 - `[PHYSICAL-PHONE]` Scanning the billboard QR from the couch at real viewing distance.
 - `[GODOT-RUNTIME]` Host frame time with ten players on the target PC. Not yet measured.
 - `[EXPORTED-BUILD]` The Windows package opens the plaza with every model and license.
