@@ -118,7 +118,7 @@ def main():
         'standing_height_m': round(bpy.data.objects['Body'].matrix_world.translation.z + 1.0, 3),
     }
     with atomic_output(OUT / 'model.json') as temporary:
-        temporary.write_text(json.dumps(report, indent=2) + '\n')
+        temporary.write_text(json.dumps(report, indent=2) + '\n', newline='\n')
     print('SQUIRCLE_GLB_OK', target)
 
 
