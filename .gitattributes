@@ -8,7 +8,13 @@ assets/Kenney_Shape_Characters/Vector/overview.swf -text
 art/playground_plaza/chair/** -text
 art/playground_plaza/tree/** -text
 art/playground_plaza/potted_plant/** -text
+assets/runtime/playground_plaza/chair/** -text
+assets/runtime/playground_plaza/tree/** -text
+assets/runtime/playground_plaza/potted_plant/** -text
 # Retain upstream license spacing verbatim.
 art/playground_plaza/chair/License.txt -whitespace
 art/playground_plaza/tree/License.txt -whitespace
 art/playground_plaza/potted_plant/License.txt -whitespace
+assets/runtime/playground_plaza/chair/License.txt -whitespace
+assets/runtime/playground_plaza/tree/License.txt -whitespace
+assets/runtime/playground_plaza/potted_plant/License.txt -whitespace
