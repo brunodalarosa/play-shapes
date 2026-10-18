@@ -70,3 +70,5 @@ What was decided.
 | [0031](0031-tilt-shift-initial-calibration.md) | Tilt Shift waits for initial calibration before a skipped-panel countdown |
 | [0032](0032-mandatory-pre-minigame-screen.md) | Every normal minigame starts at the shared Pre-minigame screen |
 | [0033](0033-plaza-lobby-plane-simulation.md) | The 3D Playground lobby simulates its characters on a 2D plane |
+| [0034](0034-bubbles-3d-jolt-plane.md) | Bubbles and jellyfishes 3D simulates on Jolt with plane-locked bodies |
+| [0035](0035-phone-three-js.md) | The phone draws 3D with three.js, loaded only when a 3D screen needs it |

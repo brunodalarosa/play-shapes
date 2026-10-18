@@ -9,6 +9,10 @@ repository.
   JavaScript clients over local HTTP and WebSockets.
 - The lobby opens a shared ready screen for **Bubbles and Jellyfishes** with 2–10 registered
   players. Bubbles starts after every current participant is ready.
+- **Bubbles and jellyfishes 3D** (minigame 004) sits beside it in the lobby dropdown for
+  comparison: the same game without the spin move, in a 3D underwater scene on Jolt physics,
+  with a real-time three.js view of each player's own bubble on the phone. It goes through the
+  same ready screen.
 - **Tilt Shift** supports 2/4/6/8/10 players. Each phone enables motion, sets a comfortable
   landscape neutral and confirms READY on the shared Pre-minigame screen before launch.
   One team paddle on each phone mirrors
@@ -17,11 +21,13 @@ repository.
   the side. Each steers their character from a portrait phone stick and a release-action
   button. The billboard shows the join QR; the lobby controls are in the top-right panel. Near-vertical input
   reaches or crouches, and FALL descends Open supports.
-- Squircle v1 is also the character in Minigame 002 and in phone setup.
-- F12 opens the debug menu: a one-real-player Bubbles scenario, the Squircle Animation Lab,
+- Squircle v1 is also the character in Minigame 002 and in phone setup. Minigame 004 uses the
+  3D Squircle on the shared screen and on the phone.
+- F12 opens the debug menu: one-real-player scenarios for both Bubbles versions, the Squircle
+  Animation Lab,
   the Gyroscope and Accelerometer Lab, and a Tilt Shift factory with explicitly simulated
   controls. The factory review creates ten synthetic operators without registering phones.
-  Bubbles labels its debug round on the host and the phone.
+  Both Bubbles versions label their debug round on the host and the phone.
 - The host defaults to a responsive 1920×1080 GL Compatibility presentation.
 - **Project > Tools > Build Standalone Host** creates a portable Windows x86_64 release ZIP.
   There is no Linux build.
@@ -67,7 +73,7 @@ type the displayed URL, on a phone on the same LAN.
 
 - Normal play starts with 2–10 registered players. Choose a minigame from the lobby dropdown
   before starting. Tilt Shift requires an even roster and calibrated motion from everyone.
-- For debug, register exactly one phone, press F12, and choose the matching one-player
-  Bubbles scenario. The separately labeled Tilt Shift factory review needs no phones.
+- For debug, register exactly one phone, press F12, and choose a one-player Bubbles
+  scenario. The separately labeled Tilt Shift factory review needs no phones.
 - Restart and lobby return preserve the running `SessionHost`, the player registry and the
   LAN services.

@@ -71,12 +71,13 @@ phone setup still use the Squircle sheets, and are rebuilt afterwards.
 The 2D painted-room art in `assets/runtime/lobby_playground/` is unused apart from the logo,
 and is removed once the plaza is approved.
 
-Next: minigame 004, Bubbles and jellyfishes 3D, a from-scratch 3D rebuild of 002 without the
-spin move, built beside 002 for comparison. Its design, scene composition and asset sources
-are in `docs/game-design-documents/Minigames/004/`. Its jellyfish and pufferfish models are
-adapted from library parts and its background props copied, all in
-[art/bubbles_3d](../art/bubbles_3d/README.md); the minigame is built next. Once 004 is
-approved, 002 is retired.
+Minigame 004, Bubbles and jellyfishes 3D, is built beside 002 for comparison: a from-scratch
+3D rebuild without the spin move, on Jolt physics with plane-locked bodies
+([0034](decisions/0034-bubbles-3d-jolt-plane.md)), with a three.js view of each player's bubble
+on the phone ([0035](decisions/0035-phone-three-js.md)). Its design is in
+`docs/game-design-documents/Minigames/004/`. It awaits physical-phone checks and the owner's
+side-by-side play review; tuning values are provisional and the Pre-minigame preview image is
+still 002's. Once 004 is approved, 002 is retired.
 
 ## Tilt Shift foundation
 

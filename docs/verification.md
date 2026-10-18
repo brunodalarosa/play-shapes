@@ -41,7 +41,8 @@ This is the default `[AUTO]` check. In order, it runs:
    end-to-end test files.
 5. `npm test` in `web/`.
 6. A rebuild of the browser bundle, which fails if `web/public/` changed.
-7. The two-phone Bubbles and Tilt Shift end-to-end journeys described below.
+7. The two-phone Bubbles, Bubbles and jellyfishes 3D and Tilt Shift end-to-end journeys
+   described below.
 
 `--full` adds the 4/6/8/10-phone Tilt Shift journeys, `tilt_shift_workshop_preview_test.gd`
 and `tilt_shift_rotation_contact_test.gd`. The default retains the shorter Tilt Shift
@@ -90,14 +91,20 @@ The host side is `tests/e2e/host.gd`:
   applies. A button that is covered, off screen, disabled or ignoring the mouse stops the run
   with a message naming what was under the mouse. That covers reachability, not appearance.
 - It prints one `E2E ...` line per event for the test to wait on.
-- By default it shortens only the Bubbles round, to 10 s and in memory. `E2E_ROUND=full` keeps
-  every default.
+- By default it shortens only the two Bubbles rounds, to 10 s and in memory. `E2E_ROUND=full`
+  keeps every default.
+- `E2E_MINIGAME` names the catalog id it picks in the lobby before Start; the fixture sets it
+  from the test's `game` option.
 - It prints `E2E round ending` two seconds before the round ends, and the phones stop swiping
   then. A swipe that reaches the host after the round has ended is rejected as
   `stale_or_unavailable`, and the phone shows that rejection in its error panel.
 
 The test fails on a missing step, a phone without an accepted swipe, a page error, a visible
 phone error panel, or a host `ERROR` line.
+
+`web/e2e/bubbles_3d_two_phones.spec.ts` plays the same journey through Bubbles and
+jellyfishes 3D: two phones swipe on the 3D phone screen, which loads `/three_view.js` and the
+models from the host, and the test fails on a phone without an accepted swipe.
 
 `web/e2e/tilt_shift_phones.spec.ts` also runs the real boot/catalog/gameplay journey with
 synthetic sensors. Its two-phone scenario runs by default, including delayed permission,
@@ -173,6 +180,13 @@ start only what they need, so they stay fast.
   the required runtime paths.
 
 ## Focused checks by area
+
+- Bubbles and jellyfishes 3D: the `tests/` folder of `minigames/004_3d_bubbles/` covers the
+  round rules, Jolt arenas on real physics frames (plane locks, swipes, speed cap, wall and bump
+  rebounds, catching, pops, scatter, caps, the zero freeze), the protocol, the shared-screen
+  scene and the independence from 002. The shared 3D components have `plane_3d_test.gd`,
+  `bubble_shell_3d_test.gd` and `underwater_environment_test.gd` in `tests/`. Run
+  `node tools/check.mjs bubbles_3d plane_3d bubble_shell underwater`.
 
 - Tilt Shift complete flow: `tilt_shift_flow_test.gd` under the minigame's tests covers
   every allowed roster, rejected debug bypass, stale capture, final joins, calibration transfer,
@@ -295,7 +309,9 @@ godot --path . --rendering-method gl_compatibility --script res://tests/<helper>
 ```
 
 The helpers whose names start with `bubbles_` are in
-`minigames/002_bubbles_and_jellyfishes/tests/`; use that folder in place of `tests/`.
+`minigames/002_bubbles_and_jellyfishes/tests/`, except `bubbles_3d_scene_visual_check`
+and `bubbles_3d_performance_check`, which are in `minigames/004_3d_bubbles/tests/`; use that
+folder in place of `tests/`.
 
 | Helper | What it saves | Folder |
 | --- | --- | --- |
@@ -306,6 +322,10 @@ The helpers whose names start with `bubbles_` are in
 | `bubbles_creature_visual_check` | Creatures: entrance and warning, active creatures, white-blinking scatter. | `bubbles-creatures/` |
 | `bubbles_creature_motion_visual_check` | Creature telegraphs in order: the offscreen bubble burst before reveal, the fish entering from that origin, pufferfish jiggle, warning off, jellyfish breathing. | `bubbles-telegraphs/` |
 | `bubbles_presentation_visual_check` | The shared screen: empty, entrance, ten players at FHD and HD, warning on and off, final timer, tied results, two-player maximum bubble. | `bubbles-presentation/` |
+| `bubbles_3d_scene_visual_check` | Bubbles and jellyfishes 3D mid-round with five and ten players, catches of several sizes, free jellyfishes and two pufferfishes. | `bubbles-3d/` |
+| `bubbles_3d_performance_check` | No capture: prints the frame time and draw calls of ten players with every jellyfish cap reached, vsync off. Run it on the target PC. | none |
+| `bubble_shell_visual_check` | Bubble shells of several sizes around tinted Squircles, one stretched and one bursting. | `bubble-shell/` |
+| `underwater_environment_visual_check` | The underwater environment behind bubble shells through the 004 camera. | `underwater-environment/` |
 | `pre_minigame_visual_check` | The ready screen with two and ten players at 1920×1080 and 1280×720. | `pre-minigame/` |
 | `lobby_playground_world_visual_check` | The plaza lobby empty, and with ten players on the ground and every landing tier, some walking, crouching and looking up. | `lobby-playground-world/` |
 | `lobby_layout_visual_check` | The lobby before and after two players join, and a character jumping in front of the billboard QR. | `lobby-layout/` |

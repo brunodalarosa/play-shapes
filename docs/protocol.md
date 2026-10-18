@@ -72,7 +72,8 @@ Local overrides and HTTPS are in [networking.md](networking.md#local-network-con
 The host serves a fixed list and nothing else:
 
 - Pages and styles: `/`, `/style.css`, `/session.json`.
-- The phone client: `/app.js`, one script that holds every module
+- The phone client: `/app.js`, one script that holds every module except the 3D view, and
+  `/three_view.js`, which `/app.js` loads only when a 3D screen starts
   ([browser-build.md](browser-build.md)).
 - Generated settings: `/platform_input_settings.json`.
 - App manifest and icons: `/manifest.webmanifest`, `/app-icon-180.png`, `/app-icon-192.png`,
@@ -80,6 +81,8 @@ The host serves a fixed list and nothing else:
 - Character sheets: `/squircle-v1/manifest.json`, `/squircle-v1/idle-front-colorable.png`,
   `/squircle-v1/idle-front-neutral.png`, `/squircle-v1/idle-front-blink.png`.
 - Bubbles art: `/bubbles-jellyfish.png`, `/bubbles-phone-background.png`.
+- 3D models for the phone: `/models/squircle.glb`, `/models/jellyfish.glb`,
+  `/models/squircle-face-neutral.png` and `/models/squircle-face-blink.png`.
 - Tilt Shift art: `/tilt-shift/manifest.json`, `/tilt-shift/paddle_orange.png`,
   `/tilt-shift/paddle_blue.png` and `/tilt-shift/paddle_neutral.png`.
 
@@ -204,6 +207,33 @@ The host side:
   `bubbles_feedback` carries collection, spin and pop cues.
 - Disconnect clears an unfinished trace. Resume requires a new gesture.
 - Reconnect embeds the latest personalized snapshot in `welcome.gameplay`.
+
+## Bubbles and jellyfishes 3D
+
+Minigame 004 has its own messages, with a `bubbles_3d` prefix; it accepts no 2D Bubbles message
+and has no spin or charge. The phone sends:
+
+- `bubbles_3d_touch` with `input_seq` and `stage`: `start` on touch down, `drag` with a coarse
+  `drag` of two integers from -4 to 4 in screen axes, and `cancel` when a touch is interrupted.
+  The phone throttles drags to 70 ms, re-sends the current one every 600 ms while held and caps
+  a touch at 48 drags.
+- `bubbles_3d_release` with the same `input_seq` and `displacement`, the net movement as two
+  numbers from -1 to 1, a share of the touch area in screen axes.
+
+The host side:
+
+- The host times a touch from its own receipt of `start`. A release later than
+  `swipe_max_hold_seconds` applies nothing, and the live stretch settles at that limit.
+- A release shorter than `swipe_min_distance` applies nothing. Otherwise one fixed-strength
+  push follows its direction; distance and speed add no strength.
+- Drags at least 60 ms apart, at most 48 per touch, drive only the shared-screen stretch, which
+  settles after 1.2 seconds without one.
+- The host answers a release with `bubbles_3d_release_result` (`action` and `reason`) and a
+  `bubbles_3d_snapshot`. `bubbles_3d_feedback` adds `event` (`captured` or `pop`) and, for a
+  pop, `lost`.
+- `bubbles_3d_visual` carries the drawn radius, shell stretch, speed share, invulnerability, time
+  since the last pop and the drawn catch, at up to 20 Hz, dropped while a connection is backed up.
+- Reconnect embeds the latest snapshot in `welcome.gameplay`.
 
 ## Lobby platform input
 

@@ -108,13 +108,29 @@ removes it. The evidence labels are defined in
 - `[HUMAN-PLAY]` Couch-distance readability of the shared screen, the final audio mix, and
   the fairness of creature collisions and telegraphs.
 
+## Bubbles and jellyfishes 3D
+
+- `[HUMAN-PLAY]` The owner's play review side by side with 002: swipe responsiveness, movement
+  feel, bump and wall rebounds, catching and pops, difficulty, readability at couch distance
+  with 5 and 10 players, the underwater look and fun. Every tuning value is provisional.
+- `[PHYSICAL-PHONE]` On the iPhone Safari and Android Chrome pair: the three.js view's
+  rendering and frame rate, the time to first frame while the models download, swipe
+  reliability, latency, haptics where supported, reconnect and the no-WebGL fallback.
+- `[HUMAN-PLAY]` The final audio mix, including the countdown beats on the shared cue.
+- `[HUMAN-PLAY]` Whether the Squircle should keep drawing over its bubble's highlight, as it
+  does in the lobby to stay in front of scenery.
+- A 3D Pre-minigame preview image from the owner; the booklet still shows 002's.
+- `[GODOT-RUNTIME]` Host frame time on the target PC. `bubbles_3d_performance_check.gd` measured
+  ten players, 70 free and 160 caught jellyfishes at 0.76 ms a frame on average (1.17 ms at the
+  95th percentile, 182 draw calls) on an RTX 5070 development machine only.
+
 ## Bubbles and jellyfishes 3D models
 
 - Owner approval of the jellyfish and pufferfish look from the review renders that
   `render_review.py` in [art/bubbles_3d](../art/bubbles_3d/README.md) writes: the reshaped
   bell, the curled tentacles, the pufferfish face, spikes and fins.
-- After the minigame is built, `[GODOT-RUNTIME]` and owner review of both creatures and the
-  recoloured props in the running scene, including frame time with the most jellyfishes.
+- Owner review of both creatures and the recoloured props in the running scene. Captures from
+  `bubbles_3d_scene_visual_check.gd` are in `test-results/bubbles-3d/`.
 - `[EXPORTED-BUILD]` The Windows package carries every model and license.
 
 ## Tilt Shift art

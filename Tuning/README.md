@@ -7,6 +7,7 @@ the relevant consumer; there is intentionally no runtime tuning UI.
 ## Find, compare, and reset values
 
 - Bubbles and jellyfishes: `minigames/002_bubbles_and_jellyfishes/tuning/Default.tres`, in the minigame's own folder, is the provisional umbrella profile for round rules, gesture recognition, and values used by the arena systems. See [its field guide](../minigames/002_bubbles_and_jellyfishes/tuning/README.md). Select a named copy in `Active Presets.tres` and relaunch before comparing feel.
+- Bubbles and jellyfishes 3D: `minigames/004_3d_bubbles/tuning/Default.tres`, in world units. See [its guide](../minigames/004_3d_bubbles/tuning/README.md).
 - Networking/session: `Shared/Networking/Default.tres` owns host-only listener, capacity, timeout, and reconnect behavior.
 - Playground lobby movement: `Shared/Lobby/Default.tres` sets speed, acceleration, gravity and jump height in character heights. The jump must still reach the café roof from a tabletop; `tests/lobby_plaza_reachability_test.gd` checks the active preset.
 - Default recovery: assign the appropriate `Default.tres` back into `Active Presets.tres`, save, and relaunch.

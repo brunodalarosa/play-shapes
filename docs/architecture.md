@@ -12,7 +12,9 @@ Messages and limits are in [protocol.md](protocol.md).
   a client-selected filesystem path.
 - `host/websocket_service.gd` owns bounded protocol-1 peers and messages. It resolves each
   connection to a host-owned player before forwarding gameplay input, and keeps one active
-  protocol at a time.
+  protocol at a time. A minigame can register a `MinigameProtocol` subclass
+  (`host/minigame_protocol.gd`): the service then routes the message types it handles to it and
+  sends what it asks for, with no minigame-specific code in the service.
 - `host/player_registry.gd` owns session, player and token identities, names, validated
   character shape and color, capacity, reconnect grace, resume and explicit leave.
 
@@ -94,7 +96,8 @@ The shared code learns about a minigame from the catalog, `minigames/catalog.tre
 To add a minigame: make its folder, save a `MinigameDefinition` in it, and add that
 definition to the catalog. Three places still name each minigame by hand: its slot in
 `Tuning/Active Presets.tres`, the phone asset routes in `host/http_service.gd`, and the
-export policy's list of required paths.
+export policy's list of required paths. A minigame whose protocol extends `MinigameProtocol`
+needs no change to the WebSocket service.
 
 Every file named in this section is in `minigames/002_bubbles_and_jellyfishes/`. The gameplay
 shared-screen scene is `bubbles_and_jellyfishes.tscn`.
@@ -157,6 +160,40 @@ shared-screen scene is `bubbles_and_jellyfishes.tscn`.
 - `bubbles_protocol.gd` validates completed normalized traces and makes personalized
   Bubbles snapshots. The messages are in [protocol.md](protocol.md#bubbles-input).
 - The browser never supplies a player ID or host time.
+
+## Bubbles and jellyfishes 3D
+
+Minigame 004 rebuilds Bubbles without spin, in `minigames/004_3d_bubbles/`. It shares no code,
+scene, resource or message with 002; `tests/bubbles_3d_independence_test.gd` in its folder
+checks that. Its gameplay runs on Jolt with plane-locked bodies
+([decision 0034](decisions/0034-bubbles-3d-jolt-plane.md)).
+
+- `bubbles_3d_round_controller.gd` owns the entrance, countdown, active and results phases,
+  scores, pops and scatter counts, the zero-time freeze, ranking, disconnects and leaves.
+- `bubbles_3d_player_arena.gd` creates up to ten `Bubbles3DPlayerBubble` rigid bodies inside
+  `PlaneWalls3D` and reports bumps. Each bubble owns its shell, its Squircle with
+  `Bubbles3DHandWobble`, and an instanced batch of caught jellyfishes.
+- `bubbles_3d_creature_arena.gd` owns jellyfish waves, safe spawns, scatter, pufferfish
+  crossings and their warnings. Jellyfishes and pufferfishes are `Area3D` sensors; free
+  jellyfishes draw through one `Bubbles3DJellyfishSwarm`.
+- `bubbles_3d_presentation.gd` and `3d_bubbles.tscn` frame the plane through a fixed 30 degree
+  camera, dress the seabed, run the entrance, countdown, timer, nameplates, audio and results,
+  register `Bubbles3DProtocol` for the round and step both arenas each physics frame.
+- `bubbles_3d_protocol.gd` validates touches and releases, times holds on the host and pushes
+  snapshots, feedback and visuals. The messages are in
+  [protocol.md](protocol.md#bubbles-and-jellyfishes-3d).
+
+## Shared 3D components
+
+These live outside any minigame folder so later 3D scenes can use them.
+
+- `components/plane_3d/`: `PlaneLock3D` locks a body's depth and rotation; `PlaneWalls3D`
+  builds invisible edge walls on their own physics layer.
+- `components/bubble_shell/`: `BubbleShell3D`, a translucent shader sphere with stretch, pop
+  droplets and re-form.
+- `components/underwater_environment/`: the water backdrop, god rays, seabed with caustics,
+  depth haze and air bubbles, plus a recolouring prop material with optional sway.
+- `components/screen_follow_label.gd`: screen text that follows a 3D node.
 
 ## Tilt Shift rules
 
@@ -293,10 +330,11 @@ template. A minigame's named resources are in its own `tuning/` folder. There is
 tuning UI.
 
 - Open `Tuning/Active Presets.tres` to select named resources. The current front doors are
-  `minigames/002_bubbles_and_jellyfishes/tuning/Default.tres` and
-  `Tuning/Shared/Networking/Default.tres`.
+  `minigames/002_bubbles_and_jellyfishes/tuning/Default.tres`,
+  `minigames/004_3d_bubbles/tuning/Default.tres` and `Tuning/Shared/Networking/Default.tres`.
 - Restart to apply a changed selection.
-- Bubbles field descriptions are in the `README.md` beside its `Default.tres`.
+- Bubbles field descriptions are in the `README.md` beside its `Default.tres`; so are those of
+  Bubbles and jellyfishes 3D.
 - Only the human owner promotes subjective feel into `Default`. Tests establish configuration
   safety, not fun or comfort.
 
