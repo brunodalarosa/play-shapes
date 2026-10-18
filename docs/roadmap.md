@@ -71,6 +71,11 @@ phone setup still use the Squircle sheets, and are rebuilt afterwards.
 The 2D painted-room art in `assets/runtime/lobby_playground/` is unused apart from the logo,
 and is removed once the plaza is approved.
 
+Next: minigame 004, Bubbles and jellyfishes 3D, a from-scratch 3D rebuild of 002 without the
+spin move, built beside 002 for comparison. Its design, scene composition and asset sources
+are in `docs/game-design-documents/Minigames/004/`. First its jellyfish and pufferfish models are
+adapted from library parts; then the minigame is built. Once 004 is approved, 002 is retired.
+
 ## Tilt Shift foundation
 
 Host rules and editable content exist for Tilt Shift: equal teams, balanced rotating
