@@ -334,6 +334,9 @@ func validation_errors() -> PackedStringArray:
 		errors.append("Bubbles 3D: Minimum jellyfish wave duration cannot exceed maximum.")
 	if pufferfish_start_spawn_rate > pufferfish_max_spawn_rate:
 		errors.append("Bubbles 3D: Start pufferfish rate cannot exceed maximum.")
+	# Godot adds two bodies' bounce, so the walls keep what the bubbles' half leaves over.
+	if wall_bounciness < bump_bounciness * 0.5:
+		errors.append("Bubbles 3D: Wall bounciness must be at least half the bump bounciness.")
 	if haze_end <= haze_begin:
 		errors.append("Bubbles 3D: Haze end must exceed haze begin.")
 	return errors
