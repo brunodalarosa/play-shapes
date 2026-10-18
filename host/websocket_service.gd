@@ -19,6 +19,7 @@ var _registry: PlayerRegistry
 var _accepting_new_players: Callable
 var _next_id: int = 1
 var _bubbles_protocol: RefCounted
+var _minigame_protocol: MinigameProtocol
 var _active_protocol: RefCounted
 var _lobby_controller: LobbyPlaygroundWorld
 var _readiness: PreMinigameReadiness
@@ -91,6 +92,28 @@ func set_tilt_shift_protocol(protocol: RefCounted) -> void:
 func clear_tilt_shift_protocol(protocol: RefCounted) -> void:
 	if _active_protocol == protocol:
 		_active_protocol = null
+
+
+## Routes the message types [param protocol] handles to it until it is cleared.
+func set_minigame_protocol(protocol: MinigameProtocol) -> void:
+	clear_minigame_protocol()
+	_minigame_protocol = protocol
+	_active_protocol = protocol
+	protocol.send_requested.connect(_send_to_player)
+	protocol.broadcast_requested.connect(_broadcast_gameplay_snapshots)
+	_broadcast_gameplay_snapshots()
+
+
+## Clears [param protocol], or whichever minigame protocol is set when it is null.
+func clear_minigame_protocol(protocol: MinigameProtocol = null) -> void:
+	if _minigame_protocol == null or (protocol != null and protocol != _minigame_protocol):
+		return
+	_minigame_protocol.send_requested.disconnect(_send_to_player)
+	_minigame_protocol.broadcast_requested.disconnect(_broadcast_gameplay_snapshots)
+	_minigame_protocol.detach()
+	if _active_protocol == _minigame_protocol:
+		_active_protocol = null
+	_minigame_protocol = null
 
 
 func send_current_snapshot(player_id: String, coalesce := true) -> void:
@@ -481,6 +504,25 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 				)
 				_send_gameplay_snapshot(peer, String(player.player_id))
 		_:
+			var type := String(message.get("type", ""))
+			if (
+				_minigame_protocol != null and _active_protocol == _minigame_protocol
+				and _minigame_protocol.handles(type)
+			):
+				var player := _registry.player_for_connection(client.connection_id)
+				var result := _minigame_protocol.handle_message(
+					player,
+					message,
+					Time.get_ticks_msec(),
+				)
+				if not result.accepted:
+					_send_rejection(peer, "error", result)
+					return
+				if result.has("reply"):
+					peer.send_text(JSON.stringify(result.reply))
+				if result.get("snapshot", false):
+					_send_gameplay_snapshot(peer, String(player.player_id))
+				return
 			_send_rejection(
 				peer,
 				"error",

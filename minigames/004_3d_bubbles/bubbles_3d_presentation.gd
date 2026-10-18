@@ -53,6 +53,7 @@ var _go_until_msec := -1
 var _pending_reforms: Dictionary[String, int] = { }
 var _last_shove_by_pair: Dictionary[String, int] = { }
 var _labels: Dictionary[String, ScreenFollowLabel] = { }
+var _protocol: Bubbles3DProtocol
 
 
 func _ready() -> void:
@@ -85,6 +86,8 @@ func _ready() -> void:
 		push_error("Bubbles and jellyfishes 3D could not start: %s" % code)
 		_return_to_lobby.call_deferred()
 		return
+	_protocol = Bubbles3DProtocol.new(controller)
+	session_host.register_minigame_protocol(_protocol)
 
 
 ## Starts a round with the registry's participants. The host calls this through the launch.
@@ -140,6 +143,11 @@ func start_round(
 
 
 func _exit_tree() -> void:
+	if _protocol != null:
+		var session_host := get_node_or_null("/root/SessionHost")
+		if session_host != null:
+			session_host.unregister_minigame_protocol(_protocol)
+		_protocol = null
 	if _music != null:
 		_music.stop()
 	for pool: Array in _audio_players.values():

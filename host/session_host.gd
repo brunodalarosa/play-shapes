@@ -307,6 +307,17 @@ func unregister_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
 		websocket.clear_lobby_controller(controller)
 
 
+## Routes a running minigame's phone messages to [param protocol].
+func register_minigame_protocol(protocol: MinigameProtocol) -> void:
+	if websocket != null:
+		websocket.set_minigame_protocol(protocol)
+
+
+func unregister_minigame_protocol(protocol: MinigameProtocol) -> void:
+	if websocket != null:
+		websocket.clear_minigame_protocol(protocol)
+
+
 func register_bubbles_controller(controller: BubblesRoundController) -> void:
 	if websocket != null:
 		websocket.set_bubbles_controller(controller)
