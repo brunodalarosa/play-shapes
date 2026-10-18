@@ -3,7 +3,8 @@
 Source models for minigame 004. The
 [asset sources guide](../../docs/game-design-documents/Minigames/004/004%20-%20Asset%20sources.md)
 decides each source and change; [scene composition](../../docs/game-design-documents/Minigames/004/004%20-%20Scene%20composition.md)
-decides placement. Nothing here is used by a scene yet.
+decides placement. Nothing here is used by a scene yet; [pending reviews](../../docs/pending-reviews.md)
+lists what still needs the owner.
 
 ## Unchanged library copies
 
@@ -42,10 +43,58 @@ Git keeps the supplied bytes without line-ending conversion, set in `.gitattribu
 Recolouring, scaling and kelp sway happen in the scene through material overrides and
 shaders; these sources stay unchanged.
 
+## Jellyfish
+
+[jellyfish.blend](jellyfish/jellyfish.blend) is the editable Blender 5.2 source, built from the
+Kenney `mushroom` cap. [export/jellyfish.glb](jellyfish/export/jellyfish.glb) holds three meshes,
+590 triangles in all, with flat-colour materials and no textures:
+
+- `Bell` (92 triangles): the cap with its stem deleted and the stem hole closed. The lip below
+  its widest ring is compressed into a short skirt, the dome above is stretched, a ring cut
+  halfway up the side is pushed out and the top ring drawn in, so the bell is a rounded dome
+  0.55 wide and 0.7 as tall as it is wide. Pink `#F48FB1`, with the skirt `Bell Rim` `#F8BBD0`.
+- `Tentacles` (450 triangles): five new tapered six-sided tubes, each a straight drop of
+  slightly different length and a seven-segment curl of about 1.25 turns ending in a point.
+  The outer pairs curl outward. Deeper pink `#F07BA6`.
+- `Eyes` (48 triangles): two new black `#151515` oval domes set into the front of the bell.
+
+The origin is the bell's bounding-box centre. The GLB is Y up and faces −Z; in Blender the
+front is +Y. Bell and rim are two surfaces of one mesh, so a scene that gives the bell a
+single material override draws the jellyfish in three surfaces instead of four.
+
+The guide asks for the cap "flattened to about 0.7 of its width in height". The cap without
+its stem is already only 0.48 as tall as it is wide, so reaching 0.7 and the dome of the
+reference sheet means stretching it; the 0.7 ratio and the sheet were followed.
+
+## Building, export and review
+
+The construction scripts are one-time and stay in ignored `scratch/`; edit the saved
+`.blend` files directly. Run these from this folder with Blender's executable in `$blender`,
+naming `jellyfish` or `pufferfish`:
+
+```powershell
+& $blender --background --factory-startup --python-exit-code 1 --python export_and_verify.py -- jellyfish
+& $blender --background --factory-startup --python-exit-code 1 --python render_review.py -- jellyfish
+& $blender --background --factory-startup --python-exit-code 1 --python render_review.py -- jellyfish --exported
+```
+
+[export_and_verify.py](export_and_verify.py) checks the library parts against `SHA256SUMS`,
+opens the saved source, exports only the asset collection and imports the GLB into an empty
+scene. It checks mesh and material names and colours, the triangle cap, non-degenerate
+triangles, the origin, the facing and that every part touches the body or bell. It writes
+`export/verification.json` and copies the GLB to the runtime folder; it never saves over the
+source.
+
+[render_review.py](render_review.py) writes front, side and three-quarter views on grey, a
+1920 × 1080 frame on blue through the scene's 30° camera framing the 19.2-unit play plane,
+and crops of that frame at true size and enlarged four times, into ignored
+`scratch/review/`. The pufferfish frame shows four headings.
+
 ## Runtime copies
 
 `art/.gdignore` keeps this folder out of Godot's importer. The game loads byte-identical
 copies of the background props from `assets/runtime/minigames/bubbles_3d/`, in the same
 folder layout, with their textures imported as VRAM-compressed with mipmaps. The jellyfish
-and pufferfish library parts feed only the Blender sources and have no runtime copy.
-The standalone export policy lists every runtime model and license.
+and pufferfish library parts feed only the Blender sources and have no runtime copy; the
+exported creature GLBs are copied to `jellyfish/` and `pufferfish/` there. The standalone
+export policy lists every runtime model and license.
