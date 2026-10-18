@@ -11,6 +11,18 @@ art/playground_plaza/potted_plant/** -text
 assets/runtime/playground_plaza/chair/** -text
 assets/runtime/playground_plaza/tree/** -text
 assets/runtime/playground_plaza/potted_plant/** -text
+art/bubbles_3d/coral/** -text
+art/bubbles_3d/kelp/** -text
+art/bubbles_3d/rocks/** -text
+art/bubbles_3d/mug/** -text
+art/bubbles_3d/bottle/** -text
+art/bubbles_3d/jellyfish/source/** -text
+art/bubbles_3d/pufferfish/source/** -text
+assets/runtime/minigames/bubbles_3d/coral/** -text
+assets/runtime/minigames/bubbles_3d/kelp/** -text
+assets/runtime/minigames/bubbles_3d/rocks/** -text
+assets/runtime/minigames/bubbles_3d/mug/** -text
+assets/runtime/minigames/bubbles_3d/bottle/** -text
 # Retain upstream license spacing verbatim.
 art/playground_plaza/chair/License.txt -whitespace
 art/playground_plaza/tree/License.txt -whitespace
@@ -18,3 +30,5 @@ art/playground_plaza/potted_plant/License.txt -whitespace
 assets/runtime/playground_plaza/chair/License.txt -whitespace
 assets/runtime/playground_plaza/tree/License.txt -whitespace
 assets/runtime/playground_plaza/potted_plant/License.txt -whitespace
+art/bubbles_3d/**/License.txt -whitespace
+assets/runtime/minigames/bubbles_3d/**/License.txt -whitespace

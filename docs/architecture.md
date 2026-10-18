@@ -275,6 +275,9 @@ describes saving, explicit active selection and preview isolation.
 - Bubbles static art lives in `assets/runtime/minigames/bubbles_and_jellyfishes/`. Its
   [asset guide](../assets/runtime/minigames/bubbles_and_jellyfishes/README.md) records scale,
   filtering, layer composition and provenance.
+- The models of minigame 004, Bubbles and jellyfishes 3D, live in
+  `assets/runtime/minigames/bubbles_3d/`. Their sources and provenance are in
+  [art/bubbles_3d](../art/bubbles_3d/README.md).
 - [GIMP regeneration and isolated export-pack checks](../art/bubbles/README.md) remain
   separate from gameplay implementation.
 - `addons/standalone_build/` is the editor-only Windows builder.

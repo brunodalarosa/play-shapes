@@ -15,7 +15,8 @@ const INCLUDE_FILTER := (
 	+ "web/public/platform_input_settings.json,"
 	+ "assets/runtime/animated_characters/squircle/v1/manifest.json,"
 	+ "assets/runtime/minigames/003/manifest.json,"
-	+ "assets/runtime/playground_plaza/*/License.txt"
+	+ "assets/runtime/playground_plaza/*/License.txt,"
+	+ "assets/runtime/minigames/bubbles_3d/*/License.txt"
 )
 const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,addons/tilt_shift_workshop/**,scratch/**,comparisons/**,docs/images/tilt-shift-workshop/**,local/**,*.local.json,*.pem,*.key,*.crt,*.cer,*.der,*.p12,*.pfx,art/**,builds/**,opencode.json,tools/**,tests/**,minigames/*/tests/**,test-results/**,web/package.json,web/package-lock.json,web/tsconfig.json,web/node_modules/**,web/src/**,web/tests/**"
 const REQUIRED_BROWSER_PATHS := [
@@ -89,6 +90,21 @@ const REQUIRED_RUNTIME_PATHS := [
 	"assets/runtime/playground_plaza/tree/License.txt",
 	"assets/runtime/playground_plaza/potted_plant/bush.gltf",
 	"assets/runtime/playground_plaza/potted_plant/License.txt",
+	"assets/runtime/minigames/bubbles_3d/coral/Tree_Bare_2_A_Color1.gltf",
+	"assets/runtime/minigames/bubbles_3d/coral/Tree_Bare_1_C_Color1.gltf",
+	"assets/runtime/minigames/bubbles_3d/coral/License.txt",
+	"assets/runtime/minigames/bubbles_3d/kelp/Grass_2_D_Singlesided_Color1.gltf",
+	"assets/runtime/minigames/bubbles_3d/kelp/Grass_1_C_Color1.gltf",
+	"assets/runtime/minigames/bubbles_3d/kelp/License.txt",
+	"assets/runtime/minigames/bubbles_3d/rocks/forest_nature/Rock_3_M_Color1.gltf",
+	"assets/runtime/minigames/bubbles_3d/rocks/forest_nature/Rock_1_L_Color1.gltf",
+	"assets/runtime/minigames/bubbles_3d/rocks/forest_nature/License.txt",
+	"assets/runtime/minigames/bubbles_3d/rocks/space_base_bits/rocks_A.gltf",
+	"assets/runtime/minigames/bubbles_3d/rocks/space_base_bits/License.txt",
+	"assets/runtime/minigames/bubbles_3d/mug/cup.glb",
+	"assets/runtime/minigames/bubbles_3d/mug/License.txt",
+	"assets/runtime/minigames/bubbles_3d/bottle/bottle_A_green.gltf",
+	"assets/runtime/minigames/bubbles_3d/bottle/License.txt",
 	"assets/runtime/animated_characters/squircle/v1/manifest.json",
 	"assets/runtime/animated_characters/squircle/v1/render_tint.gdshader",
 	"assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png",
