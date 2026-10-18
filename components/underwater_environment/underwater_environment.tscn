@@ -1,0 +1,51 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://components/underwater_environment/underwater_environment.gd" id="1"]
+[ext_resource type="Shader" path="res://components/underwater_environment/water_backdrop.gdshader" id="2"]
+[ext_resource type="Shader" path="res://components/underwater_environment/god_rays.gdshader" id="3"]
+
+[sub_resource type="Environment" id="environment"]
+background_mode = 1
+background_color = Color(0.03, 0.27, 0.6, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.72, 0.88, 1, 1)
+ambient_light_energy = 0.55
+
+[sub_resource type="QuadMesh" id="backdrop_quad"]
+size = Vector2(240, 110)
+
+[sub_resource type="ShaderMaterial" id="backdrop_material"]
+render_priority = -100
+shader = ExtResource("2")
+
+[sub_resource type="ShaderMaterial" id="rays_material"]
+render_priority = -50
+shader = ExtResource("3")
+
+[node name="UnderwaterEnvironment" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("environment")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.25, 0.433013, 0, 0.866025, 0.5, -0.5, -0.433013, 0.75, 0, 12, 4)
+light_color = Color(0.92, 0.98, 1, 1)
+light_energy = 0.9
+
+[node name="Backdrop" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -80)
+cast_shadow = 0
+mesh = SubResource("backdrop_quad")
+material_override = SubResource("backdrop_material")
+
+[node name="Rays" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+cast_shadow = 0
+mesh = SubResource("backdrop_quad")
+material_override = SubResource("rays_material")
+
+[node name="Seabed" type="MeshInstance3D" parent="."]
+cast_shadow = 0
+
+[node name="AirBubbles" type="Node3D" parent="."]
