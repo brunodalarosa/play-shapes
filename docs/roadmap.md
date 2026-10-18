@@ -73,8 +73,10 @@ and is removed once the plaza is approved.
 
 Next: minigame 004, Bubbles and jellyfishes 3D, a from-scratch 3D rebuild of 002 without the
 spin move, built beside 002 for comparison. Its design, scene composition and asset sources
-are in `docs/game-design-documents/Minigames/004/`. First its jellyfish and pufferfish models are
-adapted from library parts; then the minigame is built. Once 004 is approved, 002 is retired.
+are in `docs/game-design-documents/Minigames/004/`. Its jellyfish and pufferfish models are
+adapted from library parts and its background props copied, all in
+[art/bubbles_3d](../art/bubbles_3d/README.md); the minigame is built next. Once 004 is
+approved, 002 is retired.
 
 ## Tilt Shift foundation
 

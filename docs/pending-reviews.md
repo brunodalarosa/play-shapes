@@ -108,6 +108,15 @@ removes it. The evidence labels are defined in
 - `[HUMAN-PLAY]` Couch-distance readability of the shared screen, the final audio mix, and
   the fairness of creature collisions and telegraphs.
 
+## Bubbles and jellyfishes 3D models
+
+- Owner approval of the jellyfish and pufferfish look from the review renders that
+  `render_review.py` in [art/bubbles_3d](../art/bubbles_3d/README.md) writes: the reshaped
+  bell, the curled tentacles, the pufferfish face, spikes and fins.
+- After the minigame is built, `[GODOT-RUNTIME]` and owner review of both creatures and the
+  recoloured props in the running scene, including frame time with the most jellyfishes.
+- `[EXPORTED-BUILD]` The Windows package carries every model and license.
+
 ## Tilt Shift art
 
 - `[PHYSICAL-PHONE]` One-paddle guide readability on a real landscape phone across
