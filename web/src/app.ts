@@ -1,3 +1,6 @@
+import { BubblePhone } from "./004_3d_bubbles/phone.js";
+import { isSnapshot as isBubble3DSnapshot } from "./004_3d_bubbles/state.js";
+import type { Message as Bubble3DMessage, ViewModule } from "./004_3d_bubbles/types.js";
 import {
   attemptImmersive,
   protectControllerSurface,
@@ -197,7 +200,7 @@ let joined = false;
 let isReady = false;
 let joinFlow: JoinFlowState = defaultJoinFlow();
 let inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
-let activeGame: "bubbles" | "tilt_shift" | null = null;
+let activeGame: "bubbles" | "tilt_shift" | "bubbles_3d" | null = null;
 let bubblesPointer:
   | {
       id: number;
@@ -261,6 +264,50 @@ const pwa = new PwaOnboarding(
     void requestImmersiveMode();
   },
 );
+const bubble3DCard = document.querySelector<HTMLElement>("#bubbles-3d-card")!;
+let threeView: Promise<ViewModule> | undefined;
+const bubble3DPhone = new BubblePhone(
+  bubble3DCard,
+  document.querySelector<HTMLCanvasElement>("#bubbles-3d-visual")!,
+  document.querySelector<HTMLElement>("#bubbles-3d-score")!,
+  document.querySelector<HTMLElement>("#bubbles-3d-fallback")!,
+  () => socket?.readyState === WebSocket.OPEN,
+  () => {
+    inputSeq += 1;
+    store(STORAGE.inputSeq, String(inputSeq));
+    return inputSeq;
+  },
+  (message) => {
+    if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
+  },
+  () => {
+    const url = "/three_view.js";
+    threeView ??= (import(url) as Promise<ViewModule>).catch((error: unknown) => {
+      threeView = undefined;
+      throw error;
+    });
+    return threeView;
+  },
+);
+protectControllerSurface(bubble3DCard);
+
+function showBubble3D(message: Bubble3DMessage): void {
+  if (!isBubble3DSnapshot(message)) {
+    bubble3DPhone.receive(message);
+    return;
+  }
+  gameplayMotion.stop();
+  motionLab.stop();
+  lobbyControls.deactivate();
+  const visible = message.phase !== "lobby_return";
+  setGameplaySurface(visible, "bubbles_3d");
+  selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = true;
+  bubblesCard.hidden = readyCard.hidden = true;
+  document.documentElement.classList.remove("ready-active");
+  status.hidden = true;
+  bubble3DPhone.receive(message);
+}
+
 for (const surface of [lobbyController, bubblesPad, readyCard, tiltSurface])
   protectControllerSurface(surface);
 bindControllerLifecycle(() => cancelBubblesPointer());
@@ -322,9 +369,13 @@ for (const option of CHARACTER_COLORS) {
 }
 refreshSelectionUi();
 
-function setGameplaySurface(active: boolean, game: "bubbles" | "tilt_shift" = "bubbles"): void {
+function setGameplaySurface(
+  active: boolean,
+  game: "bubbles" | "tilt_shift" | "bubbles_3d" = "bubbles",
+): void {
   const next = active ? game : null;
   if (next !== "tilt_shift") tiltPhone.hide();
+  if (next !== "bubbles_3d") bubble3DPhone.hide();
   if (activeGame !== next) {
     cancelBubblesPointer();
     if (next === null) {
@@ -349,6 +400,7 @@ function setGameplaySurface(active: boolean, game: "bubbles" | "tilt_shift" = "b
   document.documentElement.classList.toggle("gameplay-active", active);
   document.documentElement.classList.toggle("bubbles-active", next === "bubbles");
   document.documentElement.classList.toggle("tilt-active", next === "tilt_shift");
+  document.documentElement.classList.toggle("bubbles-3d-active", next === "bubbles_3d");
 }
 
 function showJoin(message: string, focus = false): void {
@@ -1184,6 +1236,12 @@ async function connect(): Promise<void> {
         return;
       }
       if (
+        message.type === "lobby" ||
+        (message.type?.endsWith("_snapshot") && !isBubble3DSnapshot(message))
+      ) {
+        if (activeGame === "bubbles_3d") setGameplaySurface(false);
+      }
+      if (
         message.type === "welcome" &&
         message.protocol === 1 &&
         Number.isInteger(message.connection_id)
@@ -1193,7 +1251,8 @@ async function connect(): Promise<void> {
         connectionError.textContent = "";
         clearTimeout(deadline);
         if (message.resume_status === "resumed" && rememberIdentity(message)) {
-          if (message.gameplay?.type === "tilt_shift_snapshot") showTilt(message.gameplay);
+          if (isBubble3DSnapshot(message.gameplay)) showBubble3D(message.gameplay);
+          else if (message.gameplay?.type === "tilt_shift_snapshot") showTilt(message.gameplay);
           else if (message.gameplay?.type === "bubbles_snapshot") showBubbles(message.gameplay);
           else if (message.gameplay?.type === "pre_minigame_snapshot") showReady(message.gameplay);
           else if (
@@ -1246,7 +1305,13 @@ async function connect(): Promise<void> {
       } else if (message.type === "left") {
         forgetIdentity();
         showJoin("You left the lobby. Choose your character and name to join again.", true);
-      } else if (message.type === "bubbles_trace_result") bubblesLocalCharge = 0;
+      } else if (
+        isBubble3DSnapshot(message) ||
+        message.type === "bubbles_3d_visual" ||
+        message.type === "bubbles_3d_release_result"
+      )
+        showBubble3D(message as unknown as Bubble3DMessage);
+      else if (message.type === "bubbles_trace_result") bubblesLocalCharge = 0;
       else if (message.type === "bubbles_visual" && message.visual && bubblesSnapshot) {
         bubblesVisualSnapshot = message.visual;
         bubblesVisualReceivedAt = performance.now();

@@ -5,6 +5,7 @@ extends Node
 
 const BUBBLES_ART := "res://assets/runtime/minigames/bubbles_and_jellyfishes"
 const TILT_ART := "res://assets/runtime/minigames/003"
+const SQUIRCLE_MODEL := "res://assets/runtime/animated_characters/squircle/v1/model"
 const ASSETS: Dictionary = {
 	"/tilt-shift/manifest.json": {
 		"path": TILT_ART + "/manifest.json",
@@ -80,6 +81,29 @@ const ASSETS: Dictionary = {
 	},
 	"/bubbles-phone-background.png": {
 		"path": BUBBLES_ART + "/environment/phone_background_portrait.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/three_view.js": {
+		"path": "res://web/public/three_view.js",
+		"content_type": "text/javascript; charset=utf-8",
+	},
+	# Raw model copies the web build makes; Godot keeps them as files so exports carry them.
+	"/models/squircle.glb": {
+		"path": "res://web/public/models/squircle.glb",
+		"content_type": "model/gltf-binary",
+	},
+	"/models/jellyfish.glb": {
+		"path": "res://web/public/models/jellyfish.glb",
+		"content_type": "model/gltf-binary",
+	},
+	"/models/squircle-face-neutral.png": {
+		"path": SQUIRCLE_MODEL + "/face-neutral.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/models/squircle-face-blink.png": {
+		"path": SQUIRCLE_MODEL + "/face-blink.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},

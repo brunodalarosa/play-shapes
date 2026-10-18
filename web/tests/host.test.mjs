@@ -91,7 +91,7 @@ test("serves bundled HTML, JS, CSS and session configuration", async () => {
   }
 });
 
-test("the one script holds every module of the client and imports nothing", async () => {
+test("the main script bundles ordinary screens and loads the 3D view separately", async () => {
   const js = await (await fetch(base + "/app.js")).text();
 
   for (const expected of [
@@ -107,9 +107,11 @@ test("the one script holds every module of the client and imports nothing", asyn
   ]) {
     assert.ok(js.includes(expected), `the bundle should include ${expected}`);
   }
-  // A module left out of the bundle would show up as an import the host has no route for.
+  // Ordinary modules have no individual routes; the 3D view has one explicit lazy entry.
   assert.doesNotMatch(js, /^\s*import\s/m);
-  assert.doesNotMatch(js, /\bimport\(/);
+  assert.match(js, /\bimport\(url\)/);
+  assert.match(js, /\/three_view\.js/);
+  assert.doesNotMatch(js, /class WebGLRenderer|node_modules\/three/);
 
   for (const path of ["/pwa.js", "/platform_controls.js", "/vendor/nipplejs.mjs"])
     assert.equal((await fetch(base + path)).status, 404, `${path} is no longer served`);

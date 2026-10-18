@@ -12,7 +12,7 @@ const METADATA_NAME := "build-info.json"
 const ZIP_RELATIVE := "builds/standalone/Play-Shapes-windows-x86_64.zip"
 const INCLUDE_FILTER := (
 	"web/public/*.html,web/public/*.webmanifest,web/public/*.css,web/public/*.js,"
-	+ "web/public/platform_input_settings.json,"
+	+ "web/public/platform_input_settings.json,web/public/models/*.glb,"
 	+ "assets/runtime/animated_characters/squircle/v1/manifest.json,"
 	+ "assets/runtime/minigames/003/manifest.json,"
 	+ "assets/runtime/playground_plaza/*/License.txt,"
@@ -23,6 +23,9 @@ const REQUIRED_BROWSER_PATHS := [
 	"web/public/platform_input_settings.json",
 	"web/public/index.html",
 	"web/public/app.js",
+	"web/public/three_view.js",
+	"web/public/models/squircle.glb",
+	"web/public/models/jellyfish.glb",
 	"web/public/manifest.webmanifest",
 	"web/public/app-icon-180.png",
 	"web/public/app-icon-192.png",
@@ -172,6 +175,33 @@ const REQUIRED_RUNTIME_PATHS := [
 	"assets/runtime/sfxs/upgrade1.ogg",
 	"assets/runtime/sfxs/woosh4.ogg",
 	"assets/runtime/sfxs/stonesHit1.ogg",
+	"minigames/004_3d_bubbles/bubbles_3d_minigame.tres",
+	"minigames/004_3d_bubbles/bubbles_3d_pre_minigame_content.tres",
+	"minigames/004_3d_bubbles/3d_bubbles.tscn",
+	"minigames/004_3d_bubbles/bubbles_3d_presentation.gd",
+	"minigames/004_3d_bubbles/bubbles_3d_round_controller.gd",
+	"minigames/004_3d_bubbles/bubbles_3d_protocol.gd",
+	"minigames/004_3d_bubbles/bubbles_3d_tuning.gd",
+	"minigames/004_3d_bubbles/tuning/Default.tres",
+	"minigames/004_3d_bubbles/bubbles_3d_player_arena.gd",
+	"minigames/004_3d_bubbles/bubbles_3d_player_bubble.gd",
+	"minigames/004_3d_bubbles/bubbles_3d_hand_wobble.gd",
+	"minigames/004_3d_bubbles/bubbles_3d_creature_arena.gd",
+	"minigames/004_3d_bubbles/bubbles_3d_jellyfish.gd",
+	"minigames/004_3d_bubbles/bubbles_3d_jellyfish_swarm.gd",
+	"minigames/004_3d_bubbles/jellyfish_body.gdshader",
+	"minigames/004_3d_bubbles/bubbles_3d_pufferfish.gd",
+	"host/minigame_protocol.gd",
+	"components/plane_3d/plane_lock_3d.gd",
+	"components/plane_3d/plane_walls_3d.gd",
+	"components/screen_follow_label.gd",
+	"components/bubble_shell/bubble_shell_3d.gd",
+	"components/bubble_shell/bubble_shell.gdshader",
+	"components/underwater_environment/underwater_environment.tscn",
+	"components/underwater_environment/underwater_environment.gd",
+	"components/underwater_environment/water_backdrop.gdshader",
+	"components/underwater_environment/god_rays.gdshader",
+	"components/underwater_environment/underwater_prop.gdshader",
 ]
 const EXPECTED_ZIP_ENTRIES := [
 	"Play-Shapes-windows-x86_64/",

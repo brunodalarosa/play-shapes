@@ -12,6 +12,26 @@ development error panel. The joystick and action button are in
   and the player's personalized character preview.
 - The Squircle v1 body, hands and feet share the player's chosen color.
 
+## The Bubbles and jellyfishes 3D screen
+
+The portrait screen shows the exact host jellyfish count above a live 3D view of the
+player's bubble. The whole surface accepts touches, including the count. The tinted
+Squircle, natural blinking, idle animation, shell stretch, caught jellyfishes and recovery
+follow the host state. A water gradient and light rays sit behind the view. Catch and pop
+feedback requests optional vibration.
+
+A touch sends a synchronous start and a synchronous release with normalized net
+screen displacement. Coarse drag directions send only when changed after 70 ms, with a
+600 ms held refresh and a limit of 48 updates per touch. Only an active, connected player
+who has not left can send input. Interrupted gestures cancel on pointer loss, page hiding,
+blur, rotation, fullscreen or viewport changes.
+
+The renderer loads on the first game snapshot, including resumed gameplay. Lobby return
+or another screen disposes it. Rendering pauses while hidden and caps device pixel ratio
+at two. If WebGL or model loading fails, the count remains readable above a flat circle in
+the player's color, sized by the host radius. This screen's code is independent of the
+older Bubbles controller. See [browser-build.md](browser-build.md) for the separate bundle.
+
 ## The Tilt Shift screen
 
 Preparation exposes Enable tilt, Set neutral and the host-confirmed READY/CANCEL action.

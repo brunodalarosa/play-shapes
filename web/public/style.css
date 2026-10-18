@@ -706,3 +706,102 @@ html.tilt-active main > :not(#tilt-shift) {
 #tilt-shift[data-waiting="true"][data-team="1"] {
   background: radial-gradient(circle, #b5d5ff 0 14%, #4c88df 15% 18%, #243345 19%);
 }
+html.bubbles-3d-active,
+html.bubbles-3d-active body {
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  background: #086d9f;
+}
+html.bubbles-3d-active main {
+  padding: 0;
+  margin: 0;
+  max-inline-size: none;
+  inline-size: 100%;
+  block-size: var(--controller-height, 100dvh);
+}
+html.bubbles-3d-active main > :not(#bubbles-3d-card) {
+  display: none !important;
+}
+#bubbles-3d-card {
+  position: relative;
+  isolation: isolate;
+  inline-size: 100%;
+  block-size: var(--controller-height, 100dvh);
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  background: linear-gradient(#64e4ef, #098bbd 40%, #124473);
+  background-size: 100% 120%;
+  animation: underwater-depth 10s ease-in-out infinite alternate;
+}
+#bubbles-3d-card::before {
+  content: "";
+  position: absolute;
+  inset: -15%;
+  pointer-events: none;
+  background: repeating-conic-gradient(
+    from 165deg at 50% -10%,
+    transparent 0deg 13deg,
+    #e5ffff20 15deg 19deg,
+    transparent 22deg 35deg
+  );
+  animation: underwater-rays 12s ease-in-out infinite alternate;
+}
+#bubbles-3d-score {
+  position: absolute;
+  inset-block-start: max(20px, env(safe-area-inset-top));
+  inset-inline: 0;
+  z-index: 2;
+  text-align: center;
+  color: #fff;
+  font-size: clamp(2.5rem, 10vw, 4rem);
+  font-weight: 800;
+  text-shadow: 0 2px 4px #124473;
+  pointer-events: none;
+}
+#bubbles-3d-visual {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  pointer-events: none;
+}
+#bubbles-3d-fallback {
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  inline-size: min(var(--bubble-size, 60%), 70vh);
+  aspect-ratio: 1;
+  border: 3px solid #d5fbff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: inline-size 100ms linear;
+  pointer-events: none;
+}
+@keyframes underwater-rays {
+  from {
+    transform: translateX(-3%) rotate(-3deg);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateX(3%) rotate(3deg);
+    opacity: 1;
+  }
+}
+@keyframes underwater-depth {
+  from {
+    background-position: 50% 0%;
+  }
+  to {
+    background-position: 50% 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #bubbles-3d-card,
+  #bubbles-3d-card::before {
+    animation: none;
+  }
+}

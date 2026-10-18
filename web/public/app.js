@@ -57,6 +57,303 @@ function bindControllerLifecycle(cancel, target = window, page = document) {
   };
 }
 
+// build/004_3d_bubbles/input.js
+function canTouch(snapshot, connected) {
+  return connected && snapshot?.phase === "active" && snapshot.connected && !snapshot.left;
+}
+function displacement(start, end, size) {
+  return end.map((value, index) => {
+    const share = (value - start[index]) / Math.max(1, size[index]);
+    return Math.max(-1, Math.min(1, share));
+  });
+}
+function quantize(value) {
+  return value.map((axis) => Math.max(-4, Math.min(4, Math.round(axis * 10))) || 0);
+}
+var TouchInput = class {
+  available;
+  nextSequence;
+  send;
+  touch;
+  constructor(available, nextSequence, send) {
+    this.available = available;
+    this.nextSequence = nextSequence;
+    this.send = send;
+  }
+  start(point, size, now) {
+    if (!this.available() || this.touch)
+      return false;
+    const seq = this.nextSequence();
+    this.touch = { seq, start: point, size, current: [0, 0], sent: [0, 0], last: now, count: 0 };
+    this.send({ type: "bubbles_3d_touch", input_seq: seq, stage: "start" });
+    return true;
+  }
+  move(point, now) {
+    if (!this.touch)
+      return;
+    this.touch.current = quantize(displacement(this.touch.start, point, this.touch.size));
+    this.tick(now);
+  }
+  tick(now) {
+    const touch = this.touch;
+    if (!touch || !this.available())
+      return;
+    const changed = touch.current.some((axis, index) => axis !== touch.sent[index]);
+    const elapsed = now - touch.last;
+    if (touch.count >= 48 || elapsed < 70 || !changed && elapsed < 600)
+      return;
+    this.send({
+      type: "bubbles_3d_touch",
+      input_seq: touch.seq,
+      stage: "drag",
+      drag: [...touch.current]
+    });
+    touch.sent = [...touch.current];
+    touch.last = now;
+    touch.count++;
+  }
+  release(point) {
+    const touch = this.touch;
+    this.touch = void 0;
+    if (!touch || !this.available())
+      return;
+    this.send({
+      type: "bubbles_3d_release",
+      input_seq: touch.seq,
+      displacement: displacement(touch.start, point, touch.size)
+    });
+  }
+  cancel() {
+    const touch = this.touch;
+    this.touch = void 0;
+    if (touch && this.available())
+      this.send({ type: "bubbles_3d_touch", input_seq: touch.seq, stage: "cancel" });
+  }
+};
+
+// build/004_3d_bubbles/state.js
+function isSnapshot(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  const type = value.type;
+  return type === "bubbles_3d_snapshot" || type === "bubbles_3d_feedback";
+}
+var BubbleState = class {
+  snapshot;
+  snapshotAt = 0;
+  visual;
+  visualAt = 0;
+  receive(message, now) {
+    if (isSnapshot(message)) {
+      if (this.snapshot && message.host_time_msec < this.snapshot.host_time_msec)
+        return false;
+      this.snapshot = message;
+      this.snapshotAt = now;
+      if (this.visual && this.visual.host_time_msec <= message.host_time_msec)
+        this.visual = void 0;
+      return true;
+    }
+    if (message.type === "bubbles_3d_visual" && this.snapshot) {
+      const minimum = this.visual?.host_time_msec ?? this.snapshot.host_time_msec;
+      if (message.visual.host_time_msec < minimum)
+        return false;
+      this.visual = message.visual;
+      this.visualAt = now;
+      return true;
+    }
+    return false;
+  }
+  frame(now) {
+    const snapshot = this.snapshot;
+    if (!snapshot)
+      return;
+    const elapsed = Math.max(0, now - this.snapshotAt);
+    const running = snapshot.phase === "active" || snapshot.phase === "countdown";
+    const age = running ? elapsed : 0;
+    const reform = snapshot.visual_tuning.bubble_reform_seconds * 1e3;
+    const remaining = Math.max(0, snapshot.reform_remaining_msec - age);
+    const popAge = snapshot.reform_remaining_msec > 0 ? reform - snapshot.reform_remaining_msec + age : snapshot.event === "pop" ? age : -1;
+    const visual = this.visual;
+    if (visual) {
+      const visualAge = running ? Math.max(0, now - this.visualAt) : 0;
+      return {
+        snapshot,
+        visual: {
+          ...visual,
+          host_time_msec: visual.host_time_msec + visualAge,
+          pop_age_msec: visual.pop_age_msec < 0 ? -1 : visual.pop_age_msec + visualAge
+        }
+      };
+    }
+    return {
+      snapshot,
+      visual: {
+        host_time_msec: snapshot.host_time_msec + age,
+        radius: snapshot.bubble_radius * Math.max(0.08, 1 - remaining / Math.max(1, reform)),
+        stretch: [0, 0],
+        velocity: [0, 0],
+        white: snapshot.invulnerable_remaining_msec > age,
+        pop_age_msec: popAge,
+        caught: snapshot.visual_jellyfish
+      }
+    };
+  }
+};
+async function choosePresentation(create, fallback) {
+  try {
+    return await create();
+  } catch {
+    return fallback();
+  }
+}
+
+// build/004_3d_bubbles/phone.js
+var BubblePhone = class {
+  surface;
+  canvas;
+  score;
+  circle;
+  load;
+  state = new BubbleState();
+  presentation;
+  pointer;
+  timer;
+  unbind;
+  generation = 0;
+  feedback = "";
+  input;
+  constructor(surface, canvas, score, circle, connected, nextSequence, send, load) {
+    this.surface = surface;
+    this.canvas = canvas;
+    this.score = score;
+    this.circle = circle;
+    this.load = load;
+    this.input = new TouchInput(() => !surface.hidden && canTouch(this.state.snapshot, connected()), nextSequence, send);
+    surface.addEventListener("pointerdown", (event) => {
+      if (this.pointer !== void 0 || event.pointerType === "mouse" && event.button !== 0)
+        return;
+      const rect = surface.getBoundingClientRect();
+      if (!this.input.start([event.clientX, event.clientY], [rect.width, rect.height], performance.now()))
+        return;
+      event.preventDefault();
+      this.pointer = event.pointerId;
+      try {
+        surface.setPointerCapture(event.pointerId);
+      } catch {
+        this.cancel();
+      }
+    });
+    surface.addEventListener("pointermove", (event) => {
+      if (event.pointerId !== this.pointer)
+        return;
+      event.preventDefault();
+      this.input.move([event.clientX, event.clientY], performance.now());
+    });
+    surface.addEventListener("pointerup", (event) => {
+      if (event.pointerId !== this.pointer)
+        return;
+      event.preventDefault();
+      this.input.release([event.clientX, event.clientY]);
+      this.cancel();
+    });
+    for (const name of ["pointercancel", "lostpointercapture"])
+      surface.addEventListener(name, (event) => {
+        if (event.pointerId === this.pointer)
+          this.cancel();
+      });
+  }
+  receive(message) {
+    const previous = this.state.snapshot;
+    if (isSnapshot(message) && message.phase === "lobby_return") {
+      this.hide();
+      return;
+    }
+    if (isSnapshot(message) && !canTouch(message, true))
+      this.cancel();
+    if (!this.state.receive(message, performance.now()))
+      return;
+    if (isSnapshot(message)) {
+      this.surface.hidden = false;
+      this.score.textContent = String(Math.max(0, Math.floor(message.score)));
+      const key = `${message.host_time_msec}:${message.event}`;
+      if (message.type === "bubbles_3d_feedback" && this.feedback !== key) {
+        this.feedback = key;
+        try {
+          if (message.event === "captured")
+            navigator.vibrate?.(18);
+          else if (message.event === "pop")
+            navigator.vibrate?.([35, 45, 35]);
+        } catch {
+        }
+      }
+      if (!previous)
+        this.mount();
+    }
+    this.paint();
+  }
+  mount() {
+    const generation = ++this.generation;
+    this.presentation = this.fallback();
+    this.unbind = bindControllerLifecycle(() => this.cancel());
+    this.timer = setInterval(() => {
+      this.input.tick(performance.now());
+      this.paint();
+    }, 30);
+    void choosePresentation(async () => (await this.load()).createBubbleView(this.canvas), () => this.fallback()).then((presentation) => {
+      if (generation !== this.generation) {
+        presentation.dispose();
+        return;
+      }
+      this.presentation?.dispose();
+      this.presentation = presentation;
+      this.canvas.hidden = false;
+      this.circle.hidden = true;
+      this.paint();
+    });
+  }
+  fallback() {
+    return {
+      update: ({ snapshot, visual }) => {
+        this.canvas.hidden = true;
+        this.circle.hidden = false;
+        this.circle.style.backgroundColor = snapshot.character_color;
+        const maximum = Math.max(snapshot.visual_tuning.max_radius, visual.radius, 0.01);
+        const size = 24 + 60 * visual.radius / maximum;
+        this.circle.style.setProperty("--bubble-size", `${size}%`);
+      },
+      dispose: () => {
+      }
+    };
+  }
+  paint() {
+    if (document.hidden)
+      return;
+    const frame = this.state.frame(performance.now());
+    if (frame)
+      this.presentation?.update(frame);
+  }
+  cancel() {
+    this.input.cancel();
+    const pointer = this.pointer;
+    this.pointer = void 0;
+    if (pointer !== void 0 && this.surface.hasPointerCapture(pointer))
+      this.surface.releasePointerCapture(pointer);
+  }
+  hide() {
+    this.cancel();
+    this.generation++;
+    clearInterval(this.timer);
+    this.timer = void 0;
+    this.unbind?.();
+    this.unbind = void 0;
+    this.presentation?.dispose();
+    this.presentation = void 0;
+    this.state = new BubbleState();
+    this.feedback = "";
+    this.surface.hidden = true;
+  }
+};
+
 // build/pwa.js
 function isStandalone(target, browser) {
   return target.matchMedia("(display-mode: standalone)").matches || target.matchMedia("(display-mode: fullscreen)").matches || browser.standalone === true;
@@ -1948,6 +2245,40 @@ var pwa = new PwaOnboarding(document.querySelector("#app-screen"), document.quer
   nextButton.focus();
   void requestImmersiveMode();
 });
+var bubble3DCard = document.querySelector("#bubbles-3d-card");
+var threeView;
+var bubble3DPhone = new BubblePhone(bubble3DCard, document.querySelector("#bubbles-3d-visual"), document.querySelector("#bubbles-3d-score"), document.querySelector("#bubbles-3d-fallback"), () => socket?.readyState === WebSocket.OPEN, () => {
+  inputSeq += 1;
+  store(STORAGE.inputSeq, String(inputSeq));
+  return inputSeq;
+}, (message) => {
+  if (socket?.readyState === WebSocket.OPEN)
+    socket.send(JSON.stringify(message));
+}, () => {
+  const url = "/three_view.js";
+  threeView ??= import(url).catch((error) => {
+    threeView = void 0;
+    throw error;
+  });
+  return threeView;
+});
+protectControllerSurface(bubble3DCard);
+function showBubble3D(message) {
+  if (!isSnapshot(message)) {
+    bubble3DPhone.receive(message);
+    return;
+  }
+  gameplayMotion.stop();
+  motionLab.stop();
+  lobbyControls.deactivate();
+  const visible = message.phase !== "lobby_return";
+  setGameplaySurface(visible, "bubbles_3d");
+  selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = true;
+  bubblesCard.hidden = readyCard.hidden = true;
+  document.documentElement.classList.remove("ready-active");
+  status.hidden = true;
+  bubble3DPhone.receive(message);
+}
 for (const surface of [lobbyController, bubblesPad, readyCard, tiltSurface])
   protectControllerSurface(surface);
 bindControllerLifecycle(() => cancelBubblesPointer());
@@ -2006,6 +2337,8 @@ function setGameplaySurface(active, game = "bubbles") {
   const next = active ? game : null;
   if (next !== "tilt_shift")
     tiltPhone.hide();
+  if (next !== "bubbles_3d")
+    bubble3DPhone.hide();
   if (activeGame !== next) {
     cancelBubblesPointer();
     if (next === null) {
@@ -2027,6 +2360,7 @@ function setGameplaySurface(active, game = "bubbles") {
   document.documentElement.classList.toggle("gameplay-active", active);
   document.documentElement.classList.toggle("bubbles-active", next === "bubbles");
   document.documentElement.classList.toggle("tilt-active", next === "tilt_shift");
+  document.documentElement.classList.toggle("bubbles-3d-active", next === "bubbles_3d");
 }
 function showJoin(message, focus = false) {
   gameplayMotion.stop();
@@ -2658,13 +2992,19 @@ async function connect() {
         peer.close();
         return;
       }
+      if (message.type === "lobby" || message.type?.endsWith("_snapshot") && !isSnapshot(message)) {
+        if (activeGame === "bubbles_3d")
+          setGameplaySurface(false);
+      }
       if (message.type === "welcome" && message.protocol === 1 && Number.isInteger(message.connection_id)) {
         stage = "Connected WebSocket";
         connectionError.hidden = true;
         connectionError.textContent = "";
         clearTimeout(deadline);
         if (message.resume_status === "resumed" && rememberIdentity(message)) {
-          if (message.gameplay?.type === "tilt_shift_snapshot")
+          if (isSnapshot(message.gameplay))
+            showBubble3D(message.gameplay);
+          else if (message.gameplay?.type === "tilt_shift_snapshot")
             showTilt(message.gameplay);
           else if (message.gameplay?.type === "bubbles_snapshot")
             showBubbles(message.gameplay);
@@ -2699,7 +3039,9 @@ async function connect() {
       } else if (message.type === "left") {
         forgetIdentity();
         showJoin("You left the lobby. Choose your character and name to join again.", true);
-      } else if (message.type === "bubbles_trace_result")
+      } else if (isSnapshot(message) || message.type === "bubbles_3d_visual" || message.type === "bubbles_3d_release_result")
+        showBubble3D(message);
+      else if (message.type === "bubbles_trace_result")
         bubblesLocalCharge = 0;
       else if (message.type === "bubbles_visual" && message.visual && bubblesSnapshot) {
         bubblesVisualSnapshot = message.visual;
