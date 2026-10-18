@@ -131,7 +131,6 @@ removes it. The evidence labels are defined in
   bell, the curled tentacles, the pufferfish face, spikes and fins.
 - Owner review of both creatures and the recoloured props in the running scene. Captures from
   `bubbles_3d_scene_visual_check.gd` are in `test-results/bubbles-3d/`.
-- `[EXPORTED-BUILD]` The Windows package carries every model and license.
 
 ## Tilt Shift art
 
