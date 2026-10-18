@@ -65,7 +65,13 @@ func _check_jellyfish() -> void:
 
 
 ## Loads an adapted creature and returns the bounds of each named mesh, empty on failure.
-func _creature(name: String, names: Array[String], triangle_cap: int) -> Dictionary[String, AABB]:
+## Only the meshes in [param double_sided] draw their back faces.
+func _creature(
+	name: String,
+	names: Array[String],
+	triangle_cap: int,
+	double_sided: Array[String] = [],
+) -> Dictionary[String, AABB]:
 	var file := "%s/%s.glb" % [name, name]
 	check(
 		FileAccess.get_sha256(DIRECTORY + file)
@@ -80,6 +86,17 @@ func _creature(name: String, names: Array[String], triangle_cap: int) -> Diction
 		var mesh := node as MeshInstance3D
 		parts[String(mesh.name)] = mesh.transform * mesh.get_aabb()
 		triangles += mesh.mesh.get_faces().size() / 3
+		var culling := (
+			BaseMaterial3D.CULL_DISABLED
+			if String(mesh.name) in double_sided
+			else BaseMaterial3D.CULL_BACK
+		)
+		for surface: int in mesh.mesh.get_surface_count():
+			var material := mesh.mesh.surface_get_material(surface) as BaseMaterial3D
+			check(
+				material != null and material.cull_mode == culling,
+				"%s %s culls its faces as authored" % [name, mesh.name],
+			)
 	model.free()
 
 	var found: Array[String] = []

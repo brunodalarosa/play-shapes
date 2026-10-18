@@ -12,6 +12,7 @@ import hashlib
 import json
 from pathlib import Path
 import shutil
+import struct
 import sys
 
 import bmesh
@@ -35,6 +36,7 @@ MODELS = {
             "Eyes": "#151515",
         },
         "origin_mesh": "Bell",
+        "double_sided": [],
     },
     "pufferfish": {
         "collection": "Pufferfish Asset",
@@ -50,6 +52,8 @@ MODELS = {
             "Mouth": "#EF5A5A",
         },
         "origin_mesh": "Body",
+        # The fins are single sheets cut from the fish.
+        "double_sided": ["Fins"],
     },
 }
 
@@ -83,6 +87,14 @@ def check_library_parts(name):
     return hashes
 
 
+def glb_materials(path):
+    """Material name to doubleSided, read from the GLB's JSON chunk."""
+    data = path.read_bytes()
+    length = struct.unpack_from("<I", data, 12)[0]
+    document = json.loads(data[20 : 20 + length])
+    return {m["name"]: m.get("doubleSided", False) for m in document["materials"]}
+
+
 def bounds(objects):
     points = [o.matrix_world @ v.co for o in objects for v in o.data.vertices]
     low = Vector([min(p[i] for p in points) for i in range(3)])
@@ -112,6 +124,15 @@ def export(name, spec):
         require(obj.parent is None, f"{obj.name} must not be parented")
         require(obj.matrix_world.is_identity, f"{obj.name} must have applied transforms")
         require(not obj.modifiers, f"{obj.name} must have no modifiers")
+        require(
+            "custom_normal" not in obj.data.attributes,
+            f"{obj.name} must not carry normals inherited from a library source",
+        )
+        bm = bmesh.new()
+        bm.from_mesh(obj.data)
+        if all(edge.is_manifold for edge in bm.edges):
+            require(bm.calc_volume(signed=True) > 0, f"{obj.name} is inside out")
+        bm.free()
 
     bpy.ops.object.select_all(action="DESELECT")
     for obj in objects:
@@ -172,6 +193,10 @@ def verify(name, spec, target):
         close = all(abs(a - b) < TOLERANCE for a, b in zip(materials[material], expected))
         require(close, f"{material} is not {hex_color}")
 
+    sided = glb_materials(target)
+    double = sorted(name for name, value in sided.items() if value)
+    require(double == sorted(spec["double_sided"]), f"Double-sided materials are {double}")
+
     low, high = bounds([meshes[spec["origin_mesh"]]])
     centre = (low + high) / 2
     require(centre.length < TOLERANCE, f"Origin is not at the {spec['origin_mesh']} centre")
@@ -202,8 +227,7 @@ def check_jellyfish(meshes, per_mesh):
     require(eyes["maximum"][2] < 0, "Eyes are on the -Z front of the bell")
     bell_tree = tree(meshes["Bell"])
     for part in islands(meshes["Eyes"]):
-        nearest = min(bell_tree.find_nearest(point)[3] for point in part)
-        require(nearest < 0.02, "Each eye sits on the bell")
+        require(any(touches(bell_tree, q) for q in part), "Each eye sits on the bell")
     require(tentacles["minimum"][1] < bell["minimum"][1] - 0.15, "Tentacles hang below")
     require(tentacles["maximum"][1] > bell["minimum"][1], "Tentacles start under the bell")
     width = bell["maximum"][0] - bell["minimum"][0]
@@ -217,9 +241,26 @@ def check_pufferfish(meshes, per_mesh):
     require(face["minimum"][0] > 0, "The face is on the +X front")
     require(fins["minimum"][0] < body["minimum"][0], "The tail fin extends behind the body")
     body_tree = tree(meshes["Body"])
-    for part in islands(meshes["Fins"]) + islands(meshes["Face"]):
-        nearest = min(body_tree.find_nearest(point)[3] for point in part)
-        require(nearest < 0.02, "Every fin and face part touches the body")
+    parts = islands(meshes["Fins"]) + islands(meshes["Face"])
+    attached = [p for p in parts if any(touches(body_tree, q) for q in p)]
+    # A pupil sits on its eye rather than on the body: it must sink into an attached part.
+    for part in parts:
+        if part in attached:
+            continue
+        inside = any(any(within(q, other) for q in part) for other in attached)
+        require(inside, "Every fin and face part touches the body or sinks into a part that does")
+
+
+def touches(surface, point):
+    """True when the point lies inside the closed surface or within 0.02 of it."""
+    location, normal, _index, distance = surface.find_nearest(point)
+    return distance < 0.02 or (point - location).dot(normal) < 0
+
+
+def within(point, part):
+    low = Vector([min(q[i] for q in part) for i in range(3)])
+    high = Vector([max(q[i] for q in part) for i in range(3)])
+    return all(low[i] <= point[i] <= high[i] for i in range(3))
 
 
 def tree(obj):

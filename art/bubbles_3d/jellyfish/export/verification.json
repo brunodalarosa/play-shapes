@@ -6,9 +6,9 @@
     "jellyfish/source/Textures/colormap.png": "75baf74d9483a0fc56ac21ceba346fbe16fc24a2a1bf0524c53e6bbe802e1153",
     "jellyfish/source/License.txt": "32a081c2035dd4db47d850c83244da048165f0e53d71c076b76c1afc0590bc7f"
   },
-  "source_sha256": "d42584e26be5cc3dd12d9e28cc20559a4874840c0c69d18cdd14c1e67278f4a9",
-  "export_sha256": "0ddf77b76dc6b7cfada7626f7dbf522538ae528a5ab5b1cc9f8f13d93d3e059b",
-  "export_bytes": 18288,
+  "source_sha256": "97f1b83d4315789886f53ecf540305af4e5e13b76a6a1b37f24be75865860ddd",
+  "export_sha256": "696afbbc7d466767d3264609790b99d7296da759a2692426f272bbc4e009a8bd",
+  "export_bytes": 17636,
   "triangles": 590,
   "triangles_by_mesh": {
     "Bell": 92,

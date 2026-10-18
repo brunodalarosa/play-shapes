@@ -79,9 +79,11 @@ naming `jellyfish` or `pufferfish`:
 ```
 
 [export_and_verify.py](export_and_verify.py) checks the library parts against `SHA256SUMS`,
-opens the saved source, exports only the asset collection and imports the GLB into an empty
-scene. It checks mesh and material names and colours, the triangle cap, non-degenerate
-triangles, the origin, the facing and that every part touches the body or bell. It writes
+opens the saved source and checks that no mesh carries normals inherited from a library part
+and that closed meshes face outward. It exports only the asset collection and imports the GLB
+into an empty scene, where it checks mesh and material names and colours, which materials are
+double-sided, the triangle cap, non-degenerate triangles, the origin, the facing and that
+every part touches the body or bell. It writes
 `export/verification.json` and copies the GLB to the runtime folder; it never saves over the
 source.
 
