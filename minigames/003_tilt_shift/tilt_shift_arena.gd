@@ -85,6 +85,12 @@ func stop() -> void:
 	_walls.clear()
 	_floor.clear()
 	if is_instance_valid(controller):
+		# A stop inside one of its notifications must not let the signals it emits next,
+		# such as round_started right after phase_changed, revive the arena.
+		controller.round_prepared.disconnect(_on_round_prepared)
+		controller.round_started.disconnect(_on_round_started)
+		controller.round_ended.disconnect(_on_round_ended)
+		controller.angle_changed.disconnect(_on_angle_changed)
 		controller.queue_free()
 	controller = null
 	_snapshot = null

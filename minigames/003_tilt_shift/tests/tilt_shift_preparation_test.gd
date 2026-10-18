@@ -165,6 +165,10 @@ func _run() -> void:
 		"Cancellation during a phase notification retires protocol and remaining callbacks",
 	)
 	check(
+		presentation.arena.controller == null and not presentation.arena._active,
+		"The round start that follows the cancelling notification cannot revive the arena",
+	)
+	check(
 		not protocol.handle_ready(first, ready_message, _now),
 		"Retired adapter cannot resume preparation",
 	)
