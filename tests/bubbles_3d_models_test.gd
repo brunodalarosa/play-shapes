@@ -44,6 +44,7 @@ func _run() -> void:
 		model.free()
 
 	_check_jellyfish()
+	_check_pufferfish()
 
 
 func _check_jellyfish() -> void:
@@ -61,6 +62,21 @@ func _check_jellyfish() -> void:
 	check(
 		is_equal_approx(snappedf(bell.size.y / bell.size.x, 0.01), 0.7),
 		"The jellyfish bell is 0.7 as tall as it is wide",
+	)
+
+
+func _check_pufferfish() -> void:
+	var parts := _creature("pufferfish", ["Body", "Fins", "Face"], 700, ["Fins"])
+	if parts.is_empty():
+		return
+
+	var body := parts["Body"]
+	check(body.get_center().is_zero_approx(), "The pufferfish origin is the body centre")
+	check(parts["Face"].position.x > 0.0, "The pufferfish face looks along +X")
+	check(parts["Fins"].position.x < body.position.x, "The pufferfish tail trails behind")
+	check(
+		parts["Fins"].intersects(body) and parts["Face"].intersects(body),
+		"The pufferfish fins and face sit on its body",
 	)
 
 

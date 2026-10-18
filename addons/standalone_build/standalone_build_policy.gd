@@ -106,6 +106,7 @@ const REQUIRED_RUNTIME_PATHS := [
 	"assets/runtime/minigames/bubbles_3d/bottle/bottle_A_green.gltf",
 	"assets/runtime/minigames/bubbles_3d/bottle/License.txt",
 	"assets/runtime/minigames/bubbles_3d/jellyfish/jellyfish.glb",
+	"assets/runtime/minigames/bubbles_3d/pufferfish/pufferfish.glb",
 	"assets/runtime/animated_characters/squircle/v1/manifest.json",
 	"assets/runtime/animated_characters/squircle/v1/render_tint.gdshader",
 	"assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png",

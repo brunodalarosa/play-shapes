@@ -37,11 +37,12 @@ MODELS = {
             "side": Vector((0, -1, 0.12)),
             "three-quarter": Vector((1, -0.9, 0.35)),
         },
-        # Heading right, diagonally up-right, diagonally down-left and turned toward the camera.
+        # Heading right, diagonally up-right, turned around and diagonally down-left, and
+        # turned toward the camera. Turns about Z (yaw) apply before turns about Y (heading).
         "game": [
             (0.0, 0.0, 0.0, Vector((1.0, 0, 1.2))),
             (0.0, -45.0, 0.0, Vector((3.2, 0, 1.2))),
-            (0.0, 135.0, 0.0, Vector((1.0, 0, -1.0))),
+            (0.0, -45.0, 180.0, Vector((1.0, 0, -1.0))),
             (0.0, 0.0, -35.0, Vector((3.2, 0, -1.0))),
         ],
     },
@@ -155,6 +156,7 @@ def gameplay(name, exported, suffix):
     placed = []
     for rx, ry, rz, location in MODELS[name]["game"]:
         root, _objects = load_model(name, exported)
+        root.rotation_mode = "ZYX"
         root.rotation_euler = [math.radians(a) for a in (rx, ry, rz)]
         root.location = location
         placed.append(location)

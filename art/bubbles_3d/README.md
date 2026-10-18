@@ -66,6 +66,26 @@ The guide asks for the cap "flattened to about 0.7 of its width in height". The 
 its stem is already only 0.48 as tall as it is wide, so reaching 0.7 and the dome of the
 reference sheet means stretching it; the 0.7 ratio and the sheet were followed.
 
+## Pufferfish
+
+[pufferfish.blend](pufferfish/pufferfish.blend) is the editable Blender 5.2 source.
+[export/pufferfish.glb](pufferfish/export/pufferfish.glb) holds three meshes, 612 triangles in
+all, with flat-colour materials and no textures:
+
+- `Body` (140 triangles): the KayKit `projectile_catapult` turned so +X looks between two
+  neighbouring spikes, one over the forehead and one under the mouth, scaled to a radius of
+  0.415, with its twelve spikes a quarter shorter. Orange `#FF9800`; the spike faces are
+  `Spike Tips` `#FFB74D`.
+- `Fins` (24 triangles): the Kenney `fish` tail fan, turned to point −X and stretched into a
+  fan tail, and its two pectoral triangles, enlarged and set into the body's sides sweeping
+  back. Orange-red `#FF5722`, double-sided because the fish's fins are single sheets.
+- `Face` (448 triangles): new white `#FAFAFA` eyes with black `#151515` pupils looking
+  forward, pink `#F48FB1` cheek discs and a pink-red `#EF5A5A` torus mouth.
+
+The origin is the body centre. The GLB is Y up and faces +X; tail to mouth it is 1.19 long,
+about 120 pixels in the game frame. The face parts and fins are one rigid mesh each, so they
+stay attached at any heading.
+
 ## Building, export and review
 
 The construction scripts are one-time and stay in ignored `scratch/`; edit the saved
@@ -78,14 +98,16 @@ naming `jellyfish` or `pufferfish`:
 & $blender --background --factory-startup --python-exit-code 1 --python render_review.py -- jellyfish --exported
 ```
 
-[export_and_verify.py](export_and_verify.py) checks the library parts against `SHA256SUMS`,
-opens the saved source and checks that no mesh carries normals inherited from a library part
-and that closed meshes face outward. It exports only the asset collection and imports the GLB
-into an empty scene, where it checks mesh and material names and colours, which materials are
-double-sided, the triangle cap, non-degenerate triangles, the origin, the facing and that
-every part touches the body or bell. It writes
-`export/verification.json` and copies the GLB to the runtime folder; it never saves over the
-source.
+[export_and_verify.py](export_and_verify.py) never saves over the source. It:
+
+- checks the library parts against `SHA256SUMS`;
+- opens the saved source and checks that no mesh carries normals inherited from a library
+  part and that closed meshes face outward;
+- exports only the asset collection and imports the GLB into an empty scene, where it checks
+  mesh and material names and colours, which materials are double-sided, the triangle cap,
+  non-degenerate triangles, the origin, the facing and that every part touches the body or
+  bell;
+- writes `export/verification.json` and copies the GLB to the runtime folder.
 
 [render_review.py](render_review.py) writes front, side and three-quarter views on grey, a
 1920 × 1080 frame on blue through the scene's 30° camera framing the 19.2-unit play plane,
