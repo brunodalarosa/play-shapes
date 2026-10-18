@@ -464,7 +464,8 @@ func _on_return_to_lobby_requested() -> void:
 func _return_to_lobby() -> void:
 	var launcher := get_node_or_null("/root/DebugLauncher")
 	if launcher != null:
-		launcher.return_to_lobby(false)
+		# The shared transport has no return hook for this minigame, so the launcher tells phones.
+		launcher.return_to_lobby(true)
 	else:
 		var session_host := get_node_or_null("/root/SessionHost")
 		if session_host != null:

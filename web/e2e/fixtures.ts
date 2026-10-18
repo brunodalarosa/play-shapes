@@ -58,6 +58,7 @@ export class Host {
         ...process.env,
         E2E_PLAYERS: String(players),
         E2E_ROUND: process.env.E2E_ROUND === "full" ? "full" : "quick",
+        E2E_MINIGAME: game,
         E2E_HTTP_PORT: String(HTTP_PORT),
         E2E_HOST_CAPTURES: windowed ? testInfo.outputPath("host") : "",
         E2E_REPORT_FOLDER: join(ROOT, "test-results", "tilt-shift"),
@@ -209,8 +210,8 @@ export class Phone {
     await this.page.click("#ready-button");
   }
 
-  async swipe(dx: number, dy: number): Promise<void> {
-    const center = await centerOf(this.page.locator("#bubbles-pad"));
+  async swipe(dx: number, dy: number, surface = "#bubbles-pad"): Promise<void> {
+    const center = await centerOf(this.page.locator(surface));
     await this.page.mouse.move(center.x, center.y);
     await this.page.mouse.down();
     await this.page.mouse.move(center.x + dx, center.y + dy, { steps: 6 });

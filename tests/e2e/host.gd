@@ -6,7 +6,8 @@ extends SceneTree
 ##
 ## Environment:
 ##   E2E_PLAYERS        players expected before Start is pressed (default 2)
-##   E2E_ROUND          "quick" shortens the Bubbles round in memory; "full" keeps every default
+##   E2E_ROUND          "quick" shortens the Bubbles rounds in memory; "full" keeps every default
+##   E2E_MINIGAME       catalog id the host selects in the lobby before Start (default bubbles)
 ##   E2E_HTTP_PORT      HTTP port; WebSocket uses the next one (default 18200)
 ##   E2E_HOST_CAPTURES  folder for host screenshots; only useful when not headless
 
@@ -22,6 +23,7 @@ const TIMEOUT_SECONDS := 600.0
 
 var _host: Node
 var _players := 2
+var _minigame := &"bubbles"
 var _captures := ""
 var _elapsed := 0.0
 var _scene_path := ""
@@ -39,6 +41,8 @@ var _returned := false
 func _initialize() -> void:
 	_players = int(OS.get_environment("E2E_PLAYERS")) if OS.has_environment("E2E_PLAYERS") else 2
 	_captures = OS.get_environment("E2E_HOST_CAPTURES")
+	if OS.has_environment("E2E_MINIGAME"):
+		_minigame = StringName(OS.get_environment("E2E_MINIGAME"))
 	_start.call_deferred()
 
 
@@ -78,6 +82,8 @@ func _use_round(mode: String) -> void:
 	var presets: ActivePresets = _host.active_presets.duplicate()
 	presets.bubbles = presets.bubbles.duplicate()
 	presets.bubbles.round_duration_seconds = QUICK_ROUND_SECONDS
+	presets.bubbles_3d = presets.bubbles_3d.duplicate()
+	presets.bubbles_3d.round_duration_seconds = QUICK_ROUND_SECONDS
 	_host.active_presets = presets
 	_event("round quick %d s" % QUICK_ROUND_SECONDS)
 
@@ -105,6 +111,8 @@ func _process(delta: float) -> bool:
 		_watch_lobby(scene, delta)
 	elif scene.get("controller") is BubblesRoundController:
 		_watch_bubbles(scene, delta)
+	elif scene.get("controller") is Bubbles3DRoundController:
+		_watch_round(scene, delta, scene.get_node("Hud/Results/Margin/Column/ReturnToLobby"))
 
 	return false
 
@@ -138,11 +146,17 @@ func _watch_lobby(lobby: Node, delta: float) -> void:
 		and _at_rest_for >= AT_REST_SECONDS and not start.disabled
 	):
 		_started = true
+		_select_minigame(lobby.minigame_selector)
 		_click(start, "start players=%d" % _host.player_registry.player_count())
 
 
 func _watch_bubbles(bubbles: Node, delta: float) -> void:
-	var controller: BubblesRoundController = bubbles.controller
+	_watch_round(bubbles, delta, bubbles.get_node("Hud/Results/ReturnToLobby"))
+
+
+## Announces each phase, warns the phones before the end, and returns after the results.
+func _watch_round(round_scene: Node, delta: float, return_button: Button) -> void:
+	var controller: Node = round_scene.controller
 	if controller.phase_name() != _phase:
 		_phase = controller.phase_name()
 		_event("phase %s" % _phase)
@@ -152,8 +166,8 @@ func _watch_bubbles(bubbles: Node, delta: float) -> void:
 	# A swipe that reaches the host after the round ends is rejected, and the phone shows that
 	# as an error, so the phones are told to stop a little before the end.
 	if _phase == &"active" and not _ending_announced:
-		var round_msec := roundi(controller.tuning.round_duration_seconds * 1000.0)
-		var ends_msec := controller.active_start_msec() + round_msec
+		var round_msec: int = roundi(controller.tuning.round_duration_seconds * 1000.0)
+		var ends_msec: int = controller.active_start_msec() + round_msec
 		if Time.get_ticks_msec() >= ends_msec - ROUND_ENDING_MSEC:
 			_ending_announced = true
 			_event("round ending")
@@ -161,10 +175,21 @@ func _watch_bubbles(bubbles: Node, delta: float) -> void:
 	if _phase == &"results":
 		_results_for += delta
 
-	var return_button: Button = bubbles.get_node("Hud/Results/ReturnToLobby")
 	if _results_for >= RESULTS_SECONDS and not _returned and not return_button.disabled:
 		_returned = true
 		_click(return_button, "return")
+
+
+## Picks the minigame to start, as a person would in the lobby's selector.
+func _select_minigame(selector: OptionButton) -> void:
+	for index: int in selector.item_count:
+		if StringName(selector.get_item_metadata(index)) == _minigame:
+			selector.select(index)
+			selector.item_selected.emit(index)
+			_event("selected %s" % _minigame)
+			return
+	push_error("E2E could not find minigame %s in the lobby" % _minigame)
+	quit(1)
 
 
 ## Clicks a button with mouse events at its place on screen, so Godot's own hit

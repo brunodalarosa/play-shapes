@@ -73,9 +73,12 @@ func _process(delta: float) -> bool:
 		if Time.get_ticks_msec() < _start_at:
 			return false
 		_started = true
+		# By id, since the dropdown's order follows the catalog.
 		var selector: OptionButton = current_scene.minigame_selector
-		selector.select(1)
-		selector.item_selected.emit(1)
+		for index: int in selector.item_count:
+			if StringName(selector.get_item_metadata(index)) == &"tilt_shift":
+				selector.select(index)
+				selector.item_selected.emit(index)
 		current_scene.start_button.pressed.emit()
 		print("E2E start players=%d" % _players)
 	if current_scene is TiltShiftGameplay:
