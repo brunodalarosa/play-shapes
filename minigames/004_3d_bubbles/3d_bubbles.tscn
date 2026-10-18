@@ -1,0 +1,157 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://minigames/004_3d_bubbles/bubbles_3d_presentation.gd" id="1"]
+[ext_resource type="Script" path="res://minigames/004_3d_bubbles/bubbles_3d_round_controller.gd" id="2"]
+[ext_resource type="Script" path="res://minigames/004_3d_bubbles/bubbles_3d_player_arena.gd" id="3"]
+[ext_resource type="Script" path="res://minigames/004_3d_bubbles/bubbles_3d_creature_arena.gd" id="4"]
+[ext_resource type="PackedScene" path="res://components/underwater_environment/underwater_environment.tscn" id="5"]
+
+[sub_resource type="StyleBoxFlat" id="results_panel"]
+bg_color = Color(0.02, 0.11, 0.24, 0.86)
+
+[node name="BubblesAndJellyfishes3D" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1")
+
+[node name="RoundController" type="Node" parent="."]
+script = ExtResource("2")
+
+[node name="World" type="Node3D" parent="."]
+
+[node name="Water" parent="World" instance=ExtResource("5")]
+
+[node name="Scenery" type="Node3D" parent="World"]
+
+[node name="Camera" type="Camera3D" parent="World"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 20.153)
+current = true
+fov = 30.0
+far = 200.0
+
+[node name="PlayerArena" type="Node3D" parent="World"]
+script = ExtResource("3")
+
+[node name="CreatureArena" type="Node3D" parent="World"]
+script = ExtResource("4")
+
+[node name="Hud" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Nameplates" type="Control" parent="Hud"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Timer" type="Label" parent="Hud"]
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -160.0
+offset_top = 16.0
+offset_right = 160.0
+offset_bottom = 116.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.15, 0.3, 1)
+theme_override_constants/outline_size = 16
+theme_override_font_sizes/font_size = 76
+text = "90"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CenterCue" type="Label" parent="Hud"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -130.0
+offset_right = 300.0
+offset_bottom = 130.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0.03, 0.15, 0.3, 1)
+theme_override_constants/outline_size = 24
+theme_override_font_sizes/font_size = 168
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DebugLabel" type="Label" parent="Hud"]
+visible = false
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -64.0
+offset_right = 560.0
+offset_bottom = -20.0
+grow_vertical = 0
+theme_override_colors/font_color = Color(1, 1, 1, 0.85)
+theme_override_font_sizes/font_size = 26
+text = "One-player debug round"
+vertical_alignment = 1
+
+[node name="Results" type="PanelContainer" parent="Hud"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("results_panel")
+
+[node name="Margin" type="MarginContainer" parent="Hud/Results"]
+layout_mode = 2
+theme_override_constants/margin_left = 220
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 220
+theme_override_constants/margin_bottom = 40
+
+[node name="Column" type="VBoxContainer" parent="Hud/Results/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Hud/Results/Margin/Column"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 54
+text = "Results"
+horizontal_alignment = 1
+
+[node name="ResultsList" type="VBoxContainer" parent="Hud/Results/Margin/Column"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 6
+
+[node name="ReturnToLobby" type="Button" parent="Hud/Results/Margin/Column"]
+custom_minimum_size = Vector2(360, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+disabled = true
+text = "Return to lobby"

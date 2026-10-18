@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="MinigameDefinition" format=3]
+
+[ext_resource type="Script" path="res://minigames/minigame_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"bubbles_3d"
+display_name = "Bubbles and jellyfishes 3D"
+scene_path = "res://minigames/004_3d_bubbles/3d_bubbles.tscn"
+pre_minigame_content_path = "res://minigames/004_3d_bubbles/bubbles_3d_pre_minigame_content.tres"
+one_player_debug = true
