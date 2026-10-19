@@ -79,6 +79,12 @@ on the phone ([0035](decisions/0035-phone-three-js.md)). Its design is in
 side-by-side play review; tuning values are provisional and the Pre-minigame preview image is
 still 002's. Once 004 is approved, 002 is retired.
 
+Minigame 005, Tilt Shift 3D, is the next and last step of the 3D rework: 003's game rebuilt
+beside it on plane-locked Jolt physics, with each player shown as their own coloured paddle
+carrying a part-composed, expressive face, a full-width toy-factory arena and a 3D paddle on
+the phone. Its design is in `docs/game-design-documents/Minigames/005/`. The face parts and the
+adapted bin model come first. Once 005 is approved, 003 is retired.
+
 ## Tilt Shift foundation
 
 Host rules and editable content exist for Tilt Shift: equal teams, balanced rotating
