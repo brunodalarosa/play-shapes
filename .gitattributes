@@ -23,6 +23,8 @@ assets/runtime/minigames/bubbles_3d/kelp/** -text
 assets/runtime/minigames/bubbles_3d/rocks/** -text
 assets/runtime/minigames/bubbles_3d/mug/** -text
 assets/runtime/minigames/bubbles_3d/bottle/** -text
+art/tilt_shift_3d/crate/** -text
+assets/runtime/minigames/tilt_shift_3d/crate/License.txt -text
 # Retain upstream license spacing verbatim.
 art/playground_plaza/chair/License.txt -whitespace
 art/playground_plaza/tree/License.txt -whitespace
@@ -32,3 +34,5 @@ assets/runtime/playground_plaza/tree/License.txt -whitespace
 assets/runtime/playground_plaza/potted_plant/License.txt -whitespace
 art/bubbles_3d/**/License.txt -whitespace
 assets/runtime/minigames/bubbles_3d/**/License.txt -whitespace
+art/tilt_shift_3d/crate/License.txt -whitespace
+assets/runtime/minigames/tilt_shift_3d/crate/License.txt -whitespace
