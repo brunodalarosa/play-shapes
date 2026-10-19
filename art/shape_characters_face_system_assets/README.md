@@ -17,7 +17,7 @@ preset uses the navy smirk part like every other face.
 
 ## Vector masters
 
-[vector/](vector/) holds one SVG master per part, in the source's pixel units and canvas: the
+`vector/` holds one SVG master per part, in the source's pixel units and canvas: the
 fourteen supplied parts and `facial_part_eye_x`. Each is made of the shapes the parts were
 drawn with, in navy and white only:
 

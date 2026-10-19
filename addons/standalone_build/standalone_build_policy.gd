@@ -16,7 +16,9 @@ const INCLUDE_FILTER := (
 	+ "assets/runtime/animated_characters/squircle/v1/manifest.json,"
 	+ "assets/runtime/minigames/003/manifest.json,"
 	+ "assets/runtime/playground_plaza/*/License.txt,"
-	+ "assets/runtime/minigames/bubbles_3d/*/License.txt"
+	+ "assets/runtime/minigames/bubbles_3d/*/License.txt,"
+	+ "assets/runtime/shape_faces/face_presets.json,"
+	+ "assets/runtime/minigames/tilt_shift_3d/*/License.txt"
 )
 const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,addons/tilt_shift_workshop/**,scratch/**,comparisons/**,docs/images/tilt-shift-workshop/**,local/**,*.local.json,*.pem,*.key,*.crt,*.cer,*.der,*.p12,*.pfx,art/**,builds/**,opencode.json,tools/**,tests/**,minigames/*/tests/**,test-results/**,web/package.json,web/package-lock.json,web/tsconfig.json,web/node_modules/**,web/src/**,web/tests/**"
 const REQUIRED_BROWSER_PATHS := [
@@ -110,6 +112,24 @@ const REQUIRED_RUNTIME_PATHS := [
 	"assets/runtime/minigames/bubbles_3d/bottle/License.txt",
 	"assets/runtime/minigames/bubbles_3d/jellyfish/jellyfish.glb",
 	"assets/runtime/minigames/bubbles_3d/pufferfish/pufferfish.glb",
+	"assets/runtime/shape_faces/face_presets.json",
+	"assets/runtime/shape_faces/facial_part_eye_closed_down.png",
+	"assets/runtime/shape_faces/facial_part_eye_closed_up.png",
+	"assets/runtime/shape_faces/facial_part_eye_half_bottom.png",
+	"assets/runtime/shape_faces/facial_part_eye_half_top.png",
+	"assets/runtime/shape_faces/facial_part_eye_half_top_wing.png",
+	"assets/runtime/shape_faces/facial_part_eye_open.png",
+	"assets/runtime/shape_faces/facial_part_eye_x.png",
+	"assets/runtime/shape_faces/facial_part_eyebrow_a.png",
+	"assets/runtime/shape_faces/facial_part_eyebrow_b.png",
+	"assets/runtime/shape_faces/facial_part_eyebrow_c.png",
+	"assets/runtime/shape_faces/facial_part_eyebrow_d.png",
+	"assets/runtime/shape_faces/facial_part_mouth_angry.png",
+	"assets/runtime/shape_faces/facial_part_mouth_happy.png",
+	"assets/runtime/shape_faces/facial_part_mouth_sad.png",
+	"assets/runtime/shape_faces/facial_part_mouth_smirk.png",
+	"assets/runtime/minigames/tilt_shift_3d/crate/bin.glb",
+	"assets/runtime/minigames/tilt_shift_3d/crate/License.txt",
 	"assets/runtime/animated_characters/squircle/v1/manifest.json",
 	"assets/runtime/animated_characters/squircle/v1/render_tint.gdshader",
 	"assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png",

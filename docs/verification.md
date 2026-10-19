@@ -188,6 +188,13 @@ start only what they need, so they stay fast.
   `bubble_shell_3d_test.gd` and `underwater_environment_test.gd` in `tests/`. Run
   `node tools/check.mjs bubbles_3d plane_3d bubble_shell underwater`.
 
+- Tilt Shift 3D assets: `shape_faces_test.gd` and `tilt_shift_3d_models_test.gd` in `tests/`
+  check the face parts and presets and the bin against their verified exports. Run
+  `node tools/check.mjs shape_faces tilt_shift_3d_models`. The exports themselves are verified
+  by `export_faces.mjs` in
+  [art/shape_characters_face_system_assets](../art/shape_characters_face_system_assets/README.md)
+  and `export_and_verify.py` in [art/tilt_shift_3d](../art/tilt_shift_3d/README.md).
+
 - Tilt Shift complete flow: `tilt_shift_flow_test.gd` under the minigame's tests covers
   every allowed roster, rejected debug bypass, stale capture, final joins, calibration transfer,
   reconnect neutrality, mapped presets, results and cleanup. Run

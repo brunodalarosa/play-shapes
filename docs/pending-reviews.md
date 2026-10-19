@@ -132,6 +132,17 @@ removes it. The evidence labels are defined in
 - Owner review of both creatures and the recoloured props in the running scene. Captures from
   `bubbles_3d_scene_visual_check.gd` are in `test-results/bubbles-3d/`.
 
+## Tilt Shift 3D face parts and bin
+
+- Owner approval of the face presets from the review sheets that `export_faces.mjs --review` in
+  [art/shape_characters_face_system_assets](../art/shape_characters_face_system_assets/README.md)
+  writes: all twelve at 1× beside their reference faces, and at 8×, drawn from the exported
+  parts and the manifest.
+- Owner approval of the bin from the renders that `render_review.py` in
+  [art/tilt_shift_3d](../art/tilt_shift_3d/README.md) writes: openings of 0.10, 0.20 and 0.40
+  arena widths in orange, blue and grey, and heights of 0.75 and 2 times.
+- The faces and bins in the running scene are reviewed with minigame 005.
+
 ## Tilt Shift art
 
 - `[PHYSICAL-PHONE]` One-paddle guide readability on a real landscape phone across

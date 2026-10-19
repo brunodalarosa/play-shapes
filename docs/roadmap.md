@@ -82,8 +82,12 @@ still 002's. Once 004 is approved, 002 is retired.
 Minigame 005, Tilt Shift 3D, is the next and last step of the 3D rework: 003's game rebuilt
 beside it on plane-locked Jolt physics, with each player shown as their own coloured paddle
 carrying a part-composed, expressive face, a full-width toy-factory arena and a 3D paddle on
-the phone. Its design is in `docs/game-design-documents/Minigames/005/`. The face parts and the
-adapted bin model come first. Once 005 is approved, 003 is retired.
+the phone. Its design is in `docs/game-design-documents/Minigames/005/`.
+
+Its two asset inputs are ready and await the owner's approval: the face parts as vector
+masters with 8× exports and a manifest of the twelve faces, and the KayKit crate adapted into a
+three-part bin that stretches to any opening. The build comes next. Once 005 is approved, 003
+is retired.
 
 ## Tilt Shift foundation
 
