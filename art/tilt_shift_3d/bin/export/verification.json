@@ -1,0 +1,174 @@
+{
+  "result": "PASS",
+  "blender_version": "5.2.2 LTS",
+  "library_sha256": {
+    "crate/crate.gltf": "f745014f6239147f2528ac24ef988a5833d048bd3aede81085f4c4fc879a8e16",
+    "crate/crate.bin": "252687039209b62a3283319d2836d0e0d6745dd638ea53e2315df981c75a6c07",
+    "crate/restaurantbits_texture.png": "1bfff8f880c5e5e1b793bc46fa1f91149b7f70766174a817b3d5962495c5e40f",
+    "crate/License.txt": "47a1812de438d7452117753d0efbe734c5293db00859b605679128725acf86ef"
+  },
+  "source_sha256": "f9be80d2877347c9395f03cafcdc92ada571337cf27b6ceb17fe8ed81b3dfa85",
+  "export_sha256": "d7d8f2f3556731e8e0c309293c0db88463723d8dbe88b4b8c79adf28a31d822b",
+  "export_bytes": 17932,
+  "triangles": 276,
+  "triangles_by_mesh": {
+    "BinLeft": 100,
+    "BinMiddle": 76,
+    "BinRight": 100
+  },
+  "materials": {
+    "Body": "#FD5D14",
+    "Trim": "#FE9666"
+  },
+  "bounds_gltf": {
+    "minimum": [
+      -1.0,
+      -0.8,
+      -1.0
+    ],
+    "maximum": [
+      1.0,
+      -0.0,
+      1.0
+    ]
+  },
+  "meshes_gltf": {
+    "BinLeft": {
+      "minimum": [
+        -1.0,
+        -0.8,
+        -1.0
+      ],
+      "maximum": [
+        -0.75,
+        -0.0,
+        1.0
+      ],
+      "triangles": 100
+    },
+    "BinMiddle": {
+      "minimum": [
+        -0.75,
+        -0.8,
+        -1.0
+      ],
+      "maximum": [
+        0.75,
+        -0.0,
+        1.0
+      ],
+      "triangles": 76
+    },
+    "BinRight": {
+      "minimum": [
+        0.75,
+        -0.8,
+        -1.0
+      ],
+      "maximum": [
+        1.0,
+        -0.0,
+        1.0
+      ],
+      "triangles": 100
+    }
+  },
+  "assemblies": [
+    {
+      "opening_arena_widths": 0.1,
+      "inner_mouth": 1.92,
+      "outer_width": 2.42,
+      "height": 0.6,
+      "middle_stretch": 1.28,
+      "end_shift": 0.21
+    },
+    {
+      "opening_arena_widths": 0.1,
+      "inner_mouth": 1.92,
+      "outer_width": 2.42,
+      "height": 0.8,
+      "middle_stretch": 1.28,
+      "end_shift": 0.21
+    },
+    {
+      "opening_arena_widths": 0.1,
+      "inner_mouth": 1.92,
+      "outer_width": 2.42,
+      "height": 1.6,
+      "middle_stretch": 1.28,
+      "end_shift": 0.21
+    },
+    {
+      "opening_arena_widths": 0.2,
+      "inner_mouth": 3.84,
+      "outer_width": 4.34,
+      "height": 0.6,
+      "middle_stretch": 2.56,
+      "end_shift": 1.17
+    },
+    {
+      "opening_arena_widths": 0.2,
+      "inner_mouth": 3.84,
+      "outer_width": 4.34,
+      "height": 0.8,
+      "middle_stretch": 2.56,
+      "end_shift": 1.17
+    },
+    {
+      "opening_arena_widths": 0.2,
+      "inner_mouth": 3.84,
+      "outer_width": 4.34,
+      "height": 1.6,
+      "middle_stretch": 2.56,
+      "end_shift": 1.17
+    },
+    {
+      "opening_arena_widths": 0.3,
+      "inner_mouth": 5.76,
+      "outer_width": 6.26,
+      "height": 0.6,
+      "middle_stretch": 3.84,
+      "end_shift": 2.13
+    },
+    {
+      "opening_arena_widths": 0.3,
+      "inner_mouth": 5.76,
+      "outer_width": 6.26,
+      "height": 0.8,
+      "middle_stretch": 3.84,
+      "end_shift": 2.13
+    },
+    {
+      "opening_arena_widths": 0.3,
+      "inner_mouth": 5.76,
+      "outer_width": 6.26,
+      "height": 1.6,
+      "middle_stretch": 3.84,
+      "end_shift": 2.13
+    },
+    {
+      "opening_arena_widths": 0.4,
+      "inner_mouth": 7.68,
+      "outer_width": 8.18,
+      "height": 0.6,
+      "middle_stretch": 5.12,
+      "end_shift": 3.09
+    },
+    {
+      "opening_arena_widths": 0.4,
+      "inner_mouth": 7.68,
+      "outer_width": 8.18,
+      "height": 0.8,
+      "middle_stretch": 5.12,
+      "end_shift": 3.09
+    },
+    {
+      "opening_arena_widths": 0.4,
+      "inner_mouth": 7.68,
+      "outer_width": 8.18,
+      "height": 1.6,
+      "middle_stretch": 5.12,
+      "end_shift": 3.09
+    }
+  ]
+}
