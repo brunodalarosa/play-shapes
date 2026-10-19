@@ -1,0 +1,152 @@
+{
+  "export_scale": 8,
+  "parts": {
+    "facial_part_eye_closed_down": {"file": "facial_part_eye_closed_down.png", "size": [48, 24], "padding": 1},
+    "facial_part_eye_closed_up": {"file": "facial_part_eye_closed_up.png", "size": [48, 24], "padding": 1},
+    "facial_part_eye_half_bottom": {"file": "facial_part_eye_half_bottom.png", "size": [40, 20], "padding": 0},
+    "facial_part_eye_half_top": {"file": "facial_part_eye_half_top.png", "size": [40, 20], "padding": 0},
+    "facial_part_eye_half_top_wing": {"file": "facial_part_eye_half_top_wing.png", "size": [55, 20], "padding": 0},
+    "facial_part_eye_open": {"file": "facial_part_eye_open.png", "size": [42, 42], "padding": 1},
+    "facial_part_eye_x": {"file": "facial_part_eye_x.png", "size": [42, 42], "padding": 1},
+    "facial_part_eyebrow_a": {"file": "facial_part_eyebrow_a.png", "size": [42, 12], "padding": 1},
+    "facial_part_eyebrow_b": {"file": "facial_part_eyebrow_b.png", "size": [42, 16], "padding": 1},
+    "facial_part_eyebrow_c": {"file": "facial_part_eyebrow_c.png", "size": [32, 12], "padding": 1},
+    "facial_part_eyebrow_d": {"file": "facial_part_eyebrow_d.png", "size": [42, 18], "padding": 1},
+    "facial_part_mouth_angry": {"file": "facial_part_mouth_angry.png", "size": [82, 22], "padding": 1},
+    "facial_part_mouth_happy": {"file": "facial_part_mouth_happy.png", "size": [42, 16], "padding": 1},
+    "facial_part_mouth_sad": {"file": "facial_part_mouth_sad.png", "size": [42, 16], "padding": 1},
+    "facial_part_mouth_smirk": {"file": "facial_part_mouth_smirk.png", "size": [30, 16], "padding": 1}
+  },
+  "faces": {
+    "face_a": {
+      "source_size": [100, 58],
+      "box_aspect": 1.72414,
+      "layers": [
+        {"part": "facial_part_eye_open", "center": [-0.51724, -0.15517], "size": [0.72414, 0.72414], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_open", "center": [0.51724, -0.15517], "size": [0.72414, 0.72414], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_mouth_happy", "center": [0, 0.37776], "size": [0.73862, 0.27586], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_b": {
+      "source_size": [100, 48],
+      "box_aspect": 2.08333,
+      "layers": [
+        {"part": "facial_part_eye_half_bottom", "center": [-0.625, -0.08333], "size": [0.83333, 0.41667], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_half_bottom", "center": [0.625, -0.08333], "size": [0.83333, 0.41667], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eyebrow_a", "center": [-0.625, -0.39437], "size": [0.875, 0.25], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eyebrow_a", "center": [0.625, -0.39437], "size": [0.875, 0.25], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_mouth_sad", "center": [0, 0.35563], "size": [0.88375, 0.33], "rotation_degrees": 0.1, "mirror": false}
+      ]
+    },
+    "face_c": {
+      "source_size": [118, 60],
+      "box_aspect": 1.96667,
+      "layers": [
+        {"part": "facial_part_eye_half_top_wing", "center": [-0.54083, -0.099], "size": [0.91942, 0.33233], "rotation_degrees": 0.16, "mirror": true},
+        {"part": "facial_part_eye_half_top_wing", "center": [0.54217, -0.099], "size": [0.9185, 0.332], "rotation_degrees": -0.13, "mirror": false},
+        {"part": "facial_part_eyebrow_c", "center": [-0.54967, -0.41583], "size": [0.5344, 0.1994], "rotation_degrees": -1.81, "mirror": false},
+        {"part": "facial_part_eyebrow_c", "center": [0.5515, -0.41683], "size": [0.53493, 0.2002], "rotation_degrees": 1.31, "mirror": true},
+        {"part": "facial_part_mouth_happy", "center": [-0.0005, 0.367], "size": [0.7021, 0.26213], "rotation_degrees": -0.1, "mirror": false}
+      ]
+    },
+    "face_d": {
+      "source_size": [106, 66],
+      "box_aspect": 1.60606,
+      "layers": [
+        {"part": "facial_part_eye_half_top", "center": [-0.45455, -0.0347], "size": [0.60606, 0.30303], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_half_top", "center": [0.45455, -0.03394], "size": [0.60606, 0.30303], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [-0.48485, -0.13667], "size": [0.63636, 0.23727], "rotation_degrees": -15, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [0.48485, -0.28848], "size": [0.63636, 0.23782], "rotation_degrees": 15, "mirror": false},
+        {"part": "facial_part_mouth_smirk", "center": [0.12121, 0.42424], "size": [0.45909, 0.22545], "rotation_degrees": -1.2, "mirror": false}
+      ]
+    },
+    "face_e": {
+      "source_size": [110, 80],
+      "box_aspect": 1.375,
+      "layers": [
+        {"part": "facial_part_eye_open", "center": [-0.375, 0.005], "size": [0.5271, 0.525], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_open", "center": [0.375, 0.005], "size": [0.52658, 0.525], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [-0.375, -0.14412], "size": [0.63105, 0.225], "rotation_degrees": 14.8, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [0.37425, -0.29387], "size": [0.63053, 0.2268], "rotation_degrees": -14.79, "mirror": false},
+        {"part": "facial_part_mouth_smirk", "center": [0.1005, 0.43637], "size": [0.384, 0.185], "rotation_degrees": -1.5, "mirror": false}
+      ]
+    },
+    "face_f": {
+      "source_size": [110, 66],
+      "box_aspect": 1.66667,
+      "layers": [
+        {"part": "facial_part_eye_open", "center": [-0.45455, -0.09848], "size": [0.63636, 0.63636], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_open", "center": [0.45455, -0.09848], "size": [0.63636, 0.63636], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [-0.45455, -0.31758], "size": [0.76364, 0.27273], "rotation_degrees": 15, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [0.45182, -0.31667], "size": [0.76491, 0.27273], "rotation_degrees": -15, "mirror": false},
+        {"part": "facial_part_mouth_happy", "center": [0, 0.37121], "size": [0.64909, 0.23758], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_g": {
+      "source_size": [110, 64],
+      "box_aspect": 1.71875,
+      "layers": [
+        {"part": "facial_part_eye_half_top", "center": [-0.46875, -0.13281], "size": [0.625, 0.3125], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_half_top", "center": [0.46875, -0.13281], "size": [0.625, 0.3125], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [-0.46875, -0.2875], "size": [0.7875, 0.28125], "rotation_degrees": 15, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [0.46609, -0.28703], "size": [0.78816, 0.28125], "rotation_degrees": -15, "mirror": false},
+        {"part": "facial_part_mouth_angry", "center": [0, 0.33594], "size": [1.28125, 0.34375], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_h": {
+      "source_size": [110, 72],
+      "box_aspect": 1.52778,
+      "layers": [
+        {"part": "facial_part_eye_half_bottom", "center": [-0.41667, 0.12208], "size": [0.55556, 0.27778], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_half_bottom", "center": [0.41667, 0.12222], "size": [0.55556, 0.27778], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [-0.41667, -0.30556], "size": [0.70175, 0.25], "rotation_degrees": -15, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [0.41667, -0.19528], "size": [0.70233, 0.25], "rotation_degrees": 14.8, "mirror": false},
+        {"part": "facial_part_mouth_smirk", "center": [0.10972, 0.39042], "size": [0.41667, 0.21778], "rotation_degrees": -0.7, "mirror": false}
+      ]
+    },
+    "face_i": {
+      "source_size": [118, 84],
+      "box_aspect": 1.40476,
+      "layers": [
+        {"part": "facial_part_eye_open", "center": [-0.35714, 0.04226], "size": [0.5, 0.5], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_open", "center": [0.35714, 0.04226], "size": [0.5, 0.5], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [-0.40476, -0.3381], "size": [0.6015, 0.21429], "rotation_degrees": -15, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [0.40274, -0.33833], "size": [0.6005, 0.21429], "rotation_degrees": 15, "mirror": false},
+        {"part": "facial_part_mouth_sad", "center": [0, 0.4119], "size": [0.5, 0.19048], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_j": {
+      "source_size": [100, 78],
+      "box_aspect": 1.28205,
+      "layers": [
+        {"part": "facial_part_eye_x", "center": [-0.38462, 0], "size": [0.53846, 0.53846], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_x", "center": [0.38462, 0], "size": [0.53846, 0.53846], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eyebrow_a", "center": [-0.38462, -0.36923], "size": [0.53846, 0.15385], "rotation_degrees": -15, "mirror": false},
+        {"part": "facial_part_eyebrow_a", "center": [0.38205, -0.36923], "size": [0.53846, 0.15231], "rotation_degrees": 15.2, "mirror": false},
+        {"part": "facial_part_mouth_sad", "center": [0, 0.39872], "size": [0.54169, 0.20349], "rotation_degrees": 0.1, "mirror": false}
+      ]
+    },
+    "face_k": {
+      "source_size": [110, 80],
+      "box_aspect": 1.375,
+      "layers": [
+        {"part": "facial_part_eye_closed_down", "center": [-0.3875, 0.10625], "size": [0.6, 0.3], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_closed_down", "center": [0.3625, 0.10625], "size": [0.6, 0.3], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [-0.375, -0.33], "size": [0.63158, 0.225], "rotation_degrees": -15, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [0.37287, -0.33025], "size": [0.63053, 0.2259], "rotation_degrees": 15, "mirror": false},
+        {"part": "facial_part_mouth_sad", "center": [0, 0.4075], "size": [0.525, 0.2], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_l": {
+      "source_size": [106, 74],
+      "box_aspect": 1.43243,
+      "layers": [
+        {"part": "facial_part_eye_closed_up", "center": [-0.40541, 0.01486], "size": [0.64865, 0.32432], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_closed_up", "center": [0.40541, 0.015], "size": [0.64865, 0.32432], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eyebrow_a", "center": [-0.39189, -0.3627], "size": [0.56757, 0.16216], "rotation_degrees": -15, "mirror": false},
+        {"part": "facial_part_eyebrow_a", "center": [0.41622, -0.36216], "size": [0.56757, 0.16216], "rotation_degrees": 15, "mirror": false},
+        {"part": "facial_part_mouth_happy", "center": [0.01351, 0.39189], "size": [0.57778, 0.21622], "rotation_degrees": 0, "mirror": false}
+      ]
+    }
+  }
+}
