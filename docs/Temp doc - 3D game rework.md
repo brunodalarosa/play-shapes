@@ -1,5 +1,6 @@
 I want to rebuild the game from the ground to use 3D assets / scenes. We should use ready to use assets as much as possible and only work on creating new ones when strictly necessary.
 
-We'll start this rework with the Playground Lobby. We'll need a new scene and a new character controller to use the squircle 3D asset and animations instead of the pre rendered sprites. The player controls should remains the same. The new playground lobby will feature a 2.5D mechanic where the world is 3D but the character move only in 2D dimensions. Each minigame will be rebuilt afterwards, for now let's work on validating the 3D rework through the Playground lobby.
+The playground lobby is done and approved. Bubbles 3d is also done and approved. The last step of the 3d rework is remaking the Tilt shift.
 
-Every commit should be made in the branch feature/3d-low-poly-project-rework.
+
+
