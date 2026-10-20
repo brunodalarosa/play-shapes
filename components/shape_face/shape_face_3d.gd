@@ -7,8 +7,6 @@ extends Node3D
 ## Gap in depth between stacked parts, so later layers draw over earlier ones.
 const LAYER_GAP := 0.0015
 
-static var _materials: Dictionary[String, StandardMaterial3D] = { }
-
 ## The face box's height in world units; the width follows the preset's aspect.
 @export var height := 0.5:
 	set(value):
@@ -30,8 +28,9 @@ var expressions: ShapeFaceExpressions
 ## Seconds for [member expressions]; replace it to drive the face from another clock.
 var clock := func() -> float:
 	return Time.get_ticks_msec() / 1000.0
-var manifest := ShapeFaceManifest.shared()
+var manifest := ShapeFaceManifest.load_default()
 var _quads: Array[MeshInstance3D] = []
+var _materials: Dictionary[String, StandardMaterial3D] = { }
 
 
 func _ready() -> void:
@@ -47,7 +46,7 @@ func _process(_delta: float) -> void:
 
 
 ## The preset drawn now, blink included.
-func drawn_face() -> ShapeFaceManifest.Face:
+func drawn_face() -> ShapeFacePreset:
 	return manifest.blinked(face_name) if blinking else manifest.face(face_name)
 
 
@@ -64,7 +63,7 @@ func _rebuild() -> void:
 	if not is_inside_tree():
 		return
 	var face := drawn_face()
-	var layers: Array[ShapeFaceManifest.Layer] = [] if face == null else face.layers
+	var layers: Array[ShapeFaceLayer] = [] if face == null else face.layers
 	while _quads.size() < layers.size():
 		var quad := MeshInstance3D.new()
 		quad.mesh = QuadMesh.new()

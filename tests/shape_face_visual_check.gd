@@ -12,7 +12,7 @@ const NAVY := Color("3d465d")
 
 func _run() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUTPUT_DIR))
-	var manifest := ShapeFaceManifest.shared()
+	var manifest := ShapeFaceManifest.load_default()
 	var names: Array = manifest.faces.keys()
 	names.sort()
 	for name: String in names:

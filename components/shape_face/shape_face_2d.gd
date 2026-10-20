@@ -12,7 +12,7 @@ extends Control
 		blinking = value
 		queue_redraw()
 
-var manifest := ShapeFaceManifest.shared()
+var manifest := ShapeFaceManifest.load_default()
 
 
 func _ready() -> void:
@@ -36,7 +36,7 @@ func _draw() -> void:
 	if face == null or box.size.y <= 0.0:
 		return
 	var centre := box.get_center()
-	for layer: ShapeFaceManifest.Layer in face.layers:
+	for layer: ShapeFaceLayer in face.layers:
 		var part_size := layer.size * box.size.y
 		var flip := Vector2(-1.0, 1.0) if layer.mirror else Vector2.ONE
 		# Positive 2D turns are clockwise on screen, as the manifest's are.
@@ -49,5 +49,5 @@ func _draw() -> void:
 	draw_set_transform_matrix(Transform2D.IDENTITY)
 
 
-func _face() -> ShapeFaceManifest.Face:
+func _face() -> ShapeFacePreset:
 	return manifest.blinked(face_name) if blinking else manifest.face(face_name)

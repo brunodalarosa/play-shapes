@@ -5,7 +5,7 @@ extends TestScript
 
 
 func _run() -> void:
-	var manifest := ShapeFaceManifest.shared()
+	var manifest := ShapeFaceManifest.load_default()
 	check(manifest.faces.size() == 12, "The manifest gives the twelve presets")
 	var face_a := manifest.face("face_a")
 	check(face_a.layers.size() == 3, "face_a has two eyes and a mouth")
@@ -92,7 +92,8 @@ func _check_nodes() -> void:
 	face.blinking = true
 	var eye := face.quads()[0].material_override as StandardMaterial3D
 	check(
-		eye.albedo_texture == ShapeFaceManifest.shared().texture("facial_part_eye_closed_down"),
+		eye.albedo_texture
+		== ShapeFaceManifest.load_default().texture("facial_part_eye_closed_down"),
 		"Blinking closes the drawn eyes",
 	)
 

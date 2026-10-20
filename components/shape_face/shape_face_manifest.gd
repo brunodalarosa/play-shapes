@@ -7,76 +7,22 @@ extends RefCounted
 
 const DIRECTORY := "res://assets/runtime/shape_faces/"
 const MANIFEST := DIRECTORY + "face_presets.json"
-## The eye a blink draws, and the eyes that never blink because they are shut or crossed out.
+## The eye a blink draws.
 const BLINK_EYE := "facial_part_eye_closed_down"
-const UNBLINKING_EYES: Array[String] = [
-	"facial_part_eye_closed_down",
-	"facial_part_eye_closed_up",
-	"facial_part_eye_x",
-]
-const EYE_PREFIX := "facial_part_eye_"
 
-
-## One part placed in a face.
-class Layer:
-	extends RefCounted
-
-	var part := ""
-	## Centre from the box's centre, in face heights, Y down.
-	var center := Vector2.ZERO
-	## Drawn size in face heights, margin included.
-	var size := Vector2.ONE
-	## Clockwise turn about the centre.
-	var rotation_degrees := 0.0
-	## Flipped horizontally about its centre before it turns.
-	var mirror := false
-
-
-	func copy() -> Layer:
-		var result := Layer.new()
-		result.part = part
-		result.center = center
-		result.size = size
-		result.rotation_degrees = rotation_degrees
-		result.mirror = mirror
-		return result
-
-
-## A face preset: its box and its layers in drawing order.
-class Face:
-	extends RefCounted
-
-	var name := ""
-	## Width over height.
-	var box_aspect := 1.0
-	## The reference image's height in source pixels; part sizes in pixels divide by it.
-	var source_height := 1.0
-	var layers: Array[Layer] = []
-
-
-	## True when one of its eyes may close for a blink.
-	func can_blink() -> bool:
-		for layer: Layer in layers:
-			if layer.part.begins_with(EYE_PREFIX) and layer.part not in UNBLINKING_EYES:
-				return true
-		return false
-
-
-static var _shared: ShapeFaceManifest
-
-var faces: Dictionary[String, Face] = { }
+var faces: Dictionary[String, ShapeFacePreset] = { }
 ## Source size in pixels of each part.
 var part_sizes: Dictionary[String, Vector2] = { }
 var _textures: Dictionary[String, Texture2D] = { }
-var _blinked: Dictionary[String, Face] = { }
+var _blinked: Dictionary[String, ShapeFacePreset] = { }
 
 
-## The manifest every face shares, read once.
-static func shared() -> ShapeFaceManifest:
-	if _shared == null:
-		_shared = ShapeFaceManifest.new()
-		_shared.read(FileAccess.get_file_as_string(MANIFEST))
-	return _shared
+## The project's face manifest, freshly read. The part textures it loads are shared through
+## the resource cache.
+static func load_default() -> ShapeFaceManifest:
+	var result := ShapeFaceManifest.new()
+	result.read(FileAccess.get_file_as_string(MANIFEST))
+	return result
 
 
 ## Reads the manifest's JSON text. Returns false when it is not a face manifest.
@@ -91,12 +37,12 @@ func read(text: String) -> bool:
 	var presets: Dictionary = data.get("faces", { })
 	for name: String in presets:
 		var entry: Dictionary = presets[name]
-		var face := Face.new()
+		var face := ShapeFacePreset.new()
 		face.name = name
 		face.box_aspect = float(entry["box_aspect"])
 		face.source_height = float(entry["source_size"][1])
 		for layer_entry: Dictionary in entry["layers"]:
-			var layer := Layer.new()
+			var layer := ShapeFaceLayer.new()
 			layer.part = String(layer_entry["part"])
 			layer.center = Vector2(layer_entry["center"][0], layer_entry["center"][1])
 			layer.size = Vector2(layer_entry["size"][0], layer_entry["size"][1])
@@ -108,25 +54,25 @@ func read(text: String) -> bool:
 
 
 ## The preset called [param name], or null.
-func face(name: String) -> Face:
+func face(name: String) -> ShapeFacePreset:
 	return faces.get(name)
 
 
 ## The preset with its open eyes closed for a blink, each closed eye centred where the open one
 ## was at its own source size. Shut and crossed-out eyes stay as they are.
-func blinked(name: String) -> Face:
+func blinked(name: String) -> ShapeFacePreset:
 	if _blinked.has(name):
 		return _blinked[name]
 	var original := face(name)
 	if original == null:
 		return null
-	var result := Face.new()
+	var result := ShapeFacePreset.new()
 	result.name = name
 	result.box_aspect = original.box_aspect
 	result.source_height = original.source_height
-	for layer: Layer in original.layers:
+	for layer: ShapeFaceLayer in original.layers:
 		var copy := layer.copy()
-		if copy.part.begins_with(EYE_PREFIX) and copy.part not in UNBLINKING_EYES:
+		if ShapeFacePreset.can_close(copy.part):
 			copy.part = BLINK_EYE
 			copy.size = part_sizes[BLINK_EYE] / original.source_height
 			copy.rotation_degrees = 0.0
