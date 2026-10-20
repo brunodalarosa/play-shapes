@@ -3,13 +3,13 @@
 // Usage: node art/shape_characters_face_system_assets/export_faces.mjs [--check] [--review]
 //
 // Renders every SVG master in vector/ with Playwright's Chromium into assets/runtime/shape_faces/,
-// then, in the same browser, draws each preset of face_presets.json at 1x from those PNGs, as a
-// game would, and compares it with its reference face. --check verifies without rewriting the
-// PNGs. --review also writes the owner's review sheets into ignored scratch/review/: every
-// preset at 1x beside its reference, enlarged four times, and every preset at 8x. Writes
+// then draws the presets and compares the originals with their supplied references. Emoji
+// presets have structural checks; recognizability needs the Godot 3D captures. --check leaves
+// PNGs unchanged. --review writes legacy sheets into ignored scratch/review/: original presets
+// beside their references at 1x enlarged four times, and at 8x. Writes
 // vector/verification.json and exits non-zero when any check fails.
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -158,7 +158,10 @@ try {
     if (png.width !== w * SCALE || png.height !== h * SCALE) fail(`${name}.png is not 8x`);
     const softPixels = soft(png);
     if (softPixels > 0) fail(`${name}.png has ${softPixels} pixels off a sharp edge`);
-    report.parts[name] = { size: [w, h], soft_pixels: softPixels, sha256: sha256(target) };
+    report.parts[name] = {
+      size: [w, h], soft_pixels: softPixels, sha256: sha256(target),
+      master_sha256: sha256(join(VECTOR, file)),
+    };
   }
 
   // Draws a list of layers, in face-height units, from the 8x PNGs at the given 1x size.
@@ -221,6 +224,8 @@ try {
   // Each part alone at 1x against its source PNG.
   for (const name of Object.keys(sizes)) {
     if (name === "facial_part_eye_x") continue;
+    // New SVG parts have no supplied raster reference. Sharpness and hashes still apply.
+    if (!existsSync(join(here, `${name}.png`))) continue;
     const source = readPng(join(here, `${name}.png`));
     const { width, height } = source;
     const drawn = await draw([onSource(name, width, height)], width, height);
@@ -230,15 +235,28 @@ try {
   }
 
   const expected = Array.from({ length: 12 }, (_, i) => `face_${"abcdefghijkl"[i]}`);
-  if (Object.keys(manifest.faces).sort().join() !== expected.join()) {
-    fail("the manifest must hold face_a to face_l");
+  if (expected.some((name) => !manifest.faces[name])) {
+    fail("the manifest must keep face_a to face_l");
   }
   for (const [name, face] of Object.entries(manifest.faces)) {
-    const source = readPng(join(here, `${name}.png`));
     const [w, h] = face.source_size;
-    if (source.width !== w || source.height !== h) fail(`${name} source size differs`);
     if (Math.abs(face.box_aspect - w / h) > 1e-4) fail(`${name} aspect is not ${w}/${h}`);
+    if (!/^face_[a-z]+(?:_[a-z]+)*$/.test(name) || name.length > 64) fail(`${name} is not a face ID`);
+    if (!face.layers.length || face.layers.some((layer) =>
+      !manifest.parts[layer.part] ||
+      [...layer.center, ...layer.size, layer.rotation_degrees].some((value) => !Number.isFinite(value)) ||
+      layer.size.some((value) => value <= 0)
+    )) fail(`${name} has invalid layers`);
     const drawn = await draw(face.layers, w, h);
+    const reference = join(here, `${name}.png`);
+    if (!expected.includes(name)) {
+      if (!face.emoji_reference) fail(`${name} has no emoji reference`);
+      if (!drawn.some((value, index) => index % 4 === 3 && value > 0)) fail(`${name} is empty`);
+      report.faces[name] = { emoji_reference: face.emoji_reference, reference_comparison: false };
+      continue;
+    }
+    const source = readPng(reference);
+    if (source.width !== w || source.height !== h) fail(`${name} source size differs`);
     const a = planes(drawn, w, h);
     const b = planes(source.data, w, h);
     const far = farPixels(a, b);
@@ -262,7 +280,8 @@ try {
   if (cuts.some((n) => n > 0)) fail(`the X-eye differs from face_j: ${cuts}`);
 
   if (review) {
-    const faces = Object.entries(manifest.faces);
+    // This legacy comparison sheet is only for the supplied raster references.
+    const faces = Object.entries(manifest.faces).filter(([name]) => expected.includes(name));
     const ZOOM = 4;
     const GAP = 24;
     const cellW = 2 * 118 * ZOOM + 3 * GAP;

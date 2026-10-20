@@ -360,7 +360,8 @@ var BLINK_EYE = "facial_part_eye_closed_down";
 var UNBLINKING_EYES = [
   "facial_part_eye_closed_down",
   "facial_part_eye_closed_up",
-  "facial_part_eye_x"
+  "facial_part_eye_x",
+  "facial_part_eye_squeezed"
 ];
 var EYE_PREFIX = "facial_part_eye_";
 function validManifest(value) {
@@ -591,7 +592,7 @@ var FlatPaddleView = class {
 var WORLD_UNITS = 19.2;
 var PHASES = ["preparing", "countdown", "start", "active", "between_rounds", "finished"];
 var colour = (value) => typeof value === "string" && /^[0-9a-f]{6}$/i.test(value);
-var face = (value) => typeof value === "string" && /^face_[a-z]$/.test(value);
+var face = (value) => typeof value === "string" && value.length <= 64 && /^face_[a-z]+(?:_[a-z]+)*$/.test(value);
 var size = (value) => Array.isArray(value) && value.length === 2 && value.every((part) => Number.isFinite(part) && part > 0 && part <= 2);
 function validSnapshot(value) {
   if (!value || typeof value !== "object")

@@ -4,6 +4,15 @@ const Policy := preload("res://addons/standalone_build/standalone_build_policy.g
 
 
 func _run() -> void:
+	var face_manifest: Dictionary = JSON.parse_string(
+		FileAccess.get_file_as_string("res://assets/runtime/shape_faces/face_presets.json")
+	)
+	for part: Dictionary in face_manifest.parts.values():
+		check(
+			Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/shape_faces/" + part.file),
+			"The standalone verifier requires face part %s" % part.file,
+		)
+
 	check(
 		Policy.validate_preset("res://export_presets.cfg").is_empty(),
 		"release preset name, platform, architecture, paths, and filters are valid",

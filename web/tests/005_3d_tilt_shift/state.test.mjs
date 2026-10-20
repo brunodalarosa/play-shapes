@@ -79,6 +79,25 @@ test("natural blinks last 0.12 s, 2.4 to 5.6 s apart", () => {
   for (const run of open.slice(1)) assert.ok(run >= 2.4 - 0.13 && run <= 5.6 + 0.006, `gap ${run}`);
 });
 
+test("emoji presets compose on the phone and keep shut eyes during blinks", () => {
+  const emojiFaces = Object.entries(manifest.faces).filter(([, face]) => face.emoji_reference);
+  assert.equal(emojiFaces.length, 13);
+  for (const [name, preset] of emojiFaces) {
+    assert.ok(validSnapshot(snapshot({ face: name })), name);
+    assert.ok(validPreparation(preparation({ face: name })), name);
+    assert.equal(faceLayers(manifest, name, false).length, preset.layers.length);
+  }
+  for (const name of ["face_smiling_eyes", "face_disappointed", "face_confounded", "face_dizzy"]) {
+    assert.deepEqual(faceLayers(manifest, name, true), faceLayers(manifest, name, false));
+  }
+  const wink = faceLayers(manifest, "face_winking", true);
+  assert.equal(wink[0].part, "facial_part_eye_closed_down");
+  assert.equal(wink[1].part, "facial_part_eye_closed_up");
+  for (const invalid of ["face_bad/name", "face_../neutral", "face_", "face_a".repeat(20)]) {
+    assert.equal(validSnapshot(snapshot({ face: invalid })), false, invalid);
+  }
+});
+
 test("snapshots and preparations are validated before use", () => {
   assert.ok(validSnapshot(snapshot()));
   assert.ok(validSnapshot(snapshot({ selected: false, paddle_ids: [] })));

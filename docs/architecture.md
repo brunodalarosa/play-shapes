@@ -239,7 +239,8 @@ These live outside any minigame folder so later 3D scenes can use them.
   `assets/runtime/minigames/bubbles_3d/`. Their sources and provenance are in
   [art/bubbles_3d](../art/bubbles_3d/README.md).
 - The face parts shared by every minigame, 8× PNGs and the preset manifest that composes them
-  into the owner's twelve faces, live in `assets/runtime/shape_faces/`. Their vector masters
+  into the twelve original faces and thirteen emoji expressions, live in
+  `assets/runtime/shape_faces/`. Their vector masters
   and provenance are in
   [art/shape_characters_face_system_assets](../art/shape_characters_face_system_assets/README.md).
 - The bin, factory props, trash emblem and booklet preview of minigame 005, Tilt Shift 3D,

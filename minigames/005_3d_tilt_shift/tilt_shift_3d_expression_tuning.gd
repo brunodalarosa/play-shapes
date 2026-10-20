@@ -2,7 +2,7 @@
 class_name TiltShift3DExpressionTuning
 extends Resource
 ## When paddle faces change expression and which face each moment shows. Faces never change
-## physics. Face names are presets of the shared face manifest, face_a to face_l.
+## physics. Face names are presets of the shared face manifest.
 
 const FACE_MANIFEST := "res://assets/runtime/shape_faces/face_presets.json"
 

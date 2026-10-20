@@ -65,7 +65,8 @@ export const WORLD_UNITS = 19.2;
 const PHASES = ["preparing", "countdown", "start", "active", "between_rounds", "finished"];
 
 const colour = (value: unknown) => typeof value === "string" && /^[0-9a-f]{6}$/i.test(value);
-const face = (value: unknown) => typeof value === "string" && /^face_[a-z]$/.test(value);
+const face = (value: unknown) =>
+  typeof value === "string" && value.length <= 64 && /^face_[a-z]+(?:_[a-z]+)*$/.test(value);
 const size = (value: unknown) =>
   Array.isArray(value) &&
   value.length === 2 &&

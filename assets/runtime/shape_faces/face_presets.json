@@ -15,7 +15,17 @@
     "facial_part_mouth_angry": {"file": "facial_part_mouth_angry.png", "size": [82, 22], "padding": 1},
     "facial_part_mouth_happy": {"file": "facial_part_mouth_happy.png", "size": [42, 16], "padding": 1},
     "facial_part_mouth_sad": {"file": "facial_part_mouth_sad.png", "size": [42, 16], "padding": 1},
-    "facial_part_mouth_smirk": {"file": "facial_part_mouth_smirk.png", "size": [30, 16], "padding": 1}
+    "facial_part_mouth_smirk": {"file": "facial_part_mouth_smirk.png", "size": [30, 16], "padding": 1},
+    "facial_part_eye_looking_up": {"file": "facial_part_eye_looking_up.png", "size": [42,42], "padding": 1},
+    "facial_part_eye_squeezed": {"file": "facial_part_eye_squeezed.png", "size": [42,34], "padding": 1},
+    "facial_part_mouth_grin": {"file": "facial_part_mouth_grin.png", "size": [58,34], "padding": 1},
+    "facial_part_mouth_neutral": {"file": "facial_part_mouth_neutral.png", "size": [44,12], "padding": 1},
+    "facial_part_mouth_open": {"file": "facial_part_mouth_open.png", "size": [30,34], "padding": 1},
+    "facial_part_mouth_confused": {"file": "facial_part_mouth_confused.png", "size": [44,20], "padding": 1},
+    "facial_part_mouth_open_frown": {"file": "facial_part_mouth_open_frown.png", "size": [46,30], "padding": 1},
+    "facial_part_mouth_deep_frown": {"file": "facial_part_mouth_deep_frown.png", "size": [48,26], "padding": 1},
+    "facial_part_mouth_scrunched": {"file": "facial_part_mouth_scrunched.png", "size": [46,22], "padding": 1},
+    "facial_part_cheek": {"file": "facial_part_cheek.png", "size": [20,10], "padding": 1}
   },
   "faces": {
     "face_a": {
@@ -146,6 +156,144 @@
         {"part": "facial_part_eyebrow_a", "center": [-0.39189, -0.3627], "size": [0.56757, 0.16216], "rotation_degrees": -15, "mirror": false},
         {"part": "facial_part_eyebrow_a", "center": [0.41622, -0.36216], "size": [0.56757, 0.16216], "rotation_degrees": 15, "mirror": false},
         {"part": "facial_part_mouth_happy", "center": [0.01351, 0.39189], "size": [0.57778, 0.21622], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_grinning": {
+      "emoji_reference": "😀",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_open", "center": [-0.3372093023255814,-0.1744186046511628], "size": [0.38372093023255816,0.38372093023255816], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_open", "center": [0.3372093023255814,-0.1744186046511628], "size": [0.38372093023255816,0.38372093023255816], "rotation_degrees": 0, "mirror": true},
+        {"part": "facial_part_mouth_grin", "center": [0,0.26744186046511625], "size": [0.5697674418604651,0.33400160384923816], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_winking": {
+      "emoji_reference": "😉",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_open", "center": [-0.3372093023255814,-0.1744186046511628], "size": [0.38372093023255816,0.38372093023255816], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_closed_up", "center": [0.3372093023255814,-0.1744186046511628], "size": [0.3953488372093023,0.19767441860465115], "rotation_degrees": -8, "mirror": false},
+        {"part": "facial_part_mouth_happy", "center": [0,0.26744186046511625], "size": [0.4883720930232558,0.18604651162790697], "rotation_degrees": -9, "mirror": false}
+      ]
+    },
+    "face_smiling_eyes": {
+      "emoji_reference": "😊",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_closed_up", "center": [-0.3372093023255814,-0.1511627906976744], "size": [0.37209302325581395,0.18604651162790697], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_closed_up", "center": [0.3372093023255814,-0.1511627906976744], "size": [0.37209302325581395,0.18604651162790697], "rotation_degrees": 0, "mirror": true},
+        {"part": "facial_part_cheek", "center": [-0.5,0.08139534883720931], "size": [0.16279069767441862,0.08139534883720931], "rotation_degrees": 10, "mirror": false},
+        {"part": "facial_part_cheek", "center": [0.5,0.08139534883720931], "size": [0.16279069767441862,0.08139534883720931], "rotation_degrees": -10, "mirror": true},
+        {"part": "facial_part_mouth_happy", "center": [0,0.26744186046511625], "size": [0.4186046511627907,0.15946843853820597], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_neutral": {
+      "emoji_reference": "😐",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_open", "center": [-0.3372093023255814,-0.1744186046511628], "size": [0.38372093023255816,0.38372093023255816], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_open", "center": [0.3372093023255814,-0.1744186046511628], "size": [0.38372093023255816,0.38372093023255816], "rotation_degrees": 0, "mirror": true},
+        {"part": "facial_part_mouth_neutral", "center": [0,0.26744186046511625], "size": [0.4418604651162791,0.12050739957716701], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_surprised": {
+      "emoji_reference": "😮",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_open", "center": [-0.3372093023255814,-0.22093023255813954], "size": [0.4069767441860465,0.4069767441860465], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_open", "center": [0.3372093023255814,-0.22093023255813954], "size": [0.4069767441860465,0.4069767441860465], "rotation_degrees": 0, "mirror": true},
+        {"part": "facial_part_mouth_open", "center": [0,0.2558139534883721], "size": [0.26744186046511625,0.30310077519379847], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_confused": {
+      "emoji_reference": "😕",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_open", "center": [-0.3372093023255814,-0.1511627906976744], "size": [0.37209302325581395,0.37209302325581395], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_open", "center": [0.3372093023255814,-0.1511627906976744], "size": [0.37209302325581395,0.37209302325581395], "rotation_degrees": 0, "mirror": true},
+        {"part": "facial_part_eyebrow_d", "center": [-0.3372093023255814,-0.4069767441860465], "size": [0.32558139534883723,0.13953488372093023], "rotation_degrees": -17, "mirror": false},
+        {"part": "facial_part_eyebrow_d", "center": [0.3372093023255814,-0.3488372093023256], "size": [0.313953488372093,0.1345514950166113], "rotation_degrees": 9, "mirror": true},
+        {"part": "facial_part_mouth_confused", "center": [0,0.29069767441860467], "size": [0.4186046511627907,0.19027484143763213], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_disappointed": {
+      "emoji_reference": "😞",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_closed_down", "center": [-0.3372093023255814,-0.12790697674418605], "size": [0.36046511627906974,0.18023255813953487], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_closed_down", "center": [0.3372093023255814,-0.12790697674418605], "size": [0.36046511627906974,0.18023255813953487], "rotation_degrees": 0, "mirror": true},
+        {"part": "facial_part_eyebrow_a", "center": [-0.3372093023255814,-0.37209302325581395], "size": [0.3372093023255814,0.09634551495016612], "rotation_degrees": -18, "mirror": false},
+        {"part": "facial_part_eyebrow_a", "center": [0.3372093023255814,-0.37209302325581395], "size": [0.3372093023255814,0.09634551495016612], "rotation_degrees": 18, "mirror": true},
+        {"part": "facial_part_mouth_sad", "center": [0,0.27906976744186046], "size": [0.38372093023255816,0.14617940199335547], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_frowning_open_mouth": {
+      "emoji_reference": "😦",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_open", "center": [-0.3372093023255814,-0.1511627906976744], "size": [0.37209302325581395,0.37209302325581395], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_open", "center": [0.3372093023255814,-0.1511627906976744], "size": [0.37209302325581395,0.37209302325581395], "rotation_degrees": 0, "mirror": true},
+        {"part": "facial_part_eyebrow_a", "center": [-0.3372093023255814,-0.43023255813953487], "size": [0.313953488372093,0.08970099667774087], "rotation_degrees": -12, "mirror": false},
+        {"part": "facial_part_eyebrow_a", "center": [0.3372093023255814,-0.43023255813953487], "size": [0.313953488372093,0.08970099667774087], "rotation_degrees": 12, "mirror": true},
+        {"part": "facial_part_mouth_open_frown", "center": [0,0.26744186046511625], "size": [0.4186046511627907,0.2730030333670374], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_rolling_eyes": {
+      "emoji_reference": "🙄",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_looking_up", "center": [-0.3372093023255814,-0.1744186046511628], "size": [0.4069767441860465,0.4069767441860465], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_looking_up", "center": [0.3372093023255814,-0.1744186046511628], "size": [0.4069767441860465,0.4069767441860465], "rotation_degrees": 0, "mirror": true},
+        {"part": "facial_part_mouth_neutral", "center": [0,0.29069767441860467], "size": [0.37209302325581395,0.1014799154334038], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_diagonal_mouth": {
+      "emoji_reference": "🫤",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_open", "center": [-0.3372093023255814,-0.1744186046511628], "size": [0.37209302325581395,0.37209302325581395], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_open", "center": [0.3372093023255814,-0.1744186046511628], "size": [0.37209302325581395,0.37209302325581395], "rotation_degrees": 0, "mirror": true},
+        {"part": "facial_part_mouth_neutral", "center": [0,0.29069767441860467], "size": [0.5116279069767442,0.13953488372093023], "rotation_degrees": -20, "mirror": false}
+      ]
+    },
+    "face_frowning": {
+      "emoji_reference": "☹️",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_open", "center": [-0.3372093023255814,-0.1744186046511628], "size": [0.37209302325581395,0.37209302325581395], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_open", "center": [0.3372093023255814,-0.1744186046511628], "size": [0.37209302325581395,0.37209302325581395], "rotation_degrees": 0, "mirror": true},
+        {"part": "facial_part_mouth_deep_frown", "center": [0,0.29069767441860467], "size": [0.5232558139534884,0.28343023255813954], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_confounded": {
+      "emoji_reference": "😖",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_squeezed", "center": [-0.3372093023255814,-0.16279069767441862], "size": [0.38372093023255816,0.31063122923588044], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_squeezed", "center": [0.3372093023255814,-0.16279069767441862], "size": [0.38372093023255816,0.31063122923588044], "rotation_degrees": 0, "mirror": true},
+        {"part": "facial_part_mouth_scrunched", "center": [0,0.29069767441860467], "size": [0.46511627906976744,0.2224469160768453], "rotation_degrees": 0, "mirror": false}
+      ]
+    },
+    "face_dizzy": {
+      "emoji_reference": "😵",
+      "source_size": [120, 86],
+      "box_aspect": 1.3953488372093024,
+      "layers": [
+        {"part": "facial_part_eye_x", "center": [-0.3372093023255814,-0.18604651162790697], "size": [0.38372093023255816,0.38372093023255816], "rotation_degrees": 0, "mirror": false},
+        {"part": "facial_part_eye_x", "center": [0.3372093023255814,-0.18604651162790697], "size": [0.38372093023255816,0.38372093023255816], "rotation_degrees": 0, "mirror": true},
+        {"part": "facial_part_mouth_open", "center": [0,0.27906976744186046], "size": [0.27906976744186046,0.31627906976744186], "rotation_degrees": 0, "mirror": false}
       ]
     }
   }

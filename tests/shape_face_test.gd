@@ -6,7 +6,7 @@ extends TestScript
 
 func _run() -> void:
 	var manifest := ShapeFaceManifest.load_default()
-	check(manifest.faces.size() == 12, "The manifest gives the twelve presets")
+	check(manifest.faces.size() >= 12, "The manifest keeps the twelve original presets")
 	var face_a := manifest.face("face_a")
 	check(face_a.layers.size() == 3, "face_a has two eyes and a mouth")
 	check(is_equal_approx(face_a.box_aspect, 1.72414), "face_a keeps its box aspect")

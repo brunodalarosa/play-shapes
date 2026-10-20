@@ -1,7 +1,7 @@
 extends TestScript
 ## The shared face parts: every part the preset manifest names is an 8x PNG beside it with a
-## vector master, the manifest holds the owner's twelve faces, and the parts and manifest are
-## the ones the export script last verified against the reference faces.
+## vector master, the manifest keeps the original faces, and its parts and masters match the
+## last verified export. Original faces have supplied raster references; new ones name an emoji.
 
 const DIRECTORY := "res://assets/runtime/shape_faces/"
 const MANIFEST := DIRECTORY + "face_presets.json"
@@ -31,7 +31,7 @@ func _run() -> void:
 
 	check(int(manifest["export_scale"]) == EXPORT_SCALE, "The parts are exported at 8x")
 	var parts: Dictionary = manifest["parts"]
-	check(parts.size() == 15, "The manifest lists the fourteen supplied parts and the X-eye")
+	check(parts.size() >= 15, "The manifest keeps the fourteen supplied parts and the X-eye")
 	check(parts.has("facial_part_eye_x"), "The X-eye is a part")
 	for part: String in parts:
 		var entry: Dictionary = parts[part]
@@ -47,7 +47,8 @@ func _run() -> void:
 	var names: Array[String] = []
 	names.assign(faces.keys())
 	names.sort()
-	check(names == FACES, "The manifest holds face_a to face_l")
+	for original: String in FACES:
+		check(names.has(original), "The manifest keeps %s" % original)
 	for face: String in faces:
 		var entry: Dictionary = faces[face]
 		var size := Vector2i(int(entry["source_size"][0]), int(entry["source_size"][1]))
@@ -55,7 +56,13 @@ func _run() -> void:
 			is_equal_approx(float(entry["box_aspect"]), float(size.x) / size.y),
 			"%s keeps its reference's aspect" % face,
 		)
-		check(_png_size(ART + face + ".png") == size, "%s has its reference's size" % face)
+		if face in FACES:
+			check(_png_size(ART + face + ".png") == size, "%s has its reference's size" % face)
+		else:
+			check(
+				not String(entry.get("emoji_reference", "")).is_empty(),
+				"%s names its emoji" % face,
+			)
 		for layer: Dictionary in entry["layers"]:
 			check(parts.has(layer["part"]), "%s uses only listed parts" % face)
 			check(
@@ -66,7 +73,7 @@ func _run() -> void:
 	var report: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(VERIFICATION))
 	if not check(report != null, "The export verification report exists"):
 		return
-	check(report["result"] == "PASS", "The last export matched every reference face")
+	check(report["result"] == "PASS", "The last export passed its asset checks")
 	check(
 		report["manifest_sha256"] == FileAccess.get_sha256(MANIFEST),
 		"The manifest is the one the export verified",
@@ -76,6 +83,10 @@ func _run() -> void:
 		check(
 			verified["sha256"] == FileAccess.get_sha256(DIRECTORY + part + ".png"),
 			"%s is the verified export" % part,
+		)
+		check(
+			verified["master_sha256"] == FileAccess.get_sha256(ART + "vector/%s.svg" % part),
+			"%s keeps its verified master" % part,
 		)
 
 

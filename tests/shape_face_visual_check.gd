@@ -14,6 +14,11 @@ func _run() -> void:
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUTPUT_DIR))
 	var manifest := ShapeFaceManifest.load_default()
 	var names: Array = manifest.faces.keys()
+	# Only the original faces have supplied reference pixels to compare against.
+	names = names.filter(
+		func(name: String) -> bool:
+			return FileAccess.file_exists(REFERENCES + name + ".png"),
+	)
 	names.sort()
 	for name: String in names:
 		var reference := Image.load_from_file(

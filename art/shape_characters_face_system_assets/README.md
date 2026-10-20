@@ -3,7 +3,7 @@
 The owner's face system for Shape Characters: parts that compose into expressive faces, first
 used by minigame 005. The
 [asset sources guide](../../docs/game-design-documents/Minigames/005/005%20-%20Asset%20sources.md)
-decides the change. Nothing here is used by a scene yet; [pending reviews](../../docs/pending-reviews.md)
+describes the original sources. Tilt Shift 3D uses this system; [pending reviews](../../docs/pending-reviews.md)
 lists what still needs the owner.
 
 ## Sources
@@ -18,7 +18,7 @@ preset uses the navy smirk part like every other face.
 ## Vector masters
 
 `vector/` holds one SVG master per part, in the source's pixel units and canvas: the
-fourteen supplied parts and `facial_part_eye_x`. Each is made of the shapes the parts were
+fourteen supplied parts, `facial_part_eye_x`, and ten parts for emoji expressions. Each uses
 drawn with, in navy and white only:
 
 - circles for the eyes' whites and pupils;
@@ -26,7 +26,7 @@ drawn with, in navy and white only:
 - rounded polygons for the eyebrows and the eye wing: a filled path with a round-joined stroke;
 - a rounded bar with two concave edges for the angry mouth, cut by a mask of two circles.
 
-Each shape was fitted to its source's pixels, and drawn at 1× every part matches its source
+The original shapes were fitted to their source pixels; drawn at 1× they match their sources
 within one source pixel. The half eyes and the winged eye are whole circles that their canvas
 cuts, as in the sources. Every other master has a transparent margin of one source pixel, so
 the round ends of strokes that touch a source's edge stay whole.
@@ -47,7 +47,7 @@ face about 280 pixels tall, about five times the sources' size. They import with
 small in 3D stays smooth.
 
 `face_presets.json` lists every part's file, its size in source pixels and its margin
-(`padding`, 1 or 0), and for each of `face_a` to `face_l` its source size, its box aspect
+(`padding`, 1 or 0), and for each preset its design size, its box aspect
 (width over height) and its layers, drawn in order:
 
 - `part`: the part's name;
@@ -56,6 +56,29 @@ small in 3D stays smooth.
   stretched, as the longer eyebrows of several faces are;
 - `rotation_degrees`: clockwise, about the part's centre;
 - `mirror`: flips the part horizontally about its centre before it turns.
+
+The original `face_a` to `face_l` presets keep their supplied reference images. Thirteen
+additional presets have descriptive IDs and `emoji_reference` metadata:
+
+| Reference | Preset |
+| --- | --- |
+| 😀 | `face_grinning` |
+| 😉 | `face_winking` |
+| 😊 | `face_smiling_eyes` |
+| 😐 | `face_neutral` |
+| 😮 | `face_surprised` |
+| 😕 | `face_confused` |
+| 😞 | `face_disappointed` |
+| 😦 | `face_frowning_open_mouth` |
+| 🙄 | `face_rolling_eyes` |
+| 🫤 | `face_diagonal_mouth` |
+| ☹️ | `face_frowning` |
+| 😖 | `face_confounded` |
+| 😵 | `face_dizzy` |
+
+The emoji presets use the same navy and white, round strokes and layered construction.
+Their new parts have editable SVG masters; there are no supplied raster references for them.
+`source_size` is their design canvas. Existing gameplay assignments still use the original IDs.
 
 ## Export and verification
 
@@ -69,7 +92,9 @@ node art/shape_characters_face_system_assets/export_faces.mjs
 
 [export_faces.mjs](export_faces.mjs) renders every master with Playwright's Chromium into the
 runtime folder, then draws each preset at 1× from those PNGs, as a game would, and compares it
-with its reference face. Pass `--check` to verify without rewriting the PNGs. It writes
+with its supplied reference where one exists. Pass `--check` to verify without rewriting the
+PNGs. New expressions are checked for valid parts and nonempty output; emoji recognizability
+needs owner review. The script writes
 [vector/verification.json](vector/verification.json) and fails when:
 
 - any preset or part differs from its reference by more than one source pixel: some pixel at
@@ -81,5 +106,19 @@ with its reference face. Pass `--check` to verify without rewriting the PNGs. It
 - the manifest and the masters disagree.
 
 `tests/shape_faces_test.gd` checks that the runtime PNGs and manifest are the ones the script
-last verified, that every part is 8× its source and has a master, and that the manifest holds
-the twelve faces.
+last verified, including the SVG hashes, that every part is 8× its design size and has a
+master, and that the manifest keeps the original faces. `shape_face_emoji_test.gd` checks
+the new presets on 3D quads and their blink rules. The workshop discovers them from the manifest.
+
+New parts also need entries in the HTTP service's asset whitelist and the standalone build
+policy's required runtime paths. The host and standalone tests check every manifest part.
+
+Review the new expressions only through Godot 3D captures:
+
+```powershell
+godot --path . --script tests/shape_face_3d_visual_check.gd
+```
+
+It writes front, three-quarter and blink captures under `test-results/shape-face-emoji/`,
+with enlarged studies and default paddle proportions. The reference labels use an installed
+emoji font, so their appearance varies by system. Captures do not establish creative approval.

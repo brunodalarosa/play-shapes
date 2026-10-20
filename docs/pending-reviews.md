@@ -87,6 +87,13 @@ removes it. The evidence labels are defined in
 
 ## Tilt Shift 3D face parts and bin
 
+- Owner review of the thirteen emoji expressions in the Godot 3D front, three-quarter and
+  blink captures from `tests/shape_face_3d_visual_check.gd`, under
+  `test-results/shape-face-emoji/`: whether each reads as its emoji, especially the similar
+  unhappy faces, and stays readable at default paddle proportions. New gameplay assignments
+  and adoption by the lobby's Squircle are separate decisions.
+- Physical-phone readability of the emoji presets when selected in a test profile remains
+  unverified; desktop browser checks only establish composition and loading.
 - Owner approval of the face presets from the review sheets that `export_faces.mjs --review` in
   [art/shape_characters_face_system_assets](../art/shape_characters_face_system_assets/README.md)
   writes: all twelve at 1× beside their reference faces, and at 8×, drawn from the exported

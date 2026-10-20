@@ -137,6 +137,56 @@ const ASSETS: Dictionary = {
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
+	"/shape_faces/facial_part_eye_looking_up.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_looking_up.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_squeezed.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_squeezed.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_grin.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_grin.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_neutral.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_neutral.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_open.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_open.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_confused.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_confused.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_open_frown.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_open_frown.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_deep_frown.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_deep_frown.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_scrunched.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_scrunched.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_cheek.png": {
+		"path": SHAPE_FACES + "/facial_part_cheek.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
 	"/style.css": {
 		"path": "res://web/public/style.css",
 		"content_type": "text/css; charset=utf-8",

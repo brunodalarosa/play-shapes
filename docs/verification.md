@@ -207,6 +207,10 @@ start only what they need, so they stay fast.
   by `export_faces.mjs` in
   [art/shape_characters_face_system_assets](../art/shape_characters_face_system_assets/README.md)
   and `export_and_verify.py` in [art/tilt_shift_3d](../art/tilt_shift_3d/README.md).
+- Emoji face presets: `shape_face_emoji_test.gd` checks 3D layers, selectable presets and
+  blinking. The 005 browser tests check descriptive IDs and new parts in the 3D phone view.
+  Run `shape_face_3d_visual_check.gd` without `--headless` for front, three-quarter and blink
+  review captures; its examples use enlarged and default paddle proportions.
 
 - Tilt Shift 3D: the `tests/` folder of `minigames/005_3d_tilt_shift/` covers the rules,
   allocation, delivery, presets, journeys, flow, preparation, motion, negative balls, Jolt
