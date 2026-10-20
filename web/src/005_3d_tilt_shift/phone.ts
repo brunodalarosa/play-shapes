@@ -13,6 +13,12 @@ import {
 
 /** Team value used before teams exist: the paddle takes the neutral outline. */
 const NO_TEAM = 2;
+const RETRY_MSEC = 1000;
+/**
+ * Every phone reaches this screen from one host broadcast. A random wait of up to this long
+ * spreads their first downloads, since the host accepts only a few new connections at once.
+ */
+const STAGGER_MSEC = 1500;
 
 /**
  * The Tilt Shift 3D phone: landscape, motion permission, neutral calibration and READY as in
@@ -183,9 +189,11 @@ export class TiltShift3DPhone {
       let next: Presentation;
       let flat = false;
       try {
-        this.manifest ??= await loadManifest();
-        if (mounting !== this.mounting) return;
-        next = await (await this.load()).createTiltPaddleView(this.canvas, this.manifest);
+        // One retry rides out a moment when the host turns connections away.
+        next = await this.createView(mounting).catch(async () => {
+          await new Promise((done) => setTimeout(done, RETRY_MSEC));
+          return this.createView(mounting);
+        });
       } catch {
         if (mounting !== this.mounting) return;
         next = new FlatPaddleView(this.flat, this.manifest);
@@ -201,6 +209,16 @@ export class TiltShift3DPhone {
       this.surface.setAttribute("data-view", flat ? "flat" : "3d");
       if (this.frame) next.update(this.frame);
     })();
+  }
+
+  private async createView(mounting: number): Promise<Presentation> {
+    if (!this.manifest) {
+      await new Promise((done) => setTimeout(done, Math.random() * STAGGER_MSEC));
+      if (mounting !== this.mounting) throw new Error("The phone left this screen");
+    }
+    this.manifest ??= await loadManifest();
+    if (mounting !== this.mounting) throw new Error("The phone left this screen");
+    return (await this.load()).createTiltPaddleView(this.canvas, this.manifest);
   }
 
   private actionContext(): { generation: string; round_token: string } | undefined {

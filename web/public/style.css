@@ -735,10 +735,18 @@ html.tilt-3d-active main > :not(#tilt-shift-3d) {
   user-select: none;
   touch-action: none;
 }
-#tilt-shift-3d canvas {
-  inline-size: 100%;
-  min-block-size: 0;
+/* The canvases fill a stage that the layout sizes, so a canvas's own pixel size never pushes
+   the buttons around while it resizes. */
+#tilt3d-stage {
+  position: relative;
   flex: 1;
+  min-block-size: 0;
+}
+#tilt3d-stage canvas {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
 }
 #tilt3d-actions {
   display: flex;

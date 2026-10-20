@@ -155,8 +155,14 @@
         </div>
       </section>
       <section id="tilt-shift-3d" aria-label="Your Tilt Shift 3D paddle" hidden>
-        <canvas id="tilt3d-paddle" aria-label="Your paddle follows the host's tilt" hidden></canvas>
-        <canvas id="tilt3d-flat" aria-label="Your paddle follows the host's tilt" hidden></canvas>
+        <div id="tilt3d-stage">
+          <canvas
+            id="tilt3d-paddle"
+            aria-label="Your paddle follows the host's tilt"
+            hidden
+          ></canvas>
+          <canvas id="tilt3d-flat" aria-label="Your paddle follows the host's tilt" hidden></canvas>
+        </div>
         <div id="tilt3d-actions" hidden>
           <span class="tilt-phone-icon" aria-label="Hold your phone sideways">↻</span>
           <p id="tilt3d-orientation" role="status" hidden></p>

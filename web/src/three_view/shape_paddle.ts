@@ -76,15 +76,23 @@ export function roundedBarGeometry(
 
 const textures = new Map<string, Promise<Texture>>();
 const loader = new TextureLoader();
+/** Loads finish one at a time, so many phones starting together stay within the host's limit. */
+let queue: Promise<unknown> = Promise.resolve();
+const RETRY_MSEC = 1000;
 
 function partTexture(manifest: FaceManifest, part: string, base: string): Promise<Texture> {
   let texture = textures.get(part);
   if (!texture) {
-    texture = loader.loadAsync(base + manifest.parts[part].file).then((loaded) => {
-      loaded.colorSpace = SRGBColorSpace;
-      return loaded;
-    });
-    texture.catch(() => textures.delete(part));
+    const url = base + manifest.parts[part].file;
+    const load = (): Promise<Texture> => loader.loadAsync(url);
+    texture = queue
+      .then(load)
+      .catch(() => new Promise<void>((done) => setTimeout(done, RETRY_MSEC)).then(load))
+      .then((loaded) => {
+        loaded.colorSpace = SRGBColorSpace;
+        return loaded;
+      });
+    queue = texture.catch(() => undefined);
     textures.set(part, texture);
   }
   return texture;
@@ -105,6 +113,8 @@ export class ShapePaddle3D {
   private meshes: Mesh[] = [];
   private shapeKey = "";
   private faceKey = "";
+  private pending = 0;
+  private arrived = false;
 
   constructor(
     private readonly manifest: FaceManifest,
@@ -173,13 +183,26 @@ export class ShapePaddle3D {
     if (!material) {
       material = new MeshBasicMaterial({ transparent: true, depthWrite: false, side: DoubleSide });
       const created = material;
-      void partTexture(this.manifest, part, this.base).then((texture) => {
-        created.map = texture;
-        created.needsUpdate = true;
-      });
+      this.pending++;
+      partTexture(this.manifest, part, this.base)
+        .then(
+          (texture) => {
+            created.map = texture;
+            created.needsUpdate = true;
+          },
+          () => textures.delete(part),
+        )
+        .finally(() => this.pending--);
       this.materials.set(part, material);
     }
     return material;
+  }
+
+  /** True while a face part is still loading, or just arrived and is not yet drawn. */
+  loading(): boolean {
+    const waiting = this.pending > 0 || this.arrived;
+    this.arrived = this.pending > 0;
+    return waiting;
   }
 
   dispose(): void {

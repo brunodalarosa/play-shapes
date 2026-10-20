@@ -624,6 +624,8 @@ function paddleShape(sizeInWidths, color, team, look) {
 
 // build/005_3d_tilt_shift/phone.js
 var NO_TEAM = 2;
+var RETRY_MSEC = 1e3;
+var STAGGER_MSEC = 1500;
 var TiltShift3DPhone = class {
   surface;
   stream;
@@ -785,10 +787,10 @@ var TiltShift3DPhone = class {
       let next;
       let flat = false;
       try {
-        this.manifest ??= await loadManifest();
-        if (mounting !== this.mounting)
-          return;
-        next = await (await this.load()).createTiltPaddleView(this.canvas, this.manifest);
+        next = await this.createView(mounting).catch(async () => {
+          await new Promise((done) => setTimeout(done, RETRY_MSEC));
+          return this.createView(mounting);
+        });
       } catch {
         if (mounting !== this.mounting)
           return;
@@ -806,6 +808,17 @@ var TiltShift3DPhone = class {
       if (this.frame)
         next.update(this.frame);
     })();
+  }
+  async createView(mounting) {
+    if (!this.manifest) {
+      await new Promise((done) => setTimeout(done, Math.random() * STAGGER_MSEC));
+      if (mounting !== this.mounting)
+        throw new Error("The phone left this screen");
+    }
+    this.manifest ??= await loadManifest();
+    if (mounting !== this.mounting)
+      throw new Error("The phone left this screen");
+    return (await this.load()).createTiltPaddleView(this.canvas, this.manifest);
   }
   actionContext() {
     return this.roundToken && this.generation ? { generation: this.generation, round_token: this.roundToken } : void 0;
