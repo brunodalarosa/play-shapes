@@ -29,6 +29,16 @@ const EMOJIS := {
 	"face_pensive": "😔",
 	"face_worried": "😟",
 	"face_flushed": "😳",
+	"face_spiral_eyes": "😵‍💫",
+	"face_woozy": "🥴",
+	"face_angry": "😠",
+	"face_pleading": "🥺",
+	"face_anguished": "😧",
+	"face_beaming": "😁",
+	"face_tired": "😫",
+	"face_astonished": "😲",
+	"face_weary": "😩",
+	"face_grimacing": "😬",
 }
 
 
@@ -69,8 +79,12 @@ func _run() -> void:
 		"face_persevering",
 		"face_relieved",
 		"face_pensive",
+		"face_spiral_eyes",
+		"face_beaming",
+		"face_tired",
+		"face_weary",
 	]:
-		check(not manifest.face(name).can_blink(), "%s has shut or crossed eyes" % name)
+		check(not manifest.face(name).can_blink(), "%s has a fixed eye pose" % name)
 		check(
 			manifest.blinked(name).layers[0].part == manifest.face(name).layers[0].part,
 			"%s keeps its eyes on a blink" % name,
@@ -82,6 +96,20 @@ func _run() -> void:
 	check(exhausted.layers[0].part == ShapeFaceManifest.BLINK_EYE, "Tired eyes can blink")
 	for index: int in [2, 3]:
 		check(exhausted.layers[index].part == "facial_part_bag", "Eye bags survive blinking")
+	check(
+		manifest.face("face_spiral_eyes").layers[0].part == "facial_part_eye_spiral",
+		"The spiral-eyed face has its own eye parts",
+	)
+	check(
+		manifest.face("face_dizzy").layers[0].part == "facial_part_eye_x",
+		"The original dizzy face keeps its X-eyes",
+	)
+	var pleading := manifest.blinked("face_pleading")
+	check(pleading.layers[0].part == ShapeFaceManifest.BLINK_EYE, "Pleading eyes can blink")
+	check(pleading.layers[4].part == "facial_part_mouth_sad", "A pleading blink keeps its mouth")
+	var woozy := manifest.face("face_woozy")
+	check(woozy.layers[0].part != woozy.layers[1].part, "The woozy eyes have different shapes")
+	check(woozy.layers[0].center.y != woozy.layers[1].center.y, "The woozy eyes sit unevenly")
 	for name: String in ["face_smirking", "face_unamused"]:
 		check(
 			not manifest.face(name).layers[1].mirror,

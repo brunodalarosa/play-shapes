@@ -18,7 +18,7 @@ preset uses the navy smirk part like every other face.
 ## Vector masters
 
 `vector/` holds one SVG master per part, in the source's pixel units and canvas: the
-fourteen supplied parts, `facial_part_eye_x`, and nineteen parts for emoji expressions. They
+fourteen supplied parts, `facial_part_eye_x`, and twenty-six parts for emoji expressions. They
 use the same construction, in navy and white only:
 
 - circles for the eyes' whites and pupils;
@@ -57,7 +57,7 @@ small in 3D stays smooth.
 - `rotation_degrees`: clockwise, about the part's centre;
 - `mirror`: flips the part horizontally about its centre before it turns.
 
-The original `face_a` to `face_l` presets keep their supplied reference images. Twenty-seven
+The original `face_a` to `face_l` presets keep their supplied reference images. Thirty-seven
 additional presets have descriptive IDs and `emoji_reference` metadata:
 
 | Reference | Preset |
@@ -89,13 +89,25 @@ additional presets have descriptive IDs and `emoji_reference` metadata:
 | 😔 | `face_pensive` |
 | 😟 | `face_worried` |
 | 😳 | `face_flushed` |
+| 😵‍💫 | `face_spiral_eyes` |
+| 🥴 | `face_woozy` |
+| 😠 | `face_angry` |
+| 🥺 | `face_pleading` |
+| 😧 | `face_anguished` |
+| 😁 | `face_beaming` |
+| 😫 | `face_tired` |
+| 😲 | `face_astonished` |
+| 😩 | `face_weary` |
+| 😬 | `face_grimacing` |
 
 The emoji presets use the same navy and white, round strokes and layered construction.
 Their new parts have editable SVG masters; there are no supplied raster references for them.
 `source_size` is their design canvas. Existing gameplay assignments still use the original IDs.
-Closed eyes retain their shape during blinks. Tired eyes and the under-eye bags are separate
+
+Closed, X and spiral eyes retain their shape during blinks. Tired eyes and under-eye bags are separate
 layers, so the bags remain when those eyes close; side glances keep both pupils looking the
-same way. Blush uses short navy strokes to preserve the palette.
+same way. Blush uses short navy strokes to preserve the palette. Glossy eyes use white
+highlights; beaming and grimacing mouths use white teeth within the same navy outlines.
 
 ## Export and verification
 
@@ -138,6 +150,7 @@ godot --path . --script tests/shape_face_3d_visual_check.gd
 
 It writes front, three-quarter and blink captures under `test-results/shape-face-emoji/`,
 with enlarged studies and default paddle proportions, at most sixteen expressions per page.
-Filenames contain the first and last expression indices. Pass `-- --start=13` to capture
-from the fourteenth emoji preset onwards. The reference labels use an installed
+Filenames contain the first and last expression indices. Pass `-- --start=27` to capture
+the ten dazed and intense expressions from the twenty-eighth emoji preset onwards.
+The reference labels use an installed
 emoji font, so their appearance varies by system. Captures do not establish creative approval.

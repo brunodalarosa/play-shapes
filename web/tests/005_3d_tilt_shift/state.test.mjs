@@ -81,7 +81,7 @@ test("natural blinks last 0.12 s, 2.4 to 5.6 s apart", () => {
 
 test("emoji presets compose on the phone and keep shut eyes during blinks", () => {
   const emojiFaces = Object.entries(manifest.faces).filter(([, face]) => face.emoji_reference);
-  assert.equal(emojiFaces.length, 27);
+  assert.equal(emojiFaces.length, 37);
   for (const [name, preset] of emojiFaces) {
     assert.ok(validSnapshot(snapshot({ face: name })), name);
     assert.ok(validPreparation(preparation({ face: name })), name);
@@ -98,6 +98,10 @@ test("emoji presets compose on the phone and keep shut eyes during blinks", () =
     "face_persevering",
     "face_relieved",
     "face_pensive",
+    "face_spiral_eyes",
+    "face_beaming",
+    "face_tired",
+    "face_weary",
   ]) {
     assert.deepEqual(faceLayers(manifest, name, true), faceLayers(manifest, name, false));
   }
@@ -108,6 +112,14 @@ test("emoji presets compose on the phone and keep shut eyes during blinks", () =
   assert.equal(tired[0].part, "facial_part_eye_closed_down");
   assert.equal(tired[2].part, "facial_part_bag");
   assert.equal(tired[3].part, "facial_part_bag");
+  assert.equal(faceLayers(manifest, "face_spiral_eyes", true)[0].part, "facial_part_eye_spiral");
+  assert.equal(faceLayers(manifest, "face_dizzy", true)[0].part, "facial_part_eye_x");
+  const pleading = faceLayers(manifest, "face_pleading", true);
+  assert.equal(pleading[0].part, "facial_part_eye_closed_down");
+  assert.equal(pleading[4].part, "facial_part_mouth_sad");
+  const woozy = faceLayers(manifest, "face_woozy", false);
+  assert.notEqual(woozy[0].part, woozy[1].part);
+  assert.notEqual(woozy[0].center[1], woozy[1].center[1]);
   for (const name of ["face_smirking", "face_unamused"]) {
     assert.equal(faceLayers(manifest, name, false)[1].mirror, false);
   }

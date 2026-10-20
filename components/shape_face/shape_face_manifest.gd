@@ -59,7 +59,7 @@ func face(name: String) -> ShapeFacePreset:
 
 
 ## The preset with its open eyes closed for a blink, each closed eye centred where the open one
-## was at its own source size. Shut and crossed-out eyes stay as they are.
+## was at its own source size. Fixed eyes, such as shut or spiral eyes, stay as they are.
 func blinked(name: String) -> ShapeFacePreset:
 	if _blinked.has(name):
 		return _blinked[name]

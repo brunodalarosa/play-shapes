@@ -96,6 +96,15 @@
       "master_sha256": "6c65536617beae40b2b65e40af6a77862c9c2455bcb02cb0da2a84657aae6b8e",
       "source_far_pixels": 0
     },
+    "facial_part_eye_pleading": {
+      "size": [
+        44,
+        44
+      ],
+      "soft_pixels": 0,
+      "sha256": "f2bb95ed615acc865b3267f3f32a8a660c716422f1f137744aaf10731b975074",
+      "master_sha256": "8f73fab96be39d84feb41b11a8ba4f280a34cfdb82bafe0e1590c4569025debe"
+    },
     "facial_part_eye_side_glance": {
       "size": [
         42,
@@ -122,6 +131,15 @@
       "soft_pixels": 0,
       "sha256": "6c55b8c27fe8bef2600aa43a1e340b7acb214c4c26cf42adebb26e037383b422",
       "master_sha256": "142a9bc9ea5095ccc7372c36a184eabb88d0f0a99435f33d6f2b25dccafbedcf"
+    },
+    "facial_part_eye_spiral": {
+      "size": [
+        46,
+        46
+      ],
+      "soft_pixels": 0,
+      "sha256": "ad2123804d7e1c8d305d67fc1fdb13a6268eb7f7350e8be41533411b352b0252",
+      "master_sha256": "a4b9ab01c9fd4ac0abddca4567aafb9dfee31eb34dd38053cd9ba365fdbcc979"
     },
     "facial_part_eye_squeezed": {
       "size": [
@@ -218,6 +236,24 @@
       "master_sha256": "11f425eb5d9f2021c5698261afb312fb74e2e0210d7c4477811e8db0017c8498",
       "source_far_pixels": 0
     },
+    "facial_part_mouth_astonished": {
+      "size": [
+        34,
+        44
+      ],
+      "soft_pixels": 0,
+      "sha256": "ece46b77133be8174473fb3dfe581f887f6579e99e0b94212067e97aab6cacfd",
+      "master_sha256": "db67c5ccc7d9794bf1e9acff76a605ab64e87d4d8683a10fe0170e9e84d35f42"
+    },
+    "facial_part_mouth_beaming": {
+      "size": [
+        58,
+        34
+      ],
+      "soft_pixels": 0,
+      "sha256": "306c00a3cef07afc40e1e8fe4c0ff4de94143997f2b6d1c7addccb69d777574a",
+      "master_sha256": "34cd63ad6810ef95e05d8246fb14f2248382cce948ec9591a618e387d18e4407"
+    },
     "facial_part_mouth_confused": {
       "size": [
         44,
@@ -235,6 +271,15 @@
       "soft_pixels": 0,
       "sha256": "b2b1075867c853ddf6f411c24dc1e4908724607e6615f09d76ca7269358625aa",
       "master_sha256": "7eeb2017e6cf625e333dfcecfb2d16eba8d6b32a9ca88af38fb21975797453df"
+    },
+    "facial_part_mouth_grimace": {
+      "size": [
+        62,
+        28
+      ],
+      "soft_pixels": 0,
+      "sha256": "a43d4841b0cf8b50a203b2f6757fc21059f3dfcbbb1fee41198cd6d649ae5ebf",
+      "master_sha256": "cbce674382b93bdec578ad582451ff94507b16b504dbef3f593759309b737806"
     },
     "facial_part_mouth_grin": {
       "size": [
@@ -319,6 +364,24 @@
       "sha256": "77e8248637ebcbc7c97b2683cd4e25e0778f6d33c201f69cb7271a848b7f8bc4",
       "master_sha256": "9114a8e5df33f5e528d5ed823a68de154758fc205e10ffc3282259896f4ed7dd",
       "source_far_pixels": 0
+    },
+    "facial_part_mouth_wail": {
+      "size": [
+        50,
+        42
+      ],
+      "soft_pixels": 0,
+      "sha256": "091f6c696ae1733c9a7b20fe0e471eca20762adf7f320ff633c4d127dd7d6ba7",
+      "master_sha256": "588a76a8a824c62b42506f4e1afb9de5eb2edbde9120168b16476b42e62576fa"
+    },
+    "facial_part_mouth_woozy": {
+      "size": [
+        50,
+        28
+      ],
+      "soft_pixels": 0,
+      "sha256": "7080bd03eb9baf897db06edc9506e5aacd97fd9e14f33adaf940541af0984b81",
+      "master_sha256": "066be9e8c67980142525d2cf6a3d8505cb328be82207471b1d00d85c2c2df8ca"
     }
   },
   "faces": {
@@ -477,6 +540,46 @@
     "face_flushed": {
       "emoji_reference": "😳",
       "reference_comparison": false
+    },
+    "face_spiral_eyes": {
+      "emoji_reference": "😵‍💫",
+      "reference_comparison": false
+    },
+    "face_woozy": {
+      "emoji_reference": "🥴",
+      "reference_comparison": false
+    },
+    "face_angry": {
+      "emoji_reference": "😠",
+      "reference_comparison": false
+    },
+    "face_pleading": {
+      "emoji_reference": "🥺",
+      "reference_comparison": false
+    },
+    "face_anguished": {
+      "emoji_reference": "😧",
+      "reference_comparison": false
+    },
+    "face_beaming": {
+      "emoji_reference": "😁",
+      "reference_comparison": false
+    },
+    "face_tired": {
+      "emoji_reference": "😫",
+      "reference_comparison": false
+    },
+    "face_astonished": {
+      "emoji_reference": "😲",
+      "reference_comparison": false
+    },
+    "face_weary": {
+      "emoji_reference": "😩",
+      "reference_comparison": false
+    },
+    "face_grimacing": {
+      "emoji_reference": "😬",
+      "reference_comparison": false
     }
   },
   "eye_x": {
@@ -489,7 +592,7 @@
     "far_pixels_left": 0,
     "far_pixels_right": 0
   },
-  "manifest_sha256": "f4ee2a77361823e0176cc4085f2f3e321a676911f1cc45c283c974f0eebcd225",
+  "manifest_sha256": "45e9f074e1a5fc7f570bab6a3184e9d57961c1771efac3d7bbc3cc0e5af4904c",
   "result": "PASS",
   "failures": []
 }

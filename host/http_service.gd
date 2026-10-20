@@ -232,6 +232,41 @@ const ASSETS: Dictionary = {
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
+	"/shape_faces/facial_part_eye_spiral.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_spiral.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_pleading.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_pleading.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_woozy.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_woozy.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_beaming.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_beaming.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_wail.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_wail.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_astonished.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_astonished.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_grimace.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_grimace.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
 	"/style.css": {
 		"path": "res://web/public/style.css",
 		"content_type": "text/css; charset=utf-8",
