@@ -17,7 +17,7 @@ The two mockups are approved for layout, readability and mood. Their exact objec
 ## Gameplay space and camera
 
 - All play happens on one vertical plane at depth zero: bubbles move in X and Y only.
-- The playable plane is 19.2 × 10.8 world units (one unit is 100 pixels of 002's arena), centred on the origin, with invisible walls at its edges that affect bubbles only.
+- The playable plane is 19.2 × 10.8 world units (one unit is 100 pixels of a 1920 × 1080 reference frame), centred on the origin, with invisible walls at its edges that affect bubbles only.
 - The camera is fixed, near-frontal, with a narrow perspective (about 30° field of view) and a level horizon, framing the playable plane edge to edge at 16:9.
 - Nothing scenic sits on or in front of the gameplay plane. All scenery is behind it.
 - Timer, countdown, nameplates and results are screen UI, not scene objects.
@@ -68,4 +68,4 @@ The water backdrop and lighting form a reusable underwater environment. Library 
 
 ## Human review
 
-The owner judges the result in the running game, side by side with 002: readability at couch distance with 5 and 10 players, the underwater mood, the bubble look, character visibility inside the bubble, pufferfish and jellyfish appeal, and frame rate. Automated checks cannot approve these.
+The owner judges the result in the running game: readability at couch distance with 5 and 10 players, the underwater mood, the bubble look, character visibility inside the bubble, pufferfish and jellyfish appeal, and frame rate. Automated checks cannot approve these.

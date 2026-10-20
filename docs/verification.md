@@ -188,7 +188,7 @@ start only what they need, so they stay fast.
 - Bubbles and jellyfishes 3D: the `tests/` folder of `minigames/004_3d_bubbles/` covers the
   round rules, Jolt arenas on real physics frames (plane locks, swipes, speed cap, wall and bump
   rebounds, catching, pops, scatter, caps, the zero freeze), the protocol, the shared-screen
-  scene and the independence from 002. The shared 3D components have `plane_3d_test.gd`,
+  scene and the absence of spin. The shared 3D components have `plane_3d_test.gd`,
   `bubble_shell_3d_test.gd` and `underwater_environment_test.gd` in `tests/`. Run
   `node tools/check.mjs bubbles_3d plane_3d bubble_shell underwater`.
 

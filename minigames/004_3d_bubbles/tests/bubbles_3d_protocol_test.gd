@@ -40,8 +40,7 @@ func _run() -> void:
 		_protocol.handles("bubbles_3d_touch") and _protocol.handles("bubbles_3d_release"),
 		"Both types",
 	)
-	check(not _protocol.handles("bubbles_charge"), "No spin or charge message is handled")
-	check(not _protocol.handles("bubbles_trace"), "The 2D trace message is not handled")
+	check(not _protocol.handles("bubbles_3d_spin"), "No spin message is handled")
 
 	var players := [
 		{ "player_id": "p1", "seat": 1, "state": "connected" },

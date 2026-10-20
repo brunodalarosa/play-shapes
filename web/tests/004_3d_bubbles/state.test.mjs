@@ -84,9 +84,8 @@ test("fallback is selected for renderer creation or asset loading failure", asyn
   );
 });
 
-test("the independent screen and reusable view contain no retired controller coupling", () => {
-  const forbidden = /002_bubbles|bubbles_trace|bubbles_charge|spin|\/bubbles-jellyfish\.png/;
-  const oldBackground = "/bubbles-phone-background.png";
+test("the screen and reusable view contain no spin mechanic", () => {
+  const forbidden = /\bspin/i;
   for (const directory of ["004_3d_bubbles", "three_view"]) {
     const base = new URL(`../../src/${directory}/`, import.meta.url);
     for (const file of readdirSync(base, { recursive: true })) {
@@ -94,7 +93,6 @@ test("the independent screen and reusable view contain no retired controller cou
 
       const source = readFileSync(new URL(String(file).replaceAll("\\", "/"), base), "utf8");
       assert.doesNotMatch(source, forbidden, `${directory}/${file}`);
-      assert.equal(source.includes(oldBackground), false, `${directory}/${file}`);
     }
   }
 });

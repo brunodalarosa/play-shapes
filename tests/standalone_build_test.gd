@@ -50,11 +50,8 @@ func _run() -> void:
 		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/pre_minigame/bubbles_preview.png"),
 		"Ready screen, content, and gameplay preview remain in the standalone PCK",
 	)
-	var retired_in_policy := false
 	for path: String in Policy.REQUIRED_RUNTIME_PATHS:
-		if path.contains("002_") or path.contains("bubbles_and_jellyfishes"):
-			retired_in_policy = true
-	check(not retired_in_policy, "Standalone PCK policy includes no retired 2D Bubbles path")
+		check(FileAccess.file_exists("res://" + path), "Required runtime path exists: %s" % path)
 	check(
 		Policy.REQUIRED_RUNTIME_PATHS.has("characters/character_selection.gd") \
 				and Policy.REQUIRED_RUNTIME_PATHS.has("characters/squircle_v1_playback.tscn") \

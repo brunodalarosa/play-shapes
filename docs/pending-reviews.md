@@ -102,24 +102,18 @@ removes it. The evidence labels are defined in
   Check app switching and return, reload, low-power refusal and installed-app behavior.
   Record device, OS and browser versions; synthetic locks do not establish OS behavior.
 
-## Bubbles and Jellyfishes
-
-- `[HUMAN-PLAY]` The owner's two-phone play and game-feel review.
-- `[HUMAN-PLAY]` Couch-distance readability of the shared screen, the final audio mix, and
-  the fairness of creature collisions and telegraphs.
-
 ## Bubbles and jellyfishes 3D
 
-- `[HUMAN-PLAY]` The owner's play review side by side with 002: swipe responsiveness, movement
-  feel, bump and wall rebounds, catching and pops, difficulty, readability at couch distance
-  with 5 and 10 players, the underwater look and fun. Every tuning value is provisional.
+- `[HUMAN-PLAY]` The owner's play review: swipe responsiveness, movement feel, bump and wall
+  rebounds, catching and pops, difficulty, readability at couch distance with 5 and 10 players,
+  the underwater look and fun. Every tuning value is provisional.
 - `[PHYSICAL-PHONE]` On the iPhone Safari and Android Chrome pair: the three.js view's
   rendering and frame rate, the time to first frame while the models download, swipe
   reliability, latency, haptics where supported, reconnect and the no-WebGL fallback.
 - `[HUMAN-PLAY]` The final audio mix, including the countdown beats on the shared cue.
 - `[HUMAN-PLAY]` Whether the Squircle should keep drawing over its bubble's highlight, as it
   does in the lobby to stay in front of scenery.
-- A 3D Pre-minigame preview image from the owner; the booklet still shows 002's.
+- A 3D Pre-minigame preview image from the owner; the booklet still shows a 2D placeholder.
 - `[GODOT-RUNTIME]` Host frame time on the target PC. `bubbles_3d_performance_check.gd` measured
   ten players, 70 free and 160 caught jellyfishes at 0.76 ms a frame on average (1.17 ms at the
   95th percentile, 182 draw calls) on an RTX 5070 development machine only.
@@ -252,7 +246,7 @@ Record the exact OS and browser versions for each row.
 
 | Device and browser | Journey to check |
 | --- | --- |
-| iPhone Safari | The page loads the bundled client and reaches the name screen; the offer in a tab; Share, Add to Home Screen, Open as Web App; launching the icon to the current host; the standalone layout; switching with separate or shared storage; lobby stick and jump together; READY and CANCEL; Bubbles swipe, spin and cancel; the keyboard; pinch and double tap; bars and rotation; background, lock and unlock; the motion lab permission. |
+| iPhone Safari | The page loads the bundled client and reaches the name screen; the offer in a tab; Share, Add to Home Screen, Open as Web App; launching the icon to the current host; the standalone layout; switching with separate or shared storage; lobby stick and jump together; READY and CANCEL; Bubbles and jellyfishes 3D swipe and cancel; the keyboard; pinch and double tap; bars and rotation; background, lock and unlock; the motion lab permission. |
 | Android Chrome | The page loads the bundled client and reaches the name screen; a real native install event when eligible; the accepted, dismissed and unsupported paths; launching the icon; the same play, lifecycle, keyboard and permission journey. |
 | Both | Host restart, grace expiry, a change of LAN origin, certificate trust, reconnecting to the current host, and no duplicate active players after switching from browser to app. |
 | Both | Measured timing from touch to host receipt, and subjective responsiveness. Name the measurement method, the sample count and the versions. |

@@ -74,7 +74,7 @@ deterministic; a seed promises only the ordered entry positions under unchanged 
 
 Balls use native rigid-body collision response, shape CCD, and body-local force integration.
 Paddles are fixed-anchor animatable bodies synchronized to physics. Their visual and collider
-share a transform. No Bubbles kinematics, pair solver or global gravity is reused.
+share a transform. No custom kinematics, pair solver or global gravity is used.
 
 Both contact materials use `rough = true`: their maximum friction applies. Restitution
 adds the two non-absorbent material values, bounded by the engine. Zero paddle bounce

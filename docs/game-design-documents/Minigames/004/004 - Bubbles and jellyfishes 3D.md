@@ -4,19 +4,17 @@ Bubbles and jellyfishes 3D
 
 ## Overview
 
-Minigame 004 rebuilds [[docs/game-design-documents/Minigames/002/002 - Bubbles and jellyfishes]] from scratch in the 3D low-poly world. Each Shape Character floats inside a bubble that the player pushes with swipes on their phone. Players catch jellyfishes by touching them, and each catch grows the bubble. Pufferfishes cross the arena and pop the bubbles they touch.
+Each Shape Character floats inside a bubble in the 3D low-poly underwater world, pushed by swipes on the player's phone. Players catch jellyfishes by touching them, and each catch grows the bubble. Pufferfishes cross the arena and pop the bubbles they touch.
 
-004 plays exactly like 002 except that the spin move does not exist: no circle gesture, no charge, no spin shove, no spin meter and no spin feedback. Everything else in 002's rules carries over, as written below.
+There is no spin move: no circle gesture, no charge, no spin shove, no spin meter and no spin feedback.
 
-004 sits beside 002 in the lobby so the two versions can be compared. Once the owner approves 004, 002 is retired the way 001 was, and its number is never reused.
+Minigame 004 replaced the retired 2D version, 002, whose number is never reused.
 
 ## Identity and independence
 
 - Number 004, catalog ID `bubbles_3d`, display name "Bubbles and jellyfishes 3D".
 - Code in `minigames/004_3d_bubbles/`, main scene `3d_bubbles.tscn`, phone code in `web/src/004_3d_bubbles/`.
-- 004 may copy and adapt 002's code, but never imports, preloads or references 002's scripts, scenes, resources, tuning or protocol. Deleting 002's folder and phone module must not break 004.
 - Where a piece is useful beyond this minigame, it is built as a reusable component outside the minigame folder. See [Reusable components](#reusable-components).
-- 002 stays untouched, spin included.
 
 ## Stop condition
 
@@ -46,7 +44,7 @@ Fixed time duration.
 
 The host simulates 004 with Godot's 3D physics (Jolt), not with 2D physics mirrored into 3D. Bubbles, NPCs and walls live on one vertical gameplay plane at depth zero; every body's depth axis and rotation are locked so nothing leaves the plane. This differs from the 3D lobby, which mirrors a 2D simulation ([decision 0033](../../../decisions/0033-plaza-lobby-plane-simulation.md)), and is recorded as its own decision record when built.
 
-One world unit equals 100 pixels of 002's 1920 × 1080 arena. The playable plane is 19.2 × 10.8 units, centred on the origin, and 002's tuned distances and speeds carry over divided by 100 as starting values.
+One world unit equals 100 pixels of a 1920 × 1080 reference frame. The playable plane is 19.2 × 10.8 units, centred on the origin.
 
 ## Shared-screen presentation
 
@@ -106,11 +104,11 @@ Every player in ranking order with rank, name, Shape Character and final jellyfi
 
 ## Lobby and debug flow
 
-004 appears in the lobby's minigame dropdown beside 002 and 003 and starts through the Pre-minigame screen like every normal launch. `Return to lobby` keeps registered players. The F12 debug launcher gains a one-player 004 scenario that skips the Pre-minigame screen, like 002's.
+004 appears in the lobby's minigame dropdown and starts through the Pre-minigame screen like every normal launch. `Return to lobby` keeps registered players. The F12 debug launcher has a one-player 004 scenario that skips the Pre-minigame screen.
 
 ## Audio and feedback
 
-004 reuses 002's shared audio files: `Beach_music.ogg` as background music, and the existing cues for catching, popping, re-forming, bumping, the countdown and the final seconds. The spin-charge and spin-activation cues are not used. The pufferfish warning is visual only. No screen shake.
+004 uses `Beach_music.ogg` as background music, and the cues for catching, popping, re-forming, bumping, the countdown and the final seconds. The pufferfish warning is visual only. No screen shake.
 
 ## Reusable components
 
@@ -124,7 +122,7 @@ These are built outside `minigames/004_3d_bubbles/` so later 3D scenes and minig
 
 ## Designer-tunable values
 
-Distances and speeds are in world units; 002's defaults divided by 100 are the starting values.
+Distances and speeds are in world units.
 
 * Minigame time duration
 * Starting, maximum and per-jellyfish growth of the bubble radius
@@ -148,11 +146,38 @@ Distances and speeds are in world units; 002's defaults divided by 100 are the s
 
 ## Answered decisions
 
+Confirmed by the project owner on 2026-09-22:
+
+* A pop removes every jellyfish from the player's current score. A tunable ratio of those jellyfishes disappears; the remainder scatters around the pop location and can be collected again.
+* The re-forming bubble is briefly invulnerable and cannot collect jellyfishes. The shape character blinks white throughout this tunable i-frame period.
+* Bubble growth has a maximum visual size, but there is no maximum jellyfish count. Collecting continues to increase the player's score after the bubble reaches maximum size.
+* Final ranking uses the number of jellyfishes currently held when time expires. A last-second pop may therefore dramatically change the ranking.
+* Every valid directional swipe released within the tunable touch duration applies the same impulse regardless of swipe length or speed beyond the minimum recognition threshold. Slow drags deform the shared-screen bubble until that limit, then the stretch settles and release has no impulse. Player bubbles have a tunable maximum speed and tunable water drag.
+* Invisible walls bounce player bubbles back into the arena with tunable bounciness.
+* Normal play supports 2–10 players. One-player play remains available only through debug mode.
+* Jellyfishes and pufferfishes may leave the arena and despawn. Each pufferfish crosses the arena once. NPCs ignore one another, and pufferfishes collide only with vulnerable player bubbles.
+* Jellyfishes spawn immediately at positions outside a small tunable safe radius around players and hazards. A grow animation makes each new jellyfish appear to approach from the background; it cannot be captured until the animation ends.
+* Pufferfish entry may be telegraphed at the arena edge. A tunable boolean enables or disables this warning for testing. Spawn paths do not guarantee a minimum player reaction time.
+* Jellyfish waves alternate high- and low-spawn periods with randomized rates and durations inside tunable ranges. A tunable maximum caps the number of free jellyfishes present at once.
+* Larger bubbles gain mass and move more slowly according to tunable scaling values.
+* Recollectable jellyfishes scattered by a pop have a short tunable collection lockout and blink white until they become collectible.
+* A bubble's collision radius grows with its visual size. Only a capped number of captured jellyfishes are rendered; collection and scoring continue beyond that visual cap.
+* The shared screen identifies each bubble by player name but does not show live numeric scores. Each phone shows its own exact authoritative score.
+* Player collision and input are disabled during the entrance and countdown. A tunable starting population of jellyfishes is present when controls unlock at `GO`.
+* A temporarily disconnected player's bubble remains in the arena and continues drifting under normal physics. It continues collecting jellyfishes, colliding with pufferfishes, and interacting with other players. An explicit leave pops the bubble and releases jellyfishes under the normal pop rules.
+* Players tied on final jellyfish count share the same rank.
+* At zero seconds gameplay freezes immediately before any additional collision resolves. The shared screen timer sits at the top center, displays remaining seconds, and becomes more expressive during the final 10 seconds, with stronger `3`, `2`, and `1` beats.
+* Results show every player's rank, name, shape character, and final jellyfish count without an elaborate winner celebration in the first implementation.
+* The shared [[docs/game-design-documents/Player journeys/Pre-minigame screen]] booklet replaces the in-game instruction card. Normal play continues into the entrance and countdown after readiness; F12 debug bypasses the ready screen. No in-game instruction card is shown on either launch path.
+* The pufferfish warning is visual only. White blinking remains the sole added visual treatment for post-pop invulnerability and released-jellyfish collection lockout; no lock icon or transparency change is added.
+* Optional haptic feedback may reinforce collection and the local player's bubble pop where supported, but vibration is never required feedback. No screen shake is used.
+* Phone orientation is minigame-specific. This minigame requests portrait and restores the appropriate orientation when transitioning away.
+* The lobby uses a temporary minigame-selection dropdown. Return preserves the registered lobby, and F12 provides a separate one-player debug scenario. Better minigame menus and automatic sequencing are deferred.
+
 Confirmed by the project owner on 2026-10-17:
 
-* 004 is a new minigame beside 002, built from scratch and independent of 002's code; reusable pieces become shared components.
+* 004 is built from scratch in 3D; reusable pieces become shared components.
 * The spin move is removed entirely, as mechanic, gesture, phone meter, feedback, sounds and booklet text.
-* Gameplay otherwise matches 002, including its answered decisions on pops, i-frames, bumping, walls, waves, ties, the zero-time freeze, disconnects and the hidden live score.
 * The host uses 3D physics with locked depth and rotation, not a mirrored 2D simulation.
 * Camera: fixed, near-frontal, narrow perspective.
 * The bubble is a translucent shader sphere, not a modelled asset.
@@ -162,7 +187,7 @@ Confirmed by the project owner on 2026-10-17:
 * The phone renders the 3D assets in real time with three.js.
 * The booklet text above replaces any spin explanation. The preview image is not replaced as part of the build.
 * 004 gets an F12 one-player scenario.
-* After the owner approves 004, 002 is retired and removed.
+* 002 is retired and removed once 004 replaces it.
 
 ## Deferred decisions
 
@@ -172,11 +197,10 @@ Confirmed by the project owner on 2026-10-17:
 
 ## Validation needs
 
-* Deterministic automated coverage carried over from 002 minus spin: lifecycle, scoring, ties, zero-time freeze, spawn limits, pop and release, disconnect and leave, tuning bounds, and that no spin message or state exists.
-* Automated checks that 004 never references 002's files.
+* Deterministic automated coverage for lifecycle, scoring, ties, zero-time freeze, spawn limits, pop and release, disconnect and leave, tuning bounds, and that no spin message or state exists.
 * Browser tests for swipe-only input, portrait layout, reconnect snapshots and three.js rendering with a fallback when WebGL is unavailable.
 * Godot runtime checks for scene load, plane locks, collisions, visual caps, the water shaders in the Compatibility renderer, timer emphasis, audio, results, lobby return and the F12 entry.
 * Performance with ten players and the maximum free and visible jellyfishes, on the host and on a phone.
 * Physical-phone validation on the iPhone Safari and Android Chrome pair: rendering, frame rate, gesture reliability, latency and haptics.
-* Human play approval of movement feel, readability at couch distance, the underwater look, and fun, compared side by side with 002.
+* Human play approval of movement feel, readability at couch distance, the underwater look, and fun.
 * Exported-build verification of 004, including the phone's model downloads.

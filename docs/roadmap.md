@@ -71,13 +71,13 @@ phone setup still use the Squircle sheets, and are rebuilt afterwards.
 The 2D painted-room art in `assets/runtime/lobby_playground/` is unused apart from the logo,
 and is removed once the plaza is approved.
 
-Minigame 004, Bubbles and jellyfishes 3D, is built beside 002 for comparison: a from-scratch
+Minigame 004, Bubbles and jellyfishes 3D, replaced the retired 2D version, 002: a from-scratch
 3D rebuild without the spin move, on Jolt physics with plane-locked bodies
 ([0034](decisions/0034-bubbles-3d-jolt-plane.md)), with a three.js view of each player's bubble
 on the phone ([0035](decisions/0035-phone-three-js.md)). Its design is in
 `docs/game-design-documents/Minigames/004/`. It awaits physical-phone checks and the owner's
-side-by-side play review; tuning values are provisional and the Pre-minigame preview image is
-still 002's. Once 004 is approved, 002 is retired.
+play review; tuning values are provisional and the Pre-minigame preview image is still a 2D
+placeholder.
 
 Minigame 005, Tilt Shift 3D, the last step of the 3D rework, is built beside 003: the same game
 on plane-locked Jolt physics ([0038](decisions/0038-tilt-shift-3d-full-width-frame.md)), with
@@ -137,10 +137,10 @@ its red error panel for the rest of the session. Two cases are known:
 - Pressing Start while a phone holds the lobby stick. The host answers `lobby_unavailable`.
   To reproduce, set `AT_REST_SECONDS` to `0.0` in `tests/e2e/host.gd` and run `npm run e2e`
   in `web/`.
-- Releasing a swipe as a Bubbles round ends. The host answers `stale_or_unavailable`. To
-  try to reproduce, set `ROUND_ENDING_MSEC` to `0` in the same file and run
-  `node tools/check.mjs --full e2e`. It fails only when a swipe happens to land as the round
-  ends, which depends on timing.
+- Releasing a swipe as a Bubbles and jellyfishes 3D round ends. The host answers
+  `stale_or_unavailable`. To try to reproduce, set `ROUND_ENDING_MSEC` to `0` in the same file
+  and run `node tools/check.mjs --full e2e`. It fails only when a swipe happens to land as the
+  round ends, which depends on timing.
 
 Late input after a phase change should be dropped quietly. The end-to-end test avoids both
 cases on purpose; fixing the bug means removing those two waits.

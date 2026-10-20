@@ -52,7 +52,7 @@ No source edits. In the scene, materials are overridden with flat colours: coral
 2. Copy only the selected source and the dependencies listed for it, plus the pack license file. Library originals stay unchanged.
 3. Keep unchanged copies and the adapted Blender sources under `art/bubbles_3d/`, which Godot does not import. Put the runtime GLB or glTF files under `assets/runtime/minigames/bubbles_3d/` and add them to the standalone export policy.
 4. Record provenance in `art/bubbles_3d/README.md`: source pack, path, hash, license and any change, as `art/playground_plaza/README.md` does.
-5. Nothing here may change the 002 assets or the plaza assets.
+5. Nothing here may change the plaza assets.
 
 ## Selected sources and hashes
 
