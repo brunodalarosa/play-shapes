@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="MinigameDefinition" format=3]
+
+[ext_resource type="Script" path="res://minigames/minigame_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"tilt_shift_3d"
+display_name = "Tilt Shift 3D"
+scene_path = "res://minigames/005_3d_tilt_shift/3d_tilt_shift.tscn"
+max_players = 10
+allowed_player_counts = PackedInt32Array(2, 4, 6, 8, 10)
+pre_minigame_content_path = "res://minigames/005_3d_tilt_shift/tilt_shift_3d_pre_minigame_content.tres"
+session_script = "res://minigames/005_3d_tilt_shift/tilt_shift_3d_session.gd"

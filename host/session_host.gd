@@ -21,6 +21,9 @@ var _pending_minigame_launch: Dictionary = { }
 var readiness: PreMinigameReadiness
 var tilt_shift: Node
 const TILT_SHIFT_ID := &"tilt_shift"
+## Sessions of catalog minigames that prepare during the Pre-minigame screen, by minigame ID.
+## Each is created on first use from its definition's session script.
+var minigame_sessions: Dictionary[StringName, Node] = { }
 
 
 func _ready() -> void:
@@ -115,6 +118,7 @@ func addresses() -> PackedStringArray:
 
 func stop() -> void:
 	_stop_tilt_shift()
+	_stop_minigame_sessions()
 	http.stop()
 	websocket.stop()
 	running = false
@@ -199,14 +203,22 @@ func begin_pre_minigame(minigame_id: StringName) -> Dictionary:
 	if not bool(availability.available):
 		return { "accepted": false, "reason": availability.reason }
 	_stop_tilt_shift()
+	_stop_minigame_sessions()
 	var can_ready := Callable()
 	var preparation := Callable()
+	var session := minigame_session(minigame_id)
 	if minigame_id == TILT_SHIFT_ID:
 		_ensure_tilt_shift()
 		if not tilt_shift.prepare(self, active_presets.tilt_shift):
 			return { "accepted": false, "reason": "Tilt Shift preparation could not start" }
 		can_ready = tilt_shift.ready_for
 		preparation = tilt_shift.preparation_for
+	elif session != null:
+		if not session.prepare(self):
+			var reason := "%s preparation could not start" % minigame_display_name(minigame_id)
+			return { "accepted": false, "reason": reason }
+		can_ready = session.ready_for
+		preparation = session.preparation_for
 	readiness = PreMinigameReadiness.new(
 		minigame_id,
 		players(),
@@ -214,6 +226,7 @@ func begin_pre_minigame(minigame_id: StringName) -> Dictionary:
 			return (
 				bool(minigame_availability(minigame_id).available)
 				and (minigame_id != TILT_SHIFT_ID or tilt_shift.launch_eligible())
+				and (session == null or session.launch_eligible())
 			),
 		can_ready,
 		preparation,
@@ -235,6 +248,8 @@ func cancel_pre_minigame() -> void:
 func _on_readiness_changed(snapshot: Dictionary) -> void:
 	if readiness != null and readiness.minigame_id == TILT_SHIFT_ID:
 		tilt_shift.sync_players(players())
+	if readiness != null and minigame_sessions.has(readiness.minigame_id):
+		minigame_sessions[readiness.minigame_id].sync_players(players())
 	readiness_changed.emit(snapshot)
 
 
@@ -252,6 +267,7 @@ func _on_readiness_launch(minigame_id: StringName, participants: Array[Dictionar
 
 func _on_readiness_canceled() -> void:
 	_stop_tilt_shift()
+	_stop_minigame_sessions()
 	websocket.end_pre_minigame()
 	readiness = null
 	readiness_canceled.emit()
@@ -273,12 +289,16 @@ func clear_minigame_launch(minigame_id: StringName = &"") -> void:
 		_pending_minigame_launch = { }
 		if minigame_id.is_empty() or minigame_id == TILT_SHIFT_ID:
 			_stop_tilt_shift()
+		for id: StringName in minigame_sessions:
+			if minigame_id.is_empty() or minigame_id == id:
+				minigame_sessions[id].stop()
 
 
 func send_players_to_lobby() -> void:
 	if readiness != null and readiness.active:
 		readiness.cancel()
 	_stop_tilt_shift()
+	_stop_minigame_sessions()
 	if websocket != null:
 		websocket.send_lobby_state()
 
@@ -300,6 +320,28 @@ func _ensure_tilt_shift() -> void:
 func _stop_tilt_shift() -> void:
 	if tilt_shift != null:
 		tilt_shift.stop()
+
+
+## The session of [param minigame_id], created on first use, or null for a minigame without one.
+## A session is a Node with prepare(host), ready_for(player_id), preparation_for(player_id),
+## launch_eligible(), sync_players(players) and stop().
+func minigame_session(minigame_id: StringName) -> Node:
+	if minigame_sessions.has(minigame_id):
+		return minigame_sessions[minigame_id]
+	var minigame := minigame_catalog.find(minigame_id)
+	if minigame == null or minigame.session_script.is_empty():
+		return null
+	# Loaded on first use, so listing the catalog and lobby play load no minigame scripts.
+	var script := load(minigame.session_script) as Script
+	var session: Node = script.new()
+	add_child(session)
+	minigame_sessions[minigame_id] = session
+	return session
+
+
+func _stop_minigame_sessions() -> void:
+	for session: Node in minigame_sessions.values():
+		session.stop()
 
 
 func unregister_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
@@ -332,6 +374,8 @@ func _on_players_changed() -> void:
 	var public_players := player_registry.public_players()
 	if tilt_shift != null:
 		tilt_shift.sync_players(public_players)
+	for session: Node in minigame_sessions.values():
+		session.sync_players(public_players)
 	if readiness != null:
 		readiness.sync_players(public_players)
 	players_changed.emit(public_players)

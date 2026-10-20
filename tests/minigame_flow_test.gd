@@ -40,10 +40,11 @@ func _run() -> void:
 	var start_button := current_scene.get_node("%StartMinigame") as Button
 	var start_help := current_scene.get_node("%StartHelp") as Label
 	if not check(
-		selector.item_count == 3 and selector.get_item_text(0) == "Bubbles and Jellyfishes"
+		selector.item_count == 4 and selector.get_item_text(0) == "Bubbles and Jellyfishes"
 		and selector.get_item_text(1) == "Bubbles and jellyfishes 3D"
-		and selector.get_item_text(2) == "Tilt Shift",
-		"Lobby offers both Bubbles versions followed by Tilt Shift",
+		and selector.get_item_text(2) == "Tilt Shift 3D"
+		and selector.get_item_text(3) == "Tilt Shift",
+		"Lobby offers both Bubbles versions, then Tilt Shift 3D beside Tilt Shift",
 	):
 		return
 	if not check(

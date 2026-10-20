@@ -334,7 +334,7 @@ func _run() -> void:
 
 	var active: Resource = ActivePresetsScript.new()
 	if not check(
-		active.validation_errors().size() == 5,
+		active.validation_errors().size() == 6,
 		"Active selector rejects missing preset references",
 	):
 		return

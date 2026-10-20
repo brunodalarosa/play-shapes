@@ -26,6 +26,11 @@ extends Resource
 ## Whether the debug menu offers a round with exactly one registered player.
 @export var one_player_debug := false
 
+## A Node script that coordinates the minigame from the Pre-minigame screen into play, for a
+## minigame that prepares its players, such as calibrating phone tilt. Empty for none.
+## The session host creates it on first use, in its minigame_session().
+@export_file("*.gd") var session_script: String
+
 
 ## Loads the ready-screen content, or returns null when the path does not lead to one.
 func load_pre_minigame_content() -> PreMinigameContent:
