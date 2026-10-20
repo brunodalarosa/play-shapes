@@ -75,6 +75,9 @@ test("serves bundled HTML, JS, CSS and session configuration", async () => {
     ...[180, 192, 512].map((size) => [`/app-icon-${size}.png`, "image/png", null]),
     ["/platform_input_settings.json", "application/json", "x-right-y-up"],
     ["/bubbles-jellyfish.png", "image/png", null],
+    ["/shape_faces/face_presets.json", "application/json", "face_a"],
+    ["/shape_faces/facial_part_eye_open.png", "image/png", null],
+    ["/shape_faces/facial_part_eye_x.png", "image/png", null],
     ["/style.css", "text/css", "focus-visible"],
     ["/session.json", "application/json", "session_id"],
   ]) {

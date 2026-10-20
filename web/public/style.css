@@ -706,6 +706,80 @@ html.tilt-active main > :not(#tilt-shift) {
 #tilt-shift[data-waiting="true"][data-team="1"] {
   background: radial-gradient(circle, #b5d5ff 0 14%, #4c88df 15% 18%, #243345 19%);
 }
+html.tilt-3d-active,
+html.tilt-3d-active body {
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  background: #f6ecd8;
+  overscroll-behavior: none;
+}
+html.tilt-3d-active main {
+  padding: 0;
+  margin: 0;
+  inline-size: 100%;
+  max-inline-size: none;
+  block-size: var(--controller-height, 100dvh);
+}
+html.tilt-3d-active main > :not(#tilt-shift-3d) {
+  display: none !important;
+}
+#tilt-shift-3d {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  background: var(--tilt3d-wall, linear-gradient(#fbf3e2, #efdfc2));
+  user-select: none;
+  touch-action: none;
+}
+#tilt-shift-3d canvas {
+  inline-size: 100%;
+  min-block-size: 0;
+  flex: 1;
+}
+#tilt3d-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+#tilt3d-actions button {
+  min-block-size: 48px;
+  padding: 12px 20px;
+  border: 3px solid #c1aa7c;
+  border-radius: 14px;
+  background: #fff7e1;
+  color: #2d453c;
+  font-size: clamp(16px, 3vw, 23px);
+  font-weight: 800;
+  touch-action: manipulation;
+}
+#tilt3d-actions button:disabled {
+  opacity: 0.5;
+}
+#tilt3d-ready {
+  background: #9eddb6 !important;
+}
+#tilt3d-ready[aria-pressed="true"] {
+  background: #f4bc82 !important;
+}
+#tilt3d-state,
+#tilt3d-orientation {
+  flex-basis: 100%;
+  margin: 0;
+  text-align: center;
+  color: #2d453c;
+}
+#tilt-shift-3d[data-waiting="true"][data-team="0"] {
+  background: radial-gradient(circle, #ffc37d 0 14%, #d67b37 15% 18%, #3b2c24 19%);
+}
+#tilt-shift-3d[data-waiting="true"][data-team="1"] {
+  background: radial-gradient(circle, #b5d5ff 0 14%, #4c88df 15% 18%, #243345 19%);
+}
 html.bubbles-3d-active,
 html.bubbles-3d-active body {
   inline-size: 100%;

@@ -6,6 +6,7 @@ extends Node
 const BUBBLES_ART := "res://assets/runtime/minigames/bubbles_and_jellyfishes"
 const TILT_ART := "res://assets/runtime/minigames/003"
 const SQUIRCLE_MODEL := "res://assets/runtime/animated_characters/squircle/v1/model"
+const SHAPE_FACES := "res://assets/runtime/shape_faces"
 const ASSETS: Dictionary = {
 	"/tilt-shift/manifest.json": {
 		"path": TILT_ART + "/manifest.json",
@@ -104,6 +105,85 @@ const ASSETS: Dictionary = {
 	},
 	"/models/squircle-face-blink.png": {
 		"path": SQUIRCLE_MODEL + "/face-blink.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/face_presets.json": {
+		"path": SHAPE_FACES + "/face_presets.json",
+		"content_type": "application/json",
+	},
+	"/shape_faces/facial_part_eye_closed_down.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_closed_down.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_closed_up.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_closed_up.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_half_bottom.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_half_bottom.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_half_top.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_half_top.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_half_top_wing.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_half_top_wing.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_open.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_open.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_x.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_x.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eyebrow_a.png": {
+		"path": SHAPE_FACES + "/facial_part_eyebrow_a.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eyebrow_b.png": {
+		"path": SHAPE_FACES + "/facial_part_eyebrow_b.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eyebrow_c.png": {
+		"path": SHAPE_FACES + "/facial_part_eyebrow_c.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eyebrow_d.png": {
+		"path": SHAPE_FACES + "/facial_part_eyebrow_d.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_angry.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_angry.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_happy.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_happy.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_sad.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_sad.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_smirk.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_smirk.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},

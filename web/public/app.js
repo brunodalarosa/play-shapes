@@ -61,9 +61,9 @@ function bindControllerLifecycle(cancel, target = window, page = document) {
 function canTouch(snapshot, connected) {
   return connected && snapshot?.phase === "active" && snapshot.connected && !snapshot.left;
 }
-function displacement(start, end, size) {
+function displacement(start, end, size2) {
   return end.map((value, index) => {
-    const share = (value - start[index]) / Math.max(1, size[index]);
+    const share = (value - start[index]) / Math.max(1, size2[index]);
     return Math.max(-1, Math.min(1, share));
   });
 }
@@ -80,11 +80,11 @@ var TouchInput = class {
     this.nextSequence = nextSequence;
     this.send = send;
   }
-  start(point, size, now) {
+  start(point, size2, now) {
     if (!this.available() || this.touch)
       return false;
     const seq = this.nextSequence();
-    this.touch = { seq, start: point, size, current: [0, 0], sent: [0, 0], last: now, count: 0 };
+    this.touch = { seq, start: point, size: size2, current: [0, 0], sent: [0, 0], last: now, count: 0 };
     this.send({ type: "bubbles_3d_touch", input_seq: seq, stage: "start" });
     return true;
   }
@@ -318,8 +318,8 @@ var BubblePhone = class {
         this.circle.hidden = false;
         this.circle.style.backgroundColor = snapshot.character_color;
         const maximum = Math.max(snapshot.visual_tuning.max_radius, visual.radius, 0.01);
-        const size = 24 + 60 * visual.radius / maximum;
-        this.circle.style.setProperty("--bubble-size", `${size}%`);
+        const size2 = 24 + 60 * visual.radius / maximum;
+        this.circle.style.setProperty("--bubble-size", `${size2}%`);
       },
       dispose: () => {
       }
@@ -351,6 +351,488 @@ var BubblePhone = class {
     this.state = new BubbleState();
     this.feedback = "";
     this.surface.hidden = true;
+  }
+};
+
+// build/shape_paddle/face.js
+var FACE_BASE = "/shape_faces/";
+var BLINK_EYE = "facial_part_eye_closed_down";
+var UNBLINKING_EYES = [
+  "facial_part_eye_closed_down",
+  "facial_part_eye_closed_up",
+  "facial_part_eye_x"
+];
+var EYE_PREFIX = "facial_part_eye_";
+function validManifest(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  const manifest = value;
+  return !!manifest.parts && typeof manifest.parts === "object" && !!manifest.faces && typeof manifest.faces === "object" && Object.values(manifest.faces).every((face2) => Number.isFinite(face2.box_aspect) && Array.isArray(face2.layers) && face2.layers.every((layer) => typeof layer.part === "string" && layer.part in manifest.parts));
+}
+async function loadManifest(base = FACE_BASE) {
+  const response = await fetch(base + "face_presets.json");
+  if (!response.ok)
+    throw new Error("The face presets could not load");
+  const manifest = await response.json();
+  if (!validManifest(manifest))
+    throw new Error("The face presets are not a face manifest");
+  return manifest;
+}
+function canClose(part) {
+  return part.startsWith(EYE_PREFIX) && !UNBLINKING_EYES.includes(part);
+}
+function faceLayers(manifest, name, blinking) {
+  const face2 = manifest.faces[name];
+  if (!face2)
+    return [];
+  if (!blinking)
+    return face2.layers;
+  const closed = manifest.parts[BLINK_EYE].size;
+  const height = face2.source_size[1];
+  return face2.layers.map((layer) => canClose(layer.part) ? {
+    ...layer,
+    part: BLINK_EYE,
+    size: [closed[0] / height, closed[1] / height],
+    rotation_degrees: 0
+  } : layer);
+}
+var Blinker = class {
+  gaps;
+  closedSeconds;
+  random;
+  next = -1;
+  constructor(gaps = [2.4, 5.6], closedSeconds = 0.12, random = Math.random) {
+    this.gaps = gaps;
+    this.closedSeconds = closedSeconds;
+    this.random = random;
+  }
+  /** True while a blink closes the eyes at [seconds]; calls must move forward in time. */
+  closed(seconds) {
+    if (this.next < 0)
+      this.next = seconds + this.gap();
+    while (seconds >= this.next + this.closedSeconds)
+      this.next += this.closedSeconds + this.gap();
+    return seconds >= this.next;
+  }
+  gap() {
+    const [shortest, longest] = this.gaps;
+    return shortest + (Math.max(shortest, longest) - shortest) * this.random();
+  }
+};
+var FaceImages = class {
+  manifest;
+  base;
+  loaded;
+  images = /* @__PURE__ */ new Map();
+  constructor(manifest, base = FACE_BASE, loaded = () => {
+  }) {
+    this.manifest = manifest;
+    this.base = base;
+    this.loaded = loaded;
+  }
+  image(part) {
+    const entry = this.manifest.parts[part];
+    if (!entry)
+      return void 0;
+    let image = this.images.get(part);
+    if (!image) {
+      image = new Image();
+      image.addEventListener("load", this.loaded);
+      image.src = this.base + entry.file;
+      this.images.set(part, image);
+    }
+    return image;
+  }
+};
+function drawFace(context, images, layers, height) {
+  for (const layer of layers) {
+    const image = images.image(layer.part);
+    if (!image?.complete || !image.naturalWidth)
+      continue;
+    const width = layer.size[0] * height;
+    const tall = layer.size[1] * height;
+    context.save();
+    context.translate(layer.center[0] * height, layer.center[1] * height);
+    context.rotate(layer.rotation_degrees * Math.PI / 180);
+    if (layer.mirror)
+      context.scale(-1, 1);
+    context.drawImage(image, -width / 2, -tall / 2, width, tall);
+    context.restore();
+  }
+}
+
+// build/shape_paddle/rounded_bar.js
+var CORNER_SEGMENTS = 5;
+function roundedOutline(length, thickness, radius, segments = CORNER_SEGMENTS) {
+  const halfX = Math.max(length, 1e-4) / 2;
+  const halfY = Math.max(thickness, 1e-4) / 2;
+  const corner = Math.min(Math.max(radius, 0), halfX, halfY);
+  const innerX = halfX - corner;
+  const innerY = halfY - corner;
+  const centres = [
+    [innerX, innerY],
+    [-innerX, innerY],
+    [-innerX, -innerY],
+    [innerX, -innerY]
+  ];
+  const count = Math.max(1, Math.floor(segments));
+  const points = [];
+  centres.forEach(([x2, y2], index) => {
+    for (let step = 0; step <= count; step++) {
+      const angle = index * Math.PI / 2 + Math.PI / 2 * step / count;
+      points.push([x2 + Math.cos(angle) * corner, y2 + Math.sin(angle) * corner]);
+    }
+  });
+  return points;
+}
+function tracePath(context, outline) {
+  context.beginPath();
+  outline.forEach(([x2, y2], index) => {
+    if (index === 0)
+      context.moveTo(x2, -y2);
+    else
+      context.lineTo(x2, -y2);
+  });
+  context.closePath();
+}
+
+// build/shape_paddle/paddle.js
+function validLook(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  const look = value;
+  const colour2 = (text) => typeof text === "string" && /^[0-9a-f]{6}$/i.test(text);
+  return [
+    look.corner_ratio,
+    look.depth_ratio,
+    look.gap_ratio,
+    look.outline_ratio,
+    look.face_ratio
+  ].every((ratio) => Number.isFinite(ratio) && ratio >= 0 && ratio <= 3) && colour2(look.gap_color) && Array.isArray(look.outline_colors) && look.outline_colors.length === 3 && look.outline_colors.every(colour2) && Array.isArray(look.wall_colors) && look.wall_colors.length === 2 && look.wall_colors.every(colour2);
+}
+function paddleOutlines(shape) {
+  const { length, thickness, look } = shape;
+  const radius = thickness * look.corner_ratio;
+  const gap = thickness * look.gap_ratio;
+  const outline = gap + thickness * look.outline_ratio;
+  return [
+    roundedOutline(length + outline * 2, thickness + outline * 2, radius + outline),
+    roundedOutline(length + gap * 2, thickness + gap * 2, radius + gap),
+    roundedOutline(length, thickness, radius)
+  ];
+}
+function drawPaddle(context, shape, angle, images, layers) {
+  context.save();
+  context.rotate(angle);
+  const colours = [shape.outline, shape.look.gap_color, shape.body];
+  paddleOutlines(shape).forEach((outline, index) => {
+    tracePath(context, outline);
+    context.fillStyle = `#${colours[index].replace(/^#/, "")}`;
+    context.fill();
+  });
+  if (images)
+    drawFace(context, images, layers, shape.thickness * shape.look.face_ratio);
+  context.restore();
+}
+
+// build/005_3d_tilt_shift/fallback.js
+var FlatPaddleView = class {
+  canvas;
+  manifest;
+  frame;
+  context;
+  blinker = new Blinker();
+  images;
+  request = 0;
+  disposed = false;
+  constructor(canvas, manifest) {
+    this.canvas = canvas;
+    this.manifest = manifest;
+    this.context = canvas.getContext("2d");
+    this.images = manifest ? new FaceImages(manifest, void 0, () => this.draw()) : void 0;
+    this.request = requestAnimationFrame(this.tick);
+  }
+  update(frame) {
+    this.frame = frame;
+  }
+  dispose() {
+    this.disposed = true;
+    cancelAnimationFrame(this.request);
+  }
+  tick = () => {
+    if (this.disposed)
+      return;
+    this.draw();
+    this.request = requestAnimationFrame(this.tick);
+  };
+  draw() {
+    const context = this.context;
+    if (!context || !this.frame)
+      return;
+    const width = this.canvas.clientWidth;
+    const height = this.canvas.clientHeight;
+    const ratio = Math.min(devicePixelRatio || 1, 2);
+    if (this.canvas.width !== Math.round(width * ratio))
+      this.canvas.width = Math.round(width * ratio);
+    if (this.canvas.height !== Math.round(height * ratio))
+      this.canvas.height = Math.round(height * ratio);
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    context.clearRect(0, 0, width, height);
+    const { shape, angle, face: face2, resting } = this.frame;
+    const scale = Math.min(width, height) * (resting ? 0.6 : 0.82) / shape.length;
+    context.translate(width / 2, height / 2);
+    context.scale(scale, scale);
+    const layers = this.manifest ? faceLayers(this.manifest, face2, this.blinker.closed(performance.now() / 1e3)) : [];
+    drawPaddle(context, shape, angle, this.images, layers);
+  }
+};
+
+// build/005_3d_tilt_shift/types.js
+var WORLD_UNITS = 19.2;
+var PHASES = ["preparing", "countdown", "start", "active", "between_rounds", "finished"];
+var colour = (value) => typeof value === "string" && /^[0-9a-f]{6}$/i.test(value);
+var face = (value) => typeof value === "string" && /^face_[a-z]$/.test(value);
+var size = (value) => Array.isArray(value) && value.length === 2 && value.every((part) => Number.isFinite(part) && part > 0 && part <= 2);
+function validSnapshot(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  const v2 = value;
+  return v2.type === "tilt_shift_3d_snapshot" && typeof v2.generation === "string" && v2.generation.length > 0 && v2.generation.length <= 64 && Number.isSafeInteger(v2.sequence) && v2.sequence >= 0 && PHASES.includes(v2.phase) && Number.isInteger(v2.round) && v2.round >= 1 && v2.round <= 24 && (v2.team === 0 || v2.team === 1) && Number.isFinite(v2.angle_radians) && Array.isArray(v2.paddle_ids) && (v2.paddle_ids.length >= 1 || v2.selected === false) && v2.paddle_ids.length <= 5 && new Set(v2.paddle_ids).size === v2.paddle_ids.length && v2.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) && (v2.selected === void 0 || typeof v2.selected === "boolean") && (v2.round_token === void 0 || typeof v2.round_token === "string" && v2.round_token.length > 0 && v2.round_token.length <= 64) && [
+    v2.ready,
+    v2.ready_available,
+    v2.calibration_available,
+    v2.calibrated,
+    v2.usable,
+    v2.landscape
+  ].every((flag) => flag === void 0 || typeof flag === "boolean") && size(v2.paddle_size) && colour(v2.color) && face(v2.face) && validLook(v2.look);
+}
+function validPreparation(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  const v2 = value;
+  return typeof v2.generation === "string" && Number.isFinite(v2.angle_radians) && typeof v2.usable === "boolean" && typeof v2.calibrated === "boolean" && size(v2.paddle_size) && colour(v2.color) && face(v2.face) && validLook(v2.look);
+}
+function paddleShape(sizeInWidths, color, team, look) {
+  return {
+    length: sizeInWidths[0] * WORLD_UNITS,
+    thickness: sizeInWidths[1] * WORLD_UNITS,
+    body: color,
+    outline: look.outline_colors[Math.min(2, Math.max(0, team))],
+    look
+  };
+}
+
+// build/005_3d_tilt_shift/phone.js
+var NO_TEAM = 2;
+var TiltShift3DPhone = class {
+  surface;
+  stream;
+  sendReady;
+  load;
+  isLandscape;
+  canvas;
+  flat;
+  actions;
+  permission;
+  calibration;
+  ready;
+  state;
+  orientation;
+  presentation;
+  manifest;
+  mounting = 0;
+  mounted = false;
+  frame;
+  team = NO_TEAM;
+  generation;
+  sequence = -1;
+  preparing = false;
+  readyAvailable = false;
+  selected = true;
+  roundToken;
+  connected = false;
+  usable = false;
+  calibrated = false;
+  landscape = false;
+  isReady = false;
+  capture = "waiting";
+  constructor(surface, stream, sendReady, load, isLandscape = () => window.matchMedia("(orientation: landscape)").matches) {
+    this.surface = surface;
+    this.stream = stream;
+    this.sendReady = sendReady;
+    this.load = load;
+    this.isLandscape = isLandscape;
+    this.canvas = surface.querySelector("#tilt3d-paddle");
+    this.flat = surface.querySelector("#tilt3d-flat");
+    this.actions = surface.querySelector("#tilt3d-actions");
+    this.permission = surface.querySelector("#tilt3d-permission");
+    this.calibration = surface.querySelector("#tilt3d-calibrate");
+    this.ready = surface.querySelector("#tilt3d-ready");
+    this.state = surface.querySelector("#tilt3d-state");
+    this.orientation = surface.querySelector("#tilt3d-orientation");
+    this.permission.addEventListener("click", () => {
+      this.permission.disabled = true;
+      void this.stream.requestPermission().finally(() => this.buttons());
+    });
+    this.calibration.addEventListener("click", () => {
+      if (this.stream.requestCalibration(this.actionContext()))
+        this.calibration.disabled = true;
+    });
+    this.ready.addEventListener("click", () => {
+      if (this.ready.disabled)
+        return;
+      this.ready.disabled = true;
+      this.sendReady(!this.isReady, this.actionContext());
+    });
+  }
+  preparation(value, ready) {
+    if (!validPreparation(value))
+      return false;
+    this.generation = value.generation;
+    this.sequence = -1;
+    this.preparing = this.readyAvailable = this.selected = this.connected = true;
+    this.roundToken = void 0;
+    this.usable = value.usable;
+    this.calibrated = value.calibrated;
+    this.landscape = value.landscape === true;
+    this.capture = value.capture_state;
+    this.isReady = ready;
+    this.team = NO_TEAM;
+    this.show(value, value.angle_radians);
+    return true;
+  }
+  snapshot(value) {
+    if (!validSnapshot(value))
+      return false;
+    if (this.generation !== void 0 && value.generation !== this.generation)
+      return false;
+    if (value.sequence < this.sequence)
+      return false;
+    this.generation = value.generation;
+    this.sequence = value.sequence;
+    this.preparing = value.calibration_available === true;
+    this.readyAvailable = value.ready_available === true;
+    this.selected = value.selected !== false;
+    this.roundToken = value.round_token;
+    this.isReady = value.ready === true;
+    if (value.usable !== void 0)
+      this.usable = value.usable;
+    if (value.calibrated !== void 0)
+      this.calibrated = value.calibrated;
+    this.landscape = value.landscape === true;
+    this.connected = true;
+    this.team = value.team;
+    this.show(value, this.selected ? value.angle_radians : 0);
+    this.surface.hidden = value.phase === "finished";
+    return true;
+  }
+  feedback() {
+    const state = this.stream.controlState;
+    if (!state)
+      return;
+    this.capture = state.capture_state;
+    this.usable = state.usable;
+    this.calibrated = state.calibrated;
+    this.landscape = state.landscape === true;
+    this.buttons();
+  }
+  disconnect() {
+    this.connected = this.usable = false;
+    this.buttons();
+  }
+  hide() {
+    this.surface.hidden = true;
+    this.generation = void 0;
+    this.sequence = -1;
+    this.preparing = this.connected = this.usable = false;
+    this.mounting++;
+    this.mounted = false;
+    this.presentation?.dispose();
+    this.presentation = void 0;
+    this.frame = void 0;
+  }
+  /** The frame the phone draws now, for tests. */
+  currentFrame() {
+    return this.frame;
+  }
+  show(value, angle) {
+    this.frame = {
+      shape: paddleShape(value.paddle_size, value.color, this.team, value.look),
+      angle,
+      face: value.face,
+      resting: !this.selected
+    };
+    const [top, bottom] = value.look.wall_colors;
+    this.surface.style.setProperty("--tilt3d-wall", `linear-gradient(#${top}, #${bottom})`);
+    this.surface.hidden = false;
+    this.surface.setAttribute("data-waiting", String(!this.selected));
+    this.surface.setAttribute("data-team", String(this.team));
+    this.buttons();
+    if (!this.mounted) {
+      this.mounted = true;
+      this.mount();
+    }
+    this.presentation?.update(this.frame);
+  }
+  /**
+   * Draws in 3D once three.js and the faces load; without WebGL, or if either fails, the flat
+   * drawing takes over on its own canvas, since a canvas keeps the first kind of context it gets.
+   */
+  mount() {
+    const mounting = ++this.mounting;
+    this.canvas.hidden = this.flat.hidden = true;
+    void (async () => {
+      let next;
+      let flat = false;
+      try {
+        this.manifest ??= await loadManifest();
+        if (mounting !== this.mounting)
+          return;
+        next = await (await this.load()).createTiltPaddleView(this.canvas, this.manifest);
+      } catch {
+        if (mounting !== this.mounting)
+          return;
+        next = new FlatPaddleView(this.flat, this.manifest);
+        flat = true;
+      }
+      if (mounting !== this.mounting) {
+        next.dispose();
+        return;
+      }
+      this.presentation = next;
+      this.canvas.hidden = flat;
+      this.flat.hidden = !flat;
+      this.surface.setAttribute("data-view", flat ? "flat" : "3d");
+      if (this.frame)
+        next.update(this.frame);
+    })();
+  }
+  actionContext() {
+    return this.roundToken && this.generation ? { generation: this.generation, round_token: this.roundToken } : void 0;
+  }
+  buttons() {
+    const landscape = this.landscape && this.isLandscape();
+    this.orientation.hidden = !this.preparing;
+    this.orientation.textContent = landscape ? "Hold your phone in landscape while you get ready." : "Turn your phone to landscape. If it stays upright, turn off rotation lock.";
+    this.permission.hidden = this.usable;
+    this.permission.disabled = !this.connected || !this.stream.active;
+    this.calibration.hidden = !this.preparing;
+    this.calibration.disabled = !this.connected || !this.usable;
+    this.ready.hidden = !this.readyAvailable;
+    this.ready.disabled = !this.connected || !this.isReady && (!this.usable || !this.calibrated || !landscape);
+    this.ready.textContent = this.isReady ? "CANCEL" : "READY";
+    this.ready.setAttribute("aria-pressed", String(this.isReady));
+    this.actions.hidden = !this.preparing && this.usable || !this.selected && !this.preparing;
+    const blocked = {
+      insecure: "Motion needs a secure connection",
+      unsupported: "Motion is unavailable",
+      denied: "Motion access was denied",
+      error: "Motion access could not start",
+      unavailable: "Motion is unavailable",
+      degenerate_orientation: "Hold the screen toward you"
+    };
+    this.state.textContent = this.preparing && !this.usable ? blocked[this.capture] ?? "" : "";
+    this.state.hidden = !this.state.textContent;
   }
 };
 
@@ -916,7 +1398,7 @@ function validTiltSnapshot(value) {
     v2.calibrated,
     v2.usable,
     v2.landscape
-  ].every((flag) => flag === void 0 || typeof flag === "boolean") && v2.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) && Array.isArray(v2.paddle_size) && v2.paddle_size.length === 2 && v2.paddle_size.every((size) => Number.isFinite(size) && size > 0 && size <= 2);
+  ].every((flag) => flag === void 0 || typeof flag === "boolean") && v2.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) && Array.isArray(v2.paddle_size) && v2.paddle_size.length === 2 && v2.paddle_size.every((size2) => Number.isFinite(size2) && size2 > 0 && size2 <= 2);
 }
 var TiltShiftPhone = class {
   surface;
@@ -1010,7 +1492,7 @@ var TiltShiftPhone = class {
     this.landscape = value.landscape === true;
     this.capture = value.capture_state;
     this.angle = value.angle_radians;
-    if (Array.isArray(value.paddle_size) && value.paddle_size.length === 2 && value.paddle_size.every((size) => Number.isFinite(size) && size > 0))
+    if (Array.isArray(value.paddle_size) && value.paddle_size.length === 2 && value.paddle_size.every((size2) => Number.isFinite(size2) && size2 > 0))
       this.ratio = value.paddle_size[0] / value.paddle_size[1];
     this.isReady = ready;
     this.team = 2;
@@ -1173,8 +1655,8 @@ var SquircleV1Canvas = class {
   }
   draw(context, color, x2, y2, scale, timeMsec, blinking = false, rotation = 0) {
     const clip = this.clip;
-    const face = blinking ? this.blink : this.neutral;
-    if (!clip || !this.colorable.complete || !face.complete || !this.colorable.naturalWidth || !face.naturalWidth)
+    const face2 = blinking ? this.blink : this.neutral;
+    if (!clip || !this.colorable.complete || !face2.complete || !this.colorable.naturalWidth || !face2.naturalWidth)
       return false;
     const sheet = this.tint(color);
     if (!sheet)
@@ -1185,7 +1667,7 @@ var SquircleV1Canvas = class {
     context.save();
     context.translate(x2, y2);
     context.rotate(rotation);
-    for (const layer of [sheet, face])
+    for (const layer of [sheet, face2])
       context.drawImage(layer, sx, sy, this.tile[0], this.tile[1], -clip.anchor_px[0] * scale, -clip.anchor_px[1] * scale, this.tile[0] * scale, this.tile[1] * scale);
     context.restore();
     return true;
@@ -2230,7 +2712,7 @@ var lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJump
 });
 var gameplayMotion = new MotionStream(() => socket);
 window.addEventListener("pageshow", (event) => {
-  if (event.persisted && activeGame === "tilt_shift")
+  if (event.persisted && (activeGame === "tilt_shift" || activeGame === "tilt_shift_3d"))
     socket?.close();
 });
 var tiltSurface = document.querySelector("#tilt-shift");
@@ -2238,7 +2720,15 @@ var tiltPhone = new TiltShiftPhone(tiltSurface, gameplayMotion, (ready, context)
   if (socket?.readyState === WebSocket.OPEN)
     socket.send(JSON.stringify(context ? { type: "tilt_shift_ready", ready, ...context } : { type: "pre_minigame_ready", ready }));
 });
-gameplayMotion.onControlState = () => tiltPhone.feedback();
+var tilt3DSurface = document.querySelector("#tilt-shift-3d");
+var tilt3DPhone = new TiltShift3DPhone(tilt3DSurface, gameplayMotion, (ready, context) => {
+  if (socket?.readyState === WebSocket.OPEN)
+    socket.send(JSON.stringify(context ? { type: "tilt_shift_3d_ready", ready, ...context } : { type: "pre_minigame_ready", ready }));
+}, () => loadThreeView());
+gameplayMotion.onControlState = () => {
+  tiltPhone.feedback();
+  tilt3DPhone.feedback();
+};
 var motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);
 var pwa = new PwaOnboarding(document.querySelector("#app-screen"), document.querySelector("#install-button"), document.querySelector("#install-guidance"), document.querySelector("#browser-button"), () => {
   selectionScreen.hidden = false;
@@ -2247,6 +2737,14 @@ var pwa = new PwaOnboarding(document.querySelector("#app-screen"), document.quer
 });
 var bubble3DCard = document.querySelector("#bubbles-3d-card");
 var threeView;
+function loadThreeView() {
+  const url = "/three_view.js";
+  threeView ??= import(url).catch((error) => {
+    threeView = void 0;
+    throw error;
+  });
+  return threeView;
+}
 var bubble3DPhone = new BubblePhone(bubble3DCard, document.querySelector("#bubbles-3d-visual"), document.querySelector("#bubbles-3d-score"), document.querySelector("#bubbles-3d-fallback"), () => socket?.readyState === WebSocket.OPEN, () => {
   inputSeq += 1;
   store(STORAGE.inputSeq, String(inputSeq));
@@ -2254,14 +2752,7 @@ var bubble3DPhone = new BubblePhone(bubble3DCard, document.querySelector("#bubbl
 }, (message) => {
   if (socket?.readyState === WebSocket.OPEN)
     socket.send(JSON.stringify(message));
-}, () => {
-  const url = "/three_view.js";
-  threeView ??= import(url).catch((error) => {
-    threeView = void 0;
-    throw error;
-  });
-  return threeView;
-});
+}, () => loadThreeView());
 protectControllerSurface(bubble3DCard);
 function showBubble3D(message) {
   if (!isSnapshot(message)) {
@@ -2279,7 +2770,7 @@ function showBubble3D(message) {
   status.hidden = true;
   bubble3DPhone.receive(message);
 }
-for (const surface of [lobbyController, bubblesPad, readyCard, tiltSurface])
+for (const surface of [lobbyController, bubblesPad, readyCard, tiltSurface, tilt3DSurface])
   protectControllerSurface(surface);
 bindControllerLifecycle(() => cancelBubblesPointer());
 function stored(key) {
@@ -2337,6 +2828,8 @@ function setGameplaySurface(active, game = "bubbles") {
   const next = active ? game : null;
   if (next !== "tilt_shift")
     tiltPhone.hide();
+  if (next !== "tilt_shift_3d")
+    tilt3DPhone.hide();
   if (next !== "bubbles_3d")
     bubble3DPhone.hide();
   if (activeGame !== next) {
@@ -2349,7 +2842,8 @@ function setGameplaySurface(active, game = "bubbles") {
     } else if (document.fullscreenElement) {
       try {
         const orientation = screen.orientation;
-        const direction = next === "tilt_shift" ? "landscape" : "portrait";
+        const tilted = next === "tilt_shift" || next === "tilt_shift_3d";
+        const direction = tilted ? "landscape" : "portrait";
         void Promise.resolve(orientation?.lock?.(direction)).catch(() => {
         });
       } catch {
@@ -2361,6 +2855,7 @@ function setGameplaySurface(active, game = "bubbles") {
   document.documentElement.classList.toggle("bubbles-active", next === "bubbles");
   document.documentElement.classList.toggle("tilt-active", next === "tilt_shift");
   document.documentElement.classList.toggle("bubbles-3d-active", next === "bubbles_3d");
+  document.documentElement.classList.toggle("tilt-3d-active", next === "tilt_shift_3d");
 }
 function showJoin(message, focus = false) {
   gameplayMotion.stop();
@@ -2419,6 +2914,11 @@ function showReady(message) {
     tiltPhone.preparation(message.preparation, message.ready === true);
     return;
   }
+  if (message.minigame_id === "tilt_shift_3d" && message.preparation) {
+    showTiltSurface("tilt_shift_3d");
+    tilt3DPhone.preparation(message.preparation, message.ready === true);
+    return;
+  }
   gameplayMotion.stop();
   motionLab.stop();
   lobbyControls.deactivate();
@@ -2438,10 +2938,10 @@ function showReady(message) {
   readyButton.disabled = false;
   status.hidden = true;
 }
-function showTiltSurface() {
+function showTiltSurface(game = "tilt_shift") {
   motionLab.stop();
   lobbyControls.deactivate();
-  setGameplaySurface(true, "tilt_shift");
+  setGameplaySurface(true, game);
   selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = true;
   bubblesCard.hidden = readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
@@ -2450,6 +2950,10 @@ function showTiltSurface() {
 function showTilt(message) {
   if (tiltPhone.snapshot(message))
     showTiltSurface();
+}
+function showTilt3D(message) {
+  if (tilt3DPhone.snapshot(message))
+    showTiltSurface("tilt_shift_3d");
 }
 readyButton.addEventListener("click", () => {
   if (!socket || socket.readyState !== WebSocket.OPEN)
@@ -2892,10 +3396,10 @@ function renderBubbles(now) {
         const phase = index * 2.39996 + surfaceAngle * (0.55 + index % 3 * 0.2);
         const x2 = Math.cos(phase) * renderedRadius * (1.12 + index % 4 * 0.075);
         const y2 = Math.sin(phase) * renderedRadius * (1.12 + index % 4 * 0.075);
-        const size = 2.2 + index % 3 * 1.2;
-        drawArc(context, x2, y2, size, 0, Math.PI * 2, "rgba(204,250,255,.52)", 1.2);
+        const size2 = 2.2 + index % 3 * 1.2;
+        drawArc(context, x2, y2, size2, 0, Math.PI * 2, "rgba(204,250,255,.52)", 1.2);
         context.beginPath();
-        context.arc(x2 - size * 0.28, y2 - size * 0.3, 0.7, 0, Math.PI * 2);
+        context.arc(x2 - size2 * 0.28, y2 - size2 * 0.3, 0.7, 0, Math.PI * 2);
         context.fillStyle = "rgba(255,255,255,.7)";
         context.fill();
       }
@@ -3006,6 +3510,8 @@ async function connect() {
             showBubble3D(message.gameplay);
           else if (message.gameplay?.type === "tilt_shift_snapshot")
             showTilt(message.gameplay);
+          else if (message.gameplay?.type === "tilt_shift_3d_snapshot")
+            showTilt3D(message.gameplay);
           else if (message.gameplay?.type === "bubbles_snapshot")
             showBubbles(message.gameplay);
           else if (message.gameplay?.type === "pre_minigame_snapshot")
@@ -3052,6 +3558,8 @@ async function connect() {
         showReady(message);
       else if (message.type === "tilt_shift_snapshot")
         showTilt(message);
+      else if (message.type === "tilt_shift_3d_snapshot")
+        showTilt3D(message);
       else if (message.type === "motion_lab" && joined && typeof message.subscription_id === "string" && typeof message.send_hz === "number") {
         lobbyControls.deactivate();
         setGameplaySurface(false);
@@ -3073,6 +3581,7 @@ async function connect() {
           stale_msec: message.stale_msec ?? 1e3
         });
         tiltPhone.feedback();
+        tilt3DPhone.feedback();
       } else if (message.type === "motion_control_state") {
         if (typeof message.subscription_id === "string") {
           if (message.control_state)
@@ -3109,6 +3618,8 @@ async function connect() {
       motionLab.disconnect();
       if (activeGame === "tilt_shift")
         tiltPhone.disconnect();
+      else if (activeGame === "tilt_shift_3d")
+        tilt3DPhone.disconnect();
       else
         setGameplaySurface(false);
       if (socket === peer)

@@ -1,11 +1,13 @@
 extends TestScript
 ## The rounded bar builder: the outline keeps its corner radius whatever the length, the mesh
 ## and the collider follow the same outline, every triangle faces outwards, and a ball resting
-## on the bar meets its true top rather than a scaled box.
+## on the bar meets its true top rather than a scaled box. The outlines match the shared
+## fixture the phone's builder is checked against too.
 
 const LENGTH := 3.84
 const THICKNESS := 0.768
 const RADIUS := THICKNESS * 0.35
+const FIXTURE := "res://tests/fixtures/rounded_bar_outlines.json"
 
 
 func _run() -> void:
@@ -41,7 +43,21 @@ func _run() -> void:
 		check(absf(absf(point.z) - THICKNESS * 0.5) < 0.0001, "The collider has the bar's depth")
 	check(is_equal_approx(top, THICKNESS * 0.5), "The collider's top is the bar's top")
 
+	_check_fixture()
 	await _rest_on_bar()
+
+
+func _check_fixture() -> void:
+	var fixture: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(FIXTURE))
+	check(int(fixture.segments) == RoundedBar.CORNER_SEGMENTS, "The fixture's segments match")
+	for entry: Dictionary in fixture.cases:
+		var outline := RoundedBar.outline(entry.length, entry.thickness, entry.radius)
+		var expected: Array = entry.outline
+		var same := outline.size() == expected.size()
+		for index: int in mini(outline.size(), expected.size()):
+			var point := Vector2(expected[index][0], expected[index][1])
+			same = same and outline[index].distance_to(point) < 0.00001
+		check(same, "The outline matches the shared fixture at %s" % [entry.length])
 
 
 func _rest_on_bar() -> void:
