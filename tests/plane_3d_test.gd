@@ -1,7 +1,8 @@
 extends TestScript
 ## The plane-locked 3D body setup on real Jolt physics: locked bodies stay at depth zero
-## without turning, the edge walls stop bodies that mask their layer and let every other body
-## through, and a screen label sits above the node it follows.
+## without turning, or turning only about the depth axis when asked, the edge walls stop bodies
+## that mask their layer and let every other body through, and a screen label sits above the
+## node it follows.
 
 const BUBBLE_LAYER := 1 << 0
 const OTHER_LAYER := 1 << 1
@@ -30,6 +31,9 @@ func _run() -> void:
 	var passing := _ball(world, OTHER_LAYER, OTHER_LAYER, Vector3(0.0, 1.0, 0.0))
 	PlaneLock3D.lock(passing)
 	passing.linear_velocity = Vector3(6.0, 0.0, 0.0)
+	var turning := _ball(world, OTHER_LAYER, 0, Vector3(0.0, -1.0, 0.0))
+	PlaneLock3D.lock(turning, true)
+	turning.angular_velocity = Vector3(2.0, 3.0, 4.0)
 
 	for _frame: int in 120:
 		await physics_frame
@@ -39,6 +43,10 @@ func _run() -> void:
 		"A body that masks the wall layer stays inside the walls",
 	)
 	check(passing.global_position.x > 5.0, "A body that does not mask it passes through")
+	check(
+		not PlaneLock3D.is_on_plane(turning) and PlaneLock3D.is_on_plane(turning, 0.001, true),
+		"A body locked with turns kept turns only about the depth axis",
+	)
 
 	walls.bounds = Rect2(-2.0, -2.0, 4.0, 4.0)
 	check(
