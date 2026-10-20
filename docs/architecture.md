@@ -286,8 +286,6 @@ describes saving, explicit active selection and preview isolation.
   live in `assets/runtime/minigames/tilt_shift_3d/`. Their sources and provenance are in
   [art/tilt_shift_3d](../art/tilt_shift_3d/README.md). The host serves the face parts to the
   phone from `assets/runtime/shape_faces/`.
-- [GIMP regeneration and isolated export-pack checks](../art/bubbles/README.md) remain
-  separate from gameplay implementation.
 - `addons/standalone_build/` is the editor-only Windows builder.
   `addons/kenyoni/qr_code/` is the required vendored runtime QR dependency.
 - `tests/` holds focused headless, integration, policy and render checks of the shared code. A

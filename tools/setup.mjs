@@ -147,8 +147,8 @@ async function main() {
     print(ok ? "ok" : "-", text);
   print(
     "-",
-    "Python 3 with Pillow, GIMP 3, Blender, for regenerating art: not checked; " +
-      "see art/bubbles/README.md and art/squircle/README.md",
+    "Python 3 with Pillow, Blender, for regenerating art: not checked; " +
+      "see art/squircle/README.md and art/bubbles_3d/README.md",
   );
 
   if (required.some(({ ok }) => !ok)) {

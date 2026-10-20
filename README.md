@@ -46,7 +46,7 @@ Some tasks need more. The setup script reports these without failing:
 | Godot export templates matching the installed Godot | The standalone Windows build and `node tools/check.mjs --release` |
 | mkcert | Local HTTPS for motion input; `node tools/local_https.mjs download` fetches it, see [docs/local-https.md](docs/local-https.md) |
 | GitHub CLI (`gh`) | Pull requests from the terminal |
-| Python 3 with Pillow, GIMP 3, Blender | Regenerating art; see [art/bubbles/README.md](art/bubbles/README.md) and [art/squircle/README.md](art/squircle/README.md) |
+| Python 3 with Pillow, Blender | Regenerating art; see [art/squircle/README.md](art/squircle/README.md) and [art/bubbles_3d/README.md](art/bubbles_3d/README.md) |
 
 The vendored Godot MCP addon is disabled by default and is optional developer
 tooling; it is not required to launch or play the game.
@@ -69,7 +69,7 @@ tooling; it is not required to launch or play the game.
 
 The committed runtime assets are sufficient to run, edit, and test the game.
 Source-art regeneration is documented in
-`art/bubbles/README.md` and requires owner-provided originals.
+`art/squircle/README.md` and `art/bubbles_3d/README.md`.
 
 ## Start a local session
 
