@@ -26,7 +26,7 @@ at two. If WebGL or model loading fails, the count remains readable above a flat
 the player's color, sized by the host radius. See [browser-build.md](browser-build.md) for the
 separate bundle.
 
-## The Tilt Shift screen
+## The Tilt Shift 3D screen
 
 Preparation exposes Enable tilt, Set neutral and the host-confirmed READY/CANCEL action.
 Landscape orientation, current usable input and completed calibration are required by the
@@ -38,30 +38,21 @@ The selected-player panel inside gameplay has its own READY when open. Skipping 
 round panel does not skip initial preparation. Calibration remains available
 before active play and between rounds, and clears an existing READY.
 
-Gameplay shows one canonical team paddle as a movement guide, even when that player owns
-several factory paddles. Its crop, center pivot, end-cap fitting and proportions match the
-shared beam; its angle comes from the host. There are no touch gameplay controls or score HUD.
+Preparation explains landscape holding and unlocking rotation if needed. Portrait blocks READY
+on both phone and host, and rotating back while waiting clears READY. CANCEL remains available.
+Active play retains responsive portrait rendering and optional orientation lock.
 
-Spectators show a team-colored waiting visual with the guide hidden. Preparation explains
-landscape holding and unlocking rotation if needed. Portrait blocks READY on both phone and
-host, and rotating back while waiting clears READY. CANCEL remains available. Active play
-retains responsive portrait rendering and optional orientation lock.
-
-Mapped-round reconnect clears READY and retains neutral. Gameplay reconnect retains neutral and
-shows only a temporary permission action if capture needs reacquisition. Results, cancel
-and lobby return retire capture and hide the guide. Returning from a cached page reconnects
-through the authenticated subscription before capture can resume.
-
-## The Tilt Shift 3D screen
-
-Preparation, READY, calibration, landscape and reconnect behave as on the Tilt Shift screen,
-with their own buttons. The view shows the player's own paddle in real-time 3D over the cream
+The view shows the player's own paddle in real-time 3D over the cream
 wall gradient: their colour, the gap ring, their team outline once teams exist, and the face
-the host chooses. It turns with the host's physical angle and blinks on the phone.
+the host chooses. It turns with the host's physical angle and blinks on the phone. There are no
+touch gameplay controls or score HUD.
 
 Spectators see their paddle resting level, smaller, over the team-coloured waiting background.
-Results, cancel and lobby return hide the screen. The 3D view draws only when the paddle
-turns, its face changes or it blinks.
+Mapped-round reconnect clears READY and retains neutral. Gameplay reconnect retains neutral and
+shows only a temporary permission action if capture needs reacquisition.
+Results, cancel and lobby return retire capture and hide the screen. Returning from a cached
+page reconnects through the authenticated subscription before capture can resume. The 3D view
+draws only when the paddle turns, its face changes or it blinks.
 
 A phone without WebGL, or one whose 3D view fails to load twice, draws the same paddle and face
 flat on a 2D canvas. Phones wait a random moment of up to 1.5 seconds before their first

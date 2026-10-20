@@ -40,7 +40,7 @@ layouts in the workshop when the thickness changes.
 
 ## Delivery, catches and cleanup
 
-Delivery and scoring follow the 2D Tilt Shift exactly: the curves are integrated into midpoint
+The curves are integrated into midpoint
 quantiles, the positive curve spans the round minus the cutoff, the negative curve the whole
 round, and both share spawn bounds, gravity, contacts and positions. A seed repeats only the
 entry positions.

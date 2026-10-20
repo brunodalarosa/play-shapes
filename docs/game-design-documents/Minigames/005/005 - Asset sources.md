@@ -9,13 +9,13 @@ The models and images of [[005 - Tilt Shift 3D]], where each comes from and what
 | Shape paddle | None: generated in code | New reusable mesh and collider builder | Shared component folder |
 | Face parts | Owner-supplied PNGs in `art/shape_characters_face_system_assets/` | Vectorized, X-eye added, exported at 8×, preset manifest | Masters in `art/shape_characters_face_system_assets/vector/`, runtime `assets/runtime/shape_faces/` |
 | Bin | KayKit Restaurant Bits `crate` | Adapted in Blender into a three-part, flat-material bin | `art/tilt_shift_3d/crate/`, runtime `assets/runtime/minigames/tilt_shift_3d/crate/` |
-| Trash emblem | 003's `assets/runtime/minigames/003/baskets/trash_badge.png` | Copied unchanged | `assets/runtime/minigames/tilt_shift_3d/` |
+| Trash emblem | Owner-supplied trash badge | Unchanged | `assets/runtime/minigames/tilt_shift_3d/trash_badge.png` |
 | Ball | None: an engine low-poly sphere | None | — |
 | Factory wall | None: a plane with a gradient material | None | — |
 | Factory props | KayKit `pipe_90_A_blue`, `pipe_180_B_blue`, `pipe_end_blue`, `Parts_Cog`, `structure_C`, `watertower` | Copied unchanged; recoloured and scaled in the scene | `art/tilt_shift_3d/props/`, runtime `assets/runtime/minigames/tilt_shift_3d/props/` |
-| Booklet preview | `assets/runtime/pre_minigame/tilt_shift_preview.png` | Copied unchanged, temporarily | `assets/runtime/minigames/tilt_shift_3d/` |
+| Booklet preview | Owner-supplied 2D factory preview | Temporary placeholder until a 3D screenshot replaces it | `assets/runtime/minigames/tilt_shift_3d/tilt_shift_3d_preview.png` |
 
-All library sources are CC0-1.0 KayKit packs (Kay Lousberg) held in the owner's local asset library. Attribution is not required; keep each pack's license file beside its copy, as `art/playground_plaza/` does. The face assets and 003's art are the owner's own.
+All library sources are CC0-1.0 KayKit packs (Kay Lousberg) held in the owner's local asset library. Attribution is not required; keep each pack's license file beside its copy, as `art/playground_plaza/` does. The face assets, trash emblem and booklet preview are the owner's own.
 
 ## Required changes
 
@@ -53,7 +53,7 @@ No source edits. In the scene, materials are overridden with flat pale colours: 
 2. Copy only the selected source and the dependencies listed for it, plus the pack license file. Library originals stay unchanged.
 3. Keep unchanged copies and the adapted Blender source under `art/tilt_shift_3d/`, which Godot does not import. Put runtime files under `assets/runtime/minigames/tilt_shift_3d/` and `assets/runtime/shape_faces/` and add them to the standalone export policy.
 4. Record provenance in `art/tilt_shift_3d/README.md` and `art/shape_characters_face_system_assets/README.md`: source, path, hash, license and any change.
-5. Nothing here may change 003's assets, the plaza assets, 004's assets or the Squircle.
+5. Nothing here may change the plaza assets, 004's assets or the Squircle.
 
 ## Selected sources and hashes
 

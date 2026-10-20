@@ -28,7 +28,7 @@ builds/standalone/
 
 Before archiving, the builder verifies the external PCK, every browser module, the boot and
 lobby scenes, the QR dependency, the Bubbles and jellyfishes 3D scenes, scripts, models and
-audio, and the Tilt Shift and Tilt Shift 3D runtime assets. The Squircle manifest carries lever
+audio, and the Tilt Shift 3D runtime assets. The Squircle manifest carries lever
 hand positions.
 
 ## What the package includes

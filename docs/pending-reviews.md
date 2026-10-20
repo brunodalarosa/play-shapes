@@ -50,55 +50,11 @@ removes it. The evidence labels are defined in
   and `[HUMAN-PLAY]` roof reachability, ten-player readability and game feel. No Godot import
   or gameplay evidence is supplied by the standalone model delivery.
 
-## Tilt Shift rules
-
-- `[EDITOR]` Owner inspection of the rules profile, round mapping, geometry and neighbor
-  diagnostics. Automated Resource reload does not establish Inspector usability.
-- `[HUMAN-PLAY]` Owner tuning of duration/count and proximity, and strategic fairness
-  of ownership variety after gameplay integration.
-- `[HUMAN-PLAY]` Owner approval of A/B selection, spectator cadence, shared-paddle variety
-  and neutral rotation across 2/4/6/8/10 players. Synthetic fairness is not strategic fairness.
-- `[EDITOR]` Owner usability review of Tunables, per-layout dimensions, round mappings,
-  field explanations and saving/applying the same profile to runtime and preview.
-
-## Tilt Shift physics
-
-- `[HUMAN-PLAY]` Owner review of the 20-ball negative delivery curve, smooth 70% peak,
-  one-point penalty, brighter blue/white-rim visibility and enlarged ball contacts and routing.
-- `[EDITOR]` Owner usability review of negative color picker, separate count/curve controls and graph
-  in workshop Tunables, including save/apply and undo/redo.
-- `[EDITOR]` Owner inspection of the physics profile's units, delivery curve points,
-  materials and launch errors. Script save/reload and editor import do not prove usability.
-- `[HUMAN-PLAY]` Owner tuning of density, curve shape, dimensions, gravity, entry speed,
-  friction and restitution; routing coverage, fairness and full-turn control feel.
-- `[PHYSICAL-PHONE]` Responsiveness and physical-angle presentation once motion/phone
-  integration uses the arena's confirmed pose rather than its requested target.
-- `[EXPORTED-BUILD]` Physics and cleanup in the integrated Windows minigame.
-- `[EDITOR]` Owner usability review of the workshop, guide measurements, snap/tolerance
-  preferences and save/preview workflow. Scripted editor checks and captures do not
-  establish usability. The workshop now consumes the actual runtime arena.
-
-## Tilt Shift calibrated motion
-
-- `[PHYSICAL-PHONE]` Owner Chrome trials on Android and iPhone: verify normal lobby Start
-  shows shared preparation, portrait blocks READY, both landscape holds permit READY,
-  rotation lock guidance is sufficient, portrait revokes READY, and all-player readiness
-  transfers neutral into gameplay. Delay permission and test preparation reconnect/cancel.
-- `[PHYSICAL-PHONE]` Owner trials on supported iPhone and Android browsers: record versions,
-  comfortable sideways neutral, both holds, mirrored tilts, repeated full turns/reversal,
-  screen autorotation, off-axis tolerance, denial, background/lock and permission recovery.
-- `[PHYSICAL-PHONE]` Ten-phone load, end-to-end sensor delay and reconnect correction with
-  neutral preserved. Synthetic traffic and CPU measurements do not establish these results.
-- `[HUMAN-PLAY]` Owner approval of gain, filtering needs and target-versus-collider lag.
-  The initial gain is 1, with continuous mode and no extra smoothing.
-- `[EDITOR]` Owner inspection of the motion profile's units, valid ranges and launch errors.
-- `[EXPORTED-BUILD]` Calibrated control and lifecycle after readiness/phone integration.
-
 ## Phone screen wake protection
 
 - `[PHYSICAL-PHONE]` Owner Chrome trials on Android and iPhone over trusted HTTPS: leave
   onboarding, lobby, preparation, gameplay and results untouched beyond the phone's normal
-  screen timeout. Confirm the screen stays awake and Tilt Shift keeps sending input.
+  screen timeout. Confirm the screen stays awake and Tilt Shift 3D keeps sending input.
   Check app switching and return, reload, low-power refusal and installed-app behavior.
   Record device, OS and browser versions; synthetic locks do not establish OS behavior.
 
@@ -139,11 +95,15 @@ removes it. The evidence labels are defined in
 
 ## Tilt Shift 3D
 
-Everything below compares Tilt Shift 3D with Tilt Shift side by side.
-
-- `[HUMAN-PLAY]` Feel: tilting must be as responsive as in Tilt Shift on Jolt, including balls
-  rolling off the rounded ends and resting on the thicker paddles, and catches at the raised
-  floor.
+- `[HUMAN-PLAY]` Feel: tilting responsiveness on Jolt, including balls rolling off the rounded
+  ends and resting on the thicker paddles, and catches at the raised floor; density, curve
+  shape, negative delivery curve and one-point penalty, dimensions, gravity, entry speed,
+  friction and restitution; routing coverage, fairness and full-turn control feel; gain,
+  filtering needs and target-versus-collider lag.
+- `[HUMAN-PLAY]` Rules and fairness: duration, round count and proximity; strategic fairness of
+  ownership variety; A/B selection, spectator cadence, shared-paddle variety and neutral
+  rotation across 2/4/6/8/10 players; participant panel, countdown/START, catch/cutoff and
+  cumulative score/round/win/draw feedback.
 - `[HUMAN-PLAY]` Readability at couch distance with layout A and four players and layout B
   and six: paddle look, gap ring and team outline with every player colour on both teams,
   the grey automatic paddle, ball and bin contrast, the cream wall and props.
@@ -153,37 +113,26 @@ Everything below compares Tilt Shift 3D with Tilt Shift side by side.
 - `[HUMAN-PLAY]` Names: five seconds and the fade; overlap when two paddles sit close.
 - `[HUMAN-PLAY]` Layout spacing after the thicker paddles and raised floor, and every
   starting value in [the tuning guide](../minigames/005_3d_tilt_shift/tuning/README.md).
-- `[PHYSICAL-PHONE]` On the iPhone Safari and Android Chrome pair: the 3D paddle's rendering
-  and frame rate, the face parts loading over the LAN and HTTPS, motion responsiveness of the
-  turning paddle, spectators' resting paddle, and the flat drawing where WebGL is off.
-- `[EXPORTED-BUILD]` A Tilt Shift 3D shift played from the Windows package, with phones loading
-  `/three_view.js` and the face parts from it.
+- `[PHYSICAL-PHONE]` On the iPhone Safari and Android Chrome pair: normal lobby Start showing
+  shared preparation, portrait blocking and revoking READY, both landscape holds permitting
+  READY, rotation lock guidance, comfortable sideways neutral, mirrored tilts, repeated full
+  turns/reversal, screen autorotation, off-axis tolerance, denial/no-event paths,
+  background/lock and permission recovery.
+- `[PHYSICAL-PHONE]` On the same phone pair: selected-player READY/CANCEL, between-round
+  recalibration, neutral preservation on reconnect, timeout/force start, disconnected-angle
+  holds, ten-phone load, the 3D paddle's rendering and frame rate, the face parts loading over
+  the LAN and HTTPS, spectators' resting paddle, and the flat drawing where WebGL is off.
+- `[EXPORTED-BUILD]` A Tilt Shift 3D shift played from the Windows package, with real phones
+  loading `/three_view.js` and the face parts from it.
 - `[GODOT-RUNTIME]` Frame time on the target PC with `tilt_shift_3d_performance_check.gd`.
   On the development PC (RTX 5070, Core Ultra 7 265KF) ten players and 80 balls in 20 seconds
   averaged 0.62 ms per frame, 95th percentile 0.95 ms, with up to 118 draw calls.
-- `[EDITOR]` Usability of the Tilt Shift 3D workshop tab and its 3D preview.
-- The booklet preview is Tilt Shift's screenshot until the owner supplies a 3D one.
-
-## Tilt Shift art
-
-- `[PHYSICAL-PHONE]` One-paddle guide readability on a real landscape phone across
-  every supported roster, including shared-paddle participants and spectator transitions.
-- `[HUMAN-PLAY]` Couch-distance readability of balls, paddles and basket openings,
-  including different basket widths/counts and ten operator stations.
-- `[HUMAN-PLAY]` Both-side Squircle hand contact and lever travel when operating
-  animation consumes the documented art anchors.
-- `[EXPORTED-BUILD]` Run the integrated Tilt Shift presentation in a Windows package.
-
-## Tilt Shift factory presentation
-
-- `[HUMAN-PLAY]` Owner review of ball/paddle/basket readability at couch distance,
-  ownership badges, selected character colors, inward-facing operators and ten-player density.
-- `[HUMAN-PLAY]` Full-width basket routing, colored score numbers and deeper fronts at
-  FHD/HD/4:3. The default row has no gaps and catches by center at shared rims.
-- `[HUMAN-PLAY]` Lever loop, reversal and held poses on both sides; catch/cutoff and
-  cumulative score/round/win/draw feedback. Runtime captures do not establish feel.
-- `[PHYSICAL-PHONE]` Accepted-motion timing and shared-screen readability during real play.
-- `[EDITOR]` Owner inspection of `Presentation.tres` and the art-equipped workshop preview.
+- `[EDITOR]` Usability of the Tilt Shift 3D workshop tab, Tunables, negative color picker and
+  delivery curve controls, guide measurements, snap/tolerance preferences, save/apply,
+  undo/redo and its 3D preview, plus Inspector usability of the rules, physics and motion
+  profiles.
+- The booklet preview is a 2D factory screenshot until the owner supplies a 3D one.
+- Audio selection, whistle playback and listening remain deferred.
 
 ## Platform movement in the lobby
 
@@ -226,20 +175,6 @@ changed. A pixel comparison with the previous sheets found nothing a viewer shou
 - The source opened in Blender by someone who edits it: the scene, the actions and the face
   images are found under their new names. No evidence label covers Blender.
 
-## Tilt Shift phone and complete flow
-
-- `[PHYSICAL-PHONE]` Chrome on iPhone and Android: real gesture permission, denied/no-event
-  paths, comfortable sideways neutral, portrait/landscape changes, repeated full turns,
-  gameplay reconnect without neutral reset, lock/background/foreground and lobby cleanup.
-  Record exact device, OS and browser versions. Synthetic Chromium events do not cover this.
-- `[HUMAN-PLAY]` One-paddle phone guide readability and responsiveness, the provisional
-  countdown/START, participant panel, team waiting visuals and fairness with both layouts.
-- `[PHYSICAL-PHONE]` Selected-player READY/CANCEL, between-round recalibration, neutral
-  preservation on reconnect, timeout/force start and disconnected-angle holds.
-- `[EXPORTED-BUILD]` Physical-phone play against the Windows executable; desktop
-  export/pack checks do not establish this real-device journey.
-- Audio selection, whistle playback and listening remain deferred.
-
 ## Phone client
 
 Record the exact OS and browser versions for each row.
@@ -273,7 +208,7 @@ device.
 
 ## Debug screens
 
-- `[GODOT-RUNTIME]` Owner visual review of Tilt Shift simulated controls: automatic countdown,
+- `[GODOT-RUNTIME]` Owner visual review of Tilt Shift 3D simulated controls: automatic countdown,
   paddle motion, later rounds, restart and lobby return. Automated progression uses shortened
   in-memory timing and does not establish presentation or game feel.
 - `[GODOT-RUNTIME]` A look at the text of the animation lab note, the motion lab readings and

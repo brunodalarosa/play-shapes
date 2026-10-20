@@ -62,5 +62,4 @@ the shared face manifest; the workshop offers them by name.
 
 Positions are measured from the arena's top-left; both axes use one arena width. The arena is
 `1 × 0.5625` and fills the frame edge to edge; the floor sits the bin band above the bottom.
-Neighbors and fairness work as in the 2D Tilt Shift: balanced counts are mandatory, and
-same-owner neighbors are minimised within them.
+Balanced counts are mandatory, and same-owner neighbors are minimised within them.

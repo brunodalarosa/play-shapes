@@ -79,7 +79,7 @@ on the phone ([0035](decisions/0035-phone-three-js.md)). Its design is in
 play review; tuning values are provisional and the Pre-minigame preview image is still a 2D
 placeholder.
 
-Minigame 005, Tilt Shift 3D, the last step of the 3D rework, is built beside 003: the same game
+Minigame 005, Tilt Shift 3D, replaced the retired 2D version, 003: the same game
 on plane-locked Jolt physics ([0038](decisions/0038-tilt-shift-3d-full-width-frame.md)), with
 each player shown as their own coloured paddle built in code
 ([0036](decisions/0036-tilt-shift-3d-generated-paddle.md)) and carrying a part-composed,
@@ -87,29 +87,9 @@ expressive face ([0037](decisions/0037-shape-face-system.md)), in a full-width t
 
 Each phone shows the player's own paddle in 3D. 005 has its own workshop tab and F12 review, and
 launches through a catalog session script ([0039](decisions/0039-minigame-session-scripts.md)).
-It awaits physical-phone checks and the owner's side-by-side play review; tuning values are
-provisional and the Pre-minigame preview image is still 003's. Once 005 is approved, 003 is
-retired.
-
-## Tilt Shift foundation
-
-Host rules and editable content exist for Tilt Shift: equal teams, balanced rotating
-paddle assignments, immediate deadlines and cumulative team scoring. A shared physics
-arena adds falling/colliding balls, full-turn paddles, basket catches and seeded delivery.
-
-Calibrated multiplayer motion has its host consumer and reusable browser stream, with
-per-player neutral, continuous turns, bounded comparison, reconnect policy and lifecycle.
-The editor workshop provides snapped content editing, geometry guides, named saves and
-actual gameplay preview.
-
-The catalog now connects motion preparation and host-validated readiness to the factory,
-mapped rounds, cumulative results and return to the lobby.
-The default rounds alternate two authored layouts with fair participant selection,
-selected-player readiness, countdown and automatic neutral rotation. The workshop exposes
-runtime settings through a Tunables tab. Selected phones show one paddle; spectators wait.
-Audio remains deferred; real-phone
-accuracy, permission, comfort and owner readability/feel await trials.
-See [the rules contract](../minigames/003_tilt_shift/README.md).
+It awaits physical-phone checks and the owner's play review; tuning values are provisional and
+the Pre-minigame preview image is still a 2D placeholder. See
+[the minigame guide](../minigames/005_3d_tilt_shift/README.md).
 
 ## Backlog
 
@@ -145,18 +125,14 @@ its red error panel for the rest of the session. Two cases are known:
 Late input after a phase change should be dropped quietly. The end-to-end test avoids both
 cases on purpose; fixing the bug means removing those two waits.
 
-On Windows with Godot 4.7.2, `tilt_shift_rules_test` and `tilt_shift_motion_test` have exited with code
-`3221225477` during native shutdown after printing zero assertion failures. It also
-reproduces for the rules test in a fresh, fully imported copy of the rules-only commit. Treat that exit as
-a failed check, retain its log and report it separately from assertion results; its
-cause remains unresolved.
+On Windows with Godot 4.7.2, Tilt Shift 3D's tests, such as `tilt_shift_3d_delivery_test`,
+`tilt_shift_3d_protocol_test` and `tilt_shift_3d_presentation_test`, have intermittently exited
+with code `3221225477` during native shutdown after printing zero assertion failures; a rerun
+usually passes. Treat that exit as a failed check, retain its log and report it separately from
+assertion results; its cause remains unresolved.
 
-The same intermittent exit now also appears in `tilt_shift_flow_test` and in Tilt Shift 3D's
-copied tests, such as `tilt_shift_3d_delivery_test`, `tilt_shift_3d_protocol_test` and
-`tilt_shift_3d_presentation_test`, again after zero failures; a rerun usually passes.
-
-In a whole `node tools/check.mjs --full` run, the larger emulated-phone rosters of both Tilt
-Shift versions have intermittently failed with one phone's READY never enabling, because its
+In a whole `node tools/check.mjs --full` run, the larger emulated-phone rosters of Tilt
+Shift 3D have intermittently failed with one phone's READY never enabling, because its
 calibration did not take. The same rosters pass when run on their own. Report such a failure
 with its trace rather than as a pass.
 

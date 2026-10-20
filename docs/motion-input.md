@@ -1,7 +1,7 @@
 # Motion input
 
-How the phone's gyroscope and accelerometer readings reach the host, the units they use, and
-the F12 lab that displays them, and Tilt Shift's calibrated control consumer.
+How the phone's gyroscope and accelerometer readings reach the host, the units they use,
+the F12 lab that displays them, and Tilt Shift 3D's calibrated control consumer.
 Capture runs only for a host-selected consumer. Phone browsers expose these sensors only
 over HTTPS; see [local-https.md](local-https.md).
 
@@ -46,9 +46,9 @@ Gameplay capture skips sends whenever WebSocket bytes are queued. The lab retain
 8192-byte backpressure threshold. A resumed timer samples current data without catch-up.
 Feedback and stop messages match their subscription generation.
 
-## Tilt Shift control
+## Tilt Shift 3D control
 
-`TiltShiftMotionController.prepare(service, ids, profile)` starts capture and fresh
+`TiltShift3DMotionController.prepare(service, ids, profile)` starts capture and fresh
 per-player calibration state. `player_state(id)` exposes `capture_state`, `usable` and
 `calibrated` and `landscape`; `ready_for(id)` requires usable capture, completed calibration
 and a landscape display orientation. Portrait does not change the physical tilt calculation.
@@ -61,9 +61,9 @@ It sends host-owned unwrapped angles through the rules controller; all assigned 
 receive the same target. The existing physical limiter determines their confirmed poses.
 
 Control uses the direction of world up projected into the physical screen plane. Clockwise
-rotation as seen by the holder maps to clockwise 2D rotation. Yaw and display autorotation
+rotation as seen by the holder maps to clockwise rotation on screen. Yaw and display autorotation
 alone do not change the phase. Repeated sampled turns accumulate without a rotation stop.
-See [the tuning guide](../minigames/003_tilt_shift/tuning/MOTION.md).
+See [the tuning guide](../minigames/005_3d_tilt_shift/tuning/MOTION.md).
 
 Complete, fresh orientation is required. Unknown permission may be proven usable by samples;
 denied, unavailable, unsupported, insecure, missing and partial orientation remain distinct.
@@ -81,9 +81,9 @@ channels, listeners and calibration. A later preparation starts fresh. The consu
 state-change feedback at most five times/s, plus calibration replies limited to five/s;
 a new subscription receives fresh feedback. No per-frame angle snapshots are added.
 
-## Tilt Shift preparation lifecycle
+## Tilt Shift 3D preparation lifecycle
 
-The normal catalog flow uses TiltShiftSession to keep the same motion consumer across
+The normal catalog flow uses `TiltShift3DSession` to keep the same motion consumer across
 the shared all-player Pre-minigame screen to factory transition. Final joins from existing onboarding sockets
 receive new isolated channels without resetting earlier players. Expired preparation
 participants lose their channels. READY is revoked when capture becomes stale, unusable or portrait.
@@ -99,7 +99,7 @@ the complete countdown starts. Later rounds reuse calibration and retain their p
 Older shared-gate preparation retains its original neutral-reset policy.
 Host cancel, scene startup failure, results, debug replacement and return to the lobby retire
 the prepared consumer. The F12 factory review is explicitly simulated and creates no motion
-subscriptions. See [flow tuning](../minigames/003_tilt_shift/tuning/FLOW.md).
+subscriptions. See [flow tuning](../minigames/005_3d_tilt_shift/tuning/FLOW.md).
 
 ## Units and axes
 

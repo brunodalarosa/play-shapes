@@ -14,9 +14,9 @@ The host picks a minigame, everyone readies on the shared Pre-minigame screen, t
 results and return to the lobby.
 
 - Minigame 004, Bubbles and jellyfishes 3D: 2–10 players, portrait swipe gestures, Jolt 3D plane physics.
-- Minigame 005, Tilt Shift 3D, and 003, Tilt Shift: 2/4/6/8/10 players, landscape phone tilt over HTTPS motion sensors,
+- Minigame 005, Tilt Shift 3D: 2/4/6/8/10 players, landscape phone tilt over HTTPS motion sensors,
   an editor workshop addon.
-- 001 and 002 are retired. Minigame numbers are stable identifiers and are never reused.
+- 001, 002 and 003 are retired. Minigame numbers are stable identifiers and are never reused.
 
 Everything shipping today is 2D: pre-rendered Squircle sprite sheets, painted lobby layers,
 `CharacterBody2D` platforming in pixels.

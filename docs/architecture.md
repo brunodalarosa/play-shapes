@@ -11,7 +11,7 @@ Messages and limits are in [protocol.md](protocol.md).
 - A catalog definition may name a `session_script`. SessionHost creates that session on first
   use and lets it prepare players, gate READY and the launch, and follow the roster, from the
   Pre-minigame screen into play ([decision 0039](decisions/0039-minigame-session-scripts.md)).
-  Tilt Shift 3D uses one; Tilt Shift keeps its own branch until it is retired.
+  Tilt Shift 3D uses one.
 - `host/http_service.gd` serves a fixed asset allowlist with bounded requests. It never serves
   a client-selected filesystem path.
 - `host/websocket_service.gd` owns bounded protocol-1 peers and messages. It resolves each
@@ -124,20 +124,28 @@ with plane-locked bodies ([decision 0034](decisions/0034-bubbles-3d-jolt-plane.m
 
 ## Tilt Shift 3D
 
-Minigame 005 rebuilds Tilt Shift in 3D, in `minigames/005_3d_tilt_shift/`. Its rules are the
-2D Tilt Shift's, copied and renamed; it shares no code, scene, resource, message or phone
-module with 003, and `tests/tilt_shift_3d_independence_test.gd` in its folder checks that.
-[Its README](../minigames/005_3d_tilt_shift/README.md) lists what each script owns.
+Minigame 005 is Tilt Shift in 3D, in `minigames/005_3d_tilt_shift/`.
+[Its README](../minigames/005_3d_tilt_shift/README.md) lists what each script owns, and its
+selected Resources are in the [field guide](../minigames/005_3d_tilt_shift/tuning/README.md).
 
+- `tilt_shift_3d_shift_controller.gd` owns equal teams, frozen shift content, layout exposure
+  history, participant selection, readiness, countdown, round deadlines, cumulative scores,
+  ball resolution, assignments and held angles. The allocator returns inspectable neighbor and
+  conflict diagnostics.
 - The arena simulates on Jolt with plane-locked bodies, as 004 does, and fills the frame with
   the floor raised for the bins ([decision 0038](decisions/0038-tilt-shift-3d-full-width-frame.md)).
 - Paddles are rounded bars built in code with a matching convex collider
   ([decision 0036](decisions/0036-tilt-shift-3d-generated-paddle.md)), each with a composed face
   ([decision 0037](decisions/0037-shape-face-system.md)).
+- `TiltShift3DMotionController` owns capture preparation, calibration and active-consumer
+  lifecycle; each `TiltShift3DTiltInput` holds one player's neutral and continuous input. See
+  [motion input](motion-input.md#tilt-shift-3d-control).
 - `tilt_shift_3d_session.gd` is the catalog's session script; `tilt_shift_3d_protocol.gd` is a
   `MinigameProtocol`. The messages are in [protocol.md](protocol.md#tilt-shift-3d).
-- `addons/tilt_shift_3d_workshop/` is its editor workshop, and `debug/tilt_shift_3d_review.tscn`
-  its simulated F12 review.
+- `addons/tilt_shift_3d_workshop/` is its editor workshop
+  ([workshop guide](../minigames/005_3d_tilt_shift/tuning/WORKSHOP.md)), and
+  `debug/tilt_shift_3d_review.tscn` is its simulated F12 review. See
+  [player journeys](player-journeys.md).
 
 ## Shared 3D components
 
@@ -156,35 +164,6 @@ These live outside any minigame folder so later 3D scenes can use them.
   face parts and presets, `ShapeFaceExpressions` keeps timed expressions with priorities and
   natural blinks, and `ShapeFace3D` and `ShapeFace2D` draw a face in 3D or in a Control.
 
-## Tilt Shift rules
-
-`minigames/003_tilt_shift/tilt_shift_shift_controller.gd` owns equal teams, frozen
-shift content, layout exposure history, participant selection, readiness, countdown,
-round deadlines, cumulative scores, ball resolution, assignments and held angles.
-The [rules contract](../minigames/003_tilt_shift/README.md)
-describes its typed host calls and signals for later consumers.
-
-The allocator returns inspectable neighbor/conflict diagnostics. Selected Resources
-are in the [field guide](../minigames/003_tilt_shift/tuning/README.md).
-
-`TiltShiftArena` owns shared physics and delivery beneath its rules controller.
-`TiltShiftMotionController` owns capture preparation, calibration and active-consumer
-lifecycle; each `TiltShiftTiltInput` holds one player's neutral and continuous input.
-It consumes WebsocketService's keyed raw channels and supplies validated host angles
-to the rules. See [motion input](motion-input.md#tilt-shift-control).
-
-`TiltShiftPresentation` wraps the arena with imported factory artwork, physical-body
-beam visuals, one cosmetic operator per participant and host-derived score/time/result
-feedback. The editor workshop gameplay preview uses that same presentation scene.
-
-`TiltShiftSession`, a SessionHost child, carries preparation into the gameplay wrapper,
-attaches mapped rounds after shared all-player readiness, routes round readiness and retires
-capture on results or exit.
-Preparation transitions remain in the round controller. `TiltShiftProtocol`
-copies accepted state into personalized snapshots. The catalog lists the normal
-2/4/6/8/10-player entry; the separately labeled F12 review uses simulated controls.
-See [player journeys](player-journeys.md).
-
 ## Characters
 
 - `characters/character_selection.gd` normalizes missing and legacy shapes to Squircle while
@@ -201,7 +180,7 @@ See [player journeys](player-journeys.md).
 - `characters/squircle_v1_playback.tscn` plays manifest-owned sheets in the ready screen,
   results and the Animation Lab.
 - The canonical editable model and actions are in `art/squircle/squircle-animated.blend`.
-  30 runtime sheets and their frame and anchor manifest live in
+  36 runtime sheets and their frame and anchor manifest live in
   `assets/runtime/animated_characters/squircle/v1/`. The ready screen and the phone consume
   that same v1 set. `art/squircle/export_glb.py` exports the rigged model to `model/` in that
   folder.
@@ -231,7 +210,7 @@ See [player journeys](player-journeys.md).
 - **Tilt Shift 3D factory · simulated controls** opens `debug/tilt_shift_3d_review.tscn`: ten
   synthetic players tilt through a whole shift, with no phones and no launch eligibility.
 - **Animation Lab** opens `debug/animation_lab/animation_lab.tscn`.
-  - It inspects the manifest's ten Squircle v1 action and view pairs at 256, 128 and the actual
+  - It inspects the manifest's twelve Squircle v1 action and view pairs at 256, 128 and the actual
     lobby scale (0.58).
   - It has color, natural or forced blink, pause, speed, and release and re-enter controls.
   - It uses `SquircleV1Playback` directly.
@@ -247,29 +226,16 @@ See [player journeys](player-journeys.md).
   [browser-build.md](browser-build.md).
 - The phone onboarding keeps the socket available while players choose a Squircle color and
   enter a name. The host creates the player record only on the final join submission.
-- Ordinary ready-up shows one host-confirmed READY/CANCEL toggle. Tilt Shift additionally
-  exposes permission and neutral calibration; its phone shows one canonical team paddle
-  as a movement guide. Preview and instructions remain on the shared screen.
-- Tilt Shift 3D keeps the same preparation and shows the player's own paddle in 3D through
-  `web/src/005_3d_tilt_shift/`, with a flat drawing without WebGL. `web/src/shape_paddle/`
-  holds the rounded outline and the face composition; `web/src/three_view/shape_paddle.ts`
-  draws them with three.js.
+- Ordinary ready-up shows one host-confirmed READY/CANCEL toggle. Preview and instructions
+  remain on the shared screen.
+- Tilt Shift 3D additionally exposes permission and neutral calibration, and shows the player's
+  own paddle in 3D through `web/src/005_3d_tilt_shift/`, with a flat drawing without WebGL.
+  `web/src/shape_paddle/` holds the rounded outline and the face composition;
+  `web/src/three_view/shape_paddle.ts` draws them with three.js.
 - `web/src/squircle_v1.ts` draws manifest-owned front idle sheets in setup.
 - `web/src/screen_wake_lock.ts` owns one visible-page wake lock across every phone screen,
   independent of the active minigame or socket. It adds no host state or messages.
 - What the phone screens do is in [phone-client.md](phone-client.md).
-
-## Tilt Shift
-
-Tilt Shift's [host contract](../minigames/003_tilt_shift/README.md) describes its separate
-rules controller and shared gameplay/preview physics arena. The arena owns live bodies and
-delivery; its controller owns rounds, assignments, deadlines and scores. Physics snapshots
-copy the launch-frozen selected profile; no extra autoload or network message is involved.
-
-`addons/tilt_shift_workshop/` owns editor-only deep-copied drafts and geometry guides.
-Its separate preview process runs the same arena/controller with designer input; it
-does not start phone services. [The workshop guide](../minigames/003_tilt_shift/tuning/WORKSHOP.md)
-describes saving, explicit active selection and preview isolation.
 
 ## Assets, addons and tests
 

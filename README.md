@@ -4,9 +4,8 @@ Play Shapes is a local-network multiplayer party game. The Godot application
 runs the authoritative host on a PC, while players use their phones as web
 controllers.
 
-The lobby starts **004 — Bubbles and jellyfishes 3D**, **005 — Tilt Shift 3D** and
-**003 — Tilt Shift**. The shared PC display shows the round; phones provide touch or motion
-controls.
+The lobby starts **004 — Bubbles and jellyfishes 3D** and **005 — Tilt Shift 3D**. The shared
+PC display shows the round; phones provide touch or motion controls.
 
 ## Requirements
 

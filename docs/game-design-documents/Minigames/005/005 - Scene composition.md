@@ -71,4 +71,4 @@ The paddle mesh builder and the face component are reusable components. The crat
 
 ## Human review
 
-The owner judges the result in the running game, side by side with 003: readability at couch distance with 4 and 6 players, the paddle look and outline, the faces and their timing, the name fade, the cream factory mood, and frame rate. Automated checks cannot approve these.
+The owner judges the result in the running game: readability at couch distance with 4 and 6 players, the paddle look and outline, the faces and their timing, the name fade, the cream factory mood, and frame rate. Automated checks cannot approve these.

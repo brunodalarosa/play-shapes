@@ -19,7 +19,7 @@ Read the selected minigame's design when changing its controls or round sequence
 
 Every normal minigame launch follows the shared Pre-minigame screen, gameplay, then results.
 The initial screen shows the preview, instructions and all-player READY status. Readiness
-checks inside gameplay, including Tilt Shift's selected-player round panels, do not replace it.
+checks inside gameplay, including Tilt Shift 3D's selected-player round panels, do not replace it.
 
 There is no player setting to skip the initial screen. Debug launch paths may bypass it.
 See [decision 0032](decisions/0032-mandatory-pre-minigame-screen.md).

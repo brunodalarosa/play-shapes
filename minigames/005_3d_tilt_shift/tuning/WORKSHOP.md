@@ -134,7 +134,7 @@ Editor code lives in `addons/tilt_shift_3d_workshop/`. Runtime Resources and the
 arena remain in the minigame. Exports exclude the workshop and scratch content while
 retaining usable runtime content.
 
-`node tools/verify_tilt_shift_workshop.mjs 3d` runs scripted interactions in two normal
+`node tools/verify_tilt_shift_3d_workshop.mjs` runs scripted interactions in two normal
 editor launches, verifies save/reopen and preview cleanup, and writes captures below
 `test-results/tilt-shift-3d/workshop/`. It temporarily enables its test plugin and restores
 `project.godot` afterward. Run it with other project editors closed.

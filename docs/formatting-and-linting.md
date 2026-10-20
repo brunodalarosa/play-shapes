@@ -11,7 +11,7 @@ node tools/format.mjs --check   # change nothing; list the unformatted files
 ```
 
 - GDScript: every file outside `addons/`, plus the project's owned
-  `addons/tilt_shift_workshop/`, with the GDQuest GDScript formatter.
+  `addons/tilt_shift_3d_workshop/`, with the GDQuest GDScript formatter.
 - TypeScript, JavaScript, HTML and CSS: the sources of `web/` and `tools/`, with Prettier.
 - Both wrap at 100 characters.
 - `.editorconfig` states the same rules for editors.

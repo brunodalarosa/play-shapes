@@ -28,7 +28,7 @@ player ID is rejected. The raw sample/status schema is shared with the lab.
 - `motion_status`: current subscription, capture/network diagnostics and transmission rate.
   At most five accepted status messages/s; the browser normally sends about four/s.
 - `motion_calibrate`: `type` and current `subscription_id`. At most five requests/s.
-  Mapped Tilt Shift rounds additionally require current `generation` and `round_token`.
+  Mapped Tilt Shift 3D rounds additionally require current `generation` and `round_token`.
   The host chooses its latest usable orientation; active calibration is rejected.
 - `motion_control_state`: host feedback with current subscription and `control_state`,
   containing `calibrated`, `usable` and `capture_state`. Calibration replies also contain
@@ -37,8 +37,8 @@ player ID is rejected. The raw sample/status schema is shared with the lab.
 
 Samples are accepted no faster than every 34 ms; the raw transport stale threshold is
 1000 ms. Latest-only burst handling and browser backpressure avoid catch-up replay.
-Capture failure states and Tilt Shift's shorter continuity gap are documented in
-[motion-input.md](motion-input.md#tilt-shift-control).
+Capture failure states and Tilt Shift 3D's shorter continuity gap are documented in
+[motion-input.md](motion-input.md#tilt-shift-3d-control).
 
 ## Defaults
 
@@ -82,8 +82,6 @@ The host serves a fixed list and nothing else:
   `/squircle-v1/idle-front-neutral.png`, `/squircle-v1/idle-front-blink.png`.
 - 3D models for the phone: `/models/squircle.glb`, `/models/jellyfish.glb`,
   `/models/squircle-face-neutral.png` and `/models/squircle-face-blink.png`.
-- Tilt Shift art: `/tilt-shift/manifest.json`, `/tilt-shift/paddle_orange.png`,
-  `/tilt-shift/paddle_blue.png` and `/tilt-shift/paddle_neutral.png`.
 - Shape character faces: `/shape_faces/face_presets.json` and one
   `/shape_faces/facial_part_<name>.png` per part the manifest lists, from the shared runtime
   folder.
@@ -150,49 +148,17 @@ During ready-up, a registered phone sends `{"type":"pre_minigame_ready","ready":
 - Disconnect and resume clear the ready state.
 - Host cancel restores the lobby state on connected phones.
 
-## Tilt Shift state
-
-Every normal Tilt Shift launch uses the shared all-player Pre-minigame gate before freezing
-an even roster and opening the factory. Its round controller owns subsequent selected-player
-readiness. Sensor status and samples use the existing
-authenticated subscriptions.
-
-`tilt_shift_snapshot` carries generation, increasing sequence, phase, round, team,
-accepted angle in radians, owned paddle IDs and physical paddle length/thickness.
-Mapped snapshots also carry `round_token`, `selected`, `ready`, `ready_available`,
-`calibration_available`, `calibrated`, `usable` and `landscape`. Phases include `preparing`, `countdown`,
-`start`, `active`, `between_rounds` and `finished`. Spectators have empty owned IDs and
-show a team waiting visual with no paddle guide. Selected phones show one guide.
-
-No client-authored
-angle, team, assignment or score message is accepted. Obsolete snapshot generations
-or sequences cannot replace the current phone view.
-
-`tilt_shift_ready` carries exactly `type`, current `generation`, `round_token` and Boolean
-`ready`. The connection supplies identity. Only selected players in a visible ready panel
-can change readiness. Fresh usable calibration and landscape are required; recalibration,
-disconnection, portrait or stale capture clears READY. Countdown start is final even if a
-player then disconnects.
-The panel timeout runs once from opening; force start is a local host action, not a message.
-
-Angle updates coalesce to the latest state at the selected flow ceiling, 15 Hz by default.
-Queued socket output skips that update rather than accumulating a backlog. Round and
-resume transitions send current state immediately. Calibration is available before and
-between active rounds, including countdown and START; it is locked during scoring.
-Reconnect preserves neutral and does not recover unseen complete turns.
-
-`landscape` is derived from the authenticated motion sample's `screen_angle`: either
-quarter-turn display orientation qualifies. It is included in existing Tilt Shift preparation,
-control feedback and gameplay snapshots. It does not change capture `usable` or paddle angles.
-
 ## Tilt Shift 3D
 
-Minigame 005 keeps Tilt Shift's preparation, motion channel, readiness and traffic rules, under
-its own message names; it accepts no 2D Tilt Shift message. On the Pre-minigame screen, the
-readiness snapshot's `preparation` adds the player's `color`, the `face` to show and the
-paddle's `look`, with `paddle_size` taken from the first round's layout.
+Every normal Tilt Shift 3D launch uses the shared all-player Pre-minigame gate before freezing
+an even roster and opening the factory. Its round controller owns subsequent selected-player
+readiness. Sensor status and samples use the authenticated motion subscriptions. On the
+Pre-minigame screen, the readiness snapshot's `preparation` adds the player's `color`, the
+`face` to show and the paddle's `look`, with `paddle_size` taken from the first round's layout.
 
-`tilt_shift_3d_snapshot` carries what `tilt_shift_snapshot` does, plus:
+`tilt_shift_3d_snapshot` carries generation, increasing sequence, phase, round, team,
+owned paddle IDs and physical paddle length and thickness (`paddle_size` in arena widths, also
+for spectators, whose phones show their paddle resting under the waiting background), plus:
 
 - `color`: the player's Squircle colour as six hex digits.
 - `face`: the face preset the phone shows, the strongest across the player's paddles.
@@ -201,12 +167,29 @@ paddle's `look`, with `paddle_size` taken from the first round's layout.
 - `angle_radians`: the physical angle of the player's first paddle, which trails the accepted
   angle under the turning limit; zero for spectators.
 
-`paddle_size` is the player's team paddle in arena widths, also for spectators, whose phones
-show their paddle resting under the waiting background.
+Mapped snapshots also carry `round_token`, `selected`, `ready`, `ready_available`,
+`calibration_available`, `calibrated`, `usable` and `landscape`. Phases include `preparing`,
+`countdown`, `start`, `active`, `between_rounds` and `finished`. No client-authored angle,
+team, assignment or score message is accepted. Obsolete snapshot generations or sequences
+cannot replace the current phone view.
 
-A face change is sent at once, coalesced like angle updates; other traffic follows Tilt
-Shift's ceiling. `tilt_shift_3d_ready` carries exactly what `tilt_shift_ready` does. A stale or
-invalid READY is dropped without an error, and the sender gets its current snapshot back.
+`tilt_shift_3d_ready` carries `type`, current `generation`, `round_token` and Boolean `ready`.
+The connection supplies identity. Only selected players in a visible ready panel can change
+readiness. Fresh usable calibration and landscape are required; recalibration, disconnection,
+portrait or stale capture clears READY. A stale or invalid READY is dropped without an error,
+and the sender gets its current snapshot back. Countdown start is final even if a player then
+disconnects. The panel timeout runs once from opening; force start is a local host action, not
+a message.
+
+Angle updates and face changes coalesce to the latest state at the selected flow ceiling, 15 Hz
+by default. Queued socket output skips that update rather than accumulating a backlog. Round
+and resume transitions send current state immediately. Calibration is available before and
+between active rounds, including countdown and START; it is locked during scoring. Reconnect
+preserves neutral and does not recover unseen complete turns.
+
+`landscape` is derived from the authenticated motion sample's `screen_angle`: either
+quarter-turn display orientation qualifies. It is included in Tilt Shift 3D preparation,
+control feedback and gameplay snapshots. It does not change capture `usable` or paddle angles.
 
 ## Bubbles and jellyfishes 3D
 

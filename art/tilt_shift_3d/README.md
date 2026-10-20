@@ -105,10 +105,9 @@ filling the band below the mouth line, three-quarter views of each width, and th
 ## Runtime copies
 
 `assets/runtime/minigames/tilt_shift_3d/props/` holds byte-identical copies of the props for
-Godot to import. Beside them are `trash_badge.png`, the trash emblem copied unchanged from the
-2D Tilt Shift's baskets, and `tilt_shift_3d_preview.png`, the 2D factory's booklet preview,
-copied unchanged until a 3D screenshot replaces it. `tests/tilt_shift_3d_props_test.gd`
-checks every copy.
+Godot to import. Beside them are `trash_badge.png`, the owner's trash emblem, and
+`tilt_shift_3d_preview.png`, the 2D factory's booklet preview, kept until a 3D screenshot
+replaces it. `tests/tilt_shift_3d_props_test.gd` checks every copy.
 
 `art/.gdignore` keeps this folder out of Godot's importer. The game loads
 `assets/runtime/minigames/tilt_shift_3d/crate/bin.glb`, byte-identical to the verified export,

@@ -61,7 +61,7 @@ A pull request is history, read later by someone who was not there. Write what i
 - Name things for what they are. Ticket and task numbers do not belong anywhere in the repository: not in file names, comments, documents, test names or output folders.
 - Run `node tools/lint.mjs` as well. It reports naming, unused code and other mistakes in GDScript, TypeScript and JavaScript, and every line over 100 characters that the formatters could not shorten. Shorten such a line by naming part of the expression on the line before, by wrapping the expression in parentheses, or by joining a long string from shorter ones; move a trailing comment above its statement. Do not reword a message or a test title to make it fit.
 - Preserve the bundled runtime assets and `web/public/` output. Rebuild the browser bundle after changing `web/src/`.
-- Minigame numbers are stable identifiers. 001 and 002 were retired; 004 is Bubbles and jellyfishes 3D. Never reuse or renumber IDs.
+- Minigame numbers are stable identifiers. 001, 002 and 003 were retired; 004 is Bubbles and jellyfishes 3D, and 005 is Tilt Shift 3D. Never reuse or renumber IDs.
 - A Shape Character is a player-owned geometric character with floating hands and feet. Keep poses and expressions readable, including natural blinking and context-appropriate gestures.
 
 ## Visual direction

@@ -1,11 +1,8 @@
 # Tilt Shift 3D
 
-Minigame 005 rebuilds Tilt Shift in the 3D low-poly world. Two equal teams tilt their phones to
+Minigame 005 is Tilt Shift in the 3D low-poly world. Two equal teams tilt their phones to
 guide falling balls into their bins; each player is a paddle in their own colour, with a face
 that reacts. The design is in `docs/game-design-documents/Minigames/005/`.
-
-The rules, phone controls and flow are the 2D Tilt Shift's, copied and renamed so this folder
-depends on nothing of minigame 003; `tests/tilt_shift_3d_independence_test.gd` checks it.
 
 ## Ownership
 
