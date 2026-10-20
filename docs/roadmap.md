@@ -79,15 +79,17 @@ on the phone ([0035](decisions/0035-phone-three-js.md)). Its design is in
 side-by-side play review; tuning values are provisional and the Pre-minigame preview image is
 still 002's. Once 004 is approved, 002 is retired.
 
-Minigame 005, Tilt Shift 3D, is the next and last step of the 3D rework: 003's game rebuilt
-beside it on plane-locked Jolt physics, with each player shown as their own coloured paddle
-carrying a part-composed, expressive face, a full-width toy-factory arena and a 3D paddle on
-the phone. Its design is in `docs/game-design-documents/Minigames/005/`.
+Minigame 005, Tilt Shift 3D, the last step of the 3D rework, is built beside 003: the same game
+on plane-locked Jolt physics ([0038](decisions/0038-tilt-shift-3d-full-width-frame.md)), with
+each player shown as their own coloured paddle built in code
+([0036](decisions/0036-tilt-shift-3d-generated-paddle.md)) and carrying a part-composed,
+expressive face ([0037](decisions/0037-shape-face-system.md)), in a full-width toy factory.
 
-Its two asset inputs are ready and await the owner's approval: the face parts as vector
-masters with 8× exports and a manifest of the twelve faces, and the KayKit crate adapted into a
-three-part bin that stretches to any opening. The build comes next. Once 005 is approved, 003
-is retired.
+Each phone shows the player's own paddle in 3D. 005 has its own workshop tab and F12 review, and
+launches through a catalog session script ([0039](decisions/0039-minigame-session-scripts.md)).
+It awaits physical-phone checks and the owner's side-by-side play review; tuning values are
+provisional and the Pre-minigame preview image is still 003's. Once 005 is approved, 003 is
+retired.
 
 ## Tilt Shift foundation
 

@@ -17,6 +17,10 @@ repository.
   landscape neutral and confirms READY on the shared Pre-minigame screen before launch.
   One team paddle on each phone mirrors
   the host's accepted angle throughout the factory rounds.
+- **Tilt Shift 3D** (minigame 005) sits beside it in the lobby dropdown for comparison: the
+  same game and phone controls in a 3D toy factory on Jolt physics, where each player is a
+  paddle in their own colour with a face that reacts. Each phone shows the player's own paddle
+  in real-time 3D.
 - Registered players appear as 3D Squircles in the Playground lobby, a café plaza viewed from
   the side. Each steers their character from a portrait phone stick and a release-action
   button. The billboard shows the join QR; the lobby controls are in the top-right panel. Near-vertical input
@@ -25,8 +29,9 @@ repository.
   3D Squircle on the shared screen and on the phone.
 - F12 opens the debug menu: one-real-player scenarios for both Bubbles versions, the Squircle
   Animation Lab,
-  the Gyroscope and Accelerometer Lab, and a Tilt Shift factory with explicitly simulated
-  controls. The factory review creates ten synthetic operators without registering phones.
+  the Gyroscope and Accelerometer Lab, and Tilt Shift and Tilt Shift 3D factories with
+  explicitly simulated controls. The factory reviews create ten synthetic players without
+  registering phones.
   Both Bubbles versions label their debug round on the host and the phone.
 - The host defaults to a responsive 1920×1080 GL Compatibility presentation.
 - **Project > Tools > Build Standalone Host** creates a portable Windows x86_64 release ZIP.
@@ -72,8 +77,9 @@ type the displayed URL, on a phone on the same LAN.
 ## Starting a round
 
 - Normal play starts with 2–10 registered players. Choose a minigame from the lobby dropdown
-  before starting. Tilt Shift requires an even roster and calibrated motion from everyone.
+  before starting. Both Tilt Shift versions require an even roster and calibrated motion from
+  everyone.
 - For debug, register exactly one phone, press F12, and choose a one-player Bubbles
-  scenario. The separately labeled Tilt Shift factory review needs no phones.
+  scenario. The separately labeled Tilt Shift factory reviews need no phones.
 - Restart and lobby return preserve the running `SessionHost`, the player registry and the
   LAN services.

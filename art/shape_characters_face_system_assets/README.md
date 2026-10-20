@@ -43,7 +43,8 @@ was.
 
 `assets/runtime/shape_faces/`, shared by every minigame, holds each master exported as a PNG at
 8 times its source size with transparent edges, and `face_presets.json`. The phone can draw a
-face about 280 pixels tall, about five times the sources' size.
+face about 280 pixels tall, about five times the sources' size. They import with mipmaps, so a face drawn
+small in 3D stays smooth.
 
 `face_presets.json` lists every part's file, its size in source pixels and its margin
 (`padding`, 1 or 0), and for each of `face_a` to `face_l` its source size, its box aspect

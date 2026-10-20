@@ -36,11 +36,11 @@ cd ..
 3. `npm run bundle:three` bundles `web/build/three_view/index.js` into the separate,
    minified `web/public/three_view.js`, retaining legal comments. The main bundle has no
    three.js code. `app.ts` imports `/three_view.js` dynamically only on the first Bubbles
-   and jellyfishes 3D snapshot; later mounts share the loaded module.
+   and jellyfishes 3D snapshot or Tilt Shift 3D screen; later mounts share the loaded module.
 4. `scripts/copy_models.mjs` copies the runtime Squircle and jellyfish GLBs byte for byte
    into `web/public/models/`. Their `.import` files tell Godot to keep them as plain files, so
    the export carries them unchanged. The host serves the face images from the runtime
-   Squircle folder itself.
+   Squircle folder itself, and the shape character face parts from `assets/runtime/shape_faces/`.
 5. It generates `web/public/platform_input_settings.json` from the browser's input defaults.
    The host reads that file; do not edit it by hand.
 
@@ -54,6 +54,7 @@ Import it from a module that `app.ts` reaches, and rebuild. Nothing else needs t
 it: ordinary phone modules stay in `/app.js`. Reusable 3D rendering modules belong in
 `web/src/three_view/` and are exported by its entry. Screen-specific 3D composition is
 reached only from that entry; the app shares its interfaces through type-only imports.
-The host serves `/three_view.js` and the model files separately.
+The host serves `/three_view.js` and the model files separately. Phone code that 3D and flat
+drawings share, such as `web/src/shape_paddle/`, stays in `/app.js`.
 
 The other routes the host serves are in [protocol.md](protocol.md#http-routes).

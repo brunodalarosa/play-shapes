@@ -85,6 +85,9 @@ The host serves a fixed list and nothing else:
   `/models/squircle-face-neutral.png` and `/models/squircle-face-blink.png`.
 - Tilt Shift art: `/tilt-shift/manifest.json`, `/tilt-shift/paddle_orange.png`,
   `/tilt-shift/paddle_blue.png` and `/tilt-shift/paddle_neutral.png`.
+- Shape character faces: `/shape_faces/face_presets.json` and one
+  `/shape_faces/facial_part_<name>.png` per part the manifest lists, from the shared runtime
+  folder.
 
 Responses:
 
@@ -181,6 +184,29 @@ Reconnect preserves neutral and does not recover unseen complete turns.
 `landscape` is derived from the authenticated motion sample's `screen_angle`: either
 quarter-turn display orientation qualifies. It is included in existing Tilt Shift preparation,
 control feedback and gameplay snapshots. It does not change capture `usable` or paddle angles.
+
+## Tilt Shift 3D
+
+Minigame 005 keeps Tilt Shift's preparation, motion channel, readiness and traffic rules, under
+its own message names; it accepts no 2D Tilt Shift message. On the Pre-minigame screen, the
+readiness snapshot's `preparation` adds the player's `color`, the `face` to show and the
+paddle's `look`, with `paddle_size` taken from the first round's layout.
+
+`tilt_shift_3d_snapshot` carries what `tilt_shift_snapshot` does, plus:
+
+- `color`: the player's Squircle colour as six hex digits.
+- `face`: the face preset the phone shows, the strongest across the player's paddles.
+- `look`: the corner, depth, gap, outline and face ratios, the gap colour, the orange, blue
+  and neutral outline colours and the wall's two colours.
+- `angle_radians`: the physical angle of the player's first paddle, which trails the accepted
+  angle under the turning limit; zero for spectators.
+
+`paddle_size` is the player's team paddle in arena widths, also for spectators, whose phones
+show their paddle resting under the waiting background.
+
+A face change is sent at once, coalesced like angle updates; other traffic follows Tilt
+Shift's ceiling. `tilt_shift_3d_ready` carries exactly what `tilt_shift_ready` does. A stale or
+invalid READY is dropped without an error, and the sender gets its current snapshot back.
 
 ## Bubbles input
 

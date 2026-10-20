@@ -8,6 +8,10 @@ Messages and limits are in [protocol.md](protocol.md).
 - `scenes/boot.*` starts the services and presents Retry after a startup failure.
 - `host/session_host.gd` persists the services and the registry across scene changes. It
   discovers addresses, constructs URLs, and rolls HTTP back if WebSocket binding fails.
+- A catalog definition may name a `session_script`. SessionHost creates that session on first
+  use and lets it prepare players, gate READY and the launch, and follow the roster, from the
+  Pre-minigame screen into play ([decision 0039](decisions/0039-minigame-session-scripts.md)).
+  Tilt Shift 3D uses one; Tilt Shift keeps its own branch until it is retired.
 - `host/http_service.gd` serves a fixed asset allowlist with bounded requests. It never serves
   a client-selected filesystem path.
 - `host/websocket_service.gd` owns bounded protocol-1 peers and messages. It resolves each
@@ -183,6 +187,23 @@ checks that. Its gameplay runs on Jolt with plane-locked bodies
   snapshots, feedback and visuals. The messages are in
   [protocol.md](protocol.md#bubbles-and-jellyfishes-3d).
 
+## Tilt Shift 3D
+
+Minigame 005 rebuilds Tilt Shift in 3D, in `minigames/005_3d_tilt_shift/`. Its rules are the
+2D Tilt Shift's, copied and renamed; it shares no code, scene, resource, message or phone
+module with 003, and `tests/tilt_shift_3d_independence_test.gd` in its folder checks that.
+[Its README](../minigames/005_3d_tilt_shift/README.md) lists what each script owns.
+
+- The arena simulates on Jolt with plane-locked bodies, as 004 does, and fills the frame with
+  the floor raised for the bins ([decision 0038](decisions/0038-tilt-shift-3d-full-width-frame.md)).
+- Paddles are rounded bars built in code with a matching convex collider
+  ([decision 0036](decisions/0036-tilt-shift-3d-generated-paddle.md)), each with a composed face
+  ([decision 0037](decisions/0037-shape-face-system.md)).
+- `tilt_shift_3d_session.gd` is the catalog's session script; `tilt_shift_3d_protocol.gd` is a
+  `MinigameProtocol`. The messages are in [protocol.md](protocol.md#tilt-shift-3d).
+- `addons/tilt_shift_3d_workshop/` is its editor workshop, and `debug/tilt_shift_3d_review.tscn`
+  its simulated F12 review.
+
 ## Shared 3D components
 
 These live outside any minigame folder so later 3D scenes can use them.
@@ -194,6 +215,11 @@ These live outside any minigame folder so later 3D scenes can use them.
 - `components/underwater_environment/`: the water backdrop, god rays, seabed with caustics,
   depth haze and air bubbles, plus a recolouring prop material with optional sway.
 - `components/screen_follow_label.gd`: screen text that follows a 3D node.
+- `components/rounded_bar/`: `RoundedBar` builds a bar's rounded outline, mesh and convex
+  collider from its length, thickness, depth and corner radius.
+- `components/shape_face/`: the shape character face. `ShapeFaceManifest` reads the shared
+  face parts and presets, `ShapeFaceExpressions` keeps timed expressions with priorities and
+  natural blinks, and `ShapeFace3D` and `ShapeFace2D` draw a face in 3D or in a Control.
 
 ## Tilt Shift rules
 
@@ -267,6 +293,8 @@ See [player journeys](player-journeys.md).
 
 - `debug/` contains the non-pausing F12 scenario catalog and the debug scenes. The launcher
   remains present in development exports.
+- **Tilt Shift 3D factory · simulated controls** opens `debug/tilt_shift_3d_review.tscn`: ten
+  synthetic players tilt through a whole shift, with no phones and no launch eligibility.
 - **Animation Lab** opens `debug/animation_lab/animation_lab.tscn`.
   - It inspects the manifest's ten Squircle v1 action and view pairs at 256, 128 and the actual
     lobby scale (0.58).
@@ -287,6 +315,10 @@ See [player journeys](player-journeys.md).
 - Ordinary ready-up shows one host-confirmed READY/CANCEL toggle. Tilt Shift additionally
   exposes permission and neutral calibration; its phone shows one canonical team paddle
   as a movement guide. Preview and instructions remain on the shared screen.
+- Tilt Shift 3D keeps the same preparation and shows the player's own paddle in 3D through
+  `web/src/005_3d_tilt_shift/`, with a flat drawing without WebGL. `web/src/shape_paddle/`
+  holds the rounded outline and the face composition; `web/src/three_view/shape_paddle.ts`
+  draws them with three.js.
 - `web/src/squircle_v1.ts` draws manifest-owned front idle sheets in setup and in the player's
   personalized Bubbles snapshot.
 - `web/src/screen_wake_lock.ts` owns one visible-page wake lock across every phone screen,
@@ -319,8 +351,10 @@ describes saving, explicit active selection and preview isolation.
   into the owner's twelve faces, live in `assets/runtime/shape_faces/`. Their vector masters
   and provenance are in
   [art/shape_characters_face_system_assets](../art/shape_characters_face_system_assets/README.md).
-- The bin of minigame 005, Tilt Shift 3D, lives in `assets/runtime/minigames/tilt_shift_3d/`.
-  Its source and provenance are in [art/tilt_shift_3d](../art/tilt_shift_3d/README.md).
+- The bin, factory props, trash emblem and booklet preview of minigame 005, Tilt Shift 3D,
+  live in `assets/runtime/minigames/tilt_shift_3d/`. Their sources and provenance are in
+  [art/tilt_shift_3d](../art/tilt_shift_3d/README.md). The host serves the face parts to the
+  phone from `assets/runtime/shape_faces/`.
 - [GIMP regeneration and isolated export-pack checks](../art/bubbles/README.md) remain
   separate from gameplay implementation.
 - `addons/standalone_build/` is the editor-only Windows builder.
@@ -337,10 +371,11 @@ tuning UI.
 
 - Open `Tuning/Active Presets.tres` to select named resources. The current front doors are
   `minigames/002_bubbles_and_jellyfishes/tuning/Default.tres`,
-  `minigames/004_3d_bubbles/tuning/Default.tres` and `Tuning/Shared/Networking/Default.tres`.
+  `minigames/004_3d_bubbles/tuning/Default.tres`,
+  `minigames/005_3d_tilt_shift/tuning/Default.tres` and `Tuning/Shared/Networking/Default.tres`.
 - Restart to apply a changed selection.
 - Bubbles field descriptions are in the `README.md` beside its `Default.tres`; so are those of
-  Bubbles and jellyfishes 3D.
+  Bubbles and jellyfishes 3D and Tilt Shift 3D.
 - Only the human owner promotes subjective feel into `Default`. Tests establish configuration
   safety, not fun or comfort.
 

@@ -143,6 +143,33 @@ removes it. The evidence labels are defined in
   arena widths in orange, blue and grey, and heights of 0.75 and 2 times.
 - The faces and bins in the running scene are reviewed with minigame 005.
 
+## Tilt Shift 3D
+
+Everything below compares Tilt Shift 3D with Tilt Shift side by side.
+
+- `[HUMAN-PLAY]` Feel: tilting must be as responsive as in Tilt Shift on Jolt, including balls
+  rolling off the rounded ends and resting on the thicker paddles, and catches at the raised
+  floor.
+- `[HUMAN-PLAY]` Readability at couch distance with layout A and four players and layout B
+  and six: paddle look, gap ring and team outline with every player colour on both teams,
+  the grey automatic paddle, ball and bin contrast, the cream wall and props.
+- `[HUMAN-PLAY]` Faces: whether they read at the default thickness, whether dizzy and
+  startled read as different at a glance, the timing of blinks, dizziness, startle and the
+  squash, the countdown and result faces, and whether 150°/s triggers dizziness too often.
+- `[HUMAN-PLAY]` Names: five seconds and the fade; overlap when two paddles sit close.
+- `[HUMAN-PLAY]` Layout spacing after the thicker paddles and raised floor, and every
+  starting value in [the tuning guide](../minigames/005_3d_tilt_shift/tuning/README.md).
+- `[PHYSICAL-PHONE]` On the iPhone Safari and Android Chrome pair: the 3D paddle's rendering
+  and frame rate, the face parts loading over the LAN and HTTPS, motion responsiveness of the
+  turning paddle, spectators' resting paddle, and the flat drawing where WebGL is off.
+- `[EXPORTED-BUILD]` A Tilt Shift 3D shift played from the Windows package, with phones loading
+  `/three_view.js` and the face parts from it.
+- `[GODOT-RUNTIME]` Frame time on the target PC with `tilt_shift_3d_performance_check.gd`.
+  On the development PC (RTX 5070, Core Ultra 7 265KF) ten players and 80 balls in 20 seconds
+  averaged 0.62 ms per frame, 95th percentile 0.95 ms, with up to 118 draw calls.
+- `[EDITOR]` Usability of the Tilt Shift 3D workshop tab and its 3D preview.
+- The booklet preview is Tilt Shift's screenshot until the owner supplies a 3D one.
+
 ## Tilt Shift art
 
 - `[PHYSICAL-PHONE]` One-paddle guide readability on a real landscape phone across

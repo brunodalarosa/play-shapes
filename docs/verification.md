@@ -41,11 +41,12 @@ This is the default `[AUTO]` check. In order, it runs:
    end-to-end test files.
 5. `npm test` in `web/`.
 6. A rebuild of the browser bundle, which fails if `web/public/` changed.
-7. The two-phone Bubbles, Bubbles and jellyfishes 3D and Tilt Shift end-to-end journeys
-   described below.
+7. The two-phone Bubbles, Bubbles and jellyfishes 3D, Tilt Shift and Tilt Shift 3D end-to-end
+   journeys described below.
 
-`--full` adds the 4/6/8/10-phone Tilt Shift journeys, `tilt_shift_workshop_preview_test.gd`
-and `tilt_shift_rotation_contact_test.gd`. The default retains the shorter Tilt Shift
+`--full` adds the 4/6/8/10-phone Tilt Shift and Tilt Shift 3D journeys,
+`tilt_shift_workshop_preview_test.gd`, `tilt_shift_rotation_contact_test.gd` and
+`tilt_shift_3d_rotation_contact_test.gd`. The default retains the shorter Tilt Shift
 physics checks. Full coverage also keeps the full-length Bubbles round; Windows export
 remains a separate `--release` option. Name filters do not override these coverage options.
 
@@ -110,6 +111,11 @@ models from the host, and the test fails on a phone without an accepted swipe.
 synthetic sensors. Its two-phone scenario runs by default, including delayed permission,
 portrait readiness revocation and reconnect; it ends after Tilt Shift returns to the lobby.
 The 4/6/8/10-phone scenarios carry the `@full` tag and run only with full coverage.
+
+`web/e2e/tilt_shift_3d_phones.spec.ts` plays the same journey through Tilt Shift 3D, with
+`tests/e2e/tilt_shift_3d_host.gd`. Every phone loads `/three_view.js` and the face parts and
+shows its own paddle, spectators included, and the test also limits each phone's snapshot
+size and rate. Its 4/6/8/10-phone scenarios carry the `@full` tag.
 
 - Each phone saves a screenshot per step in `test-results/e2e/`, with a Playwright trace when
   the test fails.
@@ -194,6 +200,19 @@ start only what they need, so they stay fast.
   by `export_faces.mjs` in
   [art/shape_characters_face_system_assets](../art/shape_characters_face_system_assets/README.md)
   and `export_and_verify.py` in [art/tilt_shift_3d](../art/tilt_shift_3d/README.md).
+
+- Tilt Shift 3D: the `tests/` folder of `minigames/005_3d_tilt_shift/` holds the 2D Tilt
+  Shift's rule, allocation, delivery, preset, journey, flow, preparation, motion and
+  negative-ball tests, carried over. It adds Jolt physics on the plane (plane locks, rounded
+  contacts, the turning bound, raised-floor catches, contact speeds), the expression rules,
+  the presentation, the protocol, the workshop and the independence from 003.
+- In `tests/`, `rounded_bar_test.gd`, `shape_face_test.gd`, `plane_3d_test.gd`,
+  `tilt_shift_3d_props_test.gd` and `tilt_shift_3d_review_test.gd` cover the shared pieces,
+  the copied assets and the F12 review. Run `node tools/check.mjs tilt_shift_3d rounded_bar
+  shape_face plane_3d`. The phone's tests are in `web/tests/005_3d_tilt_shift/`.
+- Run `node tools/verify_tilt_shift_workshop.mjs 3d` with other project editors closed to
+  drive Tilt Shift 3D's workshop in the real editor; captures and logs are under
+  `test-results/tilt-shift-3d/workshop/`.
 
 - Tilt Shift complete flow: `tilt_shift_flow_test.gd` under the minigame's tests covers
   every allowed roster, rejected debug bypass, stale capture, final joins, calibration transfer,
@@ -318,7 +337,8 @@ godot --path . --rendering-method gl_compatibility --script res://tests/<helper>
 The helpers whose names start with `bubbles_` are in
 `minigames/002_bubbles_and_jellyfishes/tests/`, except `bubbles_3d_scene_visual_check`
 and `bubbles_3d_performance_check`, which are in `minigames/004_3d_bubbles/tests/`; use that
-folder in place of `tests/`.
+folder in place of `tests/`. Those starting with `tilt_shift_3d_` are in
+`minigames/005_3d_tilt_shift/tests/`.
 
 | Helper | What it saves | Folder |
 | --- | --- | --- |
@@ -331,6 +351,9 @@ folder in place of `tests/`.
 | `bubbles_presentation_visual_check` | The shared screen: empty, entrance, ten players at FHD and HD, warning on and off, final timer, tied results, two-player maximum bubble. | `bubbles-presentation/` |
 | `bubbles_3d_scene_visual_check` | Bubbles and jellyfishes 3D mid-round with five and ten players, catches of several sizes, free jellyfishes and two pufferfishes. | `bubbles-3d/` |
 | `bubbles_3d_performance_check` | No capture: prints the frame time and draw calls of ten players with every jellyfish cap reached, vsync off. Run it on the target PC. | none |
+| `tilt_shift_3d_presentation_visual_check` | Tilt Shift 3D with layout A and four players and layout B and six, through preparation, countdown, play with and without names and the round's end, then every colour on both teams. | `tilt-shift-3d/presentation/` |
+| `tilt_shift_3d_performance_check` | Writes `performance.txt`: frame time, physics step and draw calls of ten players with the round's whole ball budget in 20 seconds, vsync off. Run it on the target PC. | `tilt-shift-3d/` |
+| `shape_face_visual_check` | The twelve face presets drawn in 2D beside their references, compared within one pixel, and in 3D on paddles. In `tests/`. | `shape-face/` |
 | `bubble_shell_visual_check` | Bubble shells of several sizes around tinted Squircles, one stretched and one bursting. | `bubble-shell/` |
 | `underwater_environment_visual_check` | The underwater environment behind bubble shells through the 004 camera. | `underwater-environment/` |
 | `pre_minigame_visual_check` | The ready screen with two and ten players at 1920×1080 and 1280×720. | `pre-minigame/` |
