@@ -20,7 +20,7 @@ const INCLUDE_FILTER := (
 	+ "assets/runtime/shape_faces/face_presets.json,"
 	+ "assets/runtime/minigames/tilt_shift_3d/*/License.txt"
 )
-const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,addons/tilt_shift_workshop/**,scratch/**,comparisons/**,docs/images/tilt-shift-workshop/**,local/**,*.local.json,*.pem,*.key,*.crt,*.cer,*.der,*.p12,*.pfx,art/**,builds/**,opencode.json,tools/**,tests/**,minigames/*/tests/**,test-results/**,web/package.json,web/package-lock.json,web/tsconfig.json,web/node_modules/**,web/src/**,web/tests/**"
+const EXCLUDE_FILTER := "addons/godot_mcp/**,addons/standalone_build/**,addons/tilt_shift_workshop/**,addons/tilt_shift_3d_workshop/**,scratch/**,comparisons/**,docs/images/tilt-shift-workshop/**,local/**,*.local.json,*.pem,*.key,*.crt,*.cer,*.der,*.p12,*.pfx,art/**,builds/**,opencode.json,tools/**,tests/**,minigames/*/tests/**,test-results/**,web/package.json,web/package-lock.json,web/tsconfig.json,web/node_modules/**,web/src/**,web/tests/**"
 const REQUIRED_BROWSER_PATHS := [
 	"web/public/platform_input_settings.json",
 	"web/public/index.html",

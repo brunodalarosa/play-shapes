@@ -426,9 +426,10 @@ func _on_ball_spawned(ball: TiltShift3DBall) -> void:
 			else _selected.ball_color
 	if not _ball_materials.has(ball.score_value):
 		var material := StandardMaterial3D.new()
-		material.albedo_color = colour
 		material.roughness = 0.45
 		_ball_materials[ball.score_value] = material
+	# The shared material follows the running shift's colours, also after a restart.
+	_ball_materials[ball.score_value].albedo_color = colour
 	var visual := MeshInstance3D.new()
 	visual.mesh = _ball_meshes[key]
 	visual.material_override = _ball_materials[ball.score_value]
