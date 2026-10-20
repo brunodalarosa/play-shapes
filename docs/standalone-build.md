@@ -27,9 +27,9 @@ builds/standalone/
 ## What the builder verifies
 
 Before archiving, the builder verifies the external PCK, every browser module, the boot and
-lobby scenes, the QR dependency, the Bubbles scenes and scripts, and the Bubbles runtime art
-and audio. The required runtime paths also include the reusable Tilt Shift factory
-scene and its art geometry manifest. The Squircle manifest carries lever hand positions.
+lobby scenes, the QR dependency, the Bubbles and jellyfishes 3D scenes, scripts, models and
+audio, and the Tilt Shift and Tilt Shift 3D runtime assets. The Squircle manifest carries lever
+hand positions.
 
 ## What the package includes
 

@@ -1,7 +1,6 @@
 # Bubbles static-art review
 
-Environment, jellyfish, and pufferfish art, prepared 2026-09-22. Runtime art is under
-[`assets/runtime/minigames/bubbles_and_jellyfishes/`](../../assets/runtime/minigames/bubbles_and_jellyfishes/README.md).
+Environment, jellyfish, and pufferfish art, prepared 2026-09-22.
 
 ## Review images
 

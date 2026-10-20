@@ -1712,58 +1712,6 @@ var SquircleV1Canvas = class {
   }
 };
 
-// build/002_bubbles_and_jellyfishes/bubbles_gesture.js
-var MAX_TRACE_POINTS = 128;
-var GestureTrace = class {
-  bounds;
-  points = [];
-  constructor(bounds) {
-    this.bounds = bounds;
-  }
-  add(clientX, clientY) {
-    if (!Number.isFinite(clientX) || !Number.isFinite(clientY) || this.bounds.width <= 0 || this.bounds.height <= 0)
-      return;
-    const point = [
-      Math.max(0, Math.min(1, (clientX - this.bounds.left) / this.bounds.width)),
-      Math.max(0, Math.min(1, (clientY - this.bounds.top) / this.bounds.height))
-    ];
-    const last = this.points.at(-1);
-    if (last && Math.hypot(point[0] - last[0], point[1] - last[1]) < 4e-3)
-      return;
-    this.points.push(point);
-    if (this.points.length > MAX_TRACE_POINTS) {
-      this.points = this.points.filter((_2, index) => index === 0 || index === this.points.length - 1 || index % 2 === 0);
-    }
-  }
-  completed() {
-    return this.points.length >= 2 ? this.points.map((point) => [...point]) : [];
-  }
-  displacement() {
-    if (this.points.length < 2)
-      return [0, 0];
-    const first = this.points[0];
-    const last = this.points.at(-1);
-    return [last[0] - first[0], last[1] - first[1]];
-  }
-  preview(circlesToCharge) {
-    if (this.points.length < 6)
-      return 0;
-    const center = this.points.reduce(([x2, y2], point) => [x2 + point[0], y2 + point[1]], [0, 0]).map((value) => value / this.points.length);
-    let signed = 0;
-    let absolute = 0;
-    for (let index = 1; index < this.points.length; index++) {
-      const before = Math.atan2(this.points[index - 1][1] - center[1], this.points[index - 1][0] - center[0]);
-      const after = Math.atan2(this.points[index][1] - center[1], this.points[index][0] - center[0]);
-      const step = Math.atan2(Math.sin(after - before), Math.cos(after - before));
-      signed += step;
-      absolute += Math.abs(step);
-    }
-    if (absolute < Math.PI * 0.75 || Math.abs(signed) / absolute < 0.65)
-      return 0;
-    return Math.min(1, Math.abs(signed) / (Math.PI * 2 * Math.max(1, circlesToCharge)));
-  }
-};
-
 // build/vendor/nipplejs.mjs
 var t = "dynamic";
 var i = "semi";
@@ -2594,7 +2542,6 @@ var CHARACTER_COLORS = [
   { id: "pink", name: "Pink", hex: "#EC407A" },
   { id: "brown", name: "Brown", hex: "#8D6E63" }
 ];
-var FALLBACK_CHARACTER = { shape: CHARACTER_SHAPE, color: "#598DF2" };
 function defaultJoinFlow() {
   return {
     screen: "selection",
@@ -2683,11 +2630,6 @@ var lobbyController = document.querySelector("#lobby-controller");
 var lobbyStickZone = document.querySelector("#lobby-stick-zone");
 var lobbyJumpButton = document.querySelector("#lobby-jump-button");
 var lobbyLeaveButton = document.querySelector("#lobby-leave-button");
-var bubblesCard = document.querySelector("#bubbles-card");
-var bubblesPad = document.querySelector("#bubbles-pad");
-var bubblesScore = document.querySelector("#bubbles-score");
-var bubblesCanvas = document.querySelector("#bubbles-visual");
-var bubblesContext = bubblesCanvas.getContext("2d", { alpha: true });
 var motionPanel = document.querySelector("#motion-lab");
 var motionButton = document.querySelector("#motion-permission");
 var motionReadings = document.querySelector("#motion-readings");
@@ -2705,17 +2647,7 @@ var isReady = false;
 var joinFlow = defaultJoinFlow();
 var inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
 var activeGame = null;
-var bubblesPointer;
-var bubblesSnapshot;
-var bubblesSnapshotTime = 0;
-var bubblesLocalCharge = 0;
-var bubblesVisualSnapshot;
-var bubblesVisualReceivedAt = 0;
-var bubblesPhoneDragDisplay = [0, 0];
-var bubblesPreviousFrame = performance.now();
 var squircleCanvas = new SquircleV1Canvas();
-var bubblesArt = { jellyfish: new Image() };
-bubblesArt.jellyfish.src = "/bubbles-jellyfish.png";
 var lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJumpButton, (action) => {
   if (!joined || !socket || socket.readyState !== WebSocket.OPEN || activeGame !== null)
     return;
@@ -2778,14 +2710,15 @@ function showBubble3D(message) {
   const visible = message.phase !== "lobby_return";
   setGameplaySurface(visible, "bubbles_3d");
   selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = true;
-  bubblesCard.hidden = readyCard.hidden = true;
+  readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
   status.hidden = true;
   bubble3DPhone.receive(message);
 }
-for (const surface of [lobbyController, bubblesPad, readyCard, tiltSurface, tilt3DSurface])
+for (const surface of [lobbyController, readyCard, tiltSurface, tilt3DSurface])
   protectControllerSurface(surface);
-bindControllerLifecycle(() => cancelBubblesPointer());
+bindControllerLifecycle(() => {
+});
 function stored(key) {
   try {
     return localStorage.getItem(key) ?? "";
@@ -2837,8 +2770,8 @@ for (const option of CHARACTER_COLORS) {
   colorGrid.append(button);
 }
 refreshSelectionUi();
-function setGameplaySurface(active, game = "bubbles") {
-  const next = active ? game : null;
+function setGameplaySurface(active, game) {
+  const next = active ? game ?? null : null;
   if (next !== "tilt_shift")
     tiltPhone.hide();
   if (next !== "tilt_shift_3d")
@@ -2846,7 +2779,6 @@ function setGameplaySurface(active, game = "bubbles") {
   if (next !== "bubbles_3d")
     bubble3DPhone.hide();
   if (activeGame !== next) {
-    cancelBubblesPointer();
     if (next === null) {
       try {
         screen.orientation?.unlock?.();
@@ -2864,8 +2796,7 @@ function setGameplaySurface(active, game = "bubbles") {
     }
     activeGame = next;
   }
-  document.documentElement.classList.toggle("gameplay-active", active);
-  document.documentElement.classList.toggle("bubbles-active", next === "bubbles");
+  document.documentElement.classList.toggle("gameplay-active", next !== null);
   document.documentElement.classList.toggle("tilt-active", next === "tilt_shift");
   document.documentElement.classList.toggle("bubbles-3d-active", next === "bubbles_3d");
   document.documentElement.classList.toggle("tilt-3d-active", next === "tilt_shift_3d");
@@ -2878,11 +2809,8 @@ function showJoin(message, focus = false) {
   document.documentElement.classList.remove("ready-active");
   joinFlow = returnToCharacterSelection(joinFlow);
   joined = false;
-  bubblesSnapshot = void 0;
-  bubblesVisualSnapshot = void 0;
   setGameplaySurface(false);
   playerCard.hidden = true;
-  bubblesCard.hidden = true;
   selectionScreen.hidden = pwa.visible || pwa.show();
   nameScreen.hidden = true;
   joinForm.hidden = true;
@@ -2902,14 +2830,11 @@ function showJoined(player, state = "Connected") {
   readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
   joined = true;
-  bubblesSnapshot = void 0;
-  bubblesVisualSnapshot = void 0;
   setGameplaySurface(false);
   selectionScreen.hidden = true;
   nameScreen.hidden = true;
   joinForm.hidden = true;
   playerCard.hidden = true;
-  bubblesCard.hidden = true;
   playerName.textContent = player.name;
   playerState.textContent = state;
   leaveButton.disabled = false;
@@ -2940,7 +2865,6 @@ function showReady(message) {
   nameScreen.hidden = true;
   joinForm.hidden = true;
   playerCard.hidden = true;
-  bubblesCard.hidden = true;
   readyCard.hidden = false;
   document.documentElement.classList.add("ready-active");
   isReady = message.ready === true;
@@ -2956,7 +2880,7 @@ function showTiltSurface(game = "tilt_shift") {
   lobbyControls.deactivate();
   setGameplaySurface(true, game);
   selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = true;
-  bubblesCard.hidden = readyCard.hidden = true;
+  readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
   status.hidden = true;
 }
@@ -3006,177 +2930,6 @@ async function requestImmersiveMode() {
   const fullscreen = root.requestFullscreen ? () => root.requestFullscreen({ navigationUI: "hide" }) : root.webkitRequestFullscreen?.bind(root);
   await attemptImmersive(fullscreen, orientation?.lock ? () => orientation.lock("portrait") : void 0);
 }
-function sendBubblesCharge(seq, stage, step = 0) {
-  if (socket?.readyState === WebSocket.OPEN)
-    socket.send(JSON.stringify({ type: "bubbles_charge", input_seq: seq, stage, step }));
-}
-function sendBubblesMotion(pointer, now) {
-  if (pointer.motionCount >= 48 || socket?.readyState !== WebSocket.OPEN)
-    return;
-  socket.send(JSON.stringify({
-    type: "bubbles_charge",
-    input_seq: pointer.seq,
-    stage: "motion",
-    drag: pointer.drag
-  }));
-  pointer.sentDrag = [...pointer.drag];
-  pointer.lastMotionAt = now;
-  pointer.motionCount += 1;
-}
-function cancelBubblesPointer(sendCancel = true) {
-  if (!bubblesPointer)
-    return;
-  const { id, seq } = bubblesPointer;
-  bubblesPointer = void 0;
-  bubblesLocalCharge = 0;
-  bubblesPhoneDragDisplay = [0, 0];
-  if (sendCancel)
-    sendBubblesCharge(seq, "cancel");
-  if (bubblesPad.hasPointerCapture(id))
-    bubblesPad.releasePointerCapture(id);
-}
-function sendBubblesTrace(trace, gestureSeq) {
-  if (activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active" || trace.length < 2 || !socket || socket.readyState !== WebSocket.OPEN)
-    return;
-  if (gestureSeq === void 0) {
-    inputSeq += 1;
-    store(STORAGE.inputSeq, String(inputSeq));
-  }
-  socket.send(JSON.stringify({ type: "bubbles_trace", input_seq: gestureSeq ?? inputSeq, trace }));
-}
-function vibrate(pattern) {
-  try {
-    navigator.vibrate?.(pattern);
-  } catch {
-  }
-}
-bubblesPad.addEventListener("pointerdown", (event) => {
-  if (activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active" || bubblesPointer || event.pointerType === "mouse" && event.button !== 0)
-    return;
-  event.preventDefault();
-  const trace = new GestureTrace(bubblesPad.getBoundingClientRect());
-  trace.add(event.clientX, event.clientY);
-  inputSeq += 1;
-  store(STORAGE.inputSeq, String(inputSeq));
-  bubblesPhoneDragDisplay = [0, 0];
-  bubblesPointer = {
-    id: event.pointerId,
-    trace,
-    seq: inputSeq,
-    step: 0,
-    drag: [0, 0],
-    sentDrag: [0, 0],
-    lastMotionAt: performance.now(),
-    motionCount: 0
-  };
-  try {
-    bubblesPad.setPointerCapture(event.pointerId);
-  } catch {
-    cancelBubblesPointer();
-    return;
-  }
-  sendBubblesCharge(inputSeq, "start");
-});
-bubblesPad.addEventListener("pointermove", (event) => {
-  if (bubblesPointer?.id !== event.pointerId)
-    return;
-  event.preventDefault();
-  for (const sample of event.getCoalescedEvents?.() ?? [event])
-    bubblesPointer.trace.add(sample.clientX, sample.clientY);
-  bubblesLocalCharge = bubblesPointer.trace.preview(bubblesSnapshot?.circles_to_charge ?? 1);
-  const step = Math.min(4, Math.floor(bubblesLocalCharge * 4));
-  if (step > bubblesPointer.step) {
-    bubblesPointer.step = step;
-    sendBubblesCharge(bubblesPointer.seq, "progress", step);
-  }
-  const [dx, dy] = bubblesPointer.trace.displacement();
-  const drag = [
-    Math.max(-4, Math.min(4, Math.round(dx * 10))),
-    Math.max(-4, Math.min(4, Math.round(dy * 10)))
-  ];
-  const now = performance.now();
-  bubblesPointer.drag = drag;
-  if ((drag[0] !== bubblesPointer.sentDrag[0] || drag[1] !== bubblesPointer.sentDrag[1]) && now - bubblesPointer.lastMotionAt >= 70)
-    sendBubblesMotion(bubblesPointer, now);
-});
-bubblesPad.addEventListener("pointerup", (event) => {
-  if (bubblesPointer?.id !== event.pointerId)
-    return;
-  event.preventDefault();
-  bubblesPointer.trace.add(event.clientX, event.clientY);
-  const { seq } = bubblesPointer;
-  const trace = bubblesPointer.trace.completed();
-  cancelBubblesPointer(false);
-  if (trace.length < 2)
-    sendBubblesCharge(seq, "cancel");
-  else
-    sendBubblesTrace(trace, seq);
-});
-bubblesPad.addEventListener("pointercancel", (event) => {
-  if (bubblesPointer?.id === event.pointerId)
-    cancelBubblesPointer();
-});
-bubblesPad.addEventListener("lostpointercapture", (event) => {
-  if (bubblesPointer?.id === event.pointerId)
-    cancelBubblesPointer();
-});
-bubblesPad.addEventListener("contextmenu", (event) => event.preventDefault());
-bubblesPad.addEventListener("keydown", (event) => {
-  if (event.repeat || activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active")
-    return;
-  const directions = {
-    ArrowLeft: [0.1, 0.5],
-    ArrowRight: [0.9, 0.5],
-    ArrowUp: [0.5, 0.1],
-    ArrowDown: [0.5, 0.9]
-  };
-  if (directions[event.key]) {
-    event.preventDefault();
-    sendBubblesTrace([[0.5, 0.5], directions[event.key]]);
-  } else if (event.key === " " || event.key === "Enter") {
-    event.preventDefault();
-    const circles = Math.max(1, Math.min(3, bubblesSnapshot?.circles_to_charge ?? 1));
-    const trace = Array.from({ length: 97 }, (_2, index) => [
-      0.5 + 0.22 * Math.cos(index / 96 * Math.PI * 2 * circles),
-      0.5 + 0.22 * Math.sin(index / 96 * Math.PI * 2 * circles)
-    ]);
-    sendBubblesTrace(trace);
-  }
-});
-function showBubbles(message) {
-  gameplayMotion.stop();
-  motionLab.stop();
-  lobbyControls.deactivate();
-  readyCard.hidden = true;
-  document.documentElement.classList.remove("ready-active");
-  bubblesSnapshot = message;
-  bubblesSnapshotTime = performance.now();
-  playerCard.hidden = true;
-  bubblesCard.hidden = false;
-  const phase = message.phase ?? "waiting";
-  const active = phase === "results" || ["instructions", "countdown", "active"].includes(phase) && message.left !== true;
-  setGameplaySurface(active);
-  bubblesScore.textContent = String(Math.max(0, Math.floor(message.score ?? 0)));
-  if (message.type === "bubbles_feedback") {
-    if (message.event === "captured")
-      vibrate(18);
-    else if (message.event === "spin")
-      vibrate([20, 30, 20]);
-    else if (message.event === "pop")
-      vibrate([35, 45, 35]);
-  }
-}
-var BUBBLE_RIM_COLORS = ["#6eeaff", "#a785ff", "#ff8bce", "#ffdf9d", "#8af8c7"];
-function clamp(value, minimum, maximum) {
-  return Math.min(maximum, Math.max(minimum, value));
-}
-function tuningValue(key, fallback) {
-  const value = bubblesSnapshot?.visual_tuning?.[key];
-  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
-}
-function imageReady(image) {
-  return image.complete && image.naturalWidth > 0;
-}
 function renderJoinPreviews(now) {
   for (const canvas of [selectionPreview, namePreview]) {
     if (canvas.closest("section")?.hidden)
@@ -3200,236 +2953,11 @@ function renderJoinPreviews(now) {
     squircleCanvas.draw(context, joinFlow.color, rect.width / 2, rect.height * 0.89, scale, now);
   }
 }
-function drawBubblePath(context, radius, pull) {
-  const length = Math.hypot(pull[0], pull[1]);
-  const stretch = clamp(length, 0, 0.22);
-  const along = stretch > 1e-3 ? [pull[0] / length, pull[1] / length] : [1, 0];
-  const center = [along[0] * radius * stretch * 0.22, along[1] * radius * stretch * 0.22];
-  const at = (theta) => {
-    const forward = Math.cos(theta);
-    const longitudinal = 1 + stretch * (1.25 * Math.max(forward, 0) - 0.25 * Math.max(-forward, 0));
-    const normalX = -along[1];
-    const normalY = along[0];
-    return [
-      center[0] + along[0] * forward * radius * longitudinal + normalX * Math.sin(theta) * radius * (1 - stretch * 0.3),
-      center[1] + along[1] * forward * radius * longitudinal + normalY * Math.sin(theta) * radius * (1 - stretch * 0.3)
-    ];
-  };
-  const points = [];
-  for (let index = 0; index < 65; index++)
-    points.push(at(index * Math.PI * 2 / 64));
-  context.beginPath();
-  points.forEach(([x2, y2], index) => index === 0 ? context.moveTo(x2, y2) : context.lineTo(x2, y2));
-  context.closePath();
-  return { points, center, along, stretch };
-}
-function traceBubblePoint(theta, radius, center, along, stretch) {
-  const forward = Math.cos(theta);
-  const longitudinal = 1 + stretch * (1.25 * Math.max(forward, 0) - 0.25 * Math.max(-forward, 0));
-  return [
-    center[0] + along[0] * forward * radius * longitudinal - along[1] * Math.sin(theta) * radius * (1 - stretch * 0.3),
-    center[1] + along[1] * forward * radius * longitudinal + along[0] * Math.sin(theta) * radius * (1 - stretch * 0.3)
-  ];
-}
-function drawPolyline(context, points, color, width) {
-  if (points.length < 2)
-    return;
-  context.beginPath();
-  context.moveTo(points[0][0], points[0][1]);
-  for (let index = 1; index < points.length; index++)
-    context.lineTo(points[index][0], points[index][1]);
-  context.strokeStyle = color;
-  context.lineWidth = width;
-  context.lineJoin = "round";
-  context.lineCap = "round";
-  context.stroke();
-}
-function drawArc(context, x2, y2, radius, start, end, color, width) {
-  context.beginPath();
-  context.arc(x2, y2, Math.max(0, radius), start, end, false);
-  context.strokeStyle = color;
-  context.lineWidth = width;
-  context.lineCap = "round";
-  context.stroke();
-}
-function drawBubbleBurst(context, radius, progress, density) {
-  const age = clamp(progress, 0, 1);
-  const fade = 1 - clamp((age - 0.45) / 0.55, 0, 1);
-  const fragmentCount = Math.max(4, Math.floor(density / 2));
-  for (let index = 0; index < fragmentCount; index++) {
-    const phase = index * Math.PI * 2 / fragmentCount + 0.14;
-    const x2 = Math.cos(phase) * radius * (0.25 + age * 1.14);
-    const y2 = Math.sin(phase) * radius * (0.25 + age * 1.14);
-    const color = BUBBLE_RIM_COLORS[index % BUBBLE_RIM_COLORS.length];
-    drawArc(context, x2, y2, radius * (0.3 - age * 0.17), phase + 1, phase + 2.7, `${color}${Math.round(0.83 * fade * 255).toString(16).padStart(2, "0")}`, Math.max(2, radius * 0.055));
-    drawArc(context, x2, y2, radius * (0.27 - age * 0.16), phase + 1.05, phase + 2.5, `rgba(255,255,255,${0.38 * fade})`, Math.max(1, radius * 0.016));
-  }
-  for (let index = 0; index < density; index++) {
-    const phase = index * 2.39996;
-    const distance = radius * (0.35 + age * (0.75 + index % 4 * 0.13));
-    const x2 = Math.cos(phase) * distance;
-    const y2 = Math.sin(phase) * distance;
-    if (index % 4 === 0) {
-      const star = 2 + index % 3;
-      context.strokeStyle = `rgba(255,255,222,${fade})`;
-      context.lineWidth = 1.2;
-      context.beginPath();
-      context.moveTo(x2 - star, y2);
-      context.lineTo(x2 + star, y2);
-      context.moveTo(x2, y2 - star);
-      context.lineTo(x2, y2 + star);
-      context.stroke();
-    } else
-      drawArc(context, x2, y2, 2 + index % 3, 0, Math.PI * 2, `rgba(204,248,255,${0.75 * fade})`, 1.3);
-  }
-}
-function drawPhoneCharacter(context, visual, hostTime, selectedColor) {
-  const fallbackScale = Math.min(0.44, (bubblesSnapshot?.bubble_radius ?? tuningValue("starting_radius", 48)) * 0.82 / 100);
-  const position = visual?.character_position ?? [0, 40 + Math.sin(hostTime / 1e3 * 2.2) * 4];
-  squircleCanvas.draw(context, visual?.recovery_white ? "#ffffff" : selectedColor, position[0], position[1], visual?.character_scale ?? fallbackScale, hostTime, visual?.face_blink ?? false, visual?.body_rotation ?? Math.sin(hostTime / 1e3 * 1.7) * 0.05);
-}
-function renderBubbles(now) {
-  if (bubblesCard.hidden || !bubblesSnapshot)
-    return;
-  const rect = bubblesCanvas.getBoundingClientRect();
-  const pixelRatio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-  const backingWidth = Math.max(1, Math.round(rect.width * pixelRatio));
-  const backingHeight = Math.max(1, Math.round(rect.height * pixelRatio));
-  if (bubblesCanvas.width !== backingWidth || bubblesCanvas.height !== backingHeight) {
-    bubblesCanvas.width = backingWidth;
-    bubblesCanvas.height = backingHeight;
-  }
-  const context = bubblesContext;
-  context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-  context.clearRect(0, 0, rect.width, rect.height);
-  const message = bubblesSnapshot;
-  const visual = bubblesVisualSnapshot;
-  const snapshotElapsed = Math.max(0, now - bubblesSnapshotTime);
-  const visualElapsed = visual ? Math.max(0, now - bubblesVisualReceivedAt) : 0;
-  const tuneTime = Number.isFinite(visual?.host_time_msec) ? visual.host_time_msec + visualElapsed : (message.host_time_msec ?? 0) + snapshotElapsed;
-  const startRadius = Math.max(1, tuningValue("starting_radius", 48));
-  const baseRadius = Math.min(rect.width, rect.height) * 0.23;
-  const worldScale = baseRadius / startRadius;
-  const reformDuration = Math.max(1, tuningValue("bubble_reform_seconds", 0.35) * 1e3);
-  const reformRemaining = Math.max(0, (message.reform_remaining_msec ?? 0) - snapshotElapsed);
-  const reformScale = reformRemaining > 0 ? clamp((reformDuration - reformRemaining) / reformDuration, 0.08, 1) : 1;
-  const burstDuration = Math.max(1, tuningValue("burst_seconds", 0.26) * 1e3);
-  const burstProgress = visual?.burst_progress ?? (reformRemaining > 0 && reformDuration - reformRemaining < burstDuration ? (reformDuration - reformRemaining) / burstDuration : -1);
-  const radius = Math.max(1, visual?.radius ?? (message.bubble_radius ?? startRadius) * reformScale);
-  const burstRadius = message.burst_radius ?? message.bubble_radius ?? startRadius;
-  const renderedRadius = burstProgress >= 0 && burstProgress < 1 ? visual?.radius ?? burstRadius : radius;
-  const selectedColor = colorOption(message.character_color)?.hex ?? FALLBACK_CHARACTER.color;
-  const spinTurns = tuningValue("spin_surface_turns_per_second", 1.8);
-  const spinning = visual?.spinning ?? (message.phase === "active" && (message.spin_remaining_msec ?? 0) - snapshotElapsed > 0);
-  const surfaceAngle = visual ? visual.surface_angle + (spinning ? visualElapsed / 1e3 * Math.PI * 2 * spinTurns : 0) : 0;
-  let pull = visual?.pull ?? [0, 0];
-  let localDragPull = [0, 0];
-  if (bubblesPointer && message.phase === "active") {
-    const dragX = bubblesPointer.drag[0] / 4;
-    const dragY = bubblesPointer.drag[1] / 4;
-    const dragLength = Math.hypot(dragX, dragY);
-    const dragScale = dragLength > 1 ? 1 / dragLength : 1;
-    const strength = tuningValue("live_drag_pull_strength", 0.2);
-    const target = [dragX * dragScale * strength, dragY * dragScale * strength];
-    const delta = clamp((now - bubblesPreviousFrame) / 1e3, 0, 0.1);
-    const response = Math.max(1e-3, tuningValue("live_drag_response_seconds", 0.08));
-    const amount = 1 - Math.exp(-delta / response);
-    bubblesPhoneDragDisplay = [
-      bubblesPhoneDragDisplay[0] + (target[0] - bubblesPhoneDragDisplay[0]) * amount,
-      bubblesPhoneDragDisplay[1] + (target[1] - bubblesPhoneDragDisplay[1]) * amount
-    ];
-    localDragPull = bubblesPhoneDragDisplay;
-    const localCharge = bubblesPointer.step / 4;
-    const seconds = tuneTime / 1e3;
-    const wobble = tuningValue("charge_wobble_strength", 0.07) * localCharge;
-    const localChargePull = [
-      Math.sin(seconds * 13) * wobble,
-      Math.cos(seconds * 17) * wobble
-    ];
-    const hostDrag = visual?.drag_pull ?? [0, 0];
-    const hostCharge = visual?.charge_pull ?? [0, 0];
-    pull = [
-      pull[0] - hostDrag[0] - hostCharge[0] + localDragPull[0] + localChargePull[0],
-      pull[1] - hostDrag[1] - hostCharge[1] + localDragPull[1] + localChargePull[1]
-    ];
-  } else {
-    const amount = 1 - Math.exp(-clamp((now - bubblesPreviousFrame) / 1e3, 0, 0.1) / Math.max(1e-3, tuningValue("live_drag_response_seconds", 0.08)));
-    bubblesPhoneDragDisplay = [
-      bubblesPhoneDragDisplay[0] * (1 - amount),
-      bubblesPhoneDragDisplay[1] * (1 - amount)
-    ];
-  }
-  context.save();
-  context.translate(rect.width / 2, rect.height / 2);
-  context.scale(worldScale, worldScale);
-  if (burstProgress >= 0 && burstProgress < 1) {
-    drawBubbleBurst(context, renderedRadius, burstProgress + (visual ? visualElapsed / burstDuration : 0), visual?.particle_density ?? 10);
-  } else {
-    const shape = drawBubblePath(context, renderedRadius, pull);
-    context.fillStyle = "rgba(69,191,255,.10)";
-    context.fill();
-    const chargeGlow = bubblesPointer ? Math.max(0, bubblesPointer.step / 4) * tuningValue("charge_glow_strength", 0.12) : visual?.charge_glow ?? 0;
-    if (chargeGlow > 0) {
-      context.beginPath();
-      context.arc(shape.center[0], shape.center[1], renderedRadius * 0.84, 0, Math.PI * 2);
-      context.fillStyle = `rgba(125,209,255,${chargeGlow * 0.48})`;
-      context.fill();
-      drawArc(context, shape.center[0], shape.center[1], renderedRadius * 0.78, 0, Math.PI * 2, `rgba(191,240,255,${chargeGlow * 0.85})`, Math.max(3, renderedRadius * 0.16));
-    }
-    drawArc(context, shape.center[0] + renderedRadius * 0.04, shape.center[1] + renderedRadius * 0.04, renderedRadius * 0.79, 0.15 + surfaceAngle, 1.35 + surfaceAngle, "rgba(110,212,255,.13)", Math.max(3, renderedRadius * 0.12));
-    drawArc(context, shape.center[0], shape.center[1], renderedRadius * 0.87, 2.2 + surfaceAngle, 3.9 + surfaceAngle, "rgba(189,161,255,.10)", Math.max(3, renderedRadius * 0.09));
-    drawPolyline(context, [...shape.points, shape.points[0]], `rgba(186,247,255,${0.65 * (visual?.recovery_white ? 1 : 0.88)})`, Math.max(2, renderedRadius * 0.045));
-    drawPolyline(context, [...shape.points, shape.points[0]], `rgba(255,255,255,${0.56 * (visual?.recovery_white ? 1 : 0.88)})`, Math.max(1, renderedRadius * 0.016));
-    for (let index = 0; index < 12; index++) {
-      const start = index * Math.PI * 2 / 12 + surfaceAngle;
-      const arc = [];
-      for (let sample = 0; sample < 10; sample++)
-        arc.push(traceBubblePoint(start + sample * (Math.PI * 2 / 12 + 0.04) / 9, renderedRadius, shape.center, shape.along, shape.stretch));
-      const hues = ["110,234,255", "167,133,255", "255,139,206", "255,223,157", "138,248,199"];
-      const hue = visual?.recovery_white ? "255,255,255" : hues[index % 5];
-      drawPolyline(context, arc, `rgba(${hue},0.5)`, Math.max(2, renderedRadius * 0.055));
-    }
-    drawArc(context, shape.center[0] - renderedRadius * 0.08, shape.center[1] - renderedRadius * 0.08, renderedRadius * 0.74, -2.55 + surfaceAngle, -1.65 + surfaceAngle, "rgba(255,255,255,.76)", Math.max(2, renderedRadius * 0.055));
-    drawArc(context, shape.center[0], shape.center[1], renderedRadius * 0.91, 0.38 + surfaceAngle, 1.15 + surfaceAngle, "rgba(222,255,255,.34)", Math.max(1.5, renderedRadius * 0.03));
-    const count = Math.min(Math.max(0, Math.floor(message.visual_jellyfish ?? 0)), Math.max(0, Math.floor(message.visual_cap ?? 0)), 64);
-    if (imageReady(bubblesArt.jellyfish))
-      for (let index = 0; index < count; index++) {
-        const turn = index * 2.39996323;
-        const distance = Math.sqrt((index + 0.5) / Math.max(count, 1)) * renderedRadius * 0.67;
-        const width = renderedRadius * 0.11;
-        const height = width * bubblesArt.jellyfish.naturalHeight / bubblesArt.jellyfish.naturalWidth;
-        context.save();
-        context.globalAlpha = 0.82;
-        context.drawImage(bubblesArt.jellyfish, Math.cos(turn) * distance - width / 2, Math.sin(turn) * distance - height / 2, width, height);
-        context.restore();
-      }
-    if (spinning) {
-      const density = visual?.particle_density ?? 10;
-      for (let index = 0; index < density; index++) {
-        const phase = index * 2.39996 + surfaceAngle * (0.55 + index % 3 * 0.2);
-        const x2 = Math.cos(phase) * renderedRadius * (1.12 + index % 4 * 0.075);
-        const y2 = Math.sin(phase) * renderedRadius * (1.12 + index % 4 * 0.075);
-        const size2 = 2.2 + index % 3 * 1.2;
-        drawArc(context, x2, y2, size2, 0, Math.PI * 2, "rgba(204,250,255,.52)", 1.2);
-        context.beginPath();
-        context.arc(x2 - size2 * 0.28, y2 - size2 * 0.3, 0.7, 0, Math.PI * 2);
-        context.fillStyle = "rgba(255,255,255,.7)";
-        context.fill();
-      }
-    }
-  }
-  const characterVisible = visual?.character_visible ?? !(burstProgress >= 0 && burstProgress < 1);
-  if (characterVisible)
-    drawPhoneCharacter(context, visual, tuneTime, selectedColor);
-  context.restore();
-  bubblesPreviousFrame = now;
-}
-function animateBubbles(now) {
-  renderBubbles(now);
+function animateJoinPreviews(now) {
   renderJoinPreviews(now);
-  requestAnimationFrame(animateBubbles);
+  requestAnimationFrame(animateJoinPreviews);
 }
-requestAnimationFrame(animateBubbles);
+requestAnimationFrame(animateJoinPreviews);
 function rememberIdentity(message) {
   const player = message.player;
   if (!player || typeof player.name !== "string" || typeof message.session_id !== "string" || typeof message.reconnect_token !== "string")
@@ -3525,8 +3053,6 @@ async function connect() {
             showTilt(message.gameplay);
           else if (message.gameplay?.type === "tilt_shift_3d_snapshot")
             showTilt3D(message.gameplay);
-          else if (message.gameplay?.type === "bubbles_snapshot")
-            showBubbles(message.gameplay);
           else if (message.gameplay?.type === "pre_minigame_snapshot")
             showReady(message.gameplay);
           else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player)
@@ -3560,13 +3086,6 @@ async function connect() {
         showJoin("You left the lobby. Choose your character and name to join again.", true);
       } else if (isSnapshot(message) || message.type === "bubbles_3d_visual" || message.type === "bubbles_3d_release_result")
         showBubble3D(message);
-      else if (message.type === "bubbles_trace_result")
-        bubblesLocalCharge = 0;
-      else if (message.type === "bubbles_visual" && message.visual && bubblesSnapshot) {
-        bubblesVisualSnapshot = message.visual;
-        bubblesVisualReceivedAt = performance.now();
-      } else if (message.type === "bubbles_snapshot" || message.type === "bubbles_feedback")
-        showBubbles(message);
       else if (message.type === "pre_minigame_snapshot")
         showReady(message);
       else if (message.type === "tilt_shift_snapshot")
@@ -3577,7 +3096,7 @@ async function connect() {
         lobbyControls.deactivate();
         setGameplaySurface(false);
         document.documentElement.classList.remove("ready-active");
-        selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = readyCard.hidden = bubblesCard.hidden = true;
+        selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = readyCard.hidden = true;
         status.hidden = true;
         gameplayMotion.stop();
         motionLab.begin({
@@ -3612,9 +3131,6 @@ async function connect() {
         setGameplaySurface(false);
         readyCard.hidden = true;
         document.documentElement.classList.remove("ready-active");
-        bubblesCard.hidden = true;
-        bubblesSnapshot = void 0;
-        bubblesVisualSnapshot = void 0;
         if (message.player)
           rememberIdentity(message);
         else if (joined) {
@@ -3640,7 +3156,7 @@ async function connect() {
       if (event.code === 4e3) {
         stopped = true;
         leaveButton.disabled = true;
-        readyCard.hidden = bubblesCard.hidden = true;
+        readyCard.hidden = true;
         document.documentElement.classList.remove("ready-active");
         status.textContent = "This player continued in another window. Reload to switch back.";
         status.hidden = false;

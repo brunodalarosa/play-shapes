@@ -25,21 +25,22 @@ func _run() -> void:
 	var start_button := current_scene.get_node("%StartMinigame") as Button
 	var start_help := current_scene.get_node("%StartHelp") as Label
 	if not check(
-		selector.item_count == 4 and selector.get_item_text(0) == "Bubbles and Jellyfishes"
-		and selector.get_item_text(1) == "Bubbles and jellyfishes 3D"
-		and selector.get_item_text(2) == "Tilt Shift 3D"
-		and selector.get_item_text(3) == "Tilt Shift",
-		"Lobby offers both Bubbles versions, then Tilt Shift 3D beside Tilt Shift",
+		selector.item_count == 3 and selector.get_item_text(0) == "Bubbles and jellyfishes 3D"
+		and selector.get_item_text(1) == "Tilt Shift 3D"
+		and selector.get_item_text(2) == "Tilt Shift",
+		"Lobby offers Bubbles and jellyfishes 3D, then Tilt Shift 3D beside Tilt Shift",
 	):
 		return
 	if not check(
 		host.minigame_scene_path(&"flash_pose").is_empty()
-		and not host.prepare_minigame_launch(&"flash_pose").accepted,
-		"Retired game cannot launch through the host",
+		and not host.prepare_minigame_launch(&"flash_pose").accepted
+		and host.minigame_scene_path(&"bubbles").is_empty()
+		and not host.prepare_minigame_launch(&"bubbles").accepted,
+		"Retired games cannot launch through the host",
 	):
 		return
-	selector.select(1)
-	selector.item_selected.emit(1)
+	selector.select(0)
+	selector.item_selected.emit(0)
 	if not check(
 		start_button.disabled and start_help.text.contains("At least 2"),
 		"Selected Bubbles 3D blocks launch at zero players with actionable copy",
@@ -121,8 +122,8 @@ func _run() -> void:
 	selector = current_scene.get_node("%MinigameSelector") as OptionButton
 	start_button = current_scene.get_node("%StartMinigame") as Button
 	start_help = current_scene.get_node("%StartHelp") as Label
-	selector.select(1)
-	selector.item_selected.emit(1)
+	selector.select(0)
+	selector.item_selected.emit(0)
 	var overflow_connections: Array[int] = []
 	for index: int in 9:
 		var connection_id := 600 + index
@@ -173,8 +174,8 @@ func _run() -> void:
 	):
 		return
 	selector = current_scene.get_node("%MinigameSelector") as OptionButton
-	selector.select(1)
-	selector.item_selected.emit(1)
+	selector.select(0)
+	selector.item_selected.emit(0)
 	(current_scene.get_node("%StartMinigame") as Button).pressed.emit()
 	await scene_changed
 	await process_frame
@@ -264,8 +265,8 @@ func _run() -> void:
 	start_button = current_scene.get_node("%StartMinigame") as Button
 	var fourth := _join(host, 505, "Fourth")
 	await process_frame
-	selector.select(1)
-	selector.item_selected.emit(1)
+	selector.select(0)
+	selector.item_selected.emit(0)
 	if not check(
 		fourth.accepted and not start_button.disabled,
 		"Bubbles 3D can start again after returning to the lobby",

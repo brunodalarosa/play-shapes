@@ -80,7 +80,6 @@ The host serves a fixed list and nothing else:
   `/app-icon-512.png`.
 - Character sheets: `/squircle-v1/manifest.json`, `/squircle-v1/idle-front-colorable.png`,
   `/squircle-v1/idle-front-neutral.png`, `/squircle-v1/idle-front-blink.png`.
-- Bubbles art: `/bubbles-jellyfish.png`, `/bubbles-phone-background.png`.
 - 3D models for the phone: `/models/squircle.glb`, `/models/jellyfish.glb`,
   `/models/squircle-face-neutral.png` and `/models/squircle-face-blink.png`.
 - Tilt Shift art: `/tilt-shift/manifest.json`, `/tilt-shift/paddle_orange.png`,
@@ -108,7 +107,7 @@ personalized lobby and gameplay state.
   body-shape values, and validates the ten approved player colors.
 - A join with no style uses Squircle and the `#598DF2` blue fallback. A valid color without a
   shape keeps that color.
-- The registry stores Squircle. Lobby rosters, Bubbles snapshots and resume state carry it
+- The registry stores Squircle. Lobby rosters, gameplay snapshots and resume state carry it
   forward.
 
 The registry keeps four identities apart:
@@ -133,7 +132,8 @@ increasing gameplay sequence it needs to resume safely.
 
 ## Character appearance
 
-- The lobby uses the Squircle v1 movement clips. Setup and Bubbles use its front idle clip.
+- The lobby and Bubbles and jellyfishes 3D use the exported 3D Squircle. Setup and the ready
+  screen use the Squircle v1 front idle clip.
 - The Squircle v1 tint colors its body, hands and feet. The neutral and blink faces stay
   untinted.
 - The colorable layer uses the same tint treatment on host and phone.
@@ -208,36 +208,10 @@ A face change is sent at once, coalesced like angle updates; other traffic follo
 Shift's ceiling. `tilt_shift_3d_ready` carries exactly what `tilt_shift_ready` does. A stale or
 invalid READY is dropped without an error, and the sender gets its current snapshot back.
 
-## Bubbles input
-
-While a touch is held, the browser may send `bubbles_charge` with `input_seq` and `stage`:
-
-- `start`, `progress` and `cancel` carry an integer `step` from 0 to 4.
-- `motion` carries a two-axis quantized `drag` vector of integers from -4 to 4.
-- The browser throttles motion to 70 ms, sends a 600 ms heartbeat while held, and caps a
-  gesture at 48 motion packets.
-
-On touch release, the browser sends one `bubbles_trace` with the same gesture sequence. It
-holds at most 128 normalized points, under an 8192-byte packet ceiling.
-
-The host side:
-
-- For the current authenticated touch sequence, the host accepts four coarse charge steps plus
-  up to 48 quantized drag updates, spaced at least 60 ms apart.
-- Charge and drag drive only transient shared-screen deformation and glow. They reset after
-  1.2 seconds without updates.
-- The host records touch start. Live drag stretch settles once `swipe_max_hold_seconds`
-  passes, and a late swipe applies no impulse.
-- Completed spins use the gesture classifier and its cooldown.
-- The host replies to a trace with `bubbles_trace_result` and a `bubbles_snapshot`.
-  `bubbles_feedback` carries collection, spin and pop cues.
-- Disconnect clears an unfinished trace. Resume requires a new gesture.
-- Reconnect embeds the latest personalized snapshot in `welcome.gameplay`.
-
 ## Bubbles and jellyfishes 3D
 
-Minigame 004 has its own messages, with a `bubbles_3d` prefix; it accepts no 2D Bubbles message
-and has no spin or charge. The phone sends:
+Minigame 004 uses messages with a `bubbles_3d` prefix and has no spin or charge. Every client
+WebSocket packet is bounded to 8192 bytes. The phone sends:
 
 - `bubbles_3d_touch` with `input_seq` and `stage`: `start` on touch down, `drag` with a coarse
   `drag` of two integers from -4 to 4 in screen axes, and `cancel` when a touch is interrupted.

@@ -12,7 +12,7 @@ func _run() -> void:
 		return
 	var original_host_id := host.get_instance_id()
 	var animation_lab: DebugScenario = launcher.scenario_for_id(&"squircle_animation_lab")
-	var bubbles: DebugScenario = launcher.scenario_for_id(&"one_player_bubbles")
+	var bubbles: DebugScenario = launcher.scenario_for_id(&"one_player_bubbles_3d")
 	if not check(animation_lab != null, "Animation lab is registered"):
 		return
 	if not check(
@@ -31,14 +31,19 @@ func _run() -> void:
 	):
 		return
 	if not check(
-		bubbles != null and bubbles.minigame_id == &"bubbles",
-		"One-player Bubbles is registered as a separate minigame debug scenario",
+		launcher.scenario_for_id(&"one_player_bubbles") == null,
+		"Retired 2D Bubbles has no debug scenario",
+	):
+		return
+	if not check(
+		bubbles != null and bubbles.minigame_id == &"bubbles_3d",
+		"One-player Bubbles 3D is registered as a separate minigame debug scenario",
 	):
 		return
 	if not check(
 		not bubbles.availability({ "one_registered_player": false }).available \
 				and bubbles.availability({ "one_registered_player": true }).available,
-		"Bubbles debug requires exactly one registered player",
+		"Bubbles 3D debug requires exactly one registered player",
 	):
 		return
 	if not check(not launcher.restart_scenario(), "Restart is disabled outside a debug scenario"):

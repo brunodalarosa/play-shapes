@@ -2,9 +2,6 @@ extends TestScript
 
 const TUNING_ROOT := "res://Tuning"
 const MINIGAMES_ROOT := "res://minigames"
-const BubblesTuningScript := preload(
-	"res://minigames/002_bubbles_and_jellyfishes/bubbles_tuning.gd"
-)
 const Bubbles3DTuningScript := preload("res://minigames/004_3d_bubbles/bubbles_3d_tuning.gd")
 const NetworkingTuningScript := preload("res://Tuning/Shared/networking_tuning.gd")
 const LobbyMovementTuningScript := preload("res://Tuning/Shared/lobby_movement_tuning.gd")
@@ -21,55 +18,6 @@ func _run() -> void:
 			"request_timeout_seconds",
 			"max_players",
 			"reconnect_grace_seconds",
-		],
-	):
-		return
-	if not _check_tooltip_contract(
-		"res://minigames/002_bubbles_and_jellyfishes/bubbles_tuning.gd",
-		[
-			"instructions_seconds",
-			"countdown_seconds",
-			"round_duration_seconds",
-			"starting_radius",
-			"max_radius",
-			"radius_per_jellyfish",
-			"captured_visual_cap",
-			"mass_growth_per_jellyfish",
-			"speed_reduction_per_jellyfish",
-			"swipe_impulse",
-			"swipe_min_distance",
-			"max_player_speed",
-			"water_drag",
-			"wall_bounciness",
-			"circles_to_charge",
-			"circle_tolerance",
-			"spin_duration_seconds",
-			"spin_cooldown_seconds",
-			"spin_shove_impulse",
-			"jellyfish_collider_radius",
-			"starting_jellyfish",
-			"max_free_jellyfish",
-			"jellyfish_low_spawn_rate",
-			"jellyfish_high_spawn_rate",
-			"jellyfish_wave_min_seconds",
-			"jellyfish_wave_max_seconds",
-			"jellyfish_speed",
-			"jellyfish_spawn_clearance",
-			"jellyfish_entrance_seconds",
-			"released_collection_lockout_seconds",
-			"pufferfish_collider_radius",
-			"pufferfish_start_spawn_rate",
-			"pufferfish_max_spawn_rate",
-			"pufferfish_speed",
-			"pop_disappear_ratio",
-			"pop_invulnerability_seconds",
-			"bubble_reform_seconds",
-			"pufferfish_warning_enabled",
-			"pufferfish_warning_seconds",
-			"pufferfish_telegraph_bubble_count",
-			"pufferfish_telegraph_bubble_radius",
-			"pufferfish_telegraph_noise_strength",
-			"final_timer_emphasis_seconds",
 		],
 	):
 		return
@@ -186,7 +134,7 @@ func _run() -> void:
 		return
 	if not _check_tooltip_contract(
 		"res://Tuning/active_presets.gd",
-		["bubbles", "bubbles_3d", "tilt_shift", "networking", "lobby_movement"],
+		["bubbles_3d", "tilt_shift", "networking", "lobby_movement"],
 	):
 		return
 	if not _check_tooltip_contract(
@@ -201,7 +149,6 @@ func _run() -> void:
 		preset_paths.append_array(_find_presets(tuning_folder))
 	if not check(
 		preset_paths.has("res://Tuning/Active Presets.tres")
-		and preset_paths.has("res://minigames/002_bubbles_and_jellyfishes/tuning/Default.tres")
 		and preset_paths.has("res://minigames/004_3d_bubbles/tuning/Default.tres")
 		and preset_paths.has("res://Tuning/Shared/Networking/Default.tres")
 		and preset_paths.has("res://Tuning/Shared/Lobby/Default.tres"),
@@ -247,39 +194,6 @@ func _run() -> void:
 		network_errors.size() == 2 and network_errors[0].contains("must be different")
 		and network_errors[1].contains("cannot exceed"),
 		"Networking invalid combinations report actionable messages",
-	):
-		return
-	var bubbles: Resource = BubblesTuningScript.new()
-	bubbles.starting_radius = -1.0
-	var clamped: bool = bubbles.starting_radius == 16.0
-	if not check(clamped, "Bubbles individual values clamp to safe ranges"):
-		return
-	bubbles.starting_radius = 100.0
-	bubbles.max_radius = 32.0
-	bubbles.starting_jellyfish = 100
-	bubbles.max_free_jellyfish = 1
-	if not check(
-		bubbles.validation_errors().size() == 2,
-		"Bubbles invalid radius and population combinations are rejected",
-	):
-		return
-	bubbles.max_radius = 110.0
-	bubbles.starting_jellyfish = 20
-	bubbles.max_free_jellyfish = 70
-	bubbles.jellyfish_low_spawn_rate = 3.0
-	bubbles.jellyfish_high_spawn_rate = 1.0
-	bubbles.pufferfish_start_spawn_rate = 0.8
-	bubbles.pufferfish_max_spawn_rate = 0.2
-	if not check(
-		bubbles.validation_errors().size() == 2,
-		"Bubbles invalid spawn-rate ordering is rejected",
-	):
-		return
-	bubbles = BubblesTuningScript.new()
-	bubbles.water_drag = INF
-	if not check(
-		bubbles.water_drag == 8.0 and bubbles.validation_errors().is_empty(),
-		"Bubbles clamps non-finite positive input to a safe bound",
 	):
 		return
 
@@ -334,7 +248,7 @@ func _run() -> void:
 
 	var active: Resource = ActivePresetsScript.new()
 	if not check(
-		active.validation_errors().size() == 6,
+		active.validation_errors().size() == 5,
 		"Active selector rejects missing preset references",
 	):
 		return

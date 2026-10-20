@@ -41,14 +41,15 @@ This is the default `[AUTO]` check. In order, it runs:
    end-to-end test files.
 5. `npm test` in `web/`.
 6. A rebuild of the browser bundle, which fails if `web/public/` changed.
-7. The two-phone Bubbles, Bubbles and jellyfishes 3D, Tilt Shift and Tilt Shift 3D end-to-end
+7. The two-phone Bubbles and jellyfishes 3D, Tilt Shift and Tilt Shift 3D end-to-end
    journeys described below.
 
 `--full` adds the 4/6/8/10-phone Tilt Shift and Tilt Shift 3D journeys,
 `tilt_shift_workshop_preview_test.gd`, `tilt_shift_rotation_contact_test.gd` and
 `tilt_shift_3d_rotation_contact_test.gd`. The default retains the shorter Tilt Shift
-physics checks. Full coverage also keeps the full-length Bubbles round; Windows export
-remains a separate `--release` option. Name filters do not override these coverage options.
+physics checks. Full coverage also keeps the full-length Bubbles and jellyfishes 3D round;
+Windows export remains a separate `--release` option. Name filters do not override these
+coverage options.
 
 How it reports:
 
@@ -62,9 +63,9 @@ How it reports:
 Options and single runs:
 
 ```powershell
-node tools/check.mjs bubbles web-tests   # only checks whose name contains a filter
-node tools/check.mjs --full              # extended coverage and full-length Bubbles
-node tools/check.mjs --release           # also run the Windows export test
+node tools/check.mjs bubbles_3d web-tests # only checks whose name contains a filter
+node tools/check.mjs --full               # extended coverage and full-length Bubbles 3D
+node tools/check.mjs --release            # also run the Windows export test
 godot --headless --path . --script res://tests/player_registry_test.gd   # one script, full output
 godot --headless --editor --path . --quit-after 30                        # editor import scan
 ```
@@ -77,9 +78,10 @@ Before running:
 
 ## The end-to-end test
 
-`web/e2e/bubbles_two_phones.spec.ts` runs the real phone client in two emulated Pixel 7
+`web/e2e/bubbles_3d_two_phones.spec.ts` runs the real phone client in two emulated Pixel 7
 Chromium contexts against the real host on ports 18200/18201. The phones join, walk in the
-lobby, ready up, swipe through a Bubbles round and return to the lobby.
+lobby, ready up, swipe on the 3D phone screen (which loads `/three_view.js` and the models from
+the host) through a Bubbles and jellyfishes 3D round and return to the lobby.
 
 The host side is `tests/e2e/host.gd`:
 
@@ -92,8 +94,8 @@ The host side is `tests/e2e/host.gd`:
   applies. A button that is covered, off screen, disabled or ignoring the mouse stops the run
   with a message naming what was under the mouse. That covers reachability, not appearance.
 - It prints one `E2E ...` line per event for the test to wait on.
-- By default it shortens only the two Bubbles rounds, to 10 s and in memory. `E2E_ROUND=full`
-  keeps every default.
+- By default it shortens only the Bubbles and jellyfishes 3D round, to 10 s and in memory.
+  `E2E_ROUND=full` keeps every default.
 - `E2E_MINIGAME` names the catalog id it picks in the lobby before Start; the fixture sets it
   from the test's `game` option.
 - It prints `E2E round ending` two seconds before the round ends, and the phones stop swiping
@@ -102,10 +104,6 @@ The host side is `tests/e2e/host.gd`:
 
 The test fails on a missing step, a phone without an accepted swipe, a page error, a visible
 phone error panel, or a host `ERROR` line.
-
-`web/e2e/bubbles_3d_two_phones.spec.ts` plays the same journey through Bubbles and
-jellyfishes 3D: two phones swipe on the 3D phone screen, which loads `/three_view.js` and the
-models from the host, and the test fails on a phone without an accepted swipe.
 
 `web/e2e/tilt_shift_phones.spec.ts` also runs the real boot/catalog/gameplay journey with
 synthetic sensors. Its two-phone scenario runs by default, including delayed permission,
@@ -240,7 +238,7 @@ start only what they need, so they stay fast.
   in [flow tuning](../minigames/003_tilt_shift/tuning/FLOW.md).
 - `E2E_WINDOWED=1` enables real-host captures for those scenarios. It does not supply
   physical-phone evidence. The quick Tilt Shift fixture maps two eight-second rounds;
-  Bubbles retains its existing quick/full behavior.
+  Bubbles and jellyfishes 3D retains its existing quick/full behavior.
 - Set `E2E_EXPORTED_PACK` to the absolute Windows package PCK to run the same browser
   journey against exported resources in Godot. The driver remains an external test script;
   it rejects a package run that can see the workspace's test resources. This loads the
@@ -334,21 +332,14 @@ uses the Compatibility renderer by default.
 godot --path . --rendering-method gl_compatibility --script res://tests/<helper>.gd
 ```
 
-The helpers whose names start with `bubbles_` are in
-`minigames/002_bubbles_and_jellyfishes/tests/`, except `bubbles_3d_scene_visual_check`
-and `bubbles_3d_performance_check`, which are in `minigames/004_3d_bubbles/tests/`; use that
-folder in place of `tests/`. Those starting with `tilt_shift_3d_` are in
+The helpers whose names start with `bubbles_3d_` are in `minigames/004_3d_bubbles/tests/`; use
+that folder in place of `tests/`. Those starting with `tilt_shift_3d_` are in
 `minigames/005_3d_tilt_shift/tests/`.
 
 | Helper | What it saves | Folder |
 | --- | --- | --- |
 | `tilt_shift_presentation_visual_check` | A/B preparation, countdown, ten-player FHD/HD/4:3, mixed balls and outcomes; scoped 80/320-ball host costs. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/presentation/` |
 | `tilt_shift_physics_visual_check` | Three live-arena captures with ten synthetic players, repeated turns/reversal and 180 balls over eight seconds. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/physics/` |
-| `bubbles_player_visual_check` | One player bubble: small, grown, spinning, pop and re-form, and ten players. Components only, not a composed arena. | `bubbles-player/` |
-| `bubbles_animation_visual_check` | Player animation in order: small and maximum idle, held left drag, accepted swipe, slow held and released drag, charge glow and wobble, active spin, burst, reformed. | `bubbles-animation/` |
-| `bubbles_creature_visual_check` | Creatures: entrance and warning, active creatures, white-blinking scatter. | `bubbles-creatures/` |
-| `bubbles_creature_motion_visual_check` | Creature telegraphs in order: the offscreen bubble burst before reveal, the fish entering from that origin, pufferfish jiggle, warning off, jellyfish breathing. | `bubbles-telegraphs/` |
-| `bubbles_presentation_visual_check` | The shared screen: empty, entrance, ten players at FHD and HD, warning on and off, final timer, tied results, two-player maximum bubble. | `bubbles-presentation/` |
 | `bubbles_3d_scene_visual_check` | Bubbles and jellyfishes 3D mid-round with five and ten players, catches of several sizes, free jellyfishes and two pufferfishes. | `bubbles-3d/` |
 | `bubbles_3d_performance_check` | No capture: prints the frame time and draw calls of ten players with every jellyfish cap reached, vsync off. Run it on the target PC. | none |
 | `tilt_shift_3d_presentation_visual_check` | Tilt Shift 3D with layout A and four players and layout B and six, through preparation, countdown, play with and without names and the round's end, then every colour on both teams. | `tilt-shift-3d/presentation/` |
@@ -359,11 +350,8 @@ folder in place of `tests/`. Those starting with `tilt_shift_3d_` are in
 | `pre_minigame_visual_check` | The ready screen with two and ten players at 1920×1080 and 1280×720. | `pre-minigame/` |
 | `lobby_playground_world_visual_check` | The plaza lobby empty, and with ten players on the ground and every landing tier, some walking, crouching and looking up. | `lobby-playground-world/` |
 | `lobby_layout_visual_check` | The lobby before and after two players join, and a character jumping in front of the billboard QR. | `lobby-layout/` |
-| `bubbles_viewport_visual_check` | Player-bubble edge contact at 1920×1080 and 1280×720. | `bubbles-viewport/` |
 | `motion_lab_visual_check` | A synthetic desktop capture of the motion lab. Not physical sensor evidence. | `motion-lab/` |
 
-- The committed tablet preview on the ready screen comes from an active Bubbles capture made
-  by the presentation helper.
 - A normal-profile editor load may print forced-shutdown RID and ObjectDB cleanup warnings
   after a successful scan. Treat exit zero with no script or import error as the result. Do
   not confuse cache or profile permission failures with product failures.
@@ -373,12 +361,12 @@ folder in place of `tests/`. Those starting with `tilt_shift_3d_` are in
 Run the preview host, then join at `http://127.0.0.1:8080`:
 
 ```powershell
-$preview = "res://minigames/002_bubbles_and_jellyfishes/tests/bubbles_phone_preview.gd"
+$preview = "res://minigames/004_3d_bubbles/tests/bubbles_3d_phone_preview.gd"
 godot --headless --path . --script $preview
 ```
 
-- It starts a one-player Bubbles protocol fixture with eight collected jellyfish and the
-  explicit debug label.
+- It starts a one-player Bubbles and jellyfishes 3D protocol fixture with eight collected
+  jellyfish and the explicit debug label.
 - Stop it before starting normal play.
 - The browser and host suite runs the same fixture on separate ports.
 - Neither preview is a playable arena or a physical-phone check.

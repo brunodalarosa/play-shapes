@@ -13,10 +13,10 @@ Playground lobby, where each steers a Shape Character with a phone stick and a J
 The host picks a minigame, everyone readies on the shared Pre-minigame screen, they play, see
 results and return to the lobby.
 
-- Minigame 002, Bubbles and Jellyfishes: 2–10 players, portrait swipe and circle gestures.
-- Minigame 003, Tilt Shift: 2/4/6/8/10 players, landscape phone tilt over HTTPS motion sensors,
-  native rigid-body physics, an editor workshop addon.
-- 001 is retired. Minigame numbers are stable identifiers and are never reused.
+- Minigame 004, Bubbles and jellyfishes 3D: 2–10 players, portrait swipe gestures, Jolt 3D plane physics.
+- Minigame 005, Tilt Shift 3D, and 003, Tilt Shift: 2/4/6/8/10 players, landscape phone tilt over HTTPS motion sensors,
+  an editor workshop addon.
+- 001 and 002 are retired. Minigame numbers are stable identifiers and are never reused.
 
 Everything shipping today is 2D: pre-rendered Squircle sprite sheets, painted lobby layers,
 `CharacterBody2D` platforming in pixels.

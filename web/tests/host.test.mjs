@@ -74,7 +74,6 @@ test("serves bundled HTML, JS, CSS and session configuration", async () => {
     ["/manifest.webmanifest", "application/manifest+json", "standalone"],
     ...[180, 192, 512].map((size) => [`/app-icon-${size}.png`, "image/png", null]),
     ["/platform_input_settings.json", "application/json", "x-right-y-up"],
-    ["/bubbles-jellyfish.png", "image/png", null],
     ["/shape_faces/face_presets.json", "application/json", "face_a"],
     ["/shape_faces/facial_part_eye_open.png", "image/png", null],
     ["/shape_faces/facial_part_eye_x.png", "image/png", null],
@@ -100,7 +99,7 @@ test("the main script bundles ordinary screens and loads the 3D view separately"
   for (const expected of [
     "attemptImmersive",
     "PwaOnboarding",
-    "GestureTrace",
+    "BubblePhone",
     "PlatformControls",
     "createLobbyContext",
     "PlatformInputState",
@@ -153,27 +152,28 @@ test("phone join form has labels, live feedback, and explicit change-player acti
   assert.match(html, /maxlength="16"/);
 });
 
-test("Bubbles controller keeps a clean portrait screen and accessible touch controls", async () => {
+test("Bubbles 3D controller keeps a clean portrait screen and accessible touch controls", async () => {
   const html = await (await fetch(base)).text();
   const css = await (await fetch(base + "/style.css")).text();
   const js = await (await fetch(base + "/app.js")).text();
-  assert.match(html, /id="bubbles-pad"[^>]*role="button"[^>]*tabindex="0"[^>]*aria-label=/);
-  assert.match(html, /id="bubbles-help" class="visually-hidden"/);
-  assert.match(html, /id="bubbles-score" aria-live="polite">0<\/span>/);
-  assert.match(html, /id="bubbles-visual"[^>]*aria-hidden="true"/);
-  assert.doesNotMatch(html, /bubbles-status|bubbles-debug|bubbles-meter|bubbles-state/);
-  assert.match(css, /inset-block-start: 15%/);
+  assert.match(
+    html,
+    /id="bubbles-3d-card"[^>]*aria-label="Bubbles and jellyfishes 3D\. Swipe to move\."/,
+  );
+  assert.match(html, /id="bubbles-3d-score"[^>]*aria-live="polite">0<\/span>/);
+  assert.match(html, /id="bubbles-3d-visual"[^>]*aria-hidden="true"/);
+  assert.doesNotMatch(html, /bubbles-card|bubbles-pad|bubbles-status|bubbles-debug/);
   assert.match(css, /env\(safe-area-inset-top\)/);
-  assert.match(css, /bubbles-phone-background\.png/);
-  assert.doesNotMatch(css, /#bubbles-status|#bubbles-debug|\.debug-badge/);
-  assert.match(css, /html\.bubbles-active/);
+  assert.match(css, /html\.bubbles-3d-active/);
+  assert.doesNotMatch(css, /html\.bubbles-active/);
   for (const expected of [
-    "bubbles_trace",
+    "bubbles_3d_touch",
+    "bubbles_3d_release",
     "pointercancel",
     "lostpointercapture",
-    "bubbles_trace_result",
-    "bubbles_snapshot",
-    "bubbles_visual",
+    "bubbles_3d_release_result",
+    "bubbles_3d_snapshot",
+    "bubbles_3d_visual",
     "portrait",
     "navigator.vibrate",
   ]) {

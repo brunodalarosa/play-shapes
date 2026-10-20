@@ -6,12 +6,6 @@ development error panel. The joystick and action button are in
 [platform-phone-controller.md](platform-phone-controller.md); the messages are in
 [protocol.md](protocol.md).
 
-## The Bubbles screen
-
-- A full-screen portrait touch area with the exact host score, capped decorative jellyfish,
-  and the player's personalized character preview.
-- The Squircle v1 body, hands and feet share the player's chosen color.
-
 ## The Bubbles and jellyfishes 3D screen
 
 The portrait screen shows the exact host jellyfish count above a live 3D view of the
@@ -29,8 +23,8 @@ blur, rotation, fullscreen or viewport changes.
 The renderer loads on the first game snapshot, including resumed gameplay. Lobby return
 or another screen disposes it. Rendering pauses while hidden and caps device pixel ratio
 at two. If WebGL or model loading fails, the count remains readable above a flat circle in
-the player's color, sized by the host radius. This screen's code is independent of the
-older Bubbles controller. See [browser-build.md](browser-build.md) for the separate bundle.
+the player's color, sized by the host radius. See [browser-build.md](browser-build.md) for the
+separate bundle.
 
 ## The Tilt Shift screen
 
@@ -149,16 +143,17 @@ Install before joining: the original tab then has no registered player to orphan
 
 - Browser continuation attempts fullscreen and portrait lock once per onboarding gesture.
   Failure leaves the game playable.
-- There are no fullscreen requests inside Bubbles pointer or key handlers, or before sensor
-  permissions.
+- There are no fullscreen requests inside Bubbles and jellyfishes 3D pointer or key handlers,
+  or before sensor permissions.
 - A standalone launch uses the manifest and Apple metadata.
 - A website cannot force a Safari tab into installed mode, remove all browser chrome, or
   suppress edge gestures the OS reserves.
 
 ## Touch guards
 
-- The active lobby, Bubbles and READY surfaces scope `touch-action`, Safari gesture and
-  touch-move prevention, selection and callout suppression, and overscroll protection.
+- The active lobby, Bubbles and jellyfishes 3D and READY surfaces scope `touch-action`, Safari
+  gesture and touch-move prevention, selection and callout suppression, and overscroll
+  protection.
 - Single taps remain available for READY and Leave.
 - Onboarding remains scrollable and zoomable. Name entry, the keyboard and focus are outside
   those guards.
@@ -173,16 +168,17 @@ temporary controller mounts.
 - Rotation, a viewport or fullscreen change, blur, loss of visibility and `pagehide` cancel
   pending gestures.
 - The stick is recreated when the page is focused and visible again.
-- Bubbles sends a cancel instead of completing a trace that was interrupted in the
-  background.
+- Bubbles and jellyfishes 3D sends a cancel instead of completing a swipe that was interrupted
+  in the background.
 
 ## How often the phone sends
 
 - Lobby stick: a 45 ms movement throttle and a 100 ms two-axis held refresh, in
   `platform_controls.ts` and `platform_input.ts`.
-- Bubbles: a 70 ms motion throttle, a 600 ms heartbeat and a 48-packet cap per gesture, in
-  `app.ts`.
-- A platform action release, and a Bubbles action start or release, send synchronously.
+- Bubbles and jellyfishes 3D: a 70 ms motion throttle, a 600 ms heartbeat and a 48-packet cap
+  per gesture, in `app.ts`.
+- A platform action release, and a Bubbles and jellyfishes 3D swipe start or release, send
+  synchronously.
 
 ## No offline cache
 

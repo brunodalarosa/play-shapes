@@ -3,7 +3,6 @@ extends Node
 ## A bounded, nonblocking HTTP service for a fixed set of bundled assets.
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
-const BUBBLES_ART := "res://assets/runtime/minigames/bubbles_and_jellyfishes"
 const TILT_ART := "res://assets/runtime/minigames/003"
 const SQUIRCLE_MODEL := "res://assets/runtime/animated_characters/squircle/v1/model"
 const SHAPE_FACES := "res://assets/runtime/shape_faces"
@@ -72,16 +71,6 @@ const ASSETS: Dictionary = {
 	},
 	"/squircle-v1/idle-front-blink.png": {
 		"path": "res://assets/runtime/animated_characters/squircle/v1/idle-front-blink.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/bubbles-jellyfish.png": {
-		"path": BUBBLES_ART + "/jellyfish/jellyfish_small.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/bubbles-phone-background.png": {
-		"path": BUBBLES_ART + "/environment/phone_background_portrait.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},

@@ -71,13 +71,13 @@ The reusable parts behind the lobby characters. Setup and reuse are in
 - `WebsocketService` admits final joins only from onboarding sockets already open at Start,
   resolves ready actions through each registered connection, and sends personalized ready
   snapshots on resume.
-- `scenes/pre_minigame_screen.tscn` uses editable Bubbles content in
-  `bubbles_pre_minigame_content.tres`, in the minigame's folder, and a curated gameplay capture
+- `scenes/pre_minigame_screen.tscn` uses editable Bubbles and jellyfishes 3D content in
+  `bubbles_3d_pre_minigame_content.tres`, in the minigame's folder, and a curated gameplay capture
   in `assets/runtime/pre_minigame/bubbles_preview.png`.
 - Every normal catalog launch uses this screen. Journey requirements and plan warnings are
   in [player journeys](player-journeys.md).
 
-## Bubbles and Jellyfishes
+## Minigame catalog and Bubbles and jellyfishes 3D
 
 A minigame has one folder under `minigames/`, named with its number and name
 ([decision 0015](decisions/0015-one-folder-per-minigame.md)). It holds the minigame's scenes,
@@ -103,74 +103,9 @@ definition to the catalog. Three places still name each minigame by hand: its sl
 export policy's list of required paths. A minigame whose protocol extends `MinigameProtocol`
 needs no change to the WebSocket service.
 
-Every file named in this section is in `minigames/002_bubbles_and_jellyfishes/`. The gameplay
-shared-screen scene is `bubbles_and_jellyfishes.tscn`.
-
-### Round
-
-- `bubbles_round_controller.gd` owns the entrance, countdown, active and results
-  lifecycle, the score and pop state, the host-time finish freeze, and snapshots keyed by
-  player ID.
-- `bubbles_gesture_classifier.gd` validates and classifies one completed normalized trace.
-
-### Player bubbles
-
-- `bubbles_player_bubble.tscn` reuses `SquircleV1Playback` in a procedural
-  translucent bubble with a per-instance circle collider, capped approved small-jellyfish art,
-  and a readable name.
-- `bubbles_player_visual.gd` draws the iridescent rim, the live directional drag pull, the
-  charge glow and wobble, the authoritative spin surface and particles, and the pop fragments.
-- `bubbles_player_bubble.gd` animates the audience-facing character from accepted swipe events
-  and keeps the charge cue on the bubble.
-- Visual deformation and burst radius never drive collision.
-- `bubbles_player_arena.gd` creates 1–10 bodies. It steps movement, invisible bounds and
-  player pairs in sorted player-ID order.
-  - Call `setup(controller, npc_bounds, optional_wall_bounds)`, then
-    `add_bubble(player_id, position)` from the controller's participant snapshot.
-  - Call `simulate_step(fixed_delta, host_time_msec)` from the host physics loop: normally
-    1/60 second, at most 0.05.
-  - `bounds` retains the logical NPC play area. Player bubbles use the optional wall bounds.
-  - The arena settles the controller clock before movement, so exact-zero results freeze
-    first.
-  - Bodies consume only the controller's accepted swipe, spin and pop signals, and score
-    snapshots.
-
-### Creatures
-
-- `bubbles_creature_arena.gd` owns the free jellyfish and pufferfish scenes, the
-  initial safe spawns, the alternating waves, the warning and crossing paths, and the host-time
-  collection and hit checks.
-- The shared-screen scene creates player bodies, then calls `setup(controller, player_arena)`
-  before `complete_entrance()`.
-- Each fixed host step calls the player arena first, then
-  `creature_arena.simulate_step(fixed_delta, host_time_msec)` with the same time.
-- The controller alone accepts collections and pops. Creature sprites never decide rules.
-- Free jellyfish obey the tuning cap, including scatter after a pop. Overflow is reported by
-  `jellyfish_scattered` and discarded.
-
-### Presentation
-
-- `BubblesPresentation` consumes the prepared host launch, observes registry reconnect and
-  leave changes, registers its controller for the round, and unregisters it on exit.
-- It derives the player-bubble wall bounds from the visible viewport rectangle at launch and on
-  resize. Wall padding uses each bubble's transformed radius, so its visible edge meets the
-  viewport edge. NPC boundary behavior remains separate.
-- The scene owns fixed-order arena stepping, entrance, countdown, timer, approved background
-  layers, semantic audio, debug labeling, results and the host return button.
-- There is no in-game instruction card, on normal or F12 launches.
-
-### Protocol
-
-- `bubbles_protocol.gd` validates completed normalized traces and makes personalized
-  Bubbles snapshots. The messages are in [protocol.md](protocol.md#bubbles-input).
-- The browser never supplies a player ID or host time.
-
-## Bubbles and jellyfishes 3D
-
-Minigame 004 rebuilds Bubbles without spin, in `minigames/004_3d_bubbles/`. It shares no code,
-scene, resource or message with 002; `tests/bubbles_3d_independence_test.gd` in its folder
-checks that. Its gameplay runs on Jolt with plane-locked bodies
-([decision 0034](decisions/0034-bubbles-3d-jolt-plane.md)).
+Minigame 004, Bubbles and jellyfishes 3D, lives in `minigames/004_3d_bubbles/`. It has no spin
+move; `tests/bubbles_3d_no_spin_test.gd` in its folder checks that. Its gameplay runs on Jolt
+with plane-locked bodies ([decision 0034](decisions/0034-bubbles-3d-jolt-plane.md)).
 
 - `bubbles_3d_round_controller.gd` owns the entrance, countdown, active and results phases,
   scores, pops and scatter counts, the zero-time freeze, ranking, disconnects and leaves.
@@ -264,12 +199,12 @@ See [player journeys](player-journeys.md).
     Shadow passes are left alone. Nothing in the plaza may stand in front of a character
     within that distance.
 - `characters/squircle_v1_playback.tscn` plays manifest-owned sheets in the ready screen,
-  Bubbles and results.
+  results and the Animation Lab.
 - The canonical editable model and actions are in `art/squircle/squircle-animated.blend`.
   30 runtime sheets and their frame and anchor manifest live in
-  `assets/runtime/animated_characters/squircle/v1/`. The Bubbles shared screen, the ready
-  screen and the phone consume that same v1 set. `art/squircle/export_glb.py` exports the
-  rigged model to `model/` in that folder.
+  `assets/runtime/animated_characters/squircle/v1/`. The ready screen and the phone consume
+  that same v1 set. `art/squircle/export_glb.py` exports the rigged model to `model/` in that
+  folder.
 - After exporting and packing, run `art/squircle/sync_runtime.py` to refresh the runtime set.
   See the [source workflow and pose tuning](../art/squircle/README.md).
 
@@ -319,8 +254,7 @@ See [player journeys](player-journeys.md).
   `web/src/005_3d_tilt_shift/`, with a flat drawing without WebGL. `web/src/shape_paddle/`
   holds the rounded outline and the face composition; `web/src/three_view/shape_paddle.ts`
   draws them with three.js.
-- `web/src/squircle_v1.ts` draws manifest-owned front idle sheets in setup and in the player's
-  personalized Bubbles snapshot.
+- `web/src/squircle_v1.ts` draws manifest-owned front idle sheets in setup.
 - `web/src/screen_wake_lock.ts` owns one visible-page wake lock across every phone screen,
   independent of the active minigame or socket. It adds no host state or messages.
 - What the phone screens do is in [phone-client.md](phone-client.md).
@@ -341,9 +275,6 @@ describes saving, explicit active selection and preview isolation.
 
 - `assets/runtime/` is the curated runtime-media boundary. Source and archive art remains
   outside it and is excluded from Godot import and export.
-- Bubbles static art lives in `assets/runtime/minigames/bubbles_and_jellyfishes/`. Its
-  [asset guide](../assets/runtime/minigames/bubbles_and_jellyfishes/README.md) records scale,
-  filtering, layer composition and provenance.
 - The models of minigame 004, Bubbles and jellyfishes 3D, live in
   `assets/runtime/minigames/bubbles_3d/`. Their sources and provenance are in
   [art/bubbles_3d](../art/bubbles_3d/README.md).
@@ -370,12 +301,11 @@ template. A minigame's named resources are in its own `tuning/` folder. There is
 tuning UI.
 
 - Open `Tuning/Active Presets.tres` to select named resources. The current front doors are
-  `minigames/002_bubbles_and_jellyfishes/tuning/Default.tres`,
   `minigames/004_3d_bubbles/tuning/Default.tres`,
   `minigames/005_3d_tilt_shift/tuning/Default.tres` and `Tuning/Shared/Networking/Default.tres`.
 - Restart to apply a changed selection.
-- Bubbles field descriptions are in the `README.md` beside its `Default.tres`; so are those of
-  Bubbles and jellyfishes 3D and Tilt Shift 3D.
+- Field descriptions for Bubbles and jellyfishes 3D and Tilt Shift 3D are in the `README.md`
+  beside each `Default.tres`.
 - Only the human owner promotes subjective feel into `Default`. Tests establish configuration
   safety, not fun or comfort.
 

@@ -6,7 +6,7 @@ export and review resources. Temporary variants and version comparisons belong i
 `scratch/` or `comparisons/`; do not commit them.
 
 The shared game assets live in `assets/runtime/animated_characters/squircle/v1/`.
-Playground, Bubbles, the F12 Animation Lab and phone setup consume that same set.
+The Ready screen, Tilt Shift, the F12 Animation Lab and phone setup consume that same set.
 Source art is excluded from Godot import by `.gdignore` and from standalone builds
 by the existing `art/**` export filter.
 

@@ -6,7 +6,7 @@ extends SceneTree
 ##
 ## Environment:
 ##   E2E_PLAYERS        players expected before Start is pressed (default 2)
-##   E2E_ROUND          "quick" shortens the Bubbles rounds in memory; "full" keeps every default
+##   E2E_ROUND          "quick" shortens the Bubbles 3D round in memory; "full" keeps every default
 ##   E2E_MINIGAME       catalog id the host selects in the lobby before Start (default bubbles_3d)
 ##   E2E_HTTP_PORT      HTTP port; WebSocket uses the next one (default 18200)
 ##   E2E_HOST_CAPTURES  folder for host screenshots; only useful when not headless
@@ -80,8 +80,6 @@ func _use_round(mode: String) -> void:
 
 	# Duplicates, never saves: the committed presets stay untouched.
 	var presets: ActivePresets = _host.active_presets.duplicate()
-	presets.bubbles = presets.bubbles.duplicate()
-	presets.bubbles.round_duration_seconds = QUICK_ROUND_SECONDS
 	presets.bubbles_3d = presets.bubbles_3d.duplicate()
 	presets.bubbles_3d.round_duration_seconds = QUICK_ROUND_SECONDS
 	_host.active_presets = presets
@@ -109,8 +107,6 @@ func _process(delta: float) -> bool:
 
 	if _scene_path == LOBBY_SCENE:
 		_watch_lobby(scene, delta)
-	elif scene.get("controller") is BubblesRoundController:
-		_watch_bubbles(scene, delta)
 	elif scene.get("controller") is Bubbles3DRoundController:
 		_watch_round(scene, delta, scene.get_node("Hud/Results/Margin/Column/ReturnToLobby"))
 
@@ -148,10 +144,6 @@ func _watch_lobby(lobby: Node, delta: float) -> void:
 		_started = true
 		_select_minigame(lobby.minigame_selector)
 		_click(start, "start players=%d" % _host.player_registry.player_count())
-
-
-func _watch_bubbles(bubbles: Node, delta: float) -> void:
-	_watch_round(bubbles, delta, bubbles.get_node("Hud/Results/ReturnToLobby"))
 
 
 ## Announces each phase, warns the phones before the end, and returns after the results.

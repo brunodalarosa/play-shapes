@@ -266,7 +266,7 @@ Browser tests, run by `npm test` in `web/`:
   throttling, reactivation, adapter changes and cleanup.
 - `host.test.mjs`: registered, sequenced two-axis and release routes.
 - `ready_flow.test.mjs`: every lobby route is rejected during readiness, and FALL during
-  Bubbles.
+  Bubbles and jellyfishes 3D.
 
 Godot tests:
 

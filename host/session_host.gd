@@ -360,16 +360,6 @@ func unregister_minigame_protocol(protocol: MinigameProtocol) -> void:
 		websocket.clear_minigame_protocol(protocol)
 
 
-func register_bubbles_controller(controller: BubblesRoundController) -> void:
-	if websocket != null:
-		websocket.set_bubbles_controller(controller)
-
-
-func unregister_bubbles_controller(controller: BubblesRoundController) -> void:
-	if websocket != null:
-		websocket.clear_bubbles_controller(controller)
-
-
 func _on_players_changed() -> void:
 	var public_players := player_registry.public_players()
 	if tilt_shift != null:

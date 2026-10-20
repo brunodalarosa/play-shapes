@@ -3,11 +3,6 @@ extends Resource
 ## Project-level selector. Assign committed named presets here, save, then relaunch.
 
 @export_group("Minigames")
-## Active Bubbles umbrella preset. Restore the Default.tres in the minigame's tuning folder for
-## provisional baseline values.
-@export
-var bubbles: BubblesTuning
-
 ## Active Bubbles and jellyfishes 3D preset. Restore the Default.tres in the minigame's tuning
 ## folder for provisional baseline values.
 @export var bubbles_3d: Bubbles3DTuning
@@ -30,10 +25,6 @@ var networking: NetworkingTuning
 
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
-	if bubbles == null:
-		errors.append("Active Presets: Bubbles preset is missing.")
-	else:
-		errors.append_array(bubbles.validation_errors())
 	if bubbles_3d == null:
 		errors.append("Active Presets: Bubbles 3D preset is missing.")
 	else:

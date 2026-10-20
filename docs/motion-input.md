@@ -172,8 +172,8 @@ open the lab, and tap **Request Motion Permission** on that phone. Then check:
   and return to the lobby. There must be no frozen-live values, stuck controls or lingering
   streams.
 - With Internet off and Wi-Fi on, joining, permission, motion and reconnect still work.
-- Normal lobby, READY, CANCEL and Bubbles work before and after the lab on both phones. Check
-  the desktop no-sensor fallback separately.
+- Normal lobby, READY, CANCEL and Bubbles and jellyfishes 3D work before and after the lab on
+  both phones. Check the desktop no-sensor fallback separately.
 
 Record each result with the browser and device versions. The tests for this area are listed
 in [verification.md](verification.md#focused-checks-by-area).
