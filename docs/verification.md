@@ -210,7 +210,8 @@ start only what they need, so they stay fast.
 - Emoji face presets: `shape_face_emoji_test.gd` checks 3D layers, selectable presets and
   blinking. The 005 browser tests check descriptive IDs and new parts in the 3D phone view.
   Run `shape_face_3d_visual_check.gd` without `--headless` for front, three-quarter and blink
-  review captures; its examples use enlarged and default paddle proportions.
+  review captures; its examples use enlarged and default paddle proportions. Pages hold up
+  to sixteen expressions; `-- --start=13` captures the added kissing and mood presets.
 
 - Tilt Shift 3D: the `tests/` folder of `minigames/005_3d_tilt_shift/` covers the rules,
   allocation, delivery, presets, journeys, flow, preparation, motion, negative balls, Jolt

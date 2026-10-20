@@ -187,6 +187,51 @@ const ASSETS: Dictionary = {
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
+	"/shape_faces/facial_part_mouth_kiss.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_kiss.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_soft_closed_up.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_soft_closed_up.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_soft_closed_down.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_soft_closed_down.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_side_glance.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_side_glance.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_tired.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_tired.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_wide.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_wide.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eyebrow_soft.png": {
+		"path": SHAPE_FACES + "/facial_part_eyebrow_soft.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_cheek_blush.png": {
+		"path": SHAPE_FACES + "/facial_part_cheek_blush.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_bag.png": {
+		"path": SHAPE_FACES + "/facial_part_bag.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
 	"/style.css": {
 		"path": "res://web/public/style.css",
 		"content_type": "text/css; charset=utf-8",

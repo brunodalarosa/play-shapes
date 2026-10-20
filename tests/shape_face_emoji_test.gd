@@ -15,6 +15,20 @@ const EMOJIS := {
 	"face_frowning": "☹️",
 	"face_confounded": "😖",
 	"face_dizzy": "😵",
+	"face_kissing": "😗",
+	"face_kissing_smiling_eyes": "😙",
+	"face_kissing_closed_eyes": "😚",
+	"face_warm_smile": "☺️",
+	"face_raised_eyebrow": "🤨",
+	"face_smirking": "😏",
+	"face_persevering": "😣",
+	"face_hushed": "😯",
+	"face_exhausted": "🫩",
+	"face_relieved": "😌",
+	"face_unamused": "😒",
+	"face_pensive": "😔",
+	"face_worried": "😟",
+	"face_flushed": "😳",
 }
 
 
@@ -44,7 +58,18 @@ func _run() -> void:
 		check(face.quads().size() == preset.layers.size(), "%s keeps parts on a blink" % name)
 		face.queue_free()
 
-	for name: String in ["face_smiling_eyes", "face_disappointed", "face_confounded", "face_dizzy"]:
+	for name: String in [
+		"face_smiling_eyes",
+		"face_disappointed",
+		"face_confounded",
+		"face_dizzy",
+		"face_kissing_smiling_eyes",
+		"face_kissing_closed_eyes",
+		"face_warm_smile",
+		"face_persevering",
+		"face_relieved",
+		"face_pensive",
+	]:
 		check(not manifest.face(name).can_blink(), "%s has shut or crossed eyes" % name)
 		check(
 			manifest.blinked(name).layers[0].part == manifest.face(name).layers[0].part,
@@ -53,6 +78,15 @@ func _run() -> void:
 	var wink := manifest.blinked("face_winking")
 	check(wink.layers[0].part == ShapeFaceManifest.BLINK_EYE, "The wink's open eye blinks")
 	check(wink.layers[1].part == "facial_part_eye_closed_up", "The wink's shut eye stays shut")
+	var exhausted := manifest.blinked("face_exhausted")
+	check(exhausted.layers[0].part == ShapeFaceManifest.BLINK_EYE, "Tired eyes can blink")
+	for index: int in [2, 3]:
+		check(exhausted.layers[index].part == "facial_part_bag", "Eye bags survive blinking")
+	for name: String in ["face_smirking", "face_unamused"]:
+		check(
+			not manifest.face(name).layers[1].mirror,
+			"%s looks to one side with both eyes" % name,
+		)
 	var selected := TiltShift3DExpressionTuning.new()
 	for name: String in EMOJIS:
 		selected.play_face = name
