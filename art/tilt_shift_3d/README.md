@@ -3,8 +3,8 @@
 Source models for minigame 005. The
 [asset sources guide](../../docs/game-design-documents/Minigames/005/005%20-%20Asset%20sources.md)
 decides each source and change; [scene composition](../../docs/game-design-documents/Minigames/005/005%20-%20Scene%20composition.md)
-decides placement. Nothing here is used by a scene yet; [pending reviews](../../docs/pending-reviews.md)
-lists what still needs the owner.
+decides placement. [Pending reviews](../../docs/pending-reviews.md) lists what still needs the
+owner.
 
 ## Crate, unchanged
 
@@ -17,6 +17,23 @@ its buffer and texture. The library catalog ID is `asset_101425cbeee8861548b16ee
 [SHA256SUMS](SHA256SUMS) lists the SHA-256 of the four files, relative to this folder; the
 asset sources guide approved all four. Check them from this folder with `sha256sum -c SHA256SUMS`.
 Git keeps their bytes without line-ending conversion, set in `.gitattributes`.
+
+## Factory props, unchanged
+
+[props](props/SHA256SUMS) holds six KayKit pieces by Kay Lousberg, CC0-1.0, copied unchanged
+from the owner's local asset library with their buffers, texture atlases and the license of
+each pack:
+
+| Folder | Pack | Models |
+| --- | --- | --- |
+| `platformer` | Platformer Pack 1.0 FREE | `pipe_90_A_blue`, `pipe_180_B_blue`, `pipe_end_blue` from `Assets/gltf/blue/`, `structure_C` from `Assets/gltf/neutral/` |
+| `resource_bits` | ResourceBits 1.0 FREE | `Parts_Cog` |
+| `city_builder` | City Builder Bits 1.0 FREE | `watertower` |
+
+The blue and neutral folders each hold a `platformer_texture.png`; the two are byte-identical,
+so one copy serves all four Platformer pieces. [props/SHA256SUMS](props/SHA256SUMS) lists the
+eighteen files, relative to that folder; every hash equals the asset sources guide's. The
+scene recolours the props with material overrides and never edits them.
 
 ## Bin
 
@@ -86,6 +103,12 @@ filling the band below the mouth line, three-quarter views of each width, and th
 0.75 and 2 times its height.
 
 ## Runtime copies
+
+`assets/runtime/minigames/tilt_shift_3d/props/` holds byte-identical copies of the props for
+Godot to import. Beside them are `trash_badge.png`, the trash emblem copied unchanged from the
+2D Tilt Shift's baskets, and `tilt_shift_3d_preview.png`, the 2D factory's booklet preview,
+copied unchanged until a 3D screenshot replaces it. `tests/tilt_shift_3d_props_test.gd`
+checks every copy.
 
 `art/.gdignore` keeps this folder out of Godot's importer. The game loads
 `assets/runtime/minigames/tilt_shift_3d/crate/bin.glb`, byte-identical to the verified export,

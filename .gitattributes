@@ -25,6 +25,8 @@ assets/runtime/minigames/bubbles_3d/mug/** -text
 assets/runtime/minigames/bubbles_3d/bottle/** -text
 art/tilt_shift_3d/crate/** -text
 assets/runtime/minigames/tilt_shift_3d/crate/License.txt -text
+art/tilt_shift_3d/props/** -text
+assets/runtime/minigames/tilt_shift_3d/props/** -text
 # Retain upstream license spacing verbatim.
 art/playground_plaza/chair/License.txt -whitespace
 art/playground_plaza/tree/License.txt -whitespace
@@ -36,3 +38,5 @@ art/bubbles_3d/**/License.txt -whitespace
 assets/runtime/minigames/bubbles_3d/**/License.txt -whitespace
 art/tilt_shift_3d/crate/License.txt -whitespace
 assets/runtime/minigames/tilt_shift_3d/crate/License.txt -whitespace
+art/tilt_shift_3d/props/*/License.txt -whitespace
+assets/runtime/minigames/tilt_shift_3d/props/*/License.txt -whitespace
