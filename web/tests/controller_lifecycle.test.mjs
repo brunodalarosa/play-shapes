@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { snapshot } from "./004_3d_bubbles/fixtures.mjs";
 
 // Exercise the compiled app's real DOM handlers. Only joystick rendering is replaced;
 // its independent input semantics have their own tests. This measures dispatch-to-send,
@@ -195,6 +196,7 @@ async function withController(
       fullscreen: () => fullscreen,
     });
   } finally {
+    sockets[0]?.close();
     window.dispatchEvent(new Event("pagehide"));
     for (const [key, descriptor] of saved) {
       if (descriptor) Object.defineProperty(globalThis, key, descriptor);
@@ -275,7 +277,7 @@ test("host protocol errors stay visible independently of hidden gameplay status"
       session_id: "session",
       reconnect_token: "token",
     });
-    receive({ type: "bubbles_snapshot", phase: "active" });
+    receive(snapshot());
     receive({ type: "error", code: "invalid_input", message: "Input sequence must increase" });
     assert.equal(el("#connection-error").hidden, false);
     assert.match(el("#connection-error").textContent, /Host protocol error/);
@@ -336,7 +338,7 @@ test("installed/shared-token ownership handoff stops the older controller withou
       receive({ type: "pre_minigame_snapshot", ready: true });
       close(4000);
       assert.equal(el("#ready-card").hidden, true);
-      assert.equal(el("#bubbles-card").hidden, true);
+      assert.equal(el("#bubbles-3d-card").hidden, true);
       assert.equal(el("#status").hidden, false);
       assert.match(el("#status").textContent, /another window/);
       assert.equal(el("#app-screen").hidden, true);
@@ -373,7 +375,7 @@ test("standalone with shared identity resumes; separate storage starts unregiste
     );
 });
 
-test("actual Bubbles handlers send once immediately, cancel on lifecycle, and never request fullscreen", async (t) => {
+test("actual Bubbles 3D handlers send once immediately, cancel on lifecycle, and never request fullscreen", async (t) => {
   await withController(
     { standalone: true, identity: true },
     async ({ el, receive, player, document, window, messages, fullscreen }) => {
@@ -386,8 +388,8 @@ test("actual Bubbles handlers send once immediately, cancel on lifecycle, and ne
         session_id: "session",
         reconnect_token: "token",
       });
-      receive({ type: "bubbles_snapshot", phase: "active" });
-      const pad = el("#bubbles-pad");
+      receive(snapshot());
+      const pad = el("#bubbles-3d-card");
       const pointer = (type, id, x = 90) =>
         Object.assign(new Event(type, { cancelable: true }), {
           pointerId: id,
@@ -403,10 +405,10 @@ test("actual Bubbles handlers send once immediately, cancel on lifecycle, and ne
         assert.equal(sent.stage, "start");
         timing.push(sent.sentAt - start);
         pad.dispatchEvent(pointer("pointerup", id, 300));
-        // A duplicate release produces no second trace.
+        // A duplicate release produces no second release message.
         pad.dispatchEvent(pointer("pointerup", id, 300));
       }
-      assert.equal(messages.filter((m) => m.type === "bubbles_trace").length, 100);
+      assert.equal(messages.filter((m) => m.type === "bubbles_3d_release").length, 100);
       for (const [target, name] of [
         [pad, "pointercancel"],
         [pad, "lostpointercapture"],

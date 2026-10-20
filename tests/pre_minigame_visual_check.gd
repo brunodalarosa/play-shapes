@@ -25,7 +25,7 @@ func _run() -> void:
 						"ready": index % 2 == 0,
 					}
 				)
-			screen.configure(&"bubbles", { "players": players })
+			screen.configure(&"bubbles_3d", { "players": players })
 			for frame: int in 6:
 				await process_frame
 			var image := root.get_viewport().get_texture().get_image()

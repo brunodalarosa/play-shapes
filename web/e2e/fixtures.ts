@@ -32,7 +32,7 @@ export class Host {
   private process?: ChildProcess;
   private exit?: string;
 
-  async start(players: number, testInfo: TestInfo, game = "bubbles"): Promise<void> {
+  async start(players: number, testInfo: TestInfo, game = "bubbles_3d"): Promise<void> {
     // A host left running by a person would answer instead of this one.
     const busy = await fetch(`${this.url}session.json`, { signal: AbortSignal.timeout(500) }).then(
       () => true,
@@ -218,7 +218,7 @@ export class Phone {
     await this.page.click("#ready-button");
   }
 
-  async swipe(dx: number, dy: number, surface = "#bubbles-pad"): Promise<void> {
+  async swipe(dx: number, dy: number, surface = "#bubbles-3d-card"): Promise<void> {
     const center = await centerOf(this.page.locator(surface));
     await this.page.mouse.move(center.x, center.y);
     await this.page.mouse.down();
@@ -264,7 +264,7 @@ type Fixtures = {
 };
 
 export const test = base.extend<Fixtures>({
-  game: ["bubbles", { option: true }],
+  game: ["bubbles_3d", { option: true }],
   players: [2, { option: true }],
 
   host: async ({ players, game }, use, testInfo) => {

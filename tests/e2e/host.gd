@@ -7,7 +7,7 @@ extends SceneTree
 ## Environment:
 ##   E2E_PLAYERS        players expected before Start is pressed (default 2)
 ##   E2E_ROUND          "quick" shortens the Bubbles rounds in memory; "full" keeps every default
-##   E2E_MINIGAME       catalog id the host selects in the lobby before Start (default bubbles)
+##   E2E_MINIGAME       catalog id the host selects in the lobby before Start (default bubbles_3d)
 ##   E2E_HTTP_PORT      HTTP port; WebSocket uses the next one (default 18200)
 ##   E2E_HOST_CAPTURES  folder for host screenshots; only useful when not headless
 
@@ -23,7 +23,7 @@ const TIMEOUT_SECONDS := 600.0
 
 var _host: Node
 var _players := 2
-var _minigame := &"bubbles"
+var _minigame := &"bubbles_3d"
 var _captures := ""
 var _elapsed := 0.0
 var _scene_path := ""

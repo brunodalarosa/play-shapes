@@ -156,17 +156,12 @@ test("browser loads 3D lazily, renders models, sends label touches and retires o
     assert.equal(requests.filter((path) => path === "/models/squircle.glb").length, 1);
     await page.evaluate(() =>
       window.receiveHost({
-        type: "bubbles_snapshot",
-        phase: "active",
-        score: 3,
-        character_color: "#e53935",
+        type: "pre_minigame_snapshot",
+        ready: false,
       }),
     );
     assert.equal(await page.locator("#bubbles-3d-card").isVisible(), false);
-    assert.equal(await page.locator("#bubbles-pad").isVisible(), true);
-    const bounds = await page.locator("#bubbles-pad").boundingBox();
-    assert.equal(bounds.width, 390);
-    assert.equal(bounds.height, 844);
+    assert.equal(await page.locator("#ready-card").isVisible(), true);
   });
 });
 
