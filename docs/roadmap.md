@@ -151,6 +151,10 @@ reproduces for the rules test in a fresh, fully imported copy of the rules-only 
 a failed check, retain its log and report it separately from assertion results; its
 cause remains unresolved.
 
+The same intermittent exit now also appears in `tilt_shift_flow_test` and in Tilt Shift 3D's
+copied tests, such as `tilt_shift_3d_delivery_test`, `tilt_shift_3d_protocol_test` and
+`tilt_shift_3d_presentation_test`, again after zero failures; a rerun usually passes.
+
 On Windows, the browser bundle rewrite after the browser suite can fail with
 `The requested operation cannot be performed on a file with a user-mapped section open.`
 Preserving the generated file in an ignored folder and regenerating it permits the focused
