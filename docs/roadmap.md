@@ -155,6 +155,11 @@ The same intermittent exit now also appears in `tilt_shift_flow_test` and in Til
 copied tests, such as `tilt_shift_3d_delivery_test`, `tilt_shift_3d_protocol_test` and
 `tilt_shift_3d_presentation_test`, again after zero failures; a rerun usually passes.
 
+In a whole `node tools/check.mjs --full` run, the larger emulated-phone rosters of both Tilt
+Shift versions have intermittently failed with one phone's READY never enabling, because its
+calibration did not take. The same rosters pass when run on their own. Report such a failure
+with its trace rather than as a pass.
+
 On Windows, the browser bundle rewrite after the browser suite can fail with
 `The requested operation cannot be performed on a file with a user-mapped section open.`
 Preserving the generated file in an ignored folder and regenerating it permits the focused
