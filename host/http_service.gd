@@ -267,6 +267,16 @@ const ASSETS: Dictionary = {
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
+	"/shape_faces/facial_part_mouth_tongue_open.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_tongue_open.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_tongue.png": {
+		"path": SHAPE_FACES + "/facial_part_tongue.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
 	"/style.css": {
 		"path": "res://web/public/style.css",
 		"content_type": "text/css; charset=utf-8",

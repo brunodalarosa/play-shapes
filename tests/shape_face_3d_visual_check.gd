@@ -23,8 +23,10 @@ func _run() -> void:
 
 
 func _page(names: Array[String], first: int) -> void:
+	var rows := maxi(ceili(names.size() / 4.0), 1)
+	var page_height := 18.0 - (4 - rows) * 4.1
 	var viewport := SubViewport.new()
-	viewport.size = Vector2i(2400, 1980)
+	viewport.size = Vector2i(2400, roundi(1980 * page_height / 18.0))
 	viewport.own_world_3d = true
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	viewport.msaa_3d = Viewport.MSAA_4X
@@ -42,7 +44,8 @@ func _page(names: Array[String], first: int) -> void:
 	world.add_child(setting)
 	var camera := Camera3D.new()
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = 18.0
+	camera.size = page_height
+	camera.position.y = (4 - rows) * 2.05
 	camera.position.z = 24.0
 	camera.current = true
 	world.add_child(camera)

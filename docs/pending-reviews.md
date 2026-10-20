@@ -87,13 +87,13 @@ removes it. The evidence labels are defined in
 
 ## Tilt Shift 3D face parts and bin
 
-- Owner review of the thirty-seven emoji expressions in the Godot 3D front, three-quarter and
+- Owner review of the forty-two emoji expressions in the Godot 3D front, three-quarter and
   blink captures from `tests/shape_face_3d_visual_check.gd`, under
   `test-results/shape-face-emoji/`: whether each reads as its emoji, especially the similar
   unhappy faces, kissing-eye variations, subtle smiles, exhaustion, toothy mouths and dazed
-  eyes, and stays readable at default paddle proportions. The captures are paginated;
-  `-- --start=27` starts at the ten added dazed and intense presets. New gameplay assignments
-  and adoption by the lobby's Squircle are separate decisions.
+  eyes, and stays readable at default paddle proportions. The pink tongues also need to read
+  clearly, including the upward lip lick. Use `-- --start=37` for the five tongue presets.
+- New gameplay assignments and adoption by the lobby's Squircle are separate decisions.
 - Physical-phone readability of the emoji presets when selected in a test profile remains
   unverified; desktop browser checks only establish composition and loading.
 - Owner approval of the face presets from the review sheets that `export_faces.mjs --review` in

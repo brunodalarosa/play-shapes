@@ -139,6 +139,8 @@ const REQUIRED_RUNTIME_PATHS := [
 	"assets/runtime/shape_faces/facial_part_mouth_wail.png",
 	"assets/runtime/shape_faces/facial_part_mouth_astonished.png",
 	"assets/runtime/shape_faces/facial_part_mouth_grimace.png",
+	"assets/runtime/shape_faces/facial_part_mouth_tongue_open.png",
+	"assets/runtime/shape_faces/facial_part_tongue.png",
 	"assets/runtime/minigames/tilt_shift_3d/crate/bin.glb",
 	"assets/runtime/minigames/tilt_shift_3d/crate/License.txt",
 	"assets/runtime/minigames/tilt_shift_3d/trash_badge.png",

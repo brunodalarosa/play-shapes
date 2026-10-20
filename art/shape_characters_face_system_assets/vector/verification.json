@@ -365,6 +365,15 @@
       "master_sha256": "9114a8e5df33f5e528d5ed823a68de154758fc205e10ffc3282259896f4ed7dd",
       "source_far_pixels": 0
     },
+    "facial_part_mouth_tongue_open": {
+      "size": [
+        58,
+        32
+      ],
+      "soft_pixels": 0,
+      "sha256": "5924ef0c5c4a07c644b17f7120152208d825f31726cfd7712787ad83fcb54bca",
+      "master_sha256": "744eca06724fc6f4781784f3cc9f62a3d16e9e0122b3ddb1ea5fdb042a8b361f"
+    },
     "facial_part_mouth_wail": {
       "size": [
         50,
@@ -382,6 +391,15 @@
       "soft_pixels": 0,
       "sha256": "7080bd03eb9baf897db06edc9506e5aacd97fd9e14f33adaf940541af0984b81",
       "master_sha256": "066be9e8c67980142525d2cf6a3d8505cb328be82207471b1d00d85c2c2df8ca"
+    },
+    "facial_part_tongue": {
+      "size": [
+        36,
+        38
+      ],
+      "soft_pixels": 0,
+      "sha256": "4b2bf9f982bdba45ca3439fbf7177fb9ec697093701dae0d04cfb5816f2fffda",
+      "master_sha256": "71ae86ad26bd2d970f16dec759058be755a93f9a292cfbada13e69eb00cd7759"
     }
   },
   "faces": {
@@ -580,6 +598,26 @@
     "face_grimacing": {
       "emoji_reference": "😬",
       "reference_comparison": false
+    },
+    "face_tongue": {
+      "emoji_reference": "😛",
+      "reference_comparison": false
+    },
+    "face_winking_tongue": {
+      "emoji_reference": "😜",
+      "reference_comparison": false
+    },
+    "face_squinting_tongue": {
+      "emoji_reference": "😝",
+      "reference_comparison": false
+    },
+    "face_savoring_food": {
+      "emoji_reference": "😋",
+      "reference_comparison": false
+    },
+    "face_zany": {
+      "emoji_reference": "🤪",
+      "reference_comparison": false
     }
   },
   "eye_x": {
@@ -592,7 +630,7 @@
     "far_pixels_left": 0,
     "far_pixels_right": 0
   },
-  "manifest_sha256": "45e9f074e1a5fc7f570bab6a3184e9d57961c1771efac3d7bbc3cc0e5af4904c",
+  "manifest_sha256": "6b50fc6038261ac01e8898c007d49f9da63f32850475b08f0f261874d5dc8cf9",
   "result": "PASS",
   "failures": []
 }

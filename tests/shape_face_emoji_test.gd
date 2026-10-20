@@ -39,6 +39,11 @@ const EMOJIS := {
 	"face_astonished": "😲",
 	"face_weary": "😩",
 	"face_grimacing": "😬",
+	"face_tongue": "😛",
+	"face_winking_tongue": "😜",
+	"face_squinting_tongue": "😝",
+	"face_savoring_food": "😋",
+	"face_zany": "🤪",
 }
 
 
@@ -83,6 +88,8 @@ func _run() -> void:
 		"face_beaming",
 		"face_tired",
 		"face_weary",
+		"face_squinting_tongue",
+		"face_savoring_food",
 	]:
 		check(not manifest.face(name).can_blink(), "%s has a fixed eye pose" % name)
 		check(
@@ -110,6 +117,35 @@ func _run() -> void:
 	var woozy := manifest.face("face_woozy")
 	check(woozy.layers[0].part != woozy.layers[1].part, "The woozy eyes have different shapes")
 	check(woozy.layers[0].center.y != woozy.layers[1].center.y, "The woozy eyes sit unevenly")
+	for name: String in [
+		"face_tongue",
+		"face_winking_tongue",
+		"face_squinting_tongue",
+		"face_savoring_food",
+		"face_zany",
+	]:
+		var open := manifest.face(name)
+		var blinked := manifest.blinked(name)
+		check(open.layers[3].part == "facial_part_tongue", "%s has a tongue layer" % name)
+		var tongue := open.layers[3]
+		var blink_tongue := blinked.layers[3]
+		check(
+			(
+				blink_tongue.part == tongue.part and blink_tongue.center == tongue.center
+				and blink_tongue.size == tongue.size
+				and blink_tongue.rotation_degrees == tongue.rotation_degrees
+				and blink_tongue.mirror == tongue.mirror
+			),
+			"%s keeps its tongue during blinks" % name,
+		)
+	var tongue_wink := manifest.blinked("face_winking_tongue")
+	check(tongue_wink.layers[0].part == ShapeFaceManifest.BLINK_EYE, "The tongue wink can blink")
+	check(
+		tongue_wink.layers[1].part == "facial_part_eye_closed_up",
+		"The tongue wink keeps its shut eye",
+	)
+	var zany := manifest.face("face_zany")
+	check(zany.layers[0].size != zany.layers[1].size, "The zany eyes have different sizes")
 	for name: String in ["face_smirking", "face_unamused"]:
 		check(
 			not manifest.face(name).layers[1].mirror,

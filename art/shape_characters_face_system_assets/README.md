@@ -18,8 +18,8 @@ preset uses the navy smirk part like every other face.
 ## Vector masters
 
 `vector/` holds one SVG master per part, in the source's pixel units and canvas: the
-fourteen supplied parts, `facial_part_eye_x`, and twenty-six parts for emoji expressions. They
-use the same construction, in navy and white only:
+fourteen supplied parts, `facial_part_eye_x`, and twenty-eight parts for emoji expressions. They
+use the same construction, in navy and white, with pink `#F47DA8` for the tongue:
 
 - circles for the eyes' whites and pupils;
 - strokes with round caps for the closed eyes, the smile, the frown, the smirk and the X-eye;
@@ -57,7 +57,7 @@ small in 3D stays smooth.
 - `rotation_degrees`: clockwise, about the part's centre;
 - `mirror`: flips the part horizontally about its centre before it turns.
 
-The original `face_a` to `face_l` presets keep their supplied reference images. Thirty-seven
+The original `face_a` to `face_l` presets keep their supplied reference images. Forty-two
 additional presets have descriptive IDs and `emoji_reference` metadata:
 
 | Reference | Preset |
@@ -99,8 +99,14 @@ additional presets have descriptive IDs and `emoji_reference` metadata:
 | 😲 | `face_astonished` |
 | 😩 | `face_weary` |
 | 😬 | `face_grimacing` |
+| 😛 | `face_tongue` |
+| 😜 | `face_winking_tongue` |
+| 😝 | `face_squinting_tongue` |
+| 😋 | `face_savoring_food` |
+| 🤪 | `face_zany` |
 
-The emoji presets use the same navy and white, round strokes and layered construction.
+The emoji presets use the same navy and white, round strokes and layered construction,
+with pink as the tongue's accent colour.
 Their new parts have editable SVG masters; there are no supplied raster references for them.
 `source_size` is their design canvas. Existing gameplay assignments still use the original IDs.
 
@@ -108,6 +114,11 @@ Closed, X and spiral eyes retain their shape during blinks. Tired eyes and under
 layers, so the bags remain when those eyes close; side glances keep both pupils looking the
 same way. Blush uses short navy strokes to preserve the palette. Glossy eyes use white
 highlights; beaming and grimacing mouths use white teeth within the same navy outlines.
+
+The reusable tongue has a broad pink fill, a navy outline, a soft rounded tip and a short
+curved crease. It projects past the mouth; turning it upward at the smile's corner makes
+the lip-licking pose. It is a separate layer from the mouth and eyes, so it retains its
+placement during blinks.
 
 ## Export and verification
 
@@ -130,8 +141,8 @@ needs owner review. The script writes
   least half navy, or half white, has no pixel at least a quarter of that colour within one
   pixel in the other image, so that colour's edge is more than a pixel away;
 - the X-eye differs from either of `face_j`'s eyes;
-- any 8× PNG has a partly covered or blended pixel that touches no clear, fully navy or fully
-  white pixel, which a blurred edge would have;
+- any 8× PNG has a partly covered or blended pixel that touches no clear pixel or fully solid
+  palette colour (navy/white, or navy/pink for the tongue), which a blurred edge would have;
 - the manifest and the masters disagree.
 
 `tests/shape_faces_test.gd` checks that the runtime PNGs and manifest are the ones the script
@@ -150,7 +161,8 @@ godot --path . --script tests/shape_face_3d_visual_check.gd
 
 It writes front, three-quarter and blink captures under `test-results/shape-face-emoji/`,
 with enlarged studies and default paddle proportions, at most sixteen expressions per page.
-Filenames contain the first and last expression indices. Pass `-- --start=27` to capture
-the ten dazed and intense expressions from the twenty-eighth emoji preset onwards.
+Small pages keep only the rows they need. Filenames contain the first and last expression
+indices. Pass `-- --start=37` to capture the five tongue expressions from the thirty-eighth
+emoji preset onwards.
 The reference labels use an installed
 emoji font, so their appearance varies by system. Captures do not establish creative approval.

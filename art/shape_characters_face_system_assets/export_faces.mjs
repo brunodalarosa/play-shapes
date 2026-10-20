@@ -25,6 +25,8 @@ const RUNTIME = join(root, "assets", "runtime", "shape_faces");
 const MANIFEST = join(RUNTIME, "face_presets.json");
 const SCALE = 8;
 const NAVY = [0x3d, 0x46, 0x5d];
+const WHITE = [255, 255, 255];
+const TONGUE_PINK = [0xf4, 0x7d, 0xa8];
 // The X-eye is cut from face_j's left eye: a 40 x 40 box like the open eye's.
 const EYE_X_CUT = { face: "face_j", x: 0, y: 19, size: 40 };
 
@@ -90,17 +92,20 @@ function largestDifference(a, b) {
   return Math.round(largest * 1000) / 1000;
 }
 
-// Every partly covered pixel and every navy-white blend at 8x lies on a sharp edge: it touches a
-// pixel that is clear, or fully navy, or fully white. A blurred edge would be a wider band.
-function soft(png) {
+// At 8x, every partially covered or blended pixel touches clear space or a solid palette
+// colour. A blurred edge would be a wider band. The tongue's pink is a separate solid colour.
+function soft(png, palette) {
   const { width, height, data } = png;
   const at = (x, y) => {
     const i = (y * width + x) * 4;
     const alpha = data[i + 3] / 255;
-    const t = Math.min(1, Math.max(0, (data[i] - NAVY[0]) / (255 - NAVY[0])));
-    return { alpha, t };
+    return { alpha, rgb: [data[i], data[i + 1], data[i + 2]] };
   };
-  const solid = ({ alpha, t }) => alpha <= 0.05 || (alpha >= 0.95 && (t <= 0.05 || t >= 0.95));
+  const solid = ({ alpha, rgb }) => alpha <= 0.05 || (
+    alpha >= 0.95 && palette.some((colour) =>
+      colour.every((channel, index) => Math.abs(channel - rgb[index]) <= 255 * 0.05),
+    )
+  );
   let count = 0;
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -156,7 +161,8 @@ try {
     }
     const png = readPng(target);
     if (png.width !== w * SCALE || png.height !== h * SCALE) fail(`${name}.png is not 8x`);
-    const softPixels = soft(png);
+    const palette = name === "facial_part_tongue" ? [NAVY, TONGUE_PINK] : [NAVY, WHITE];
+    const softPixels = soft(png, palette);
     if (softPixels > 0) fail(`${name}.png has ${softPixels} pixels off a sharp edge`);
     report.parts[name] = {
       size: [w, h], soft_pixels: softPixels, sha256: sha256(target),
