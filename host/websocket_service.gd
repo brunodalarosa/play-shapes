@@ -79,17 +79,6 @@ func remove_multiplayer_motion(player_id: String) -> void:
 	channel.end()
 
 
-func set_tilt_shift_protocol(protocol: RefCounted) -> void:
-	# Keep game state types out of shared transport startup; adapters expose snapshot_for().
-	_active_protocol = protocol
-	_broadcast_gameplay_snapshots()
-
-
-func clear_tilt_shift_protocol(protocol: RefCounted) -> void:
-	if _active_protocol == protocol:
-		_active_protocol = null
-
-
 ## Routes the message types [param protocol] handles to it until it is cleared.
 func set_minigame_protocol(protocol: MinigameProtocol) -> void:
 	clear_minigame_protocol()
@@ -435,14 +424,6 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			}
 			if not result.accepted:
 				_send_rejection(peer, "error", result)
-		"tilt_shift_ready":
-			var player := _registry.player_for_connection(client.connection_id)
-			if _active_protocol != null and _active_protocol.has_method("handle_ready"):
-				_active_protocol.handle_ready(
-					String(player.get("player_id", "")),
-					message,
-					Time.get_ticks_msec(),
-				)
 		"pre_minigame_ready":
 			var player := _registry.player_for_connection(client.connection_id)
 			var ready_value: Variant = message.get("ready")

@@ -189,7 +189,7 @@ test("generic capture scopes feedback, skips queued input and retires listeners 
       excluded: "WebSocket/TLS framing, network delay, physical sensors, host feedback",
     };
     const directory = fileURLToPath(
-      new URL("../../test-results/tilt-shift/motion/", import.meta.url),
+      new URL("../../test-results/tilt-shift-3d/motion/", import.meta.url),
     );
     mkdirSync(directory, { recursive: true });
     writeFileSync(`${directory}/traffic.json`, JSON.stringify(report, null, 2));

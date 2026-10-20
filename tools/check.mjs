@@ -29,12 +29,12 @@ const USAGE = `Usage: node tools/check.mjs [--full] [--release] [filter ...]
 
 Runs the Godot test scripts, the format, lint and document checks, the tests
 of these tools, the browser type check and tests, verifies that web/public
-matches a fresh build, then plays Bubbles and jellyfishes 3D, Tilt Shift and Tilt Shift 3D
+matches a fresh build, then plays Bubbles and jellyfishes 3D and Tilt Shift 3D
 with two emulated phones against the real host.
 
   filter      Run only checks whose name contains one of the filters,
               for example "bubbles_3d", "web" or "e2e".
-  --full      Add larger Tilt Shift and Tilt Shift 3D phone rosters, workshop preview
+  --full      Add larger Tilt Shift 3D phone rosters, workshop preview
               and extended rotation contacts; play Bubbles and jellyfishes 3D at full length.
   --release   Also run the Windows export test. Needs Godot export templates.
 `;

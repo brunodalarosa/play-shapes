@@ -3,29 +3,9 @@ extends Node
 ## A bounded, nonblocking HTTP service for a fixed set of bundled assets.
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
-const TILT_ART := "res://assets/runtime/minigames/003"
 const SQUIRCLE_MODEL := "res://assets/runtime/animated_characters/squircle/v1/model"
 const SHAPE_FACES := "res://assets/runtime/shape_faces"
 const ASSETS: Dictionary = {
-	"/tilt-shift/manifest.json": {
-		"path": TILT_ART + "/manifest.json",
-		"content_type": "application/json",
-	},
-	"/tilt-shift/paddle_orange.png": {
-		"path": TILT_ART + "/paddles/paddle_orange.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/tilt-shift/paddle_blue.png": {
-		"path": TILT_ART + "/paddles/paddle_blue.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/tilt-shift/paddle_neutral.png": {
-		"path": TILT_ART + "/paddles/paddle_neutral.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
 	"/manifest.webmanifest": {
 		"path": "res://web/public/manifest.webmanifest",
 		"content_type": "application/manifest+json",

@@ -19,16 +19,6 @@ async function phone(options, verify) {
     await page.route("**/*", async (route) => {
       const path = new URL(route.request().url()).pathname;
       requests.push(path);
-      if (path === "/tilt-shift/manifest.json") {
-        const assets = Object.fromEntries(
-          ["orange", "blue", "neutral"].map((team) => [
-            `paddles/paddle_${team}.png`,
-            { visible_bounds_px: [10, 9, 663, 151] },
-          ]),
-        );
-        await route.fulfill({ json: { assets } });
-        return;
-      }
       if (path === "/session.json") {
         await route.fulfill({
           json: {

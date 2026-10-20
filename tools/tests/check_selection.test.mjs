@@ -2,15 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { includeGodotTest } from "../check_selection.mjs";
 
-const extended = [
-  "tilt_shift_workshop_preview_test",
-  "tilt_shift_rotation_contact_test",
-  "tilt_shift_3d_rotation_contact_test",
-];
+const extended = ["tilt_shift_3d_workshop_preview_test", "tilt_shift_3d_rotation_contact_test"];
 const exported = "standalone_build_editor_integration_test";
 
 test("default retains ordinary physics and excludes extended coverage and export", () => {
-  assert.equal(includeGodotTest("tilt_shift_physics_test"), true);
+  assert.equal(includeGodotTest("tilt_shift_3d_physics_test"), true);
   for (const name of [...extended, exported]) assert.equal(includeGodotTest(name), false);
 });
 

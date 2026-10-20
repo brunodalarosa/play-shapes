@@ -1,8 +1,8 @@
 # Play Shapes tuning guide
 
 Start with `Active Presets.tres`. It is the project-level selector for active Bubbles and
-jellyfishes 3D, Tilt Shift rules/content and shared Networking assets. Save a selection and relaunch
-the relevant consumer; there is intentionally no runtime tuning UI.
+jellyfishes 3D, Tilt Shift 3D rules/content and shared Networking assets. Save a selection and
+relaunch the relevant consumer; there is intentionally no runtime tuning UI.
 
 ## Find, compare, and reset values
 
@@ -15,12 +15,11 @@ the relevant consumer; there is intentionally no runtime tuning UI.
 
 Hover an Inspector property for its purpose, units, default, safe range, and higher/lower guidance. Range metadata and clamping protect individual fields. Automated validation handles related-field rules, including distinct listener ports and player capacity versus connection capacity.
 
-## Tilt Shift rules/content
+## Tilt Shift 3D rules/content
 
-`minigames/003_tilt_shift/tuning/Default.tres` selects duration/count, proximity,
-one paddle layout, baskets by numbered round and the physics/delivery profile.
-The standalone arena accepts this Resource at shift launch; lobby integration is deferred.
-See [the field guide](../minigames/003_tilt_shift/tuning/README.md).
+`minigames/005_3d_tilt_shift/tuning/Default.tres` selects duration/count, proximity,
+paddles and baskets by numbered round, presentation, expressions and the physics/delivery profile.
+See [the field guide](../minigames/005_3d_tilt_shift/tuning/README.md).
 
 ## Shared category map
 

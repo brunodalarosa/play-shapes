@@ -1,7 +1,6 @@
 // Development-only. Full coverage and Windows export are independent suite options.
 const FULL_TESTS = new Set([
-  "tilt_shift_workshop_preview_test",
-  "tilt_shift_rotation_contact_test",
+  "tilt_shift_3d_workshop_preview_test",
   "tilt_shift_3d_rotation_contact_test",
 ]);
 

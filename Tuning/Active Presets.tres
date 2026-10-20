@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://30jj0wxp5yer" path="res://Tuning/active_presets.gd" id="1"]
 [ext_resource type="Resource" path="res://Tuning/Shared/Networking/Default.tres" id="3"]
-[ext_resource type="Resource" path="res://minigames/003_tilt_shift/tuning/Default.tres" id="5"]
 [ext_resource type="Resource" path="res://Tuning/Shared/Lobby/Default.tres" id="6"]
 [ext_resource type="Resource" path="res://minigames/004_3d_bubbles/tuning/Default.tres" id="7"]
 [ext_resource type="Resource" path="res://minigames/005_3d_tilt_shift/tuning/Default.tres" id="8"]
@@ -10,7 +9,6 @@
 [resource]
 script = ExtResource("1")
 bubbles_3d = ExtResource("7")
-tilt_shift = ExtResource("5")
 tilt_shift_3d = ExtResource("8")
 networking = ExtResource("3")
 lobby_movement = ExtResource("6")

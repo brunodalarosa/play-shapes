@@ -1399,228 +1399,6 @@ function formatSample(sample) {
   ].join("\n");
 }
 
-// build/003_tilt_shift/tilt_shift_phone.js
-function validTiltSnapshot(value) {
-  if (!value || typeof value !== "object")
-    return false;
-  const v2 = value;
-  return v2.type === "tilt_shift_snapshot" && typeof v2.generation === "string" && v2.generation.length > 0 && v2.generation.length <= 64 && Number.isSafeInteger(v2.sequence) && v2.sequence >= 0 && ["preparing", "countdown", "start", "active", "between_rounds", "finished"].includes(v2.phase) && Number.isInteger(v2.round) && v2.round >= 1 && v2.round <= 24 && (v2.team === 0 || v2.team === 1) && Number.isFinite(v2.angle_radians) && Array.isArray(v2.paddle_ids) && (v2.paddle_ids.length >= 1 || v2.selected === false) && v2.paddle_ids.length <= 5 && new Set(v2.paddle_ids).size === v2.paddle_ids.length && (v2.selected === void 0 || typeof v2.selected === "boolean") && (v2.round_token === void 0 || typeof v2.round_token === "string" && v2.round_token.length > 0 && v2.round_token.length <= 64) && [
-    v2.ready,
-    v2.ready_available,
-    v2.calibration_available,
-    v2.calibrated,
-    v2.usable,
-    v2.landscape
-  ].every((flag) => flag === void 0 || typeof flag === "boolean") && v2.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) && Array.isArray(v2.paddle_size) && v2.paddle_size.length === 2 && v2.paddle_size.every((size2) => Number.isFinite(size2) && size2 > 0 && size2 <= 2);
-}
-var TiltShiftPhone = class {
-  surface;
-  stream;
-  sendReady;
-  isLandscape;
-  canvas;
-  context;
-  actions;
-  permission;
-  calibration;
-  ready;
-  state;
-  orientation;
-  images = [];
-  bounds = [];
-  angle = 0;
-  ratio = 6;
-  team = 2;
-  generation;
-  sequence = -1;
-  preparing = false;
-  readyAvailable = false;
-  selected = true;
-  roundToken;
-  connected = false;
-  usable = false;
-  calibrated = false;
-  landscape = false;
-  isReady = false;
-  capture = "waiting";
-  observer;
-  constructor(surface, stream, sendReady, isLandscape = () => window.matchMedia("(orientation: landscape)").matches) {
-    this.surface = surface;
-    this.stream = stream;
-    this.sendReady = sendReady;
-    this.isLandscape = isLandscape;
-    this.canvas = surface.querySelector("canvas");
-    this.context = this.canvas.getContext("2d");
-    this.actions = surface.querySelector("#tilt-actions");
-    this.permission = surface.querySelector("#tilt-permission");
-    this.calibration = surface.querySelector("#tilt-calibrate");
-    this.ready = surface.querySelector("#tilt-ready");
-    this.state = surface.querySelector("#tilt-state");
-    this.orientation = surface.querySelector("#tilt-orientation");
-    this.permission.addEventListener("click", () => {
-      this.permission.disabled = true;
-      void this.stream.requestPermission().finally(() => this.buttons());
-    });
-    this.calibration.addEventListener("click", () => {
-      if (this.stream.requestCalibration(this.actionContext()))
-        this.calibration.disabled = true;
-    });
-    this.ready.addEventListener("click", () => {
-      if (this.ready.disabled)
-        return;
-      this.ready.disabled = true;
-      this.sendReady(!this.isReady, this.actionContext());
-    });
-    this.observer = new ResizeObserver(() => {
-      this.buttons();
-      this.draw();
-    });
-    this.observer.observe(this.canvas);
-    void this.loadArt();
-  }
-  async loadArt() {
-    const response = await fetch("/tilt-shift/manifest.json");
-    if (!response.ok)
-      throw new Error("Tilt Shift artwork metadata could not load");
-    const manifest = await response.json();
-    for (const name of ["orange", "blue", "neutral"]) {
-      const image = new Image();
-      image.src = `/tilt-shift/paddle_${name}.png`;
-      this.images.push(image);
-      this.bounds.push(manifest.assets[`paddles/paddle_${name}.png`].visible_bounds_px);
-      image.addEventListener("load", () => this.draw());
-    }
-  }
-  preparation(value, ready) {
-    if (typeof value?.generation !== "string" || !Number.isFinite(value.angle_radians))
-      return false;
-    if (typeof value.usable !== "boolean" || typeof value.calibrated !== "boolean")
-      return false;
-    this.generation = value.generation;
-    this.sequence = -1;
-    this.preparing = this.readyAvailable = this.selected = this.connected = true;
-    this.roundToken = void 0;
-    this.usable = value.usable;
-    this.calibrated = value.calibrated;
-    this.landscape = value.landscape === true;
-    this.capture = value.capture_state;
-    this.angle = value.angle_radians;
-    if (Array.isArray(value.paddle_size) && value.paddle_size.length === 2 && value.paddle_size.every((size2) => Number.isFinite(size2) && size2 > 0))
-      this.ratio = value.paddle_size[0] / value.paddle_size[1];
-    this.isReady = ready;
-    this.team = 2;
-    this.surface.hidden = false;
-    this.canvas.hidden = false;
-    this.surface.setAttribute("data-waiting", "false");
-    this.surface.setAttribute("data-team", String(this.team));
-    this.actions.hidden = false;
-    this.buttons();
-    this.draw();
-    return true;
-  }
-  snapshot(value) {
-    if (!validTiltSnapshot(value))
-      return false;
-    if (this.generation !== void 0 && value.generation !== this.generation)
-      return false;
-    if (value.sequence < this.sequence)
-      return false;
-    this.generation = value.generation;
-    this.sequence = value.sequence;
-    this.preparing = value.calibration_available === true;
-    this.readyAvailable = value.ready_available === true;
-    this.selected = value.selected !== false;
-    this.roundToken = value.round_token;
-    this.isReady = value.ready === true;
-    if (value.usable !== void 0)
-      this.usable = value.usable;
-    if (value.calibrated !== void 0)
-      this.calibrated = value.calibrated;
-    this.landscape = value.landscape === true;
-    this.connected = true;
-    this.team = value.team;
-    this.angle = value.angle_radians;
-    this.ratio = value.paddle_size[0] / value.paddle_size[1];
-    this.surface.hidden = value.phase === "finished";
-    this.canvas.hidden = !this.selected;
-    this.surface.setAttribute("data-waiting", String(!this.selected));
-    this.surface.setAttribute("data-team", String(this.team));
-    this.buttons();
-    this.draw();
-    return true;
-  }
-  feedback() {
-    const state = this.stream.controlState;
-    if (!state)
-      return;
-    this.capture = state.capture_state;
-    this.usable = state.usable;
-    this.calibrated = state.calibrated;
-    this.landscape = state.landscape === true;
-    this.buttons();
-  }
-  disconnect() {
-    this.connected = this.usable = false;
-    this.buttons();
-  }
-  hide() {
-    this.surface.hidden = true;
-    this.generation = void 0;
-    this.sequence = -1;
-    this.preparing = this.connected = this.usable = false;
-  }
-  actionContext() {
-    return this.roundToken && this.generation ? { generation: this.generation, round_token: this.roundToken } : void 0;
-  }
-  buttons() {
-    const landscape = this.landscape && this.isLandscape();
-    this.orientation.hidden = !this.preparing;
-    this.orientation.textContent = landscape ? "Hold your phone in landscape while you get ready." : "Turn your phone to landscape. If it stays upright, turn off rotation lock.";
-    this.permission.hidden = this.usable;
-    this.permission.disabled = !this.connected || !this.stream.active;
-    this.calibration.hidden = !this.preparing;
-    this.calibration.disabled = !this.connected || !this.usable;
-    this.ready.hidden = !this.readyAvailable;
-    this.ready.disabled = !this.connected || !this.isReady && (!this.usable || !this.calibrated || !landscape);
-    this.ready.textContent = this.isReady ? "CANCEL" : "READY";
-    this.ready.setAttribute("aria-pressed", String(this.isReady));
-    this.actions.hidden = !this.preparing && this.usable || !this.selected && !this.preparing;
-    const blocked = {
-      insecure: "Motion needs a secure connection",
-      unsupported: "Motion is unavailable",
-      denied: "Motion access was denied",
-      error: "Motion access could not start",
-      unavailable: "Motion is unavailable",
-      degenerate_orientation: "Hold the screen toward you"
-    };
-    this.state.textContent = this.preparing && !this.usable ? blocked[this.capture] ?? "" : "";
-    this.state.hidden = !this.state.textContent;
-  }
-  draw() {
-    if (this.surface.hidden || !this.selected)
-      return;
-    const width = this.canvas.clientWidth, height = this.canvas.clientHeight;
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    this.canvas.width = Math.round(width * dpr);
-    this.canvas.height = Math.round(height * dpr);
-    const ctx = this.context;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, width, height);
-    const image = this.images[this.team], bounds = this.bounds[this.team];
-    if (!image?.complete || !image.naturalWidth || !bounds)
-      return;
-    const length = Math.min(width, height) * 0.82, thickness = length / this.ratio;
-    const [sx, sy, right, bottom] = bounds;
-    const sw = right - sx, sh = bottom - sy;
-    const capPx = Math.min(96, sw * 0.25), cap = Math.min(capPx * thickness / sh, length * 0.25);
-    ctx.translate(width / 2, height / 2);
-    ctx.rotate(this.angle);
-    ctx.drawImage(image, sx, sy, capPx, sh, -length / 2, -thickness / 2, cap, thickness);
-    ctx.drawImage(image, sx + capPx, sy, sw - 2 * capPx, sh, -length / 2 + cap, -thickness / 2, length - 2 * cap, thickness);
-    ctx.drawImage(image, right - capPx, sy, capPx, sh, length / 2 - cap, -thickness / 2, cap, thickness);
-  }
-};
-
 // build/network_config.js
 function controllerSocketUrl(config, pageUrl) {
   const page = new URL(pageUrl);
@@ -2657,13 +2435,8 @@ var lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJump
 });
 var gameplayMotion = new MotionStream(() => socket);
 window.addEventListener("pageshow", (event) => {
-  if (event.persisted && (activeGame === "tilt_shift" || activeGame === "tilt_shift_3d"))
+  if (event.persisted && activeGame === "tilt_shift_3d")
     socket?.close();
-});
-var tiltSurface = document.querySelector("#tilt-shift");
-var tiltPhone = new TiltShiftPhone(tiltSurface, gameplayMotion, (ready, context) => {
-  if (socket?.readyState === WebSocket.OPEN)
-    socket.send(JSON.stringify(context ? { type: "tilt_shift_ready", ready, ...context } : { type: "pre_minigame_ready", ready }));
 });
 var tilt3DSurface = document.querySelector("#tilt-shift-3d");
 var tilt3DPhone = new TiltShift3DPhone(tilt3DSurface, gameplayMotion, (ready, context) => {
@@ -2671,7 +2444,6 @@ var tilt3DPhone = new TiltShift3DPhone(tilt3DSurface, gameplayMotion, (ready, co
     socket.send(JSON.stringify(context ? { type: "tilt_shift_3d_ready", ready, ...context } : { type: "pre_minigame_ready", ready }));
 }, () => loadThreeView());
 gameplayMotion.onControlState = () => {
-  tiltPhone.feedback();
   tilt3DPhone.feedback();
 };
 var motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);
@@ -2715,7 +2487,7 @@ function showBubble3D(message) {
   status.hidden = true;
   bubble3DPhone.receive(message);
 }
-for (const surface of [lobbyController, readyCard, tiltSurface, tilt3DSurface])
+for (const surface of [lobbyController, readyCard, tilt3DSurface])
   protectControllerSurface(surface);
 bindControllerLifecycle(() => {
 });
@@ -2772,8 +2544,6 @@ for (const option of CHARACTER_COLORS) {
 refreshSelectionUi();
 function setGameplaySurface(active, game) {
   const next = active ? game ?? null : null;
-  if (next !== "tilt_shift")
-    tiltPhone.hide();
   if (next !== "tilt_shift_3d")
     tilt3DPhone.hide();
   if (next !== "bubbles_3d")
@@ -2787,8 +2557,7 @@ function setGameplaySurface(active, game) {
     } else if (document.fullscreenElement) {
       try {
         const orientation = screen.orientation;
-        const tilted = next === "tilt_shift" || next === "tilt_shift_3d";
-        const direction = tilted ? "landscape" : "portrait";
+        const direction = next === "tilt_shift_3d" ? "landscape" : "portrait";
         void Promise.resolve(orientation?.lock?.(direction)).catch(() => {
         });
       } catch {
@@ -2797,7 +2566,6 @@ function setGameplaySurface(active, game) {
     activeGame = next;
   }
   document.documentElement.classList.toggle("gameplay-active", next !== null);
-  document.documentElement.classList.toggle("tilt-active", next === "tilt_shift");
   document.documentElement.classList.toggle("bubbles-3d-active", next === "bubbles_3d");
   document.documentElement.classList.toggle("tilt-3d-active", next === "tilt_shift_3d");
 }
@@ -2847,13 +2615,8 @@ function showJoined(player, state = "Connected") {
   status.hidden = true;
 }
 function showReady(message) {
-  if (message.minigame_id === "tilt_shift" && message.preparation) {
-    showTiltSurface();
-    tiltPhone.preparation(message.preparation, message.ready === true);
-    return;
-  }
   if (message.minigame_id === "tilt_shift_3d" && message.preparation) {
-    showTiltSurface("tilt_shift_3d");
+    showTiltSurface();
     tilt3DPhone.preparation(message.preparation, message.ready === true);
     return;
   }
@@ -2875,22 +2638,18 @@ function showReady(message) {
   readyButton.disabled = false;
   status.hidden = true;
 }
-function showTiltSurface(game = "tilt_shift") {
+function showTiltSurface() {
   motionLab.stop();
   lobbyControls.deactivate();
-  setGameplaySurface(true, game);
+  setGameplaySurface(true, "tilt_shift_3d");
   selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = true;
   readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
   status.hidden = true;
 }
-function showTilt(message) {
-  if (tiltPhone.snapshot(message))
-    showTiltSurface();
-}
 function showTilt3D(message) {
   if (tilt3DPhone.snapshot(message))
-    showTiltSurface("tilt_shift_3d");
+    showTiltSurface();
 }
 readyButton.addEventListener("click", () => {
   if (!socket || socket.readyState !== WebSocket.OPEN)
@@ -3049,8 +2808,6 @@ async function connect() {
         if (message.resume_status === "resumed" && rememberIdentity(message)) {
           if (isSnapshot(message.gameplay))
             showBubble3D(message.gameplay);
-          else if (message.gameplay?.type === "tilt_shift_snapshot")
-            showTilt(message.gameplay);
           else if (message.gameplay?.type === "tilt_shift_3d_snapshot")
             showTilt3D(message.gameplay);
           else if (message.gameplay?.type === "pre_minigame_snapshot")
@@ -3088,8 +2845,6 @@ async function connect() {
         showBubble3D(message);
       else if (message.type === "pre_minigame_snapshot")
         showReady(message);
-      else if (message.type === "tilt_shift_snapshot")
-        showTilt(message);
       else if (message.type === "tilt_shift_3d_snapshot")
         showTilt3D(message);
       else if (message.type === "motion_lab" && joined && typeof message.subscription_id === "string" && typeof message.send_hz === "number") {
@@ -3112,7 +2867,6 @@ async function connect() {
           send_hz: message.send_hz,
           stale_msec: message.stale_msec ?? 1e3
         });
-        tiltPhone.feedback();
         tilt3DPhone.feedback();
       } else if (message.type === "motion_control_state") {
         if (typeof message.subscription_id === "string") {
@@ -3145,9 +2899,7 @@ async function connect() {
       lobbyControls.deactivate();
       gameplayMotion.stop();
       motionLab.disconnect();
-      if (activeGame === "tilt_shift")
-        tiltPhone.disconnect();
-      else if (activeGame === "tilt_shift_3d")
+      if (activeGame === "tilt_shift_3d")
         tilt3DPhone.disconnect();
       else
         setGameplaySurface(false);

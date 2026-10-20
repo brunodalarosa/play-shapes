@@ -21,7 +21,7 @@ func _run() -> void:
 	protocol.set_look(profile)
 	protocol.apply_snapshot(state)
 	check(protocol.handles(TiltShift3DProtocol.READY), "READY is the protocol's message")
-	check(not protocol.handles("tilt_shift_ready"), "2D Tilt Shift's READY is not")
+	check(not protocol.handles("other_ready"), "Unrelated messages are not handled")
 
 	var selected: TiltShift3DState.Player
 	var spectator: TiltShift3DState.Player

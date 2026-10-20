@@ -129,7 +129,12 @@ func _draw() -> void:
 		_label(point + Vector2(-3, -12), str(index + 1), Color("332719"), 13)
 	var preset: TiltShift3DBasketPreset = model.basket()
 	var floor_y := arena.y - model.profile.physics.bin_band
-	draw_line(to_screen(Vector2(0, floor_y)), to_screen(Vector2(arena.x, floor_y)), Color("929292"), 2)
+	draw_line(
+		to_screen(Vector2(0, floor_y)),
+		to_screen(Vector2(arena.x, floor_y)),
+		Color("929292"),
+		2,
+	)
 	for index: int in preset.openings.size():
 		var opening: TiltShift3DBasketOpening = preset.openings[index]
 		if opening == null:

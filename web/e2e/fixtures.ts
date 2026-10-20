@@ -45,7 +45,6 @@ export class Host {
     const windowed = process.env.E2E_WINDOWED === "1";
     const exported = process.env.E2E_EXPORTED_PACK;
     const scripts: Record<string, string> = {
-      tilt_shift: "tilt_shift_host.gd",
       tilt_shift_3d: "tilt_shift_3d_host.gd",
     };
     const script = scripts[game] ?? "host.gd";
@@ -65,11 +64,7 @@ export class Host {
         E2E_MINIGAME: game,
         E2E_HTTP_PORT: String(HTTP_PORT),
         E2E_HOST_CAPTURES: windowed ? testInfo.outputPath("host") : "",
-        E2E_REPORT_FOLDER: join(
-          ROOT,
-          "test-results",
-          game === "tilt_shift_3d" ? "tilt-shift-3d" : "tilt-shift",
-        ),
+        E2E_REPORT_FOLDER: join(ROOT, "test-results", "tilt-shift-3d"),
         PLAY_SHAPES_NETWORK_CONFIG: "off",
       },
     });

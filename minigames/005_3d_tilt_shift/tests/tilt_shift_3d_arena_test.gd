@@ -1,9 +1,9 @@
 extends TestScript
-## The arena's delivery, catches, deadline and round content on the 3D plane, with 2D Tilt
-## Shift's distances scaled from 1,000 units per width to the arena's world units. Positions are
+## The arena's delivery, catches, deadline and round content on the 3D plane, with millisecond
+## distances scaled from 1,000 units per width to the arena's world units. Positions are
 ## set in arena coordinates, from the top-left with Y down, through the arena's conversion.
 
-## World units per 2D Tilt Shift arena unit.
+## World units per 1/1000 of an arena width.
 const SCALE := TiltShift3DArena.WORLD_UNITS / 1000.0
 
 

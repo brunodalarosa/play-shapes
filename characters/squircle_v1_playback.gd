@@ -1,6 +1,6 @@
 class_name SquircleV1Playback
 extends Node2D
-## Shared Squircle v1 sheet playback for the Ready screen, Tilt Shift and Animation Lab.
+## Shared Squircle v1 sheet playback for the Ready screen and Animation Lab.
 
 const MANIFEST_PATH := "res://assets/runtime/animated_characters/squircle/v1/manifest.json"
 const ASSET_ROOT := "res://assets/runtime/animated_characters/squircle/v1/"

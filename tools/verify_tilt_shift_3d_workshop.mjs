@@ -1,5 +1,5 @@
-// Development-only. Run the real editor with a temporary verification plugin. Pass "3d" to
-// verify Tilt Shift 3D's workshop instead of Tilt Shift's.
+// Development-only. Run the real editor with a temporary verification plugin for
+// Tilt Shift 3D's workshop.
 import { spawn } from "node:child_process";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
@@ -7,11 +7,8 @@ import { root, godotBinary } from "./environment.mjs";
 
 const config = join(root, "project.godot");
 const original = readFileSync(config, "utf8");
-const threeD = process.argv.includes("3d");
-const driver = threeD
-  ? "res://minigames/005_3d_tilt_shift/tests/editor_driver/plugin.cfg"
-  : "res://minigames/003_tilt_shift/tests/editor_driver/plugin.cfg";
-const logFolder = join(root, "test-results", threeD ? "tilt-shift-3d" : "tilt-shift", "workshop");
+const driver = "res://minigames/005_3d_tilt_shift/tests/editor_driver/plugin.cfg";
+const logFolder = join(root, "test-results", "tilt-shift-3d", "workshop");
 mkdirSync(logFolder, { recursive: true });
 if (original.includes(driver))
   throw new Error("The temporary verification plugin is already enabled");

@@ -133,17 +133,6 @@ async function withController(
         status: 503,
         statusText: "Service Unavailable",
         json: async () => {
-          if (path === "/tilt-shift/manifest.json")
-            return {
-              assets: Object.fromEntries(
-                ["orange", "blue", "neutral"].map((team) => [
-                  `paddles/paddle_${team}.png`,
-                  {
-                    visible_bounds_px: [10, 9, 663, 151],
-                  },
-                ]),
-              ),
-            };
           if (path !== "/session.json") return { resolution: [256, 256], clips: [] };
           if (failure === "json") throw new SyntaxError("Unexpected token < in JSON");
           return {

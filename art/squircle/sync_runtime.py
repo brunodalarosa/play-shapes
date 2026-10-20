@@ -47,6 +47,6 @@ for source_clip, runtime_clip in zip(manifest['clips'], runtime['clips']):
 (OUT / 'manifest.json').write_text(json.dumps(runtime, indent=2) + '\n', encoding='utf-8')
 record = {'source_sha256': manifest['source_sha256'], 'sheets': hashes,
           'runtime_directory': OUT.relative_to(ROOT).as_posix(),
-          'note': 'Current sheets shared by Ready screen, Tilt Shift, Animation Lab and phones.'}
+          'note': 'Current sheets shared by Ready screen, Animation Lab and phones.'}
 (HERE / 'runtime-sync.json').write_text(json.dumps(record, indent=2) + '\n', encoding='utf-8')
 print(f'Squircle v1: {len(names)} shared runtime sheets and manifest updated.')

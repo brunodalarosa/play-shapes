@@ -62,7 +62,10 @@ static func inspect(profile: TiltShift3DTuning, tolerance: float) -> Dictionary:
 			)
 		)
 	if not paddles.has(null):
-		edges = TiltShift3DPaddleAllocator.neighbors(profile.paddle_layout, profile.neighbor_distance)
+		edges = TiltShift3DPaddleAllocator.neighbors(
+			profile.paddle_layout,
+			profile.neighbor_distance,
+		)
 	blocked.sort_custom(
 		func(a: Vector2, b: Vector2) -> bool:
 			return a.x < b.x,

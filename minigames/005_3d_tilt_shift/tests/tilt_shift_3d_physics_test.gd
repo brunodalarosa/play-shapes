@@ -1,12 +1,12 @@
 extends TestScript
 ## Ball and paddle contacts on Jolt, on the plane: the materials' restitution and friction act as
-## 2D Tilt Shift's did, balls collide with each other, keep their own acceleration, cannot tunnel
+## expected, balls collide with each other, keep their own acceleration, cannot tunnel
 ## through a paddle, stay at depth zero and roll only about the depth axis. Each new paddle
 ## contact is reported once, with the speed it closed in at. Speeds and distances
-## are 2D Tilt Shift's, scaled from its 1,000 units per width to 19.2.
+## are scaled from 1,000 units per width to 19.2.
 
 const UNITS := TiltShift3DArena.WORLD_UNITS
-## World units per 2D Tilt Shift arena unit.
+## World units per 1/1000 of an arena width.
 const SCALE := UNITS / 1000.0
 
 

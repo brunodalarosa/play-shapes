@@ -97,7 +97,7 @@ func _run() -> void:
 	):
 		return
 	if not _check_tooltip_contract(
-		"res://minigames/003_tilt_shift/tilt_shift_tuning.gd",
+		"res://minigames/005_3d_tilt_shift/tilt_shift_3d_tuning.gd",
 		[
 			"round_duration_seconds",
 			"round_count",
@@ -109,7 +109,7 @@ func _run() -> void:
 	):
 		return
 	if not _check_tooltip_contract(
-		"res://minigames/003_tilt_shift/tilt_shift_physics_tuning.gd",
+		"res://minigames/005_3d_tilt_shift/tilt_shift_3d_physics_tuning.gd",
 		[
 			"ball_count",
 			"delivery_curve",
@@ -122,6 +122,9 @@ func _run() -> void:
 			"ball_radius",
 			"paddle_length",
 			"paddle_thickness",
+			"corner_radius_ratio",
+			"depth_ratio",
+			"bin_band",
 			"gravity",
 			"entry_speed",
 			"rotation_speed_degrees",
@@ -134,7 +137,7 @@ func _run() -> void:
 		return
 	if not _check_tooltip_contract(
 		"res://Tuning/active_presets.gd",
-		["bubbles_3d", "tilt_shift", "networking", "lobby_movement"],
+		["bubbles_3d", "tilt_shift_3d", "networking", "lobby_movement"],
 	):
 		return
 	if not _check_tooltip_contract(
@@ -150,6 +153,7 @@ func _run() -> void:
 	if not check(
 		preset_paths.has("res://Tuning/Active Presets.tres")
 		and preset_paths.has("res://minigames/004_3d_bubbles/tuning/Default.tres")
+		and preset_paths.has("res://minigames/005_3d_tilt_shift/tuning/Default.tres")
 		and preset_paths.has("res://Tuning/Shared/Networking/Default.tres")
 		and preset_paths.has("res://Tuning/Shared/Lobby/Default.tres"),
 		"Default presets and Active Presets are discovered",
@@ -248,7 +252,7 @@ func _run() -> void:
 
 	var active: Resource = ActivePresetsScript.new()
 	if not check(
-		active.validation_errors().size() == 5,
+		active.validation_errors().size() == 4,
 		"Active selector rejects missing preset references",
 	):
 		return

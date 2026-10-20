@@ -32,7 +32,7 @@ func handles(message_type: String) -> bool:
 	return message_type == READY
 
 
-## Like 2D Tilt Shift, a stale or invalid READY is dropped without an error; the sender gets its
+## A stale or invalid READY is dropped without an error; the sender gets its
 ## current snapshot back so its button shows the true state.
 func handle_message(player: Dictionary, message: Dictionary, host_msec: int) -> Dictionary:
 	var accepted := handle_ready(String(player.get("player_id", "")), message, host_msec)

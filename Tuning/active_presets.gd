@@ -7,9 +7,6 @@ extends Resource
 ## folder for provisional baseline values.
 @export var bubbles_3d: Bubbles3DTuning
 
-## Active Tilt Shift rules/content preset. Default values are provisional, pending owner play.
-@export var tilt_shift: TiltShiftTuning
-
 ## Active Tilt Shift 3D rules/content preset. Default values are provisional, pending owner play.
 @export var tilt_shift_3d: TiltShift3DTuning
 
@@ -29,10 +26,6 @@ func validation_errors() -> PackedStringArray:
 		errors.append("Active Presets: Bubbles 3D preset is missing.")
 	else:
 		errors.append_array(bubbles_3d.validation_errors())
-	if tilt_shift == null:
-		errors.append("Active Presets: Tilt Shift preset is missing.")
-	else:
-		errors.append_array(tilt_shift.validation_errors())
 	if tilt_shift_3d == null:
 		errors.append("Active Presets: Tilt Shift 3D preset is missing.")
 	else:

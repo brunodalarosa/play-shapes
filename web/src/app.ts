@@ -2,7 +2,7 @@ import { BubblePhone } from "./004_3d_bubbles/phone.js";
 import { isSnapshot as isBubble3DSnapshot } from "./004_3d_bubbles/state.js";
 import type { Message as Bubble3DMessage, ViewModule } from "./004_3d_bubbles/types.js";
 import { TiltShift3DPhone } from "./005_3d_tilt_shift/phone.js";
-import type { ViewModule as TiltViewModule } from "./005_3d_tilt_shift/types.js";
+import type { Preparation, ViewModule as TiltViewModule } from "./005_3d_tilt_shift/types.js";
 import {
   attemptImmersive,
   protectControllerSurface,
@@ -12,7 +12,6 @@ import { PwaOnboarding, isStandalone } from "./pwa.js";
 import { bindScreenWakeLock } from "./screen_wake_lock.js";
 import { MotionLabController } from "./motion_lab.js";
 import { MotionStream, type MotionControlState } from "./motion_stream.js";
-import { TiltShiftPhone, type Preparation } from "./003_tilt_shift/tilt_shift_phone.js";
 import { controllerSocketUrl } from "./network_config.js";
 import { SquircleV1Canvas } from "./squircle_v1.js";
 import { LobbyControls } from "./lobby_controls.js";
@@ -142,7 +141,7 @@ let joined = false;
 let isReady = false;
 let joinFlow: JoinFlowState = defaultJoinFlow();
 let inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
-type Game = "tilt_shift" | "bubbles_3d" | "tilt_shift_3d";
+type Game = "bubbles_3d" | "tilt_shift_3d";
 let activeGame: Game | null = null;
 const squircleCanvas = new SquircleV1Canvas();
 const lobbyControls = new LobbyControls(
@@ -160,19 +159,7 @@ const lobbyControls = new LobbyControls(
 const gameplayMotion = new MotionStream(() => socket);
 window.addEventListener("pageshow", (event) => {
   // A cached page retired capture on pagehide; resume through a fresh host subscription.
-  if (event.persisted && (activeGame === "tilt_shift" || activeGame === "tilt_shift_3d"))
-    socket?.close();
-});
-const tiltSurface = document.querySelector<HTMLElement>("#tilt-shift")!;
-const tiltPhone = new TiltShiftPhone(tiltSurface, gameplayMotion, (ready, context) => {
-  if (socket?.readyState === WebSocket.OPEN)
-    socket.send(
-      JSON.stringify(
-        context
-          ? { type: "tilt_shift_ready", ready, ...context }
-          : { type: "pre_minigame_ready", ready },
-      ),
-    );
+  if (event.persisted && activeGame === "tilt_shift_3d") socket?.close();
 });
 const tilt3DSurface = document.querySelector<HTMLElement>("#tilt-shift-3d")!;
 const tilt3DPhone = new TiltShift3DPhone(
@@ -191,7 +178,6 @@ const tilt3DPhone = new TiltShift3DPhone(
   () => loadThreeView(),
 );
 gameplayMotion.onControlState = () => {
-  tiltPhone.feedback();
   tilt3DPhone.feedback();
 };
 const motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);
@@ -252,7 +238,7 @@ function showBubble3D(message: Bubble3DMessage): void {
   bubble3DPhone.receive(message);
 }
 
-for (const surface of [lobbyController, readyCard, tiltSurface, tilt3DSurface])
+for (const surface of [lobbyController, readyCard, tilt3DSurface])
   protectControllerSurface(surface);
 bindControllerLifecycle(() => {});
 
@@ -315,7 +301,6 @@ refreshSelectionUi();
 
 function setGameplaySurface(active: boolean, game?: Game): void {
   const next = active ? (game ?? null) : null;
-  if (next !== "tilt_shift") tiltPhone.hide();
   if (next !== "tilt_shift_3d") tilt3DPhone.hide();
   if (next !== "bubbles_3d") bubble3DPhone.hide();
   if (activeGame !== next) {
@@ -330,8 +315,7 @@ function setGameplaySurface(active: boolean, game?: Game): void {
         const orientation = screen.orientation as ScreenOrientation & {
           lock?: (value: string) => Promise<void>;
         };
-        const tilted = next === "tilt_shift" || next === "tilt_shift_3d";
-        const direction = tilted ? "landscape" : "portrait";
+        const direction = next === "tilt_shift_3d" ? "landscape" : "portrait";
         void Promise.resolve(orientation?.lock?.(direction)).catch(() => {});
       } catch {
         /* Lock denied. */
@@ -340,7 +324,6 @@ function setGameplaySurface(active: boolean, game?: Game): void {
     activeGame = next;
   }
   document.documentElement.classList.toggle("gameplay-active", next !== null);
-  document.documentElement.classList.toggle("tilt-active", next === "tilt_shift");
   document.documentElement.classList.toggle("bubbles-3d-active", next === "bubbles_3d");
   document.documentElement.classList.toggle("tilt-3d-active", next === "tilt_shift_3d");
 }
@@ -391,13 +374,8 @@ function showJoined(player: PublicPlayer, state = "Connected"): void {
 }
 
 function showReady(message: HostMessage): void {
-  if (message.minigame_id === "tilt_shift" && message.preparation) {
-    showTiltSurface();
-    tiltPhone.preparation(message.preparation, message.ready === true);
-    return;
-  }
   if (message.minigame_id === "tilt_shift_3d" && message.preparation) {
-    showTiltSurface("tilt_shift_3d");
+    showTiltSurface();
     tilt3DPhone.preparation(message.preparation, message.ready === true);
     return;
   }
@@ -420,22 +398,18 @@ function showReady(message: HostMessage): void {
   status.hidden = true;
 }
 
-function showTiltSurface(game: "tilt_shift" | "tilt_shift_3d" = "tilt_shift"): void {
+function showTiltSurface(): void {
   motionLab.stop();
   lobbyControls.deactivate();
-  setGameplaySurface(true, game);
+  setGameplaySurface(true, "tilt_shift_3d");
   selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = true;
   readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
   status.hidden = true;
 }
 
-function showTilt(message: unknown): void {
-  if (tiltPhone.snapshot(message)) showTiltSurface();
-}
-
 function showTilt3D(message: unknown): void {
-  if (tilt3DPhone.snapshot(message)) showTiltSurface("tilt_shift_3d");
+  if (tilt3DPhone.snapshot(message)) showTiltSurface();
 }
 readyButton.addEventListener("click", () => {
   if (!socket || socket.readyState !== WebSocket.OPEN) return;
@@ -612,7 +586,6 @@ async function connect(): Promise<void> {
         clearTimeout(deadline);
         if (message.resume_status === "resumed" && rememberIdentity(message)) {
           if (isBubble3DSnapshot(message.gameplay)) showBubble3D(message.gameplay);
-          else if (message.gameplay?.type === "tilt_shift_snapshot") showTilt(message.gameplay);
           else if (message.gameplay?.type === "tilt_shift_3d_snapshot")
             showTilt3D(message.gameplay);
           else if (message.gameplay?.type === "pre_minigame_snapshot") showReady(message.gameplay);
@@ -673,7 +646,6 @@ async function connect(): Promise<void> {
       )
         showBubble3D(message as unknown as Bubble3DMessage);
       else if (message.type === "pre_minigame_snapshot") showReady(message);
-      else if (message.type === "tilt_shift_snapshot") showTilt(message);
       else if (message.type === "tilt_shift_3d_snapshot") showTilt3D(message);
       else if (
         message.type === "motion_lab" &&
@@ -710,7 +682,6 @@ async function connect(): Promise<void> {
           send_hz: message.send_hz,
           stale_msec: message.stale_msec ?? 1000,
         });
-        tiltPhone.feedback();
         tilt3DPhone.feedback();
       } else if (message.type === "motion_control_state") {
         if (typeof message.subscription_id === "string")
@@ -747,8 +718,7 @@ async function connect(): Promise<void> {
       lobbyControls.deactivate();
       gameplayMotion.stop();
       motionLab.disconnect();
-      if (activeGame === "tilt_shift") tiltPhone.disconnect();
-      else if (activeGame === "tilt_shift_3d") tilt3DPhone.disconnect();
+      if (activeGame === "tilt_shift_3d") tilt3DPhone.disconnect();
       else setGameplaySurface(false);
       if (socket === peer) socket = undefined;
       if (event.code === 4000) {

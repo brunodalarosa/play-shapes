@@ -82,7 +82,7 @@ test("natural blinks last 0.12 s, 2.4 to 5.6 s apart", () => {
 test("snapshots and preparations are validated before use", () => {
   assert.ok(validSnapshot(snapshot()));
   assert.ok(validSnapshot(snapshot({ selected: false, paddle_ids: [] })));
-  assert.equal(validSnapshot(snapshot({ type: "tilt_shift_snapshot" })), false);
+  assert.equal(validSnapshot(snapshot({ type: "other_snapshot" })), false);
   assert.equal(validSnapshot(snapshot({ face: "../evil" })), false);
   assert.equal(validSnapshot(snapshot({ color: "red" })), false);
   assert.equal(validSnapshot(snapshot({ look: { ...look, outline_colors: ["fd8702"] } })), false);

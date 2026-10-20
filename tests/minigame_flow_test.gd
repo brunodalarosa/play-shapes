@@ -25,17 +25,18 @@ func _run() -> void:
 	var start_button := current_scene.get_node("%StartMinigame") as Button
 	var start_help := current_scene.get_node("%StartHelp") as Label
 	if not check(
-		selector.item_count == 3 and selector.get_item_text(0) == "Bubbles and jellyfishes 3D"
-		and selector.get_item_text(1) == "Tilt Shift 3D"
-		and selector.get_item_text(2) == "Tilt Shift",
-		"Lobby offers Bubbles and jellyfishes 3D, then Tilt Shift 3D beside Tilt Shift",
+		selector.item_count == 2 and selector.get_item_text(0) == "Bubbles and jellyfishes 3D"
+		and selector.get_item_text(1) == "Tilt Shift 3D",
+		"Lobby offers Bubbles and jellyfishes 3D, then Tilt Shift 3D",
 	):
 		return
 	if not check(
 		host.minigame_scene_path(&"flash_pose").is_empty()
 		and not host.prepare_minigame_launch(&"flash_pose").accepted
 		and host.minigame_scene_path(&"bubbles").is_empty()
-		and not host.prepare_minigame_launch(&"bubbles").accepted,
+		and not host.prepare_minigame_launch(&"bubbles").accepted
+		and host.minigame_scene_path(&"tilt_shift").is_empty()
+		and not host.prepare_minigame_launch(&"tilt_shift").accepted,
 		"Retired games cannot launch through the host",
 	):
 		return
