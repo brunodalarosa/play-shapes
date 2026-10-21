@@ -29,6 +29,7 @@ var _file_kind: String = "profile"
 var _saving: bool = false
 var _draft_save: bool = false
 var _coordinate: Label
+var _paddle_title: Label
 var _width_input: SpinBox
 
 
@@ -230,6 +231,12 @@ func _rebuild_settings() -> void:
 	)
 	_toggle(
 		_settings,
+		"Force reflected paddles symmetry",
+		model.force_paddle_symmetry,
+		model.set_force_paddle_symmetry,
+	)
+	_toggle(
+		_settings,
 		"Move reflected basket pair",
 		canvas.paired,
 		func(value: bool) -> void:
@@ -341,6 +348,7 @@ func _rebuild_settings() -> void:
 
 func _rebuild_selection() -> void:
 	_coordinate = null
+	_paddle_title = null
 	_width_input = null
 	for child: Node in _selection.get_children():
 		_selection.remove_child(child)
@@ -353,7 +361,9 @@ func _rebuild_selection() -> void:
 		if index >= model.profile.paddle_layout.paddles.size():
 			return
 		var paddle := model.profile.paddle_layout.paddles[index]
-		_heading(_selection, paddle.paddle_id)
+		_paddle_title = Label.new()
+		_paddle_title.text = _paddle_title_text(index)
+		_selection.add_child(_paddle_title)
 		var category := OptionButton.new()
 		category.add_item("Orange")
 		category.add_item("Blue")
@@ -500,9 +510,19 @@ func _build_curve(parent: Node, key: String = "delivery_curve") -> void:
 	)
 
 
+func _paddle_title_text(index: int) -> String:
+	var paddle := model.profile.paddle_layout.paddles[index]
+	return "%s • %s" % [model.paddle_labels()[index], paddle.paddle_id]
+
+
 func _refresh() -> void:
 	if not is_instance_valid(status):
 		return
+	if (
+		is_instance_valid(_paddle_title) and canvas.selected >= 0
+		and canvas.selected < model.profile.paddle_layout.paddles.size()
+	):
+		_paddle_title.text = _paddle_title_text(canvas.selected)
 	if is_instance_valid(_coordinate) and canvas.selected >= 0 \
 			and canvas.selected < model.profile.paddle_layout.paddles.size():
 		var point := model.profile.paddle_layout.paddles[canvas.selected].position

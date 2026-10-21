@@ -6,6 +6,8 @@ signal changed
 
 const CONTENT := "res://minigames/005_3d_tilt_shift/tuning/"
 const DRAFTS := "res://scratch/tilt_shift_3d_workshop/"
+## Anchors this close to the center line, in widths, belong to neither side.
+const CENTER_TOLERANCE := 0.0001
 
 var profile: TiltShift3DTuning
 var baskets: Array[TiltShift3DBasketPreset] = []
@@ -18,6 +20,7 @@ var snap_enabled: bool = true
 var position_snap: float = 0.01
 var width_snap: float = 0.01
 var guide_tolerance: float = 0.005
+var force_paddle_symmetry: bool = false
 var last_error: String = ""
 var _undo: Array[Dictionary] = []
 var _redo: Array[Dictionary] = []
@@ -146,8 +149,90 @@ func snap(value: float, step: float) -> float:
 
 func move_paddle(index: int, position: Vector2) -> void:
 	var point := Vector2(snap(position.x, position_snap), snap(position.y, position_snap))
-	profile.paddle_layout.paddles[index].position = point
+	# The partner is found before the move, while both sides still rank alike.
+	var partner := paddle_partner(index) if force_paddle_symmetry else -1
+	var paddles := profile.paddle_layout.paddles
+	paddles[index].position = point
+	if partner >= 0:
+		paddles[partner].position = _mirrored(point)
 	changed.emit()
+
+
+## Turning symmetry on corrects the draft at once, taking side A as the reference.
+func set_force_paddle_symmetry(enabled: bool) -> void:
+	force_paddle_symmetry = enabled
+	if not enabled:
+		return
+	var corrections := _symmetry_corrections()
+	if corrections.is_empty():
+		return
+	begin_edit()
+	for partner: int in corrections:
+		profile.paddle_layout.paddles[partner].position = corrections[partner]
+	end_edit()
+
+
+## Names each anchor by its side of the center line, A left and B right, and its rank from
+## the floor, so A0 is the lowest anchor on the left. Anchors on the line itself are C.
+## Entries are empty for missing paddles.
+func paddle_labels() -> PackedStringArray:
+	var paddles := profile.paddle_layout.paddles
+	var half := profile.paddle_layout.arena_size.x * 0.5
+	var sides := { "A": [], "B": [], "C": [] }
+	for index: int in paddles.size():
+		var paddle := paddles[index]
+		if paddle == null:
+			continue
+		var offset := paddle.position.x - half
+		var letter := "C" if absf(offset) <= CENTER_TOLERANCE else ("A" if offset < 0.0 else "B")
+		sides[letter].append(index)
+	var labels := PackedStringArray()
+	labels.resize(paddles.size())
+	for letter: String in sides:
+		var members: Array = sides[letter]
+		members.sort_custom(
+			func(first: int, second: int) -> bool:
+				var one := paddles[first].position
+				var two := paddles[second].position
+				if one.y != two.y:
+					return one.y > two.y
+				if one.x != two.x:
+					return one.x < two.x
+				return first < second,
+		)
+		for rank: int in members.size():
+			labels[members[rank]] = "%s%d" % [letter, rank]
+	return labels
+
+
+## The anchor of equal rank on the other side, or -1 for a center or unmatched anchor.
+func paddle_partner(index: int) -> int:
+	var labels := paddle_labels()
+	var label := labels[index]
+	if label.is_empty() or label.begins_with("C"):
+		return -1
+	var opposite := ("B" if label.begins_with("A") else "A") + label.substr(1)
+	return labels.find(opposite)
+
+
+func _mirrored(point: Vector2) -> Vector2:
+	return Vector2(profile.paddle_layout.arena_size.x - point.x, point.y)
+
+
+func _symmetry_corrections() -> Dictionary:
+	var paddles := profile.paddle_layout.paddles
+	var labels := paddle_labels()
+	var corrections := { }
+	for index: int in paddles.size():
+		if not labels[index].begins_with("A"):
+			continue
+		var partner := labels.find("B" + labels[index].substr(1))
+		if partner < 0:
+			continue
+		var target := _mirrored(paddles[index].position)
+		if not paddles[partner].position.is_equal_approx(target):
+			corrections[partner] = target
+	return corrections
 
 
 func reflected_index(index: int) -> int:

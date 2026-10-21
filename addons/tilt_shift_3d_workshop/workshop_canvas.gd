@@ -103,6 +103,7 @@ func _draw() -> void:
 					Color("633c75"),
 					11,
 				)
+	var labels := model.paddle_labels()
 	for index: int in model.profile.paddle_layout.paddles.size():
 		var paddle: TiltShift3DPaddle = model.profile.paddle_layout.paddles[index]
 		if paddle == null:
@@ -126,7 +127,7 @@ func _draw() -> void:
 			var ring := _outline(point, extent + Vector2(6, 6), corner + 3)
 			ring.append(ring[0])
 			draw_polyline(ring, Color("332719"), 2)
-		_label(point + Vector2(-3, -12), str(index + 1), Color("332719"), 13)
+		_label(point + Vector2(-8, -12), labels[index], Color("332719"), 13)
 	var preset: TiltShift3DBasketPreset = model.basket()
 	var floor_y := arena.y - model.profile.physics.bin_band
 	draw_line(
