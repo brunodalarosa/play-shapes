@@ -173,18 +173,21 @@ func set_force_paddle_symmetry(enabled: bool) -> void:
 
 
 ## Names each anchor by its side of the center line, A left and B right, and its rank from
-## the floor, so A0 is the lowest anchor on the left. Anchors on the line itself are C.
+## the floor, so A0 is the lowest anchor on the left. Neutral paddles are Z, ranked the same
+## way, and take no part in symmetry. Other anchors on the line itself are C.
 ## Entries are empty for missing paddles.
 func paddle_labels() -> PackedStringArray:
 	var paddles := profile.paddle_layout.paddles
 	var half := profile.paddle_layout.arena_size.x * 0.5
-	var sides := { "A": [], "B": [], "C": [] }
+	var sides := { "A": [], "B": [], "C": [], "Z": [] }
 	for index: int in paddles.size():
 		var paddle := paddles[index]
 		if paddle == null:
 			continue
 		var offset := paddle.position.x - half
 		var letter := "C" if absf(offset) <= CENTER_TOLERANCE else ("A" if offset < 0.0 else "B")
+		if not TiltShift3DTypes.is_player_team(paddle.team):
+			letter = "Z"
 		sides[letter].append(index)
 	var labels := PackedStringArray()
 	labels.resize(paddles.size())
@@ -205,11 +208,11 @@ func paddle_labels() -> PackedStringArray:
 	return labels
 
 
-## The anchor of equal rank on the other side, or -1 for a center or unmatched anchor.
+## The anchor of equal rank on the other side, or -1 for a neutral, center or unmatched anchor.
 func paddle_partner(index: int) -> int:
 	var labels := paddle_labels()
 	var label := labels[index]
-	if label.is_empty() or label.begins_with("C"):
+	if not (label.begins_with("A") or label.begins_with("B")):
 		return -1
 	var opposite := ("B" if label.begins_with("A") else "A") + label.substr(1)
 	return labels.find(opposite)

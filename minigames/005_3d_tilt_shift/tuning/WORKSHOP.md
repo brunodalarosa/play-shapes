@@ -11,12 +11,14 @@ Tilt Shift 3D profile from `Tuning/Active Presets.tres`; edits stay in an indepe
    layout separately from each round's mapping. A and B keep their own anchors and sizes;
    grey markers are automatic neutral paddles.
 2. Labels follow position, so they change as a paddle moves. The letter is the side of the
-   center line, A on the left and B on the right; an anchor on the line is C. The number
-   counts up from the floor on that side: A0 is the lowest left paddle, A1 the next above it.
+   center line, A on the left and B on the right. The number counts up from the floor on
+   that side: A0 is the lowest left paddle, A1 the next above it. Neutral paddles are
+   labelled Z0, Z1 and so on by the same rule, whatever their side.
 3. **Force reflected paddles symmetry**, when checked, mirrors each A paddle to the B paddle
    of the same number (A0 to B0), and moving either one moves the other. Checking the box
    corrects the draft at once, taking side A as the reference, as one undo step. Unchecking
-   it allows an asymmetric layout. A paddle without a partner is left alone.
+   it allows an asymmetric layout. A paddle without a partner, and every neutral Z paddle,
+   is left alone.
 4. **Snap to grid** displays the grid and snaps both axes in arena-width units. The
    provisional position and width steps are `0.01` widths, or 10 physics units.
    Disable snapping for free placement; change the steps for finer work.

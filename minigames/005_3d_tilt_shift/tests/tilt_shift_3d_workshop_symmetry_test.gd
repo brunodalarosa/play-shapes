@@ -9,7 +9,7 @@ func _run() -> void:
 	check(draft.load_profile(DEFAULT), "Workshop loads the selected runtime profile")
 	var layout := draft.profile.paddle_layout
 	layout.arena_size = Vector2(1.0, 0.5625)
-	# Three anchors on the left, two on the right and one on the center line.
+	# Three anchors on the left, two on the right and a neutral one on the center line.
 	var points: Array[Vector2] = [
 		Vector2(0.17, 0.15),
 		Vector2(0.83, 0.15),
@@ -22,6 +22,7 @@ func _run() -> void:
 	for index: int in points.size():
 		var paddle := TiltShift3DPaddle.new()
 		paddle.paddle_id = "test_%d" % index
+		paddle.team = 2 if index == 5 else index % 2
 		paddle.position = points[index]
 		paddles.append(paddle)
 	layout.paddles = paddles
@@ -30,13 +31,13 @@ func _run() -> void:
 
 	var labels := draft.paddle_labels()
 	check(
-		labels == PackedStringArray(["A2", "B1", "A0", "B0", "A1", "C0"]),
+		labels == PackedStringArray(["A2", "B1", "A0", "B0", "A1", "Z0"]),
 		"Labels give the side, then the rank counted up from the floor: %s" % labels,
 	)
 	check(draft.paddle_partner(2) == 3, "A0 pairs with B0")
 	check(draft.paddle_partner(3) == 2, "B0 pairs with A0")
 	check(draft.paddle_partner(0) == -1, "An anchor without an opposite rank has no partner")
-	check(draft.paddle_partner(5) == -1, "A center anchor has no partner")
+	check(draft.paddle_partner(5) == -1, "A neutral paddle has no partner")
 
 	draft.move_paddle(2, Vector2(0.40, 0.45))
 	check(
@@ -48,6 +49,7 @@ func _run() -> void:
 	check(_mirrored(draft, 2, 3), "Turning symmetry on mirrors B0 from A0")
 	check(_mirrored(draft, 4, 1), "Turning symmetry on mirrors B1 from A1")
 	check(paddles[0].position == points[0], "A paddle without a partner keeps its place")
+	check(paddles[5].position == points[5], "Symmetry never moves the neutral paddle")
 	# Undo swaps in a copy of the profile, so the paddles have to be read again.
 	draft.undo()
 	check(
@@ -58,6 +60,13 @@ func _run() -> void:
 	paddles = draft.profile.paddle_layout.paddles
 	check(_mirrored(draft, 2, 3), "Redo restores the correction")
 
+	draft.move_paddle(5, Vector2(0.48, 0.20))
+	check(
+		paddles[5].position.is_equal_approx(Vector2(0.48, 0.20))
+		and paddles[2].position.is_equal_approx(Vector2(0.40, 0.45)),
+		"Moving the neutral paddle moves no other paddle",
+	)
+	draft.move_paddle(5, Vector2(0.50, 0.25))
 	draft.move_paddle(1, Vector2(0.66, 0.43))
 	check(
 		paddles[4].position.is_equal_approx(Vector2(0.34, 0.43)),
