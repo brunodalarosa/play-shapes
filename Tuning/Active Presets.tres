@@ -4,7 +4,7 @@
 [ext_resource type="Resource" path="res://Tuning/Shared/Networking/Default.tres" id="3"]
 [ext_resource type="Resource" path="res://Tuning/Shared/Lobby/Default.tres" id="6"]
 [ext_resource type="Resource" path="res://minigames/004_3d_bubbles/tuning/Default.tres" id="7"]
-[ext_resource type="Resource" path="res://minigames/005_3d_tilt_shift/tuning/Default.tres" id="8"]
+[ext_resource type="Resource" uid="uid://b6hqgmifkqwh8" path="res://minigames/005_3d_tilt_shift/tuning/Default.tres" id="8"]
 
 [resource]
 script = ExtResource("1")

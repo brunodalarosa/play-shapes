@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cq3vyvk7nj7fy"]
 
-[ext_resource type="Script" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_gameplay.gd" id="1"]
+[ext_resource type="Script" uid="uid://bq55xxk3p6l2k" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_gameplay.gd" id="1"]
 
-[node name="TiltShift3D" type="Control"]
+[node name="TiltShift3D" type="Control" unique_id=1150758785]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

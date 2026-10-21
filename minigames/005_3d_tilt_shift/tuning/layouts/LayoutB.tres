@@ -1,12 +1,11 @@
-[gd_resource type="Resource" script_class="TiltShift3DPaddleLayout" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="TiltShift3DPaddleLayout" format=3 uid="uid://b04qy7bf8tmaq"]
 
-[ext_resource type="Script" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_paddle_layout.gd" id="1"]
-[ext_resource type="Script" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_paddle.gd" id="2"]
+[ext_resource type="Script" uid="uid://be4ul7tmhayhc" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_paddle_layout.gd" id="1"]
+[ext_resource type="Script" uid="uid://c6e27ok05i4jf" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_paddle.gd" id="2"]
 
 [sub_resource type="Resource" id="Paddle0"]
 script = ExtResource("2")
 paddle_id = "b_0"
-team = 0
 position = Vector2(0.32, 0.1558)
 
 [sub_resource type="Resource" id="Paddle1"]
@@ -24,13 +23,11 @@ position = Vector2(0.172, 0.3143)
 [sub_resource type="Resource" id="Paddle3"]
 script = ExtResource("2")
 paddle_id = "b_3"
-team = 0
 position = Vector2(0.837, 0.3143)
 
 [sub_resource type="Resource" id="Paddle4"]
 script = ExtResource("2")
 paddle_id = "b_4"
-team = 0
 position = Vector2(0.383, 0.3599)
 
 [sub_resource type="Resource" id="Paddle5"]
@@ -45,8 +42,4 @@ preset_name = "Layout B"
 layout_id = "b"
 player_length = 0.18
 player_thickness = 0.04
-auto_length = 0.20
-auto_thickness = 0.04
-auto_speed_degrees = 45.0
-auto_clockwise = true
-paddles = Array[Resource]([SubResource("Paddle0"), SubResource("Paddle1"), SubResource("Paddle2"), SubResource("Paddle3"), SubResource("Paddle4"), SubResource("Paddle5")])
+paddles = Array[ExtResource("2")]([SubResource("Paddle0"), SubResource("Paddle1"), SubResource("Paddle2"), SubResource("Paddle3"), SubResource("Paddle4"), SubResource("Paddle5")])
