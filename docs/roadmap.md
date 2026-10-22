@@ -131,11 +131,6 @@ with code `3221225477` during native shutdown after printing zero assertion fail
 usually passes. Treat that exit as a failed check, retain its log and report it separately from
 assertion results; its cause remains unresolved.
 
-In a whole `node tools/check.mjs --full` run, the larger emulated-phone rosters of Tilt
-Shift 3D have intermittently failed with one phone's READY never enabling, because its
-calibration did not take. The same rosters pass when run on their own. Report such a failure
-with its trace rather than as a pass.
-
 On Windows, the browser bundle rewrite after the browser suite can fail with
 `The requested operation cannot be performed on a file with a user-mapped section open.`
 Preserving the generated file in an ignored folder and regenerating it permits the focused

@@ -42,7 +42,8 @@ It reports what it actually knows:
 asks the host to use its latest usable sample; no phone-authored neutral or angle is sent.
 The lab wraps this same stream with its existing developer panel.
 
-Gameplay capture skips sends whenever WebSocket bytes are queued. The lab retains its
+Gameplay capture skips status and sample sends whenever WebSocket bytes are queued. A
+calibration request is a one-time click and is sent regardless. The lab retains its
 8192-byte backpressure threshold. A resumed timer samples current data without catch-up.
 Feedback and stop messages match their subscription generation.
 

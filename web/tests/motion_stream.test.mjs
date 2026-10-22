@@ -98,6 +98,8 @@ test("generic capture scopes feedback, skips queued input and retires listeners 
     orientation(70);
     stream.tick();
     assert.equal(messages.length, before, "any queued gameplay bytes drop the sample");
+    assert.ok(stream.requestCalibration(), "queued bytes cannot swallow a one-shot click");
+    assert.equal(messages.at(-1).type, "motion_calibrate");
     socket.bufferedAmount = 0;
     now = 500;
     orientation(-20);
