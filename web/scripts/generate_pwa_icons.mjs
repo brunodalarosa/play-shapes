@@ -1,11 +1,10 @@
-// Reuse the approved Squircle idle frame and Playground logo; no external art.
+// Reuse the current Cubio icon render and Playground logo; no animation sheets.
 import { PNG } from "pngjs";
 import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 const root = new URL("../../", import.meta.url);
 const load = (path) => PNG.sync.read(readFileSync(new URL(path, root)));
-const body = load("assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png");
-const face = load("assets/runtime/animated_characters/squircle/v1/idle-front-neutral.png");
+const character = load("art/cubio/previews/three-quarter.png");
 const logo = load("assets/runtime/lobby_playground/play_shapes_logo.png");
 for (const size of [180, 192, 512]) {
   const output = new PNG({ width: size, height: size });
@@ -39,8 +38,7 @@ for (const size of [180, 192, 512]) {
   }
   const tileSize = Math.round(size * 0.82),
     tileLeft = Math.floor((size - tileSize) / 2);
-  draw(body, 256, 256, tileLeft, 0, tileSize, tileSize);
-  draw(face, 256, 256, tileLeft, 0, tileSize, tileSize);
+  draw(character, character.width, character.height, tileLeft, 0, tileSize, tileSize);
   const logoWidth = Math.round(size * 0.92),
     logoHeight = Math.round((logoWidth * logo.height) / logo.width);
   draw(

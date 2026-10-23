@@ -53,7 +53,7 @@ No source edits. In the scene, materials are overridden with flat pale colours: 
 2. Copy only the selected source and the dependencies listed for it, plus the pack license file. Library originals stay unchanged.
 3. Keep unchanged copies and the adapted Blender source under `art/tilt_shift_3d/`, which Godot does not import. Put runtime files under `assets/runtime/minigames/tilt_shift_3d/` and `assets/runtime/shape_faces/` and add them to the standalone export policy.
 4. Record provenance in `art/tilt_shift_3d/README.md` and `art/shape_characters_face_system_assets/README.md`: source, path, hash, license and any change.
-5. Nothing here may change the plaza assets, 004's assets or the Squircle.
+5. Nothing here may change the plaza assets, 004's assets or the Cubio.
 
 ## Selected sources and hashes
 

@@ -23,7 +23,7 @@ func _run() -> void:
 		check(result.accepted, "The registry accepts the preview player")
 	await _wait_for_render()
 	_save_capture("%s/ready-%s.png" % [OUTPUT_DIR, size_label])
-	var character := lobby.get_node("World/Simulation/Bodies").get_child(0) as LobbySquircle
+	var character := lobby.get_node("World/Simulation/Bodies").get_child(0) as LobbyCubio
 	character.set_connected(false)
 	# High jumps may cross the billboard; the character draws in front of the QR.
 	character.position = Vector2(0.0, -8.0 * LobbyPlaygroundWorld.PIXELS_PER_UNIT)

@@ -48,7 +48,7 @@ Balls enter wholly above the visible top. Invisible walls stay at the arena's le
 
 - Shape: a rounded-rectangle bar generated in code from length, thickness, depth and corner radius. The corner radius stays constant when the length changes, so the ends never stretch. No library model is used ([[005 - Asset sources]]).
 - Starting sizes: player paddles have lengths of 0.20 widths in layout A and 0.18 widths in layout B at a thickness of 0.04 widths; the neutral paddle is 0.20 × 0.04. Corner radius 0.35 × thickness, depth equal to thickness.
-- Colour: the body uses the player's selected Squircle colour from `characters/character_selection.gd`.
+- Colour: the body uses the player's selected Cubio colour from `characters/character_selection.gd`.
 - Outline: a cream gap ring (about `#FFF3DC`, 6% of thickness) around the front silhouette, then the team outline (9% of thickness): orange `#FD8702` or blue `#0144F2`. The gap keeps the outline readable when the body colour equals the team colour.
 - Neutral paddle: grey body `#A0A0A0`, darker grey outline `#707070`, no gap ring, no face.
 - Face: centred on the front, 0.72 × thickness tall, scaled only by thickness, never stretched by length. The back of the paddle is plain.
@@ -59,7 +59,7 @@ Balls enter wholly above the visible top. Invisible walls stay at the arena's le
 
 A new reusable face component composes faces from separate parts: two eyes, two eyebrows and a mouth, with mirroring for left and right. Its sources are the owner's 2D assets in `art/shape_characters_face_system_assets/`, prepared as high-resolution parts plus a preset manifest ([[005 - Asset sources]]).
 
-The twelve reference faces `face_a` to `face_l` are named presets that reproduce those images exactly. A missing X-eye part is cut from `face_j`. Blinking swaps the eyes to `eye_closed_down` for 0.12 s every 2.4–5.6 s, as the 3D Squircle does; there is no blink while the eyes show X or are already closed.
+The twelve reference faces `face_a` to `face_l` are named presets that reproduce those images exactly. A missing X-eye part is cut from `face_j`. Blinking swaps the eyes to `eye_closed_down` for 0.12 s every 2.4–5.6 s, as the 3D Cubio does; there is no blink while the eyes show X or are already closed.
 
 ![The supplied face assets](references/face-system-assets.jpg)
 
@@ -188,7 +188,7 @@ Confirmed by the project owner on 2026-10-18:
 * Final numeric tuning and layout spacing, after human play.
 * A 3D preview screenshot for the Pre-minigame screen.
 * More expressions and moments, such as reactions to team scores or negative balls.
-* Using the face system on the 3D Squircle in the lobby, 004 or other minigames.
+* Using the face system on the 3D Cubio in the lobby, 004 or other minigames.
 * Audio.
 
 ## Validation needs

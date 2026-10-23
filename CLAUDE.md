@@ -58,7 +58,7 @@ Squircle 3D model and its animations, while the phone controls stay exactly as t
   `Hand.R` and the two feet), and the actions `Squircle | Idle`, `| Walk`, `| Run`,
   `| Look Up`, `| Crouch` and `| Lever Pull` at 24 fps. Its scale is real metres: body 2.00 m
   wide, hands 0.60 m spheres. The face is a separate image plane with neutral and blink
-  textures. See [the Squircle README](art/squircle/README.md).
+  textures. See [the character source README](art/cubio/README.md).
 - **There is no glTF export of the Squircle yet.** The pipeline renders only sprite sheets.
   A 3D controller first needs a GLB with the rig, actions, face and a tintable body, hands and
   feet. Blender 5.2 is installed at `C:\Program Files\Blender Foundation\Blender 5.2\blender.exe`.

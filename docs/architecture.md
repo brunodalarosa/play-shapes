@@ -44,9 +44,9 @@ Messages and limits are in [protocol.md](protocol.md).
   - `scenes/plaza_billboard.*` draws the logo and the live join QR in a `SubViewport` that
     renders only when they change, shown unshaded on the billboard's `Display` surface.
 - `scenes/lobby_playground_world.gd` reconciles registered players to ten seat-indexed
-  `SpawnPoints` and places each body's 3D Squircle every frame.
-- `characters/lobby_squircle.tscn` is the host body: the shared `PlatformMotor`, a capsule and
-  the player lifecycle. It drives its `Squircle3D` and frees it on exit.
+  `SpawnPoints` and places each body's 3D Cubio every frame.
+- `characters/lobby_cubio.tscn` is the host body: the shared `PlatformMotor`, a capsule and
+  the player lifecycle. It drives its `Cubio3D` and frees it on exit.
 - `Tuning/Shared/Lobby/Default.tres` holds the movement preset, in character heights, selected
   in `Active Presets.tres`.
 
@@ -110,7 +110,7 @@ with plane-locked bodies ([decision 0034](decisions/0034-bubbles-3d-jolt-plane.m
 - `bubbles_3d_round_controller.gd` owns the entrance, countdown, active and results phases,
   scores, pops and scatter counts, the zero-time freeze, ranking, disconnects and leaves.
 - `bubbles_3d_player_arena.gd` creates up to ten `Bubbles3DPlayerBubble` rigid bodies inside
-  `PlaneWalls3D` and reports bumps. Each bubble owns its shell, its Squircle with
+  `PlaneWalls3D` and reports bumps. Each bubble owns its shell, its Cubio with
   `Bubbles3DHandWobble`, and an instanced batch of caught jellyfishes.
 - `bubbles_3d_creature_arena.gd` owns jellyfish waves, safe spawns, scatter, pufferfish
   crossings and their warnings. Jellyfishes and pufferfishes are `Area3D` sensors; free
@@ -166,38 +166,34 @@ These live outside any minigame folder so later 3D scenes can use them.
 
 ## Characters
 
-- `characters/character_selection.gd` normalizes missing and legacy shapes to Squircle while
+- `characters/character_selection.gd` normalizes missing and legacy shapes to Cubio while
   preserving selected colors. `web/src/character_selection.ts` offers colors and sends
-  `squircle`.
-- `characters/squircle_3d.tscn` is the real-time Squircle used by the Playground lobby: the
+  `cubio`.
+- `characters/cubio_3d.tscn` is the real-time Cubio used by the Playground lobby: the
   exported rig and clips, the player tint, natural blinking, held stances, turning toward
   travel and a nameplate.
-  - Its shaders, `squircle_tint` and `squircle_face`, draw the character in front of any
+  - Its shaders, `cubio_tint` and `cubio_face`, draw the character in front of any
     scenery within `front_push` (2 units) of it. Each vertex moves toward the camera along
     its view ray, so its place on screen and the character's own layering are unchanged.
     Shadow passes are left alone. Nothing in the plaza may stand in front of a character
     within that distance.
-- `characters/squircle_v1_playback.tscn` plays manifest-owned sheets in the ready screen,
-  results and the Animation Lab.
-- The canonical editable model and actions are in `art/squircle/squircle-animated.blend`.
-  36 runtime sheets and their frame and anchor manifest live in
-  `assets/runtime/animated_characters/squircle/v1/`. The ready screen and the phone consume
-  that same v1 set. `art/squircle/export_glb.py` exports the rigged model to `model/` in that
-  folder.
-- After exporting and packing, run `art/squircle/sync_runtime.py` to refresh the runtime set.
-  See the [source workflow and pose tuning](../art/squircle/README.md).
+- `characters/cubio_preview.gd` renders a Ready-screen row of live Cubio instances in one
+  isolated 3D viewport. Readiness and color updates reuse existing instances.
+- The canonical model and six actions are in `art/cubio/cubio-animated.blend`. The body is
+  a two-metre cube with a small bevel; the floating limbs and rig retain their transforms.
+- `art/cubio/export_glb.py` exports the model and two face textures to
+  `assets/runtime/animated_characters/cubio/model/`. Both host and phone consume that model.
+  See the [source workflow](../art/cubio/README.md).
 
 ### Loops and held stances
 
-- Runtime clip metadata distinguishes `playback: loop` (idle, walk, run) from
+- Runtime clip metadata distinguishes `playback: loop` (idle, walk, run, lever pull) from
   `playback: held` (look_up, crouch).
-- `SquircleV1Playback.play(action, view)` enters a held stance once and sustains its final
+- `Cubio3D.play(action)` enters a held stance once and sustains its final
   frame.
 - Another request reverses current progress to the shared idle neutral before entering the
   latest requested action.
 - Re-pressing the current stance cancels the release without restarting.
-- `advance_playback(delta)` drives normal and slowed review. `seek_clip(action, view,
-  milliseconds)` inspects an exact clip time.
 - Stances keep the feet and ground anchor fixed, with independent color and face or blink
   layers.
 - The shared host motor chooses these stances only while grounded. Crouch retains the full
@@ -209,13 +205,6 @@ These live outside any minigame folder so later 3D scenes can use them.
   remains present in development exports.
 - **Tilt Shift 3D factory · simulated controls** opens `debug/tilt_shift_3d_review.tscn`: ten
   synthetic players tilt through a whole shift, with no phones and no launch eligibility.
-- **Animation Lab** opens `debug/animation_lab/animation_lab.tscn`.
-  - It inspects the manifest's twelve Squircle v1 action and view pairs at 256, 128 and the actual
-    lobby scale (0.58).
-  - It has color, natural or forced blink, pause, speed, and release and re-enter controls.
-  - It uses `SquircleV1Playback` directly.
-  - Its focused check is
-    `godot --headless --path . --script res://tests/squircle_animation_lab_test.gd`.
 - The motion lab is described in [motion-input.md](motion-input.md).
 
 ## Phone client
@@ -224,7 +213,7 @@ These live outside any minigame folder so later 3D scenes can use them.
   `web/public/app.js`, which is committed and served by Godot with the page, the styles and
   the icons beside it. Normal play needs neither Node nor Internet. See
   [browser-build.md](browser-build.md).
-- The phone onboarding keeps the socket available while players choose a Squircle color and
+- The phone onboarding keeps the socket available while players choose a Cubio color and
   enter a name. The host creates the player record only on the final join submission.
 - Ordinary ready-up shows one host-confirmed READY/CANCEL toggle. Preview and instructions
   remain on the shared screen.
@@ -232,7 +221,9 @@ These live outside any minigame folder so later 3D scenes can use them.
   own paddle in 3D through `web/src/005_3d_tilt_shift/`, with a flat drawing without WebGL.
   `web/src/shape_paddle/` holds the rounded outline and the face composition;
   `web/src/three_view/shape_paddle.ts` draws them with three.js.
-- `web/src/squircle_v1.ts` draws manifest-owned front idle sheets in setup.
+- `web/src/character_preview.ts` mounts a live 3D Cubio only in the visible setup canvas.
+  Its renderer is in `web/src/three_view/character_preview.ts`; model and face downloads are
+  cached with gameplay's assets. Hidden setup screens release their renderer.
 - `web/src/screen_wake_lock.ts` owns one visible-page wake lock across every phone screen,
   independent of the active minigame or socket. It adds no host state or messages.
 - What the phone screens do is in [phone-client.md](phone-client.md).

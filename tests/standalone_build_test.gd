@@ -53,12 +53,12 @@ func _run() -> void:
 	for path: String in Policy.REQUIRED_RUNTIME_PATHS:
 		check(FileAccess.file_exists("res://" + path), "Required runtime path exists: %s" % path)
 	check(
-		Policy.REQUIRED_RUNTIME_PATHS.has("characters/character_selection.gd") \
-				and Policy.REQUIRED_RUNTIME_PATHS.has("characters/squircle_v1_playback.tscn") \
-				and Policy
+		Policy.REQUIRED_RUNTIME_PATHS.has("characters/character_selection.gd")
+		and Policy.REQUIRED_RUNTIME_PATHS.has("characters/cubio_preview.gd")
+		and Policy
 		.REQUIRED_RUNTIME_PATHS
-		.has("assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png"),
-		"Squircle playback and approved sheets remain in the standalone PCK",
+		.has("assets/runtime/animated_characters/cubio/model/cubio.glb"),
+		"Live Cubio previews and the animated model remain in the standalone PCK",
 	)
 	check(
 		Policy.REQUIRED_RUNTIME_PATHS.has("addons/kenyoni/qr_code/qr_code_rect.gd"),

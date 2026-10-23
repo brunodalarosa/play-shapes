@@ -26,11 +26,11 @@ func _run() -> void:
 		"Players get distinct seat anchors and one character each",
 	)
 	check(
-		first.player.character_shape == "squircle" and second.player.character_shape == "squircle"
+		first.player.character_shape == "cubio" and second.player.character_shape == "cubio"
 		and first_character.visual.nameplate.text == "First"
 		and first_character.visual.player_color == Color("#EC407A")
 		and second_character.visual.player_color == Color("#00ACC1"),
-		"Each lobby Squircle shows its player's name and registered tint",
+		"Each lobby Cubio shows its player's name and registered tint",
 	)
 	check(
 		first_character.collision_layer == 256 and first_character.collision_mask == 384,
@@ -118,7 +118,7 @@ func _run() -> void:
 	)
 	check(
 		first_character.visual.facing_yaw() > 0.0 and second_character.visual.facing_yaw() < 0.0,
-		"Each Squircle turns toward its direction of travel",
+		"Each Cubio turns toward its direction of travel",
 	)
 	check(
 		world.handle_input(first_player, {

@@ -235,7 +235,7 @@ Its host configuration and its browser constructor must share settings, not tune
 
 - The Playground's speed, acceleration, gravity and jump height live in
   `Tuning/Shared/Lobby/Default.tres`, in character heights. Bounce stays on
-  `LobbySquircle/PlatformMotor`.
+  `LobbyCubio/PlatformMotor`.
 - A short timeout can stop a slow drop early. A longer timeout still excludes only one
   support.
 - Disconnect or resume, expiry, component or scene exit and respawn clear transient contact

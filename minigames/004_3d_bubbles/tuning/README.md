@@ -27,7 +27,7 @@ preset, so a preset that breaks a rule below fails the check.
   wandering speed, spawn clearance, entrance and the lockout after a pop.
 - **Pufferfish and pop**: size, wobble, spawn rates at the start and end, speed, how much of a
   catch vanishes on a pop, invulnerability, re-form time and the edge warning.
-- **Presentation**: the Squircle's size, bob, lean and hand drift inside the bubble, swipe and
+- **Presentation**: the Cubio's size, bob, lean and hand drift inside the bubble, swipe and
   drag stretch, pop droplets and the final-seconds timer pulses.
 - **Water look**: water colours, god rays, caustics, haze distances and air bubbles.
 - **Audio**: music and effect levels.

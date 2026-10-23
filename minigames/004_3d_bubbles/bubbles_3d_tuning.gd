@@ -208,26 +208,26 @@ extends Resource
 		pufferfish_telegraph_bubble_radius = clampf(value, 0.02, 0.1)
 
 @export_group("Presentation")
-## Squircle height per unit of bubble radius; 1 is half the bubble diameter. Default: 1.0. Safe
+## Cubio height per unit of bubble radius; 1 is half the bubble diameter. Default: 1.0. Safe
 ## range: 0.4 to 1.6.
 @export_range(0.4, 1.6, 0.05) var character_height_per_radius: float = 1.0:
 	set(value):
 		character_height_per_radius = clampf(value, 0.4, 1.6)
-## Tallest the Squircle grows as its bubble grows. Default: 0.95. Safe range: 0.3 to 2.0.
+## Tallest the Cubio grows as its bubble grows. Default: 0.95. Safe range: 0.3 to 2.0.
 @export_range(0.3, 2.0, 0.05, "suffix:u") var character_max_height: float = 0.95:
 	set(value):
 		character_max_height = clampf(value, 0.3, 2.0)
-## Gentle up-and-down float of the Squircle. Zero holds it still. Default: 0.04. Safe range: 0.0 to
+## Gentle up-and-down float of the Cubio. Zero holds it still. Default: 0.04. Safe range: 0.0 to
 ## 0.15.
 @export_range(0.0, 0.15, 0.005, "suffix:u") var character_bob: float = 0.04:
 	set(value):
 		character_bob = clampf(value, 0.0, 0.15)
-## Lean of the Squircle toward its bubble travel at top speed. Default: 12.0. Safe range: 0.0 to
+## Lean of the Cubio toward its bubble travel at top speed. Default: 12.0. Safe range: 0.0 to
 ## 30.0.
 @export_range(0.0, 30.0, 0.5, "suffix:deg") var character_lean_degrees: float = 12.0:
 	set(value):
 		character_lean_degrees = clampf(value, 0.0, 30.0)
-## Drift of the floating hands of the Squircle while it floats. Default: 0.05. Safe range: 0.0 to
+## Drift of the floating hands of the Cubio while it floats. Default: 0.05. Safe range: 0.0 to
 ## 0.2.
 @export_range(0.0, 0.2, 0.005, "suffix:u") var character_hand_wobble: float = 0.05:
 	set(value):
@@ -244,7 +244,7 @@ extends Resource
 @export_range(0.0, 0.22, 0.01) var swipe_pull_strength: float = 0.17:
 	set(value):
 		swipe_pull_strength = clampf(value, 0.0, 0.22)
-## Squircle travel inside its bubble on an accepted swipe. Default: 0.13. Safe range: 0.0 to 0.3.
+## Cubio travel inside its bubble on an accepted swipe. Default: 0.13. Safe range: 0.0 to 0.3.
 @export_range(0.0, 0.3, 0.01, "suffix:u") var swipe_character_push: float = 0.13:
 	set(value):
 		swipe_character_push = clampf(value, 0.0, 0.3)
@@ -357,7 +357,7 @@ func max_speed_for(radius: float) -> float:
 	return max_player_speed / (1.0 + _growth(radius) * speed_reduction_per_jellyfish)
 
 
-## Squircle standing height inside a bubble of [param radius].
+## Cubio standing height inside a bubble of [param radius].
 func character_height_for(radius: float) -> float:
 	return minf(character_max_height, radius * character_height_per_radius)
 

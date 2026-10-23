@@ -1,12 +1,12 @@
 class_name Bubbles3DPlayerBubble
 extends RigidBody3D
 ## One player's bubble: a plane-locked Jolt body whose sphere always matches the drawn radius,
-## with the player's Squircle and caught jellyfishes floating inside. Only controller events move
+## with the player's Cubio and caught jellyfishes floating inside. Only controller events move
 ## it; contacts with other bubbles and the walls are left to the physics engine.
 
 signal bumped(other_id: String)
 
-const SQUIRCLE_SCENE: PackedScene = preload("res://characters/squircle_3d.tscn")
+const CUBIO_SCENE: PackedScene = preload("res://characters/cubio_3d.tscn")
 const BLINK_PERIOD_MSEC := 100
 const PHONE_VISUAL_SEND_INTERVAL_MSEC := 50
 ## Caught jellyfishes are drawn this share of a free jellyfish's width.
@@ -15,7 +15,7 @@ const CAUGHT_WIDTH_SHARE := 0.6
 var player_id := ""
 var tuning: Bubbles3DTuning
 var shell: BubbleShell3D
-var squircle: Squircle3D
+var cubio: Cubio3D
 var caught: Bubbles3DJellyfishSwarm
 var _controller: Bubbles3DRoundController
 var _collider: CollisionShape3D
@@ -62,9 +62,9 @@ func _init() -> void:
 	shell = BubbleShell3D.new()
 	shell.name = "Shell"
 	add_child(shell)
-	squircle = SQUIRCLE_SCENE.instantiate() as Squircle3D
-	squircle.name = "Squircle"
-	add_child(squircle)
+	cubio = CUBIO_SCENE.instantiate() as Cubio3D
+	cubio.name = "Cubio"
+	add_child(cubio)
 	caught = Bubbles3DJellyfishSwarm.new()
 	caught.name = "Caught"
 	add_child(caught)
@@ -73,8 +73,8 @@ func _init() -> void:
 
 
 func _ready() -> void:
-	squircle.nameplate.visible = false
-	var skeletons := squircle.find_children("*", "Skeleton3D", true, false)
+	cubio.nameplate.visible = false
+	var skeletons := cubio.find_children("*", "Skeleton3D", true, false)
 	if not skeletons.is_empty():
 		_hand_wobble = Bubbles3DHandWobble.new()
 		skeletons[0].add_child(_hand_wobble)
@@ -95,7 +95,7 @@ func configure(
 	# Godot adds the two bodies' bounce, so each bubble carries half of a bump's rebound.
 	_material.bounce = tuning.bump_bounciness * 0.5
 	_player_color = color
-	squircle.player_color = color
+	cubio.player_color = color
 	caught.setup(tuning.captured_visual_cap)
 	shell.droplet_count = tuning.pop_droplet_count
 	shell.droplet_seconds = tuning.burst_seconds
@@ -261,20 +261,20 @@ func _refresh_visual(host_time_msec: int) -> void:
 	)
 
 	var white := is_invulnerable(host_time_msec) and (host_time_msec / BLINK_PERIOD_MSEC) % 2 == 0
-	squircle.player_color = Color.WHITE if white else _player_color
+	cubio.player_color = Color.WHITE if white else _player_color
 	var height := tuning.character_height_for(radius)
 	var seconds := float(host_time_msec) / 1000.0
 	var bob := sin(seconds * 2.2 + _bob_phase) * tuning.character_bob
 	var offset := _swipe_direction * push * tuning.swipe_character_push
-	squircle.scale = Vector3.ONE * height
-	squircle.position = Vector3(offset.x, -height * 0.5 + bob + offset.y, 0.0)
-	squircle.rotation.z = -deg_to_rad(tuning.character_lean_degrees) * _lean
+	cubio.scale = Vector3.ONE * height
+	cubio.position = Vector3(offset.x, -height * 0.5 + bob + offset.y, 0.0)
+	cubio.rotation.z = -deg_to_rad(tuning.character_lean_degrees) * _lean
 	if _hand_wobble != null:
-		_hand_wobble.amount = tuning.character_hand_wobble * Squircle3D.SOURCE_HEIGHT / height
+		_hand_wobble.amount = tuning.character_hand_wobble * Cubio3D.SOURCE_HEIGHT / height
 	_place_caught(radius, seconds)
 
 
-## Caught jellyfishes orbit slowly in a ring around the Squircle, inside the shell.
+## Caught jellyfishes orbit slowly in a ring around the Cubio, inside the shell.
 func _place_caught(radius: float, seconds: float) -> void:
 	var count := mini(_score, tuning.captured_visual_cap)
 	caught.set_visible_count(count)

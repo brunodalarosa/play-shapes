@@ -1419,76 +1419,70 @@ function controllerSocketUrl(config, pageUrl) {
   return endpoint.href;
 }
 
-// build/squircle_v1.js
-var ROOT = "/squircle-v1/";
-var BLUE = [30, 136, 229];
-var SquircleV1Canvas = class {
-  clip;
-  tile = [256, 256];
-  colorable = new Image();
-  neutral = new Image();
-  blink = new Image();
-  tinted = /* @__PURE__ */ new Map();
-  constructor() {
-    void this.load();
+// build/character_preview.js
+var JoinCharacterPreview = class {
+  canvases;
+  load;
+  canvas;
+  view;
+  generation = 0;
+  color = "#1E88E5";
+  loading;
+  constructor(canvases, load) {
+    this.canvases = canvases;
+    this.load = load;
+    const observer = new MutationObserver(() => this.refresh(this.color));
+    for (const canvas of canvases) {
+      const section = canvas.closest("section");
+      if (section)
+        observer.observe(section, { attributes: true, attributeFilter: ["hidden"] });
+    }
+    document.addEventListener("visibilitychange", () => this.refresh(this.color));
+    window.addEventListener("pagehide", () => this.clear());
+    window.addEventListener("pageshow", () => this.refresh(this.color));
   }
-  async load() {
+  refresh(color) {
+    this.color = color;
+    const canvas = document.hidden ? void 0 : this.canvases.find((candidate) => !candidate.closest("section")?.hidden);
+    if (canvas === this.canvas) {
+      this.view?.setColor(color);
+      return;
+    }
+    this.clear();
+    if (!canvas)
+      return;
+    this.canvas = canvas;
+    this.loading = new AbortController();
+    canvas.dataset.preview = "loading";
+    void this.activate(canvas, this.generation);
+  }
+  clear() {
+    this.generation++;
+    this.loading?.abort();
+    this.loading = void 0;
+    this.view?.dispose();
+    this.view = void 0;
+    if (this.canvas)
+      this.canvas.dataset.preview = "idle";
+    this.canvas = void 0;
+  }
+  async activate(canvas, generation) {
     try {
-      const response = await fetch(`${ROOT}manifest.json`);
-      if (!response.ok)
+      const module = await this.load();
+      if (generation !== this.generation)
         return;
-      const manifest = await response.json();
-      this.tile = manifest.resolution;
-      this.clip = manifest.clips.find((clip) => clip.name === "idle" && clip.view === "front");
-      this.colorable.src = `${ROOT}idle-front-colorable.png`;
-      this.neutral.src = `${ROOT}idle-front-neutral.png`;
-      this.blink.src = `${ROOT}idle-front-blink.png`;
+      const view = await module.createCharacterPreview(canvas, this.loading?.signal);
+      if (generation !== this.generation) {
+        view.dispose();
+        return;
+      }
+      this.view = view;
+      view.setColor(this.color);
+      canvas.dataset.preview = "ready";
     } catch {
+      if (generation === this.generation)
+        canvas.dataset.preview = "unavailable";
     }
-  }
-  draw(context, color, x2, y2, scale, timeMsec, blinking = false, rotation = 0) {
-    const clip = this.clip;
-    const face2 = blinking ? this.blink : this.neutral;
-    if (!clip || !this.colorable.complete || !face2.complete || !this.colorable.naturalWidth || !face2.naturalWidth)
-      return false;
-    const sheet = this.tint(color);
-    if (!sheet)
-      return false;
-    const frame = Math.floor(Math.max(0, timeMsec) * clip.fps / 1e3) % clip.frames;
-    const sx = frame % clip.sheet_columns * this.tile[0];
-    const sy = Math.floor(frame / clip.sheet_columns) * this.tile[1];
-    context.save();
-    context.translate(x2, y2);
-    context.rotate(rotation);
-    for (const layer of [sheet, face2])
-      context.drawImage(layer, sx, sy, this.tile[0], this.tile[1], -clip.anchor_px[0] * scale, -clip.anchor_px[1] * scale, this.tile[0] * scale, this.tile[1] * scale);
-    context.restore();
-    return true;
-  }
-  tint(color) {
-    const key = /^#[0-9a-f]{6}$/i.test(color) ? color.toUpperCase() : "#1E88E5";
-    const cached = this.tinted.get(key);
-    if (cached)
-      return cached;
-    const canvas = document.createElement("canvas");
-    canvas.width = this.colorable.naturalWidth;
-    canvas.height = this.colorable.naturalHeight;
-    const context = canvas.getContext("2d", { willReadFrequently: true });
-    if (!context)
-      return void 0;
-    context.drawImage(this.colorable, 0, 0);
-    const image = context.getImageData(0, 0, canvas.width, canvas.height);
-    const rgb = [1, 3, 5].map((index) => Number.parseInt(key.slice(index, index + 2), 16));
-    for (let offset = 0; offset < image.data.length; offset += 4) {
-      if (image.data[offset + 3] === 0)
-        continue;
-      const diffuse = Math.min(1.4, Math.max(0, (image.data[offset + 2] - image.data[offset]) / 199));
-      for (let channel = 0; channel < 3; channel++)
-        image.data[offset + channel] = Math.min(255, Math.max(0, image.data[offset + channel] + diffuse * (rgb[channel] - BLUE[channel])));
-    }
-    context.putImageData(image, 0, 0);
-    this.tinted.set(key, canvas);
-    return canvas;
   }
 };
 
@@ -2309,7 +2303,7 @@ var LobbyControls = class extends PlatformControls {
 };
 
 // build/character_selection.js
-var CHARACTER_SHAPE = "squircle";
+var CHARACTER_SHAPE = "cubio";
 var CHARACTER_COLORS = [
   { id: "red", name: "Red", hex: "#E53935" },
   { id: "orange", name: "Orange", hex: "#F57C00" },
@@ -2427,7 +2421,6 @@ var isReady = false;
 var joinFlow = defaultJoinFlow();
 var inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
 var activeGame = null;
-var squircleCanvas = new SquircleV1Canvas();
 var lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJumpButton, (action) => {
   if (!joined || !socket || socket.readyState !== WebSocket.OPEN || activeGame !== null)
     return;
@@ -2464,6 +2457,7 @@ function loadThreeView() {
   });
   return threeView;
 }
+var joinPreview = new JoinCharacterPreview([selectionPreview, namePreview], loadThreeView);
 var bubble3DPhone = new BubblePhone(bubble3DCard, document.querySelector("#bubbles-3d-visual"), document.querySelector("#bubbles-3d-score"), document.querySelector("#bubbles-3d-fallback"), () => socket?.readyState === WebSocket.OPEN, () => {
   inputSeq += 1;
   store(STORAGE.inputSeq, String(inputSeq));
@@ -2517,7 +2511,7 @@ function forgetIdentity() {
 }
 function selectedCharacterName() {
   const color = colorOption(joinFlow.color)?.name ?? "Blue";
-  return `${color} Squircle`;
+  return `${color} Cubio`;
 }
 function refreshSelectionUi() {
   const label = selectedCharacterName();
@@ -2527,7 +2521,7 @@ function refreshSelectionUi() {
   for (const button of Array.from(colorGrid.querySelectorAll(".color-button"))) {
     button.setAttribute("aria-pressed", String(button.dataset.color === joinFlow.color));
   }
-  renderJoinPreviews(performance.now());
+  joinPreview.refresh(joinFlow.color);
 }
 for (const option of CHARACTER_COLORS) {
   const button = document.createElement("button");
@@ -2691,34 +2685,6 @@ async function requestImmersiveMode() {
   const fullscreen = root.requestFullscreen ? () => root.requestFullscreen({ navigationUI: "hide" }) : root.webkitRequestFullscreen?.bind(root);
   await attemptImmersive(fullscreen, orientation?.lock ? () => orientation.lock("portrait") : void 0);
 }
-function renderJoinPreviews(now) {
-  for (const canvas of [selectionPreview, namePreview]) {
-    if (canvas.closest("section")?.hidden)
-      continue;
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0)
-      continue;
-    const pixelRatio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-    const width = Math.max(1, Math.round(rect.width * pixelRatio));
-    const height = Math.max(1, Math.round(rect.height * pixelRatio));
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-    }
-    const context = canvas.getContext("2d");
-    if (!context)
-      continue;
-    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    context.clearRect(0, 0, rect.width, rect.height);
-    const scale = Math.min(rect.width / 256, rect.height / 220) * 0.95;
-    squircleCanvas.draw(context, joinFlow.color, rect.width / 2, rect.height * 0.89, scale, now);
-  }
-}
-function animateJoinPreviews(now) {
-  renderJoinPreviews(now);
-  requestAnimationFrame(animateJoinPreviews);
-}
-requestAnimationFrame(animateJoinPreviews);
 function rememberIdentity(message) {
   const player = message.player;
   if (!player || typeof player.name !== "string" || typeof message.session_id !== "string" || typeof message.reconnect_token !== "string")

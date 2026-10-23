@@ -3,8 +3,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { snapshot } from "./004_3d_bubbles/fixtures.mjs";
 
-// Exercise the compiled app's real DOM handlers. Only joystick rendering is replaced;
-// its independent input semantics have their own tests. This measures dispatch-to-send,
+// Exercise the compiled app's real handlers with a minimal DOM and fake transport.
+// Rendering has separate Chromium coverage. This measures dispatch-to-send,
 // with fake transport, not browser latency, Wi-Fi, Godot receipt or physical feel.
 class Element extends EventTarget {
   hidden = true;
@@ -122,6 +122,9 @@ async function withController(
       addEventListener() {}
     },
     ResizeObserver: class {
+      observe() {}
+    },
+    MutationObserver: class {
       observe() {}
     },
     requestAnimationFrame() {},

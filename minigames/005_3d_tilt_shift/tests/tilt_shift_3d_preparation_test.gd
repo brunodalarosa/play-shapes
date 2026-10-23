@@ -24,7 +24,7 @@ func _run() -> void:
 			"Designer %d" % index,
 			true,
 			0,
-			"squircle",
+			"cubio",
 			"#1E88E5",
 		)
 	var start: Dictionary = host.begin_pre_minigame(TiltShift3DSession.ID)

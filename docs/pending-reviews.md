@@ -9,7 +9,7 @@ removes it. The evidence labels are defined in
 ## Playground plaza lobby
 
 - `[GODOT-RUNTIME]` and owner visual review of the running plaza against the approved mockup:
-  composition, colors, lighting, the Squircle's scale beside the props, and the nameplates.
+  composition, colors, lighting, the Cubio's scale beside the props, and the nameplates.
   Captures are in `test-results/lobby-playground-world/`.
 - `[HUMAN-PLAY]` Movement feel with the new jump height, roof reachability from the tables,
   jump corridors, ten-player readability and game feel.
@@ -67,7 +67,7 @@ removes it. The evidence labels are defined in
   rendering and frame rate, the time to first frame while the models download, swipe
   reliability, latency, haptics where supported, reconnect and the no-WebGL fallback.
 - `[HUMAN-PLAY]` The final audio mix, including the countdown beats on the shared cue.
-- `[HUMAN-PLAY]` Whether the Squircle should keep drawing over its bubble's highlight, as it
+- `[HUMAN-PLAY]` Whether the Cubio should keep drawing over its bubble's highlight, as it
   does in the lobby to stay in front of scenery.
 - A 3D Pre-minigame preview image from the owner; the booklet still shows a 2D placeholder.
 - `[GODOT-RUNTIME]` Host frame time on the target PC. `bubbles_3d_performance_check.gd` measured
@@ -155,25 +155,15 @@ removes it. The evidence labels are defined in
 - Set another platform to Closed in the Inspector and check it alone changes.
 - Feet stay grounded, and characters still interact as before.
 
-## Squircle look-up and crouch
+## Cubio look-up and crouch
 
 - `[HUMAN-PLAY]` The owner's approval of the animation timing and feel, and of the poses.
 - `[PHYSICAL-PHONE]` How the stances read on a real phone and from the couch.
 
-## Squircle lever pull
+## Cubio lever pull
 
 - `[HUMAN-PLAY]` Owner approval of the reach, downward pull, upward return and loop
-  timing in F12 > Animation Lab > Lever Pull, including the small reference size.
-
-## Squircle source and sheets
-
-The sheets were rendered again on another machine after the names inside the Blender source
-changed. A pixel comparison with the previous sheets found nothing a viewer should notice.
-
-- `[GODOT-RUNTIME]` A look at the Squircle sheets in the ready screen and in the F12 Animation
-  Lab, in every clip and both views.
-- The source opened in Blender by someone who edits it: the scene, the actions and the face
-  images are found under their new names. No evidence label covers Blender.
+  timing in the Blender source and current motion-pose review images.
 
 ## Phone client
 
@@ -220,3 +210,14 @@ device.
 - `[AUTO]` `node tools/setup.mjs` and `node tools/check.mjs` on macOS and Linux. Only Windows
   has been run. The formatter checksums for the other platforms were recorded from the
   release, not run.
+
+## Cubio character and live previews
+
+- Owner visual approval of the two-metre cube, small bevel, existing floating limbs and
+  retained face, at lobby and Bubbles gameplay distances and in the live Ready-screen tray.
+  Source renders are in [the Cubio folder](../art/cubio/README.md).
+- `[HUMAN-PLAY]` Existing idle, walk, run, look-up, crouch and lever-pull motion on the deeper
+  body, plus lobby movement, jumps and readability with ten players.
+- `[PHYSICAL-PHONE]` Android Chrome and iPhone Safari: live setup preview, selected color,
+  back/next navigation, first model download, app icons and rendering performance. Confirm
+  joining remains possible when WebGL is unavailable.

@@ -26,4 +26,4 @@ The phone composes the same faces from the same manifest and parts, which the ho
 - A new expression is a preset in the manifest, not a new image.
 - Blinking needs no extra art and skips eyes that are shut or crossed out.
 - Which face a moment shows, and every threshold and duration, is tuning.
-- The lobby's and 004's Squircle keep their own face until the owner decides otherwise.
+- The lobby's and 004's Cubio keep their own face until the owner decides otherwise.

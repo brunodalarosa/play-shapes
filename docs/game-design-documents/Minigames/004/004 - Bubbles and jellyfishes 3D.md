@@ -58,11 +58,11 @@ See [[004 - Scene composition]] for the full scene layout and [[004 - Asset sour
 - Pop: the bubble bursts into droplet particles; re-forming grows a new bubble around the character. These effects are code-driven.
 - A readable player name follows each bubble as screen UI. The shared screen shows no live scores.
 - A timer at the top centre shows the remaining whole seconds. During the final 10 seconds, progressively larger pulses mark each second, strongest on `3`, `2` and `1`, without relying on colour alone.
-- The Squircle and the jellyfishes always face the camera. Pufferfishes turn to face their direction of travel, showing their side profile and tilting up or down by at most 35° on diagonal paths.
+- The Cubio and the jellyfishes always face the camera. Pufferfishes turn to face their direction of travel, showing their side profile and tilting up or down by at most 35° on diagonal paths.
 
 ## Character appearance
 
-The shared screen and the phone both use the real-time 3D Squircle: the same exported model, player tint, face and natural blink used by the 3D lobby. Inside the bubble the Squircle plays its Idle clip with a code-driven bob, a lean toward its velocity and a gentle hand wobble, always facing the camera. No new animation is authored for this minigame.
+The shared screen and the phone both use the real-time 3D Cubio: the same exported model, player tint, face and natural blink used by the 3D lobby. Inside the bubble the Cubio plays its Idle clip with a code-driven bob, a lean toward its velocity and a gentle hand wobble, always facing the camera. No new animation is authored for this minigame.
 
 ## Phone controls
 
@@ -74,7 +74,7 @@ Repeated swipes cannot push a bubble beyond a tunable maximum speed. Without new
 
 ## Phone presentation
 
-The phone renders its player's own bubble in real-time 3D in the browser, with three.js, using the same 3D models as the host: the tinted Squircle with its face and blink, the bubble shader ported to the browser, and caught jellyfishes up to the same visual cap. Behind them is a simple animated water gradient with light rays.
+The phone renders its player's own bubble in real-time 3D in the browser, with three.js, using the same 3D models as the host: the tinted Cubio with its face and blink, the bubble shader ported to the browser, and caught jellyfishes up to the same visual cap. Behind them is a simple animated water gradient with light rays.
 
 - The exact number of caught jellyfishes is shown at the top. The round timer stays on the shared screen only.
 - The camera zooms out progressively as the bubble grows.
@@ -118,7 +118,7 @@ These are built outside `minigames/004_3d_bubbles/` so later 3D scenes and minig
 - An underwater environment: the water backdrop, god rays, caustics, haze and rising bubbles, as one scene with tunable parameters.
 - A plane-locked 3D body setup: depth and rotation locks plus edge walls that collide with chosen layers only.
 - A screen-space label that follows a 3D node, for nameplates.
-- On the phone: a small three.js viewport module with GLB loading, a 3D Squircle renderer (tint, face, blink, Idle) and the bubble shader port, reusable by later phone screens.
+- On the phone: a small three.js viewport module with GLB loading, a 3D Cubio renderer (tint, face, blink, Idle) and the bubble shader port, reusable by later phone screens.
 
 ## Designer-tunable values
 
@@ -140,7 +140,7 @@ Distances and speeds are in world units.
 * Post-pop invulnerability and re-form durations
 * Pufferfish edge warning on or off, and its duration
 * Final timer emphasis threshold (10 seconds by default)
-* Squircle bob, lean and hand-wobble amounts inside the bubble
+* Cubio bob, lean and hand-wobble amounts inside the bubble
 * Water look: gradient colours, god-ray strength and speed, caustic strength, haze distance, air-bubble rate
 * Music and effect volumes
 
@@ -181,7 +181,7 @@ Confirmed by the project owner on 2026-10-17:
 * The host uses 3D physics with locked depth and rotation, not a mirrored 2D simulation.
 * Camera: fixed, near-frontal, narrow perspective.
 * The bubble is a translucent shader sphere, not a modelled asset.
-* The Squircle uses its existing Idle clip with code-driven motion inside the bubble.
+* The Cubio uses its existing Idle clip with code-driven motion inside the bubble.
 * The jellyfish is pink with two dot eyes, curly-tipped tentacles and a soft translucent rim glow.
 * The background combines natural reef with a few oversized sunken everyday objects, faded and behind play, with no foreground props.
 * The phone renders the 3D assets in real time with three.js.
@@ -193,7 +193,7 @@ Confirmed by the project owner on 2026-10-17:
 
 * Final numeric tuning, after human play.
 * A 3D preview screenshot for the Pre-minigame screen.
-* A dedicated floating animation for the Squircle, which can replace Idle later.
+* A dedicated floating animation for the Cubio, which can replace Idle later.
 
 ## Validation needs
 

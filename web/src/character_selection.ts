@@ -1,4 +1,4 @@
-export const CHARACTER_SHAPE = "squircle" as const;
+export const CHARACTER_SHAPE = "cubio" as const;
 
 export const CHARACTER_COLORS = [
   { id: "red", name: "Red", hex: "#E53935" },

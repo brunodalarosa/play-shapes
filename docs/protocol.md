@@ -78,10 +78,8 @@ The host serves a fixed list and nothing else:
 - Generated settings: `/platform_input_settings.json`.
 - App manifest and icons: `/manifest.webmanifest`, `/app-icon-180.png`, `/app-icon-192.png`,
   `/app-icon-512.png`.
-- Character sheets: `/squircle-v1/manifest.json`, `/squircle-v1/idle-front-colorable.png`,
-  `/squircle-v1/idle-front-neutral.png`, `/squircle-v1/idle-front-blink.png`.
-- 3D models for the phone: `/models/squircle.glb`, `/models/jellyfish.glb`,
-  `/models/squircle-face-neutral.png` and `/models/squircle-face-blink.png`.
+- 3D models for the phone: `/models/cubio.glb`, `/models/jellyfish.glb`,
+  `/models/cubio-face-neutral.png` and `/models/cubio-face-blink.png`.
 - Shape character faces: `/shape_faces/face_presets.json` and one
   `/shape_faces/facial_part_<name>.png` per part the manifest lists, from the shared runtime
   folder.
@@ -99,13 +97,13 @@ Responses:
 Protocol 1 begins with `hello` and `welcome`. It then supports join, resume, leave, and
 personalized lobby and gameplay state.
 
-- Before join, the phone shows Squircle color selection, then name entry.
-- `join` submits `name`, `character_shape: "squircle"` and `character_color` together.
-- The host accepts missing and legacy body-shape values as Squircle, rejects unknown
+- Before join, the phone shows Cubio color selection, then name entry.
+- `join` submits `name`, `character_shape: "cubio"` and `character_color` together.
+- The host accepts missing and legacy body-shape values as Cubio, rejects unknown
   body-shape values, and validates the ten approved player colors.
-- A join with no style uses Squircle and the `#598DF2` blue fallback. A valid color without a
+- A join with no style uses Cubio and the `#598DF2` blue fallback. A valid color without a
   shape keeps that color.
-- The registry stores Squircle. Lobby rosters, gameplay snapshots and resume state carry it
+- The registry stores Cubio. Lobby rosters, gameplay snapshots and resume state carry it
   forward.
 
 The registry keeps four identities apart:
@@ -130,11 +128,12 @@ increasing gameplay sequence it needs to resume safely.
 
 ## Character appearance
 
-- The lobby and Bubbles and jellyfishes 3D use the exported 3D Squircle. Setup and the ready
-  screen use the Squircle v1 front idle clip.
-- The Squircle v1 tint colors its body, hands and feet. The neutral and blink faces stay
+- The lobby, Bubbles and jellyfishes 3D, setup and the Ready screen use the same exported
+  3D Cubio. Current selections send `character_shape: "cubio"`; legacy `squircle` selections
+  are accepted and normalized to Cubio.
+- The player tint colors the body, hands and feet. The neutral and blink faces stay
   untinted.
-- The colorable layer uses the same tint treatment on host and phone.
+- The host and phone render the same rig and preserve the original face artwork.
 
 ## Ready-up
 
@@ -160,7 +159,7 @@ Pre-minigame screen, the readiness snapshot's `preparation` adds the player's `c
 owned paddle IDs and physical paddle length and thickness (`paddle_size` in arena widths, also
 for spectators, whose phones show their paddle resting under the waiting background), plus:
 
-- `color`: the player's Squircle colour as six hex digits.
+- `color`: the player's Cubio colour as six hex digits.
 - `face`: the face preset the phone shows, the strongest across the player's paddles.
 - `look`: the corner, depth, gap, outline and face ratios, the gap colour, the orange, blue
   and neutral outline colours and the wall's two colours.

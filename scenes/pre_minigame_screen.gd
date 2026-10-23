@@ -2,8 +2,6 @@ class_name PreMinigameScreen
 extends Control
 ## One tabletop composition for every minigame content resource.
 
-const CHARACTER: PackedScene = preload("res://characters/squircle_v1_playback.tscn")
-
 var _content: PreMinigameContent
 var _preview: TextureRect
 var _title: Label
@@ -11,6 +9,7 @@ var _controls: Label
 var _win: Label
 var _hints: Label
 var _tray: HBoxContainer
+var _characters: CubioPreview
 var _snapshot: Dictionary = { }
 
 
@@ -83,6 +82,7 @@ func set_snapshot(snapshot: Dictionary) -> void:
 	for child: Node in _tray.get_children():
 		child.queue_free()
 	var players: Array = snapshot.get("players", [])
+	_characters.set_players(players)
 	for player: Dictionary in players:
 		var slot := Control.new()
 		slot.custom_minimum_size = Vector2(171, 178)
@@ -93,21 +93,17 @@ func set_snapshot(snapshot: Dictionary) -> void:
 			26,
 			Color("#137541"),
 		)
-		ready.position = Vector2(0, 6)
-		ready.size = Vector2(171, 35)
 		ready.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		slot.add_child(ready)
-		var character := CHARACTER.instantiate() as SquircleV1Playback
-		character.position = Vector2(84, 105)
-		character.visual_scale = 0.38
-		character.player_color = Color(String(player.get("character_color", "#598DF2")))
-		character.play("idle", "front")
-		slot.add_child(character)
+		ready.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+		ready.offset_top = 6
+		ready.offset_bottom = 41
 		var name_label := _label(String(player.get("name", "")), 23, Color("#233e46"))
-		name_label.position = Vector2(0, 152)
-		name_label.size = Vector2(171, 30)
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		slot.add_child(name_label)
+		name_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+		name_label.offset_top = 152
+		name_label.offset_bottom = 182
 
 
 func _build_tabletop() -> void:
@@ -154,6 +150,10 @@ func _build_tabletop() -> void:
 	_tray.size = Vector2(1740, 182)
 	_tray.add_theme_constant_override("separation", 2)
 	add_child(_tray)
+	_characters = CubioPreview.new()
+	_characters.position = Vector2(79, 857)
+	_characters.size = Vector2(1740, 125)
+	add_child(_characters)
 	var cancel := Button.new()
 	cancel.text = "Back to lobby"
 	cancel.tooltip_text = "Host only: cancel ready-up"

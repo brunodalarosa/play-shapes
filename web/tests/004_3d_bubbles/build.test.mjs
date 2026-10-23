@@ -4,10 +4,10 @@ import { readFileSync } from "node:fs";
 
 test("runtime models are copied byte for byte", () => {
   const runtime = "../../../assets/runtime/";
-  const character = runtime + "animated_characters/squircle/v1/model/";
+  const character = runtime + "animated_characters/cubio/model/";
   const jellyfish = runtime + "minigames/bubbles_3d/jellyfish/";
   for (const [source, name] of [
-    [character + "squircle.glb", "squircle.glb"],
+    [character + "cubio.glb", "cubio.glb"],
     [jellyfish + "jellyfish.glb", "jellyfish.glb"],
   ]) {
     const original = readFileSync(new URL(source, import.meta.url));

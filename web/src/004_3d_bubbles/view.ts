@@ -8,7 +8,7 @@ import {
   Vector2,
 } from "three";
 import { Viewport } from "../three_view/viewport.js";
-import { createSquircle } from "../three_view/squircle.js";
+import { createCubio } from "../three_view/cubio.js";
 import { createBubbleShell } from "../three_view/bubble_shell.js";
 import { modelInstance } from "../three_view/assets.js";
 import type { Frame, Presentation } from "./types.js";
@@ -26,19 +26,19 @@ export async function createBubbleView(canvas: HTMLCanvasElement): Promise<Prese
   const dropletGeometry = new SphereGeometry(1, 6, 4);
   const dropletMaterial = new MeshBasicMaterial({ color: 0xc5f8ff, transparent: true });
   for (let index = 0; index < 24; index++) droplets.add(new Mesh(dropletGeometry, dropletMaterial));
-  let squircle: Awaited<ReturnType<typeof createSquircle>> | undefined;
+  let cubio: Awaited<ReturnType<typeof createCubio>> | undefined;
   let jellyfish: Awaited<ReturnType<typeof modelInstance>> | undefined;
   let viewport: Viewport | undefined;
   const dispose = (): void => {
     viewport?.dispose();
-    squircle?.dispose();
+    cubio?.dispose();
     shell.dispose();
     dropletGeometry.dispose();
     dropletMaterial.dispose();
   };
   try {
     viewport = new Viewport(canvas, (delta, seconds) => {
-      if (!frame || !viewport || !squircle) return;
+      if (!frame || !viewport || !cubio) return;
 
       const { snapshot, visual } = frame;
       const tuning = snapshot.visual_tuning;
@@ -62,7 +62,7 @@ export async function createBubbleView(canvas: HTMLCanvasElement): Promise<Prese
       character.rotation.z =
         (-Math.max(-1, Math.min(1, velocity.x)) * tuning.character_lean_degrees * Math.PI) / 180;
       const white = visual.white && Math.floor(visual.host_time_msec / 100) % 2 === 0;
-      squircle.update(delta, height, snapshot.character_color, white);
+      cubio.update(delta, height, snapshot.character_color, white);
       const count = Math.min(tuning.visual_cap, Math.max(0, visual.caught));
       while (caught.children.length < count && jellyfish) {
         const instance = jellyfish.scene.clone(true);
@@ -91,9 +91,9 @@ export async function createBubbleView(canvas: HTMLCanvasElement): Promise<Prese
         });
       }
     });
-    squircle = await createSquircle();
+    cubio = await createCubio();
     jellyfish = await modelInstance("/models/jellyfish.glb");
-    character.add(squircle.root);
+    character.add(cubio.root);
     viewport.scene.add(shell.mesh, character, caught, droplets);
     viewport.scene.add(new HemisphereLight(0xe2faff, 0x3b6586, 2.4));
     const light = new DirectionalLight(0xffffff, 2.2);

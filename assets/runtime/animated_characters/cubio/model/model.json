@@ -1,0 +1,57 @@
+{
+  "source_sha256": "25e27448d74ee1c89858ec15e727519960db31ae27fad7be09e43403ff632681",
+  "glb_sha256": "73660883d12c481ce549d09ce4b7b52b06ad921137aa3024691184c3d95e6e80",
+  "clips": {
+    "idle": {
+      "frames": 48,
+      "fps": 24,
+      "playback": "loop",
+      "forward_speed_m_per_s": 0.0
+    },
+    "walk": {
+      "frames": 24,
+      "fps": 24,
+      "playback": "loop",
+      "forward_speed_m_per_s": 1.65
+    },
+    "run": {
+      "frames": 16,
+      "fps": 24,
+      "playback": "loop",
+      "forward_speed_m_per_s": 3.6
+    },
+    "look_up": {
+      "frames": 9,
+      "fps": 24,
+      "playback": "held",
+      "forward_speed_m_per_s": 0.0
+    },
+    "crouch": {
+      "frames": 9,
+      "fps": 24,
+      "playback": "held",
+      "forward_speed_m_per_s": 0.0
+    },
+    "lever_pull": {
+      "frames": 24,
+      "fps": 24,
+      "playback": "loop",
+      "forward_speed_m_per_s": 0.0
+    }
+  },
+  "meshes": [
+    "Body",
+    "Face",
+    "FootL",
+    "FootR",
+    "HandL",
+    "HandR"
+  ],
+  "body_dimensions_m": [
+    2.0,
+    2.0,
+    2.0
+  ],
+  "body_bevel_m": 0.08,
+  "standing_height_m": 2.62
+}

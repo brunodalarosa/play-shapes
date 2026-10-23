@@ -148,7 +148,7 @@ async function main() {
   print(
     "-",
     "Python 3 with Pillow, Blender, for regenerating art: not checked; " +
-      "see art/squircle/README.md and art/bubbles_3d/README.md",
+      "see art/cubio/README.md and art/bubbles_3d/README.md",
   );
 
   if (required.some(({ ok }) => !ok)) {

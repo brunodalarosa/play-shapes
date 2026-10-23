@@ -177,10 +177,18 @@ start only what they need, so they stay fast.
 - `tests/standalone_build_test.gd` needs no templates and runs by default.
 - After a local Windows release export, run
   `godot --headless --path . --script res://tests/lobby_export_pack_check.gd`. It verifies that
-  the external PCK includes the offline phone modules, the Squircle metadata and sheets, and
+  the external PCK includes the offline phone modules, the Cubio model and face textures, and
   the required runtime paths.
 
 ## Focused checks by area
+
+- Cubio: `node tools/check.mjs cubio pre_minigame_screen lobby_playground` checks the
+  model, tint, clips, blinking, live Ready-screen instances and lobby input. Source geometry,
+  quarter-frame intersections and export commands are in [the Cubio workflow](../art/cubio/README.md).
+- `pre_minigame_visual_check.gd` captures two- and ten-player Ready screens at 1080p and 720p.
+  Run `cubio_preview_performance_check.gd` without `--headless` to measure ten live previews;
+  it writes `test-results/cubio/ready-performance.json`. These are desktop composition and
+  timing evidence, not phone performance or owner visual approval.
 
 - Bubbles and jellyfishes 3D: the `tests/` folder of `minigames/004_3d_bubbles/` covers the
   round rules, Jolt arenas on real physics frames (plane locks, swipes, speed cap, wall and bump
@@ -267,7 +275,7 @@ that folder in place of `tests/`. Those starting with `tilt_shift_3d_` are in
 | `tilt_shift_3d_presentation_visual_check` | Tilt Shift 3D with layout A and four players and layout B and six, through preparation, countdown, play with and without names and the round's end, then every colour on both teams. | `tilt-shift-3d/presentation/` |
 | `tilt_shift_3d_performance_check` | Writes `performance.txt`: frame time, physics step and draw calls of ten players with the round's whole ball budget in 20 seconds, vsync off. Run it on the target PC. | `tilt-shift-3d/` |
 | `shape_face_visual_check` | The twelve face presets drawn in 2D beside their references, compared within one pixel, and in 3D on paddles. In `tests/`. | `shape-face/` |
-| `bubble_shell_visual_check` | Bubble shells of several sizes around tinted Squircles, one stretched and one bursting. | `bubble-shell/` |
+| `bubble_shell_visual_check` | Bubble shells of several sizes around tinted Cubios, one stretched and one bursting. | `bubble-shell/` |
 | `underwater_environment_visual_check` | The underwater environment behind bubble shells through the 004 camera. | `underwater-environment/` |
 | `pre_minigame_visual_check` | The ready screen with two and ten players at 1920×1080 and 1280×720. | `pre-minigame/` |
 | `lobby_playground_world_visual_check` | The plaza lobby empty, and with ten players on the ground and every landing tier, some walking, crouching and looking up. | `lobby-playground-world/` |

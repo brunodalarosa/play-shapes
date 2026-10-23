@@ -24,7 +24,7 @@ none of them needs the others first.
 | The Windows package | [docs/standalone-build.md](docs/standalone-build.md) |
 | Tuning values | [Tuning/README.md](Tuning/README.md) |
 | Tilt Shift 3D editor workshop | [the workshop guide](minigames/005_3d_tilt_shift/tuning/WORKSHOP.md) |
-| Squircle art source and export | [art/squircle/README.md](art/squircle/README.md) |
+| Cubio art source and export | [art/cubio/README.md](art/cubio/README.md) |
 | Bubbles and jellyfishes 3D art source and runtime assets | [art/bubbles_3d/README.md](art/bubbles_3d/README.md) |
 | Tilt Shift 3D art source and runtime assets | [art/tilt_shift_3d/README.md](art/tilt_shift_3d/README.md) |
 

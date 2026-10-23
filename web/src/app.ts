@@ -13,7 +13,7 @@ import { bindScreenWakeLock } from "./screen_wake_lock.js";
 import { MotionLabController } from "./motion_lab.js";
 import { MotionStream, type MotionControlState } from "./motion_stream.js";
 import { controllerSocketUrl } from "./network_config.js";
-import { SquircleV1Canvas } from "./squircle_v1.js";
+import { JoinCharacterPreview, type CharacterPreviewModule } from "./character_preview.js";
 import { LobbyControls } from "./lobby_controls.js";
 import type { LobbyAction } from "./lobby_input.js";
 import {
@@ -143,7 +143,6 @@ let joinFlow: JoinFlowState = defaultJoinFlow();
 let inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
 type Game = "bubbles_3d" | "tilt_shift_3d";
 let activeGame: Game | null = null;
-const squircleCanvas = new SquircleV1Canvas();
 const lobbyControls = new LobbyControls(
   lobbyController,
   lobbyStickZone,
@@ -193,16 +192,19 @@ const pwa = new PwaOnboarding(
   },
 );
 const bubble3DCard = document.querySelector<HTMLElement>("#bubbles-3d-card")!;
-let threeView: Promise<ViewModule & TiltViewModule> | undefined;
+let threeView: Promise<ViewModule & TiltViewModule & CharacterPreviewModule> | undefined;
 /** The 3D view module, imported once on first use so other screens never download it. */
-function loadThreeView(): Promise<ViewModule & TiltViewModule> {
+function loadThreeView(): Promise<ViewModule & TiltViewModule & CharacterPreviewModule> {
   const url = "/three_view.js";
-  threeView ??= (import(url) as Promise<ViewModule & TiltViewModule>).catch((error: unknown) => {
+  threeView ??= (
+    import(url) as Promise<ViewModule & TiltViewModule & CharacterPreviewModule>
+  ).catch((error: unknown) => {
     threeView = undefined;
     throw error;
   });
   return threeView;
 }
+const joinPreview = new JoinCharacterPreview([selectionPreview, namePreview], loadThreeView);
 const bubble3DPhone = new BubblePhone(
   bubble3DCard,
   document.querySelector<HTMLCanvasElement>("#bubbles-3d-visual")!,
@@ -269,7 +271,7 @@ function forgetIdentity(): void {
 
 function selectedCharacterName(): string {
   const color = colorOption(joinFlow.color)?.name ?? "Blue";
-  return `${color} Squircle`;
+  return `${color} Cubio`;
 }
 
 function refreshSelectionUi(): void {
@@ -280,7 +282,7 @@ function refreshSelectionUi(): void {
   for (const button of Array.from(colorGrid.querySelectorAll<HTMLButtonElement>(".color-button"))) {
     button.setAttribute("aria-pressed", String(button.dataset.color === joinFlow.color));
   }
-  renderJoinPreviews(performance.now());
+  joinPreview.refresh(joinFlow.color);
 }
 
 for (const option of CHARACTER_COLORS) {
@@ -455,33 +457,6 @@ async function requestImmersiveMode(): Promise<void> {
     orientation?.lock ? () => orientation.lock!("portrait") : undefined,
   );
 }
-
-function renderJoinPreviews(now: number): void {
-  for (const canvas of [selectionPreview, namePreview]) {
-    if (canvas.closest("section")?.hidden) continue;
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) continue;
-    const pixelRatio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-    const width = Math.max(1, Math.round(rect.width * pixelRatio));
-    const height = Math.max(1, Math.round(rect.height * pixelRatio));
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-    }
-    const context = canvas.getContext("2d");
-    if (!context) continue;
-    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    context.clearRect(0, 0, rect.width, rect.height);
-    const scale = Math.min(rect.width / 256, rect.height / 220) * 0.95;
-    squircleCanvas.draw(context, joinFlow.color, rect.width / 2, rect.height * 0.89, scale, now);
-  }
-}
-
-function animateJoinPreviews(now: number): void {
-  renderJoinPreviews(now);
-  requestAnimationFrame(animateJoinPreviews);
-}
-requestAnimationFrame(animateJoinPreviews);
 
 function rememberIdentity(message: HostMessage): boolean {
   const player = message.player as PublicPlayer | undefined;

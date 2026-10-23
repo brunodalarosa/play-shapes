@@ -14,7 +14,7 @@ in the 2D `PlatformMotor`, `PlatformSurface` and `PlatformInput`.
 ## Decision
 
 Each lobby character is a hidden `CharacterBody2D` on the action plane, driven by the same
-`PlatformMotor`. A 3D Squircle mirrors its position at depth zero in the plaza.
+`PlatformMotor`. A 3D Cubio mirrors its position at depth zero in the plaza.
 
 One world unit is one character height and 96 plane pixels, the motor body's height, so the
 earlier speed and gravity carry over. `PlazaLanding` markers on the 3D props are the only

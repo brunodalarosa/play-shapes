@@ -1,6 +1,6 @@
 class_name Bubbles3DHandWobble
 extends SkeletonModifier3D
-## Lets a floating Squircle's hands drift gently on top of whatever clip plays, so Idle reads as
+## Lets a floating Cubio's hands drift gently on top of whatever clip plays, so Idle reads as
 ## floating in water without a new animation.
 
 const HANDS: Array[StringName] = [&"Hand.L", &"Hand.R"]

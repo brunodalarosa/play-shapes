@@ -103,7 +103,7 @@ test("the main script bundles ordinary screens and loads the 3D view separately"
     "PlatformControls",
     "createLobbyContext",
     "PlatformInputState",
-    "SquircleV1Canvas",
+    "JoinCharacterPreview",
     "MotionLabController",
     "controllerSocketUrl",
   ]) {
@@ -399,7 +399,7 @@ test("host accepts sequenced lobby intent only from its registered connection", 
       character_color: "#EC407A",
     });
     assert.equal(joined.type, "join_accepted");
-    assert.equal(joined.player.character_shape, "squircle");
+    assert.equal(joined.player.character_shape, "cubio");
     player.peer.send(
       JSON.stringify({
         type: "lobby_move",

@@ -2,10 +2,10 @@ class_name LobbyPlaygroundWorld
 extends Node3D
 ## The Playground plaza. Reconciles host registry records into one character per player
 ## identity. Bodies simulate on a hidden 2D action plane, where one-way landings, FALL and
-## player bounce already exist; each body's 3D Squircle mirrors it in the plaza at depth zero.
+## player bounce already exist; each body's 3D Cubio mirrors it in the plaza at depth zero.
 
-const CHARACTER: PackedScene = preload("res://characters/lobby_squircle.tscn")
-const VISUAL: PackedScene = preload("res://characters/squircle_3d.tscn")
+const CHARACTER: PackedScene = preload("res://characters/lobby_cubio.tscn")
+const VISUAL: PackedScene = preload("res://characters/cubio_3d.tscn")
 const ACTIVE_PRESETS: ActivePresets = preload("res://Tuning/Active Presets.tres")
 const MAX_SEQUENCE := 9007199254740991.0
 ## Plane pixels per world unit. One unit is one character height, the motor's 96-pixel body.
@@ -13,7 +13,7 @@ const PIXELS_PER_UNIT := 96.0
 ## Landing collision depth below its top, plane pixels.
 const LANDING_THICKNESS := 10.0
 const PLATFORM_LAYER := 128
-## Half the width of a lobby body: the capsule radius in lobby_squircle.tscn, plane pixels.
+## Half the width of a lobby body: the capsule radius in lobby_cubio.tscn, plane pixels.
 const BODY_HALF_WIDTH := 23.0
 const WALL_THICKNESS := 40.0
 ## Walls run from below the ground to far above the highest jump, plane pixels.
@@ -94,7 +94,7 @@ func reconcile(players: Array[Dictionary]) -> void:
 		if seat < 1 or seat > _spawn_points.get_child_count():
 			continue
 		present[player_id] = true
-		var character := _characters.get(player_id) as LobbySquircle
+		var character := _characters.get(player_id) as LobbyCubio
 		if character == null:
 			character = _spawn(player, seat)
 			_characters[player_id] = character
@@ -105,14 +105,14 @@ func reconcile(players: Array[Dictionary]) -> void:
 	for player_id: String in _characters.keys():
 		if present.has(player_id):
 			continue
-		var character := _characters[player_id] as LobbySquircle
+		var character := _characters[player_id] as LobbyCubio
 		character.queue_free()
 		_characters.erase(player_id)
 		_last_sequence.erase(player_id)
 
 
 func clear_all_input() -> void:
-	for character: LobbySquircle in _characters.values():
+	for character: LobbyCubio in _characters.values():
 		character.clear_input()
 
 
@@ -123,8 +123,8 @@ func reset_sequence(player_id: String) -> void:
 		character.clear_input()
 
 
-func character_for(player_id: String) -> LobbySquircle:
-	return _characters.get(player_id) as LobbySquircle
+func character_for(player_id: String) -> LobbyCubio:
+	return _characters.get(player_id) as LobbyCubio
 
 
 func handle_input(player: Dictionary, message: Dictionary, now_msec: int) -> Dictionary:
@@ -166,16 +166,16 @@ func handle_input(player: Dictionary, message: Dictionary, now_msec: int) -> Dic
 
 
 func _process(_delta: float) -> void:
-	for character: LobbySquircle in _characters.values():
+	for character: LobbyCubio in _characters.values():
 		var visual := character.visual
 		visual.position = to_world(character.position)
 		visual.set_travel(character.velocity.x / PIXELS_PER_UNIT)
 
 
-func _spawn(player: Dictionary, seat: int) -> LobbySquircle:
-	var visual := VISUAL.instantiate() as Squircle3D
+func _spawn(player: Dictionary, seat: int) -> LobbyCubio:
+	var visual := VISUAL.instantiate() as Cubio3D
 	_visuals.add_child(visual)
-	var character := CHARACTER.instantiate() as LobbySquircle
+	var character := CHARACTER.instantiate() as LobbyCubio
 	_apply_movement(character.get_node("PlatformMotor") as PlatformMotor)
 	character.configure(player, spawn_point(seat), visual)
 	_bodies.add_child(character)

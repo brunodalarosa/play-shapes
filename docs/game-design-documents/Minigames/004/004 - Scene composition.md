@@ -32,14 +32,14 @@ The two mockups are approved for layout, readability and mood. Their exact objec
 | Landmarks | One oversized white mug tilted on the seabed at the far left, one large green bottle on its side at the far right | Small and pale in frame, never brighter than the play objects |
 | Light | God-ray shafts fanning down from the top centre, slowly drifting; caustic shimmer on the seabed and props | Additive, low intensity behind the play plane |
 | Ambient motion | Small rising air bubbles in a few columns | Behind the play plane |
-| Gameplay plane | Player bubbles with Squircles and caught jellyfishes, free jellyfishes, pufferfishes, pop droplets, warning bubbles | The only bright, saturated, high-contrast layer |
+| Gameplay plane | Player bubbles with Cubios and caught jellyfishes, free jellyfishes, pufferfishes, pop droplets, warning bubbles | The only bright, saturated, high-contrast layer |
 
 ## Asset placement and repetition
 
 | Scene role | Asset | Placement / scale | Repetition | Gameplay relevance |
 | --- | --- | --- | --- | --- |
 | Player bubble | Bubble shell shader | Gameplay plane; radius from tuning | One per player, up to 10 | Its radius is its collider |
-| Character | 3D Squircle | Centred in its bubble, about half the bubble diameter tall | One per bubble | Identifies the player |
+| Character | 3D Cubio | Centred in its bubble, about half the bubble diameter tall | One per bubble | Identifies the player |
 | Jellyfish | Adapted jellyfish model | Gameplay plane; free ones about 3% of screen width, caught ones smaller, orbiting inside the bubble | Free population plus the visual cap per bubble | Collectible |
 | Pufferfish | Adapted pufferfish model | Gameplay plane; about 6–7% of screen width | A few at once | Hazard |
 | Branch coral | Two bare-tree models, recoloured | Far back, lower corners | 4–8 | None |

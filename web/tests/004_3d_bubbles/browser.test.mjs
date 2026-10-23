@@ -31,10 +31,10 @@ async function phone(options, verify) {
         });
         return;
       }
-      // The host serves the face images from the runtime Squircle folder, as here.
-      const face = path.match(/^\/models\/squircle-face-(neutral|blink)\.png$/);
+      // The host serves the face images from the runtime Cubio folder, as here.
+      const face = path.match(/^\/models\/cubio-face-(neutral|blink)\.png$/);
       const source = face
-        ? `../../../assets/runtime/animated_characters/squircle/v1/model/face-${face[1]}.png`
+        ? `../../../assets/runtime/animated_characters/cubio/model/face-${face[1]}.png`
         : `../../public${path === "/" ? "/index.html" : path}`;
       const file = new URL(source, import.meta.url);
       const types = {
@@ -116,7 +116,7 @@ test("browser loads 3D lazily, renders models, sends label touches and retires o
     });
     await page.waitForTimeout(200);
     assert.equal(requests.filter((path) => path === "/three_view.js").length, 1);
-    assert.ok(requests.includes("/models/squircle.glb"));
+    assert.ok(requests.includes("/models/cubio.glb"));
     assert.ok(requests.includes("/models/jellyfish.glb"));
     assert.equal(await page.locator("#bubbles-3d-score").textContent(), "7");
     assert.equal(await page.locator("#bubbles-3d-visual").evaluate((canvas) => canvas.width), 780);
@@ -143,7 +143,7 @@ test("browser loads 3D lazily, renders models, sends label touches and retires o
     assert.equal(await page.locator("#bubbles-3d-card").isVisible(), false);
     await page.evaluate((gameplay) => window.receiveHost(gameplay), snapshot());
     await page.waitForFunction(() => !document.querySelector("#bubbles-3d-visual").hidden);
-    assert.equal(requests.filter((path) => path === "/models/squircle.glb").length, 1);
+    assert.equal(requests.filter((path) => path === "/models/cubio.glb").length, 1);
     await page.evaluate(() =>
       window.receiveHost({
         type: "pre_minigame_snapshot",
@@ -155,11 +155,102 @@ test("browser loads 3D lazily, renders models, sends label touches and retires o
   });
 });
 
-test("reusable Squircle tints every limb, faces the camera, scales and blinks", async () => {
+test("setup shows live Cubio, preserves color through navigation and releases hidden previews", async () => {
+  await phone({ noWebGL: false }, async (page, requests) => {
+    await page.getByRole("button", { name: "CONTINUE IN BROWSER" }).click();
+    const selection = page.locator("#selection-preview");
+    const name = page.locator("#name-preview");
+    await page.waitForFunction(
+      () => document.querySelector("#selection-preview").dataset.preview === "ready",
+    );
+    assert.equal(await selection.getAttribute("aria-label"), "Blue Cubio Shape Character");
+    await page.getByRole("button", { name: "Choose Pink", exact: true }).click();
+    assert.equal(await selection.getAttribute("aria-label"), "Pink Cubio Shape Character");
+    const capture = new URL("../../../test-results/cubio/phone-setup.png", import.meta.url);
+    await page.screenshot({ path: fileURLToPath(capture) });
+    await page.getByRole("button", { name: "NEXT", exact: true }).click();
+    await page.waitForFunction(
+      () => document.querySelector("#name-preview").dataset.preview === "ready",
+    );
+    assert.equal(await selection.getAttribute("data-preview"), "idle");
+    assert.equal(await name.getAttribute("aria-label"), "Pink Cubio character preview");
+    await page.getByRole("button", { name: "Back to character selection" }).click();
+    await page.waitForFunction(
+      () => document.querySelector("#selection-preview").dataset.preview === "ready",
+    );
+    assert.equal(await name.getAttribute("data-preview"), "idle");
+    await page.getByRole("button", { name: "NEXT", exact: true }).click();
+    await page.locator("#player-name").fill("Cubio Player");
+    await page.locator("#join-button").click();
+    const sent = await page.evaluate(() => window.sentInput);
+    const join = sent.find((message) => message.type === "join");
+    assert.equal(join.character_shape, "cubio");
+    assert.equal(join.character_color, "#EC407A");
+    assert.equal(requests.filter((path) => path === "/models/cubio.glb").length, 1);
+    assert.equal(
+      requests.some((path) => /squircle|cubio-v1|colorable/.test(path)),
+      false,
+    );
+    await page.evaluate(() =>
+      window.receiveHost({
+        type: "join_accepted",
+        session_id: "test-session",
+        reconnect_token: "test-token",
+        player: { player_id: "one", name: "Cubio Player", seat: 1, state: "connected" },
+      }),
+    );
+    await page.waitForFunction(
+      () => document.querySelector("#name-preview").dataset.preview === "idle",
+    );
+    assert.equal(await page.locator("#lobby-controller").isVisible(), true);
+  });
+});
+
+test("setup still joins when WebGL is unavailable", async () => {
+  await phone({ noWebGL: true }, async (page) => {
+    await page.getByRole("button", { name: "CONTINUE IN BROWSER" }).click();
+    await page.waitForFunction(
+      () => document.querySelector("#selection-preview").dataset.preview === "unavailable",
+    );
+    await page.getByRole("button", { name: "NEXT", exact: true }).click();
+    await page.locator("#player-name").fill("No WebGL");
+    await page.locator("#join-button").click();
+    const sent = await page.evaluate(() => window.sentInput);
+    const join = sent.find((message) => message.type === "join");
+    assert.equal(join.character_shape, "cubio");
+    assert.equal(join.name, "No WebGL");
+  });
+});
+
+test("setup navigation while the model loads retires pending views without duplicate downloads", async () => {
+  await phone({ noWebGL: false }, async (page, requests) => {
+    let release;
+    const blocked = new Promise((resolve) => {
+      release = resolve;
+    });
+    await page.route("**/models/cubio.glb", async (route) => {
+      await blocked;
+      await route.fallback();
+    });
+    const loading = page.waitForRequest("**/models/cubio.glb");
+    await page.getByRole("button", { name: "CONTINUE IN BROWSER" }).click();
+    await loading;
+    await page.getByRole("button", { name: "NEXT", exact: true }).click();
+    await page.getByRole("button", { name: "Back to character selection" }).click();
+    release();
+    await page.waitForFunction(
+      () => document.querySelector("#selection-preview").dataset.preview === "ready",
+    );
+    assert.equal(requests.filter((path) => path === "/models/cubio.glb").length, 1);
+    assert.equal(await page.locator("#name-preview").getAttribute("data-preview"), "idle");
+  });
+});
+
+test("reusable Cubio tints every limb, faces the camera, scales and blinks", async () => {
   await phone({ noWebGL: false }, async (page) => {
     const result = await page.evaluate(async () => {
-      const { createSquircle } = await import("/three_view.js");
-      const character = await createSquircle();
+      const { createCubio } = await import("/three_view.js");
+      const character = await createCubio();
       character.update(0, 1.31, "#e53935", false);
       character.root.updateMatrixWorld(true);
       const colors = [];
@@ -177,9 +268,9 @@ test("reusable Squircle tints every limb, faces the camera, scales and blinks", 
       const scale = character.root.scale.x;
       character.update(6, 1.31, "#e53935", true);
       const white = tinted.map((object) => object.material.color.getHexString());
-      const blink = face.material.map.image.src.endsWith("squircle-face-blink.png");
+      const blink = face.material.map.image.src.endsWith("cubio-face-blink.png");
       character.update(0.13, 1.31, "#e53935", false);
-      const neutral = face.material.map.image.src.endsWith("squircle-face-neutral.png");
+      const neutral = face.material.map.image.src.endsWith("cubio-face-neutral.png");
       character.dispose();
       return { colors, z, scale, white, blink, neutral };
     });

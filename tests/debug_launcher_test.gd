@@ -11,17 +11,16 @@ func _run() -> void:
 	if not check(host.start(false), "Test LAN services start"):
 		return
 	var original_host_id := host.get_instance_id()
-	var animation_lab: DebugScenario = launcher.scenario_for_id(&"squircle_animation_lab")
 	var bubbles: DebugScenario = launcher.scenario_for_id(&"one_player_bubbles_3d")
-	if not check(animation_lab != null, "Animation lab is registered"):
-		return
 	if not check(
-		animation_lab.availability({ }).available,
-		"Implemented animation lab is available",
+		launcher.scenario_for_id(&"squircle_animation_lab") == null
+		and launcher.scenario_for_id(&"cubio_animation_lab") == null,
+		"The retired Animation Lab has no debug scenario",
 	):
 		return
 	if not check(
-		launcher.scenario_for_id(&"squircle_render_preview") == null,
+		launcher.scenario_for_id(&"squircle_render_preview") == null
+		and launcher.scenario_for_id(&"cubio_render_preview") == null,
 		"Retired comparison is not registered",
 	):
 		return

@@ -6,11 +6,18 @@ development error panel. The joystick and action button are in
 [platform-phone-controller.md](platform-phone-controller.md); the messages are in
 [protocol.md](protocol.md).
 
+## Character setup
+
+Color selection and name entry show the live 3D Cubio, with the registered color and
+natural blinking. Only the visible preview renders. It shares the model and face downloads
+with gameplay, and releases its renderer when setup is hidden. If 3D is unavailable, the
+color and name controls still allow joining.
+
 ## The Bubbles and jellyfishes 3D screen
 
 The portrait screen shows the exact host jellyfish count above a live 3D view of the
 player's bubble. The whole surface accepts touches, including the count. The tinted
-Squircle, natural blinking, idle animation, shell stretch, caught jellyfishes and recovery
+Cubio, natural blinking, idle animation, shell stretch, caught jellyfishes and recovery
 follow the host state. A water gradient and light rays sit behind the view. Catch and pop
 feedback requests optional vibration.
 
@@ -185,7 +192,7 @@ temporary controller mounts.
 
 ## Icons
 
-- The icons reuse the approved Squircle v1 front idle frame and the Playground logo.
+- The icons reuse the approved Cubio v1 front idle frame and the Playground logo.
 - Regenerate them with `node web/scripts/generate_pwa_icons.mjs`, then import in Godot.
 - The HTTP allowlist, the export presets and the pack policy include the manifest, the 180,
   192 and 512 px PNGs, and `pwa.js`.

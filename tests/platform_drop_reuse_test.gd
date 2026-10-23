@@ -1,5 +1,5 @@
 extends TestScript
-## Real physics on generic bodies: no LobbySquircle, registry or UI required.
+## Real physics on generic bodies: no LobbyCubio, registry or UI required.
 
 const FIXTURE := preload("res://tests/fixtures/platform_reuse.tscn")
 var _fixture: Node2D

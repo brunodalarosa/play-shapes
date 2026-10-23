@@ -46,7 +46,7 @@ func _run() -> void:
 	await process_frame
 
 
-func _settle(climber: LobbySquircle) -> void:
+func _settle(climber: LobbyCubio) -> void:
 	climber.clear_input()
 	for _frame: int in 20:
 		await physics_frame
@@ -55,7 +55,7 @@ func _settle(climber: LobbySquircle) -> void:
 ## Optionally runs to the near edge of the current support, releases JUMP once while holding
 ## toward the target, then centres over the target.
 func _jump_onto(
-	climber: LobbySquircle,
+	climber: LobbyCubio,
 	target: PlatformSurface,
 	direction: float,
 	from_edge: bool,

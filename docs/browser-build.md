@@ -35,12 +35,12 @@ cd ..
    number in the phone's error panel can be looked up.
 3. `npm run bundle:three` bundles `web/build/three_view/index.js` into the separate,
    minified `web/public/three_view.js`, retaining legal comments. The main bundle has no
-   three.js code. `app.ts` imports `/three_view.js` dynamically only on the first Bubbles
-   and jellyfishes 3D snapshot or Tilt Shift 3D screen; later mounts share the loaded module.
-4. `scripts/copy_models.mjs` copies the runtime Squircle and jellyfish GLBs byte for byte
+   three.js code. `app.ts` imports `/three_view.js` when the first live Cubio setup preview, Bubbles and jellyfishes 3D snapshot or Tilt Shift 3D
+   screen needs it; later mounts share the loaded module.
+4. `scripts/copy_models.mjs` copies the runtime Cubio and jellyfish GLBs byte for byte
    into `web/public/models/`. Their `.import` files tell Godot to keep them as plain files, so
    the export carries them unchanged. The host serves the face images from the runtime
-   Squircle folder itself, and the shape character face parts from `assets/runtime/shape_faces/`.
+   Cubio folder itself, and the shape character face parts from `assets/runtime/shape_faces/`.
 5. It generates `web/public/platform_input_settings.json` from the browser's input defaults.
    The host reads that file; do not edit it by hand.
 

@@ -29,3 +29,20 @@ func _run() -> void:
 		and screen._tray.get_child(1).get_child(0).text == ""
 	)
 	check(okay, "Reusable screen content, preview, or ordered tray failed")
+	check(
+		screen._characters._characters.size() == 10 and screen._characters.get_child_count() == 1,
+		"Ten live characters share one isolated preview viewport",
+	)
+	var first: Cubio3D = screen._characters._characters["p0"]
+	roster[0].ready = false
+	roster[0].character_color = "#EC407A"
+	screen.set_snapshot({ "players": roster })
+	check(
+		screen._characters._characters["p0"] == first and first.player_color == Color("#EC407A"),
+		"Ready changes preserve live instances and refresh the registered tint",
+	)
+	screen.set_snapshot({ "players": [roster[1]] })
+	check(
+		screen._characters._characters.size() == 1 and screen._characters._characters.has("p1"),
+		"Leaving players are removed from the live preview",
+	)

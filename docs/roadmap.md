@@ -20,7 +20,7 @@ existing ones. The game keeps playing the same while the code is reshaped; see
 - A decision log and this roadmap.
 - A branching model, Git Flow, with `develop` as the branch work merges into
   ([branching.md](branching.md)).
-- No ticket numbers anywhere, with no exemptions: the names inside the Squircle Blender
+- No ticket numbers anywhere, with no exemptions: the names inside the Cubio Blender
   source were the last.
 - One shared base for the test scripts
   ([0023](decisions/0023-shared-test-base.md)). A script error, or anything a test still
@@ -64,9 +64,10 @@ After the input pipeline: bots that fill a game with players
 ## The 3D rework
 
 The game is being rebuilt with 3D assets, starting with the Playground lobby. The lobby is a
-3D café plaza where real-time Squircles move on one plane with the unchanged phone controls
-([0033](decisions/0033-plaza-lobby-plane-simulation.md)). The ready screen, the minigames and
-phone setup still use the Squircle sheets, and are rebuilt afterwards.
+3D café plaza where real-time Cubios move on one plane with the unchanged phone controls
+([0033](decisions/0033-plaza-lobby-plane-simulation.md)). Cubio is a cube with a small bevel;
+the lobby, Bubbles, the Ready screen and phone setup share its live model and original rig.
+The rendered animation sheets and Animation Lab are retired.
 
 The 2D painted-room art in `assets/runtime/lobby_playground/` is unused apart from the logo,
 and is removed once the plaza is approved.

@@ -23,8 +23,8 @@ func _run() -> void:
 	):
 		return
 	if not check(
-		first.player.character_shape == "squircle" and first.player.character_color == "#EC407A",
-		"Legacy body input resolves to Squircle while preserving the selected color",
+		first.player.character_shape == "cubio" and first.player.character_color == "#EC407A",
+		"Legacy body input resolves to Cubio while preserving the selected color",
 	):
 		return
 	if not check(
@@ -49,9 +49,9 @@ func _run() -> void:
 	var partial_registry := PlayerRegistry.new()
 	var color_only := partial_registry.join_player(19, "Color Only", true, 1000, null, "#43A047")
 	if not check(
-		color_only.accepted and color_only.player.character_shape == "squircle"
+		color_only.accepted and color_only.player.character_shape == "cubio"
 		and color_only.player.character_color == "#43A047",
-		"Missing shape resolves to Squircle without replacing a valid selected color",
+		"Missing shape resolves to Cubio without replacing a valid selected color",
 	):
 		return
 	var duplicate := registry.join_player(12, "ZOË 🎮", true, 1000)
@@ -80,8 +80,7 @@ func _run() -> void:
 	var resumed := registry.resume_player(14, registry.session_id, first.reconnect_token, 60999)
 	if not check(
 		resumed.accepted and resumed.player.player_id == first.player.player_id
-		and resumed.player.seat == first.player.seat
-		and resumed.player.character_shape == "squircle"
+		and resumed.player.seat == first.player.seat and resumed.player.character_shape == "cubio"
 		and resumed.player.character_color == "#EC407A",
 		"A valid grace-window resume restores the same player, seat, shape, and color",
 	):
@@ -108,9 +107,9 @@ func _run() -> void:
 		return
 	var reused := registry.join_player(16, "zoë 🎮", true, 61000)
 	if not check(
-		reused.accepted and reused.player.character_shape == "squircle"
+		reused.accepted and reused.player.character_shape == "cubio"
 		and reused.player.character_color == CharacterSelection.FALLBACK_COLOR,
-		"Legacy and test joins without a style receive the Squircle-and-blue fallback",
+		"Legacy and test joins without a style receive the Cubio-and-blue fallback",
 	):
 		return
 

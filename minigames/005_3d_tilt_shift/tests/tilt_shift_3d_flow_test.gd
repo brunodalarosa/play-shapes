@@ -21,7 +21,7 @@ func _join(host: Node, connection: int) -> Dictionary:
 		"Player %d" % connection,
 		true,
 		Time.get_ticks_msec(),
-		"squircle",
+		"cubio",
 		"#1E88E5",
 	)
 	return result.player

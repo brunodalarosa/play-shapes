@@ -6,7 +6,7 @@ The models of [[004 - Bubbles and jellyfishes 3D]], where each comes from and wh
 
 | Scene role | Source | Change | Project destination |
 | --- | --- | --- | --- |
-| Player character | Existing `assets/runtime/animated_characters/squircle/v1/model/squircle.glb` | None; used through the existing 3D Squircle scene | Already in the project |
+| Player character | Existing `assets/runtime/animated_characters/cubio/model/cubio.glb` | None; used through the existing 3D Cubio scene | Already in the project |
 | Player bubble | None: a shader on an engine sphere | New reusable component | Shared component folder |
 | Jellyfish | Kenney Food Kit `mushroom` (bell) + new geometry | Adapted in Blender into a new model | `art/bubbles_3d/jellyfish/`, runtime `assets/runtime/minigames/bubbles_3d/jellyfish/` |
 | Pufferfish | KayKit `projectile_catapult` (body) + Kenney Food Kit `fish` (fins) + new geometry | Adapted in Blender into a new model | `art/bubbles_3d/pufferfish/`, runtime `assets/runtime/minigames/bubbles_3d/pufferfish/` |
@@ -190,6 +190,6 @@ Paths are relative to the root of the owner's local asset library.
 - Each runtime model imports in Godot without errors, at the expected orientation and origin.
 - Triangle budgets above hold; ten players with the maximum free and visible jellyfishes keep the
   host and a phone at a smooth frame rate.
-- The phone loads the jellyfish model and the Squircle files from the host over HTTP, including in
+- The phone loads the jellyfish model and the Cubio files from the host over HTTP, including in
   the exported Windows build.
 - The owner reviews the jellyfish, pufferfish and background in the running scene.

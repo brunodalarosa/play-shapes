@@ -13,7 +13,7 @@ const START_ELLIPSE := Vector2(5.7, 2.7)
 ## Vertical field of view that frames the plane edge to edge at 16:9.
 const CAMERA_FOV := 30.0
 const PLANE_ASPECT := 16.0 / 9.0
-const SQUIRCLE_SCENE: PackedScene = preload("res://characters/squircle_3d.tscn")
+const CUBIO_SCENE: PackedScene = preload("res://characters/cubio_3d.tscn")
 const MUSIC: AudioStream = preload("res://assets/runtime/bgm/Beach_music.ogg")
 const SFX: Dictionary[StringName, AudioStream] = {
 	&"collect": preload("res://assets/runtime/sfxs/drawKnife2.ogg"),
@@ -413,7 +413,7 @@ func _add_result_row(entry: Dictionary, count: int) -> void:
 	row.add_child(_result_label("%d %s" % [score, "jellyfish"], 0.21, 28))
 
 
-## A small live render of the player's Squircle for a results row.
+## A small live render of the player's Cubio for a results row.
 func _portrait(colour: Color, edge: float) -> SubViewportContainer:
 	var frame := SubViewportContainer.new()
 	frame.stretch = true
@@ -423,13 +423,13 @@ func _portrait(colour: Color, edge: float) -> SubViewportContainer:
 	view.own_world_3d = true
 	view.transparent_bg = true
 	frame.add_child(view)
-	var squircle := SQUIRCLE_SCENE.instantiate() as Squircle3D
-	squircle.player_color = colour
-	view.add_child(squircle)
+	var cubio := CUBIO_SCENE.instantiate() as Cubio3D
+	cubio.player_color = colour
+	view.add_child(cubio)
 	# The nameplate is ready only once the portrait is in the tree.
-	squircle.ready.connect(
+	cubio.ready.connect(
 		func() -> void:
-			squircle.nameplate.visible = false,
+			cubio.nameplate.visible = false,
 	)
 	var light := DirectionalLight3D.new()
 	light.rotation_degrees = Vector3(-40.0, -30.0, 0.0)

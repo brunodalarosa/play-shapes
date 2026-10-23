@@ -3,7 +3,7 @@ export function snapshot(overrides = {}) {
     type: "bubbles_3d_snapshot",
     phase: "active",
     debug_mode: false,
-    character_shape: "squircle",
+    character_shape: "cubio",
     character_color: "#1e88e5",
     score: 7,
     bubble_radius: 0.6,

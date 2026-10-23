@@ -1,9 +1,9 @@
 extends TestScript
-## Renders bubble shells of several sizes around tinted Squircles on an underwater blue, one
+## Renders bubble shells of several sizes around tinted Cubios on an underwater blue, one
 ## stretched and one bursting, for visual review. Run without --headless.
 
 const OUTPUT_DIR := "res://test-results/bubble-shell"
-const SQUIRCLE: PackedScene = preload("res://characters/squircle_3d.tscn")
+const CUBIO: PackedScene = preload("res://characters/cubio_3d.tscn")
 
 
 func _run() -> void:
@@ -39,12 +39,12 @@ func _run() -> void:
 	for setup: Array in setups:
 		var at: Vector2 = setup[0]
 		var radius: float = setup[1]
-		var squircle := SQUIRCLE.instantiate() as Squircle3D
-		squircle.standing_height = minf(radius * 1.0, 0.95)
-		squircle.position = Vector3(at.x, at.y - squircle.standing_height * 0.5, 0.0)
-		world.add_child(squircle)
-		squircle.nameplate.visible = false
-		squircle.player_color = Color(String(setup[2]))
+		var cubio := CUBIO.instantiate() as Cubio3D
+		cubio.standing_height = minf(radius * 1.0, 0.95)
+		cubio.position = Vector3(at.x, at.y - cubio.standing_height * 0.5, 0.0)
+		world.add_child(cubio)
+		cubio.nameplate.visible = false
+		cubio.player_color = Color(String(setup[2]))
 		var shell := BubbleShell3D.new()
 		shell.radius = radius
 		shell.position = Vector3(at.x, at.y, 0.0)

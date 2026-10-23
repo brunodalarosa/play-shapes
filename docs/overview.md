@@ -16,15 +16,14 @@ repository.
   launch. Players guide balls in a 3D toy factory on Jolt physics, where each player is a
   paddle in their own colour with a face that reacts. Each phone shows the player's own paddle
   in real-time 3D.
-- Registered players appear as 3D Squircles in the Playground lobby, a café plaza viewed from
+- Registered players appear as 3D Cubios in the Playground lobby, a café plaza viewed from
   the side. Each steers their character from a portrait phone stick and a release-action
   button. The billboard shows the join QR; the lobby controls are in the top-right panel. Near-vertical input
   reaches or crouches, and FALL descends Open supports.
-- Squircle v1 is the character in phone setup and the Ready screen. Minigame 004
-  uses the 3D Squircle on the shared screen and on the phone.
+- The live 3D Cubio is the character in phone setup and the Ready screen. Minigame 004
+  uses the same model on the shared screen and on the phone.
 - F12 opens the debug menu: the one-real-player scenario for Bubbles and jellyfishes 3D, the
-  Squircle Animation Lab,
-  the Gyroscope and Accelerometer Lab, and the Tilt Shift 3D factory with
+  Gyroscope and Accelerometer Lab, and the Tilt Shift 3D factory with
   explicitly simulated controls. The factory review creates ten synthetic players without
   registering phones.
   Bubbles and jellyfishes 3D labels its debug round on the host and the phone.

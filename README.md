@@ -45,7 +45,7 @@ Some tasks need more. The setup script reports these without failing:
 | Godot export templates matching the installed Godot | The standalone Windows build and `node tools/check.mjs --release` |
 | mkcert | Local HTTPS for motion input; `node tools/local_https.mjs download` fetches it, see [docs/local-https.md](docs/local-https.md) |
 | GitHub CLI (`gh`) | Pull requests from the terminal |
-| Python 3 with Pillow, Blender | Regenerating art; see [art/squircle/README.md](art/squircle/README.md) and [art/bubbles_3d/README.md](art/bubbles_3d/README.md) |
+| Python 3 with Pillow, Blender | Regenerating art; see [art/cubio/README.md](art/cubio/README.md) and [art/bubbles_3d/README.md](art/bubbles_3d/README.md) |
 
 The vendored Godot MCP addon is disabled by default and is optional developer
 tooling; it is not required to launch or play the game.
@@ -68,7 +68,7 @@ tooling; it is not required to launch or play the game.
 
 The committed runtime assets are sufficient to run, edit, and test the game.
 Source-art regeneration is documented in
-`art/squircle/README.md` and `art/bubbles_3d/README.md`.
+`art/cubio/README.md` and `art/bubbles_3d/README.md`.
 
 ## Start a local session
 
@@ -78,7 +78,7 @@ Source-art regeneration is documented in
 4. On each phone, scan the QR code or open the displayed URL. Phones must be
    on the same reachable network as the host; guest Wi-Fi, VPNs, and client
    isolation can prevent connections.
-5. Choose a Squircle color, select **Next**, enter a player name, then select **Enter Lobby**.
+5. Choose a Cubio color, select **Next**, enter a player name, then select **Enter Lobby**.
 
 The host uses HTTP port `8080` and WebSocket port `8081` by default. If those
 ports are already in use, stop the other host or change the values in
@@ -90,7 +90,7 @@ The debug flow is for testing Bubbles and jellyfishes 3D with one real registere
 It does not create simulated players.
 
 1. Start the project and connect exactly one phone to the lobby.
-2. Choose a Squircle color, enter a player name, and select **Enter Lobby**.
+2. Choose a Cubio color, enter a player name, and select **Enter Lobby**.
 3. On the PC, press **F12** to open the non-pausing debug launcher.
 4. Choose **One-player Bubbles and jellyfishes 3D**.
 5. Play from the phone while watching the shared PC display. The PC labels the

@@ -182,7 +182,7 @@ func score_texts() -> PackedStringArray:
 	return PackedStringArray([_orange.text, _blue.text])
 
 
-## The paddle colour of a player's chosen Squircle colour, given as its ID or hex.
+## The paddle colour of a player's chosen Cubio colour, given as its ID or hex.
 static func player_color(character_color: String) -> Color:
 	for color: Dictionary in CharacterSelection.COLORS:
 		if color.id == character_color or color.hex == character_color:

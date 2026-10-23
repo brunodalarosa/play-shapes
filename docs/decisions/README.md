@@ -76,3 +76,4 @@ What was decided.
 | [0037](0037-shape-face-system.md) | Shape character faces are composed from parts, with expressions in a stack |
 | [0038](0038-tilt-shift-3d-full-width-frame.md) | Tilt Shift 3D fills the full width and raises its floor for the bins |
 | [0039](0039-minigame-session-scripts.md) | A minigame that prepares its players names a session script in the catalog |
+| [0040](0040-cubio-live-previews.md) | Cubio uses one animated model in gameplay and setup |

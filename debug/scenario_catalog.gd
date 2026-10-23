@@ -16,11 +16,6 @@ static func scenarios(minigames: MinigameCatalog) -> Array[DebugScenario]:
 			"Gyroscope and Accelerometer Lab",
 			"res://debug/motion_lab/motion_lab.tscn",
 		),
-		DebugScenario.new(
-			&"squircle_animation_lab",
-			"Animation Lab",
-			"res://debug/animation_lab/animation_lab.tscn",
-		),
 	]
 
 	for minigame: MinigameDefinition in minigames.minigames:

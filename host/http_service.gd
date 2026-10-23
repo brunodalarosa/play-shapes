@@ -3,7 +3,7 @@ extends Node
 ## A bounded, nonblocking HTTP service for a fixed set of bundled assets.
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
-const SQUIRCLE_MODEL := "res://assets/runtime/animated_characters/squircle/v1/model"
+const CUBIO_MODEL := "res://assets/runtime/animated_characters/cubio/model"
 const SHAPE_FACES := "res://assets/runtime/shape_faces"
 const ASSETS: Dictionary = {
 	"/manifest.webmanifest": {
@@ -35,45 +35,26 @@ const ASSETS: Dictionary = {
 		"path": "res://web/public/platform_input_settings.json",
 		"content_type": "application/json",
 	},
-	"/squircle-v1/manifest.json": {
-		"path": "res://assets/runtime/animated_characters/squircle/v1/manifest.json",
-		"content_type": "application/json",
-	},
-	"/squircle-v1/idle-front-colorable.png": {
-		"path": "res://assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/squircle-v1/idle-front-neutral.png": {
-		"path": "res://assets/runtime/animated_characters/squircle/v1/idle-front-neutral.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/squircle-v1/idle-front-blink.png": {
-		"path": "res://assets/runtime/animated_characters/squircle/v1/idle-front-blink.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
 	"/three_view.js": {
 		"path": "res://web/public/three_view.js",
 		"content_type": "text/javascript; charset=utf-8",
 	},
 	# Raw model copies the web build makes; Godot keeps them as files so exports carry them.
-	"/models/squircle.glb": {
-		"path": "res://web/public/models/squircle.glb",
+	"/models/cubio.glb": {
+		"path": "res://web/public/models/cubio.glb",
 		"content_type": "model/gltf-binary",
 	},
 	"/models/jellyfish.glb": {
 		"path": "res://web/public/models/jellyfish.glb",
 		"content_type": "model/gltf-binary",
 	},
-	"/models/squircle-face-neutral.png": {
-		"path": SQUIRCLE_MODEL + "/face-neutral.png",
+	"/models/cubio-face-neutral.png": {
+		"path": CUBIO_MODEL + "/face-neutral.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
-	"/models/squircle-face-blink.png": {
-		"path": SQUIRCLE_MODEL + "/face-blink.png",
+	"/models/cubio-face-blink.png": {
+		"path": CUBIO_MODEL + "/face-blink.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},

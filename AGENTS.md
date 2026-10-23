@@ -68,7 +68,7 @@ A pull request is history, read later by someone who was not there. Write what i
 
 Read [game-design-documents/Art direction.md](docs/game-design-documents/Art%20direction.md) and apply it to UI, environments, characters, effects, shaders, and animation.
 
-The canonical editable Squircle source and current export tools live in `art/squircle/`. Keep only current source and useful pipeline/review resources there. Prior versions, backups, variant experiments and version comparisons are temporary artifacts: use ignored `scratch/` or `comparisons/` directories and do not commit them or obsolete one-time construction scripts.
+The canonical editable Cubio source and current export tools live in `art/cubio/`. Keep only current source and useful pipeline/review resources there. Prior versions, backups, variant experiments and version comparisons are temporary artifacts: use ignored `scratch/` or `comparisons/` directories and do not commit them or obsolete one-time construction scripts.
 
 ## Setup and verification
 
