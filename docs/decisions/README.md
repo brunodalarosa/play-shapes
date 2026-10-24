@@ -82,3 +82,4 @@ What was decided.
 | [0043](0043-cubio-shape-face.md) | Cubio's face is the shape face system, drawn on an anchor in the model |
 | [0044](0044-one-face-style.md) | Every shape face is named for its emoji and drawn to the originals' measurements |
 | [0045](0045-shared-face-frame.md) | Every shape face shares one frame and scale |
+| [0046](0046-shape-face-for-every-character.md) | Every Shape Character wears the shared shape face |
