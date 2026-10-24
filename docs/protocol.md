@@ -78,8 +78,8 @@ The host serves a fixed list and nothing else:
 - Generated settings: `/platform_input_settings.json`.
 - App manifest and icons: `/manifest.webmanifest`, `/app-icon-180.png`, `/app-icon-192.png`,
   `/app-icon-512.png`.
-- 3D models for the phone: `/models/cubio.glb`, `/models/jellyfish.glb`,
-  `/models/cubio-face-neutral.png` and `/models/cubio-face-blink.png`.
+- 3D models for the phone: `/models/cubio.glb` and `/models/jellyfish.glb`, and where
+  Cubio's shape face sits on its model, `/models/cubio-face-anchor.json`.
 - Shape character faces: `/shape_faces/face_presets.json` and one
   `/shape_faces/facial_part_<name>.png` per part the manifest lists, from the shared runtime
   folder.

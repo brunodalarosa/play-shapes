@@ -6,7 +6,6 @@ rig is restructured only in this process's memory before export.
 from pathlib import Path
 import hashlib
 import json
-import shutil
 import sys
 
 import bpy
@@ -19,11 +18,9 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 OUT = ROOT / 'assets/runtime/animated_characters/cubio/model'
 RIG = 'Animation.Controls'
-FACE = 'Face.Plane - neutral artwork'
 # Godot node names cannot contain dots, so the exported objects use plain names.
 MESH_NAMES = {
     'Body.Cubio': 'Body',
-    FACE: 'Face',
     'Hand.L': 'HandL',
     'Hand.R': 'HandR',
     'Foot.L': 'FootL',
@@ -99,12 +96,9 @@ def main():
             export_frame_step=1,
             export_def_bones=False,
             export_rest_position_armature=True,
-            # Godot assigns the tint and face materials, so none are embedded.
+            # Godot and the phone assign the tint, so no materials are embedded.
             export_materials='NONE',
         )
-    for face in ('neutral', 'blink'):
-        with atomic_output(OUT / f'face-{face}.png') as temporary:
-            shutil.copyfile(HERE / 'textures' / f'{face}.png', temporary)
     source = HERE / 'cubio-animated.blend'
     report = {
         'source_sha256': hashlib.sha256(source.read_bytes()).hexdigest(),

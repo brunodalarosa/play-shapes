@@ -72,7 +72,7 @@
       "detail": null
     },
     {
-      "name": "face follows the body at its front surface",
+      "name": "face anchor follows the body just in front of its centre",
       "passed": true,
       "detail": null
     },
@@ -212,11 +212,6 @@
       "detail": null
     },
     {
-      "name": "neutral and blink artwork is packed and matches editable textures",
-      "passed": true,
-      "detail": null
-    },
-    {
       "name": "ground anchor is fixed at the origin",
       "passed": true,
       "detail": null
@@ -278,6 +273,6 @@
       "surface_intersections": []
     }
   },
-  "source_sha256": "2022b0b971e6bba7bdd178be227f310b96dd5a84d0b391b70ca335688476f956",
+  "source_sha256": "af88bc9f187216e493a2f55d841a579cb81ae2a3474cb19ede1a4b3fce204e60",
   "passed": true
 }

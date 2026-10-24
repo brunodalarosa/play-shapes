@@ -173,9 +173,12 @@ These live outside any minigame folder so later 3D scenes can use them.
   preserving selected colors. `web/src/character_selection.ts` offers colors and sends
   `cubio`.
 - `characters/cubio_3d.tscn` is the real-time Cubio used by the Playground lobby: the
-  exported rig and clips, the player tint, natural blinking, held stances, turning toward
+  exported rig and clips, the player tint, a shape face, held stances, turning toward
   travel and a nameplate.
-  - Its shaders, `cubio_tint` and `cubio_face`, draw the character in front of any
+  - The face is a `ShapeFace3D` on the model's `FaceAnchor`, placed by
+    `assets/runtime/animated_characters/cubio/face_anchor.json` and driven by a
+    `ShapeFaceExpressions` that shows `face_neutral` and blinks.
+  - Its tint shader and the face's parts draw the character in front of any
     scenery within `front_push` (2 units) of it. Each vertex moves toward the camera along
     its view ray, so its place on screen and the character's own layering are unchanged.
     Shadow passes are left alone. Nothing in the plaza may stand in front of a character

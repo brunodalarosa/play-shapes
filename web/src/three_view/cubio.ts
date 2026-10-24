@@ -57,7 +57,6 @@ export async function createCubio() {
 
     const name = object.name.replace(/_\d+$/, "");
     if (TINTED.includes(name)) object.material = tint;
-    if (name === "Face") object.visible = false;
   });
   const face = new ShapeFace3D(manifest);
   // The anchor faces out of the body's front, toward the phone camera.

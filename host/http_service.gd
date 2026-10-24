@@ -3,7 +3,7 @@ extends Node
 ## A bounded, nonblocking HTTP service for a fixed set of bundled assets.
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
-const CUBIO_MODEL := "res://assets/runtime/animated_characters/cubio/model"
+const CUBIO := "res://assets/runtime/animated_characters/cubio"
 const SHAPE_FACES := "res://assets/runtime/shape_faces"
 const ASSETS: Dictionary = {
 	"/manifest.webmanifest": {
@@ -48,18 +48,8 @@ const ASSETS: Dictionary = {
 		"path": "res://web/public/models/jellyfish.glb",
 		"content_type": "model/gltf-binary",
 	},
-	"/models/cubio-face-neutral.png": {
-		"path": CUBIO_MODEL + "/face-neutral.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/models/cubio-face-blink.png": {
-		"path": CUBIO_MODEL + "/face-blink.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
 	"/models/cubio-face-anchor.json": {
-		"path": "res://assets/runtime/animated_characters/cubio/face_anchor.json",
+		"path": CUBIO + "/face_anchor.json",
 		"content_type": "application/json",
 	},
 	"/shape_faces/face_presets.json": {

@@ -75,8 +75,6 @@ func _ready() -> void:
 	for mesh: MeshInstance3D in _model.find_children("*", "MeshInstance3D", true, false):
 		if String(mesh.name) in TINTED_MESHES:
 			_tinted.append(mesh)
-		elif mesh.name == "Face":
-			mesh.visible = false
 	var anchor := _model.find_child("FaceAnchor", true, false) as Node3D
 	assert(anchor != null and _tinted.size() == TINTED_MESHES.size(), "Cubio model is incomplete")
 	set_player_color(player_color)

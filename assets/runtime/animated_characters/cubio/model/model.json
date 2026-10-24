@@ -1,6 +1,6 @@
 {
-  "source_sha256": "2022b0b971e6bba7bdd178be227f310b96dd5a84d0b391b70ca335688476f956",
-  "glb_sha256": "4ae28fa441b10f6ca42f9ee6912ab00945d9662dcda6599cc8767973d5eb5a25",
+  "source_sha256": "af88bc9f187216e493a2f55d841a579cb81ae2a3474cb19ede1a4b3fce204e60",
+  "glb_sha256": "f3405e8b5a519634de2ef2ffe1564edd18007cd00c68acc6274b91fe3f631776",
   "clips": {
     "idle": {
       "frames": 48,
@@ -41,7 +41,6 @@
   },
   "meshes": [
     "Body",
-    "Face",
     "FootL",
     "FootR",
     "HandL",
