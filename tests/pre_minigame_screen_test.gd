@@ -46,3 +46,53 @@ func _run() -> void:
 		screen._characters._characters.size() == 1 and screen._characters._characters.has("p1"),
 		"Leaving players are removed from the live preview",
 	)
+	screen.queue_free()
+	await process_frame
+	await _check_booklet_pages()
+
+
+func _check_booklet_pages() -> void:
+	var screen := SCENE.instantiate() as PreMinigameScreen
+	root.add_child(screen)
+	screen.configure(&"tilt_shift_3d", { "players": [] })
+	await _settle()
+	check(_sections_stay_apart(screen), "Tilt Shift's booklet sections do not overlap")
+
+	screen._controls.text = "Hold the phone steady. ".repeat(30).strip_edges()
+	await _settle()
+	var inner := screen._booklet_scroll.get_v_scroll_bar()
+	check(_sections_stay_apart(screen), "Long booklet sections still do not overlap")
+	check(inner.max_value > inner.page, "Long booklet text overflows into a scrollable page")
+	var page := screen._booklet_scroll.get_global_rect()
+	for body: Label in [screen._controls, screen._win, screen._hints]:
+		var rect := body.get_global_rect()
+		check(
+			rect.position.x >= page.position.x and rect.end.x <= page.end.x,
+			"Booklet text stays within the page width",
+		)
+	check(
+		screen._booklet_bar.mouse_filter == Control.MOUSE_FILTER_STOP,
+		"The binding becomes a usable scroll bar when the text overflows",
+	)
+	screen._booklet_bar.value = 120.0
+	check(screen._booklet_scroll.scroll_vertical == 120, "Dragging the binding scrolls the page")
+	screen._booklet_scroll.scroll_vertical = 60
+	await _settle()
+	check(is_equal_approx(screen._booklet_bar.value, 60.0), "Scrolling the page moves the binding")
+	screen.queue_free()
+	await process_frame
+
+
+func _sections_stay_apart(screen: PreMinigameScreen) -> bool:
+	var bodies: Array[Label] = [screen._controls, screen._win, screen._hints]
+	for index: int in range(1, bodies.size()):
+		var previous := bodies[index - 1].get_global_rect()
+		var heading := bodies[index].get_parent().get_child(0) as Label
+		if heading.get_global_rect().position.y < previous.end.y:
+			return false
+	return true
+
+
+func _settle() -> void:
+	for _frame: int in 3:
+		await process_frame
