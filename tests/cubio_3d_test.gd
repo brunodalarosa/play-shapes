@@ -104,8 +104,8 @@ func _check_face(cubio: Cubio3D) -> void:
 	for quad: MeshInstance3D in cubio.face.quads():
 		var material := quad.material_override as ShaderMaterial
 		check(
-			material != null and float(material.get_shader_parameter("front_push")) == 2.0,
-			"Face parts are pushed in front of scenery like the body",
+			material != null and float(material.get_shader_parameter("front_push")) > 2.0,
+			"Face parts are pushed a little further than the body, so it never covers them",
 		)
 		check(
 			material.get_shader_parameter("player_color") == null,

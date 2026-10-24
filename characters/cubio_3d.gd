@@ -195,8 +195,9 @@ func _add_face(anchor: Node3D) -> void:
 	face.manifest = _face_manifest
 	face.face_name = DEFAULT_FACE
 	face.expressions = expressions
-	# Matches the default push of cubio_tint, so the face stays on the body it sits on.
-	face.front_push = 2.0
+	# The body's push of 2.0 plus a margin: the body's front is two large triangles, and close to
+	# the camera their interpolated depth can reach past a face lying just on top of them.
+	face.front_push = 2.1
 	set_face_placement(face_anchor())
 	anchor.add_child(face)
 
