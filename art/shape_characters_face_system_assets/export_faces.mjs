@@ -32,20 +32,22 @@ const PART_PALETTES = {
   facial_part_tongue: [TONGUE_PINK],
 };
 // The owner's twelve faces, named for their emoji counterparts; each has a reference image.
-const ORIGINALS = [
-  "face_slightly_smiling",
-  "face_unamused",
-  "face_content",
-  "face_suspicious",
-  "face_scheming",
-  "face_mischievous",
-  "face_furious",
-  "face_smirking",
-  "face_worried",
-  "face_dizzy",
-  "face_disappointed",
-  "face_smiling_eyes",
-];
+// Every face shares one frame at the originals' pixel scale, so each reference image sits at
+// its own place in it: these are its centre's offsets below the frame's centre, in pixels.
+const ORIGINALS = {
+  face_slightly_smiling: 0,
+  face_unamused: -5,
+  face_content: -3.06,
+  face_suspicious: -6.735,
+  face_scheming: -9.4,
+  face_mischievous: -2.5,
+  face_furious: -0.5,
+  face_smirking: -17.795,
+  face_worried: -12.55,
+  face_dizzy: -9,
+  face_disappointed: -17.5,
+  face_smiling_eyes: -10.105,
+};
 // The X-eye is cut from face_dizzy's left eye: a 40 x 40 box like the open eye's.
 const EYE_X_CUT = { face: "face_dizzy", x: 0, y: 19, size: 40 };
 
@@ -189,15 +191,17 @@ try {
     };
   }
 
-  // Draws a list of layers, in face-height units, from the 8x PNGs at the given 1x size.
-  const draw = async (layers, width, height) => {
+  // Draws a list of layers, in face-height units, from the 8x PNGs onto a canvas of the given
+  // size, one face height being `scale` pixels, with the frame's centre `offset` pixels below
+  // the canvas's centre.
+  const draw = async (layers, width, height, scale = height, offset = 0) => {
     const images = {};
     for (const layer of layers) {
       const png = readFileSync(join(RUNTIME, `${layer.part}.png`));
       images[layer.part] = `data:image/png;base64,${png.toString("base64")}`;
     }
     return page.evaluate(
-      async ({ layers, images, width, height }) => {
+      async ({ layers, images, width, height, scale, offset }) => {
         const loaded = {};
         for (const [name, src] of Object.entries(images)) {
           const image = new Image();
@@ -213,17 +217,20 @@ try {
         context.imageSmoothingQuality = "high";
         for (const layer of layers) {
           context.save();
-          context.translate(width / 2 + layer.center[0] * height, height / 2 + layer.center[1] * height);
+          context.translate(
+            width / 2 + layer.center[0] * scale,
+            height / 2 + layer.center[1] * scale - offset,
+          );
           context.rotate((layer.rotation_degrees * Math.PI) / 180);
           context.scale(layer.mirror ? -1 : 1, 1);
-          const w = layer.size[0] * height;
-          const h = layer.size[1] * height;
+          const w = layer.size[0] * scale;
+          const h = layer.size[1] * scale;
           context.drawImage(loaded[layer.part], -w / 2, -h / 2, w, h);
           context.restore();
         }
         return Array.from(context.getImageData(0, 0, width, height).data);
       },
-      { layers, images, width, height },
+      { layers, images, width, height, scale, offset },
     );
   };
 
@@ -259,7 +266,7 @@ try {
     if (far.length > 0) fail(`${name} differs from its source at ${JSON.stringify(far)}`);
   }
 
-  const expected = ORIGINALS;
+  const expected = Object.keys(ORIGINALS);
   if (expected.some((name) => !manifest.faces[name])) {
     fail("the manifest must keep the twelve original faces");
   }
@@ -281,9 +288,10 @@ try {
       continue;
     }
     const source = readPng(reference);
-    if (source.width !== w || source.height !== h) fail(`${name} source size differs`);
-    const a = planes(drawn, w, h);
-    const b = planes(source.data, w, h);
+    const { width: rw, height: rh } = source;
+    const placed = await draw(face.layers, rw, rh, h, ORIGINALS[name]);
+    const a = planes(placed, rw, rh);
+    const b = planes(source.data, rw, rh);
     const far = farPixels(a, b);
     report.faces[name] = {
       far_pixels: far.length,
@@ -316,14 +324,15 @@ try {
     fill(pairs);
     fill(large);
     for (const [index, [name, face]] of faces.entries()) {
-      const [w, h] = face.source_size;
+      const frame = face.source_size[1];
       const source = readPng(join(here, `${name}.png`));
-      const drawn = await draw(face.layers, w, h);
+      const { width: w, height: h } = source;
+      const drawn = await draw(face.layers, w, h, frame, ORIGINALS[name]);
       const x = (index % 2) * cellW + GAP;
       const y = Math.floor(index / 2) * cellH + GAP;
       paste(pairs, source.data, w, h, x, y, ZOOM);
       paste(pairs, drawn, w, h, x + w * ZOOM + GAP, y, ZOOM);
-      const eight = await draw(face.layers, w * SCALE, h * SCALE);
+      const eight = await draw(face.layers, w * SCALE, h * SCALE, frame * SCALE, ORIGINALS[name] * SCALE);
       const lx = (index % 4) * (118 * SCALE + GAP) + GAP;
       const ly = Math.floor(index / 4) * (84 * SCALE + GAP) + GAP;
       paste(large, eight, w * SCALE, h * SCALE, lx, ly, 1);

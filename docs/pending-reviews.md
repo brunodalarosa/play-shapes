@@ -226,8 +226,8 @@ device.
 
 - `[HUMAN-PLAY]` The fifty-two redrawn faces against their emoji, on Cubio and on Tilt Shift
   paddles, and the six originals that replaced their AI counterparts.
-- `[HUMAN-PLAY]` Whether faces with brows, drawn smaller than faces without them at the same
-  face height, should share one scale instead.
+- `[HUMAN-PLAY]` Faces that reach past a thin Tilt Shift paddle now that every face shares one
+  scale.
 
 ## Tooling on other platforms
 

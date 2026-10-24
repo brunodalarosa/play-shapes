@@ -54,11 +54,11 @@ func _run() -> void:
 		var size := Vector2i(int(entry["source_size"][0]), int(entry["source_size"][1]))
 		check(
 			is_equal_approx(float(entry["box_aspect"]), float(size.x) / size.y),
-			"%s keeps its reference's aspect" % face,
+			"%s keeps its frame's aspect" % face,
 		)
-		if face in FACES:
-			check(_png_size(ART + face + ".png") == size, "%s has its reference's size" % face)
-		else:
+		var frame := _png_size(ART + "face_slightly_smiling.png")
+		check(size == frame, "%s shares the default face's frame" % face)
+		if face not in FACES:
 			check(
 				not String(entry.get("emoji_reference", "")).is_empty(),
 				"%s names its emoji" % face,

@@ -146,8 +146,11 @@ The drawn presets follow the measurements of the originals, so every face reads 
 - Brows are the supplied slabs, `eyebrow_a` or `eyebrow_d`, level or turned up to 15° at the
   inner end.
 
-Each preset's box is the ink of its eyes, brows and mouth. Tears, sweat, drool, the sleep marks
-and the halo sit beside or above the box and do not enlarge it, so they do not shrink the face.
+Every preset shares one frame: `face_slightly_smiling`'s 100 × 58 pixels, with the eye line 9
+pixels above its centre. A face drawn at a given height therefore has the same eye size and eye
+line whatever its expression; brows, tears, the sleep marks and the halo may reach outside the
+frame. Each original's reference image sits at its own place in the frame, which
+`export_faces.mjs` lists.
 
 Closed eyes, X-eyes, squeezed eyes, spirals, hearts, stars and dollar signs keep their shape
 during blinks, and so do sunglasses. Decorations and the tongue are layers of their own and
