@@ -1,6 +1,6 @@
 {
-  "source_sha256": "25e27448d74ee1c89858ec15e727519960db31ae27fad7be09e43403ff632681",
-  "glb_sha256": "73660883d12c481ce549d09ce4b7b52b06ad921137aa3024691184c3d95e6e80",
+  "source_sha256": "2022b0b971e6bba7bdd178be227f310b96dd5a84d0b391b70ca335688476f956",
+  "glb_sha256": "4ae28fa441b10f6ca42f9ee6912ab00945d9662dcda6599cc8767973d5eb5a25",
   "clips": {
     "idle": {
       "frames": 48,
@@ -46,6 +46,9 @@
     "FootR",
     "HandL",
     "HandR"
+  ],
+  "anchors": [
+    "FaceAnchor"
   ],
   "body_dimensions_m": [
     2.0,

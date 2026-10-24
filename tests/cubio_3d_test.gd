@@ -1,5 +1,6 @@
 extends TestScript
-## The exported Cubio model: its clips and timing, player tint, held stances and blinking.
+## The exported Cubio model: its clips and timing, player tint, shape face, held stances and
+## blinking.
 
 const VISUAL := preload("res://characters/cubio_3d.tscn")
 
@@ -42,15 +43,10 @@ func _run() -> void:
 	var tinted := 0
 	for mesh: MeshInstance3D in cubio.find_children("*", "MeshInstance3D", true, false):
 		var material := mesh.material_override as ShaderMaterial
-		if mesh.name == "Face":
-			check(
-				material != null and material.shader == Cubio3D.FACE_SHADER
-				and material.get_shader_parameter("face") == Cubio3D.FACE_NEUTRAL,
-				"The face keeps its untinted artwork",
-			)
-		elif material != null and material.get_shader_parameter("player_color") == Color("#43A047"):
+		if material != null and material.get_shader_parameter("player_color") == Color("#43A047"):
 			tinted += 1
 	check(tinted == 5, "Body, both hands and both feet take the player tint")
+	_check_face(cubio)
 
 	cubio.play("look_up")
 	await _wait(0.5)
@@ -80,6 +76,41 @@ func _run() -> void:
 	check(blinked, "The Cubio blinks on its own")
 	cubio.queue_free()
 	await process_frame
+
+
+func _check_face(cubio: Cubio3D) -> void:
+	var anchor := cubio.find_child("FaceAnchor", true, false) as Node3D
+	check(
+		anchor != null and cubio.face.get_parent() == anchor,
+		"The shape face is drawn on the model's face anchor",
+	)
+	var front := cubio.find_child("Body", true, false) as Node3D
+	var out := anchor.global_basis.z.normalized()
+	check(
+		out.is_equal_approx(front.global_basis.z.normalized())
+		and anchor.global_position.z > front.global_position.z,
+		"The face anchor faces out of the body's front",
+	)
+	var placement := Cubio3D.face_anchor()
+	check(
+		is_equal_approx(cubio.face.height, placement.height)
+		and cubio.face.position.is_equal_approx(Vector3(placement.offset.x, placement.offset.y, 0)),
+		"The face takes the placement from Cubio's anchor file",
+	)
+	check(
+		cubio.face.face_name == Cubio3D.DEFAULT_FACE and not cubio.face.quads().is_empty(),
+		"A new Cubio shows the neutral face",
+	)
+	for quad: MeshInstance3D in cubio.face.quads():
+		var material := quad.material_override as ShaderMaterial
+		check(
+			material != null and float(material.get_shader_parameter("front_push")) == 2.0,
+			"Face parts are pushed in front of scenery like the body",
+		)
+		check(
+			material.get_shader_parameter("player_color") == null,
+			"Face parts keep their untinted artwork",
+		)
 
 
 func _wait(seconds: float) -> void:

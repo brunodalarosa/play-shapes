@@ -58,6 +58,10 @@ const ASSETS: Dictionary = {
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
+	"/models/cubio-face-anchor.json": {
+		"path": "res://assets/runtime/animated_characters/cubio/face_anchor.json",
+		"content_type": "application/json",
+	},
 	"/shape_faces/face_presets.json": {
 		"path": SHAPE_FACES + "/face_presets.json",
 		"content_type": "application/json",
