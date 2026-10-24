@@ -112,7 +112,7 @@ When the participant panel opens, each selected player appears as a small 2D chi
 ## Pre-minigame booklet
 
 - Title: "Tilt Shift 3D".
-- Preview image: `assets/runtime/minigames/tilt_shift_3d/tilt_shift_3d_preview.png`, until the owner supplies a 3D screenshot.
+- Preview image: `assets/runtime/minigames/tilt_shift_3d/tilt_shift_3d_preview.png`, a 1920 × 1080 capture of the 3D round with four players.
 
 ## Results
 

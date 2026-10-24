@@ -74,8 +74,8 @@ The reusable parts behind the lobby characters. Setup and reuse are in
   resolves ready actions through each registered connection, and sends personalized ready
   snapshots on resume.
 - `scenes/pre_minigame_screen.tscn` uses editable Bubbles and jellyfishes 3D content in
-  `bubbles_3d_pre_minigame_content.tres`, in the minigame's folder, and a curated gameplay capture
-  in `assets/runtime/pre_minigame/bubbles_preview.png`.
+  `bubbles_3d_pre_minigame_content.tres`, in the minigame's folder, and a four-player gameplay
+  capture in `assets/runtime/minigames/bubbles_3d/bubbles_3d_preview.png`.
 - Every normal catalog launch uses this screen. Journey requirements and plan warnings are
   in [player journeys](player-journeys.md).
 

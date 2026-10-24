@@ -80,8 +80,7 @@ Minigame 004, Bubbles and jellyfishes 3D, replaced the retired 2D version, 002: 
 ([0034](decisions/0034-bubbles-3d-jolt-plane.md)), with a three.js view of each player's bubble
 on the phone ([0035](decisions/0035-phone-three-js.md)). Its design is in
 `docs/game-design-documents/Minigames/004/`. It awaits physical-phone checks and the owner's
-play review; tuning values are provisional and the Pre-minigame preview image is still a 2D
-placeholder.
+play review; tuning values are provisional.
 
 Minigame 005, Tilt Shift 3D, replaced the retired 2D version, 003: the same game
 on plane-locked Jolt physics ([0038](decisions/0038-tilt-shift-3d-full-width-frame.md)), with
@@ -91,8 +90,7 @@ expressive face ([0037](decisions/0037-shape-face-system.md)), in a full-width t
 
 Each phone shows the player's own paddle in 3D. 005 has its own workshop tab and F12 review, and
 launches through a catalog session script ([0039](decisions/0039-minigame-session-scripts.md)).
-It awaits physical-phone checks and the owner's play review; tuning values are provisional and
-the Pre-minigame preview image is still a 2D placeholder. See
+It awaits physical-phone checks and the owner's play review; tuning values are provisional. See
 [the minigame guide](../minigames/005_3d_tilt_shift/README.md).
 
 ## Backlog

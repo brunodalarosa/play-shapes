@@ -140,7 +140,7 @@ const REQUIRED_RUNTIME_PATHS := [
 	"scenes/pre_minigame_screen.tscn",
 	"scenes/pre_minigame_screen.gd",
 	"scenes/pre_minigame_content.gd",
-	"assets/runtime/pre_minigame/bubbles_preview.png",
+	"assets/runtime/minigames/bubbles_3d/bubbles_3d_preview.png",
 	"host/pre_minigame_readiness.gd",
 	"minigames/catalog.tres",
 	"minigames/minigame_catalog.gd",

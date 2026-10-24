@@ -13,9 +13,9 @@ The models and images of [[005 - Tilt Shift 3D]], where each comes from and what
 | Ball | None: an engine low-poly sphere | None | — |
 | Factory wall | None: a plane with a gradient material | None | — |
 | Factory props | KayKit `pipe_90_A_blue`, `pipe_180_B_blue`, `pipe_end_blue`, `Parts_Cog`, `structure_C`, `watertower` | Copied unchanged; recoloured and scaled in the scene | `art/tilt_shift_3d/props/`, runtime `assets/runtime/minigames/tilt_shift_3d/props/` |
-| Booklet preview | Owner-supplied 2D factory preview | Temporary placeholder until a 3D screenshot replaces it | `assets/runtime/minigames/tilt_shift_3d/tilt_shift_3d_preview.png` |
+| Booklet preview | Capture of the 3D round with four players | None | `assets/runtime/minigames/tilt_shift_3d/tilt_shift_3d_preview.png` |
 
-All library sources are CC0-1.0 KayKit packs (Kay Lousberg) held in the owner's local asset library. Attribution is not required; keep each pack's license file beside its copy, as `art/playground_plaza/` does. The face assets, trash emblem and booklet preview are the owner's own.
+All library sources are CC0-1.0 KayKit packs (Kay Lousberg) held in the owner's local asset library. Attribution is not required; keep each pack's license file beside its copy, as `art/playground_plaza/` does. The face assets and trash emblem are the owner's own; the booklet preview is a capture of the game.
 
 ## Required changes
 

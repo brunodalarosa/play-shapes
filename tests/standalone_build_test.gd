@@ -41,13 +41,14 @@ func _run() -> void:
 		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/sfxs/stonesHit1.ogg"),
 		"Bubbles 3D scene, music, and sound effects remain in the standalone PCK",
 	)
+	var preview := "assets/runtime/minigames/bubbles_3d/bubbles_3d_preview.png"
 	check(
 		Policy.REQUIRED_RUNTIME_PATHS.has("host/pre_minigame_readiness.gd")
 		and Policy.REQUIRED_RUNTIME_PATHS.has("scenes/pre_minigame_screen.tscn")
 		and Policy
 		.REQUIRED_RUNTIME_PATHS
 		.has("minigames/004_3d_bubbles/bubbles_3d_pre_minigame_content.tres")
-		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/pre_minigame/bubbles_preview.png"),
+		and Policy.REQUIRED_RUNTIME_PATHS.has(preview),
 		"Ready screen, content, and gameplay preview remain in the standalone PCK",
 	)
 	for path: String in Policy.REQUIRED_RUNTIME_PATHS:

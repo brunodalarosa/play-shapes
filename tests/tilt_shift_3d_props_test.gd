@@ -49,6 +49,6 @@ func _run() -> void:
 	)
 	check(
 		FileAccess.get_sha256(RUNTIME + "tilt_shift_3d_preview.png")
-		== "f30118a214159ec53a0ef5f4e13c8b430d82f32fd62d716973f1df5c923d6f04",
-		"The booklet preview is the factory's preview, unchanged until a 3D one is supplied",
+		== "7d775e262efa80eff7b12c6167a8f4e075c60bc581e6fd4ec0ef01f57429ff48",
+		"The booklet preview is the four-player 3D capture, unchanged",
 	)

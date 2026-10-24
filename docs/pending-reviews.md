@@ -73,7 +73,6 @@ removes it. The evidence labels are defined in
 - `[HUMAN-PLAY]` The final audio mix, including the countdown beats on the shared cue.
 - `[HUMAN-PLAY]` Whether the Cubio should keep drawing over its bubble's highlight, as it
   does in the lobby to stay in front of scenery.
-- A 3D Pre-minigame preview image from the owner; the booklet still shows a 2D placeholder.
 - `[GODOT-RUNTIME]` Host frame time on the target PC. `bubbles_3d_performance_check.gd` measured
   ten players, 70 free and 160 caught jellyfishes at 0.76 ms a frame on average (1.17 ms at the
   95th percentile, 182 draw calls) on an RTX 5070 development machine only.
@@ -135,7 +134,6 @@ removes it. The evidence labels are defined in
   delivery curve controls, guide measurements, snap/tolerance preferences, save/apply,
   undo/redo and its 3D preview, plus Inspector usability of the rules, physics and motion
   profiles.
-- The booklet preview is a 2D factory screenshot until the owner supplies a 3D one.
 - Audio selection, whistle playback and listening remain deferred.
 
 ## Platform movement in the lobby

@@ -106,8 +106,8 @@ filling the band below the mouth line, three-quarter views of each width, and th
 
 `assets/runtime/minigames/tilt_shift_3d/props/` holds byte-identical copies of the props for
 Godot to import. Beside them are `trash_badge.png`, the owner's trash emblem, and
-`tilt_shift_3d_preview.png`, the 2D factory's booklet preview, kept until a 3D screenshot
-replaces it. `tests/tilt_shift_3d_props_test.gd` checks every copy.
+`tilt_shift_3d_preview.png`, the booklet preview, a capture of the 3D round with four
+players. `tests/tilt_shift_3d_props_test.gd` checks every copy.
 
 `art/.gdignore` keeps this folder out of Godot's importer. The game loads
 `assets/runtime/minigames/tilt_shift_3d/crate/bin.glb`, byte-identical to the verified export,

@@ -88,7 +88,7 @@ The phone renders its player's own bubble in real-time 3D in the browser, with t
 - Controls: "Swipe and release to nudge your bubble."
 - Win condition: "Catch the most jellyfishes. Pufferfish pop bubbles and spill your catch!"
 - Hints: "Big bubbles catch more but are easier to pop. Bump other bubbles to push them away."
-- Preview image: temporarily the existing `assets/runtime/pre_minigame/bubbles_preview.png`, until the owner supplies a 3D screenshot. The 3D build does not replace it.
+- Preview image: `assets/runtime/minigames/bubbles_3d/bubbles_3d_preview.png`, a 1920 × 1080 capture of the 3D round with four players.
 
 ## Difficulty progression
 
