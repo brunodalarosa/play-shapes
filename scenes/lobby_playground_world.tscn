@@ -1,9 +1,10 @@
-[gd_scene load_steps=34 format=3]
+[gd_scene load_steps=35 format=3]
 
 [ext_resource type="Script" path="res://scenes/lobby_playground_world.gd" id="world"]
 [ext_resource type="Script" path="res://scenes/plaza_landing.gd" id="landing"]
 [ext_resource type="PackedScene" path="res://scenes/plaza_billboard.tscn" id="billboard"]
 [ext_resource type="PackedScene" path="res://assets/runtime/playground_plaza/cafe/cafe.glb" id="cafe"]
+[ext_resource type="PackedScene" path="res://assets/runtime/playground_plaza/logo_sign/logo_sign.glb" id="logo_sign"]
 [ext_resource type="PackedScene" path="res://assets/runtime/playground_plaza/chair/chair_A.gltf" id="chair"]
 [ext_resource type="PackedScene" path="res://assets/runtime/playground_plaza/table/cafe-table.glb" id="table"]
 [ext_resource type="PackedScene" path="res://assets/runtime/playground_plaza/tree/Tree_2_E_Color1.gltf" id="tree"]
@@ -217,6 +218,9 @@ rotation = Vector3(0, 3.14159, 0)
 position = Vector3(0, 6.5, 0)
 script = ExtResource("landing")
 width = 6.8
+
+[node name="LogoSign" parent="Plaza/Cafe" instance=ExtResource("logo_sign")]
+position = Vector3(0, 6.5, -2.2)
 
 [node name="ChairLeft" type="Node3D" parent="Plaza"]
 position = Vector3(-3, 0, 0)

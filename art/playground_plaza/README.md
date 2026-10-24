@@ -2,6 +2,7 @@
 
 Source models for the plaza. The authored [cafe](cafe/README.md),
 [billboard](billboard/README.md) and [table](table/README.md) have their own delivery notes.
+The café's rooftop [logo sign](logo_sign/README.md) is generated from the logo artwork.
 
 ## KayKit props
 
@@ -34,7 +35,7 @@ SHA-256 of each unchanged model:
 ## Runtime copies
 
 `art/.gdignore` excludes these sources from Godot's asset importer. The Playground lobby
-loads byte-identical copies from `assets/runtime/playground_plaza/`: the three exported GLBs
+loads byte-identical copies from `assets/runtime/playground_plaza/`: the four exported GLBs
 and the three KayKit models with their buffers, textures and licenses. After re-exporting a
 model here, copy it there too.
 

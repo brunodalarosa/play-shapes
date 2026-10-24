@@ -1,7 +1,7 @@
 class_name PlazaBillboard
 extends Node3D
-## The plaza billboard. Its display shows the game logo and the live join QR, drawn in a
-## SubViewport that renders only when its content changes.
+## The plaza billboard. Its whole display shows the live join QR, drawn in a SubViewport that
+## renders only when its content changes. The logo stands on the cafe roof instead.
 
 @onready var qr: QRCodeRect = %JoinQR
 @onready var _screen: SubViewport = $Screen

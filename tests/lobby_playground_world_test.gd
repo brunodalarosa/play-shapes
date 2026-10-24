@@ -74,6 +74,29 @@ func _run() -> void:
 		and (display.material_override as StandardMaterial3D).albedo_texture != null,
 		"The billboard display shows its runtime screen",
 	)
+	world.billboard.show_join_url("http://192.168.0.2:8080")
+	await process_frame
+	var screen_size := Vector2(world.billboard.get_node("Screen").size)
+	check(
+		world.billboard.qr.size.x >= screen_size.x * 0.9
+		and world.billboard.qr.size.y >= screen_size.y * 0.9,
+		"The join QR fills the billboard display",
+	)
+
+	var sign_bounds := _sign_bounds(world)
+	var roof_span := world.get_node("Plaza/Cafe/Landing") as PlazaLanding
+	var roof_top := roof_span.global_position.y
+	check(
+		absf(sign_bounds.position.y - roof_top) < 0.05
+		and sign_bounds.get_center().x > roof_span.plane_span().position.x
+		and sign_bounds.get_center().x < roof_span.plane_span().end.x,
+		"The logo sign stands on the café roof",
+	)
+	check(
+		sign_bounds.end.z < 0.0
+		and world.logo_sign.find_children("*", "CollisionObject3D").is_empty(),
+		"The logo sign is scenery behind the character plane",
+	)
 
 	for size: Vector2i in SIZES:
 		_check_framing(size)
@@ -116,4 +139,20 @@ func _check_framing(size: Vector2i) -> void:
 						"edge" if height == 0.0 else "standing character",
 					],
 				)
+	var sign_bounds := _sign_bounds(world)
+	var sign_on_screen := true
+	for corner: int in 8:
+		var point := world.camera.unproject_position(sign_bounds.get_endpoint(corner))
+		sign_on_screen = sign_on_screen and screen.has_point(point)
+	check(sign_on_screen, "The whole logo sign is on screen at %s" % size)
 	viewport.queue_free()
+
+
+func _sign_bounds(world: LobbyPlaygroundWorld) -> AABB:
+	var bounds := AABB()
+	var first := true
+	for mesh: MeshInstance3D in world.logo_sign.find_children("*", "MeshInstance3D", true, false):
+		var box := mesh.global_transform * mesh.get_aabb()
+		bounds = box if first else bounds.merge(box)
+		first = false
+	return bounds

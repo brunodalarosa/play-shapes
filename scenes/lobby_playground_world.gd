@@ -30,6 +30,7 @@ var _characters: Dictionary = { }
 var _last_sequence: Dictionary = { }
 
 @onready var billboard: PlazaBillboard = $Plaza/Billboard
+@onready var logo_sign: Node3D = $Plaza/Cafe/LogoSign
 @onready var camera: Camera3D = $Camera3D
 @onready var _spawn_points: Node3D = $SpawnPoints
 @onready var _visuals: Node3D = $Characters

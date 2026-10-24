@@ -72,6 +72,7 @@ const REQUIRED_RUNTIME_PATHS := [
 	"assets/runtime/animated_characters/cubio/model/face-blink.png",
 	"assets/runtime/playground_plaza/cafe/cafe.glb",
 	"assets/runtime/playground_plaza/billboard/billboard.glb",
+	"assets/runtime/playground_plaza/logo_sign/logo_sign.glb",
 	"assets/runtime/playground_plaza/table/cafe-table.glb",
 	"assets/runtime/playground_plaza/chair/chair_A.gltf",
 	"assets/runtime/playground_plaza/chair/License.txt",

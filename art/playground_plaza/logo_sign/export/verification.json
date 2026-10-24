@@ -1,0 +1,27 @@
+{
+  "source": "play-shapes-logo.png",
+  "source_sha256": "e001fa9331b6b374c16ed3bcd5ce34ecf70591e6a426463d59a3d689411ed5bb",
+  "export_sha256": "deda27ccaf2ec66fe06e8afce387e50d76c799ced0a4b5220a3d8aa3ce860a77",
+  "triangles": {
+    "Letters": 3812,
+    "Backing": 960,
+    "Posts": 224
+  },
+  "total_triangles": 4996,
+  "materials": [
+    "Logo Backing",
+    "Logo Blue",
+    "Logo Orange",
+    "Sign Metal"
+  ],
+  "bounds_min": [
+    -3.714,
+    -0.33,
+    0.0
+  ],
+  "bounds_max": [
+    3.714,
+    0.805,
+    4.614
+  ]
+}

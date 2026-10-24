@@ -77,3 +77,4 @@ What was decided.
 | [0038](0038-tilt-shift-3d-full-width-frame.md) | Tilt Shift 3D fills the full width and raises its floor for the bins |
 | [0039](0039-minigame-session-scripts.md) | A minigame that prepares its players names a session script in the catalog |
 | [0040](0040-cubio-live-previews.md) | Cubio uses one animated model in gameplay and setup |
+| [0041](0041-rooftop-logo-sign.md) | The logo is a 3D sign on the café roof, and the billboard shows only the QR |

@@ -69,8 +69,11 @@ The game is being rebuilt with 3D assets, starting with the Playground lobby. Th
 the lobby, Bubbles, the Ready screen and phone setup share its live model and original rig.
 The rendered animation sheets and Animation Lab are retired.
 
-The 2D painted-room art in `assets/runtime/lobby_playground/` is unused apart from the logo,
-and is removed once the plaza is approved.
+The café roof carries the logo as a 3D sign traced from the approved artwork, and the
+billboard shows only the join QR ([0041](decisions/0041-rooftop-logo-sign.md)).
+
+The 2D painted-room art in `assets/runtime/lobby_playground/` is unused and is removed once
+the plaza is approved.
 
 Minigame 004, Bubbles and jellyfishes 3D, replaced the retired 2D version, 002: a from-scratch
 3D rebuild without the spin move, on Jolt physics with plane-locked bodies

@@ -18,7 +18,11 @@ removes it. The evidence labels are defined in
 - `[HUMAN-PLAY]` Characters drawn in front of chairs, tables and the café instead of
   clipping into them, including while jumping up through or falling through a landing.
   Owner decision whether this replaces true depth layering.
-- `[PHYSICAL-PHONE]` Scanning the billboard QR from the couch at real viewing distance.
+- `[PHYSICAL-PHONE]` Scanning the billboard QR from the couch at real viewing distance, now
+  that it fills the display.
+- Owner visual review of the café [logo sign](../art/playground_plaza/logo_sign/README.md) at
+  the real camera: letter depth, cream backing, posts, and characters on the roof in front.
+- `[PHYSICAL-PHONE]` The installed app icon with the stacked logo at Home Screen size.
 - `[GODOT-RUNTIME]` Host frame time with ten players on the target PC. Not yet measured.
 - `[EXPORTED-BUILD]` The Windows package opens the plaza with every model and license.
 

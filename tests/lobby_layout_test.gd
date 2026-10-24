@@ -4,6 +4,7 @@ extends TestScript
 
 const SIZES: Array[Vector2i] = [Vector2i(1920, 1080), Vector2i(1280, 720)]
 const MIN_PADDING := 24.0
+const SIGN_TOP_RIGHT := Vector3(3.7, 4.6, 0.0)
 const CONTROLS: Array[String] = [
 	"AddressPicker",
 	"Refresh",
@@ -60,10 +61,14 @@ func _check_size(size: Vector2i) -> bool:
 	var billboard_top := camera.unproject_position(world.billboard.to_global(Vector3.UP * 11.0))
 	var roof := world.surface_named("Cafe").world_bounds()
 	var roof_end := camera.unproject_position(LobbyPlaygroundWorld.to_world(roof.end))
-	var covers_landmark := area.has_point(billboard_top) or area.has_point(roof_end)
+	# The logo sign's top corner nearest the panel.
+	var sign_corner := camera.unproject_position(world.logo_sign.to_global(SIGN_TOP_RIGHT))
+	var covers_landmark := (
+		area.has_point(billboard_top) or area.has_point(roof_end) or area.has_point(sign_corner)
+	)
 	if not check(
-		billboard_top.y > 0.0 and not covers_landmark,
-		"The panel leaves the billboard and the café roof in view at %s" % size,
+		billboard_top.y > 0.0 and sign_corner.y > 0.0 and not covers_landmark,
+		"The panel leaves the billboard, the café roof and its logo sign in view at %s" % size,
 	):
 		return false
 

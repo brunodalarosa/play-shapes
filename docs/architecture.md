@@ -41,8 +41,10 @@ Messages and limits are in [protocol.md](protocol.md).
   - Two invisible side walls on the same layer keep characters in view. `fit_walls()` places
     them from the camera whenever the view resizes, so a character stops with its centre on
     the screen edge, half out of view. The ground runs past both walls.
-  - `scenes/plaza_billboard.*` draws the logo and the live join QR in a `SubViewport` that
-    renders only when they change, shown unshaded on the billboard's `Display` surface.
+  - `scenes/plaza_billboard.*` draws the live join QR across the whole display in a
+    `SubViewport` that renders only when it changes, shown unshaded on the `Display` surface.
+  - `Plaza/Cafe/LogoSign` is the logo as 3D letters on posts on the café roof, scenery with no
+    collision ([decision 0041](decisions/0041-rooftop-logo-sign.md)).
 - `scenes/lobby_playground_world.gd` reconciles registered players to ten seat-indexed
   `SpawnPoints` and places each body's 3D Cubio every frame.
 - `characters/lobby_cubio.tscn` is the host body: the shared `PlatformMotor`, a capsule and
