@@ -127,9 +127,9 @@ func _run() -> void:
 	check(wink.layers[0].part == ShapeFaceManifest.BLINK_EYE, "The wink's open eye blinks")
 	check(wink.layers[1].part == "facial_part_eye_closed_up", "The wink's shut eye stays shut")
 	var exhausted := manifest.blinked("face_exhausted")
-	check(exhausted.layers[0].part == ShapeFaceManifest.BLINK_EYE, "Tired eyes can blink")
+	check(exhausted.layers[0].part == ShapeFaceManifest.BLINK_EYE, "Heavy-lidded eyes can blink")
 	for index: int in [2, 3]:
-		check(exhausted.layers[index].part == "facial_part_bag", "Eye bags survive blinking")
+		check(exhausted.layers[index].part == "facial_part_eyebrow_a", "Brows survive blinking")
 	check(
 		manifest.face("face_spiral_eyes").layers[0].part == "facial_part_eye_spiral",
 		"The spiral-eyed face has its own eye parts",
@@ -141,6 +141,12 @@ func _run() -> void:
 	var pleading := manifest.blinked("face_pleading")
 	check(pleading.layers[0].part == ShapeFaceManifest.BLINK_EYE, "Pleading eyes can blink")
 	check(pleading.layers[4].part == "facial_part_mouth_sad", "A pleading blink keeps its mouth")
+	var teary := manifest.face("face_holding_back_tears")
+	check(teary.layers[0].part == "facial_part_eye_teary", "Held-back tears well in the eyes")
+	check(
+		manifest.blinked("face_holding_back_tears").layers[0].part == ShapeFaceManifest.BLINK_EYE,
+		"Teary eyes can blink",
+	)
 	var woozy := manifest.face("face_woozy")
 	check(woozy.layers[0].part != woozy.layers[1].part, "The woozy eyes have different shapes")
 	check(woozy.layers[0].center.y != woozy.layers[1].center.y, "The woozy eyes sit unevenly")
@@ -198,12 +204,11 @@ func _check_decorations(manifest: ShapeFaceManifest) -> void:
 		"face_sad_relieved": ["facial_part_tear_drop", 1],
 		"face_sleepy": ["facial_part_sleep_bubble", 1],
 		"face_sleeping": ["facial_part_sleep_z", 1],
-		"face_drooling": ["facial_part_drool", 1],
+		"face_drooling": ["facial_part_tear_drop", 1],
 		"face_downcast_sweat": ["facial_part_tear_drop", 1],
-		"face_money_mouth": ["facial_part_money_tongue", 1],
+		"face_money_mouth": ["facial_part_tongue", 1],
 		"face_crying": ["facial_part_tear_drop", 1],
 		"face_loudly_crying": ["facial_part_tear_stream", 2],
-		"face_holding_back_tears": ["facial_part_tear_pool", 2],
 		"face_halo": ["facial_part_halo", 1],
 	}
 	for name: String in expected:

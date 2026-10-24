@@ -8,8 +8,6 @@ const UNBLINKING_EYES: Array[String] = [
 	"facial_part_eye_closed_up",
 	"facial_part_eye_x",
 	"facial_part_eye_squeezed",
-	"facial_part_eye_soft_closed_up",
-	"facial_part_eye_soft_closed_down",
 	"facial_part_eye_spiral",
 	"facial_part_eye_heart",
 	"facial_part_eye_star",

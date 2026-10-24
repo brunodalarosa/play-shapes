@@ -156,11 +156,6 @@ const ASSETS: Dictionary = {
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
-	"/shape_faces/facial_part_mouth_confused.png": {
-		"path": SHAPE_FACES + "/facial_part_mouth_confused.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
 	"/shape_faces/facial_part_mouth_open_frown.png": {
 		"path": SHAPE_FACES + "/facial_part_mouth_open_frown.png",
 		"content_type": "image/png",
@@ -181,43 +176,8 @@ const ASSETS: Dictionary = {
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
-	"/shape_faces/facial_part_eye_soft_closed_up.png": {
-		"path": SHAPE_FACES + "/facial_part_eye_soft_closed_up.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/shape_faces/facial_part_eye_soft_closed_down.png": {
-		"path": SHAPE_FACES + "/facial_part_eye_soft_closed_down.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/shape_faces/facial_part_eye_side_glance.png": {
-		"path": SHAPE_FACES + "/facial_part_eye_side_glance.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/shape_faces/facial_part_eye_tired.png": {
-		"path": SHAPE_FACES + "/facial_part_eye_tired.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
 	"/shape_faces/facial_part_eye_wide.png": {
 		"path": SHAPE_FACES + "/facial_part_eye_wide.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/shape_faces/facial_part_eyebrow_soft.png": {
-		"path": SHAPE_FACES + "/facial_part_eyebrow_soft.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/shape_faces/facial_part_cheek_blush.png": {
-		"path": SHAPE_FACES + "/facial_part_cheek_blush.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/shape_faces/facial_part_bag.png": {
-		"path": SHAPE_FACES + "/facial_part_bag.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
@@ -296,18 +256,8 @@ const ASSETS: Dictionary = {
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
-	"/shape_faces/facial_part_drool.png": {
-		"path": SHAPE_FACES + "/facial_part_drool.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
 	"/shape_faces/facial_part_eye_money.png": {
 		"path": SHAPE_FACES + "/facial_part_eye_money.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/shape_faces/facial_part_money_tongue.png": {
-		"path": SHAPE_FACES + "/facial_part_money_tongue.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
@@ -316,8 +266,8 @@ const ASSETS: Dictionary = {
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
-	"/shape_faces/facial_part_tear_pool.png": {
-		"path": SHAPE_FACES + "/facial_part_tear_pool.png",
+	"/shape_faces/facial_part_eye_teary.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_teary.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},

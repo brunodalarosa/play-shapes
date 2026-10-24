@@ -27,20 +27,9 @@ const SCALE = 8;
 const NAVY = [0x3d, 0x46, 0x5d];
 const WHITE = [255, 255, 255];
 const TONGUE_PINK = [0xf4, 0x7d, 0xa8];
-const WATER_BLUE = [0x75, 0xcb, 0xee];
-const GOLD = [0xff, 0xd1, 0x66];
-const MONEY_GREEN = [0x7f, 0xd7, 0x8b];
+// Every part is navy and white except the tongue.
 const PART_PALETTES = {
-  facial_part_tongue: [NAVY, TONGUE_PINK],
-  facial_part_eye_heart: [NAVY, TONGUE_PINK],
-  facial_part_eye_star: [NAVY, GOLD],
-  facial_part_tear_drop: [NAVY, WATER_BLUE, WHITE],
-  facial_part_sleep_bubble: [NAVY, WATER_BLUE, WHITE],
-  facial_part_drool: [NAVY, WATER_BLUE, WHITE],
-  facial_part_money_tongue: [NAVY, MONEY_GREEN],
-  facial_part_tear_stream: [NAVY, WATER_BLUE, WHITE],
-  facial_part_tear_pool: [NAVY, WATER_BLUE, WHITE],
-  facial_part_halo: [NAVY, GOLD, WHITE],
+  facial_part_tongue: [TONGUE_PINK],
 };
 // The owner's twelve faces, named for their emoji counterparts; each has a reference image.
 const ORIGINALS = [

@@ -18,17 +18,17 @@ preset uses the navy smirk part like every other face.
 ## Vector masters
 
 `vector/` holds one SVG master per part, in the source's pixel units and canvas: the
-fourteen supplied parts, `facial_part_eye_x`, and forty parts for emoji expressions. They
-use the same construction, with navy and white as the base palette:
+fourteen supplied parts, `facial_part_eye_x`, and twenty-nine parts drawn for the emoji
+expressions. They all use the supplied parts' construction, in navy and white:
 
 - circles for the eyes' whites and pupils;
 - strokes with round caps for the closed eyes, the smile, the frown, the smirk and the X-eye;
 - rounded polygons for the eyebrows and the eye wing: a filled path with a round-joined stroke;
 - a rounded bar with two concave edges for the angry mouth, cut by a mask of two circles.
 
-Coloured accents use pink `#F47DA8` for tongues and hearts, blue `#75CBEE` for tears, sweat,
-drool and the sleep bubble, gold `#FFD166` for stars and the halo, and green `#7FD78B` for
-the money tongue. Navy outlines keep them readable against character colours.
+The only other colour is the tongue's pink `#F47DA8`, which always hangs from a navy mouth.
+Tears, sweat, drool, the sleep bubble and the halo are white, so they read on every character
+colour without an outline.
 
 The original shapes were fitted to their source pixels; drawn at 1× they match their sources
 within one source pixel. The half eyes and the winged eye are whole circles that their canvas
@@ -132,28 +132,31 @@ and `emoji_reference` metadata:
 | 🥹 | `face_holding_back_tears` | Drawn |
 | 😇 | `face_halo` | Drawn |
 
-The emoji presets use round strokes and layered construction, with the accent colours above.
-Their new parts have editable SVG masters; there are no supplied raster references for them.
-`source_size` is their design canvas. Existing gameplay assignments still use the original IDs.
+## Drawing a new face
 
-Closed eyes, X-eyes, spirals, hearts, stars and dollar signs retain their shape during blinks.
-Sunglasses stay fixed too. Decorations are independent layers: tears, sweat, drool, pooled
-tears, sleep marks and the halo retain their placement while open eyes close. Side glances
-keep both pupils looking the same way; dollar signs share one reading direction.
+The drawn presets follow the measurements of the originals, so every face reads as one set:
 
-Blush uses short navy strokes. Glossy eyes use white highlights; beaming and grimacing mouths
-use white teeth within navy outlines. The halo can sit above the face box, floating over the
-character's body; review captions leave room for it.
+- Eyes are 40 pixels across, their centres 60 pixels apart on one eye line. An open eye is a
+  white circle with a navy pupil 24 pixels across; other eyes change the pupil or cut the
+  circle, never the size.
+- Lines are 8 pixels with round caps, as in the supplied smile, frown and closed eyes. Nothing
+  is drawn thinner than 6 pixels, and there are no outlines, hatching or small sparkles.
+- Mouths are about 32 pixels wide, centred 31 pixels below the eye line. Open mouths are filled
+  navy shapes; teeth are white bars inside them, or a whole white mouth.
+- Brows are the supplied slabs, `eyebrow_a` or `eyebrow_d`, level or turned up to 15° at the
+  inner end.
 
-The reusable tongue has a broad pink fill, a navy outline, a soft rounded tip and a short
-curved crease. It projects past the mouth; turning it upward at the smile's corner makes
-the lip-licking pose. It is a separate layer from the mouth and eyes, so it retains its
-placement during blinks.
+Each preset's box is the ink of its eyes, brows and mouth. Tears, sweat, drool, the sleep marks
+and the halo sit beside or above the box and do not enlarge it, so they do not shrink the face.
+
+Closed eyes, X-eyes, squeezed eyes, spirals, hearts, stars and dollar signs keep their shape
+during blinks, and so do sunglasses. Decorations and the tongue are layers of their own and
+keep their place while open eyes close. Dollar signs share one reading direction.
 
 ## Export and verification
 
-The construction scripts that fitted the shapes and the presets are one-time and stay in
-ignored `scratch/`; edit the SVG masters directly. From the repository root, after
+The construction scripts that fitted the shapes and laid out the presets are one-time and stay
+in ignored `scratch/`; edit the SVG masters and the manifest directly. From the repository root, after
 `node tools/setup.mjs`:
 
 ```powershell
@@ -172,7 +175,8 @@ needs owner review. The script writes
   pixel in the other image, so that colour's edge is more than a pixel away;
 - the X-eye differs from either of `face_dizzy`'s eyes;
 - any 8× PNG has a partly covered or blended pixel that touches no clear pixel or fully solid
-  colour from its declared part palette, which a blurred edge would have;
+  colour from its part palette, navy and white or the tongue's pink, which a blurred edge
+  would have;
 - the manifest and the masters disagree.
 
 `tests/shape_faces_test.gd` checks that the runtime PNGs and manifest are the ones the script

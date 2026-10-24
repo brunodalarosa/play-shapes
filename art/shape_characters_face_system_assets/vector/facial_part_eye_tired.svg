@@ -1,3 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="42" height="30" viewBox="-1 -1 42 30">
-  <defs><clipPath id="eye"><path d="M3 10 H37 Q36 25 20 25 Q4 25 3 10 Z"/></clipPath></defs><path d="M3 10 H37 Q36 25 20 25 Q4 25 3 10 Z" fill="#ffffff"/><circle cx="20" cy="17" r="8" fill="#3d465d" clip-path="url(#eye)"/><path d="M3 10 H37" fill="none" stroke="#3d465d" stroke-width="7" stroke-linecap="round"/>
-</svg>

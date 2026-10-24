@@ -123,13 +123,21 @@ test("emoji presets compose on the phone and keep shut eyes during blinks", () =
   assert.equal(wink[1].part, "facial_part_eye_closed_up");
   const tired = faceLayers(manifest, "face_exhausted", true);
   assert.equal(tired[0].part, "facial_part_eye_closed_down");
-  assert.equal(tired[2].part, "facial_part_bag");
-  assert.equal(tired[3].part, "facial_part_bag");
+  assert.equal(tired[2].part, "facial_part_eyebrow_a");
+  assert.equal(tired[3].part, "facial_part_eyebrow_a");
   assert.equal(faceLayers(manifest, "face_spiral_eyes", true)[0].part, "facial_part_eye_spiral");
   assert.equal(faceLayers(manifest, "face_dizzy", true)[0].part, "facial_part_eye_x");
   const pleading = faceLayers(manifest, "face_pleading", true);
   assert.equal(pleading[0].part, "facial_part_eye_closed_down");
   assert.equal(pleading[4].part, "facial_part_mouth_sad");
+  assert.equal(
+    faceLayers(manifest, "face_holding_back_tears", false)[0].part,
+    "facial_part_eye_teary",
+  );
+  assert.equal(
+    faceLayers(manifest, "face_holding_back_tears", true)[0].part,
+    "facial_part_eye_closed_down",
+  );
   const woozy = faceLayers(manifest, "face_woozy", false);
   assert.notEqual(woozy[0].part, woozy[1].part);
   assert.notEqual(woozy[0].center[1], woozy[1].center[1]);
@@ -159,12 +167,11 @@ test("emoji presets compose on the phone and keep shut eyes during blinks", () =
     face_sad_relieved: ["facial_part_tear_drop", 1],
     face_sleepy: ["facial_part_sleep_bubble", 1],
     face_sleeping: ["facial_part_sleep_z", 1],
-    face_drooling: ["facial_part_drool", 1],
+    face_drooling: ["facial_part_tear_drop", 1],
     face_downcast_sweat: ["facial_part_tear_drop", 1],
-    face_money_mouth: ["facial_part_money_tongue", 1],
+    face_money_mouth: ["facial_part_tongue", 1],
     face_crying: ["facial_part_tear_drop", 1],
     face_loudly_crying: ["facial_part_tear_stream", 2],
-    face_holding_back_tears: ["facial_part_tear_pool", 2],
     face_halo: ["facial_part_halo", 1],
   };
   for (const [name, [part, count]] of Object.entries(decorations)) {
