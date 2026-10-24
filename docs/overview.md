@@ -23,7 +23,7 @@ repository.
 - The live 3D Cubio is the character in phone setup and the Ready screen. Minigame 004
   uses the same model on the shared screen and on the phone.
 - F12 opens the debug menu: the one-real-player scenario for Bubbles and jellyfishes 3D, the
-  Gyroscope and Accelerometer Lab, and the Tilt Shift 3D factory with
+  Shape Characters lab, the Gyroscope and Accelerometer Lab, and the Tilt Shift 3D factory with
   explicitly simulated controls. The factory review creates ten synthetic players without
   registering phones.
   Bubbles and jellyfishes 3D labels its debug round on the host and the phone.

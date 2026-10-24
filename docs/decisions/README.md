@@ -79,3 +79,4 @@ What was decided.
 | [0040](0040-cubio-live-previews.md) | Cubio uses one animated model in gameplay and setup |
 | [0041](0041-rooftop-logo-sign.md) | The logo is a 3D sign on the café roof, and the billboard shows only the QR |
 | [0042](0042-plaza-lobby-jolt-plane.md) | The Playground lobby simulates its characters on Jolt with plane-locked bodies |
+| [0043](0043-cubio-shape-face.md) | Cubio's face is the shape face system, drawn on an anchor in the model |

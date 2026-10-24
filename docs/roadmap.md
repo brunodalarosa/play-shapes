@@ -85,6 +85,10 @@ each player shown as their own coloured paddle built in code
 ([0036](decisions/0036-tilt-shift-3d-generated-paddle.md)) and carrying a part-composed,
 expressive face ([0037](decisions/0037-shape-face-system.md)), in a full-width toy factory.
 
+Cubio wears the same shape face, drawn on an anchor in its model on host and phone
+([0043](decisions/0043-cubio-shape-face.md)). The F12 Shape Characters lab reviews colours,
+clips and faces and saves the face's default placement.
+
 Each phone shows the player's own paddle in 3D. 005 has its own workshop tab and F12 review, and
 launches through a catalog session script ([0039](decisions/0039-minigame-session-scripts.md)).
 It awaits physical-phone checks and the owner's play review; tuning values are provisional. See

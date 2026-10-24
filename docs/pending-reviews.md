@@ -222,6 +222,15 @@ device.
   lab panel and error panel. Tests cover their content; no
   one has looked at them on a screen since their strings were last rebuilt.
 
+## Shape Characters lab and Cubio's shape face
+
+- `[HUMAN-PLAY]` The lab: turning, colours, clip controls and speed, and the face controls.
+  Choose the face's default placement and scale there and save it.
+- `[HUMAN-PLAY]` Cubio's shape face at lobby, Bubbles and Ready-screen distances, replacing
+  the painted face.
+- `[PHYSICAL-PHONE]` The shape face on the phone's setup preview and Bubbles view, its blinks,
+  and its first download on a slow network.
+
 ## Tooling on other platforms
 
 - `[AUTO]` `node tools/setup.mjs` and `node tools/check.mjs` on macOS and Linux. Only Windows
@@ -230,8 +239,8 @@ device.
 
 ## Cubio character and live previews
 
-- Owner visual approval of the two-metre cube, small bevel, existing floating limbs and
-  retained face, at lobby and Bubbles gameplay distances and in the live Ready-screen tray.
+- Owner visual approval of the two-metre cube, small bevel and existing floating limbs, at
+  lobby and Bubbles gameplay distances and in the live Ready-screen tray.
   Source renders are in [the Cubio folder](../art/cubio/README.md).
 - `[HUMAN-PLAY]` Existing idle, walk, run, look-up, crouch and lever-pull motion on the deeper
   body, plus lobby movement, jumps and readability with ten players.

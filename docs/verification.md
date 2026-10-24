@@ -258,6 +258,9 @@ start only what they need, so they stay fast.
 - Test clients explicitly trust only their fixture certificate. They never disable
   verification.
 - Motion input: `tests/motion_input_channel_test.gd` and `web/tests/motion_input.test.mjs`.
+- Shape Characters lab: `tests/shape_characters_lab_test.gd` checks the 3:1 layout, turning,
+  colours, one-pass clips and their controls, and the face controls, saving to a test file.
+  `tests/shape_face_anchor_test.gd` and `tests/cubio_3d_test.gd` cover the face placement.
 - Motion lab: `tests/motion_lab_test.gd`, `tests/motion_input_channel_test.gd`,
   `tests/debug_launcher_test.gd`, `web/tests/motion_lab_host.test.mjs` and
   `web/tests/motion_lab_controller.test.mjs`.
