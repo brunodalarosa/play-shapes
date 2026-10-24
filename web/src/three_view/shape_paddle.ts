@@ -1,18 +1,7 @@
-import {
-  BufferGeometry,
-  DoubleSide,
-  Float32BufferAttribute,
-  Group,
-  Mesh,
-  MeshBasicMaterial,
-  MeshStandardMaterial,
-  PlaneGeometry,
-  SRGBColorSpace,
-  TextureLoader,
-  type Texture,
-} from "three";
+import { BufferGeometry, Float32BufferAttribute, Group, Mesh, MeshStandardMaterial } from "three";
 import { roundedOutline, CORNER_SEGMENTS } from "../shape_paddle/rounded_bar.js";
 import { FACE_BASE, type FaceLayer, type FaceManifest } from "../shape_paddle/face.js";
+import { ShapeFace3D } from "./shape_face.js";
 import type { PaddleShape } from "../shape_paddle/paddle.js";
 
 /** The bar's mesh, as the host builds it: flat faces front and back, a wall that follows it. */
@@ -74,30 +63,6 @@ export function roundedBarGeometry(
   return geometry;
 }
 
-const textures = new Map<string, Promise<Texture>>();
-const loader = new TextureLoader();
-/** Loads finish one at a time, so many phones starting together stay within the host's limit. */
-let queue: Promise<unknown> = Promise.resolve();
-const RETRY_MSEC = 1000;
-
-function partTexture(manifest: FaceManifest, part: string, base: string): Promise<Texture> {
-  let texture = textures.get(part);
-  if (!texture) {
-    const url = base + manifest.parts[part].file;
-    const load = (): Promise<Texture> => loader.loadAsync(url);
-    texture = queue
-      .then(load)
-      .catch(() => new Promise<void>((done) => setTimeout(done, RETRY_MSEC)).then(load))
-      .then((loaded) => {
-        loaded.colorSpace = SRGBColorSpace;
-        return loaded;
-      });
-    queue = texture.catch(() => undefined);
-    textures.set(part, texture);
-  }
-  return texture;
-}
-
 /**
  * A shape paddle in 3D: the outline and gap rings, the body and a face of flat parts on its
  * front. One unit of its measurements is one world unit.
@@ -107,20 +72,13 @@ export class ShapePaddle3D {
   private readonly body = new MeshStandardMaterial({ roughness: 0.65 });
   private readonly gap = new MeshStandardMaterial({ roughness: 0.8 });
   private readonly outline = new MeshStandardMaterial({ roughness: 0.7 });
-  private readonly face = new Group();
-  private readonly plane = new PlaneGeometry(1, 1);
-  private readonly materials = new Map<string, MeshBasicMaterial>();
+  private readonly face: ShapeFace3D;
   private meshes: Mesh[] = [];
   private shapeKey = "";
-  private faceKey = "";
-  private pending = 0;
-  private arrived = false;
 
-  constructor(
-    private readonly manifest: FaceManifest,
-    private readonly base = FACE_BASE,
-  ) {
-    this.root.add(this.face);
+  constructor(manifest: FaceManifest, base = FACE_BASE) {
+    this.face = new ShapeFace3D(manifest, base);
+    this.root.add(this.face.root);
   }
 
   /** Rebuilds the meshes when the size or look changes, and repaints. */
@@ -154,61 +112,22 @@ export class ShapePaddle3D {
         new Mesh(roundedBarGeometry(length, thickness, depth, radius), this.body),
       ];
       this.root.add(...this.meshes);
-      this.face.position.z = depth / 2 + 0.004 * thickness;
+      this.face.root.position.z = depth / 2 + 0.004 * thickness;
     }
     this.body.color.set(`#${shape.body}`);
     this.gap.color.set(`#${look.gap_color}`);
     this.outline.color.set(`#${shape.outline}`);
-    this.setFace(layers, thickness * look.face_ratio);
-  }
-
-  private setFace(layers: FaceLayer[], height: number): void {
-    const key = JSON.stringify([layers, height]);
-    if (key === this.faceKey) return;
-    this.faceKey = key;
-    this.face.clear();
-    layers.forEach((layer, index) => {
-      const mesh = new Mesh(this.plane, this.material(layer.part));
-      mesh.scale.set(layer.size[0] * height * (layer.mirror ? -1 : 1), layer.size[1] * height, 1);
-      mesh.position.set(layer.center[0] * height, -layer.center[1] * height, index * 0.0015);
-      // The manifest turns clockwise on screen, a negative turn about +Z.
-      mesh.rotation.z = (-layer.rotation_degrees * Math.PI) / 180;
-      mesh.renderOrder = 10 + index;
-      this.face.add(mesh);
-    });
-  }
-
-  private material(part: string): MeshBasicMaterial {
-    let material = this.materials.get(part);
-    if (!material) {
-      material = new MeshBasicMaterial({ transparent: true, depthWrite: false, side: DoubleSide });
-      const created = material;
-      this.pending++;
-      partTexture(this.manifest, part, this.base)
-        .then(
-          (texture) => {
-            created.map = texture;
-            created.needsUpdate = true;
-          },
-          () => textures.delete(part),
-        )
-        .finally(() => this.pending--);
-      this.materials.set(part, material);
-    }
-    return material;
+    this.face.set(layers, thickness * look.face_ratio);
   }
 
   /** True while a face part is still loading, or just arrived and is not yet drawn. */
   loading(): boolean {
-    const waiting = this.pending > 0 || this.arrived;
-    this.arrived = this.pending > 0;
-    return waiting;
+    return this.face.loading();
   }
 
   dispose(): void {
     for (const mesh of this.meshes) mesh.geometry.dispose();
-    this.plane.dispose();
-    for (const material of [this.body, this.gap, this.outline, ...this.materials.values()])
-      material.dispose();
+    this.face.dispose();
+    for (const material of [this.body, this.gap, this.outline]) material.dispose();
   }
 }
