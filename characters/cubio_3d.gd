@@ -22,7 +22,7 @@ const TINTED_MESHES: Array[String] = ["Body", "HandL", "HandR", "FootL", "FootR"
 const TINT_SHADER: Shader = preload("res://characters/cubio_tint.gdshader")
 const FACE_ANCHOR_PATH := "res://assets/runtime/animated_characters/cubio/face_anchor.json"
 ## The face a Cubio shows when nothing else is asked of it.
-const DEFAULT_FACE := "face_neutral"
+const DEFAULT_FACE := "face_a"
 
 static var _tints: Dictionary = { }
 static var _prepared_libraries: Dictionary = { }

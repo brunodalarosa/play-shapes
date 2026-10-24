@@ -177,7 +177,7 @@ These live outside any minigame folder so later 3D scenes can use them.
   travel and a nameplate.
   - The face is a `ShapeFace3D` on the model's `FaceAnchor`, placed by
     `assets/runtime/animated_characters/cubio/face_anchor.json` and driven by a
-    `ShapeFaceExpressions` that shows `face_neutral` and blinks.
+    `ShapeFaceExpressions` that shows `face_a` and blinks.
   - Its tint shader and the face's parts draw the character in front of any
     scenery within `front_push` (2 units) of it. Each vertex moves toward the camera along
     its view ray, so its place on screen and the character's own layering are unchanged.

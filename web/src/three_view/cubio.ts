@@ -5,7 +5,7 @@ import { ShapeFace3D } from "./shape_face.js";
 
 const TINTED = ["Body", "HandL", "HandR", "FootL", "FootR"];
 /** The face a Cubio shows, as on the host. */
-const FACE = "face_neutral";
+const FACE = "face_a";
 
 /** Where the face sits on the model's FaceAnchor, in source units, X right and Y up. */
 export interface FaceAnchor {
