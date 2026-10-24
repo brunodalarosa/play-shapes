@@ -28,7 +28,7 @@ player ID is rejected. The raw sample/status schema is shared with the lab.
 - `motion_status`: current subscription, capture/network diagnostics and transmission rate.
   At most five accepted status messages/s; the browser normally sends about four/s.
 - `motion_calibrate`: `type` and current `subscription_id`. At most five requests/s.
-  Mapped Tilt Shift rounds additionally require current `generation` and `round_token`.
+  Mapped Tilt Shift 3D rounds additionally require current `generation` and `round_token`.
   The host chooses its latest usable orientation; active calibration is rejected.
 - `motion_control_state`: host feedback with current subscription and `control_state`,
   containing `calibrated`, `usable` and `capture_state`. Calibration replies also contain
@@ -37,8 +37,8 @@ player ID is rejected. The raw sample/status schema is shared with the lab.
 
 Samples are accepted no faster than every 34 ms; the raw transport stale threshold is
 1000 ms. Latest-only burst handling and browser backpressure avoid catch-up replay.
-Capture failure states and Tilt Shift's shorter continuity gap are documented in
-[motion-input.md](motion-input.md#tilt-shift-control).
+Capture failure states and Tilt Shift 3D's shorter continuity gap are documented in
+[motion-input.md](motion-input.md#tilt-shift-3d-control).
 
 ## Defaults
 
@@ -72,16 +72,17 @@ Local overrides and HTTPS are in [networking.md](networking.md#local-network-con
 The host serves a fixed list and nothing else:
 
 - Pages and styles: `/`, `/style.css`, `/session.json`.
-- The phone client: `/app.js`, one script that holds every module
+- The phone client: `/app.js`, one script that holds every module except the 3D view, and
+  `/three_view.js`, which `/app.js` loads only when a 3D screen starts
   ([browser-build.md](browser-build.md)).
 - Generated settings: `/platform_input_settings.json`.
 - App manifest and icons: `/manifest.webmanifest`, `/app-icon-180.png`, `/app-icon-192.png`,
   `/app-icon-512.png`.
-- Character sheets: `/squircle-v1/manifest.json`, `/squircle-v1/idle-front-colorable.png`,
-  `/squircle-v1/idle-front-neutral.png`, `/squircle-v1/idle-front-blink.png`.
-- Bubbles art: `/bubbles-jellyfish.png`, `/bubbles-phone-background.png`.
-- Tilt Shift art: `/tilt-shift/manifest.json`, `/tilt-shift/paddle_orange.png`,
-  `/tilt-shift/paddle_blue.png` and `/tilt-shift/paddle_neutral.png`.
+- 3D models for the phone: `/models/cubio.glb`, `/models/jellyfish.glb`,
+  `/models/cubio-face-neutral.png` and `/models/cubio-face-blink.png`.
+- Shape character faces: `/shape_faces/face_presets.json` and one
+  `/shape_faces/facial_part_<name>.png` per part the manifest lists, from the shared runtime
+  folder.
 
 Responses:
 
@@ -96,13 +97,13 @@ Responses:
 Protocol 1 begins with `hello` and `welcome`. It then supports join, resume, leave, and
 personalized lobby and gameplay state.
 
-- Before join, the phone shows Squircle color selection, then name entry.
-- `join` submits `name`, `character_shape: "squircle"` and `character_color` together.
-- The host accepts missing and legacy body-shape values as Squircle, rejects unknown
+- Before join, the phone shows Cubio color selection, then name entry.
+- `join` submits `name`, `character_shape: "cubio"` and `character_color` together.
+- The host accepts missing and legacy body-shape values as Cubio, rejects unknown
   body-shape values, and validates the ten approved player colors.
-- A join with no style uses Squircle and the `#598DF2` blue fallback. A valid color without a
+- A join with no style uses Cubio and the `#598DF2` blue fallback. A valid color without a
   shape keeps that color.
-- The registry stores Squircle. Lobby rosters, Bubbles snapshots and resume state carry it
+- The registry stores Cubio. Lobby rosters, gameplay snapshots and resume state carry it
   forward.
 
 The registry keeps four identities apart:
@@ -127,10 +128,11 @@ increasing gameplay sequence it needs to resume safely.
 
 ## Character appearance
 
-- The lobby uses the Squircle v1 movement clips. Setup and Bubbles use its front idle clip.
-- The Squircle v1 tint colors its body, hands and feet. The neutral and blink faces stay
+- The lobby, Bubbles and jellyfishes 3D, setup and the Ready screen use the same exported
+  3D Cubio. Joins send `character_shape: "cubio"`, the only accepted body.
+- The player tint colors the body, hands and feet. The neutral and blink faces stay
   untinted.
-- The colorable layer uses the same tint treatment on host and phone.
+- The host and phone render the same rig and preserve the original face artwork.
 
 ## Ready-up
 
@@ -144,66 +146,75 @@ During ready-up, a registered phone sends `{"type":"pre_minigame_ready","ready":
 - Disconnect and resume clear the ready state.
 - Host cancel restores the lobby state on connected phones.
 
-## Tilt Shift state
+## Tilt Shift 3D
 
-Every normal Tilt Shift launch uses the shared all-player Pre-minigame gate before freezing
+Every normal Tilt Shift 3D launch uses the shared all-player Pre-minigame gate before freezing
 an even roster and opening the factory. Its round controller owns subsequent selected-player
-readiness. Sensor status and samples use the existing
-authenticated subscriptions.
+readiness. Sensor status and samples use the authenticated motion subscriptions. On the
+Pre-minigame screen, the readiness snapshot's `preparation` adds the player's `color`, the
+`face` to show and the paddle's `look`, with `paddle_size` taken from the first round's layout.
 
-`tilt_shift_snapshot` carries generation, increasing sequence, phase, round, team,
-accepted angle in radians, owned paddle IDs and physical paddle length/thickness.
+`tilt_shift_3d_snapshot` carries generation, increasing sequence, phase, round, team,
+owned paddle IDs and physical paddle length and thickness (`paddle_size` in arena widths, also
+for spectators, whose phones show their paddle resting under the waiting background), plus:
+
+- `color`: the player's Cubio colour as six hex digits.
+- `face`: the face preset the phone shows, the strongest across the player's paddles.
+- `look`: the corner, depth, gap, outline and face ratios, the gap colour, the orange, blue
+  and neutral outline colours and the wall's two colours.
+- `angle_radians`: the physical angle of the player's first paddle, which trails the accepted
+  angle under the turning limit; zero for spectators.
+
 Mapped snapshots also carry `round_token`, `selected`, `ready`, `ready_available`,
-`calibration_available`, `calibrated`, `usable` and `landscape`. Phases include `preparing`, `countdown`,
-`start`, `active`, `between_rounds` and `finished`. Spectators have empty owned IDs and
-show a team waiting visual with no paddle guide. Selected phones show one guide.
+`calibration_available`, `calibrated`, `usable` and `landscape`. Phases include `preparing`,
+`countdown`, `start`, `active`, `between_rounds` and `finished`. No client-authored angle,
+team, assignment or score message is accepted. Obsolete snapshot generations or sequences
+cannot replace the current phone view.
 
-No client-authored
-angle, team, assignment or score message is accepted. Obsolete snapshot generations
-or sequences cannot replace the current phone view.
+`tilt_shift_3d_ready` carries `type`, current `generation`, `round_token` and Boolean `ready`.
+The connection supplies identity. Only selected players in a visible ready panel can change
+readiness. Fresh usable calibration and landscape are required; recalibration, disconnection,
+portrait or stale capture clears READY. A stale or invalid READY is dropped without an error,
+and the sender gets its current snapshot back. Countdown start is final even if a player then
+disconnects. The panel timeout runs once from opening; force start is a local host action, not
+a message.
 
-`tilt_shift_ready` carries exactly `type`, current `generation`, `round_token` and Boolean
-`ready`. The connection supplies identity. Only selected players in a visible ready panel
-can change readiness. Fresh usable calibration and landscape are required; recalibration,
-disconnection, portrait or stale capture clears READY. Countdown start is final even if a
-player then disconnects.
-The panel timeout runs once from opening; force start is a local host action, not a message.
-
-Angle updates coalesce to the latest state at the selected flow ceiling, 15 Hz by default.
-Queued socket output skips that update rather than accumulating a backlog. Round and
-resume transitions send current state immediately. Calibration is available before and
-between active rounds, including countdown and START; it is locked during scoring.
-Reconnect preserves neutral and does not recover unseen complete turns.
+Angle updates and face changes coalesce to the latest state at the selected flow ceiling, 15 Hz
+by default. Queued socket output skips that update rather than accumulating a backlog. Round
+and resume transitions send current state immediately. Calibration is available before and
+between active rounds, including countdown and START; it is locked during scoring. Reconnect
+preserves neutral and does not recover unseen complete turns.
 
 `landscape` is derived from the authenticated motion sample's `screen_angle`: either
-quarter-turn display orientation qualifies. It is included in existing Tilt Shift preparation,
+quarter-turn display orientation qualifies. It is included in Tilt Shift 3D preparation,
 control feedback and gameplay snapshots. It does not change capture `usable` or paddle angles.
 
-## Bubbles input
+## Bubbles and jellyfishes 3D
 
-While a touch is held, the browser may send `bubbles_charge` with `input_seq` and `stage`:
+Minigame 004 uses messages with a `bubbles_3d` prefix and has no spin or charge. Every client
+WebSocket packet is bounded to 8192 bytes. The phone sends:
 
-- `start`, `progress` and `cancel` carry an integer `step` from 0 to 4.
-- `motion` carries a two-axis quantized `drag` vector of integers from -4 to 4.
-- The browser throttles motion to 70 ms, sends a 600 ms heartbeat while held, and caps a
-  gesture at 48 motion packets.
-
-On touch release, the browser sends one `bubbles_trace` with the same gesture sequence. It
-holds at most 128 normalized points, under an 8192-byte packet ceiling.
+- `bubbles_3d_touch` with `input_seq` and `stage`: `start` on touch down, `drag` with a coarse
+  `drag` of two integers from -4 to 4 in screen axes, and `cancel` when a touch is interrupted.
+  The phone throttles drags to 70 ms, re-sends the current one every 600 ms while held and caps
+  a touch at 48 drags.
+- `bubbles_3d_release` with the same `input_seq` and `displacement`, the net movement as two
+  numbers from -1 to 1, a share of the touch area in screen axes.
 
 The host side:
 
-- For the current authenticated touch sequence, the host accepts four coarse charge steps plus
-  up to 48 quantized drag updates, spaced at least 60 ms apart.
-- Charge and drag drive only transient shared-screen deformation and glow. They reset after
-  1.2 seconds without updates.
-- The host records touch start. Live drag stretch settles once `swipe_max_hold_seconds`
-  passes, and a late swipe applies no impulse.
-- Completed spins use the gesture classifier and its cooldown.
-- The host replies to a trace with `bubbles_trace_result` and a `bubbles_snapshot`.
-  `bubbles_feedback` carries collection, spin and pop cues.
-- Disconnect clears an unfinished trace. Resume requires a new gesture.
-- Reconnect embeds the latest personalized snapshot in `welcome.gameplay`.
+- The host times a touch from its own receipt of `start`. A release later than
+  `swipe_max_hold_seconds` applies nothing, and the live stretch settles at that limit.
+- A release shorter than `swipe_min_distance` applies nothing. Otherwise one fixed-strength
+  push follows its direction; distance and speed add no strength.
+- Drags at least 60 ms apart, at most 48 per touch, drive only the shared-screen stretch, which
+  settles after 1.2 seconds without one.
+- The host answers a release with `bubbles_3d_release_result` (`action` and `reason`) and a
+  `bubbles_3d_snapshot`. `bubbles_3d_feedback` adds `event` (`captured` or `pop`) and, for a
+  pop, `lost`.
+- `bubbles_3d_visual` carries the drawn radius, shell stretch, speed share, invulnerability, time
+  since the last pop and the drawn catch, at up to 20 Hz, dropped while a connection is backed up.
+- Reconnect embeds the latest snapshot in `welcome.gameplay`.
 
 ## Lobby platform input
 

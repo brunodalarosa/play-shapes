@@ -1,0 +1,77 @@
+{
+  "result": "PASS",
+  "blender_version": "5.2.2 LTS",
+  "library_sha256": {
+    "jellyfish/source/mushroom.glb": "9ba28f47de26738f31083e590180aba99568f4399de0ec271924f0b278bac997",
+    "jellyfish/source/Textures/colormap.png": "75baf74d9483a0fc56ac21ceba346fbe16fc24a2a1bf0524c53e6bbe802e1153",
+    "jellyfish/source/License.txt": "32a081c2035dd4db47d850c83244da048165f0e53d71c076b76c1afc0590bc7f"
+  },
+  "source_sha256": "97f1b83d4315789886f53ecf540305af4e5e13b76a6a1b37f24be75865860ddd",
+  "export_sha256": "696afbbc7d466767d3264609790b99d7296da759a2692426f272bbc4e009a8bd",
+  "export_bytes": 17636,
+  "triangles": 590,
+  "triangles_by_mesh": {
+    "Bell": 92,
+    "Eyes": 48,
+    "Tentacles": 450
+  },
+  "materials": {
+    "Bell": "#F48FB1",
+    "Bell Rim": "#F8BBD0",
+    "Tentacles": "#F07BA6",
+    "Eyes": "#151515"
+  },
+  "bounds_gltf": {
+    "minimum": [
+      -0.275,
+      -0.52811,
+      -0.30113
+    ],
+    "maximum": [
+      0.275,
+      0.1925,
+      0.30113
+    ]
+  },
+  "meshes_gltf": {
+    "Bell": {
+      "minimum": [
+        -0.275,
+        -0.1925,
+        -0.30113
+      ],
+      "maximum": [
+        0.275,
+        0.1925,
+        0.30113
+      ],
+      "triangles": 92
+    },
+    "Eyes": {
+      "minimum": [
+        -0.1213,
+        -0.0374,
+        -0.27867
+      ],
+      "maximum": [
+        0.12101,
+        0.0396,
+        -0.23015
+      ],
+      "triangles": 48
+    },
+    "Tentacles": {
+      "minimum": [
+        -0.25424,
+        -0.52811,
+        -0.07882
+      ],
+      "maximum": [
+        0.25424,
+        -0.15825,
+        0.08982
+      ],
+      "triangles": 450
+    }
+  }
+}

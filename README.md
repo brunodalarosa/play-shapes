@@ -4,8 +4,8 @@ Play Shapes is a local-network multiplayer party game. The Godot application
 runs the authoritative host on a PC, while players use their phones as web
 controllers.
 
-The lobby starts **002 — Bubbles and Jellyfishes**. The shared PC display shows
-the round; phones provide portrait touch controls.
+The lobby starts **004 — Bubbles and jellyfishes 3D** and **005 — Tilt Shift 3D**. The shared
+PC display shows the round; phones provide touch or motion controls.
 
 ## Requirements
 
@@ -45,7 +45,7 @@ Some tasks need more. The setup script reports these without failing:
 | Godot export templates matching the installed Godot | The standalone Windows build and `node tools/check.mjs --release` |
 | mkcert | Local HTTPS for motion input; `node tools/local_https.mjs download` fetches it, see [docs/local-https.md](docs/local-https.md) |
 | GitHub CLI (`gh`) | Pull requests from the terminal |
-| Python 3 with Pillow, GIMP 3, Blender | Regenerating art; see [art/bubbles/README.md](art/bubbles/README.md) and [art/squircle/README.md](art/squircle/README.md) |
+| Python 3 with Pillow, Blender | Regenerating art; see [art/cubio/README.md](art/cubio/README.md) and [art/bubbles_3d/README.md](art/bubbles_3d/README.md) |
 
 The vendored Godot MCP addon is disabled by default and is optional developer
 tooling; it is not required to launch or play the game.
@@ -68,7 +68,7 @@ tooling; it is not required to launch or play the game.
 
 The committed runtime assets are sufficient to run, edit, and test the game.
 Source-art regeneration is documented in
-`art/bubbles/README.md` and requires owner-provided originals.
+`art/cubio/README.md` and `art/bubbles_3d/README.md`.
 
 ## Start a local session
 
@@ -78,24 +78,24 @@ Source-art regeneration is documented in
 4. On each phone, scan the QR code or open the displayed URL. Phones must be
    on the same reachable network as the host; guest Wi-Fi, VPNs, and client
    isolation can prevent connections.
-5. Choose a Squircle color, select **Next**, enter a player name, then select **Enter Lobby**.
+5. Choose a Cubio color, select **Next**, enter a player name, then select **Enter Lobby**.
 
 The host uses HTTP port `8080` and WebSocket port `8081` by default. If those
 ports are already in use, stop the other host or change the values in
 `Tuning/Shared/Networking/Default.tres` before restarting Godot.
 
-## Test Bubbles with the debug flow
+## Test Bubbles and jellyfishes 3D with the debug flow
 
-The debug flow is for testing Bubbles with one real registered player.
+The debug flow is for testing Bubbles and jellyfishes 3D with one real registered player.
 It does not create simulated players.
 
 1. Start the project and connect exactly one phone to the lobby.
-2. Choose a Squircle color, enter a player name, and select **Enter Lobby**.
+2. Choose a Cubio color, enter a player name, and select **Enter Lobby**.
 3. On the PC, press **F12** to open the non-pausing debug launcher.
-4. Choose **One-player Bubbles and Jellyfishes**.
+4. Choose **One-player Bubbles and jellyfishes 3D**.
 5. Play from the phone while watching the shared PC display. The PC labels the
-   selected debug scenario; Bubbles also shows a one-player debug badge on the
-   phone and shared screen.
+   selected debug scenario; Bubbles and jellyfishes 3D also shows a one-player debug badge on
+   the phone and shared screen.
 6. Use **Restart current debug scenario** in the F12 launcher to restart with
    a fresh snapshot.
 7. Use **Return to lobby** when finished. This keeps the host services alive
@@ -111,17 +111,17 @@ registered. A browser connection by itself does not count as a player.
 2. Each player enters a name and chooses **Join game**.
 3. On the shared PC display, wait until at least two players appear in the
    roster.
-4. Choose **Bubbles and Jellyfishes** from the minigame
+4. Choose **Bubbles and jellyfishes 3D** from the minigame
    dropdown, then choose **Start selected minigame**. New-player admission
    closes for the round.
-5. Swipe to move and draw a circle, then release to spin; the
+5. Swipe on the phone to launch your bubble across the arena; the
    phone controller uses portrait orientation.
 6. At the results screen, use **Return to lobby** on the shared PC display to
    start another round. Existing players and LAN services stay
    connected.
 
 The host session holds **at most ten registered players**, matching the **2–10
-registered players** supported by Bubbles in normal play. The separate
+registered players** supported by Bubbles and jellyfishes 3D in normal play. The separate
 transport limit is 32 connections per service.
 
 The minigame works in Safari, but it currently plays best in Chrome. Chrome is
@@ -150,7 +150,7 @@ The generated files in `web/public/` are the files Godot serves to phones.
 
 - This is an early local-network prototype, not an internet-hosted service.
   The host PC and phones must be able to reach one another on the same LAN.
-- Bubbles is currently limited to 2–10 players in normal
+- Bubbles and jellyfishes 3D is currently limited to 2–10 players in normal
   play and one real player in its explicit debug flow. There is no
   matchmaking, queue, or remote multiplayer service.
 - Reconnecting players keep their registered seat during the configured
@@ -158,7 +158,7 @@ The generated files in `web/public/` are the files Godot serves to phones.
   the player must start a new gesture after reconnecting.
 - Safari is supported, but Chrome is the preferred browser. Phone-specific
   layout, orientation, and touch behavior still need broader device coverage.
-- Bubbles still needs its owner-led two-phone and game-feel review. No validation here
+- Minigames still need their owner-led phone and game-feel reviews. No validation here
   guarantees every phone, browser, Wi-Fi configuration, or accessibility
   setup. See [docs/pending-reviews.md](docs/pending-reviews.md) for what still
   needs a person, and [docs/networking.md](docs/networking.md) when a phone

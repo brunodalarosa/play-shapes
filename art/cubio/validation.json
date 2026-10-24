@@ -1,0 +1,283 @@
+{
+  "source": "cubio-animated.blend",
+  "checks": [
+    {
+      "name": "rest body is a two metre cube",
+      "passed": true,
+      "detail": [
+        2.0,
+        2.0,
+        2.0
+      ]
+    },
+    {
+      "name": "small uniform bevel",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Hand.L original dimensions",
+      "passed": true,
+      "detail": [
+        0.6000005006790161,
+        0.6000002026557922,
+        0.6000000238418579
+      ]
+    },
+    {
+      "name": "Hand.L applied scale",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Hand.R original dimensions",
+      "passed": true,
+      "detail": [
+        0.6000005006790161,
+        0.600000262260437,
+        0.6000000238418579
+      ]
+    },
+    {
+      "name": "Hand.R applied scale",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Foot.L original dimensions",
+      "passed": true,
+      "detail": [
+        0.7799994945526123,
+        0.9199991822242737,
+        0.38999998569488525
+      ]
+    },
+    {
+      "name": "Foot.L applied scale",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "Foot.R original dimensions",
+      "passed": true,
+      "detail": [
+        0.7799994945526123,
+        0.9199991822242737,
+        0.38999998569488525
+      ]
+    },
+    {
+      "name": "Foot.R applied scale",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "face follows the body at its front surface",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "idle loop seam",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "idle no body or limb surface intersections",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "idle soles stay above ground",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "walk loop seam",
+      "passed": true,
+      "detail": 1.5140622942303238e-17
+    },
+    {
+      "name": "walk no body or limb surface intersections",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "walk soles stay above ground",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "run loop seam",
+      "passed": true,
+      "detail": 1.5920407760118202e-17
+    },
+    {
+      "name": "run no body or limb surface intersections",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "run soles stay above ground",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "look_up sustained hold",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "look_up starts at idle neutral",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "look_up keeps both feet fixed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "look_up has no cyclic reset",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "look_up no body or limb surface intersections",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "look_up soles stay above ground",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "crouch sustained hold",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "crouch starts at idle neutral",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "crouch keeps both feet fixed",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "crouch has no cyclic reset",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "crouch no body or limb surface intersections",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "crouch soles stay above ground",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "lever_pull loop seam",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "lever_pull no body or limb surface intersections",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "lever_pull soles stay above ground",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "lever pull only moves the right hand",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "all six editable actions exist",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "five independent controls",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "neutral and blink artwork is packed and matches editable textures",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "ground anchor is fixed at the origin",
+      "passed": true,
+      "detail": null
+    }
+  ],
+  "clips": {
+    "idle": {
+      "frames": 48,
+      "fps": 24,
+      "playback": "loop",
+      "sampled_poses": 193,
+      "maximum_seam_error": 0.0,
+      "minimum_sole_z": 0.0,
+      "surface_intersections": []
+    },
+    "walk": {
+      "frames": 24,
+      "fps": 24,
+      "playback": "loop",
+      "sampled_poses": 97,
+      "maximum_seam_error": 1.5140622942303238e-17,
+      "minimum_sole_z": 0.0,
+      "surface_intersections": []
+    },
+    "run": {
+      "frames": 16,
+      "fps": 24,
+      "playback": "loop",
+      "sampled_poses": 65,
+      "maximum_seam_error": 1.5920407760118202e-17,
+      "minimum_sole_z": 0.0,
+      "surface_intersections": []
+    },
+    "look_up": {
+      "frames": 9,
+      "fps": 24,
+      "playback": "held",
+      "sampled_poses": 37,
+      "maximum_seam_error": 0.0,
+      "minimum_sole_z": 0.0,
+      "surface_intersections": []
+    },
+    "crouch": {
+      "frames": 9,
+      "fps": 24,
+      "playback": "held",
+      "sampled_poses": 37,
+      "maximum_seam_error": 0.0,
+      "minimum_sole_z": 0.0,
+      "surface_intersections": []
+    },
+    "lever_pull": {
+      "frames": 24,
+      "fps": 24,
+      "playback": "loop",
+      "sampled_poses": 97,
+      "maximum_seam_error": 0.0,
+      "minimum_sole_z": 0.0,
+      "surface_intersections": []
+    }
+  },
+  "source_sha256": "25e27448d74ee1c89858ec15e727519960db31ae27fad7be09e43403ff632681",
+  "passed": true
+}

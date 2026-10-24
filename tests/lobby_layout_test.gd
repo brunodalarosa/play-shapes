@@ -1,96 +1,114 @@
 extends TestScript
-## Structural checks for the FHD reference layout used at both 16:9 host sizes.
+## The lobby controls sit in one padded top-right panel at both 16:9 host sizes, and the
+## billboard carries the live join QR.
 
-const CANVAS := Vector2i(1920, 1080)
+const SIZES: Array[Vector2i] = [Vector2i(1920, 1080), Vector2i(1280, 720)]
+const MIN_PADDING := 24.0
+const SIGN_TOP_RIGHT := Vector3(3.7, 4.6, 0.0)
+const CONTROLS: Array[String] = [
+	"AddressPicker",
+	"Refresh",
+	"Copy",
+	"JoinAddress",
+	"Instructions",
+	"MinigameSelector",
+	"StartMinigame",
+	"StartHelp",
+]
 
 
 func _run() -> void:
+	for size: Vector2i in SIZES:
+		if not await _check_size(size):
+			return
+
+
+func _check_size(size: Vector2i) -> bool:
 	var viewport := SubViewport.new()
-	viewport.size = CANVAS
+	viewport.size = size
 	root.add_child(viewport)
 	var lobby := load("res://scenes/lobby.tscn").instantiate() as Control
 	viewport.add_child(lobby)
 	await process_frame
 	await process_frame
-	var panels := lobby.get_node("World/PanelBackings")
+	var canvas := Rect2(Vector2.ZERO, Vector2(size))
+	var panel := lobby.get_node("%ControlPanel") as Control
+	var area := panel.get_global_rect()
 	if not check(
-		panels.get_node("GreenBoard") is Sprite2D
-		and panels.get_node("MinigameCalendar") is Sprite2D
-		and panels.get_index() < lobby.get_node("World/CharactersFrontOfPanels").get_index(),
-		"Board and calendar are in front of the world and behind future characters",
+		canvas.encloses(area) and canvas.end.x - area.end.x >= MIN_PADDING
+		and area.position.y >= MIN_PADDING and area.position.x > canvas.size.x * 0.5
+		and area.end.y < canvas.size.y * 0.6,
+		"The control panel sits in the top-right corner, clear of the edges at %s" % size,
 	):
-		return
-	if not check(
-		lobby.get_node("World/CharactersFrontOfPanels").get_child_count() == 0,
-		"Future character layer remains empty",
-	):
-		return
+		return false
+	for name: String in CONTROLS:
+		var control := lobby.get_node("%" + name) as Control
+		if not check(
+			area.grow(1.0).encloses(control.get_global_rect()),
+			"%s is inside the control panel at %s" % [name, size],
+		):
+			return false
 	if not check(
 		lobby.find_child("PlayerRoster", true, false) == null
 		and lobby.find_child("PlayerSection", true, false) == null,
 		"No old roster panel remains",
 	):
-		return
+		return false
+
+	var world: LobbyPlaygroundWorld = lobby.world
+	var camera := world.camera
+	# The board's top edge in the model, above its own origin.
+	var billboard_top := camera.unproject_position(world.billboard.to_global(Vector3.UP * 11.0))
+	var roof := world.surface_named("Cafe").world_bounds()
+	var roof_end := camera.unproject_position(Vector3(roof.end.x, roof.end.y, 0.0))
+	# The logo sign's top corner nearest the panel.
+	var sign_corner := camera.unproject_position(world.logo_sign.to_global(SIGN_TOP_RIGHT))
+	var covers_landmark := (
+		area.has_point(billboard_top) or area.has_point(roof_end) or area.has_point(sign_corner)
+	)
 	if not check(
-		lobby.get_node("World/CharactersFrontOfPanels").z_index
-		> lobby.get_node("LiveControls").z_index
-		and lobby.get_node("World/Foreground").z_index
-		> lobby.get_node("World/CharactersFrontOfPanels").z_index,
-		"Characters draw over lobby controls and under the world foreground",
+		billboard_top.y > 0.0 and sign_corner.y > 0.0 and not covers_landmark,
+		"The panel leaves the billboard, the café roof and its logo sign in view at %s" % size,
 	):
-		return
-	for name: String in [
-		"Logo",
-		"JoinQR",
-		"JoinAddress",
-		"AddressPicker",
-		"Refresh",
-		"Copy",
-		"MinigameSelector",
-		"StartMinigame",
-		"StartHelp",
-	]:
-		var control := lobby.get_node("LiveControls/" + name) as Control
-		if not check(
-			Rect2(Vector2.ZERO, Vector2(CANVAS)).encloses(control.get_global_rect()),
-			"%s fits the FHD canvas" % name,
-		):
-			return
+		return false
+
 	var picker := lobby.get_node("%AddressPicker") as OptionButton
-	var instructions := lobby.get_node_or_null("%Instructions") as Label
-	if not check(instructions != null, "Join instructions resolve from the lobby script"):
-		return
+	var instructions := lobby.get_node("%Instructions") as Label
+	var join_address := lobby.get_node("%JoinAddress") as Label
 	if picker.item_count > 0:
-		var offers_scan: bool = instructions.text.contains("scan")
-		if not check(offers_scan, "Join instructions match the available QR"):
-			return
+		var offers_scan := instructions.text.contains("scan")
+		if not check(offers_scan, "Join instructions match the billboard QR"):
+			return false
 		if not check(
-			(lobby.get_node("%JoinQR") as QRCodeRect).data
-			== (lobby.get_node("%JoinAddress") as Label).text.to_utf8_buffer(),
-			"Displayed join URL supplies the live QR data",
+			world.billboard.is_showing_qr()
+			and world.billboard.qr.data == join_address.text.to_utf8_buffer(),
+			"The displayed join URL supplies the billboard's live QR",
 		):
-			return
+			return false
 		if not check(
 			not (lobby.get_node("%Copy") as Button).disabled,
 			"Detected LAN address keeps copy available",
 		):
-			return
+			return false
 		var selected_address := picker.get_item_text(picker.selected)
 		(lobby.get_node("%Refresh") as Button).pressed.emit()
 		if not check(
 			picker.get_item_text(picker.selected) == selected_address
-			and (lobby.get_node("%JoinAddress") as Label).text.contains(selected_address),
+			and join_address.text.contains(selected_address),
 			"Refreshing keeps the selected reachable address",
 		):
-			return
+			return false
 	elif not check(
-		(lobby.get_node("%Copy") as Button).disabled and instructions.text.contains("refresh"),
-		"No LAN address disables copy and explains refresh",
+		(lobby.get_node("%Copy") as Button).disabled
+		and instructions.text.contains("refresh") and not world.billboard.is_showing_qr(),
+		"No LAN address disables copy, hides the QR and explains refresh",
 	):
-		return
+		return false
 	if not check(
 		(lobby.get_node("%StartMinigame") as Button).disabled,
 		"Start is disabled before players join",
 	):
-		return
+		return false
 	viewport.queue_free()
+	await process_frame
+	return true

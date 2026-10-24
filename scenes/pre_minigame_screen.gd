@@ -2,15 +2,16 @@ class_name PreMinigameScreen
 extends Control
 ## One tabletop composition for every minigame content resource.
 
-const CHARACTER: PackedScene = preload("res://characters/squircle_v1_playback.tscn")
-
 var _content: PreMinigameContent
 var _preview: TextureRect
 var _title: Label
 var _controls: Label
 var _win: Label
 var _hints: Label
+var _booklet_scroll: ScrollContainer
+var _booklet_bar: VScrollBar
 var _tray: HBoxContainer
+var _characters: CubioPreview
 var _snapshot: Dictionary = { }
 
 
@@ -83,6 +84,7 @@ func set_snapshot(snapshot: Dictionary) -> void:
 	for child: Node in _tray.get_children():
 		child.queue_free()
 	var players: Array = snapshot.get("players", [])
+	_characters.set_players(players)
 	for player: Dictionary in players:
 		var slot := Control.new()
 		slot.custom_minimum_size = Vector2(171, 178)
@@ -93,21 +95,17 @@ func set_snapshot(snapshot: Dictionary) -> void:
 			26,
 			Color("#137541"),
 		)
-		ready.position = Vector2(0, 6)
-		ready.size = Vector2(171, 35)
 		ready.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		slot.add_child(ready)
-		var character := CHARACTER.instantiate() as SquircleV1Playback
-		character.position = Vector2(84, 105)
-		character.visual_scale = 0.38
-		character.player_color = Color(String(player.get("character_color", "#598DF2")))
-		character.play("idle", "front")
-		slot.add_child(character)
+		ready.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+		ready.offset_top = 6
+		ready.offset_bottom = 41
 		var name_label := _label(String(player.get("name", "")), 23, Color("#233e46"))
-		name_label.position = Vector2(0, 152)
-		name_label.size = Vector2(171, 30)
 		name_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		slot.add_child(name_label)
+		name_label.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+		name_label.offset_top = 152
+		name_label.offset_bottom = 182
 
 
 func _build_tabletop() -> void:
@@ -137,14 +135,10 @@ func _build_tabletop() -> void:
 	add_child(booklet_shadow)
 	var booklet := _panel(Rect2(1270, 87, 580, 656), Color("#fff8df"), Color("#c59361"), 8)
 	add_child(booklet)
-	var binding := _panel(Rect2(1292, 102, 24, 625), Color("#cfdbd4"), Color("#8aa99c"), 8)
-	add_child(binding)
 	var heading := _label("HOW TO PLAY", 36, Color("#235663"))
 	_place(heading, 1340, 117, 470, 48)
 	add_child(heading)
-	_controls = _booklet_field("CONTROLS", 184)
-	_win = _booklet_field("WIN CONDITION", 364)
-	_hints = _booklet_field("HINTS", 543)
+	_build_booklet_pages()
 	var tray_shadow := _panel(Rect2(70, 803, 1790, 237), Color("#a47850"), Color("#a47850"), 26)
 	add_child(tray_shadow)
 	var tray_panel := _panel(Rect2(55, 788, 1790, 237), Color("#f6dfb0"), Color("#b98557"), 26)
@@ -154,6 +148,10 @@ func _build_tabletop() -> void:
 	_tray.size = Vector2(1740, 182)
 	_tray.add_theme_constant_override("separation", 2)
 	add_child(_tray)
+	_characters = CubioPreview.new()
+	_characters.position = Vector2(79, 857)
+	_characters.size = Vector2(1740, 125)
+	add_child(_characters)
 	var cancel := Button.new()
 	cancel.text = "Back to lobby"
 	cancel.tooltip_text = "Host only: cancel ready-up"
@@ -173,14 +171,67 @@ func _title_plate_add(plate: Panel, label: Label) -> void:
 	plate.add_child(label)
 
 
-func _booklet_field(heading: String, y: float) -> Label:
-	var heading_label := _label(heading, 27, Color("#b35b46"))
-	_place(heading_label, 1343, y, 465, 38)
-	add_child(heading_label)
+## The booklet's sections flow in a scroll container; its binding is the scroll bar, so text of
+## any length stays inside the page and the host can scroll to the end.
+func _build_booklet_pages() -> void:
+	_booklet_scroll = ScrollContainer.new()
+	_place(_booklet_scroll, 1343, 172, 475, 556)
+	_booklet_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_booklet_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_NEVER
+	add_child(_booklet_scroll)
+	var sections := VBoxContainer.new()
+	sections.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sections.add_theme_constant_override("separation", 26)
+	_booklet_scroll.add_child(sections)
+	_controls = _booklet_field(sections, "CONTROLS")
+	_win = _booklet_field(sections, "WIN CONDITION")
+	_hints = _booklet_field(sections, "HINTS")
+
+	_booklet_bar = VScrollBar.new()
+	_place(_booklet_bar, 1292, 102, 24, 625)
+	var binding := _style(Color("#cfdbd4"), Color("#8aa99c"), 8)
+	_booklet_bar.add_theme_stylebox_override("scroll", binding)
+	_booklet_bar.add_theme_stylebox_override("scroll_focus", StyleBoxEmpty.new())
+	add_child(_booklet_bar)
+	var inner := _booklet_scroll.get_v_scroll_bar()
+	inner.changed.connect(_sync_booklet_bar)
+	inner.value_changed.connect(_booklet_bar.set_value_no_signal)
+	_booklet_bar.value_changed.connect(
+		func(value: float) -> void:
+			_booklet_scroll.scroll_vertical = roundi(value),
+	)
+	_sync_booklet_bar()
+
+
+func _sync_booklet_bar() -> void:
+	var inner := _booklet_scroll.get_v_scroll_bar()
+	_booklet_bar.min_value = inner.min_value
+	_booklet_bar.max_value = inner.max_value
+	_booklet_bar.page = inner.page
+	_booklet_bar.set_value_no_signal(inner.value)
+	# Without overflow the binding stays plain; a grabber appears only when there is more to read.
+	var overflows := inner.max_value - inner.min_value > inner.page
+	var grabber: StyleBox = StyleBoxEmpty.new()
+	var pressed: StyleBox = grabber
+	if overflows:
+		grabber = _style(Color("#8aa99c"), Color("#8aa99c"), 8)
+		pressed = _style(Color("#6f8f82"), Color("#6f8f82"), 8)
+	_booklet_bar.add_theme_stylebox_override("grabber", grabber)
+	_booklet_bar.add_theme_stylebox_override("grabber_highlight", pressed)
+	_booklet_bar.add_theme_stylebox_override("grabber_pressed", pressed)
+	var filter := Control.MOUSE_FILTER_STOP if overflows else Control.MOUSE_FILTER_IGNORE
+	_booklet_bar.mouse_filter = filter
+
+
+func _booklet_field(sections: VBoxContainer, heading: String) -> Label:
+	var section := VBoxContainer.new()
+	section.add_theme_constant_override("separation", 2)
+	sections.add_child(section)
+	section.add_child(_label(heading, 27, Color("#b35b46")))
 	var body := _label("", 28, Color("#31474e"))
-	_place(body, 1343, y + 39, 455, 133)
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	add_child(body)
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	section.add_child(body)
 	return body
 
 
@@ -189,13 +240,17 @@ func _panel(rect: Rect2, fill: Color, border: Color, radius: int) -> Panel:
 	panel.position = rect.position
 	panel.size = rect.size
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_theme_stylebox_override("panel", _style(fill, border, radius))
+	return panel
+
+
+func _style(fill: Color, border: Color, radius: int) -> StyleBoxFlat:
 	var style := StyleBoxFlat.new()
 	style.bg_color = fill
 	style.border_color = border
 	style.set_border_width_all(4)
 	style.set_corner_radius_all(radius)
-	panel.add_theme_stylebox_override("panel", style)
-	return panel
+	return style
 
 
 func _label(value: String, font_size: int, color: Color) -> Label:

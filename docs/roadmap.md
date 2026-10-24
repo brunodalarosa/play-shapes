@@ -20,7 +20,7 @@ existing ones. The game keeps playing the same while the code is reshaped; see
 - A decision log and this roadmap.
 - A branching model, Git Flow, with `develop` as the branch work merges into
   ([branching.md](branching.md)).
-- No ticket numbers anywhere, with no exemptions: the names inside the Squircle Blender
+- No ticket numbers anywhere, with no exemptions: the names inside the Cubio Blender
   source were the last.
 - One shared base for the test scripts
   ([0023](decisions/0023-shared-test-base.md)). A script error, or anything a test still
@@ -61,25 +61,34 @@ one has, the `private-access` lint rule is turned back on for `tests/`
 After the input pipeline: bots that fill a game with players
 ([0008](decisions/0008-bots.md)).
 
-## Tilt Shift foundation
+## The 3D rework
 
-Host rules and editable content exist for Tilt Shift: equal teams, balanced rotating
-paddle assignments, immediate deadlines and cumulative team scoring. A shared physics
-arena adds falling/colliding balls, full-turn paddles, basket catches and seeded delivery.
+The game is being rebuilt with 3D assets, starting with the Playground lobby. The lobby is a
+3D café plaza where real-time Cubios move as plane-locked Jolt bodies with the unchanged phone
+controls ([0042](decisions/0042-plaza-lobby-jolt-plane.md)). Cubio is a cube with a small bevel;
+the lobby, Bubbles, the Ready screen and phone setup share its live model and original rig.
+The rendered animation sheets and Animation Lab are retired.
 
-Calibrated multiplayer motion has its host consumer and reusable browser stream, with
-per-player neutral, continuous turns, bounded comparison, reconnect policy and lifecycle.
-The editor workshop provides snapped content editing, geometry guides, named saves and
-actual gameplay preview.
+The café roof carries the logo as a 3D sign traced from the approved artwork, and the
+billboard shows only the join QR ([0041](decisions/0041-rooftop-logo-sign.md)).
 
-The catalog now connects motion preparation and host-validated readiness to the factory,
-mapped rounds, cumulative results and return to the lobby.
-The default rounds alternate two authored layouts with fair participant selection,
-selected-player readiness, countdown and automatic neutral rotation. The workshop exposes
-runtime settings through a Tunables tab. Selected phones show one paddle; spectators wait.
-Audio remains deferred; real-phone
-accuracy, permission, comfort and owner readability/feel await trials.
-See [the rules contract](../minigames/003_tilt_shift/README.md).
+Minigame 004, Bubbles and jellyfishes 3D, replaced the retired 2D version, 002: a from-scratch
+3D rebuild without the spin move, on Jolt physics with plane-locked bodies
+([0034](decisions/0034-bubbles-3d-jolt-plane.md)), with a three.js view of each player's bubble
+on the phone ([0035](decisions/0035-phone-three-js.md)). Its design is in
+`docs/game-design-documents/Minigames/004/`. It awaits physical-phone checks and the owner's
+play review; tuning values are provisional.
+
+Minigame 005, Tilt Shift 3D, replaced the retired 2D version, 003: the same game
+on plane-locked Jolt physics ([0038](decisions/0038-tilt-shift-3d-full-width-frame.md)), with
+each player shown as their own coloured paddle built in code
+([0036](decisions/0036-tilt-shift-3d-generated-paddle.md)) and carrying a part-composed,
+expressive face ([0037](decisions/0037-shape-face-system.md)), in a full-width toy factory.
+
+Each phone shows the player's own paddle in 3D. 005 has its own workshop tab and F12 review, and
+launches through a catalog session script ([0039](decisions/0039-minigame-session-scripts.md)).
+It awaits physical-phone checks and the owner's play review; tuning values are provisional. See
+[the minigame guide](../minigames/005_3d_tilt_shift/README.md).
 
 ## Backlog
 
@@ -107,19 +116,19 @@ its red error panel for the rest of the session. Two cases are known:
 - Pressing Start while a phone holds the lobby stick. The host answers `lobby_unavailable`.
   To reproduce, set `AT_REST_SECONDS` to `0.0` in `tests/e2e/host.gd` and run `npm run e2e`
   in `web/`.
-- Releasing a swipe as a Bubbles round ends. The host answers `stale_or_unavailable`. To
-  try to reproduce, set `ROUND_ENDING_MSEC` to `0` in the same file and run
-  `node tools/check.mjs --full e2e`. It fails only when a swipe happens to land as the round
-  ends, which depends on timing.
+- Releasing a swipe as a Bubbles and jellyfishes 3D round ends. The host answers
+  `stale_or_unavailable`. To try to reproduce, set `ROUND_ENDING_MSEC` to `0` in the same file
+  and run `node tools/check.mjs --full e2e`. It fails only when a swipe happens to land as the
+  round ends, which depends on timing.
 
 Late input after a phase change should be dropped quietly. The end-to-end test avoids both
 cases on purpose; fixing the bug means removing those two waits.
 
-On Windows with Godot 4.7.2, `tilt_shift_rules_test` and `tilt_shift_motion_test` have exited with code
-`3221225477` during native shutdown after printing zero assertion failures. It also
-reproduces for the rules test in a fresh, fully imported copy of the rules-only commit. Treat that exit as
-a failed check, retain its log and report it separately from assertion results; its
-cause remains unresolved.
+On Windows with Godot 4.7.2, Tilt Shift 3D's tests, such as `tilt_shift_3d_delivery_test`,
+`tilt_shift_3d_protocol_test` and `tilt_shift_3d_presentation_test`, have intermittently exited
+with code `3221225477` during native shutdown after printing zero assertion failures; a rerun
+usually passes. Treat that exit as a failed check, retain its log and report it separately from
+assertion results; its cause remains unresolved.
 
 On Windows, the browser bundle rewrite after the browser suite can fail with
 `The requested operation cannot be performed on a file with a user-mapped section open.`

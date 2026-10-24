@@ -1,16 +1,23 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scenes/lobby.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/lobby_playground_world.tscn" id="2"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/play_shapes_logo.png" id="3"]
-[ext_resource type="Script" path="res://addons/kenyoni/qr_code/qr_code_rect.gd" id="4"]
 
-[sub_resource type="StyleBoxFlat" id="qr_background"]
-bg_color = Color(1, 1, 1, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+[sub_resource type="StyleBoxFlat" id="panel"]
+bg_color = Color(0.07, 0.15, 0.25, 0.86)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.56, 0.78, 0.9, 0.7)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+content_margin_left = 18.0
+content_margin_top = 16.0
+content_margin_right = 18.0
+content_margin_bottom = 16.0
 
 [node name="LobbyPlayground" type="Control"]
 layout_mode = 3
@@ -19,159 +26,103 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1")
 
 [node name="World" parent="." instance=ExtResource("2")]
 
-[node name="LiveControls" type="Control" parent="."]
-editor_description = "FHD reference positions. Controls stay interactive while characters draw in front of them."
+[node name="ControlPanel" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+editor_description = "Lobby controls. Kept clear of the screen edges; grows down and left from the top-right corner."
+custom_minimum_size = Vector2(420, 0)
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 1
+anchor_left = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
+offset_left = -452.0
+offset_top = 32.0
+offset_right = -32.0
+offset_bottom = 32.0
+grow_horizontal = 0
+theme_override_styles/panel = SubResource("panel")
 
-[node name="Logo" type="TextureRect" parent="LiveControls"]
-layout_mode = 0
-offset_left = 708.0
-offset_top = 164.0
-offset_right = 1212.0
-offset_bottom = 284.0
-mouse_filter = 2
-texture = ExtResource("3")
-expand_mode = 1
-stretch_mode = 5
+[node name="Layout" type="VBoxContainer" parent="ControlPanel"]
+layout_mode = 2
+theme_override_constants/separation = 8
 
-[node name="JoinQRBackground" type="Panel" parent="LiveControls"]
+[node name="JoinTitle" type="Label" parent="ControlPanel/Layout"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.93, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "Join on the same network"
+
+[node name="JoinRow" type="HBoxContainer" parent="ControlPanel/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="AddressPicker" type="OptionButton" parent="ControlPanel/Layout/JoinRow"]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 854.0
-offset_top = 266.0
-offset_right = 1066.0
-offset_bottom = 432.0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("qr_background")
-
-[node name="JoinQR" type="TextureRect" parent="LiveControls"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 860.0
-offset_top = 267.0
-offset_right = 1060.0
-offset_bottom = 431.0
-mouse_filter = 2
-texture_filter = 1
-expand_mode = 1
-stretch_mode = 5
-script = ExtResource("4")
-mode = 4
-auto_module_size = false
-module_size = 6
-quiet_zone_size = 4
-
-[node name="Instructions" type="Label" parent="LiveControls"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 710.0
-offset_top = 433.0
-offset_right = 1210.0
-offset_bottom = 457.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0, 0.2, 0.15, 1)
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 19
-text = "Connect your phone to the same network, then scan."
-horizontal_alignment = 1
-
-[node name="JoinAddress" type="Label" parent="LiveControls"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 745.0
-offset_top = 458.0
-offset_right = 1175.0
-offset_bottom = 498.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_shadow_color = Color(0, 0.13, 0.13, 1)
-theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 21
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="AddressPicker" type="OptionButton" parent="LiveControls"]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 710.0
-offset_top = 499.0
-offset_right = 930.0
-offset_bottom = 537.0
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 17
 tooltip_text = "Choose the PC address on your phone's network. VPN addresses may not work."
+clip_text = true
 
-[node name="Refresh" type="Button" parent="LiveControls"]
+[node name="Refresh" type="Button" parent="ControlPanel/Layout/JoinRow"]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 936.0
-offset_top = 499.0
-offset_right = 1060.0
-offset_bottom = 537.0
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
 theme_override_font_sizes/font_size = 17
 text = "Refresh"
 
-[node name="Copy" type="Button" parent="LiveControls"]
+[node name="Copy" type="Button" parent="ControlPanel/Layout/JoinRow"]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 1066.0
-offset_top = 499.0
-offset_right = 1210.0
-offset_bottom = 537.0
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
 theme_override_font_sizes/font_size = 17
 text = "Copy link"
 
-[node name="MinigameTitle" type="Label" parent="LiveControls"]
-layout_mode = 0
-offset_left = 760.0
-offset_top = 579.0
-offset_right = 1160.0
-offset_bottom = 619.0
-theme_override_colors/font_color = Color(0.04, 0.13, 0.28, 1)
-theme_override_font_sizes/font_size = 30
-text = "Minigame"
-horizontal_alignment = 1
-
-[node name="MinigameSelector" type="OptionButton" parent="LiveControls"]
+[node name="JoinAddress" type="Label" parent="ControlPanel/Layout"]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 759.0
-offset_top = 625.0
-offset_right = 1161.0
-offset_bottom = 681.0
-theme_override_font_sizes/font_size = 22
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 19
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Instructions" type="Label" parent="ControlPanel/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.93, 1, 1)
+theme_override_font_sizes/font_size = 16
+text = "Connect your phone to the same network, then scan."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Divider" type="HSeparator" parent="ControlPanel/Layout"]
+layout_mode = 2
+
+[node name="MinigameSelector" type="OptionButton" parent="ControlPanel/Layout"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
 tooltip_text = "Choose which minigame to start for the registered players."
 
-[node name="StartMinigame" type="Button" parent="LiveControls"]
+[node name="StartMinigame" type="Button" parent="ControlPanel/Layout"]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 795.0
-offset_top = 691.0
-offset_right = 1125.0
-offset_bottom = 739.0
+custom_minimum_size = Vector2(0, 50)
+layout_mode = 2
 theme_override_font_sizes/font_size = 21
 disabled = true
 text = "Start selected minigame"
 
-[node name="StartHelp" type="Label" parent="LiveControls"]
+[node name="StartHelp" type="Label" parent="ControlPanel/Layout"]
 unique_name_in_owner = true
-layout_mode = 0
-offset_left = 735.0
-offset_top = 743.0
-offset_right = 1185.0
-offset_bottom = 783.0
-theme_override_colors/font_color = Color(0.04, 0.13, 0.28, 1)
-theme_override_font_sizes/font_size = 19
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.93, 1, 1)
+theme_override_font_sizes/font_size = 17
 text = "At least 2 registered players are needed"
 horizontal_alignment = 1
-vertical_alignment = 1
 autowrap_mode = 2

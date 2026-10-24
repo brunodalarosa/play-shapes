@@ -1,339 +1,791 @@
-[gd_scene load_steps=29 format=3 uid="uid://brvltjdb6e6uc"]
+[gd_scene load_steps=35 format=3]
 
-[ext_resource type="Script" path="res://scenes/lobby_playground_world.gd" id="script"]
-[ext_resource type="Script" path="res://components/platform_surface.gd" id="surface"]
+[ext_resource type="Script" path="res://scenes/lobby_playground_world.gd" id="world"]
+[ext_resource type="Script" path="res://scenes/plaza_landing.gd" id="landing"]
+[ext_resource type="PackedScene" path="res://scenes/plaza_billboard.tscn" id="billboard"]
+[ext_resource type="PackedScene" path="res://assets/runtime/playground_plaza/cafe/cafe.glb" id="cafe"]
+[ext_resource type="PackedScene" path="res://assets/runtime/playground_plaza/logo_sign/logo_sign.glb" id="logo_sign"]
+[ext_resource type="PackedScene" path="res://assets/runtime/playground_plaza/chair/chair_A.gltf" id="chair"]
+[ext_resource type="PackedScene" path="res://assets/runtime/playground_plaza/table/cafe-table.glb" id="table"]
+[ext_resource type="PackedScene" path="res://assets/runtime/playground_plaza/tree/Tree_2_E_Color1.gltf" id="tree"]
+[ext_resource type="PackedScene" path="res://assets/runtime/playground_plaza/potted_plant/bush.gltf" id="plant"]
 
-[ext_resource type="Texture2D" uid="uid://bmpraaalpmgm3" path="res://assets/runtime/lobby_playground/room_background.png" id="1"]
-[ext_resource type="Texture2D" uid="uid://bjv5ntbjjuvqd" path="res://assets/runtime/lobby_playground/shelf_structure.png" id="3"]
-[ext_resource type="Texture2D" uid="uid://dvlw2cwsenhwe" path="res://assets/runtime/lobby_playground/foreground.png" id="4"]
-[ext_resource type="Texture2D" uid="uid://duv56ep54ep24" path="res://assets/runtime/lobby_playground/house_blue_red_roof.png" id="5"]
-[ext_resource type="Texture2D" uid="uid://rcj4lnxud524" path="res://assets/runtime/lobby_playground/arch_green.png" id="6"]
-[ext_resource type="Texture2D" uid="uid://ceotbxpmlpn5j" path="res://assets/runtime/lobby_playground/block_red.png" id="7"]
-[ext_resource type="Texture2D" uid="uid://d6efao7dsiou" path="res://assets/runtime/lobby_playground/block_yellow.png" id="8"]
-[ext_resource type="Texture2D" uid="uid://bdj6i20glf4x5" path="res://assets/runtime/lobby_playground/block_blue.png" id="9"]
-[ext_resource type="Texture2D" uid="uid://bggeop70mqew1" path="res://assets/runtime/lobby_playground/block_green.png" id="10"]
-[ext_resource type="Texture2D" uid="uid://xfi88wdcuwyh" path="res://assets/runtime/lobby_playground/arch_yellow.png" id="11"]
-[ext_resource type="Texture2D" uid="uid://xcg8q38rs05" path="res://assets/runtime/lobby_playground/teddy_bear.png" id="13"]
-[ext_resource type="Texture2D" uid="uid://dublr5112dixv" path="res://assets/runtime/lobby_playground/crayon_mug.png" id="14"]
-[ext_resource type="Texture2D" uid="uid://ty022jt5b0w2" path="res://assets/runtime/lobby_playground/dino_plushie.png" id="15"]
-[ext_resource type="Texture2D" uid="uid://b5hopjdc4wx56" path="res://assets/runtime/lobby_playground/mushroom.png" id="16"]
-[ext_resource type="Texture2D" uid="uid://cp7oxubhwwmyn" path="res://assets/runtime/lobby_playground/robot_action_figure.png" id="17"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/green_board_blank.png" id="18"]
-[ext_resource type="Texture2D" path="res://assets/runtime/lobby_playground/minigame_calendar_blank.png" id="19"]
+[sub_resource type="StandardMaterial3D" id="m_paving"]
+albedo_color = Color(0.745, 0.647, 0.545, 1)
+roughness = 1.0
+metallic_specular = 0.1
 
-[sub_resource type="RectangleShape2D" id="FullShelfTop"]
-size = Vector2(1840, 10)
+[sub_resource type="StandardMaterial3D" id="m_seam"]
+albedo_color = Color(0.643, 0.545, 0.447, 1)
+roughness = 1.0
+metallic_specular = 0.1
 
-[sub_resource type="RectangleShape2D" id="MiddleBlueBlockTop"]
-size = Vector2(148, 8)
+[sub_resource type="StandardMaterial3D" id="m_wall"]
+albedo_color = Color(0.824, 0.765, 0.690, 1)
+roughness = 1.0
+metallic_specular = 0.1
 
-[sub_resource type="RectangleShape2D" id="LeftRedBlockTop"]
-size = Vector2(222, 8)
+[sub_resource type="StandardMaterial3D" id="m_wall_cap"]
+albedo_color = Color(0.725, 0.651, 0.557, 1)
+roughness = 1.0
+metallic_specular = 0.1
 
-[sub_resource type="RectangleShape2D" id="RightYellowBlockTop"]
-size = Vector2(208, 8)
+[sub_resource type="StandardMaterial3D" id="m_park"]
+albedo_color = Color(0.447, 0.663, 0.298, 1)
+roughness = 1.0
+metallic_specular = 0.1
 
-[sub_resource type="RectangleShape2D" id="BottomBlueBlockTop"]
-size = Vector2(178, 8)
+[sub_resource type="StandardMaterial3D" id="m_water"]
+albedo_color = Color(0.290, 0.525, 0.784, 1)
+roughness = 1.0
+metallic_specular = 0.1
 
-[sub_resource type="RectangleShape2D" id="BottomMiddleGreenBlockTop"]
-size = Vector2(70, 8)
+[sub_resource type="StandardMaterial3D" id="m_hill_near"]
+albedo_color = Color(0.416, 0.486, 0.753, 1)
+roughness = 1.0
+metallic_specular = 0.1
 
-[sub_resource type="RectangleShape2D" id="BottomArchTop"]
-size = Vector2(192, 8)
+[sub_resource type="StandardMaterial3D" id="m_hill_far"]
+albedo_color = Color(0.604, 0.596, 0.812, 1)
+roughness = 1.0
+metallic_specular = 0.1
 
-[sub_resource type="RectangleShape2D" id="BottomMiddleBlueBlockTop"]
-size = Vector2(96, 8)
+[sub_resource type="StandardMaterial3D" id="m_block"]
+albedo_color = Color(0.769, 0.722, 0.678, 1)
+roughness = 1.0
+metallic_specular = 0.1
 
-[sub_resource type="RectangleShape2D" id="BottomRedBlockTop"]
-size = Vector2(178, 8)
+[sub_resource type="StandardMaterial3D" id="m_block_shade"]
+albedo_color = Color(0.718, 0.667, 0.627, 1)
+roughness = 1.0
+metallic_specular = 0.1
 
-[node name="LobbyPlaygroundWorld" type="Node2D" unique_id=1715306950]
-editor_description = "1920 x 1080 reference canvas. Keep shelf art and PlatformSurfaces aligned; the project scales this canvas for smaller 16:9 host windows."
-script = ExtResource("script")
+[sub_resource type="StandardMaterial3D" id="m_cloud"]
+albedo_color = Color(1.000, 1.000, 1.000, 1)
+roughness = 1.0
+emission_enabled = true
+emission = Color(1.000, 0.839, 0.753, 1)
+emission_energy_multiplier = 0.4
 
-[node name="RoomBackground" type="Sprite2D" parent="." unique_id=593009055]
-texture = ExtResource("1")
-centered = false
+[sub_resource type="ProceduralSkyMaterial" id="sky_material"]
+sky_top_color = Color(0.227, 0.471, 0.824, 1)
+sky_horizon_color = Color(0.965, 0.784, 0.627, 1)
+sky_curve = 0.16
+ground_bottom_color = Color(0.918, 0.722, 0.580, 1)
+ground_horizon_color = Color(0.965, 0.784, 0.627, 1)
+sun_angle_max = 20.0
 
-[node name="WoodenShelves" type="Sprite2D" parent="." unique_id=898885870]
-texture = ExtResource("3")
-centered = false
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_material")
 
-[node name="RearDecorations" type="Node2D" parent="." unique_id=201887107]
-editor_description = "Decorative props sit visually on shelves but have no collision. Adjust each Sprite2D in the Inspector."
+[sub_resource type="Environment" id="environment"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 3
+ambient_light_sky_contribution = 0.8
+ambient_light_energy = 0.45
+reflected_light_source = 1
 
-[node name="TeddyBear" type="Sprite2D" parent="RearDecorations" unique_id=634443932]
-position = Vector2(886, 10.000001)
-scale = Vector2(0.35, 0.33)
-texture = ExtResource("13")
-centered = false
+[sub_resource type="BoxMesh" id="ground"]
+material = SubResource("m_paving")
+size = Vector3(80, 1, 34)
 
-[node name="CrayonMug" type="Sprite2D" parent="RearDecorations" unique_id=2062212600]
-position = Vector2(309, 259)
-scale = Vector2(0.27, 0.29)
-texture = ExtResource("14")
-centered = false
+[sub_resource type="BoxMesh" id="seam"]
+material = SubResource("m_seam")
+size = Vector3(80, 0.02, 0.07)
 
-[node name="DinoPlushie" type="Sprite2D" parent="RearDecorations" unique_id=369540556]
-position = Vector2(169, 10)
-scale = Vector2(0.35, 0.33)
-texture = ExtResource("15")
-centered = false
+[sub_resource type="BoxMesh" id="wall"]
+material = SubResource("m_wall")
+size = Vector3(80, 1.1, 0.6)
 
-[node name="TopMushroom" type="Sprite2D" parent="RearDecorations" unique_id=1187347448]
-position = Vector2(1709, 297)
-scale = Vector2(0.28, 0.26)
-texture = ExtResource("16")
-centered = false
+[sub_resource type="BoxMesh" id="wall_cap"]
+material = SubResource("m_wall_cap")
+size = Vector3(80, 0.14, 0.78)
 
-[node name="Robot" type="Sprite2D" parent="RearDecorations" unique_id=237432687]
-position = Vector2(1569, 24)
-scale = Vector2(0.26, 0.32)
-texture = ExtResource("17")
-centered = false
+[sub_resource type="BoxMesh" id="park"]
+material = SubResource("m_park")
+size = Vector3(160, 0.2, 40)
 
-[node name="LowerLeftMushroom" type="Sprite2D" parent="RearDecorations" unique_id=1696232380]
-position = Vector2(119.00001, 538)
-scale = Vector2(0.29, 0.34)
-texture = ExtResource("16")
-centered = false
+[sub_resource type="PlaneMesh" id="water"]
+material = SubResource("m_water")
+size = Vector2(260, 60)
 
-[node name="BuildingBlocks" type="Node2D" parent="." unique_id=1192452758]
+[sub_resource type="PrismMesh" id="hill_near"]
+material = SubResource("m_hill_near")
+size = Vector3(46, 13, 12)
 
-[node name="UpperLeftHouse" type="Sprite2D" parent="BuildingBlocks" unique_id=1534262884]
-position = Vector2(118.000046, 253)
-scale = Vector2(0.42, 0.42)
-texture = ExtResource("5")
-centered = false
+[sub_resource type="PrismMesh" id="hill_far"]
+material = SubResource("m_hill_far")
+size = Vector3(60, 19, 12)
 
-[node name="UpperRightBlueStep" type="Sprite2D" parent="BuildingBlocks" unique_id=357018356]
-position = Vector2(1308, 361)
-scale = Vector2(0.42, 0.23)
-texture = ExtResource("9")
-centered = false
+[sub_resource type="BoxMesh" id="block"]
+material = SubResource("m_block")
+size = Vector3(7, 7, 5)
 
-[node name="LowerLeftArch" type="Sprite2D" parent="BuildingBlocks" unique_id=658722556]
-position = Vector2(215, 533)
-scale = Vector2(0.45, 0.62)
-texture = ExtResource("6")
-centered = false
+[sub_resource type="BoxMesh" id="block_low"]
+material = SubResource("m_block_shade")
+size = Vector3(9, 4.5, 5)
 
-[node name="LowerLeftRedStep" type="Sprite2D" parent="BuildingBlocks" unique_id=1612111393]
-position = Vector2(350, 596)
-scale = Vector2(0.62, 0.5)
-texture = ExtResource("7")
-centered = false
+[sub_resource type="SphereMesh" id="cloud"]
+material = SubResource("m_cloud")
+radial_segments = 7
+rings = 4
 
-[node name="LowerRightYellowStep" type="Sprite2D" parent="BuildingBlocks" unique_id=1523874726]
-position = Vector2(1320, 596)
-scale = Vector2(0.58, 0.51)
-texture = ExtResource("8")
-centered = false
+[node name="LobbyPlaygroundWorld" type="Node3D"]
+script = ExtResource("world")
 
-[node name="LowerRightHouse" type="Sprite2D" parent="BuildingBlocks" unique_id=130713156]
-position = Vector2(1697.0001, 518)
-scale = Vector2(0.42, 0.43)
-texture = ExtResource("5")
-centered = false
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(0, 8.4, 23)
+rotation = Vector3(-0.1309, 0, 0)
+current = true
+fov = 32.0
+far = 400.0
 
-[node name="BottomLeftBlueStep" type="Sprite2D" parent="BuildingBlocks" unique_id=1983478385]
-position = Vector2(443, 867)
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("9")
-centered = false
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation = Vector3(-0.488692, -0.663225, 0)
+light_color = Color(1.000, 0.812, 0.620, 1)
+light_energy = 1.1
+shadow_enabled = true
+shadow_opacity = 0.55
+shadow_blur = 1.5
+directional_shadow_max_distance = 70.0
 
-[node name="BottomMiddleGreenBlock" type="Sprite2D" parent="BuildingBlocks" unique_id=2012698900]
-position = Vector2(765, 868)
-scale = Vector2(0.2, 0.5)
-texture = ExtResource("10")
-centered = false
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("environment")
 
-[node name="BottomMiddleYellowArch" type="Sprite2D" parent="BuildingBlocks" unique_id=1523723489]
-position = Vector2(846, 834)
-scale = Vector2(0.55, 0.48)
-texture = ExtResource("11")
-centered = false
+[node name="Plaza" type="Node3D" parent="."]
 
-[node name="BottomMiddleBlueBlock" type="Sprite2D" parent="BuildingBlocks" unique_id=238678118]
-position = Vector2(1073, 867)
-scale = Vector2(0.27, 0.5)
-texture = ExtResource("9")
-centered = false
+[node name="Ground" type="MeshInstance3D" parent="Plaza"]
+position = Vector3(0, -0.5, 7)
+mesh = SubResource("ground")
 
-[node name="BottomRightRedStep" type="Sprite2D" parent="BuildingBlocks" unique_id=403587846]
-position = Vector2(1560, 866)
-scale = Vector2(0.5, 0.5)
-texture = ExtResource("7")
-centered = false
+[node name="Seam1" type="MeshInstance3D" parent="Plaza/Ground"]
+position = Vector3(0, 0.5, -1.6)
+mesh = SubResource("seam")
+cast_shadow = 0
 
-[node name="PanelBackings" type="Node2D" parent="." unique_id=660800634]
-editor_description = "QR board and calendar backings sit above blocks and behind future characters. Live controls are in lobby.tscn."
+[node name="Seam2" type="MeshInstance3D" parent="Plaza/Ground"]
+position = Vector3(0, 0.5, -3.1)
+mesh = SubResource("seam")
+cast_shadow = 0
 
-[node name="GreenBoard" type="Sprite2D" parent="PanelBackings"]
-position = Vector2(623, 127)
-scale = Vector2(0.45, 0.45)
-texture = ExtResource("18")
-centered = false
+[node name="Seam3" type="MeshInstance3D" parent="Plaza/Ground"]
+position = Vector3(0, 0.5, -4.6)
+mesh = SubResource("seam")
+cast_shadow = 0
 
-[node name="MinigameCalendar" type="Sprite2D" parent="PanelBackings"]
-position = Vector2(646, 520)
-scale = Vector2(0.36, 0.36)
-texture = ExtResource("19")
-centered = false
+[node name="Seam4" type="MeshInstance3D" parent="Plaza/Ground"]
+position = Vector3(0, 0.5, -6.1)
+mesh = SubResource("seam")
+cast_shadow = 0
 
-[node name="PlatformSurfaces" type="Node2D" parent="." unique_id=580875252]
-editor_description = "Select any surface and set Drop Rule to Open or Closed. This affects deliberate FALL only; one-way tops and art stay independent. Platform layer 8 (128)."
+[node name="Seam5" type="MeshInstance3D" parent="Plaza/Ground"]
+position = Vector3(0, 0.5, -7.6)
+mesh = SubResource("seam")
+cast_shadow = 0
 
-[node name="UpperShelf" type="StaticBody2D" parent="PlatformSurfaces" unique_id=774492155]
-collision_layer = 128
-collision_mask = 0
-script = ExtResource("surface")
+[node name="Seam6" type="MeshInstance3D" parent="Plaza/Ground"]
+position = Vector3(0, 0.5, -9.1)
+mesh = SubResource("seam")
+cast_shadow = 0
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/UpperShelf" unique_id=1077323979]
-position = Vector2(960, 405)
-shape = SubResource("FullShelfTop")
-one_way_collision = true
+[node name="Seam7" type="MeshInstance3D" parent="Plaza/Ground"]
+position = Vector3(0, 0.5, -10.6)
+mesh = SubResource("seam")
+cast_shadow = 0
 
-[node name="LowerShelf" type="StaticBody2D" parent="PlatformSurfaces" unique_id=746358840]
-collision_layer = 128
-collision_mask = 0
-script = ExtResource("surface")
-
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/LowerShelf" unique_id=855471257]
-position = Vector2(960, 680)
-shape = SubResource("FullShelfTop")
-one_way_collision = true
-
-[node name="BottomShelf" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1149967427]
-collision_layer = 128
-collision_mask = 0
-script = ExtResource("surface")
+[node name="GroundLanding" type="Node3D" parent="Plaza"]
+script = ExtResource("landing")
+width = 40.0
 drop_rule = 1
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomShelf" unique_id=326335805]
-position = Vector2(960, 950)
-shape = SubResource("FullShelfTop")
-one_way_collision = true
+[node name="RearWall" type="MeshInstance3D" parent="Plaza"]
+position = Vector3(0, 0.55, -5.4)
+mesh = SubResource("wall")
 
-[node name="UpperRightBlueStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1830860633]
-collision_layer = 128
-collision_mask = 0
-script = ExtResource("surface")
+[node name="Cap" type="MeshInstance3D" parent="Plaza/RearWall"]
+position = Vector3(0, 0.62, 0)
+mesh = SubResource("wall_cap")
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/UpperRightBlueStep" unique_id=1901789501]
-position = Vector2(1393, 365)
-shape = SubResource("MiddleBlueBlockTop")
-one_way_collision = true
+[node name="Cafe" type="Node3D" parent="Plaza"]
+position = Vector3(-7.7, 0, 0)
 
-[node name="LowerLeftRedStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=849883032]
-collision_layer = 128
-collision_mask = 0
-script = ExtResource("surface")
+[node name="Model" parent="Plaza/Cafe" instance=ExtResource("cafe")]
+position = Vector3(0, 0, -2.42)
+rotation = Vector3(0, 3.14159, 0)
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/LowerLeftRedStep" unique_id=289897698]
-position = Vector2(477, 600)
-shape = SubResource("LeftRedBlockTop")
-one_way_collision = true
+[node name="Landing" type="Node3D" parent="Plaza/Cafe"]
+position = Vector3(0, 6.5, 0)
+script = ExtResource("landing")
+width = 6.8
 
-[node name="LowerRightYellowStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=136273662]
-collision_layer = 128
-collision_mask = 0
-script = ExtResource("surface")
+[node name="LogoSign" parent="Plaza/Cafe" instance=ExtResource("logo_sign")]
+position = Vector3(0, 6.5, -2.2)
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/LowerRightYellowStep" unique_id=1352119568]
-position = Vector2(1439, 600)
-shape = SubResource("RightYellowBlockTop")
-one_way_collision = true
+[node name="ChairLeft" type="Node3D" parent="Plaza"]
+position = Vector3(-3, 0, 0)
 
-[node name="BottomLeftBlueStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1002418720]
-collision_layer = 128
-collision_mask = 0
-script = ExtResource("surface")
+[node name="Model" parent="Plaza/ChairLeft" instance=ExtResource("chair")]
+position = Vector3(0, 0, -0.55)
+rotation = Vector3(0, 0.5236, 0)
+scale = Vector3(2.3, 2.3, 2.3)
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomLeftBlueStep" unique_id=924173686]
-position = Vector2(545, 871)
-shape = SubResource("BottomBlueBlockTop")
-one_way_collision = true
+[node name="Landing" type="Node3D" parent="Plaza/ChairLeft"]
+position = Vector3(0, 1.15, 0)
+script = ExtResource("landing")
+width = 1.4
 
-[node name="BottomMiddleGreenBlock" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1764212000]
-collision_layer = 128
-collision_mask = 0
-script = ExtResource("surface")
+[node name="ChairMiddle" type="Node3D" parent="Plaza"]
+position = Vector3(3.1, 0, 0)
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomMiddleGreenBlock" unique_id=2141806235]
-position = Vector2(806, 872)
-shape = SubResource("BottomMiddleGreenBlockTop")
-one_way_collision = true
+[node name="Model" parent="Plaza/ChairMiddle" instance=ExtResource("chair")]
+position = Vector3(0, 0, -0.55)
+rotation = Vector3(0, -0.5236, 0)
+scale = Vector3(2.3, 2.3, 2.3)
 
-[node name="BottomMiddleYellowArch" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1085676547]
-collision_layer = 128
-collision_mask = 0
-script = ExtResource("surface")
+[node name="Landing" type="Node3D" parent="Plaza/ChairMiddle"]
+position = Vector3(0, 1.15, 0)
+script = ExtResource("landing")
+width = 1.4
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomMiddleYellowArch" unique_id=306986494]
-position = Vector2(959, 838)
-shape = SubResource("BottomArchTop")
-one_way_collision = true
+[node name="ChairRight" type="Node3D" parent="Plaza"]
+position = Vector3(9.2, 0, 0)
 
-[node name="BottomMiddleBlueBlock" type="StaticBody2D" parent="PlatformSurfaces" unique_id=2112623683]
-collision_layer = 128
-collision_mask = 0
-script = ExtResource("surface")
+[node name="Model" parent="Plaza/ChairRight" instance=ExtResource("chair")]
+position = Vector3(0, 0, -0.55)
+rotation = Vector3(0, -0.5236, 0)
+scale = Vector3(2.3, 2.3, 2.3)
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomMiddleBlueBlock" unique_id=1738861353]
-position = Vector2(1128, 871)
-shape = SubResource("BottomMiddleBlueBlockTop")
-one_way_collision = true
+[node name="Landing" type="Node3D" parent="Plaza/ChairRight"]
+position = Vector3(0, 1.15, 0)
+script = ExtResource("landing")
+width = 1.4
 
-[node name="BottomRightRedStep" type="StaticBody2D" parent="PlatformSurfaces" unique_id=1967092793]
-collision_layer = 128
-collision_mask = 0
-script = ExtResource("surface")
+[node name="TableLeft" type="Node3D" parent="Plaza"]
+position = Vector3(0, 0, 0)
 
-[node name="LandingTop" type="CollisionShape2D" parent="PlatformSurfaces/BottomRightRedStep" unique_id=170481355]
-position = Vector2(1662, 870)
-shape = SubResource("BottomRedBlockTop")
-one_way_collision = true
+[node name="Model" parent="Plaza/TableLeft" instance=ExtResource("table")]
+position = Vector3(0, 0, -1.1)
+scale = Vector3(1.1, 1.1, 1.1)
 
-[node name="CharactersFrontOfPanels" type="Node2D" parent="." unique_id=1166393284]
-editor_description = "Registered Playground characters draw in front of lobby controls and behind the world foreground."
-z_index = 1
+[node name="Landing" type="Node3D" parent="Plaza/TableLeft"]
+position = Vector3(0, 3.3, 0)
+script = ExtResource("landing")
+width = 3.9
 
-[node name="FutureCharacterAnchors" type="Node2D" parent="." unique_id=1317649962]
-editor_description = "Seat 1â€“10 feet positions. Free seats are reused when a player leaves or expires."
+[node name="TableRight" type="Node3D" parent="Plaza"]
+position = Vector3(6.2, 0, 0)
 
-[node name="UpperLeftA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=2116312259]
-position = Vector2(218, 400)
+[node name="Model" parent="Plaza/TableRight" instance=ExtResource("table")]
+position = Vector3(0, 0, -1.1)
+scale = Vector3(1.1, 1.1, 1.1)
 
-[node name="UpperLeftB" type="Marker2D" parent="FutureCharacterAnchors" unique_id=1913980234]
-position = Vector2(555, 400)
+[node name="Landing" type="Node3D" parent="Plaza/TableRight"]
+position = Vector3(0, 3.3, 0)
+script = ExtResource("landing")
+width = 3.9
 
-[node name="UpperRightA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=829782701]
-position = Vector2(1393, 361)
+[node name="Billboard" parent="Plaza" instance=ExtResource("billboard")]
+position = Vector3(0.3, -1.2, -12.5)
+scale = Vector3(1.25, 1.25, 1.25)
 
-[node name="UpperRightB" type="Marker2D" parent="FutureCharacterAnchors" unique_id=1603051938]
-position = Vector2(1740, 400)
+[node name="Scenery" type="Node3D" parent="Plaza"]
 
-[node name="LowerLeftA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=87197722]
-position = Vector2(180, 675)
+[node name="TreeLeft" parent="Plaza/Scenery" instance=ExtResource("tree")]
+position = Vector3(-10.6, 0, -5)
+rotation = Vector3(0, 0.349066, 0)
+scale = Vector3(0.95, 0.95, 0.95)
 
-[node name="LowerLeftStep" type="Marker2D" parent="FutureCharacterAnchors" unique_id=126896430]
-position = Vector2(477, 596)
+[node name="TreeRight" parent="Plaza/Scenery" instance=ExtResource("tree")]
+position = Vector3(11.4, 0, -3.2)
+rotation = Vector3(0, -0.610865, 0)
+scale = Vector3(0.9, 0.9, 0.9)
 
-[node name="LowerRightStep" type="Marker2D" parent="FutureCharacterAnchors" unique_id=345364927]
-position = Vector2(1439, 599)
+[node name="Plant1" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-11.25, 0, -0.3)
+rotation = Vector3(0, 0, 0)
+scale = Vector3(4.5, 4.5, 4.5)
 
-[node name="LowerRightA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=763559725]
-position = Vector2(1740, 675)
+[node name="Plant2" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-10.55, 0, -0.3)
+rotation = Vector3(0, 0.6981, 0)
+scale = Vector3(3.2, 3.2, 3.2)
 
-[node name="BottomLeftA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=1583872719]
-position = Vector2(705, 945)
+[node name="Plant3" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-9.6, 0, -0.3)
+rotation = Vector3(0, 1.309, 0)
+scale = Vector3(3.6, 3.6, 3.6)
 
-[node name="BottomRightA" type="Marker2D" parent="FutureCharacterAnchors" unique_id=370337190]
-position = Vector2(1280, 945)
+[node name="Plant4" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-7.9, 0, -0.3)
+rotation = Vector3(0, 0.2618, 0)
+scale = Vector3(3.2, 3.2, 3.2)
 
-[node name="Foreground" type="Sprite2D" parent="." unique_id=525094680]
-z_index = 2
-texture = ExtResource("4")
-centered = false
+[node name="Plant5" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-6.85, 0, -0.3)
+rotation = Vector3(0, 1.0472, 0)
+scale = Vector3(4, 4, 4)
+
+[node name="Plant6" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-4.7, 0, -0.3)
+rotation = Vector3(0, 0.4363, 0)
+scale = Vector3(4.5, 4.5, 4.5)
+
+[node name="Plant7" parent="Plaza/Scenery" instance=ExtResource("plant")]
+position = Vector3(-4.05, 0, -0.3)
+rotation = Vector3(0, 1.3963, 0)
+scale = Vector3(3, 3, 3)
+
+[node name="WallTree1" parent="Plaza/Scenery" instance=ExtResource("tree")]
+position = Vector3(-13.5, 0, -7)
+rotation = Vector3(0, 0.8727, 0)
+scale = Vector3(0.7, 0.7, 0.7)
+
+[node name="WallTree2" parent="Plaza/Scenery" instance=ExtResource("tree")]
+position = Vector3(-8.2, 0, -7.6)
+rotation = Vector3(0, 2.4435, 0)
+scale = Vector3(0.6, 0.6, 0.6)
+
+[node name="WallTree3" parent="Plaza/Scenery" instance=ExtResource("tree")]
+position = Vector3(5.6, 0, -7.4)
+rotation = Vector3(0, 3.6652, 0)
+scale = Vector3(0.55, 0.55, 0.55)
+
+[node name="WallTree4" parent="Plaza/Scenery" instance=ExtResource("tree")]
+position = Vector3(8.6, 0, -6.8)
+rotation = Vector3(0, 5.236, 0)
+scale = Vector3(0.65, 0.65, 0.65)
+
+[node name="WallTree5" parent="Plaza/Scenery" instance=ExtResource("tree")]
+position = Vector3(14, 0, -7.8)
+rotation = Vector3(0, 1.6581, 0)
+scale = Vector3(0.75, 0.75, 0.75)
+
+[node name="Backdrop" type="Node3D" parent="."]
+
+[node name="Park" type="MeshInstance3D" parent="Backdrop"]
+position = Vector3(0, -0.35, -26)
+mesh = SubResource("park")
+cast_shadow = 0
+
+[node name="Water" type="MeshInstance3D" parent="Backdrop"]
+position = Vector3(0, -0.2, -72)
+mesh = SubResource("water")
+cast_shadow = 0
+
+[node name="Grove1" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-42.53, -0.25, -11.91)
+rotation = Vector3(0, 0.455, 0)
+scale = Vector3(0.65, 0.65, 0.65)
+
+[node name="Grove2" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-36.29, -0.25, -13.19)
+rotation = Vector3(0, 3.188, 0)
+scale = Vector3(0.47, 0.47, 0.47)
+
+[node name="Grove3" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-32.19, -0.25, -13.6)
+rotation = Vector3(0, 0.57, 0)
+scale = Vector3(0.47, 0.47, 0.47)
+
+[node name="Grove4" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-25.43, -0.25, -15.96)
+rotation = Vector3(0, 1.403, 0)
+scale = Vector3(0.49, 0.49, 0.49)
+
+[node name="Grove5" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-19.22, -0.25, -16.69)
+rotation = Vector3(0, 2.492, 0)
+scale = Vector3(0.62, 0.62, 0.62)
+
+[node name="Grove6" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-12.57, -0.25, -11.28)
+rotation = Vector3(0, 1.82, 0)
+scale = Vector3(0.71, 0.71, 0.71)
+
+[node name="Grove7" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-9.47, -0.25, -11.71)
+rotation = Vector3(0, 5.128, 0)
+scale = Vector3(0.54, 0.54, 0.54)
+
+[node name="Grove8" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-3.76, -0.25, -14.49)
+rotation = Vector3(0, 2.34, 0)
+scale = Vector3(0.64, 0.64, 0.64)
+
+[node name="Grove9" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(2.94, -0.25, -11.38)
+rotation = Vector3(0, 1.294, 0)
+scale = Vector3(0.47, 0.47, 0.47)
+
+[node name="Grove10" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(8.94, -0.25, -13.57)
+rotation = Vector3(0, 3.679, 0)
+scale = Vector3(0.54, 0.54, 0.54)
+
+[node name="Grove11" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(13.86, -0.25, -12.8)
+rotation = Vector3(0, 4.392, 0)
+scale = Vector3(0.69, 0.69, 0.69)
+
+[node name="Grove12" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(18.83, -0.25, -14.45)
+rotation = Vector3(0, 5.499, 0)
+scale = Vector3(0.61, 0.61, 0.61)
+
+[node name="Grove13" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(25.89, -0.25, -12.73)
+rotation = Vector3(0, 0.742, 0)
+scale = Vector3(0.74, 0.74, 0.74)
+
+[node name="Grove14" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(30.55, -0.25, -15.54)
+rotation = Vector3(0, 3.072, 0)
+scale = Vector3(0.5, 0.5, 0.5)
+
+[node name="Grove15" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(35.02, -0.25, -15.01)
+rotation = Vector3(0, 3.6, 0)
+scale = Vector3(0.68, 0.68, 0.68)
+
+[node name="Grove16" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(43.13, -0.25, -12.88)
+rotation = Vector3(0, 3.735, 0)
+scale = Vector3(0.66, 0.66, 0.66)
+
+[node name="Grove17" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-51.76, -0.25, -23.11)
+rotation = Vector3(0, 5.936, 0)
+scale = Vector3(0.79, 0.79, 0.79)
+
+[node name="Grove18" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-47.68, -0.25, -24.98)
+rotation = Vector3(0, 4.408, 0)
+scale = Vector3(0.52, 0.52, 0.52)
+
+[node name="Grove19" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-42.76, -0.25, -27.94)
+rotation = Vector3(0, 1.788, 0)
+scale = Vector3(0.79, 0.79, 0.79)
+
+[node name="Grove20" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-39.14, -0.25, -25.02)
+rotation = Vector3(0, 2.901, 0)
+scale = Vector3(0.51, 0.51, 0.51)
+
+[node name="Grove21" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-35.4, -0.25, -20.05)
+rotation = Vector3(0, 4.827, 0)
+scale = Vector3(0.52, 0.52, 0.52)
+
+[node name="Grove22" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-31.11, -0.25, -21.23)
+rotation = Vector3(0, 5.475, 0)
+scale = Vector3(0.64, 0.64, 0.64)
+
+[node name="Grove23" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-26.86, -0.25, -23.04)
+rotation = Vector3(0, 5.55, 0)
+scale = Vector3(0.69, 0.69, 0.69)
+
+[node name="Grove24" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-20.24, -0.25, -26.78)
+rotation = Vector3(0, 2.609, 0)
+scale = Vector3(0.6, 0.6, 0.6)
+
+[node name="Grove25" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-17.22, -0.25, -26.96)
+rotation = Vector3(0, 0.948, 0)
+scale = Vector3(0.84, 0.84, 0.84)
+
+[node name="Grove26" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-13.37, -0.25, -21.09)
+rotation = Vector3(0, 3.047, 0)
+scale = Vector3(0.58, 0.58, 0.58)
+
+[node name="Grove27" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-7.73, -0.25, -21.36)
+rotation = Vector3(0, 2.632, 0)
+scale = Vector3(0.5, 0.5, 0.5)
+
+[node name="Grove28" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(-3.99, -0.25, -24.1)
+rotation = Vector3(0, 4.338, 0)
+scale = Vector3(0.83, 0.83, 0.83)
+
+[node name="Grove29" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(0.85, -0.25, -24.56)
+rotation = Vector3(0, 0.339, 0)
+scale = Vector3(0.74, 0.74, 0.74)
+
+[node name="Grove30" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(6.4, -0.25, -26.02)
+rotation = Vector3(0, 5.013, 0)
+scale = Vector3(0.81, 0.81, 0.81)
+
+[node name="Grove31" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(9.28, -0.25, -22.59)
+rotation = Vector3(0, 3.985, 0)
+scale = Vector3(0.54, 0.54, 0.54)
+
+[node name="Grove32" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(12.69, -0.25, -19.61)
+rotation = Vector3(0, 1.02, 0)
+scale = Vector3(0.57, 0.57, 0.57)
+
+[node name="Grove33" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(17.92, -0.25, -19.47)
+rotation = Vector3(0, 0.95, 0)
+scale = Vector3(0.5, 0.5, 0.5)
+
+[node name="Grove34" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(21.6, -0.25, -22.27)
+rotation = Vector3(0, 5.494, 0)
+scale = Vector3(0.51, 0.51, 0.51)
+
+[node name="Grove35" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(27.54, -0.25, -20.34)
+rotation = Vector3(0, 2.183, 0)
+scale = Vector3(0.59, 0.59, 0.59)
+
+[node name="Grove36" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(31.19, -0.25, -20.11)
+rotation = Vector3(0, 6.24, 0)
+scale = Vector3(0.8, 0.8, 0.8)
+
+[node name="Grove37" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(35.9, -0.25, -23.35)
+rotation = Vector3(0, 0.642, 0)
+scale = Vector3(0.53, 0.53, 0.53)
+
+[node name="Grove38" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(39.93, -0.25, -21.38)
+rotation = Vector3(0, 1.014, 0)
+scale = Vector3(0.79, 0.79, 0.79)
+
+[node name="Grove39" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(43.37, -0.25, -27.56)
+rotation = Vector3(0, 0.921, 0)
+scale = Vector3(0.68, 0.68, 0.68)
+
+[node name="Grove40" parent="Backdrop" instance=ExtResource("tree")]
+position = Vector3(49.33, -0.25, -19.24)
+rotation = Vector3(0, 6.148, 0)
+scale = Vector3(0.68, 0.68, 0.68)
+
+[node name="Block1" type="MeshInstance3D" parent="Backdrop"]
+position = Vector3(-24, 2, -58)
+mesh = SubResource("block")
+cast_shadow = 0
+
+[node name="Block2" type="MeshInstance3D" parent="Backdrop"]
+position = Vector3(-15, 2, -62)
+mesh = SubResource("block_low")
+cast_shadow = 0
+
+[node name="Block3" type="MeshInstance3D" parent="Backdrop"]
+position = Vector3(17, 2, -60)
+mesh = SubResource("block_low")
+cast_shadow = 0
+
+[node name="Block4" type="MeshInstance3D" parent="Backdrop"]
+position = Vector3(27, 2, -56)
+mesh = SubResource("block")
+cast_shadow = 0
+
+[node name="Hill1" type="MeshInstance3D" parent="Backdrop"]
+position = Vector3(-36, 4, -105)
+mesh = SubResource("hill_far")
+cast_shadow = 0
+
+[node name="Hill2" type="MeshInstance3D" parent="Backdrop"]
+position = Vector3(30, 4, -110)
+mesh = SubResource("hill_far")
+cast_shadow = 0
+
+[node name="Hill3" type="MeshInstance3D" parent="Backdrop"]
+position = Vector3(-8, 4, -98)
+mesh = SubResource("hill_near")
+cast_shadow = 0
+
+[node name="Hill4" type="MeshInstance3D" parent="Backdrop"]
+position = Vector3(48, 4, -96)
+mesh = SubResource("hill_near")
+cast_shadow = 0
+
+[node name="Cloud1" type="Node3D" parent="Backdrop"]
+position = Vector3(-22, 27, -60)
+scale = Vector3(1, 1, 1)
+
+[node name="Puff1" type="MeshInstance3D" parent="Backdrop/Cloud1"]
+position = Vector3(0, 0, 0)
+scale = Vector3(3.2, 2.56, 3.2)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff2" type="MeshInstance3D" parent="Backdrop/Cloud1"]
+position = Vector3(3.4, -0.6, 0)
+scale = Vector3(2.4, 1.92, 2.4)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff3" type="MeshInstance3D" parent="Backdrop/Cloud1"]
+position = Vector3(-3.2, -0.8, 0)
+scale = Vector3(2.2, 1.76, 2.2)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff4" type="MeshInstance3D" parent="Backdrop/Cloud1"]
+position = Vector3(1.2, 1.4, 0)
+scale = Vector3(2.3, 1.84, 2.3)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Cloud2" type="Node3D" parent="Backdrop"]
+position = Vector3(26, 30, -70)
+scale = Vector3(1.2, 1.2, 1.2)
+
+[node name="Puff1" type="MeshInstance3D" parent="Backdrop/Cloud2"]
+position = Vector3(0, 0, 0)
+scale = Vector3(3.2, 2.56, 3.2)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff2" type="MeshInstance3D" parent="Backdrop/Cloud2"]
+position = Vector3(3.4, -0.6, 0)
+scale = Vector3(2.4, 1.92, 2.4)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff3" type="MeshInstance3D" parent="Backdrop/Cloud2"]
+position = Vector3(-3.2, -0.8, 0)
+scale = Vector3(2.2, 1.76, 2.2)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff4" type="MeshInstance3D" parent="Backdrop/Cloud2"]
+position = Vector3(1.2, 1.4, 0)
+scale = Vector3(2.3, 1.84, 2.3)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Cloud3" type="Node3D" parent="Backdrop"]
+position = Vector3(13, 19, -50)
+scale = Vector3(0.7, 0.7, 0.7)
+
+[node name="Puff1" type="MeshInstance3D" parent="Backdrop/Cloud3"]
+position = Vector3(0, 0, 0)
+scale = Vector3(3.2, 2.56, 3.2)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff2" type="MeshInstance3D" parent="Backdrop/Cloud3"]
+position = Vector3(3.4, -0.6, 0)
+scale = Vector3(2.4, 1.92, 2.4)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff3" type="MeshInstance3D" parent="Backdrop/Cloud3"]
+position = Vector3(-3.2, -0.8, 0)
+scale = Vector3(2.2, 1.76, 2.2)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff4" type="MeshInstance3D" parent="Backdrop/Cloud3"]
+position = Vector3(1.2, 1.4, 0)
+scale = Vector3(2.3, 1.84, 2.3)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Cloud4" type="Node3D" parent="Backdrop"]
+position = Vector3(-38, 20, -70)
+scale = Vector3(0.8, 0.8, 0.8)
+
+[node name="Puff1" type="MeshInstance3D" parent="Backdrop/Cloud4"]
+position = Vector3(0, 0, 0)
+scale = Vector3(3.2, 2.56, 3.2)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff2" type="MeshInstance3D" parent="Backdrop/Cloud4"]
+position = Vector3(3.4, -0.6, 0)
+scale = Vector3(2.4, 1.92, 2.4)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff3" type="MeshInstance3D" parent="Backdrop/Cloud4"]
+position = Vector3(-3.2, -0.8, 0)
+scale = Vector3(2.2, 1.76, 2.2)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff4" type="MeshInstance3D" parent="Backdrop/Cloud4"]
+position = Vector3(1.2, 1.4, 0)
+scale = Vector3(2.3, 1.84, 2.3)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Cloud5" type="Node3D" parent="Backdrop"]
+position = Vector3(40, 22, -60)
+scale = Vector3(0.6, 0.6, 0.6)
+
+[node name="Puff1" type="MeshInstance3D" parent="Backdrop/Cloud5"]
+position = Vector3(0, 0, 0)
+scale = Vector3(3.2, 2.56, 3.2)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff2" type="MeshInstance3D" parent="Backdrop/Cloud5"]
+position = Vector3(3.4, -0.6, 0)
+scale = Vector3(2.4, 1.92, 2.4)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff3" type="MeshInstance3D" parent="Backdrop/Cloud5"]
+position = Vector3(-3.2, -0.8, 0)
+scale = Vector3(2.2, 1.76, 2.2)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="Puff4" type="MeshInstance3D" parent="Backdrop/Cloud5"]
+position = Vector3(1.2, 1.4, 0)
+scale = Vector3(2.3, 1.84, 2.3)
+mesh = SubResource("cloud")
+cast_shadow = 0
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="Seat1" type="Marker3D" parent="SpawnPoints"]
+position = Vector3(-4.2, 0, 0)
+
+[node name="Seat2" type="Marker3D" parent="SpawnPoints"]
+position = Vector3(-2.8, 0, 0)
+
+[node name="Seat3" type="Marker3D" parent="SpawnPoints"]
+position = Vector3(-1.4, 0, 0)
+
+[node name="Seat4" type="Marker3D" parent="SpawnPoints"]
+position = Vector3(-0, 0, 0)
+
+[node name="Seat5" type="Marker3D" parent="SpawnPoints"]
+position = Vector3(1.4, 0, 0)
+
+[node name="Seat6" type="Marker3D" parent="SpawnPoints"]
+position = Vector3(2.8, 0, 0)
+
+[node name="Seat7" type="Marker3D" parent="SpawnPoints"]
+position = Vector3(4.2, 0, 0)
+
+[node name="Seat8" type="Marker3D" parent="SpawnPoints"]
+position = Vector3(5.6, 0, 0)
+
+[node name="Seat9" type="Marker3D" parent="SpawnPoints"]
+position = Vector3(7, 0, 0)
+
+[node name="Seat10" type="Marker3D" parent="SpawnPoints"]
+position = Vector3(8.4, 0, 0)
+
+[node name="Characters" type="Node3D" parent="."]
+
+[node name="PlatformSurfaces" type="Node3D" parent="."]
+editor_description = "Invisible landings and side walls on the action plane. Landings are built from PlazaLanding markers at runtime."

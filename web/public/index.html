@@ -37,10 +37,10 @@
               id="selection-preview"
               class="character-preview"
               role="img"
-              aria-label="Blue Squircle character"
+              aria-label="Blue Cubio character"
             ></canvas>
             <p id="selected-character-label" class="selection-label" aria-live="polite">
-              Blue Squircle
+              Blue Cubio
             </p>
           </div>
         </div>
@@ -76,7 +76,7 @@
           id="name-preview"
           class="character-preview name-preview"
           role="img"
-          aria-label="Your Squircle character"
+          aria-label="Your Cubio character"
         ></canvas>
         <h2 id="name-screen-title" class="name-screen-title">What's your name?</h2>
         <form id="join-form">
@@ -112,23 +112,10 @@
           READY
         </button>
       </section>
-      <section id="bubbles-card" aria-labelledby="bubbles-heading" hidden>
-        <h2 id="bubbles-heading">Bubbles and Jellyfishes</h2>
-        <div
-          id="bubbles-pad"
-          role="button"
-          tabindex="0"
-          aria-label="Bubbles controller. Swipe to move, or draw circles and release to spin. Arrow keys move; Space spins."
-          aria-describedby="bubbles-help"
-        >
-          <span id="bubbles-help" class="visually-hidden"
-            >Swipe to move. Draw circles and release to spin. Arrow keys move; Space spins.</span
-          >
-          <div class="bubbles-content">
-            <span id="bubbles-score" aria-live="polite">0</span>
-            <canvas id="bubbles-visual" aria-hidden="true"></canvas>
-          </div>
-        </div>
+      <section id="bubbles-3d-card" aria-label="Bubbles and jellyfishes 3D. Swipe to move." hidden>
+        <span id="bubbles-3d-score" aria-label="Caught jellyfishes" aria-live="polite">0</span>
+        <canvas id="bubbles-3d-visual" aria-hidden="true"></canvas>
+        <div id="bubbles-3d-fallback" aria-hidden="true" hidden></div>
       </section>
       <section id="motion-lab" aria-labelledby="motion-lab-title" hidden>
         <h2 id="motion-lab-title">Motion Lab · Player 1</h2>
@@ -138,15 +125,22 @@
         <p>Developer diagnostics. Move this phone and watch the host preview.</p>
         <pre id="motion-readings" aria-label="Live sensor diagnostics"></pre>
       </section>
-      <section id="tilt-shift" aria-label="Tilt Shift movement guide" hidden>
-        <canvas id="tilt-paddle" aria-label="Your team paddle follows accepted tilt"></canvas>
-        <div id="tilt-actions" hidden>
+      <section id="tilt-shift-3d" aria-label="Your Tilt Shift 3D paddle" hidden>
+        <div id="tilt3d-stage">
+          <canvas
+            id="tilt3d-paddle"
+            aria-label="Your paddle follows the host's tilt"
+            hidden
+          ></canvas>
+          <canvas id="tilt3d-flat" aria-label="Your paddle follows the host's tilt" hidden></canvas>
+        </div>
+        <div id="tilt3d-actions" hidden>
           <span class="tilt-phone-icon" aria-label="Hold your phone sideways">↻</span>
-          <p id="tilt-orientation" role="status" hidden></p>
-          <p id="tilt-state" role="status" hidden></p>
-          <button id="tilt-permission" type="button">ENABLE TILT</button>
-          <button id="tilt-calibrate" type="button">SET NEUTRAL</button>
-          <button id="tilt-ready" type="button" aria-pressed="false">READY</button>
+          <p id="tilt3d-orientation" role="status" hidden></p>
+          <p id="tilt3d-state" role="status" hidden></p>
+          <button id="tilt3d-permission" type="button">ENABLE TILT</button>
+          <button id="tilt3d-calibrate" type="button">SET NEUTRAL</button>
+          <button id="tilt3d-ready" type="button" aria-pressed="false">READY</button>
         </div>
       </section>
       <noscript>Enable JavaScript to connect to the game.</noscript>

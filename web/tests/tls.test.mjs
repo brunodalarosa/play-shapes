@@ -164,7 +164,7 @@ test("verified HTTPS serves assets and WSS joins then resumes a registered playe
     "/app-icon-180.png",
     "/app-icon-192.png",
     "/app-icon-512.png",
-    "/squircle-v1/idle-front-colorable.png",
+    "/models/cubio-face-neutral.png",
   ]) {
     const response = await get(path);
     assert.equal(response.status, 200);

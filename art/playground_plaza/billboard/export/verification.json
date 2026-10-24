@@ -1,0 +1,236 @@
+{
+  "result": "PASS",
+  "blender_version": "5.2.2 LTS",
+  "source_sha256": "7136b7707fd39b911e10e1f8e3920b224daa4bb9a2b8e81a09229683e57332c2",
+  "export_sha256": "45582810ca7bb717f44c30c89c08bda0627350ea0c898fc439435b29655fbc99",
+  "export_bytes": 75064,
+  "source_geometry_blender_xyz": {
+    "minimum": [
+      -3.200000047683716,
+      -0.4000000059604645,
+      0.0
+    ],
+    "maximum": [
+      3.200000047683716,
+      0.4000000059604645,
+      11.570000648498535
+    ],
+    "triangles": 990,
+    "mesh_count": 9,
+    "triangles_by_object": {
+      "Frame": 96,
+      "Backing": 12,
+      "Display": 2,
+      "Foot Left": 44,
+      "Support Left": 360,
+      "Lamp Left": 36,
+      "Foot Right": 44,
+      "Support Right": 360,
+      "Lamp Right": 36
+    }
+  },
+  "round_trip_geometry_blender_xyz": {
+    "minimum": [
+      -3.200000047683716,
+      -0.4000000059604645,
+      0.0
+    ],
+    "maximum": [
+      3.200000047683716,
+      0.4000000059604645,
+      11.570000648498535
+    ],
+    "triangles": 990,
+    "mesh_count": 9,
+    "triangles_by_object": {
+      "Backing": 12,
+      "Display": 2,
+      "Foot Left": 44,
+      "Foot Right": 44,
+      "Frame": 96,
+      "Lamp Left": 36,
+      "Lamp Right": 36,
+      "Support Left": 360,
+      "Support Right": 360
+    }
+  },
+  "materials": {
+    "Frame Blue Gray": {
+      "color": [
+        0.09305896610021591,
+        0.15292614698410034,
+        0.30946892499923706,
+        1.0
+      ],
+      "roughness": 0.7200000286102295,
+      "metallic": 0.0
+    },
+    "Backing Navy": {
+      "color": [
+        0.04817182570695877,
+        0.0802198201417923,
+        0.15896083414554596,
+        1.0
+      ],
+      "roughness": 0.7200000286102295,
+      "metallic": 0.0
+    },
+    "Display Blank Cream": {
+      "color": [
+        1.0,
+        0.8713670969009399,
+        0.6583748459815979,
+        1.0
+      ],
+      "roughness": 0.7200000286102295,
+      "metallic": 0.0
+    },
+    "Support Blue Gray": {
+      "color": [
+        0.13013647496700287,
+        0.21223075687885284,
+        0.3762621283531189,
+        1.0
+      ],
+      "roughness": 0.7200000286102295,
+      "metallic": 0.0
+    },
+    "Lamp Lens": {
+      "color": [
+        0.7912979125976562,
+        0.7379103899002075,
+        0.6172065734863281,
+        1.0
+      ],
+      "roughness": 0.7200000286102295,
+      "metallic": 0.0
+    }
+  },
+  "gltf_world_bounds_xyz": {
+    "minimum": [
+      -3.200000047683716,
+      0.0,
+      -0.4000000059604645
+    ],
+    "maximum": [
+      3.200000047683716,
+      11.570000648498535,
+      0.4000000059604645
+    ]
+  },
+  "exported_mesh_surfaces": 11,
+  "display_size": [
+    6,
+    6
+  ],
+  "display_bottom": 5,
+  "display_source_mapping": [
+    {
+      "position": [
+        3.0,
+        0.20100000500679016,
+        5.0
+      ],
+      "uv": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "position": [
+        -3.0,
+        0.20100000500679016,
+        5.0
+      ],
+      "uv": [
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "position": [
+        -3.0,
+        0.20100000500679016,
+        11.0
+      ],
+      "uv": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "position": [
+        3.0,
+        0.20100000500679016,
+        11.0
+      ],
+      "uv": [
+        0.0,
+        1.0
+      ]
+    }
+  ],
+  "display_gltf_mapping": [
+    {
+      "position": [
+        3.0,
+        5.0,
+        -0.20100000500679016
+      ],
+      "uv": [
+        0.0,
+        1.0
+      ]
+    },
+    {
+      "position": [
+        -3.0,
+        5.0,
+        -0.20100000500679016
+      ],
+      "uv": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "position": [
+        -3.0,
+        11.0,
+        -0.20100000500679016
+      ],
+      "uv": [
+        1.0,
+        0.0
+      ]
+    },
+    {
+      "position": [
+        3.0,
+        11.0,
+        -0.20100000500679016
+      ],
+      "uv": [
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "gltf_orientation": "Y up; display -Z; ground-centered origin",
+  "evidence": "AUTO: Blender source and GLB round trip; no Godot import/runtime evidence",
+  "checks": [
+    "closed positive-volume structure",
+    "front-facing single display surface",
+    "no degenerate faces",
+    "triangle, mesh and material budgets",
+    "square display bounds and full-square upright UV in source and GLB",
+    "grounded feet and support contact",
+    "independent display mesh/material",
+    "applied mesh scales/rotations",
+    "ground origin",
+    "no external dependencies",
+    "no studio objects in export",
+    "decoded GLB world bounds and orientation",
+    "round-trip names, bounds, triangles, UV and material values"
+  ]
+}

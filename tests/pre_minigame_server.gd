@@ -30,6 +30,12 @@ func _process(_delta: float) -> bool:
 	var host := root.get_node("SessionHost")
 	if host.player_registry.player_count() != 2:
 		return false
+	var selector := current_scene.get_node("%MinigameSelector") as OptionButton
+	for index: int in selector.item_count:
+		if StringName(selector.get_item_metadata(index)) == &"bubbles_3d":
+			selector.select(index)
+			selector.item_selected.emit(index)
+			break
 	var start := current_scene.get_node("%StartMinigame") as Button
 	if start.disabled:
 		return false

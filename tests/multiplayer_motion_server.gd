@@ -2,7 +2,7 @@ extends SceneTree
 ## Synthetic real-socket roster fixture. Observer output is never a production route.
 
 var _host: Node
-var _motion: TiltShiftMotionController
+var _motion: TiltShift3DMotionController
 var _observed_at: int = -1000
 
 
@@ -19,7 +19,7 @@ func _boot() -> void:
 		push_error("Multiplayer motion fixture could not start")
 		quit(1)
 		return
-	_motion = TiltShiftMotionController.new()
+	_motion = TiltShift3DMotionController.new()
 	_host.set_accepting_new_players(true)
 	root.add_child(_motion)
 	print("Multiplayer motion fixture ready")
@@ -33,7 +33,7 @@ func _process(_delta: float) -> bool:
 		var ids := PackedStringArray()
 		for player: Dictionary in players:
 			ids.append(player.player_id)
-		_motion.prepare(_host.websocket, ids, TiltShiftMotionTuning.new())
+		_motion.prepare(_host.websocket, ids, TiltShift3DMotionTuning.new())
 	var now := Time.get_ticks_msec()
 	if now - _observed_at < 50:
 		return false

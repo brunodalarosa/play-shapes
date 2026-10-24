@@ -27,7 +27,7 @@ test("finds ticket numbers in text and in file names", () => {
   assert.deepEqual(ticketLines("HTTPS on port 8080, GPS 12, caps 100"), []);
 
   assert.equal(hasTicketName(`docs/${ticket("080").toLowerCase()}-animations.md`), true);
-  assert.equal(hasTicketName("docs/squircle-animations.md"), false);
+  assert.equal(hasTicketName("docs/cubio-animations.md"), false);
 });
 
 test("splits Markdown into paragraphs, list items and table rows", () => {

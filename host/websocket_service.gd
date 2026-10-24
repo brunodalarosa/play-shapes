@@ -5,10 +5,7 @@ extends Node
 signal connection_count_changed(count: int)
 signal motion_session_ended
 
-const MAX_PACKET_BYTES := 8192 # One bounded 128-point Bubbles trace plus protocol envelope.
-const BubblesProtocolScript = preload(
-	"res://minigames/002_bubbles_and_jellyfishes/bubbles_protocol.gd"
-)
+const MAX_PACKET_BYTES := 8192 # Bounds every client WebSocket packet.
 
 var _server: TCPServer = TCPServer.new()
 var _clients: Array[Dictionary] = []
@@ -18,7 +15,7 @@ var _network: ControllerNetworkConfig
 var _registry: PlayerRegistry
 var _accepting_new_players: Callable
 var _next_id: int = 1
-var _bubbles_protocol: RefCounted
+var _minigame_protocol: MinigameProtocol
 var _active_protocol: RefCounted
 var _lobby_controller: LobbyPlaygroundWorld
 var _readiness: PreMinigameReadiness
@@ -82,15 +79,26 @@ func remove_multiplayer_motion(player_id: String) -> void:
 	channel.end()
 
 
-func set_tilt_shift_protocol(protocol: RefCounted) -> void:
-	# Keep game state types out of shared transport startup; adapters expose snapshot_for().
+## Routes the message types [param protocol] handles to it until it is cleared.
+func set_minigame_protocol(protocol: MinigameProtocol) -> void:
+	clear_minigame_protocol()
+	_minigame_protocol = protocol
 	_active_protocol = protocol
+	protocol.send_requested.connect(_send_to_player)
+	protocol.broadcast_requested.connect(_broadcast_gameplay_snapshots)
 	_broadcast_gameplay_snapshots()
 
 
-func clear_tilt_shift_protocol(protocol: RefCounted) -> void:
-	if _active_protocol == protocol:
+## Clears [param protocol], or whichever minigame protocol is set when it is null.
+func clear_minigame_protocol(protocol: MinigameProtocol = null) -> void:
+	if _minigame_protocol == null or (protocol != null and protocol != _minigame_protocol):
+		return
+	_minigame_protocol.send_requested.disconnect(_send_to_player)
+	_minigame_protocol.broadcast_requested.disconnect(_broadcast_gameplay_snapshots)
+	_minigame_protocol.detach()
+	if _active_protocol == _minigame_protocol:
 		_active_protocol = null
+	_minigame_protocol = null
 
 
 func send_current_snapshot(player_id: String, coalesce := true) -> void:
@@ -178,23 +186,6 @@ func end_pre_minigame() -> void:
 
 func _on_readiness_changed(_snapshot: Dictionary) -> void:
 	_broadcast_gameplay_snapshots()
-
-
-func set_bubbles_controller(controller: BubblesRoundController) -> void:
-	_clear_bubbles_controller()
-	_bubbles_protocol = BubblesProtocolScript.new(controller)
-	_active_protocol = _bubbles_protocol
-	controller.phase_changed.connect(_on_bubbles_phase_changed)
-	controller.personal_state_changed.connect(_on_bubbles_personal_state_changed)
-	controller.personal_visual_changed.connect(_on_bubbles_personal_visual_changed)
-	controller.feedback_requested.connect(_on_bubbles_feedback)
-	controller.return_to_lobby_requested.connect(_on_bubbles_return_to_lobby)
-	_broadcast_gameplay_snapshots()
-
-
-func clear_bubbles_controller(controller: BubblesRoundController) -> void:
-	if _bubbles_protocol != null and _bubbles_protocol.controller == controller:
-		_clear_bubbles_controller()
 
 
 func send_lobby_state() -> void:
@@ -433,14 +424,6 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 			}
 			if not result.accepted:
 				_send_rejection(peer, "error", result)
-		"tilt_shift_ready":
-			var player := _registry.player_for_connection(client.connection_id)
-			if _active_protocol != null and _active_protocol.has_method("handle_ready"):
-				_active_protocol.handle_ready(
-					String(player.get("player_id", "")),
-					message,
-					Time.get_ticks_msec(),
-				)
 		"pre_minigame_ready":
 			var player := _registry.player_for_connection(client.connection_id)
 			var ready_value: Variant = message.get("ready")
@@ -454,33 +437,26 @@ func _handle_message(client: Dictionary, message: Dictionary) -> void:
 				_send_rejection(peer, "error", result)
 			elif _readiness != null:
 				_send_gameplay_snapshot(peer, String(player.player_id))
-		"bubbles_trace", "bubbles_charge":
-			var player := _registry.player_for_connection(client.connection_id)
-			var result: Dictionary = _active_protocol.handle_action(
-				player,
-				message,
-				Time.get_ticks_msec(),
-			) \
-					if _active_protocol == _bubbles_protocol and _bubbles_protocol != null else {
-				"accepted": false,
-				"code": &"game_unavailable",
-				"message": "Bubbles is not active",
-			}
-			if not result.accepted:
-				_send_rejection(peer, "error", result)
-			elif message.get("type") == "bubbles_trace":
-				peer.send_text(
-					JSON.stringify(
-						{
-							"type": "bubbles_trace_result",
-							"action": result.action,
-							"reason": result.reason,
-							"charge": 0.0,
-						}
-					)
-				)
-				_send_gameplay_snapshot(peer, String(player.player_id))
 		_:
+			var type := String(message.get("type", ""))
+			if (
+				_minigame_protocol != null and _active_protocol == _minigame_protocol
+				and _minigame_protocol.handles(type)
+			):
+				var player := _registry.player_for_connection(client.connection_id)
+				var result := _minigame_protocol.handle_message(
+					player,
+					message,
+					Time.get_ticks_msec(),
+				)
+				if not result.accepted:
+					_send_rejection(peer, "error", result)
+					return
+				if result.has("reply"):
+					peer.send_text(JSON.stringify(result.reply))
+				if result.get("snapshot", false):
+					_send_gameplay_snapshot(peer, String(player.player_id))
+				return
 			_send_rejection(
 				peer,
 				"error",
@@ -521,52 +497,6 @@ func _broadcast_gameplay_snapshots() -> void:
 		var player := _registry.player_for_connection(client.connection_id)
 		if not player.is_empty():
 			_send_gameplay_snapshot(client.peer, String(player.player_id))
-
-
-func _on_bubbles_phase_changed(_phase: StringName, _snapshot: Dictionary) -> void:
-	_broadcast_gameplay_snapshots()
-
-
-func _on_bubbles_personal_state_changed(player_id: String, _snapshot: Dictionary) -> void:
-	if _bubbles_protocol != null:
-		_send_to_player(player_id, _bubbles_protocol.snapshot_for(player_id))
-
-
-func _on_bubbles_personal_visual_changed(player_id: String, visual_state: Dictionary) -> void:
-	if _bubbles_protocol != null:
-		_send_to_player(player_id, { "type": "bubbles_visual", "visual": visual_state })
-
-
-func _on_bubbles_feedback(player_id: String, kind: StringName, data: Dictionary) -> void:
-	if _bubbles_protocol == null or kind not in [&"captured", &"spin", &"pop"]:
-		return
-	var message: Dictionary = _bubbles_protocol.feedback_for(player_id, kind, data)
-	if not message.is_empty():
-		_send_to_player(player_id, message)
-
-
-func _on_bubbles_return_to_lobby() -> void:
-	send_lobby_state()
-
-
-func _clear_bubbles_controller() -> void:
-	if _bubbles_protocol == null:
-		return
-	var controller: BubblesRoundController = _bubbles_protocol.controller
-	if is_instance_valid(controller):
-		if controller.phase_changed.is_connected(_on_bubbles_phase_changed):
-			controller.phase_changed.disconnect(_on_bubbles_phase_changed)
-		if controller.personal_state_changed.is_connected(_on_bubbles_personal_state_changed):
-			controller.personal_state_changed.disconnect(_on_bubbles_personal_state_changed)
-		if controller.personal_visual_changed.is_connected(_on_bubbles_personal_visual_changed):
-			controller.personal_visual_changed.disconnect(_on_bubbles_personal_visual_changed)
-		if controller.feedback_requested.is_connected(_on_bubbles_feedback):
-			controller.feedback_requested.disconnect(_on_bubbles_feedback)
-		if controller.return_to_lobby_requested.is_connected(_on_bubbles_return_to_lobby):
-			controller.return_to_lobby_requested.disconnect(_on_bubbles_return_to_lobby)
-	if _active_protocol == _bubbles_protocol:
-		_active_protocol = null
-	_bubbles_protocol = null
 
 
 func _close_replaced_connection(old_connection_id: int, new_connection_id: int) -> void:

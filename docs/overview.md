@@ -7,20 +7,26 @@ repository.
 
 - Godot 4.7.2 is the authoritative host. Phone controllers are bundled HTML, CSS and
   JavaScript clients over local HTTP and WebSockets.
-- The lobby opens a shared ready screen for **Bubbles and Jellyfishes** with 2–10 registered
-  players. Bubbles starts after every current participant is ready.
-- **Tilt Shift** supports 2/4/6/8/10 players. Each phone enables motion, sets a comfortable
-  landscape neutral and confirms READY on the shared Pre-minigame screen before launch.
-  One team paddle on each phone mirrors
-  the host's accepted angle throughout the factory rounds.
-- Registered players appear as Squircle v1 characters in the Playground lobby. Each steers
-  their character from a portrait phone stick and a release-action button. Near-vertical input
+- **Bubbles and jellyfishes 3D** (minigame 004) opens a shared ready screen with 2–10 registered
+  players and starts after every current participant is ready. Players push their bubbles in a
+  3D underwater scene on Jolt physics, with a real-time three.js view of each player's own
+  bubble on the phone.
+- **Tilt Shift 3D** (minigame 005) supports 2/4/6/8/10 players. Each phone enables motion, sets
+  a comfortable landscape neutral and confirms READY on the shared Pre-minigame screen before
+  launch. Players guide balls in a 3D toy factory on Jolt physics, where each player is a
+  paddle in their own colour with a face that reacts. Each phone shows the player's own paddle
+  in real-time 3D.
+- Registered players appear as 3D Cubios in the Playground lobby, a café plaza viewed from
+  the side. Each steers their character from a portrait phone stick and a release-action
+  button. The billboard shows the join QR; the lobby controls are in the top-right panel. Near-vertical input
   reaches or crouches, and FALL descends Open supports.
-- Squircle v1 is also the character in Minigame 002 and in phone setup.
-- F12 opens the debug menu: a one-real-player Bubbles scenario, the Squircle Animation Lab,
-  the Gyroscope and Accelerometer Lab, and a Tilt Shift factory with explicitly simulated
-  controls. The factory review creates ten synthetic operators without registering phones.
-  Bubbles labels its debug round on the host and the phone.
+- The live 3D Cubio is the character in phone setup and the Ready screen. Minigame 004
+  uses the same model on the shared screen and on the phone.
+- F12 opens the debug menu: the one-real-player scenario for Bubbles and jellyfishes 3D, the
+  Gyroscope and Accelerometer Lab, and the Tilt Shift 3D factory with
+  explicitly simulated controls. The factory review creates ten synthetic players without
+  registering phones.
+  Bubbles and jellyfishes 3D labels its debug round on the host and the phone.
 - The host defaults to a responsive 1920×1080 GL Compatibility presentation.
 - **Project > Tools > Build Standalone Host** creates a portable Windows x86_64 release ZIP.
   There is no Linux build.
@@ -65,8 +71,9 @@ type the displayed URL, on a phone on the same LAN.
 ## Starting a round
 
 - Normal play starts with 2–10 registered players. Choose a minigame from the lobby dropdown
-  before starting. Tilt Shift requires an even roster and calibrated motion from everyone.
-- For debug, register exactly one phone, press F12, and choose the matching one-player
-  Bubbles scenario. The separately labeled Tilt Shift factory review needs no phones.
+  before starting. Tilt Shift 3D requires an even roster and calibrated motion from
+  everyone.
+- For debug, register exactly one phone, press F12, and choose a one-player Bubbles
+  scenario. The separately labeled Tilt Shift 3D factory review needs no phones.
 - Restart and lobby return preserve the running `SessionHost`, the player registry and the
   LAN services.

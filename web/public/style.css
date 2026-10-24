@@ -216,8 +216,7 @@ h2 {
 p {
   line-height: 1.6;
 }
-#player-card,
-#bubbles-card {
+#player-card {
   padding: 18px;
   border: 1px solid #587567;
   border-radius: 12px;
@@ -240,9 +239,6 @@ button:disabled {
   opacity: 0.65;
 }
 #player-card {
-  margin-block-start: 20px;
-}
-#bubbles-card {
   margin-block-start: 20px;
 }
 .eyebrow {
@@ -299,99 +295,6 @@ html.gameplay-active body {
   display: block;
   padding: 0;
   touch-action: none;
-}
-
-html.bubbles-active main,
-html.bubbles-active #bubbles-card {
-  inline-size: 100%;
-  max-inline-size: none;
-  block-size: 100%;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-  background: #113850;
-}
-html.bubbles-active main > :not(#bubbles-card),
-html.bubbles-active #bubbles-heading {
-  position: absolute !important;
-  inline-size: 1px !important;
-  block-size: 1px !important;
-  overflow: hidden !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-}
-html.bubbles-active main,
-html.bubbles-active #bubbles-card {
-  block-size: 100vh;
-}
-@supports (height: 100dvh) {
-  html.bubbles-active main,
-  html.bubbles-active #bubbles-card {
-    block-size: 100dvh;
-  }
-}
-html.bubbles-active #bubbles-pad {
-  position: fixed;
-  inset: 0;
-  display: block;
-  overflow: hidden;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  background-color: #087bc1;
-  background-image: url("/bubbles-phone-background.png");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}
-html.bubbles-active #bubbles-pad:focus-visible {
-  outline: 5px solid #ffd166;
-  outline-offset: -8px;
-}
-html.bubbles-active .bubbles-content {
-  position: absolute;
-  inset-block-start: env(safe-area-inset-top);
-  inset-block-end: env(safe-area-inset-bottom);
-  inset-inline-start: env(safe-area-inset-left);
-  inset-inline-end: env(safe-area-inset-right);
-  overflow: hidden;
-}
-#bubbles-visual {
-  position: absolute;
-  inset: 0;
-  display: block;
-  inline-size: 100%;
-  block-size: 100%;
-}
-#bubbles-score {
-  position: absolute;
-  z-index: 1;
-  inset-block-start: 15%;
-  inset-inline-start: 50%;
-  transform: translateX(-50%);
-  color: #f3d32c;
-  font-size: clamp(46px, 13vw, 76px);
-  font-weight: 500;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 2px 10px rgb(0 67 128 / 0.12);
-  pointer-events: none;
-}
-.visually-hidden {
-  position: absolute !important;
-  inline-size: 1px !important;
-  block-size: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
-}
-html.bubbles-active .footnote {
-  display: none;
 }
 
 /* One large, host-confirmed ready control. */
@@ -487,8 +390,7 @@ html:is(.gameplay-active, .lobby-active, .ready-active),
 html:is(.gameplay-active, .lobby-active, .ready-active) body {
   overscroll-behavior: none;
 }
-#lobby-controller,
-html.bubbles-active #bubbles-pad {
+#lobby-controller {
   block-size: var(--controller-height, 100dvh);
   inset-block-end: auto;
 }
@@ -496,7 +398,6 @@ html.ready-active main {
   min-block-size: var(--controller-height, 100dvh);
 }
 #lobby-controller,
-#bubbles-pad,
 #ready-card {
   user-select: none;
   -webkit-user-select: none;
@@ -616,75 +517,6 @@ html.ready-active main {
   padding: 14px;
 }
 
-html.tilt-active,
-html.tilt-active body {
-  inline-size: 100%;
-  block-size: 100%;
-  overflow: hidden;
-  background: #eee1c8;
-  overscroll-behavior: none;
-}
-html.tilt-active main {
-  padding: 0;
-  margin: 0;
-  inline-size: 100%;
-  max-inline-size: none;
-  block-size: var(--controller-height, 100dvh);
-}
-html.tilt-active main > :not(#tilt-shift) {
-  display: none !important;
-}
-#tilt-shift {
-  display: flex;
-  flex-direction: column;
-  inline-size: 100%;
-  block-size: 100%;
-  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
-    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
-  user-select: none;
-  touch-action: none;
-}
-#tilt-paddle {
-  inline-size: 100%;
-  min-block-size: 0;
-  flex: 1;
-}
-#tilt-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-}
-#tilt-actions button {
-  min-block-size: 48px;
-  padding: 12px 20px;
-  border: 3px solid #c1aa7c;
-  border-radius: 14px;
-  background: #fff7e1;
-  color: #2d453c;
-  font-size: clamp(16px, 3vw, 23px);
-  font-weight: 800;
-  touch-action: manipulation;
-}
-#tilt-actions button:disabled {
-  opacity: 0.5;
-}
-#tilt-ready {
-  background: #9eddb6 !important;
-}
-#tilt-ready[aria-pressed="true"] {
-  background: #f4bc82 !important;
-}
-#tilt-state,
-#tilt-orientation {
-  flex-basis: 100%;
-  margin: 0;
-  text-align: center;
-}
-#tilt-orientation {
-  color: #2d453c;
-}
 .tilt-phone-icon {
   display: none;
   border: 3px solid #9a8565;
@@ -699,10 +531,184 @@ html.tilt-active main > :not(#tilt-shift) {
     display: block;
   }
 }
-#tilt-shift[data-waiting="true"][data-team="0"] {
+html.tilt-3d-active,
+html.tilt-3d-active body {
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  background: #f6ecd8;
+  overscroll-behavior: none;
+}
+html.tilt-3d-active main {
+  padding: 0;
+  margin: 0;
+  inline-size: 100%;
+  max-inline-size: none;
+  block-size: var(--controller-height, 100dvh);
+}
+html.tilt-3d-active main > :not(#tilt-shift-3d) {
+  display: none !important;
+}
+#tilt-shift-3d {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  background: var(--tilt3d-wall, linear-gradient(#fbf3e2, #efdfc2));
+  user-select: none;
+  touch-action: none;
+}
+/* The canvases fill a stage that the layout sizes, so a canvas's own pixel size never pushes
+   the buttons around while it resizes. */
+#tilt3d-stage {
+  position: relative;
+  flex: 1;
+  min-block-size: 0;
+}
+#tilt3d-stage canvas {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+#tilt3d-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+#tilt3d-actions button {
+  min-block-size: 48px;
+  padding: 12px 20px;
+  border: 3px solid #c1aa7c;
+  border-radius: 14px;
+  background: #fff7e1;
+  color: #2d453c;
+  font-size: clamp(16px, 3vw, 23px);
+  font-weight: 800;
+  touch-action: manipulation;
+}
+#tilt3d-actions button:disabled {
+  opacity: 0.5;
+}
+#tilt3d-ready {
+  background: #9eddb6 !important;
+}
+#tilt3d-ready[aria-pressed="true"] {
+  background: #f4bc82 !important;
+}
+#tilt3d-state,
+#tilt3d-orientation {
+  flex-basis: 100%;
+  margin: 0;
+  text-align: center;
+  color: #2d453c;
+}
+#tilt-shift-3d[data-waiting="true"][data-team="0"] {
   background: radial-gradient(circle, #ffc37d 0 14%, #d67b37 15% 18%, #3b2c24 19%);
 }
-
-#tilt-shift[data-waiting="true"][data-team="1"] {
+#tilt-shift-3d[data-waiting="true"][data-team="1"] {
   background: radial-gradient(circle, #b5d5ff 0 14%, #4c88df 15% 18%, #243345 19%);
+}
+html.bubbles-3d-active,
+html.bubbles-3d-active body {
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  background: #086d9f;
+}
+html.bubbles-3d-active main {
+  padding: 0;
+  margin: 0;
+  max-inline-size: none;
+  inline-size: 100%;
+  block-size: var(--controller-height, 100dvh);
+}
+html.bubbles-3d-active main > :not(#bubbles-3d-card) {
+  display: none !important;
+}
+#bubbles-3d-card {
+  position: relative;
+  isolation: isolate;
+  inline-size: 100%;
+  block-size: var(--controller-height, 100dvh);
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  background: linear-gradient(#64e4ef, #098bbd 40%, #124473);
+  background-size: 100% 120%;
+  animation: underwater-depth 10s ease-in-out infinite alternate;
+}
+#bubbles-3d-card::before {
+  content: "";
+  position: absolute;
+  inset: -15%;
+  pointer-events: none;
+  background: repeating-conic-gradient(
+    from 165deg at 50% -10%,
+    transparent 0deg 13deg,
+    #e5ffff20 15deg 19deg,
+    transparent 22deg 35deg
+  );
+  animation: underwater-rays 12s ease-in-out infinite alternate;
+}
+#bubbles-3d-score {
+  position: absolute;
+  inset-block-start: max(20px, env(safe-area-inset-top));
+  inset-inline: 0;
+  z-index: 2;
+  text-align: center;
+  color: #fff;
+  font-size: clamp(2.5rem, 10vw, 4rem);
+  font-weight: 800;
+  text-shadow: 0 2px 4px #124473;
+  pointer-events: none;
+}
+#bubbles-3d-visual {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  pointer-events: none;
+}
+#bubbles-3d-fallback {
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-start: 50%;
+  inline-size: min(var(--bubble-size, 60%), 70vh);
+  aspect-ratio: 1;
+  border: 3px solid #d5fbff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: inline-size 100ms linear;
+  pointer-events: none;
+}
+@keyframes underwater-rays {
+  from {
+    transform: translateX(-3%) rotate(-3deg);
+    opacity: 0.6;
+  }
+  to {
+    transform: translateX(3%) rotate(3deg);
+    opacity: 1;
+  }
+}
+@keyframes underwater-depth {
+  from {
+    background-position: 50% 0%;
+  }
+  to {
+    background-position: 50% 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #bubbles-3d-card,
+  #bubbles-3d-card::before {
+    animation: none;
+  }
 }

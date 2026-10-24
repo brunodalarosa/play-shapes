@@ -6,13 +6,34 @@ development error panel. The joystick and action button are in
 [platform-phone-controller.md](platform-phone-controller.md); the messages are in
 [protocol.md](protocol.md).
 
-## The Bubbles screen
+## Character setup
 
-- A full-screen portrait touch area with the exact host score, capped decorative jellyfish,
-  and the player's personalized character preview.
-- The Squircle v1 body, hands and feet share the player's chosen color.
+Color selection and name entry show the live 3D Cubio, with the registered color and
+natural blinking. Only the visible preview renders. It shares the model and face downloads
+with gameplay, and releases its renderer when setup is hidden. If 3D is unavailable, the
+color and name controls still allow joining.
 
-## The Tilt Shift screen
+## The Bubbles and jellyfishes 3D screen
+
+The portrait screen shows the exact host jellyfish count above a live 3D view of the
+player's bubble. The whole surface accepts touches, including the count. The tinted
+Cubio, natural blinking, idle animation, shell stretch, caught jellyfishes and recovery
+follow the host state. A water gradient and light rays sit behind the view. Catch and pop
+feedback requests optional vibration.
+
+A touch sends a synchronous start and a synchronous release with normalized net
+screen displacement. Coarse drag directions send only when changed after 70 ms, with a
+600 ms held refresh and a limit of 48 updates per touch. Only an active, connected player
+who has not left can send input. Interrupted gestures cancel on pointer loss, page hiding,
+blur, rotation, fullscreen or viewport changes.
+
+The renderer loads on the first game snapshot, including resumed gameplay. Lobby return
+or another screen disposes it. Rendering pauses while hidden and caps device pixel ratio
+at two. If WebGL or model loading fails, the count remains readable above a flat circle in
+the player's color, sized by the host radius. See [browser-build.md](browser-build.md) for the
+separate bundle.
+
+## The Tilt Shift 3D screen
 
 Preparation exposes Enable tilt, Set neutral and the host-confirmed READY/CANCEL action.
 Landscape orientation, current usable input and completed calibration are required by the
@@ -24,19 +45,25 @@ The selected-player panel inside gameplay has its own READY when open. Skipping 
 round panel does not skip initial preparation. Calibration remains available
 before active play and between rounds, and clears an existing READY.
 
-Gameplay shows one canonical team paddle as a movement guide, even when that player owns
-several factory paddles. Its crop, center pivot, end-cap fitting and proportions match the
-shared beam; its angle comes from the host. There are no touch gameplay controls or score HUD.
+Preparation explains landscape holding and unlocking rotation if needed. Portrait blocks READY
+on both phone and host, and rotating back while waiting clears READY. CANCEL remains available.
+Active play retains responsive portrait rendering and optional orientation lock.
 
-Spectators show a team-colored waiting visual with the guide hidden. Preparation explains
-landscape holding and unlocking rotation if needed. Portrait blocks READY on both phone and
-host, and rotating back while waiting clears READY. CANCEL remains available. Active play
-retains responsive portrait rendering and optional orientation lock.
+The view shows the player's own paddle in real-time 3D over the cream
+wall gradient: their colour, the gap ring, their team outline once teams exist, and the face
+the host chooses. It turns with the host's physical angle and blinks on the phone. There are no
+touch gameplay controls or score HUD.
 
+Spectators see their paddle resting level, smaller, over the team-coloured waiting background.
 Mapped-round reconnect clears READY and retains neutral. Gameplay reconnect retains neutral and
-shows only a temporary permission action if capture needs reacquisition. Results, cancel
-and lobby return retire capture and hide the guide. Returning from a cached page reconnects
-through the authenticated subscription before capture can resume.
+shows only a temporary permission action if capture needs reacquisition.
+Results, cancel and lobby return retire capture and hide the screen. Returning from a cached
+page reconnects through the authenticated subscription before capture can resume. The 3D view
+draws only when the paddle turns, its face changes or it blinks.
+
+A phone without WebGL, or one whose 3D view fails to load twice, draws the same paddle and face
+flat on a 2D canvas. Phones wait a random moment of up to 1.5 seconds before their first
+download, and load face parts one at a time, so a room of phones does not overwhelm the host.
 
 ## Keeping the screen awake
 
@@ -114,16 +141,17 @@ Install before joining: the original tab then has no registered player to orphan
 
 - Browser continuation attempts fullscreen and portrait lock once per onboarding gesture.
   Failure leaves the game playable.
-- There are no fullscreen requests inside Bubbles pointer or key handlers, or before sensor
-  permissions.
+- There are no fullscreen requests inside Bubbles and jellyfishes 3D pointer or key handlers,
+  or before sensor permissions.
 - A standalone launch uses the manifest and Apple metadata.
 - A website cannot force a Safari tab into installed mode, remove all browser chrome, or
   suppress edge gestures the OS reserves.
 
 ## Touch guards
 
-- The active lobby, Bubbles and READY surfaces scope `touch-action`, Safari gesture and
-  touch-move prevention, selection and callout suppression, and overscroll protection.
+- The active lobby, Bubbles and jellyfishes 3D and READY surfaces scope `touch-action`, Safari
+  gesture and touch-move prevention, selection and callout suppression, and overscroll
+  protection.
 - Single taps remain available for READY and Leave.
 - Onboarding remains scrollable and zoomable. Name entry, the keyboard and focus are outside
   those guards.
@@ -138,16 +166,17 @@ temporary controller mounts.
 - Rotation, a viewport or fullscreen change, blur, loss of visibility and `pagehide` cancel
   pending gestures.
 - The stick is recreated when the page is focused and visible again.
-- Bubbles sends a cancel instead of completing a trace that was interrupted in the
-  background.
+- Bubbles and jellyfishes 3D sends a cancel instead of completing a swipe that was interrupted
+  in the background.
 
 ## How often the phone sends
 
 - Lobby stick: a 45 ms movement throttle and a 100 ms two-axis held refresh, in
   `platform_controls.ts` and `platform_input.ts`.
-- Bubbles: a 70 ms motion throttle, a 600 ms heartbeat and a 48-packet cap per gesture, in
-  `app.ts`.
-- A platform action release, and a Bubbles action start or release, send synchronously.
+- Bubbles and jellyfishes 3D: a 70 ms motion throttle, a 600 ms heartbeat and a 48-packet cap
+  per gesture, in `app.ts`.
+- A platform action release, and a Bubbles and jellyfishes 3D swipe start or release, send
+  synchronously.
 
 ## No offline cache
 
@@ -163,7 +192,8 @@ temporary controller mounts.
 
 ## Icons
 
-- The icons reuse the approved Squircle v1 front idle frame and the Playground logo.
+- The icons reuse the Cubio three-quarter render and the [approved logo](../art/logo/README.md),
+  cut out from its cream background.
 - Regenerate them with `node web/scripts/generate_pwa_icons.mjs`, then import in Godot.
 - The HTTP allowlist, the export presets and the pack policy include the manifest, the 180,
   192 and 512 px PNGs, and `pwa.js`.

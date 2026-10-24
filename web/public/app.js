@@ -57,6 +57,798 @@ function bindControllerLifecycle(cancel, target = window, page = document) {
   };
 }
 
+// build/004_3d_bubbles/input.js
+function canTouch(snapshot, connected) {
+  return connected && snapshot?.phase === "active" && snapshot.connected && !snapshot.left;
+}
+function displacement(start, end, size2) {
+  return end.map((value, index) => {
+    const share = (value - start[index]) / Math.max(1, size2[index]);
+    return Math.max(-1, Math.min(1, share));
+  });
+}
+function quantize(value) {
+  return value.map((axis) => Math.max(-4, Math.min(4, Math.round(axis * 10))) || 0);
+}
+var TouchInput = class {
+  available;
+  nextSequence;
+  send;
+  touch;
+  constructor(available, nextSequence, send) {
+    this.available = available;
+    this.nextSequence = nextSequence;
+    this.send = send;
+  }
+  start(point, size2, now) {
+    if (!this.available() || this.touch)
+      return false;
+    const seq = this.nextSequence();
+    this.touch = { seq, start: point, size: size2, current: [0, 0], sent: [0, 0], last: now, count: 0 };
+    this.send({ type: "bubbles_3d_touch", input_seq: seq, stage: "start" });
+    return true;
+  }
+  move(point, now) {
+    if (!this.touch)
+      return;
+    this.touch.current = quantize(displacement(this.touch.start, point, this.touch.size));
+    this.tick(now);
+  }
+  tick(now) {
+    const touch = this.touch;
+    if (!touch || !this.available())
+      return;
+    const changed = touch.current.some((axis, index) => axis !== touch.sent[index]);
+    const elapsed = now - touch.last;
+    if (touch.count >= 48 || elapsed < 70 || !changed && elapsed < 600)
+      return;
+    this.send({
+      type: "bubbles_3d_touch",
+      input_seq: touch.seq,
+      stage: "drag",
+      drag: [...touch.current]
+    });
+    touch.sent = [...touch.current];
+    touch.last = now;
+    touch.count++;
+  }
+  release(point) {
+    const touch = this.touch;
+    this.touch = void 0;
+    if (!touch || !this.available())
+      return;
+    this.send({
+      type: "bubbles_3d_release",
+      input_seq: touch.seq,
+      displacement: displacement(touch.start, point, touch.size)
+    });
+  }
+  cancel() {
+    const touch = this.touch;
+    this.touch = void 0;
+    if (touch && this.available())
+      this.send({ type: "bubbles_3d_touch", input_seq: touch.seq, stage: "cancel" });
+  }
+};
+
+// build/004_3d_bubbles/state.js
+function isSnapshot(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  const type = value.type;
+  return type === "bubbles_3d_snapshot" || type === "bubbles_3d_feedback";
+}
+var BubbleState = class {
+  snapshot;
+  snapshotAt = 0;
+  visual;
+  visualAt = 0;
+  receive(message, now) {
+    if (isSnapshot(message)) {
+      if (this.snapshot && message.host_time_msec < this.snapshot.host_time_msec)
+        return false;
+      this.snapshot = message;
+      this.snapshotAt = now;
+      if (this.visual && this.visual.host_time_msec <= message.host_time_msec)
+        this.visual = void 0;
+      return true;
+    }
+    if (message.type === "bubbles_3d_visual" && this.snapshot) {
+      const minimum = this.visual?.host_time_msec ?? this.snapshot.host_time_msec;
+      if (message.visual.host_time_msec < minimum)
+        return false;
+      this.visual = message.visual;
+      this.visualAt = now;
+      return true;
+    }
+    return false;
+  }
+  frame(now) {
+    const snapshot = this.snapshot;
+    if (!snapshot)
+      return;
+    const elapsed = Math.max(0, now - this.snapshotAt);
+    const running = snapshot.phase === "active" || snapshot.phase === "countdown";
+    const age = running ? elapsed : 0;
+    const reform = snapshot.visual_tuning.bubble_reform_seconds * 1e3;
+    const remaining = Math.max(0, snapshot.reform_remaining_msec - age);
+    const popAge = snapshot.reform_remaining_msec > 0 ? reform - snapshot.reform_remaining_msec + age : snapshot.event === "pop" ? age : -1;
+    const visual = this.visual;
+    if (visual) {
+      const visualAge = running ? Math.max(0, now - this.visualAt) : 0;
+      return {
+        snapshot,
+        visual: {
+          ...visual,
+          host_time_msec: visual.host_time_msec + visualAge,
+          pop_age_msec: visual.pop_age_msec < 0 ? -1 : visual.pop_age_msec + visualAge
+        }
+      };
+    }
+    return {
+      snapshot,
+      visual: {
+        host_time_msec: snapshot.host_time_msec + age,
+        radius: snapshot.bubble_radius * Math.max(0.08, 1 - remaining / Math.max(1, reform)),
+        stretch: [0, 0],
+        velocity: [0, 0],
+        white: snapshot.invulnerable_remaining_msec > age,
+        pop_age_msec: popAge,
+        caught: snapshot.visual_jellyfish
+      }
+    };
+  }
+};
+async function choosePresentation(create, fallback) {
+  try {
+    return await create();
+  } catch {
+    return fallback();
+  }
+}
+
+// build/004_3d_bubbles/phone.js
+var BubblePhone = class {
+  surface;
+  canvas;
+  score;
+  circle;
+  load;
+  state = new BubbleState();
+  presentation;
+  pointer;
+  timer;
+  unbind;
+  generation = 0;
+  feedback = "";
+  input;
+  constructor(surface, canvas, score, circle, connected, nextSequence, send, load) {
+    this.surface = surface;
+    this.canvas = canvas;
+    this.score = score;
+    this.circle = circle;
+    this.load = load;
+    this.input = new TouchInput(() => !surface.hidden && canTouch(this.state.snapshot, connected()), nextSequence, send);
+    surface.addEventListener("pointerdown", (event) => {
+      if (this.pointer !== void 0 || event.pointerType === "mouse" && event.button !== 0)
+        return;
+      const rect = surface.getBoundingClientRect();
+      if (!this.input.start([event.clientX, event.clientY], [rect.width, rect.height], performance.now()))
+        return;
+      event.preventDefault();
+      this.pointer = event.pointerId;
+      try {
+        surface.setPointerCapture(event.pointerId);
+      } catch {
+        this.cancel();
+      }
+    });
+    surface.addEventListener("pointermove", (event) => {
+      if (event.pointerId !== this.pointer)
+        return;
+      event.preventDefault();
+      this.input.move([event.clientX, event.clientY], performance.now());
+    });
+    surface.addEventListener("pointerup", (event) => {
+      if (event.pointerId !== this.pointer)
+        return;
+      event.preventDefault();
+      this.input.release([event.clientX, event.clientY]);
+      this.cancel();
+    });
+    for (const name of ["pointercancel", "lostpointercapture"])
+      surface.addEventListener(name, (event) => {
+        if (event.pointerId === this.pointer)
+          this.cancel();
+      });
+  }
+  receive(message) {
+    const previous = this.state.snapshot;
+    if (isSnapshot(message) && message.phase === "lobby_return") {
+      this.hide();
+      return;
+    }
+    if (isSnapshot(message) && !canTouch(message, true))
+      this.cancel();
+    if (!this.state.receive(message, performance.now()))
+      return;
+    if (isSnapshot(message)) {
+      this.surface.hidden = false;
+      this.score.textContent = String(Math.max(0, Math.floor(message.score)));
+      const key = `${message.host_time_msec}:${message.event}`;
+      if (message.type === "bubbles_3d_feedback" && this.feedback !== key) {
+        this.feedback = key;
+        try {
+          if (message.event === "captured")
+            navigator.vibrate?.(18);
+          else if (message.event === "pop")
+            navigator.vibrate?.([35, 45, 35]);
+        } catch {
+        }
+      }
+      if (!previous)
+        this.mount();
+    }
+    this.paint();
+  }
+  mount() {
+    const generation = ++this.generation;
+    this.presentation = this.fallback();
+    this.unbind = bindControllerLifecycle(() => this.cancel());
+    this.timer = setInterval(() => {
+      this.input.tick(performance.now());
+      this.paint();
+    }, 30);
+    void choosePresentation(async () => (await this.load()).createBubbleView(this.canvas), () => this.fallback()).then((presentation) => {
+      if (generation !== this.generation) {
+        presentation.dispose();
+        return;
+      }
+      this.presentation?.dispose();
+      this.presentation = presentation;
+      this.canvas.hidden = false;
+      this.circle.hidden = true;
+      this.paint();
+    });
+  }
+  fallback() {
+    return {
+      update: ({ snapshot, visual }) => {
+        this.canvas.hidden = true;
+        this.circle.hidden = false;
+        this.circle.style.backgroundColor = snapshot.character_color;
+        const maximum = Math.max(snapshot.visual_tuning.max_radius, visual.radius, 0.01);
+        const size2 = 24 + 60 * visual.radius / maximum;
+        this.circle.style.setProperty("--bubble-size", `${size2}%`);
+      },
+      dispose: () => {
+      }
+    };
+  }
+  paint() {
+    if (document.hidden)
+      return;
+    const frame = this.state.frame(performance.now());
+    if (frame)
+      this.presentation?.update(frame);
+  }
+  cancel() {
+    this.input.cancel();
+    const pointer = this.pointer;
+    this.pointer = void 0;
+    if (pointer !== void 0 && this.surface.hasPointerCapture(pointer))
+      this.surface.releasePointerCapture(pointer);
+  }
+  hide() {
+    this.cancel();
+    this.generation++;
+    clearInterval(this.timer);
+    this.timer = void 0;
+    this.unbind?.();
+    this.unbind = void 0;
+    this.presentation?.dispose();
+    this.presentation = void 0;
+    this.state = new BubbleState();
+    this.feedback = "";
+    this.surface.hidden = true;
+  }
+};
+
+// build/shape_paddle/face.js
+var FACE_BASE = "/shape_faces/";
+var BLINK_EYE = "facial_part_eye_closed_down";
+var UNBLINKING_EYES = [
+  "facial_part_eye_closed_down",
+  "facial_part_eye_closed_up",
+  "facial_part_eye_x"
+];
+var EYE_PREFIX = "facial_part_eye_";
+function validManifest(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  const manifest = value;
+  return !!manifest.parts && typeof manifest.parts === "object" && !!manifest.faces && typeof manifest.faces === "object" && Object.values(manifest.faces).every((face2) => Number.isFinite(face2.box_aspect) && Array.isArray(face2.layers) && face2.layers.every((layer) => typeof layer.part === "string" && layer.part in manifest.parts));
+}
+async function loadManifest(base = FACE_BASE) {
+  const response = await fetch(base + "face_presets.json");
+  if (!response.ok)
+    throw new Error("The face presets could not load");
+  const manifest = await response.json();
+  if (!validManifest(manifest))
+    throw new Error("The face presets are not a face manifest");
+  return manifest;
+}
+function canClose(part) {
+  return part.startsWith(EYE_PREFIX) && !UNBLINKING_EYES.includes(part);
+}
+function faceLayers(manifest, name, blinking) {
+  const face2 = manifest.faces[name];
+  if (!face2)
+    return [];
+  if (!blinking)
+    return face2.layers;
+  const closed = manifest.parts[BLINK_EYE].size;
+  const height = face2.source_size[1];
+  return face2.layers.map((layer) => canClose(layer.part) ? {
+    ...layer,
+    part: BLINK_EYE,
+    size: [closed[0] / height, closed[1] / height],
+    rotation_degrees: 0
+  } : layer);
+}
+var Blinker = class {
+  gaps;
+  closedSeconds;
+  random;
+  next = -1;
+  constructor(gaps = [2.4, 5.6], closedSeconds = 0.12, random = Math.random) {
+    this.gaps = gaps;
+    this.closedSeconds = closedSeconds;
+    this.random = random;
+  }
+  /** True while a blink closes the eyes at [seconds]; calls must move forward in time. */
+  closed(seconds) {
+    if (this.next < 0)
+      this.next = seconds + this.gap();
+    while (seconds >= this.next + this.closedSeconds)
+      this.next += this.closedSeconds + this.gap();
+    return seconds >= this.next;
+  }
+  gap() {
+    const [shortest, longest] = this.gaps;
+    return shortest + (Math.max(shortest, longest) - shortest) * this.random();
+  }
+};
+var FaceImages = class {
+  manifest;
+  base;
+  loaded;
+  images = /* @__PURE__ */ new Map();
+  constructor(manifest, base = FACE_BASE, loaded = () => {
+  }) {
+    this.manifest = manifest;
+    this.base = base;
+    this.loaded = loaded;
+  }
+  image(part) {
+    const entry = this.manifest.parts[part];
+    if (!entry)
+      return void 0;
+    let image = this.images.get(part);
+    if (!image) {
+      image = new Image();
+      image.addEventListener("load", this.loaded);
+      image.src = this.base + entry.file;
+      this.images.set(part, image);
+    }
+    return image;
+  }
+};
+function drawFace(context, images, layers, height) {
+  for (const layer of layers) {
+    const image = images.image(layer.part);
+    if (!image?.complete || !image.naturalWidth)
+      continue;
+    const width = layer.size[0] * height;
+    const tall = layer.size[1] * height;
+    context.save();
+    context.translate(layer.center[0] * height, layer.center[1] * height);
+    context.rotate(layer.rotation_degrees * Math.PI / 180);
+    if (layer.mirror)
+      context.scale(-1, 1);
+    context.drawImage(image, -width / 2, -tall / 2, width, tall);
+    context.restore();
+  }
+}
+
+// build/shape_paddle/rounded_bar.js
+var CORNER_SEGMENTS = 5;
+function roundedOutline(length, thickness, radius, segments = CORNER_SEGMENTS) {
+  const halfX = Math.max(length, 1e-4) / 2;
+  const halfY = Math.max(thickness, 1e-4) / 2;
+  const corner = Math.min(Math.max(radius, 0), halfX, halfY);
+  const innerX = halfX - corner;
+  const innerY = halfY - corner;
+  const centres = [
+    [innerX, innerY],
+    [-innerX, innerY],
+    [-innerX, -innerY],
+    [innerX, -innerY]
+  ];
+  const count = Math.max(1, Math.floor(segments));
+  const points = [];
+  centres.forEach(([x2, y2], index) => {
+    for (let step = 0; step <= count; step++) {
+      const angle = index * Math.PI / 2 + Math.PI / 2 * step / count;
+      points.push([x2 + Math.cos(angle) * corner, y2 + Math.sin(angle) * corner]);
+    }
+  });
+  return points;
+}
+function tracePath(context, outline) {
+  context.beginPath();
+  outline.forEach(([x2, y2], index) => {
+    if (index === 0)
+      context.moveTo(x2, -y2);
+    else
+      context.lineTo(x2, -y2);
+  });
+  context.closePath();
+}
+
+// build/shape_paddle/paddle.js
+function validLook(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  const look = value;
+  const colour2 = (text) => typeof text === "string" && /^[0-9a-f]{6}$/i.test(text);
+  return [
+    look.corner_ratio,
+    look.depth_ratio,
+    look.gap_ratio,
+    look.outline_ratio,
+    look.face_ratio
+  ].every((ratio) => Number.isFinite(ratio) && ratio >= 0 && ratio <= 3) && colour2(look.gap_color) && Array.isArray(look.outline_colors) && look.outline_colors.length === 3 && look.outline_colors.every(colour2) && Array.isArray(look.wall_colors) && look.wall_colors.length === 2 && look.wall_colors.every(colour2);
+}
+function paddleOutlines(shape) {
+  const { length, thickness, look } = shape;
+  const radius = thickness * look.corner_ratio;
+  const gap = thickness * look.gap_ratio;
+  const outline = gap + thickness * look.outline_ratio;
+  return [
+    roundedOutline(length + outline * 2, thickness + outline * 2, radius + outline),
+    roundedOutline(length + gap * 2, thickness + gap * 2, radius + gap),
+    roundedOutline(length, thickness, radius)
+  ];
+}
+function drawPaddle(context, shape, angle, images, layers) {
+  context.save();
+  context.rotate(angle);
+  const colours = [shape.outline, shape.look.gap_color, shape.body];
+  paddleOutlines(shape).forEach((outline, index) => {
+    tracePath(context, outline);
+    context.fillStyle = `#${colours[index].replace(/^#/, "")}`;
+    context.fill();
+  });
+  if (images)
+    drawFace(context, images, layers, shape.thickness * shape.look.face_ratio);
+  context.restore();
+}
+
+// build/005_3d_tilt_shift/fallback.js
+var FlatPaddleView = class {
+  canvas;
+  manifest;
+  frame;
+  context;
+  blinker = new Blinker();
+  images;
+  request = 0;
+  disposed = false;
+  constructor(canvas, manifest) {
+    this.canvas = canvas;
+    this.manifest = manifest;
+    this.context = canvas.getContext("2d");
+    this.images = manifest ? new FaceImages(manifest, void 0, () => this.draw()) : void 0;
+    this.request = requestAnimationFrame(this.tick);
+  }
+  update(frame) {
+    this.frame = frame;
+  }
+  dispose() {
+    this.disposed = true;
+    cancelAnimationFrame(this.request);
+  }
+  tick = () => {
+    if (this.disposed)
+      return;
+    this.draw();
+    this.request = requestAnimationFrame(this.tick);
+  };
+  draw() {
+    const context = this.context;
+    if (!context || !this.frame)
+      return;
+    const width = this.canvas.clientWidth;
+    const height = this.canvas.clientHeight;
+    const ratio = Math.min(devicePixelRatio || 1, 2);
+    if (this.canvas.width !== Math.round(width * ratio))
+      this.canvas.width = Math.round(width * ratio);
+    if (this.canvas.height !== Math.round(height * ratio))
+      this.canvas.height = Math.round(height * ratio);
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    context.clearRect(0, 0, width, height);
+    const { shape, angle, face: face2, resting } = this.frame;
+    const scale = Math.min(width, height) * (resting ? 0.6 : 0.82) / shape.length;
+    context.translate(width / 2, height / 2);
+    context.scale(scale, scale);
+    const layers = this.manifest ? faceLayers(this.manifest, face2, this.blinker.closed(performance.now() / 1e3)) : [];
+    drawPaddle(context, shape, angle, this.images, layers);
+  }
+};
+
+// build/005_3d_tilt_shift/types.js
+var WORLD_UNITS = 19.2;
+var PHASES = ["preparing", "countdown", "start", "active", "between_rounds", "finished"];
+var colour = (value) => typeof value === "string" && /^[0-9a-f]{6}$/i.test(value);
+var face = (value) => typeof value === "string" && /^face_[a-z]$/.test(value);
+var size = (value) => Array.isArray(value) && value.length === 2 && value.every((part) => Number.isFinite(part) && part > 0 && part <= 2);
+function validSnapshot(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  const v2 = value;
+  return v2.type === "tilt_shift_3d_snapshot" && typeof v2.generation === "string" && v2.generation.length > 0 && v2.generation.length <= 64 && Number.isSafeInteger(v2.sequence) && v2.sequence >= 0 && PHASES.includes(v2.phase) && Number.isInteger(v2.round) && v2.round >= 1 && v2.round <= 24 && (v2.team === 0 || v2.team === 1) && Number.isFinite(v2.angle_radians) && Array.isArray(v2.paddle_ids) && (v2.paddle_ids.length >= 1 || v2.selected === false) && v2.paddle_ids.length <= 5 && new Set(v2.paddle_ids).size === v2.paddle_ids.length && v2.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) && (v2.selected === void 0 || typeof v2.selected === "boolean") && (v2.round_token === void 0 || typeof v2.round_token === "string" && v2.round_token.length > 0 && v2.round_token.length <= 64) && [
+    v2.ready,
+    v2.ready_available,
+    v2.calibration_available,
+    v2.calibrated,
+    v2.usable,
+    v2.landscape
+  ].every((flag) => flag === void 0 || typeof flag === "boolean") && size(v2.paddle_size) && colour(v2.color) && face(v2.face) && validLook(v2.look);
+}
+function validPreparation(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  const v2 = value;
+  return typeof v2.generation === "string" && Number.isFinite(v2.angle_radians) && typeof v2.usable === "boolean" && typeof v2.calibrated === "boolean" && size(v2.paddle_size) && colour(v2.color) && face(v2.face) && validLook(v2.look);
+}
+function paddleShape(sizeInWidths, color, team, look) {
+  return {
+    length: sizeInWidths[0] * WORLD_UNITS,
+    thickness: sizeInWidths[1] * WORLD_UNITS,
+    body: color,
+    outline: look.outline_colors[Math.min(2, Math.max(0, team))],
+    look
+  };
+}
+
+// build/005_3d_tilt_shift/phone.js
+var NO_TEAM = 2;
+var RETRY_MSEC = 1e3;
+var STAGGER_MSEC = 1500;
+var TiltShift3DPhone = class {
+  surface;
+  stream;
+  sendReady;
+  load;
+  isLandscape;
+  canvas;
+  flat;
+  actions;
+  permission;
+  calibration;
+  ready;
+  state;
+  orientation;
+  presentation;
+  manifest;
+  mounting = 0;
+  mounted = false;
+  frame;
+  team = NO_TEAM;
+  generation;
+  sequence = -1;
+  preparing = false;
+  readyAvailable = false;
+  selected = true;
+  roundToken;
+  connected = false;
+  usable = false;
+  calibrated = false;
+  landscape = false;
+  isReady = false;
+  capture = "waiting";
+  constructor(surface, stream, sendReady, load, isLandscape = () => window.matchMedia("(orientation: landscape)").matches) {
+    this.surface = surface;
+    this.stream = stream;
+    this.sendReady = sendReady;
+    this.load = load;
+    this.isLandscape = isLandscape;
+    this.canvas = surface.querySelector("#tilt3d-paddle");
+    this.flat = surface.querySelector("#tilt3d-flat");
+    this.actions = surface.querySelector("#tilt3d-actions");
+    this.permission = surface.querySelector("#tilt3d-permission");
+    this.calibration = surface.querySelector("#tilt3d-calibrate");
+    this.ready = surface.querySelector("#tilt3d-ready");
+    this.state = surface.querySelector("#tilt3d-state");
+    this.orientation = surface.querySelector("#tilt3d-orientation");
+    this.permission.addEventListener("click", () => {
+      this.permission.disabled = true;
+      void this.stream.requestPermission().finally(() => this.buttons());
+    });
+    this.calibration.addEventListener("click", () => {
+      if (this.stream.requestCalibration(this.actionContext()))
+        this.calibration.disabled = true;
+    });
+    this.ready.addEventListener("click", () => {
+      if (this.ready.disabled)
+        return;
+      this.ready.disabled = true;
+      this.sendReady(!this.isReady, this.actionContext());
+    });
+  }
+  preparation(value, ready) {
+    if (!validPreparation(value))
+      return false;
+    this.generation = value.generation;
+    this.sequence = -1;
+    this.preparing = this.readyAvailable = this.selected = this.connected = true;
+    this.roundToken = void 0;
+    this.usable = value.usable;
+    this.calibrated = value.calibrated;
+    this.landscape = value.landscape === true;
+    this.capture = value.capture_state;
+    this.isReady = ready;
+    this.team = NO_TEAM;
+    this.show(value, value.angle_radians);
+    return true;
+  }
+  snapshot(value) {
+    if (!validSnapshot(value))
+      return false;
+    if (this.generation !== void 0 && value.generation !== this.generation)
+      return false;
+    if (value.sequence < this.sequence)
+      return false;
+    this.generation = value.generation;
+    this.sequence = value.sequence;
+    this.preparing = value.calibration_available === true;
+    this.readyAvailable = value.ready_available === true;
+    this.selected = value.selected !== false;
+    this.roundToken = value.round_token;
+    this.isReady = value.ready === true;
+    if (value.usable !== void 0)
+      this.usable = value.usable;
+    if (value.calibrated !== void 0)
+      this.calibrated = value.calibrated;
+    this.landscape = value.landscape === true;
+    this.connected = true;
+    this.team = value.team;
+    this.show(value, this.selected ? value.angle_radians : 0);
+    this.surface.hidden = value.phase === "finished";
+    return true;
+  }
+  feedback() {
+    const state = this.stream.controlState;
+    if (!state)
+      return;
+    this.capture = state.capture_state;
+    this.usable = state.usable;
+    this.calibrated = state.calibrated;
+    this.landscape = state.landscape === true;
+    this.buttons();
+  }
+  disconnect() {
+    this.connected = this.usable = false;
+    this.buttons();
+  }
+  hide() {
+    this.surface.hidden = true;
+    this.generation = void 0;
+    this.sequence = -1;
+    this.preparing = this.connected = this.usable = false;
+    this.mounting++;
+    this.mounted = false;
+    this.presentation?.dispose();
+    this.presentation = void 0;
+    this.frame = void 0;
+  }
+  /** The frame the phone draws now, for tests. */
+  currentFrame() {
+    return this.frame;
+  }
+  show(value, angle) {
+    this.frame = {
+      shape: paddleShape(value.paddle_size, value.color, this.team, value.look),
+      angle,
+      face: value.face,
+      resting: !this.selected
+    };
+    const [top, bottom] = value.look.wall_colors;
+    this.surface.style.setProperty("--tilt3d-wall", `linear-gradient(#${top}, #${bottom})`);
+    this.surface.hidden = false;
+    this.surface.setAttribute("data-waiting", String(!this.selected));
+    this.surface.setAttribute("data-team", String(this.team));
+    this.buttons();
+    if (!this.mounted) {
+      this.mounted = true;
+      this.mount();
+    }
+    this.presentation?.update(this.frame);
+  }
+  /**
+   * Draws in 3D once three.js and the faces load; without WebGL, or if either fails, the flat
+   * drawing takes over on its own canvas, since a canvas keeps the first kind of context it gets.
+   */
+  mount() {
+    const mounting = ++this.mounting;
+    this.canvas.hidden = this.flat.hidden = true;
+    void (async () => {
+      let next;
+      let flat = false;
+      try {
+        next = await this.createView(mounting).catch(async () => {
+          await new Promise((done) => setTimeout(done, RETRY_MSEC));
+          return this.createView(mounting);
+        });
+      } catch {
+        if (mounting !== this.mounting)
+          return;
+        next = new FlatPaddleView(this.flat, this.manifest);
+        flat = true;
+      }
+      if (mounting !== this.mounting) {
+        next.dispose();
+        return;
+      }
+      this.presentation = next;
+      this.canvas.hidden = flat;
+      this.flat.hidden = !flat;
+      this.surface.setAttribute("data-view", flat ? "flat" : "3d");
+      if (this.frame)
+        next.update(this.frame);
+    })();
+  }
+  async createView(mounting) {
+    if (!this.manifest) {
+      await new Promise((done) => setTimeout(done, Math.random() * STAGGER_MSEC));
+      if (mounting !== this.mounting)
+        throw new Error("The phone left this screen");
+    }
+    this.manifest ??= await loadManifest();
+    if (mounting !== this.mounting)
+      throw new Error("The phone left this screen");
+    return (await this.load()).createTiltPaddleView(this.canvas, this.manifest);
+  }
+  actionContext() {
+    return this.roundToken && this.generation ? { generation: this.generation, round_token: this.roundToken } : void 0;
+  }
+  buttons() {
+    const landscape = this.landscape && this.isLandscape();
+    this.orientation.hidden = !this.preparing;
+    this.orientation.textContent = landscape ? "Hold your phone in landscape while you get ready." : "Turn your phone to landscape. If it stays upright, turn off rotation lock.";
+    this.permission.hidden = this.usable;
+    this.permission.disabled = !this.connected || !this.stream.active;
+    this.calibration.hidden = !this.preparing;
+    this.calibration.disabled = !this.connected || !this.usable;
+    this.ready.hidden = !this.readyAvailable;
+    this.ready.disabled = !this.connected || !this.isReady && (!this.usable || !this.calibrated || !landscape);
+    this.ready.textContent = this.isReady ? "CANCEL" : "READY";
+    this.ready.setAttribute("aria-pressed", String(this.isReady));
+    this.actions.hidden = !this.preparing && this.usable || !this.selected && !this.preparing;
+    const blocked = {
+      insecure: "Motion needs a secure connection",
+      unsupported: "Motion is unavailable",
+      denied: "Motion access was denied",
+      error: "Motion access could not start",
+      unavailable: "Motion is unavailable",
+      degenerate_orientation: "Hold the screen toward you"
+    };
+    this.state.textContent = this.preparing && !this.usable ? blocked[this.capture] ?? "" : "";
+    this.state.hidden = !this.state.textContent;
+  }
+};
+
 // build/pwa.js
 function isStandalone(target, browser) {
   return target.matchMedia("(display-mode: standalone)").matches || target.matchMedia("(display-mode: fullscreen)").matches || browser.standalone === true;
@@ -495,7 +1287,7 @@ var MotionStream = class {
     this.tick();
   }
   requestCalibration(context) {
-    return this.send({ type: "motion_calibrate", ...context });
+    return this.send({ type: "motion_calibrate", ...context }, false);
   }
   feedback(subscriptionId, state) {
     if (subscriptionId !== this.subscription?.subscription_id)
@@ -506,9 +1298,11 @@ var MotionStream = class {
     this.onControlState?.({ ...state });
     return true;
   }
-  send(payload) {
+  // Streamed messages yield to queued bytes because the next one replaces them. A click is sent
+  // once, so queued bytes must not swallow it.
+  send(payload, streamed = true) {
     const socket2 = this.connection();
-    if (!this.subscription || socket2?.readyState !== WebSocket.OPEN || socket2.bufferedAmount > this.maximumBufferedBytes)
+    if (!this.subscription || socket2?.readyState !== WebSocket.OPEN || streamed && socket2.bufferedAmount > this.maximumBufferedBytes)
       return false;
     socket2.send(JSON.stringify({ ...payload, subscription_id: this.subscription.subscription_id }));
     return true;
@@ -607,228 +1401,6 @@ function formatSample(sample) {
   ].join("\n");
 }
 
-// build/003_tilt_shift/tilt_shift_phone.js
-function validTiltSnapshot(value) {
-  if (!value || typeof value !== "object")
-    return false;
-  const v2 = value;
-  return v2.type === "tilt_shift_snapshot" && typeof v2.generation === "string" && v2.generation.length > 0 && v2.generation.length <= 64 && Number.isSafeInteger(v2.sequence) && v2.sequence >= 0 && ["preparing", "countdown", "start", "active", "between_rounds", "finished"].includes(v2.phase) && Number.isInteger(v2.round) && v2.round >= 1 && v2.round <= 24 && (v2.team === 0 || v2.team === 1) && Number.isFinite(v2.angle_radians) && Array.isArray(v2.paddle_ids) && (v2.paddle_ids.length >= 1 || v2.selected === false) && v2.paddle_ids.length <= 5 && new Set(v2.paddle_ids).size === v2.paddle_ids.length && (v2.selected === void 0 || typeof v2.selected === "boolean") && (v2.round_token === void 0 || typeof v2.round_token === "string" && v2.round_token.length > 0 && v2.round_token.length <= 64) && [
-    v2.ready,
-    v2.ready_available,
-    v2.calibration_available,
-    v2.calibrated,
-    v2.usable,
-    v2.landscape
-  ].every((flag) => flag === void 0 || typeof flag === "boolean") && v2.paddle_ids.every((id) => typeof id === "string" && id.length > 0 && id.length <= 96) && Array.isArray(v2.paddle_size) && v2.paddle_size.length === 2 && v2.paddle_size.every((size) => Number.isFinite(size) && size > 0 && size <= 2);
-}
-var TiltShiftPhone = class {
-  surface;
-  stream;
-  sendReady;
-  isLandscape;
-  canvas;
-  context;
-  actions;
-  permission;
-  calibration;
-  ready;
-  state;
-  orientation;
-  images = [];
-  bounds = [];
-  angle = 0;
-  ratio = 6;
-  team = 2;
-  generation;
-  sequence = -1;
-  preparing = false;
-  readyAvailable = false;
-  selected = true;
-  roundToken;
-  connected = false;
-  usable = false;
-  calibrated = false;
-  landscape = false;
-  isReady = false;
-  capture = "waiting";
-  observer;
-  constructor(surface, stream, sendReady, isLandscape = () => window.matchMedia("(orientation: landscape)").matches) {
-    this.surface = surface;
-    this.stream = stream;
-    this.sendReady = sendReady;
-    this.isLandscape = isLandscape;
-    this.canvas = surface.querySelector("canvas");
-    this.context = this.canvas.getContext("2d");
-    this.actions = surface.querySelector("#tilt-actions");
-    this.permission = surface.querySelector("#tilt-permission");
-    this.calibration = surface.querySelector("#tilt-calibrate");
-    this.ready = surface.querySelector("#tilt-ready");
-    this.state = surface.querySelector("#tilt-state");
-    this.orientation = surface.querySelector("#tilt-orientation");
-    this.permission.addEventListener("click", () => {
-      this.permission.disabled = true;
-      void this.stream.requestPermission().finally(() => this.buttons());
-    });
-    this.calibration.addEventListener("click", () => {
-      if (this.stream.requestCalibration(this.actionContext()))
-        this.calibration.disabled = true;
-    });
-    this.ready.addEventListener("click", () => {
-      if (this.ready.disabled)
-        return;
-      this.ready.disabled = true;
-      this.sendReady(!this.isReady, this.actionContext());
-    });
-    this.observer = new ResizeObserver(() => {
-      this.buttons();
-      this.draw();
-    });
-    this.observer.observe(this.canvas);
-    void this.loadArt();
-  }
-  async loadArt() {
-    const response = await fetch("/tilt-shift/manifest.json");
-    if (!response.ok)
-      throw new Error("Tilt Shift artwork metadata could not load");
-    const manifest = await response.json();
-    for (const name of ["orange", "blue", "neutral"]) {
-      const image = new Image();
-      image.src = `/tilt-shift/paddle_${name}.png`;
-      this.images.push(image);
-      this.bounds.push(manifest.assets[`paddles/paddle_${name}.png`].visible_bounds_px);
-      image.addEventListener("load", () => this.draw());
-    }
-  }
-  preparation(value, ready) {
-    if (typeof value?.generation !== "string" || !Number.isFinite(value.angle_radians))
-      return false;
-    if (typeof value.usable !== "boolean" || typeof value.calibrated !== "boolean")
-      return false;
-    this.generation = value.generation;
-    this.sequence = -1;
-    this.preparing = this.readyAvailable = this.selected = this.connected = true;
-    this.roundToken = void 0;
-    this.usable = value.usable;
-    this.calibrated = value.calibrated;
-    this.landscape = value.landscape === true;
-    this.capture = value.capture_state;
-    this.angle = value.angle_radians;
-    if (Array.isArray(value.paddle_size) && value.paddle_size.length === 2 && value.paddle_size.every((size) => Number.isFinite(size) && size > 0))
-      this.ratio = value.paddle_size[0] / value.paddle_size[1];
-    this.isReady = ready;
-    this.team = 2;
-    this.surface.hidden = false;
-    this.canvas.hidden = false;
-    this.surface.setAttribute("data-waiting", "false");
-    this.surface.setAttribute("data-team", String(this.team));
-    this.actions.hidden = false;
-    this.buttons();
-    this.draw();
-    return true;
-  }
-  snapshot(value) {
-    if (!validTiltSnapshot(value))
-      return false;
-    if (this.generation !== void 0 && value.generation !== this.generation)
-      return false;
-    if (value.sequence < this.sequence)
-      return false;
-    this.generation = value.generation;
-    this.sequence = value.sequence;
-    this.preparing = value.calibration_available === true;
-    this.readyAvailable = value.ready_available === true;
-    this.selected = value.selected !== false;
-    this.roundToken = value.round_token;
-    this.isReady = value.ready === true;
-    if (value.usable !== void 0)
-      this.usable = value.usable;
-    if (value.calibrated !== void 0)
-      this.calibrated = value.calibrated;
-    this.landscape = value.landscape === true;
-    this.connected = true;
-    this.team = value.team;
-    this.angle = value.angle_radians;
-    this.ratio = value.paddle_size[0] / value.paddle_size[1];
-    this.surface.hidden = value.phase === "finished";
-    this.canvas.hidden = !this.selected;
-    this.surface.setAttribute("data-waiting", String(!this.selected));
-    this.surface.setAttribute("data-team", String(this.team));
-    this.buttons();
-    this.draw();
-    return true;
-  }
-  feedback() {
-    const state = this.stream.controlState;
-    if (!state)
-      return;
-    this.capture = state.capture_state;
-    this.usable = state.usable;
-    this.calibrated = state.calibrated;
-    this.landscape = state.landscape === true;
-    this.buttons();
-  }
-  disconnect() {
-    this.connected = this.usable = false;
-    this.buttons();
-  }
-  hide() {
-    this.surface.hidden = true;
-    this.generation = void 0;
-    this.sequence = -1;
-    this.preparing = this.connected = this.usable = false;
-  }
-  actionContext() {
-    return this.roundToken && this.generation ? { generation: this.generation, round_token: this.roundToken } : void 0;
-  }
-  buttons() {
-    const landscape = this.landscape && this.isLandscape();
-    this.orientation.hidden = !this.preparing;
-    this.orientation.textContent = landscape ? "Hold your phone in landscape while you get ready." : "Turn your phone to landscape. If it stays upright, turn off rotation lock.";
-    this.permission.hidden = this.usable;
-    this.permission.disabled = !this.connected || !this.stream.active;
-    this.calibration.hidden = !this.preparing;
-    this.calibration.disabled = !this.connected || !this.usable;
-    this.ready.hidden = !this.readyAvailable;
-    this.ready.disabled = !this.connected || !this.isReady && (!this.usable || !this.calibrated || !landscape);
-    this.ready.textContent = this.isReady ? "CANCEL" : "READY";
-    this.ready.setAttribute("aria-pressed", String(this.isReady));
-    this.actions.hidden = !this.preparing && this.usable || !this.selected && !this.preparing;
-    const blocked = {
-      insecure: "Motion needs a secure connection",
-      unsupported: "Motion is unavailable",
-      denied: "Motion access was denied",
-      error: "Motion access could not start",
-      unavailable: "Motion is unavailable",
-      degenerate_orientation: "Hold the screen toward you"
-    };
-    this.state.textContent = this.preparing && !this.usable ? blocked[this.capture] ?? "" : "";
-    this.state.hidden = !this.state.textContent;
-  }
-  draw() {
-    if (this.surface.hidden || !this.selected)
-      return;
-    const width = this.canvas.clientWidth, height = this.canvas.clientHeight;
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    this.canvas.width = Math.round(width * dpr);
-    this.canvas.height = Math.round(height * dpr);
-    const ctx = this.context;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, width, height);
-    const image = this.images[this.team], bounds = this.bounds[this.team];
-    if (!image?.complete || !image.naturalWidth || !bounds)
-      return;
-    const length = Math.min(width, height) * 0.82, thickness = length / this.ratio;
-    const [sx, sy, right, bottom] = bounds;
-    const sw = right - sx, sh = bottom - sy;
-    const capPx = Math.min(96, sw * 0.25), cap = Math.min(capPx * thickness / sh, length * 0.25);
-    ctx.translate(width / 2, height / 2);
-    ctx.rotate(this.angle);
-    ctx.drawImage(image, sx, sy, capPx, sh, -length / 2, -thickness / 2, cap, thickness);
-    ctx.drawImage(image, sx + capPx, sy, sw - 2 * capPx, sh, -length / 2 + cap, -thickness / 2, length - 2 * cap, thickness);
-    ctx.drawImage(image, right - capPx, sy, capPx, sh, length / 2 - cap, -thickness / 2, cap, thickness);
-  }
-};
-
 // build/network_config.js
 function controllerSocketUrl(config, pageUrl) {
   const page = new URL(pageUrl);
@@ -847,128 +1419,70 @@ function controllerSocketUrl(config, pageUrl) {
   return endpoint.href;
 }
 
-// build/squircle_v1.js
-var ROOT = "/squircle-v1/";
-var BLUE = [30, 136, 229];
-var SquircleV1Canvas = class {
-  clip;
-  tile = [256, 256];
-  colorable = new Image();
-  neutral = new Image();
-  blink = new Image();
-  tinted = /* @__PURE__ */ new Map();
-  constructor() {
-    void this.load();
+// build/character_preview.js
+var JoinCharacterPreview = class {
+  canvases;
+  load;
+  canvas;
+  view;
+  generation = 0;
+  color = "#1E88E5";
+  loading;
+  constructor(canvases, load) {
+    this.canvases = canvases;
+    this.load = load;
+    const observer = new MutationObserver(() => this.refresh(this.color));
+    for (const canvas of canvases) {
+      const section = canvas.closest("section");
+      if (section)
+        observer.observe(section, { attributes: true, attributeFilter: ["hidden"] });
+    }
+    document.addEventListener("visibilitychange", () => this.refresh(this.color));
+    window.addEventListener("pagehide", () => this.clear());
+    window.addEventListener("pageshow", () => this.refresh(this.color));
   }
-  async load() {
+  refresh(color) {
+    this.color = color;
+    const canvas = document.hidden ? void 0 : this.canvases.find((candidate) => !candidate.closest("section")?.hidden);
+    if (canvas === this.canvas) {
+      this.view?.setColor(color);
+      return;
+    }
+    this.clear();
+    if (!canvas)
+      return;
+    this.canvas = canvas;
+    this.loading = new AbortController();
+    canvas.dataset.preview = "loading";
+    void this.activate(canvas, this.generation);
+  }
+  clear() {
+    this.generation++;
+    this.loading?.abort();
+    this.loading = void 0;
+    this.view?.dispose();
+    this.view = void 0;
+    if (this.canvas)
+      this.canvas.dataset.preview = "idle";
+    this.canvas = void 0;
+  }
+  async activate(canvas, generation) {
     try {
-      const response = await fetch(`${ROOT}manifest.json`);
-      if (!response.ok)
+      const module = await this.load();
+      if (generation !== this.generation)
         return;
-      const manifest = await response.json();
-      this.tile = manifest.resolution;
-      this.clip = manifest.clips.find((clip) => clip.name === "idle" && clip.view === "front");
-      this.colorable.src = `${ROOT}idle-front-colorable.png`;
-      this.neutral.src = `${ROOT}idle-front-neutral.png`;
-      this.blink.src = `${ROOT}idle-front-blink.png`;
+      const view = await module.createCharacterPreview(canvas, this.loading?.signal);
+      if (generation !== this.generation) {
+        view.dispose();
+        return;
+      }
+      this.view = view;
+      view.setColor(this.color);
+      canvas.dataset.preview = "ready";
     } catch {
+      if (generation === this.generation)
+        canvas.dataset.preview = "unavailable";
     }
-  }
-  draw(context, color, x2, y2, scale, timeMsec, blinking = false, rotation = 0) {
-    const clip = this.clip;
-    const face = blinking ? this.blink : this.neutral;
-    if (!clip || !this.colorable.complete || !face.complete || !this.colorable.naturalWidth || !face.naturalWidth)
-      return false;
-    const sheet = this.tint(color);
-    if (!sheet)
-      return false;
-    const frame = Math.floor(Math.max(0, timeMsec) * clip.fps / 1e3) % clip.frames;
-    const sx = frame % clip.sheet_columns * this.tile[0];
-    const sy = Math.floor(frame / clip.sheet_columns) * this.tile[1];
-    context.save();
-    context.translate(x2, y2);
-    context.rotate(rotation);
-    for (const layer of [sheet, face])
-      context.drawImage(layer, sx, sy, this.tile[0], this.tile[1], -clip.anchor_px[0] * scale, -clip.anchor_px[1] * scale, this.tile[0] * scale, this.tile[1] * scale);
-    context.restore();
-    return true;
-  }
-  tint(color) {
-    const key = /^#[0-9a-f]{6}$/i.test(color) ? color.toUpperCase() : "#1E88E5";
-    const cached = this.tinted.get(key);
-    if (cached)
-      return cached;
-    const canvas = document.createElement("canvas");
-    canvas.width = this.colorable.naturalWidth;
-    canvas.height = this.colorable.naturalHeight;
-    const context = canvas.getContext("2d", { willReadFrequently: true });
-    if (!context)
-      return void 0;
-    context.drawImage(this.colorable, 0, 0);
-    const image = context.getImageData(0, 0, canvas.width, canvas.height);
-    const rgb = [1, 3, 5].map((index) => Number.parseInt(key.slice(index, index + 2), 16));
-    for (let offset = 0; offset < image.data.length; offset += 4) {
-      if (image.data[offset + 3] === 0)
-        continue;
-      const diffuse = Math.min(1.4, Math.max(0, (image.data[offset + 2] - image.data[offset]) / 199));
-      for (let channel = 0; channel < 3; channel++)
-        image.data[offset + channel] = Math.min(255, Math.max(0, image.data[offset + channel] + diffuse * (rgb[channel] - BLUE[channel])));
-    }
-    context.putImageData(image, 0, 0);
-    this.tinted.set(key, canvas);
-    return canvas;
-  }
-};
-
-// build/002_bubbles_and_jellyfishes/bubbles_gesture.js
-var MAX_TRACE_POINTS = 128;
-var GestureTrace = class {
-  bounds;
-  points = [];
-  constructor(bounds) {
-    this.bounds = bounds;
-  }
-  add(clientX, clientY) {
-    if (!Number.isFinite(clientX) || !Number.isFinite(clientY) || this.bounds.width <= 0 || this.bounds.height <= 0)
-      return;
-    const point = [
-      Math.max(0, Math.min(1, (clientX - this.bounds.left) / this.bounds.width)),
-      Math.max(0, Math.min(1, (clientY - this.bounds.top) / this.bounds.height))
-    ];
-    const last = this.points.at(-1);
-    if (last && Math.hypot(point[0] - last[0], point[1] - last[1]) < 4e-3)
-      return;
-    this.points.push(point);
-    if (this.points.length > MAX_TRACE_POINTS) {
-      this.points = this.points.filter((_2, index) => index === 0 || index === this.points.length - 1 || index % 2 === 0);
-    }
-  }
-  completed() {
-    return this.points.length >= 2 ? this.points.map((point) => [...point]) : [];
-  }
-  displacement() {
-    if (this.points.length < 2)
-      return [0, 0];
-    const first = this.points[0];
-    const last = this.points.at(-1);
-    return [last[0] - first[0], last[1] - first[1]];
-  }
-  preview(circlesToCharge) {
-    if (this.points.length < 6)
-      return 0;
-    const center = this.points.reduce(([x2, y2], point) => [x2 + point[0], y2 + point[1]], [0, 0]).map((value) => value / this.points.length);
-    let signed = 0;
-    let absolute = 0;
-    for (let index = 1; index < this.points.length; index++) {
-      const before = Math.atan2(this.points[index - 1][1] - center[1], this.points[index - 1][0] - center[0]);
-      const after = Math.atan2(this.points[index][1] - center[1], this.points[index][0] - center[0]);
-      const step = Math.atan2(Math.sin(after - before), Math.cos(after - before));
-      signed += step;
-      absolute += Math.abs(step);
-    }
-    if (absolute < Math.PI * 0.75 || Math.abs(signed) / absolute < 0.65)
-      return 0;
-    return Math.min(1, Math.abs(signed) / (Math.PI * 2 * Math.max(1, circlesToCharge)));
   }
 };
 
@@ -1789,7 +2303,7 @@ var LobbyControls = class extends PlatformControls {
 };
 
 // build/character_selection.js
-var CHARACTER_SHAPE = "squircle";
+var CHARACTER_SHAPE = "cubio";
 var CHARACTER_COLORS = [
   { id: "red", name: "Red", hex: "#E53935" },
   { id: "orange", name: "Orange", hex: "#F57C00" },
@@ -1802,7 +2316,6 @@ var CHARACTER_COLORS = [
   { id: "pink", name: "Pink", hex: "#EC407A" },
   { id: "brown", name: "Brown", hex: "#8D6E63" }
 ];
-var FALLBACK_CHARACTER = { shape: CHARACTER_SHAPE, color: "#598DF2" };
 function defaultJoinFlow() {
   return {
     screen: "selection",
@@ -1891,11 +2404,6 @@ var lobbyController = document.querySelector("#lobby-controller");
 var lobbyStickZone = document.querySelector("#lobby-stick-zone");
 var lobbyJumpButton = document.querySelector("#lobby-jump-button");
 var lobbyLeaveButton = document.querySelector("#lobby-leave-button");
-var bubblesCard = document.querySelector("#bubbles-card");
-var bubblesPad = document.querySelector("#bubbles-pad");
-var bubblesScore = document.querySelector("#bubbles-score");
-var bubblesCanvas = document.querySelector("#bubbles-visual");
-var bubblesContext = bubblesCanvas.getContext("2d", { alpha: true });
 var motionPanel = document.querySelector("#motion-lab");
 var motionButton = document.querySelector("#motion-permission");
 var motionReadings = document.querySelector("#motion-readings");
@@ -1913,17 +2421,6 @@ var isReady = false;
 var joinFlow = defaultJoinFlow();
 var inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
 var activeGame = null;
-var bubblesPointer;
-var bubblesSnapshot;
-var bubblesSnapshotTime = 0;
-var bubblesLocalCharge = 0;
-var bubblesVisualSnapshot;
-var bubblesVisualReceivedAt = 0;
-var bubblesPhoneDragDisplay = [0, 0];
-var bubblesPreviousFrame = performance.now();
-var squircleCanvas = new SquircleV1Canvas();
-var bubblesArt = { jellyfish: new Image() };
-bubblesArt.jellyfish.src = "/bubbles-jellyfish.png";
 var lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJumpButton, (action) => {
   if (!joined || !socket || socket.readyState !== WebSocket.OPEN || activeGame !== null)
     return;
@@ -1933,24 +2430,63 @@ var lobbyControls = new LobbyControls(lobbyController, lobbyStickZone, lobbyJump
 });
 var gameplayMotion = new MotionStream(() => socket);
 window.addEventListener("pageshow", (event) => {
-  if (event.persisted && activeGame === "tilt_shift")
+  if (event.persisted && activeGame === "tilt_shift_3d")
     socket?.close();
 });
-var tiltSurface = document.querySelector("#tilt-shift");
-var tiltPhone = new TiltShiftPhone(tiltSurface, gameplayMotion, (ready, context) => {
+var tilt3DSurface = document.querySelector("#tilt-shift-3d");
+var tilt3DPhone = new TiltShift3DPhone(tilt3DSurface, gameplayMotion, (ready, context) => {
   if (socket?.readyState === WebSocket.OPEN)
-    socket.send(JSON.stringify(context ? { type: "tilt_shift_ready", ready, ...context } : { type: "pre_minigame_ready", ready }));
-});
-gameplayMotion.onControlState = () => tiltPhone.feedback();
+    socket.send(JSON.stringify(context ? { type: "tilt_shift_3d_ready", ready, ...context } : { type: "pre_minigame_ready", ready }));
+}, () => loadThreeView());
+gameplayMotion.onControlState = () => {
+  tilt3DPhone.feedback();
+};
 var motionLab = new MotionLabController(motionPanel, motionButton, motionReadings, () => socket);
 var pwa = new PwaOnboarding(document.querySelector("#app-screen"), document.querySelector("#install-button"), document.querySelector("#install-guidance"), document.querySelector("#browser-button"), () => {
   selectionScreen.hidden = false;
   nextButton.focus();
   void requestImmersiveMode();
 });
-for (const surface of [lobbyController, bubblesPad, readyCard, tiltSurface])
+var bubble3DCard = document.querySelector("#bubbles-3d-card");
+var threeView;
+function loadThreeView() {
+  const url = "/three_view.js";
+  threeView ??= import(url).catch((error) => {
+    threeView = void 0;
+    throw error;
+  });
+  return threeView;
+}
+var joinPreview = new JoinCharacterPreview([selectionPreview, namePreview], loadThreeView);
+var bubble3DPhone = new BubblePhone(bubble3DCard, document.querySelector("#bubbles-3d-visual"), document.querySelector("#bubbles-3d-score"), document.querySelector("#bubbles-3d-fallback"), () => socket?.readyState === WebSocket.OPEN, () => {
+  inputSeq += 1;
+  store(STORAGE.inputSeq, String(inputSeq));
+  return inputSeq;
+}, (message) => {
+  if (socket?.readyState === WebSocket.OPEN)
+    socket.send(JSON.stringify(message));
+}, () => loadThreeView());
+protectControllerSurface(bubble3DCard);
+function showBubble3D(message) {
+  if (!isSnapshot(message)) {
+    bubble3DPhone.receive(message);
+    return;
+  }
+  gameplayMotion.stop();
+  motionLab.stop();
+  lobbyControls.deactivate();
+  const visible = message.phase !== "lobby_return";
+  setGameplaySurface(visible, "bubbles_3d");
+  selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = true;
+  readyCard.hidden = true;
+  document.documentElement.classList.remove("ready-active");
+  status.hidden = true;
+  bubble3DPhone.receive(message);
+}
+for (const surface of [lobbyController, readyCard, tilt3DSurface])
   protectControllerSurface(surface);
-bindControllerLifecycle(() => cancelBubblesPointer());
+bindControllerLifecycle(() => {
+});
 function stored(key) {
   try {
     return localStorage.getItem(key) ?? "";
@@ -1975,7 +2511,7 @@ function forgetIdentity() {
 }
 function selectedCharacterName() {
   const color = colorOption(joinFlow.color)?.name ?? "Blue";
-  return `${color} Squircle`;
+  return `${color} Cubio`;
 }
 function refreshSelectionUi() {
   const label = selectedCharacterName();
@@ -1985,7 +2521,7 @@ function refreshSelectionUi() {
   for (const button of Array.from(colorGrid.querySelectorAll(".color-button"))) {
     button.setAttribute("aria-pressed", String(button.dataset.color === joinFlow.color));
   }
-  renderJoinPreviews(performance.now());
+  joinPreview.refresh(joinFlow.color);
 }
 for (const option of CHARACTER_COLORS) {
   const button = document.createElement("button");
@@ -2002,12 +2538,13 @@ for (const option of CHARACTER_COLORS) {
   colorGrid.append(button);
 }
 refreshSelectionUi();
-function setGameplaySurface(active, game = "bubbles") {
-  const next = active ? game : null;
-  if (next !== "tilt_shift")
-    tiltPhone.hide();
+function setGameplaySurface(active, game) {
+  const next = active ? game ?? null : null;
+  if (next !== "tilt_shift_3d")
+    tilt3DPhone.hide();
+  if (next !== "bubbles_3d")
+    bubble3DPhone.hide();
   if (activeGame !== next) {
-    cancelBubblesPointer();
     if (next === null) {
       try {
         screen.orientation?.unlock?.();
@@ -2016,7 +2553,7 @@ function setGameplaySurface(active, game = "bubbles") {
     } else if (document.fullscreenElement) {
       try {
         const orientation = screen.orientation;
-        const direction = next === "tilt_shift" ? "landscape" : "portrait";
+        const direction = next === "tilt_shift_3d" ? "landscape" : "portrait";
         void Promise.resolve(orientation?.lock?.(direction)).catch(() => {
         });
       } catch {
@@ -2024,9 +2561,9 @@ function setGameplaySurface(active, game = "bubbles") {
     }
     activeGame = next;
   }
-  document.documentElement.classList.toggle("gameplay-active", active);
-  document.documentElement.classList.toggle("bubbles-active", next === "bubbles");
-  document.documentElement.classList.toggle("tilt-active", next === "tilt_shift");
+  document.documentElement.classList.toggle("gameplay-active", next !== null);
+  document.documentElement.classList.toggle("bubbles-3d-active", next === "bubbles_3d");
+  document.documentElement.classList.toggle("tilt-3d-active", next === "tilt_shift_3d");
 }
 function showJoin(message, focus = false) {
   gameplayMotion.stop();
@@ -2036,11 +2573,8 @@ function showJoin(message, focus = false) {
   document.documentElement.classList.remove("ready-active");
   joinFlow = returnToCharacterSelection(joinFlow);
   joined = false;
-  bubblesSnapshot = void 0;
-  bubblesVisualSnapshot = void 0;
   setGameplaySurface(false);
   playerCard.hidden = true;
-  bubblesCard.hidden = true;
   selectionScreen.hidden = pwa.visible || pwa.show();
   nameScreen.hidden = true;
   joinForm.hidden = true;
@@ -2060,14 +2594,11 @@ function showJoined(player, state = "Connected") {
   readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
   joined = true;
-  bubblesSnapshot = void 0;
-  bubblesVisualSnapshot = void 0;
   setGameplaySurface(false);
   selectionScreen.hidden = true;
   nameScreen.hidden = true;
   joinForm.hidden = true;
   playerCard.hidden = true;
-  bubblesCard.hidden = true;
   playerName.textContent = player.name;
   playerState.textContent = state;
   leaveButton.disabled = false;
@@ -2080,9 +2611,9 @@ function showJoined(player, state = "Connected") {
   status.hidden = true;
 }
 function showReady(message) {
-  if (message.minigame_id === "tilt_shift" && message.preparation) {
+  if (message.minigame_id === "tilt_shift_3d" && message.preparation) {
     showTiltSurface();
-    tiltPhone.preparation(message.preparation, message.ready === true);
+    tilt3DPhone.preparation(message.preparation, message.ready === true);
     return;
   }
   gameplayMotion.stop();
@@ -2093,7 +2624,6 @@ function showReady(message) {
   nameScreen.hidden = true;
   joinForm.hidden = true;
   playerCard.hidden = true;
-  bubblesCard.hidden = true;
   readyCard.hidden = false;
   document.documentElement.classList.add("ready-active");
   isReady = message.ready === true;
@@ -2107,14 +2637,14 @@ function showReady(message) {
 function showTiltSurface() {
   motionLab.stop();
   lobbyControls.deactivate();
-  setGameplaySurface(true, "tilt_shift");
+  setGameplaySurface(true, "tilt_shift_3d");
   selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = true;
-  bubblesCard.hidden = readyCard.hidden = true;
+  readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
   status.hidden = true;
 }
-function showTilt(message) {
-  if (tiltPhone.snapshot(message))
+function showTilt3D(message) {
+  if (tilt3DPhone.snapshot(message))
     showTiltSurface();
 }
 readyButton.addEventListener("click", () => {
@@ -2155,430 +2685,6 @@ async function requestImmersiveMode() {
   const fullscreen = root.requestFullscreen ? () => root.requestFullscreen({ navigationUI: "hide" }) : root.webkitRequestFullscreen?.bind(root);
   await attemptImmersive(fullscreen, orientation?.lock ? () => orientation.lock("portrait") : void 0);
 }
-function sendBubblesCharge(seq, stage, step = 0) {
-  if (socket?.readyState === WebSocket.OPEN)
-    socket.send(JSON.stringify({ type: "bubbles_charge", input_seq: seq, stage, step }));
-}
-function sendBubblesMotion(pointer, now) {
-  if (pointer.motionCount >= 48 || socket?.readyState !== WebSocket.OPEN)
-    return;
-  socket.send(JSON.stringify({
-    type: "bubbles_charge",
-    input_seq: pointer.seq,
-    stage: "motion",
-    drag: pointer.drag
-  }));
-  pointer.sentDrag = [...pointer.drag];
-  pointer.lastMotionAt = now;
-  pointer.motionCount += 1;
-}
-function cancelBubblesPointer(sendCancel = true) {
-  if (!bubblesPointer)
-    return;
-  const { id, seq } = bubblesPointer;
-  bubblesPointer = void 0;
-  bubblesLocalCharge = 0;
-  bubblesPhoneDragDisplay = [0, 0];
-  if (sendCancel)
-    sendBubblesCharge(seq, "cancel");
-  if (bubblesPad.hasPointerCapture(id))
-    bubblesPad.releasePointerCapture(id);
-}
-function sendBubblesTrace(trace, gestureSeq) {
-  if (activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active" || trace.length < 2 || !socket || socket.readyState !== WebSocket.OPEN)
-    return;
-  if (gestureSeq === void 0) {
-    inputSeq += 1;
-    store(STORAGE.inputSeq, String(inputSeq));
-  }
-  socket.send(JSON.stringify({ type: "bubbles_trace", input_seq: gestureSeq ?? inputSeq, trace }));
-}
-function vibrate(pattern) {
-  try {
-    navigator.vibrate?.(pattern);
-  } catch {
-  }
-}
-bubblesPad.addEventListener("pointerdown", (event) => {
-  if (activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active" || bubblesPointer || event.pointerType === "mouse" && event.button !== 0)
-    return;
-  event.preventDefault();
-  const trace = new GestureTrace(bubblesPad.getBoundingClientRect());
-  trace.add(event.clientX, event.clientY);
-  inputSeq += 1;
-  store(STORAGE.inputSeq, String(inputSeq));
-  bubblesPhoneDragDisplay = [0, 0];
-  bubblesPointer = {
-    id: event.pointerId,
-    trace,
-    seq: inputSeq,
-    step: 0,
-    drag: [0, 0],
-    sentDrag: [0, 0],
-    lastMotionAt: performance.now(),
-    motionCount: 0
-  };
-  try {
-    bubblesPad.setPointerCapture(event.pointerId);
-  } catch {
-    cancelBubblesPointer();
-    return;
-  }
-  sendBubblesCharge(inputSeq, "start");
-});
-bubblesPad.addEventListener("pointermove", (event) => {
-  if (bubblesPointer?.id !== event.pointerId)
-    return;
-  event.preventDefault();
-  for (const sample of event.getCoalescedEvents?.() ?? [event])
-    bubblesPointer.trace.add(sample.clientX, sample.clientY);
-  bubblesLocalCharge = bubblesPointer.trace.preview(bubblesSnapshot?.circles_to_charge ?? 1);
-  const step = Math.min(4, Math.floor(bubblesLocalCharge * 4));
-  if (step > bubblesPointer.step) {
-    bubblesPointer.step = step;
-    sendBubblesCharge(bubblesPointer.seq, "progress", step);
-  }
-  const [dx, dy] = bubblesPointer.trace.displacement();
-  const drag = [
-    Math.max(-4, Math.min(4, Math.round(dx * 10))),
-    Math.max(-4, Math.min(4, Math.round(dy * 10)))
-  ];
-  const now = performance.now();
-  bubblesPointer.drag = drag;
-  if ((drag[0] !== bubblesPointer.sentDrag[0] || drag[1] !== bubblesPointer.sentDrag[1]) && now - bubblesPointer.lastMotionAt >= 70)
-    sendBubblesMotion(bubblesPointer, now);
-});
-bubblesPad.addEventListener("pointerup", (event) => {
-  if (bubblesPointer?.id !== event.pointerId)
-    return;
-  event.preventDefault();
-  bubblesPointer.trace.add(event.clientX, event.clientY);
-  const { seq } = bubblesPointer;
-  const trace = bubblesPointer.trace.completed();
-  cancelBubblesPointer(false);
-  if (trace.length < 2)
-    sendBubblesCharge(seq, "cancel");
-  else
-    sendBubblesTrace(trace, seq);
-});
-bubblesPad.addEventListener("pointercancel", (event) => {
-  if (bubblesPointer?.id === event.pointerId)
-    cancelBubblesPointer();
-});
-bubblesPad.addEventListener("lostpointercapture", (event) => {
-  if (bubblesPointer?.id === event.pointerId)
-    cancelBubblesPointer();
-});
-bubblesPad.addEventListener("contextmenu", (event) => event.preventDefault());
-bubblesPad.addEventListener("keydown", (event) => {
-  if (event.repeat || activeGame !== "bubbles" || bubblesSnapshot?.phase !== "active")
-    return;
-  const directions = {
-    ArrowLeft: [0.1, 0.5],
-    ArrowRight: [0.9, 0.5],
-    ArrowUp: [0.5, 0.1],
-    ArrowDown: [0.5, 0.9]
-  };
-  if (directions[event.key]) {
-    event.preventDefault();
-    sendBubblesTrace([[0.5, 0.5], directions[event.key]]);
-  } else if (event.key === " " || event.key === "Enter") {
-    event.preventDefault();
-    const circles = Math.max(1, Math.min(3, bubblesSnapshot?.circles_to_charge ?? 1));
-    const trace = Array.from({ length: 97 }, (_2, index) => [
-      0.5 + 0.22 * Math.cos(index / 96 * Math.PI * 2 * circles),
-      0.5 + 0.22 * Math.sin(index / 96 * Math.PI * 2 * circles)
-    ]);
-    sendBubblesTrace(trace);
-  }
-});
-function showBubbles(message) {
-  gameplayMotion.stop();
-  motionLab.stop();
-  lobbyControls.deactivate();
-  readyCard.hidden = true;
-  document.documentElement.classList.remove("ready-active");
-  bubblesSnapshot = message;
-  bubblesSnapshotTime = performance.now();
-  playerCard.hidden = true;
-  bubblesCard.hidden = false;
-  const phase = message.phase ?? "waiting";
-  const active = phase === "results" || ["instructions", "countdown", "active"].includes(phase) && message.left !== true;
-  setGameplaySurface(active);
-  bubblesScore.textContent = String(Math.max(0, Math.floor(message.score ?? 0)));
-  if (message.type === "bubbles_feedback") {
-    if (message.event === "captured")
-      vibrate(18);
-    else if (message.event === "spin")
-      vibrate([20, 30, 20]);
-    else if (message.event === "pop")
-      vibrate([35, 45, 35]);
-  }
-}
-var BUBBLE_RIM_COLORS = ["#6eeaff", "#a785ff", "#ff8bce", "#ffdf9d", "#8af8c7"];
-function clamp(value, minimum, maximum) {
-  return Math.min(maximum, Math.max(minimum, value));
-}
-function tuningValue(key, fallback) {
-  const value = bubblesSnapshot?.visual_tuning?.[key];
-  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
-}
-function imageReady(image) {
-  return image.complete && image.naturalWidth > 0;
-}
-function renderJoinPreviews(now) {
-  for (const canvas of [selectionPreview, namePreview]) {
-    if (canvas.closest("section")?.hidden)
-      continue;
-    const rect = canvas.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0)
-      continue;
-    const pixelRatio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-    const width = Math.max(1, Math.round(rect.width * pixelRatio));
-    const height = Math.max(1, Math.round(rect.height * pixelRatio));
-    if (canvas.width !== width || canvas.height !== height) {
-      canvas.width = width;
-      canvas.height = height;
-    }
-    const context = canvas.getContext("2d");
-    if (!context)
-      continue;
-    context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    context.clearRect(0, 0, rect.width, rect.height);
-    const scale = Math.min(rect.width / 256, rect.height / 220) * 0.95;
-    squircleCanvas.draw(context, joinFlow.color, rect.width / 2, rect.height * 0.89, scale, now);
-  }
-}
-function drawBubblePath(context, radius, pull) {
-  const length = Math.hypot(pull[0], pull[1]);
-  const stretch = clamp(length, 0, 0.22);
-  const along = stretch > 1e-3 ? [pull[0] / length, pull[1] / length] : [1, 0];
-  const center = [along[0] * radius * stretch * 0.22, along[1] * radius * stretch * 0.22];
-  const at = (theta) => {
-    const forward = Math.cos(theta);
-    const longitudinal = 1 + stretch * (1.25 * Math.max(forward, 0) - 0.25 * Math.max(-forward, 0));
-    const normalX = -along[1];
-    const normalY = along[0];
-    return [
-      center[0] + along[0] * forward * radius * longitudinal + normalX * Math.sin(theta) * radius * (1 - stretch * 0.3),
-      center[1] + along[1] * forward * radius * longitudinal + normalY * Math.sin(theta) * radius * (1 - stretch * 0.3)
-    ];
-  };
-  const points = [];
-  for (let index = 0; index < 65; index++)
-    points.push(at(index * Math.PI * 2 / 64));
-  context.beginPath();
-  points.forEach(([x2, y2], index) => index === 0 ? context.moveTo(x2, y2) : context.lineTo(x2, y2));
-  context.closePath();
-  return { points, center, along, stretch };
-}
-function traceBubblePoint(theta, radius, center, along, stretch) {
-  const forward = Math.cos(theta);
-  const longitudinal = 1 + stretch * (1.25 * Math.max(forward, 0) - 0.25 * Math.max(-forward, 0));
-  return [
-    center[0] + along[0] * forward * radius * longitudinal - along[1] * Math.sin(theta) * radius * (1 - stretch * 0.3),
-    center[1] + along[1] * forward * radius * longitudinal + along[0] * Math.sin(theta) * radius * (1 - stretch * 0.3)
-  ];
-}
-function drawPolyline(context, points, color, width) {
-  if (points.length < 2)
-    return;
-  context.beginPath();
-  context.moveTo(points[0][0], points[0][1]);
-  for (let index = 1; index < points.length; index++)
-    context.lineTo(points[index][0], points[index][1]);
-  context.strokeStyle = color;
-  context.lineWidth = width;
-  context.lineJoin = "round";
-  context.lineCap = "round";
-  context.stroke();
-}
-function drawArc(context, x2, y2, radius, start, end, color, width) {
-  context.beginPath();
-  context.arc(x2, y2, Math.max(0, radius), start, end, false);
-  context.strokeStyle = color;
-  context.lineWidth = width;
-  context.lineCap = "round";
-  context.stroke();
-}
-function drawBubbleBurst(context, radius, progress, density) {
-  const age = clamp(progress, 0, 1);
-  const fade = 1 - clamp((age - 0.45) / 0.55, 0, 1);
-  const fragmentCount = Math.max(4, Math.floor(density / 2));
-  for (let index = 0; index < fragmentCount; index++) {
-    const phase = index * Math.PI * 2 / fragmentCount + 0.14;
-    const x2 = Math.cos(phase) * radius * (0.25 + age * 1.14);
-    const y2 = Math.sin(phase) * radius * (0.25 + age * 1.14);
-    const color = BUBBLE_RIM_COLORS[index % BUBBLE_RIM_COLORS.length];
-    drawArc(context, x2, y2, radius * (0.3 - age * 0.17), phase + 1, phase + 2.7, `${color}${Math.round(0.83 * fade * 255).toString(16).padStart(2, "0")}`, Math.max(2, radius * 0.055));
-    drawArc(context, x2, y2, radius * (0.27 - age * 0.16), phase + 1.05, phase + 2.5, `rgba(255,255,255,${0.38 * fade})`, Math.max(1, radius * 0.016));
-  }
-  for (let index = 0; index < density; index++) {
-    const phase = index * 2.39996;
-    const distance = radius * (0.35 + age * (0.75 + index % 4 * 0.13));
-    const x2 = Math.cos(phase) * distance;
-    const y2 = Math.sin(phase) * distance;
-    if (index % 4 === 0) {
-      const star = 2 + index % 3;
-      context.strokeStyle = `rgba(255,255,222,${fade})`;
-      context.lineWidth = 1.2;
-      context.beginPath();
-      context.moveTo(x2 - star, y2);
-      context.lineTo(x2 + star, y2);
-      context.moveTo(x2, y2 - star);
-      context.lineTo(x2, y2 + star);
-      context.stroke();
-    } else
-      drawArc(context, x2, y2, 2 + index % 3, 0, Math.PI * 2, `rgba(204,248,255,${0.75 * fade})`, 1.3);
-  }
-}
-function drawPhoneCharacter(context, visual, hostTime, selectedColor) {
-  const fallbackScale = Math.min(0.44, (bubblesSnapshot?.bubble_radius ?? tuningValue("starting_radius", 48)) * 0.82 / 100);
-  const position = visual?.character_position ?? [0, 40 + Math.sin(hostTime / 1e3 * 2.2) * 4];
-  squircleCanvas.draw(context, visual?.recovery_white ? "#ffffff" : selectedColor, position[0], position[1], visual?.character_scale ?? fallbackScale, hostTime, visual?.face_blink ?? false, visual?.body_rotation ?? Math.sin(hostTime / 1e3 * 1.7) * 0.05);
-}
-function renderBubbles(now) {
-  if (bubblesCard.hidden || !bubblesSnapshot)
-    return;
-  const rect = bubblesCanvas.getBoundingClientRect();
-  const pixelRatio = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
-  const backingWidth = Math.max(1, Math.round(rect.width * pixelRatio));
-  const backingHeight = Math.max(1, Math.round(rect.height * pixelRatio));
-  if (bubblesCanvas.width !== backingWidth || bubblesCanvas.height !== backingHeight) {
-    bubblesCanvas.width = backingWidth;
-    bubblesCanvas.height = backingHeight;
-  }
-  const context = bubblesContext;
-  context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-  context.clearRect(0, 0, rect.width, rect.height);
-  const message = bubblesSnapshot;
-  const visual = bubblesVisualSnapshot;
-  const snapshotElapsed = Math.max(0, now - bubblesSnapshotTime);
-  const visualElapsed = visual ? Math.max(0, now - bubblesVisualReceivedAt) : 0;
-  const tuneTime = Number.isFinite(visual?.host_time_msec) ? visual.host_time_msec + visualElapsed : (message.host_time_msec ?? 0) + snapshotElapsed;
-  const startRadius = Math.max(1, tuningValue("starting_radius", 48));
-  const baseRadius = Math.min(rect.width, rect.height) * 0.23;
-  const worldScale = baseRadius / startRadius;
-  const reformDuration = Math.max(1, tuningValue("bubble_reform_seconds", 0.35) * 1e3);
-  const reformRemaining = Math.max(0, (message.reform_remaining_msec ?? 0) - snapshotElapsed);
-  const reformScale = reformRemaining > 0 ? clamp((reformDuration - reformRemaining) / reformDuration, 0.08, 1) : 1;
-  const burstDuration = Math.max(1, tuningValue("burst_seconds", 0.26) * 1e3);
-  const burstProgress = visual?.burst_progress ?? (reformRemaining > 0 && reformDuration - reformRemaining < burstDuration ? (reformDuration - reformRemaining) / burstDuration : -1);
-  const radius = Math.max(1, visual?.radius ?? (message.bubble_radius ?? startRadius) * reformScale);
-  const burstRadius = message.burst_radius ?? message.bubble_radius ?? startRadius;
-  const renderedRadius = burstProgress >= 0 && burstProgress < 1 ? visual?.radius ?? burstRadius : radius;
-  const selectedColor = colorOption(message.character_color)?.hex ?? FALLBACK_CHARACTER.color;
-  const spinTurns = tuningValue("spin_surface_turns_per_second", 1.8);
-  const spinning = visual?.spinning ?? (message.phase === "active" && (message.spin_remaining_msec ?? 0) - snapshotElapsed > 0);
-  const surfaceAngle = visual ? visual.surface_angle + (spinning ? visualElapsed / 1e3 * Math.PI * 2 * spinTurns : 0) : 0;
-  let pull = visual?.pull ?? [0, 0];
-  let localDragPull = [0, 0];
-  if (bubblesPointer && message.phase === "active") {
-    const dragX = bubblesPointer.drag[0] / 4;
-    const dragY = bubblesPointer.drag[1] / 4;
-    const dragLength = Math.hypot(dragX, dragY);
-    const dragScale = dragLength > 1 ? 1 / dragLength : 1;
-    const strength = tuningValue("live_drag_pull_strength", 0.2);
-    const target = [dragX * dragScale * strength, dragY * dragScale * strength];
-    const delta = clamp((now - bubblesPreviousFrame) / 1e3, 0, 0.1);
-    const response = Math.max(1e-3, tuningValue("live_drag_response_seconds", 0.08));
-    const amount = 1 - Math.exp(-delta / response);
-    bubblesPhoneDragDisplay = [
-      bubblesPhoneDragDisplay[0] + (target[0] - bubblesPhoneDragDisplay[0]) * amount,
-      bubblesPhoneDragDisplay[1] + (target[1] - bubblesPhoneDragDisplay[1]) * amount
-    ];
-    localDragPull = bubblesPhoneDragDisplay;
-    const localCharge = bubblesPointer.step / 4;
-    const seconds = tuneTime / 1e3;
-    const wobble = tuningValue("charge_wobble_strength", 0.07) * localCharge;
-    const localChargePull = [
-      Math.sin(seconds * 13) * wobble,
-      Math.cos(seconds * 17) * wobble
-    ];
-    const hostDrag = visual?.drag_pull ?? [0, 0];
-    const hostCharge = visual?.charge_pull ?? [0, 0];
-    pull = [
-      pull[0] - hostDrag[0] - hostCharge[0] + localDragPull[0] + localChargePull[0],
-      pull[1] - hostDrag[1] - hostCharge[1] + localDragPull[1] + localChargePull[1]
-    ];
-  } else {
-    const amount = 1 - Math.exp(-clamp((now - bubblesPreviousFrame) / 1e3, 0, 0.1) / Math.max(1e-3, tuningValue("live_drag_response_seconds", 0.08)));
-    bubblesPhoneDragDisplay = [
-      bubblesPhoneDragDisplay[0] * (1 - amount),
-      bubblesPhoneDragDisplay[1] * (1 - amount)
-    ];
-  }
-  context.save();
-  context.translate(rect.width / 2, rect.height / 2);
-  context.scale(worldScale, worldScale);
-  if (burstProgress >= 0 && burstProgress < 1) {
-    drawBubbleBurst(context, renderedRadius, burstProgress + (visual ? visualElapsed / burstDuration : 0), visual?.particle_density ?? 10);
-  } else {
-    const shape = drawBubblePath(context, renderedRadius, pull);
-    context.fillStyle = "rgba(69,191,255,.10)";
-    context.fill();
-    const chargeGlow = bubblesPointer ? Math.max(0, bubblesPointer.step / 4) * tuningValue("charge_glow_strength", 0.12) : visual?.charge_glow ?? 0;
-    if (chargeGlow > 0) {
-      context.beginPath();
-      context.arc(shape.center[0], shape.center[1], renderedRadius * 0.84, 0, Math.PI * 2);
-      context.fillStyle = `rgba(125,209,255,${chargeGlow * 0.48})`;
-      context.fill();
-      drawArc(context, shape.center[0], shape.center[1], renderedRadius * 0.78, 0, Math.PI * 2, `rgba(191,240,255,${chargeGlow * 0.85})`, Math.max(3, renderedRadius * 0.16));
-    }
-    drawArc(context, shape.center[0] + renderedRadius * 0.04, shape.center[1] + renderedRadius * 0.04, renderedRadius * 0.79, 0.15 + surfaceAngle, 1.35 + surfaceAngle, "rgba(110,212,255,.13)", Math.max(3, renderedRadius * 0.12));
-    drawArc(context, shape.center[0], shape.center[1], renderedRadius * 0.87, 2.2 + surfaceAngle, 3.9 + surfaceAngle, "rgba(189,161,255,.10)", Math.max(3, renderedRadius * 0.09));
-    drawPolyline(context, [...shape.points, shape.points[0]], `rgba(186,247,255,${0.65 * (visual?.recovery_white ? 1 : 0.88)})`, Math.max(2, renderedRadius * 0.045));
-    drawPolyline(context, [...shape.points, shape.points[0]], `rgba(255,255,255,${0.56 * (visual?.recovery_white ? 1 : 0.88)})`, Math.max(1, renderedRadius * 0.016));
-    for (let index = 0; index < 12; index++) {
-      const start = index * Math.PI * 2 / 12 + surfaceAngle;
-      const arc = [];
-      for (let sample = 0; sample < 10; sample++)
-        arc.push(traceBubblePoint(start + sample * (Math.PI * 2 / 12 + 0.04) / 9, renderedRadius, shape.center, shape.along, shape.stretch));
-      const hues = ["110,234,255", "167,133,255", "255,139,206", "255,223,157", "138,248,199"];
-      const hue = visual?.recovery_white ? "255,255,255" : hues[index % 5];
-      drawPolyline(context, arc, `rgba(${hue},0.5)`, Math.max(2, renderedRadius * 0.055));
-    }
-    drawArc(context, shape.center[0] - renderedRadius * 0.08, shape.center[1] - renderedRadius * 0.08, renderedRadius * 0.74, -2.55 + surfaceAngle, -1.65 + surfaceAngle, "rgba(255,255,255,.76)", Math.max(2, renderedRadius * 0.055));
-    drawArc(context, shape.center[0], shape.center[1], renderedRadius * 0.91, 0.38 + surfaceAngle, 1.15 + surfaceAngle, "rgba(222,255,255,.34)", Math.max(1.5, renderedRadius * 0.03));
-    const count = Math.min(Math.max(0, Math.floor(message.visual_jellyfish ?? 0)), Math.max(0, Math.floor(message.visual_cap ?? 0)), 64);
-    if (imageReady(bubblesArt.jellyfish))
-      for (let index = 0; index < count; index++) {
-        const turn = index * 2.39996323;
-        const distance = Math.sqrt((index + 0.5) / Math.max(count, 1)) * renderedRadius * 0.67;
-        const width = renderedRadius * 0.11;
-        const height = width * bubblesArt.jellyfish.naturalHeight / bubblesArt.jellyfish.naturalWidth;
-        context.save();
-        context.globalAlpha = 0.82;
-        context.drawImage(bubblesArt.jellyfish, Math.cos(turn) * distance - width / 2, Math.sin(turn) * distance - height / 2, width, height);
-        context.restore();
-      }
-    if (spinning) {
-      const density = visual?.particle_density ?? 10;
-      for (let index = 0; index < density; index++) {
-        const phase = index * 2.39996 + surfaceAngle * (0.55 + index % 3 * 0.2);
-        const x2 = Math.cos(phase) * renderedRadius * (1.12 + index % 4 * 0.075);
-        const y2 = Math.sin(phase) * renderedRadius * (1.12 + index % 4 * 0.075);
-        const size = 2.2 + index % 3 * 1.2;
-        drawArc(context, x2, y2, size, 0, Math.PI * 2, "rgba(204,250,255,.52)", 1.2);
-        context.beginPath();
-        context.arc(x2 - size * 0.28, y2 - size * 0.3, 0.7, 0, Math.PI * 2);
-        context.fillStyle = "rgba(255,255,255,.7)";
-        context.fill();
-      }
-    }
-  }
-  const characterVisible = visual?.character_visible ?? !(burstProgress >= 0 && burstProgress < 1);
-  if (characterVisible)
-    drawPhoneCharacter(context, visual, tuneTime, selectedColor);
-  context.restore();
-  bubblesPreviousFrame = now;
-}
-function animateBubbles(now) {
-  renderBubbles(now);
-  renderJoinPreviews(now);
-  requestAnimationFrame(animateBubbles);
-}
-requestAnimationFrame(animateBubbles);
 function rememberIdentity(message) {
   const player = message.player;
   if (!player || typeof player.name !== "string" || typeof message.session_id !== "string" || typeof message.reconnect_token !== "string")
@@ -2658,16 +2764,20 @@ async function connect() {
         peer.close();
         return;
       }
+      if (message.type === "lobby" || message.type?.endsWith("_snapshot") && !isSnapshot(message)) {
+        if (activeGame === "bubbles_3d")
+          setGameplaySurface(false);
+      }
       if (message.type === "welcome" && message.protocol === 1 && Number.isInteger(message.connection_id)) {
         stage = "Connected WebSocket";
         connectionError.hidden = true;
         connectionError.textContent = "";
         clearTimeout(deadline);
         if (message.resume_status === "resumed" && rememberIdentity(message)) {
-          if (message.gameplay?.type === "tilt_shift_snapshot")
-            showTilt(message.gameplay);
-          else if (message.gameplay?.type === "bubbles_snapshot")
-            showBubbles(message.gameplay);
+          if (isSnapshot(message.gameplay))
+            showBubble3D(message.gameplay);
+          else if (message.gameplay?.type === "tilt_shift_3d_snapshot")
+            showTilt3D(message.gameplay);
           else if (message.gameplay?.type === "pre_minigame_snapshot")
             showReady(message.gameplay);
           else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player)
@@ -2699,22 +2809,17 @@ async function connect() {
       } else if (message.type === "left") {
         forgetIdentity();
         showJoin("You left the lobby. Choose your character and name to join again.", true);
-      } else if (message.type === "bubbles_trace_result")
-        bubblesLocalCharge = 0;
-      else if (message.type === "bubbles_visual" && message.visual && bubblesSnapshot) {
-        bubblesVisualSnapshot = message.visual;
-        bubblesVisualReceivedAt = performance.now();
-      } else if (message.type === "bubbles_snapshot" || message.type === "bubbles_feedback")
-        showBubbles(message);
+      } else if (isSnapshot(message) || message.type === "bubbles_3d_visual" || message.type === "bubbles_3d_release_result")
+        showBubble3D(message);
       else if (message.type === "pre_minigame_snapshot")
         showReady(message);
-      else if (message.type === "tilt_shift_snapshot")
-        showTilt(message);
+      else if (message.type === "tilt_shift_3d_snapshot")
+        showTilt3D(message);
       else if (message.type === "motion_lab" && joined && typeof message.subscription_id === "string" && typeof message.send_hz === "number") {
         lobbyControls.deactivate();
         setGameplaySurface(false);
         document.documentElement.classList.remove("ready-active");
-        selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = readyCard.hidden = bubblesCard.hidden = true;
+        selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = readyCard.hidden = true;
         status.hidden = true;
         gameplayMotion.stop();
         motionLab.begin({
@@ -2730,7 +2835,7 @@ async function connect() {
           send_hz: message.send_hz,
           stale_msec: message.stale_msec ?? 1e3
         });
-        tiltPhone.feedback();
+        tilt3DPhone.feedback();
       } else if (message.type === "motion_control_state") {
         if (typeof message.subscription_id === "string") {
           if (message.control_state)
@@ -2748,9 +2853,6 @@ async function connect() {
         setGameplaySurface(false);
         readyCard.hidden = true;
         document.documentElement.classList.remove("ready-active");
-        bubblesCard.hidden = true;
-        bubblesSnapshot = void 0;
-        bubblesVisualSnapshot = void 0;
         if (message.player)
           rememberIdentity(message);
         else if (joined) {
@@ -2765,8 +2867,8 @@ async function connect() {
       lobbyControls.deactivate();
       gameplayMotion.stop();
       motionLab.disconnect();
-      if (activeGame === "tilt_shift")
-        tiltPhone.disconnect();
+      if (activeGame === "tilt_shift_3d")
+        tilt3DPhone.disconnect();
       else
         setGameplaySurface(false);
       if (socket === peer)
@@ -2774,7 +2876,7 @@ async function connect() {
       if (event.code === 4e3) {
         stopped = true;
         leaveButton.disabled = true;
-        readyCard.hidden = bubblesCard.hidden = true;
+        readyCard.hidden = true;
         document.documentElement.classList.remove("ready-active");
         status.textContent = "This player continued in another window. Reload to switch back.";
         status.hidden = false;

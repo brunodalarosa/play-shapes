@@ -15,7 +15,7 @@ BRUNO_GIT_IGNORE/
 opencode.json
 *.local.json
 *.log
-.squircle-output-*
+.cubio-output-*
 local/
 *.pem
 *.key

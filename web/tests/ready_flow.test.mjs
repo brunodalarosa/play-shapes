@@ -48,7 +48,7 @@ async function hello(client, identity = {}) {
 }
 
 test(
-  "host ready-up accepts prior onboarding, resets reconnect, and launches Bubbles once",
+  "host ready-up accepts prior onboarding, resets reconnect, and launches Bubbles 3D once",
   { timeout: 30000 },
   async () => {
     const server = spawn(
@@ -175,7 +175,10 @@ test(
         (message) => message.type === "pre_minigame_snapshot" && message.ready === true,
       );
       resumed.send({ type: "pre_minigame_ready", ready: true });
-      const gameplay = await resumed.next((message) => message.type === "bubbles_snapshot", 10000);
+      const gameplay = await resumed.next(
+        (message) => message.type === "bubbles_3d_snapshot",
+        10000,
+      );
       assert.equal(gameplay.phase, "instructions");
       resumed.send({
         type: "lobby_fall_release",

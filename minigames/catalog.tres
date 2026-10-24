@@ -1,10 +1,10 @@
 [gd_resource type="Resource" script_class="MinigameCatalog" format=3]
 
 [ext_resource type="Script" path="res://minigames/minigame_definition.gd" id="1_hl4hp"]
-[ext_resource type="Resource" path="res://minigames/002_bubbles_and_jellyfishes/bubbles_minigame.tres" id="2_wea0d"]
 [ext_resource type="Script" path="res://minigames/minigame_catalog.gd" id="3_7uu0u"]
-[ext_resource type="Resource" path="res://minigames/003_tilt_shift/tilt_shift_minigame.tres" id="4_tilt"]
+[ext_resource type="Resource" path="res://minigames/004_3d_bubbles/bubbles_3d_minigame.tres" id="5_bubbles_3d"]
+[ext_resource type="Resource" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_minigame.tres" id="6_tilt_shift_3d"]
 
 [resource]
 script = ExtResource("3_7uu0u")
-minigames = Array[ExtResource("1_hl4hp")]([ExtResource("2_wea0d"), ExtResource("4_tilt")])
+minigames = Array[ExtResource("1_hl4hp")]([ExtResource("5_bubbles_3d"), ExtResource("6_tilt_shift_3d")])

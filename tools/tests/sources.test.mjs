@@ -14,18 +14,18 @@ test("treats project GDScript as source and vendored addons as not", () => {
   assert.equal(isGdscriptSource("host/session_host.gd"), true);
   assert.equal(isGdscriptSource("tests/e2e/host.gd"), true);
   assert.equal(isGdscriptSource("addons/godot_mcp/plugin.gd"), false);
-  assert.equal(isGdscriptSource("addons/tilt_shift_workshop/workshop_model.gd"), true);
+  assert.equal(isGdscriptSource("addons/tilt_shift_3d_workshop/workshop_model.gd"), true);
   assert.equal(isGdscriptSource("addons/standalone_build/standalone_build_plugin.gd"), false);
   assert.equal(isGdscriptSource("host/session_host.gd.uid"), false);
 });
 
 test("finds Godot tests in tests/ and in a minigame's tests/ folder", () => {
-  const game = "minigames/002_bubbles_and_jellyfishes";
+  const game = "minigames/004_3d_bubbles";
 
   assert.equal(isGodotTest("tests/player_registry_test.gd"), true);
   assert.equal(isGodotTest("tests/e2e/host.gd"), true);
-  assert.equal(isGodotTest(`${game}/tests/bubbles_protocol_test.gd`), true);
-  assert.equal(isGodotTest(`${game}/bubbles_protocol.gd`), false);
+  assert.equal(isGodotTest(`${game}/tests/bubbles_3d_protocol_test.gd`), true);
+  assert.equal(isGodotTest(`${game}/bubbles_3d_protocol.gd`), false);
   assert.equal(isGodotTest("host/session_host.gd"), false);
   assert.equal(isGodotTest("tests/fixtures/debug_scenario.tscn"), false);
 });
@@ -57,7 +57,7 @@ test("leaves compiled, vendored and other files alone", () => {
     "web/node_modules/prettier/index.mjs",
     "web/package.json",
     "addons/kenyoni/qr_code/tool.mjs",
-    "art/squircle/review.js",
+    "art/cubio/review.js",
     "README.md",
     "host/session_host.gd",
   ]) {
@@ -75,7 +75,7 @@ test("reports a script that no rule covers and is not left alone on purpose", ()
   assert.equal(isUncoveredScript("web/public/app.js"), false);
   assert.equal(isUncoveredScript("web/src/vendor/nipplejs.d.mts"), false);
   assert.equal(isUncoveredScript("addons/kenyoni/tool.js"), false);
-  assert.equal(isUncoveredScript("art/squircle/review.js"), false);
+  assert.equal(isUncoveredScript("art/cubio/review.js"), false);
   assert.equal(isUncoveredScript("host/session_host.gd"), false);
   assert.equal(isUncoveredScript("README.md"), false);
 });

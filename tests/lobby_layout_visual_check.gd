@@ -23,9 +23,10 @@ func _run() -> void:
 		check(result.accepted, "The registry accepts the preview player")
 	await _wait_for_render()
 	_save_capture("%s/ready-%s.png" % [OUTPUT_DIR, size_label])
-	var character := lobby.get_node("World/CharactersFrontOfPanels").get_child(0) as LobbySquircle
+	var character := lobby.get_node("World/Characters").get_child(0) as LobbyCubio
 	character.set_connected(false)
-	character.position = Vector2(960, 420)
+	# High jumps may cross the billboard; the character draws in front of the QR.
+	character.position = Vector3(0.0, 8.0, 0.0)
 	await _wait_for_render()
 	_save_capture("%s/character-over-qr-%s.png" % [OUTPUT_DIR, size_label])
 	var saved := "[GODOT-RUNTIME] Playground lobby captures saved at %s" % size_label

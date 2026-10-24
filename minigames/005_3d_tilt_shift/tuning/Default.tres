@@ -1,0 +1,156 @@
+[gd_resource type="Resource" script_class="TiltShift3DTuning" format=3 uid="uid://b6hqgmifkqwh8"]
+
+[ext_resource type="Script" uid="uid://dutdivhqpgejx" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_tuning.gd" id="1"]
+[ext_resource type="Script" uid="uid://x7iygv1knboc" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_basket_preset.gd" id="1_hpepm"]
+[ext_resource type="Script" uid="uid://xbhiw5rtqgaj" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_basket_opening.gd" id="2_415vs"]
+[ext_resource type="Script" uid="uid://55t5u2uhwrw5" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_expression_tuning.gd" id="3_hpepm"]
+[ext_resource type="Script" uid="uid://ba4oyiwhhnui7" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_flow_tuning.gd" id="4_0f66o"]
+[ext_resource type="Script" uid="uid://be4ul7tmhayhc" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_paddle_layout.gd" id="5_8lxa4"]
+[ext_resource type="Script" uid="uid://c6e27ok05i4jf" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_paddle.gd" id="6_8lxa4"]
+[ext_resource type="Script" uid="uid://cnq3an02v0qvo" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_motion_tuning.gd" id="7_yt5c2"]
+[ext_resource type="Script" uid="uid://bbg6bestipalh" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_physics_tuning.gd" id="8_uw4vq"]
+[ext_resource type="Script" uid="uid://br3d0v74aqqwt" path="res://minigames/005_3d_tilt_shift/tilt_shift_3d_presentation_tuning.gd" id="9_57snj"]
+
+[sub_resource type="Resource" id="Resource_415vs"]
+script = ExtResource("2_415vs")
+basket_id = "orange_left"
+team = 0
+center = 0.1
+width = 0.2
+
+[sub_resource type="Resource" id="Resource_hpepm"]
+script = ExtResource("2_415vs")
+basket_id = "blue_left"
+team = 1
+center = 0.3
+width = 0.2
+
+[sub_resource type="Resource" id="Resource_0f66o"]
+script = ExtResource("2_415vs")
+basket_id = "trash_center"
+width = 0.2
+
+[sub_resource type="Resource" id="Resource_8lxa4"]
+script = ExtResource("2_415vs")
+basket_id = "orange_right"
+team = 0
+center = 0.7
+width = 0.2
+
+[sub_resource type="Resource" id="Resource_yt5c2"]
+script = ExtResource("2_415vs")
+basket_id = "blue_right"
+team = 1
+center = 0.9
+width = 0.2
+
+[sub_resource type="Resource" id="Resource_uw4vq"]
+script = ExtResource("1_hpepm")
+preset_name = "Five mirrored openings"
+openings = Array[ExtResource("2_415vs")]([SubResource("Resource_415vs"), SubResource("Resource_hpepm"), SubResource("Resource_0f66o"), SubResource("Resource_8lxa4"), SubResource("Resource_yt5c2")])
+
+[sub_resource type="Resource" id="Resource_57snj"]
+script = ExtResource("3_hpepm")
+
+[sub_resource type="Resource" id="Resource_twk5s"]
+script = ExtResource("4_0f66o")
+
+[sub_resource type="Resource" id="Resource_ichxx"]
+script = ExtResource("6_8lxa4")
+paddle_id = "a_0"
+team = 1
+position = Vector2(0.32, 0.33)
+
+[sub_resource type="Resource" id="Resource_5p4ne"]
+script = ExtResource("6_8lxa4")
+paddle_id = "a_1"
+position = Vector2(0.68, 0.33)
+
+[sub_resource type="Resource" id="Resource_ae6ri"]
+script = ExtResource("6_8lxa4")
+paddle_id = "a_2"
+team = 2
+position = Vector2(0.5, 0.15)
+
+[sub_resource type="Resource" id="Resource_xx2bs"]
+script = ExtResource("6_8lxa4")
+paddle_id = "a_3"
+position = Vector2(0.13, 0.16)
+
+[sub_resource type="Resource" id="Resource_0no21"]
+script = ExtResource("6_8lxa4")
+paddle_id = "a_4"
+team = 1
+position = Vector2(0.87, 0.16)
+
+[sub_resource type="Resource" id="Resource_guyak"]
+script = ExtResource("5_8lxa4")
+preset_name = "Layout A"
+layout_id = "a"
+player_length = 0.2
+player_thickness = 0.04
+paddles = Array[ExtResource("6_8lxa4")]([SubResource("Resource_ichxx"), SubResource("Resource_5p4ne"), SubResource("Resource_ae6ri"), SubResource("Resource_xx2bs"), SubResource("Resource_0no21")])
+
+[sub_resource type="Resource" id="Resource_mpg3y"]
+script = ExtResource("6_8lxa4")
+paddle_id = "b_0"
+position = Vector2(0.39, 0.16)
+
+[sub_resource type="Resource" id="Resource_c0vuw"]
+script = ExtResource("6_8lxa4")
+paddle_id = "b_1"
+team = 1
+position = Vector2(0.61, 0.16)
+
+[sub_resource type="Resource" id="Resource_83al4"]
+script = ExtResource("6_8lxa4")
+paddle_id = "b_2"
+team = 1
+position = Vector2(0.12, 0.25)
+
+[sub_resource type="Resource" id="Resource_ucbwf"]
+script = ExtResource("6_8lxa4")
+paddle_id = "b_3"
+position = Vector2(0.88, 0.25)
+
+[sub_resource type="Resource" id="Resource_f63eu"]
+script = ExtResource("6_8lxa4")
+paddle_id = "b_4"
+position = Vector2(0.33, 0.37)
+
+[sub_resource type="Resource" id="Resource_qtu4p"]
+script = ExtResource("6_8lxa4")
+paddle_id = "b_5"
+team = 1
+position = Vector2(0.66999996, 0.37)
+
+[sub_resource type="Resource" id="Resource_1ngu0"]
+script = ExtResource("5_8lxa4")
+preset_name = "Layout B"
+layout_id = "b"
+player_length = 0.18
+player_thickness = 0.04
+paddles = Array[ExtResource("6_8lxa4")]([SubResource("Resource_mpg3y"), SubResource("Resource_c0vuw"), SubResource("Resource_83al4"), SubResource("Resource_ucbwf"), SubResource("Resource_f63eu"), SubResource("Resource_qtu4p")])
+
+[sub_resource type="Resource" id="Resource_23xhy"]
+script = ExtResource("7_yt5c2")
+
+[sub_resource type="Resource" id="Resource_6yxne"]
+script = ExtResource("8_uw4vq")
+delivery_curve = PackedVector2Array(0, 1, 1, 1)
+negative_delivery_curve = PackedVector2Array(0, 0, 0.2, 0, 0.35, 0.15, 0.7, 1, 0.9, 0, 1, 0)
+delivery_cutoff_seconds = 6.0
+
+[sub_resource type="Resource" id="Resource_egf4j"]
+script = ExtResource("9_57snj")
+
+[resource]
+script = ExtResource("1")
+flow = SubResource("Resource_twk5s")
+motion = SubResource("Resource_23xhy")
+physics = SubResource("Resource_6yxne")
+paddle_layout = SubResource("Resource_guyak")
+layouts_by_round = Array[ExtResource("5_8lxa4")]([SubResource("Resource_guyak"), SubResource("Resource_1ngu0"), SubResource("Resource_guyak"), SubResource("Resource_1ngu0")])
+presentation = SubResource("Resource_egf4j")
+expressions = SubResource("Resource_57snj")
+baskets_by_round = Array[ExtResource("1_hpepm")]([SubResource("Resource_uw4vq"), SubResource("Resource_uw4vq"), SubResource("Resource_uw4vq"), SubResource("Resource_uw4vq")])

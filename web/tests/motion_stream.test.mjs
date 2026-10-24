@@ -98,6 +98,8 @@ test("generic capture scopes feedback, skips queued input and retires listeners 
     orientation(70);
     stream.tick();
     assert.equal(messages.length, before, "any queued gameplay bytes drop the sample");
+    assert.ok(stream.requestCalibration(), "queued bytes cannot swallow a one-shot click");
+    assert.equal(messages.at(-1).type, "motion_calibrate");
     socket.bufferedAmount = 0;
     now = 500;
     orientation(-20);
@@ -189,7 +191,7 @@ test("generic capture scopes feedback, skips queued input and retires listeners 
       excluded: "WebSocket/TLS framing, network delay, physical sensors, host feedback",
     };
     const directory = fileURLToPath(
-      new URL("../../test-results/tilt-shift/motion/", import.meta.url),
+      new URL("../../test-results/tilt-shift-3d/motion/", import.meta.url),
     );
     mkdirSync(directory, { recursive: true });
     writeFileSync(`${directory}/traffic.json`, JSON.stringify(report, null, 2));

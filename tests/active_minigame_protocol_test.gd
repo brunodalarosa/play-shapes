@@ -1,17 +1,14 @@
 extends TestScript
 
 const Service = preload("res://host/websocket_service.gd")
-const BubblesController = preload(
-	"res://minigames/002_bubbles_and_jellyfishes/bubbles_round_controller.gd"
-)
 
 
 func _run() -> void:
 	var service := Service.new()
 	root.add_child(service)
-	var bubbles := BubblesController.new()
+	var bubbles := Bubbles3DRoundController.new()
 	root.add_child(bubbles)
-	bubbles.tuning = BubblesTuning.new()
+	bubbles.tuning = Bubbles3DTuning.new()
 	bubbles.tuning.instructions_seconds = 0.0
 	bubbles.tuning.countdown_seconds = 0.0
 	bubbles.start_round(
@@ -23,18 +20,20 @@ func _run() -> void:
 	)
 	bubbles.complete_entrance(0)
 	bubbles.advance(0)
-	service.set_bubbles_controller(bubbles)
+	var protocol := Bubbles3DProtocol.new(bubbles)
+	service.set_minigame_protocol(protocol)
 	check(
-		service._active_protocol == service._bubbles_protocol
-		and service._active_protocol.snapshot_for("p0").type == "bubbles_snapshot",
-		"Bubbles is the only active gameplay protocol",
+		service._active_protocol == service._minigame_protocol
+		and service._active_protocol.snapshot_for("p0").type == "bubbles_3d_snapshot",
+		"Bubbles 3D is the only active gameplay protocol",
 	)
 	check(
-		bubbles.return_to_lobby_requested.is_connected(service._on_bubbles_return_to_lobby),
-		"Bubbles results return resets the connected phones",
+		protocol.send_requested.is_connected(service._send_to_player)
+		and protocol.broadcast_requested.is_connected(service._broadcast_gameplay_snapshots),
+		"Active minigame protocol connects its send and broadcast signals",
 	)
-	service.clear_bubbles_controller(bubbles)
+	service.clear_minigame_protocol(protocol)
 	check(
-		service._active_protocol == null and service._bubbles_protocol == null,
-		"Leaving Bubbles clears active routing",
+		service._active_protocol == null and service._minigame_protocol == null,
+		"Leaving Bubbles 3D clears active routing",
 	)

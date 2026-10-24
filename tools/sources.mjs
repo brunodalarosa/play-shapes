@@ -22,7 +22,7 @@ export function repositoryFiles() {
 export function isGdscriptSource(file) {
   return (
     file.endsWith(".gd") &&
-    (!file.startsWith("addons/") || file.startsWith("addons/tilt_shift_workshop/"))
+    (!file.startsWith("addons/") || file.startsWith("addons/tilt_shift_3d_workshop/"))
   );
 }
 

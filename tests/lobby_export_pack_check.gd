@@ -1,5 +1,5 @@
 extends TestScript
-## Run after a local export to confirm the new offline controller and sheets reached the PCK.
+## Run after a local export to confirm the new offline controller and Cubio model reached the PCK.
 
 const Policy := preload("res://addons/standalone_build/standalone_build_policy.gd")
 const PACK := "res://builds/standalone/windows-x86_64/Play Shapes.pck"

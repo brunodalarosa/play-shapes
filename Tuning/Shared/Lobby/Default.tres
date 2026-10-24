@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="LobbyMovementTuning" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Tuning/Shared/lobby_movement_tuning.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+move_speed = 3.44
+acceleration = 19.8
+gravity = 14.06
+jump_height = 4.0

@@ -69,3 +69,13 @@ What was decided.
 | [0030](0030-tilt-shift-round-preparation.md) | Tilt Shift prepares selected players inside each mapped round |
 | [0031](0031-tilt-shift-initial-calibration.md) | Tilt Shift waits for initial calibration before a skipped-panel countdown |
 | [0032](0032-mandatory-pre-minigame-screen.md) | Every normal minigame starts at the shared Pre-minigame screen |
+| [0033](0033-plaza-lobby-plane-simulation.md) | The 3D Playground lobby simulates its characters on a 2D plane |
+| [0034](0034-bubbles-3d-jolt-plane.md) | Bubbles and jellyfishes 3D simulates on Jolt with plane-locked bodies |
+| [0035](0035-phone-three-js.md) | The phone draws 3D with three.js, loaded only when a 3D screen needs it |
+| [0036](0036-tilt-shift-3d-generated-paddle.md) | Tilt Shift 3D builds its paddles in code with a rounded convex collider |
+| [0037](0037-shape-face-system.md) | Shape character faces are composed from parts, with expressions in a stack |
+| [0038](0038-tilt-shift-3d-full-width-frame.md) | Tilt Shift 3D fills the full width and raises its floor for the bins |
+| [0039](0039-minigame-session-scripts.md) | A minigame that prepares its players names a session script in the catalog |
+| [0040](0040-cubio-live-previews.md) | Cubio uses one animated model in gameplay and setup |
+| [0041](0041-rooftop-logo-sign.md) | The logo is a 3D sign on the café roof, and the billboard shows only the QR |
+| [0042](0042-plaza-lobby-jolt-plane.md) | The Playground lobby simulates its characters on Jolt with plane-locked bodies |

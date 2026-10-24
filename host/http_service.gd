@@ -3,28 +3,9 @@ extends Node
 ## A bounded, nonblocking HTTP service for a fixed set of bundled assets.
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
-const BUBBLES_ART := "res://assets/runtime/minigames/bubbles_and_jellyfishes"
-const TILT_ART := "res://assets/runtime/minigames/003"
+const CUBIO_MODEL := "res://assets/runtime/animated_characters/cubio/model"
+const SHAPE_FACES := "res://assets/runtime/shape_faces"
 const ASSETS: Dictionary = {
-	"/tilt-shift/manifest.json": {
-		"path": TILT_ART + "/manifest.json",
-		"content_type": "application/json",
-	},
-	"/tilt-shift/paddle_orange.png": {
-		"path": TILT_ART + "/paddles/paddle_orange.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/tilt-shift/paddle_blue.png": {
-		"path": TILT_ART + "/paddles/paddle_blue.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/tilt-shift/paddle_neutral.png": {
-		"path": TILT_ART + "/paddles/paddle_neutral.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
 	"/manifest.webmanifest": {
 		"path": "res://web/public/manifest.webmanifest",
 		"content_type": "application/manifest+json",
@@ -54,32 +35,105 @@ const ASSETS: Dictionary = {
 		"path": "res://web/public/platform_input_settings.json",
 		"content_type": "application/json",
 	},
-	"/squircle-v1/manifest.json": {
-		"path": "res://assets/runtime/animated_characters/squircle/v1/manifest.json",
+	"/three_view.js": {
+		"path": "res://web/public/three_view.js",
+		"content_type": "text/javascript; charset=utf-8",
+	},
+	# Raw model copies the web build makes; Godot keeps them as files so exports carry them.
+	"/models/cubio.glb": {
+		"path": "res://web/public/models/cubio.glb",
+		"content_type": "model/gltf-binary",
+	},
+	"/models/jellyfish.glb": {
+		"path": "res://web/public/models/jellyfish.glb",
+		"content_type": "model/gltf-binary",
+	},
+	"/models/cubio-face-neutral.png": {
+		"path": CUBIO_MODEL + "/face-neutral.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/models/cubio-face-blink.png": {
+		"path": CUBIO_MODEL + "/face-blink.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/face_presets.json": {
+		"path": SHAPE_FACES + "/face_presets.json",
 		"content_type": "application/json",
 	},
-	"/squircle-v1/idle-front-colorable.png": {
-		"path": "res://assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png",
+	"/shape_faces/facial_part_eye_closed_down.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_closed_down.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
-	"/squircle-v1/idle-front-neutral.png": {
-		"path": "res://assets/runtime/animated_characters/squircle/v1/idle-front-neutral.png",
+	"/shape_faces/facial_part_eye_closed_up.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_closed_up.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
-	"/squircle-v1/idle-front-blink.png": {
-		"path": "res://assets/runtime/animated_characters/squircle/v1/idle-front-blink.png",
+	"/shape_faces/facial_part_eye_half_bottom.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_half_bottom.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
-	"/bubbles-jellyfish.png": {
-		"path": BUBBLES_ART + "/jellyfish/jellyfish_small.png",
+	"/shape_faces/facial_part_eye_half_top.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_half_top.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
-	"/bubbles-phone-background.png": {
-		"path": BUBBLES_ART + "/environment/phone_background_portrait.png",
+	"/shape_faces/facial_part_eye_half_top_wing.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_half_top_wing.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_open.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_open.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_x.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_x.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eyebrow_a.png": {
+		"path": SHAPE_FACES + "/facial_part_eyebrow_a.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eyebrow_b.png": {
+		"path": SHAPE_FACES + "/facial_part_eyebrow_b.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eyebrow_c.png": {
+		"path": SHAPE_FACES + "/facial_part_eyebrow_c.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eyebrow_d.png": {
+		"path": SHAPE_FACES + "/facial_part_eyebrow_d.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_angry.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_angry.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_happy.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_happy.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_sad.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_sad.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_smirk.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_smirk.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},

@@ -86,7 +86,7 @@ export class MotionStream {
   }
 
   requestCalibration(context?: { generation: string; round_token: string }): boolean {
-    return this.send({ type: "motion_calibrate", ...context });
+    return this.send({ type: "motion_calibrate", ...context }, false);
   }
 
   feedback(subscriptionId: string, state: MotionControlState): boolean {
@@ -103,12 +103,14 @@ export class MotionStream {
     return true;
   }
 
-  private send(payload: Record<string, unknown>): boolean {
+  // Streamed messages yield to queued bytes because the next one replaces them. A click is sent
+  // once, so queued bytes must not swallow it.
+  private send(payload: Record<string, unknown>, streamed = true): boolean {
     const socket = this.connection();
     if (
       !this.subscription ||
       socket?.readyState !== WebSocket.OPEN ||
-      socket.bufferedAmount > this.maximumBufferedBytes
+      (streamed && socket.bufferedAmount > this.maximumBufferedBytes)
     )
       return false;
     socket.send(JSON.stringify({ ...payload, subscription_id: this.subscription.subscription_id }));

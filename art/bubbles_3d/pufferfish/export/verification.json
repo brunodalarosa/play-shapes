@@ -1,0 +1,84 @@
+{
+  "result": "PASS",
+  "blender_version": "5.2.2 LTS",
+  "library_sha256": {
+    "pufferfish/source/kaykit_medieval_hexagon/projectile_catapult.gltf": "237483a212c16b392216e9318010a6eaa6ba8849d5b71470967eaa1c313f618b",
+    "pufferfish/source/kaykit_medieval_hexagon/projectile_catapult.bin": "6baeee13f5ce52976212f8acef4de7cfd55ce604ee3d239f94f6660ffdff9f51",
+    "pufferfish/source/kaykit_medieval_hexagon/hexagons_medieval.png": "5301a06866ba3be68dcc14cc429bd6d0f69004b72884283715d7e233f2e9782e",
+    "pufferfish/source/kaykit_medieval_hexagon/License.txt": "18c35a487baeffbdbe8256c0c7154a688321fe955b351c78773fab0a978cc02c",
+    "pufferfish/source/kenney_food_kit/fish.glb": "5bb8109f83f7ec4609427c6d6de76572c4fc4d055dfc16d47f2c397290c0e29d",
+    "pufferfish/source/kenney_food_kit/Textures/colormap.png": "75baf74d9483a0fc56ac21ceba346fbe16fc24a2a1bf0524c53e6bbe802e1153",
+    "pufferfish/source/kenney_food_kit/License.txt": "32a081c2035dd4db47d850c83244da048165f0e53d71c076b76c1afc0590bc7f"
+  },
+  "source_sha256": "05d4d5e31ab0d82449a5f92ab16d53a98112f7ca00b5910a22c79d2695495922",
+  "export_sha256": "80fe5395b3e9e295bd1214c4648bab66cee27d2c43b2818bb4a055f1619081a4",
+  "export_bytes": 26896,
+  "triangles": 612,
+  "triangles_by_mesh": {
+    "Body": 140,
+    "Face": 448,
+    "Fins": 24
+  },
+  "materials": {
+    "Body": "#FF9800",
+    "Spike Tips": "#FFB74D",
+    "Fins": "#FF5722",
+    "Eye White": "#FAFAFA",
+    "Pupil": "#151515",
+    "Cheeks": "#F48FB1",
+    "Mouth": "#EF5A5A"
+  },
+  "bounds_gltf": {
+    "minimum": [
+      -0.68709,
+      -0.44771,
+      -0.51389
+    ],
+    "maximum": [
+      0.50057,
+      0.44771,
+      0.51389
+    ]
+  },
+  "meshes_gltf": {
+    "Body": {
+      "minimum": [
+        -0.44771,
+        -0.44771,
+        -0.4477
+      ],
+      "maximum": [
+        0.44771,
+        0.44771,
+        0.4477
+      ],
+      "triangles": 140
+    },
+    "Face": {
+      "minimum": [
+        0.26808,
+        -0.14938,
+        -0.28675
+      ],
+      "maximum": [
+        0.50057,
+        0.21319,
+        0.28675
+      ],
+      "triangles": 448
+    },
+    "Fins": {
+      "minimum": [
+        -0.68709,
+        -0.24301,
+        -0.51389
+      ],
+      "maximum": [
+        0.05537,
+        0.23901,
+        0.51389
+      ],
+      "triangles": 24
+    }
+  }
+}

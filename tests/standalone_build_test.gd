@@ -36,31 +36,30 @@ func _run() -> void:
 		"the bundled phone client and its page assets are required in the PCK",
 	)
 	check(
-		Policy
-		.REQUIRED_RUNTIME_PATHS
-		.has("minigames/002_bubbles_and_jellyfishes/bubbles_and_jellyfishes.tscn") \
-				and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/bgm/Beach_music.ogg") \
-				and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/sfxs/woosh4.ogg"),
-		"Bubbles scene, music, and sound effects remain in the standalone PCK",
+		Policy.REQUIRED_RUNTIME_PATHS.has("minigames/004_3d_bubbles/3d_bubbles.tscn")
+		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/bgm/Beach_music.ogg")
+		and Policy.REQUIRED_RUNTIME_PATHS.has("assets/runtime/sfxs/stonesHit1.ogg"),
+		"Bubbles 3D scene, music, and sound effects remain in the standalone PCK",
 	)
+	var preview := "assets/runtime/minigames/bubbles_3d/bubbles_3d_preview.png"
 	check(
-		Policy.REQUIRED_RUNTIME_PATHS.has("host/pre_minigame_readiness.gd") \
-				and Policy.REQUIRED_RUNTIME_PATHS.has("scenes/pre_minigame_screen.tscn") \
-				and Policy
+		Policy.REQUIRED_RUNTIME_PATHS.has("host/pre_minigame_readiness.gd")
+		and Policy.REQUIRED_RUNTIME_PATHS.has("scenes/pre_minigame_screen.tscn")
+		and Policy
 		.REQUIRED_RUNTIME_PATHS
-		.has("minigames/002_bubbles_and_jellyfishes/bubbles_pre_minigame_content.tres") \
-				and Policy
-		.REQUIRED_RUNTIME_PATHS
-		.has("assets/runtime/pre_minigame/bubbles_preview.png"),
+		.has("minigames/004_3d_bubbles/bubbles_3d_pre_minigame_content.tres")
+		and Policy.REQUIRED_RUNTIME_PATHS.has(preview),
 		"Ready screen, content, and gameplay preview remain in the standalone PCK",
 	)
+	for path: String in Policy.REQUIRED_RUNTIME_PATHS:
+		check(FileAccess.file_exists("res://" + path), "Required runtime path exists: %s" % path)
 	check(
-		Policy.REQUIRED_RUNTIME_PATHS.has("characters/character_selection.gd") \
-				and Policy.REQUIRED_RUNTIME_PATHS.has("characters/squircle_v1_playback.tscn") \
-				and Policy
+		Policy.REQUIRED_RUNTIME_PATHS.has("characters/character_selection.gd")
+		and Policy.REQUIRED_RUNTIME_PATHS.has("characters/cubio_preview.gd")
+		and Policy
 		.REQUIRED_RUNTIME_PATHS
-		.has("assets/runtime/animated_characters/squircle/v1/idle-front-colorable.png"),
-		"Squircle playback and approved sheets remain in the standalone PCK",
+		.has("assets/runtime/animated_characters/cubio/model/cubio.glb"),
+		"Live Cubio previews and the animated model remain in the standalone PCK",
 	)
 	check(
 		Policy.REQUIRED_RUNTIME_PATHS.has("addons/kenyoni/qr_code/qr_code_rect.gd"),

@@ -41,12 +41,14 @@ This is the default `[AUTO]` check. In order, it runs:
    end-to-end test files.
 5. `npm test` in `web/`.
 6. A rebuild of the browser bundle, which fails if `web/public/` changed.
-7. The two-phone Bubbles and Tilt Shift end-to-end journeys described below.
+7. The two-phone Bubbles and jellyfishes 3D and Tilt Shift 3D end-to-end
+   journeys described below.
 
-`--full` adds the 4/6/8/10-phone Tilt Shift journeys, `tilt_shift_workshop_preview_test.gd`
-and `tilt_shift_rotation_contact_test.gd`. The default retains the shorter Tilt Shift
-physics checks. Full coverage also keeps the full-length Bubbles round; Windows export
-remains a separate `--release` option. Name filters do not override these coverage options.
+`--full` adds the 4/6/8/10-phone Tilt Shift 3D journeys and
+`tilt_shift_3d_rotation_contact_test.gd`. The default retains the shorter Tilt Shift 3D
+physics checks. Full coverage also keeps the full-length Bubbles and jellyfishes 3D round;
+Windows export remains a separate `--release` option. Name filters do not override these
+coverage options.
 
 How it reports:
 
@@ -60,9 +62,9 @@ How it reports:
 Options and single runs:
 
 ```powershell
-node tools/check.mjs bubbles web-tests   # only checks whose name contains a filter
-node tools/check.mjs --full              # extended coverage and full-length Bubbles
-node tools/check.mjs --release           # also run the Windows export test
+node tools/check.mjs bubbles_3d web-tests # only checks whose name contains a filter
+node tools/check.mjs --full               # extended coverage and full-length Bubbles 3D
+node tools/check.mjs --release            # also run the Windows export test
 godot --headless --path . --script res://tests/player_registry_test.gd   # one script, full output
 godot --headless --editor --path . --quit-after 30                        # editor import scan
 ```
@@ -75,9 +77,10 @@ Before running:
 
 ## The end-to-end test
 
-`web/e2e/bubbles_two_phones.spec.ts` runs the real phone client in two emulated Pixel 7
+`web/e2e/bubbles_3d_two_phones.spec.ts` runs the real phone client in two emulated Pixel 7
 Chromium contexts against the real host on ports 18200/18201. The phones join, walk in the
-lobby, ready up, swipe through a Bubbles round and return to the lobby.
+lobby, ready up, swipe on the 3D phone screen (which loads `/three_view.js` and the models from
+the host) through a Bubbles and jellyfishes 3D round and return to the lobby.
 
 The host side is `tests/e2e/host.gd`:
 
@@ -90,8 +93,10 @@ The host side is `tests/e2e/host.gd`:
   applies. A button that is covered, off screen, disabled or ignoring the mouse stops the run
   with a message naming what was under the mouse. That covers reachability, not appearance.
 - It prints one `E2E ...` line per event for the test to wait on.
-- By default it shortens only the Bubbles round, to 10 s and in memory. `E2E_ROUND=full` keeps
-  every default.
+- By default it shortens only the Bubbles and jellyfishes 3D round, to 10 s and in memory.
+  `E2E_ROUND=full` keeps every default.
+- `E2E_MINIGAME` names the catalog id it picks in the lobby before Start; the fixture sets it
+  from the test's `game` option.
 - It prints `E2E round ending` two seconds before the round ends, and the phones stop swiping
   then. A swipe that reaches the host after the round has ended is rejected as
   `stale_or_unavailable`, and the phone shows that rejection in its error panel.
@@ -99,10 +104,13 @@ The host side is `tests/e2e/host.gd`:
 The test fails on a missing step, a phone without an accepted swipe, a page error, a visible
 phone error panel, or a host `ERROR` line.
 
-`web/e2e/tilt_shift_phones.spec.ts` also runs the real boot/catalog/gameplay journey with
-synthetic sensors. Its two-phone scenario runs by default, including delayed permission,
-portrait readiness revocation and reconnect; it ends after Tilt Shift returns to the lobby.
-The 4/6/8/10-phone scenarios carry the `@full` tag and run only with full coverage.
+`web/e2e/tilt_shift_3d_phones.spec.ts` runs the real boot/catalog/gameplay journey through
+Tilt Shift 3D with `tests/e2e/tilt_shift_3d_host.gd` and synthetic sensors. Every phone loads
+`/three_view.js` and the face parts and shows its own paddle, spectators included, and the test
+also limits each phone's snapshot size and rate. Its two-phone scenario runs by default,
+including delayed permission, portrait readiness revocation and reconnect; it ends after Tilt
+Shift 3D returns to the lobby. Its 4/6/8/10-phone scenarios carry the `@full` tag and run only
+with full coverage.
 
 - Each phone saves a screenshot per step in `test-results/e2e/`, with a Playwright trace when
   the test fails.
@@ -148,8 +156,8 @@ func _run() -> void:
 Seven scripts do not use the base:
 
 - `pre_minigame_server.gd`, `motion_lab_server.gd`, `e2e/host.gd` and
-  `e2e/tilt_shift_host.gd` in `tests/`, and
-  `bubbles_phone_preview.gd` in the Bubbles `tests/` folder, are hosts that a browser test
+  `e2e/tilt_shift_3d_host.gd` in `tests/`, and
+  `bubbles_3d_phone_preview.gd` in the Bubbles 3D `tests/` folder, are hosts that a browser test
   starts and stops. They never reach an end.
 - `tests/multiplayer_motion_server.gd` is the ten-socket calibrated-control fixture;
   its browser test starts and stops it.
@@ -169,106 +177,73 @@ start only what they need, so they stay fast.
 - `tests/standalone_build_test.gd` needs no templates and runs by default.
 - After a local Windows release export, run
   `godot --headless --path . --script res://tests/lobby_export_pack_check.gd`. It verifies that
-  the external PCK includes the offline phone modules, the Squircle metadata and sheets, and
+  the external PCK includes the offline phone modules, the Cubio model and face textures, and
   the required runtime paths.
 
 ## Focused checks by area
 
-- Tilt Shift complete flow: `tilt_shift_flow_test.gd` under the minigame's tests covers
-  every allowed roster, rejected debug bypass, stale capture, final joins, calibration transfer,
-  reconnect neutrality, mapped presets, results and cleanup. Run
-  `node tools/check.mjs tilt_shift_flow minigame_flow pre_minigame_readiness` alongside
-  the catalog and debug checks.
-- Mapped Tilt Shift rounds: `tilt_shift_journey_test.gd`, `tilt_shift_preparation_test.gd`
-  and `tilt_shift_round_arena_test.gd` cover all roster selections, layout exposure,
-  sharing, automatic direction, READY/timeout/force, calibration and reconnect, fitted
-  offscreen spawns and no pre-active delivery. Run `node tools/check.mjs tilt_shift`.
-- `tilt_shift_preparation_test.gd` also checks shared preparation for mapped two/four-phone
-  sessions, delayed permission, portrait rejection, both landscape holds, READY revocation,
-  reconnect, calibration transfer, accepted angles and later-round reuse.
-  The two-phone browser journey delays permission beyond the default countdown, checks
-  portrait readiness and the real shared screen, then keeps the three-second countdown.
+- Cubio: `node tools/check.mjs cubio pre_minigame_screen lobby_playground` checks the
+  model, tint, clips, blinking, live Ready-screen instances and lobby input. Source geometry,
+  quarter-frame intersections and export commands are in [the Cubio workflow](../art/cubio/README.md).
+- `pre_minigame_visual_check.gd` captures two- and ten-player Ready screens at 1080p and 720p.
+  Run `cubio_preview_performance_check.gd` without `--headless` to measure ten live previews;
+  it writes `test-results/cubio/ready-performance.json`. These are desktop composition and
+  timing evidence, not phone performance or owner visual approval.
+- Playground lobby: `node tools/check.mjs lobby platform` covers the plane-locked Jolt
+  characters, one-way landings, FALL, bounce, side walls and the climb to the café roof. Run
+  `tests/lobby_physics_cost_check.gd` with `--headless` to print the physics cost of ten
+  characters.
+
+- Bubbles and jellyfishes 3D: the `tests/` folder of `minigames/004_3d_bubbles/` covers the
+  round rules, Jolt arenas on real physics frames (plane locks, swipes, speed cap, wall and bump
+  rebounds, catching, pops, scatter, caps, the zero freeze), the protocol, the shared-screen
+  scene and the absence of spin. The shared 3D components have `plane_3d_test.gd`,
+  `bubble_shell_3d_test.gd` and `underwater_environment_test.gd` in `tests/`. Run
+  `node tools/check.mjs bubbles_3d plane_3d bubble_shell underwater`.
+
+- Tilt Shift 3D assets: `shape_faces_test.gd` and `tilt_shift_3d_models_test.gd` in `tests/`
+  check the face parts and presets and the bin against their verified exports. Run
+  `node tools/check.mjs shape_faces tilt_shift_3d_models`. The exports themselves are verified
+  by `export_faces.mjs` in
+  [art/shape_characters_face_system_assets](../art/shape_characters_face_system_assets/README.md)
+  and `export_and_verify.py` in [art/tilt_shift_3d](../art/tilt_shift_3d/README.md).
+
+- Tilt Shift 3D: the `tests/` folder of `minigames/005_3d_tilt_shift/` covers the rules,
+  allocation, delivery, presets, journeys, flow, preparation, motion, negative balls, Jolt
+  physics on the plane (plane locks, rounded contacts, the turning bound, raised-floor catches,
+  contact speeds), the expression rules, the presentation, the protocol and the workshop.
+  `tilt_shift_3d_rotation_contact_test.gd` adds extended full turns and reversal with
+  `node tools/check.mjs --full tilt_shift_3d_rotation_contact`.
+- In `tests/`, `rounded_bar_test.gd`, `shape_face_test.gd`, `plane_3d_test.gd`,
+  `tilt_shift_3d_props_test.gd` and `tilt_shift_3d_review_test.gd` cover the shared pieces,
+  the copied assets and the F12 review. Run `node tools/check.mjs tilt_shift_3d rounded_bar
+  shape_face plane_3d`. The phone's tests are in `web/tests/005_3d_tilt_shift/`.
+- Run `node tools/verify_tilt_shift_3d_workshop.mjs` with other project editors closed to
+  drive Tilt Shift 3D's workshop in the real editor; captures and logs are under
+  `test-results/tilt-shift-3d/workshop/`.
 - `web/tests/screen_wake_lock.test.mjs` checks page-level acquisition, refusal, external
   release, visibility, cached-page restoration, cleanup and pending-request races.
-  The Tilt Shift browser journey uses a synthetic wake lock across preparation, gameplay
+  The Tilt Shift 3D browser journey uses a synthetic wake lock across preparation, gameplay
   and lobby return. It does not prove the physical phone avoids automatic screen lock.
-- `web/tests/003_tilt_shift/phone.test.mjs` checks malformed/replayed snapshots and one
-  canonical guide for five assignments. `web/e2e/tilt_shift_phones.spec.ts` uses the real
-  boot/catalog/gameplay journey with 2/4/6/8/10 Chromium phones and synthetic sensor events.
-  Two phones run in the default check; the other rosters require `--full`.
-  Traffic and coordination costs are described
-  in [flow tuning](../minigames/003_tilt_shift/tuning/FLOW.md).
+- Traffic and coordination costs are described in
+  [flow tuning](../minigames/005_3d_tilt_shift/tuning/FLOW.md); motion and physics measurement
+  boundaries are in [MOTION.md](../minigames/005_3d_tilt_shift/tuning/MOTION.md#measurement-boundaries)
+  and [PHYSICS.md](../minigames/005_3d_tilt_shift/tuning/PHYSICS.md#measurement).
 - `E2E_WINDOWED=1` enables real-host captures for those scenarios. It does not supply
-  physical-phone evidence. The quick Tilt Shift fixture maps two eight-second rounds;
-  Bubbles retains its existing quick/full behavior.
+  physical-phone evidence. The quick Tilt Shift 3D fixture maps two eight-second rounds;
+  Bubbles and jellyfishes 3D retains its existing quick/full behavior.
 - Set `E2E_EXPORTED_PACK` to the absolute Windows package PCK to run the same browser
   journey against exported resources in Godot. The driver remains an external test script;
   it rejects a package run that can see the workspace's test resources. This loads the
   exported boot, browser bundle, scenes and art. The release executable ignores external
   script drivers, so its startup/served-assets check is separate from this PCK journey.
 - `debug_launcher_test.gd` checks the separately labeled simulated factory, ten synthetic
-  operators, automatic readiness/countdown, active paddle motion and ball delivery across
+  players, automatic readiness/countdown, active paddle motion and ball delivery across
   every mapped round, results, no registered phones/subscriptions, restart and clean lobby return.
-
-- Tilt Shift factory: `tilt_shift_presentation_test.gd` in the minigame's `tests/`
-  folder checks 2/4/6/8/10 players, actual collider sizes/transforms through turns and
-  reversal, selected colors, label-free inward-facing operators, colored scores,
-  scoring mouths/front depth, accepted-control holds, cutoff,
-  cleanup, remapped rounds and cumulative win/draw. Run
-  `node tools/check.mjs --full tilt_shift_presentation tilt_shift_workshop_preview`.
-- Run `tilt_shift_presentation_visual_check.gd` without `--headless` for A/B preparation,
-  countdown, ten-player FHD/HD/4:3 and outcomes. It measures A with 60 positive balls
-  and B with 300 positive balls, each plus the selected negative budget, for 45 seconds.
-  The default totals are 80 and 320. Script p95 covers arena,
-  selected controls and presentation; native physics uses one-second engine maxima.
-  Transport and render costs are separate. Readability and motion feel need the owner.
-
-- Tilt Shift workshop: `tilt_shift_workshop_test.gd` and `tilt_shift_workshop_preview_test.gd`
-  in the minigame's `tests/` folder cover deep-copy isolation, snapping, paired edits,
-  undo/redo, fresh-process reload, draft versus usable saves, curve gaps and actual
-  gameplay preview cleanup/materials. Run `node tools/check.mjs --full tilt_shift_workshop`
-  to include the live preview. Without `--full`, only the workshop model checks run.
-- Run `node tools/verify_tilt_shift_workshop.mjs` with other project editors closed for
-  scripted drag/hit-testing, guide/error reports, save/close/reopen, mapped presets,
-  invalid launch rejection and separate preview-process start/restart/stop. Captures
-  and logs are under `test-results/tilt-shift/workshop/`; usability still needs the owner.
-- Run `tilt_shift_workshop_preview_visual_check.gd` in that folder without `--headless`
-  to capture and measure a 45-second, 300-ball preview with ten synthetic players.
-  Its reported p95 covers sampled arena script time, excluding native physics/rendering.
-
-- Calibrated Tilt Shift motion: `tilt_shift_motion_test.gd` in the minigame's `tests/`
-  folder, `web/tests/motion_stream.test.mjs` and `web/tests/multiplayer_motion_host.test.mjs`.
-  Cover repeated turns/reversal, calibration/gain, autorotation, capture failure states,
-  ten real sockets, forged identity/subscription, replaced-tab resume and arena teardown.
-- Run `tilt_shift_motion_cost_check.gd` in that folder for ten-stream host polling costs.
-  The browser stream test writes encoded traffic measurements. Their measurement scopes
-  and outputs are described in [MOTION.md](../minigames/003_tilt_shift/tuning/MOTION.md#measurement-boundaries).
-
-- Tilt Shift physics: `tilt_shift_delivery_test.gd`, `tilt_shift_arena_test.gd` and
-  `tilt_shift_physics_test.gd` in `minigames/003_tilt_shift/tests/` cover curve counts/gaps,
-  seed sequences, catches, exclusive cutoff, cleanup, native material/pair contacts,
-  acceleration and fast impacts. `tilt_shift_rotation_contact_test.gd` adds extended
-  full turns and reversal with `node tools/check.mjs --full tilt_shift_rotation_contact`.
-- `tilt_shift_negative_balls_test.gd` checks independent delivery counts, smooth integrated
-  density, full-round 20%/70%/90% timing, hitches, penalties, score saturation, stale handles,
-  enlarged colliders/sprites, tint, and workshop undo/redo, isolated edits and reload.
-- The arena test samples 201 crossings across the default continuous basket row,
-  including shared rims and stage edges; all resolve exactly once to a basket.
-- Run `tilt_shift_physics_cost_check.gd` in that folder as a headless script for the
-  300-ball/45-second, ten-player profile and empty-arena baseline. It writes ignored
-  `test-results/tilt-shift/physics-cost.txt`. Engine timings are sampled one-second
-  maxima; script timings are per callback. See [measurement limits](../minigames/003_tilt_shift/tuning/PHYSICS.md#measurement-limits).
-
-- Tilt Shift rules: `tilt_shift_allocation_test.gd`, `tilt_shift_rules_test.gd` and
-  `tilt_shift_presets_test.gd` in `minigames/003_tilt_shift/tests/`. Run
-  `node tools/check.mjs tilt_shift tuning_presets` for fairness cycles, adversarial
-  graph optima, exclusive deadlines, resolution, identity and content validity.
-- Tilt Shift cost: run that folder's `tilt_shift_cost_check.gd` as a headless script.
-  It writes controller-only assignment/transition median, p95 and maximum to ignored
-  `test-results/tilt-shift/cost.txt`, with 20 warmups and 200 measured samples per case.
-  Cases include ten players and dense graphs; physics and phones are absent.
-  The same helper writes readable neighbor, ownership and unavoidable-conflict tables
-  to `test-results/tilt-shift/assignments.md` for synthetic four-round examples.
+- Calibrated motion: `tilt_shift_3d_motion_test.gd` in `minigames/005_3d_tilt_shift/tests/`,
+  `web/tests/motion_stream.test.mjs` and `web/tests/multiplayer_motion_host.test.mjs` cover
+  repeated turns/reversal, calibration/gain, autorotation, capture failure states, ten real
+  sockets, forged identity/subscription, replaced-tab resume and arena teardown.
 
 - Local HTTPS: `godot --headless --path . --script tests/controller_tls_test.gd` generates
   disposable ignored fixture material. `node --test tests/tls.test.mjs` in `web/` verifies
@@ -287,31 +262,30 @@ start only what they need, so they stay fast.
 ## Render helpers
 
 Run a render helper only when its output will be inspected. Each writes ignored captures
-under `test-results/`. All but the first need `--rendering-method gl_compatibility`; the first
-uses the Compatibility renderer by default.
+under `test-results/`. All need `--rendering-method gl_compatibility`.
 
 ```powershell
 godot --path . --rendering-method gl_compatibility --script res://tests/<helper>.gd
 ```
 
-The helpers whose names start with `bubbles_` are in
-`minigames/002_bubbles_and_jellyfishes/tests/`; use that folder in place of `tests/`.
+The helpers whose names start with `bubbles_3d_` are in `minigames/004_3d_bubbles/tests/`; use
+that folder in place of `tests/`. Those starting with `tilt_shift_3d_` are in
+`minigames/005_3d_tilt_shift/tests/`.
 
 | Helper | What it saves | Folder |
 | --- | --- | --- |
-| `tilt_shift_presentation_visual_check` | A/B preparation, countdown, ten-player FHD/HD/4:3, mixed balls and outcomes; scoped 80/320-ball host costs. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/presentation/` |
-| `tilt_shift_physics_visual_check` | Three live-arena captures with ten synthetic players, repeated turns/reversal and 180 balls over eight seconds. In `minigames/003_tilt_shift/tests/`. | `tilt-shift/physics/` |
-| `bubbles_player_visual_check` | One player bubble: small, grown, spinning, pop and re-form, and ten players. Components only, not a composed arena. | `bubbles-player/` |
-| `bubbles_animation_visual_check` | Player animation in order: small and maximum idle, held left drag, accepted swipe, slow held and released drag, charge glow and wobble, active spin, burst, reformed. | `bubbles-animation/` |
-| `bubbles_creature_visual_check` | Creatures: entrance and warning, active creatures, white-blinking scatter. | `bubbles-creatures/` |
-| `bubbles_creature_motion_visual_check` | Creature telegraphs in order: the offscreen bubble burst before reveal, the fish entering from that origin, pufferfish jiggle, warning off, jellyfish breathing. | `bubbles-telegraphs/` |
-| `bubbles_presentation_visual_check` | The shared screen: empty, entrance, ten players at FHD and HD, warning on and off, final timer, tied results, two-player maximum bubble. | `bubbles-presentation/` |
+| `bubbles_3d_scene_visual_check` | Bubbles and jellyfishes 3D mid-round with five and ten players, catches of several sizes, free jellyfishes and two pufferfishes. | `bubbles-3d/` |
+| `bubbles_3d_performance_check` | No capture: prints the frame time and draw calls of ten players with every jellyfish cap reached, vsync off. Run it on the target PC. | none |
+| `tilt_shift_3d_presentation_visual_check` | Tilt Shift 3D with layout A and four players and layout B and six, through preparation, countdown, play with and without names and the round's end, then every colour on both teams. | `tilt-shift-3d/presentation/` |
+| `tilt_shift_3d_performance_check` | Writes `performance.txt`: frame time, physics step and draw calls of ten players with the round's whole ball budget in 20 seconds, vsync off. Run it on the target PC. | `tilt-shift-3d/` |
+| `shape_face_visual_check` | The twelve face presets drawn in 2D beside their references, compared within one pixel, and in 3D on paddles. In `tests/`. | `shape-face/` |
+| `bubble_shell_visual_check` | Bubble shells of several sizes around tinted Cubios, one stretched and one bursting. | `bubble-shell/` |
+| `underwater_environment_visual_check` | The underwater environment behind bubble shells through the 004 camera. | `underwater-environment/` |
 | `pre_minigame_visual_check` | The ready screen with two and ten players at 1920×1080 and 1280×720. | `pre-minigame/` |
-| `bubbles_viewport_visual_check` | Player-bubble edge contact at 1920×1080 and 1280×720. | `bubbles-viewport/` |
+| `lobby_playground_world_visual_check` | The plaza lobby empty, and with ten players on the ground and every landing tier, some walking, crouching and looking up. | `lobby-playground-world/` |
+| `lobby_layout_visual_check` | The lobby before and after two players join, and a character jumping in front of the billboard QR. | `lobby-layout/` |
 | `motion_lab_visual_check` | A synthetic desktop capture of the motion lab. Not physical sensor evidence. | `motion-lab/` |
 
-- The committed tablet preview on the ready screen comes from an active Bubbles capture made
-  by the presentation helper.
 - A normal-profile editor load may print forced-shutdown RID and ObjectDB cleanup warnings
   after a successful scan. Treat exit zero with no script or import error as the result. Do
   not confuse cache or profile permission failures with product failures.
@@ -321,12 +295,12 @@ The helpers whose names start with `bubbles_` are in
 Run the preview host, then join at `http://127.0.0.1:8080`:
 
 ```powershell
-$preview = "res://minigames/002_bubbles_and_jellyfishes/tests/bubbles_phone_preview.gd"
+$preview = "res://minigames/004_3d_bubbles/tests/bubbles_3d_phone_preview.gd"
 godot --headless --path . --script $preview
 ```
 
-- It starts a one-player Bubbles protocol fixture with eight collected jellyfish and the
-  explicit debug label.
+- It starts a one-player Bubbles and jellyfishes 3D protocol fixture with eight collected
+  jellyfish and the explicit debug label.
 - Stop it before starting normal play.
 - The browser and host suite runs the same fixture on separate ports.
 - Neither preview is a playable arena or a physical-phone check.

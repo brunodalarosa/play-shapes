@@ -13,7 +13,7 @@ import {
 } from "../build/character_selection.js";
 
 test("phone setup keeps one approved body and all ten player colors", () => {
-  assert.equal(CHARACTER_SHAPE, "squircle");
+  assert.equal(CHARACTER_SHAPE, "cubio");
   assert.deepEqual(
     CHARACTER_COLORS.map(({ name, hex }) => [name, hex]),
     [
@@ -30,10 +30,10 @@ test("phone setup keeps one approved body and all ten player colors", () => {
     ],
   );
   assert.equal(colorOption("#ec407a")?.name, "Pink");
-  assert.deepEqual(FALLBACK_CHARACTER, { shape: "squircle", color: "#598DF2" });
+  assert.deepEqual(FALLBACK_CHARACTER, { shape: "cubio", color: "#598DF2" });
 });
 
-test("join preserves color through the name screen and submits Squircle automatically", () => {
+test("join preserves color through the name screen and submits Cubio automatically", () => {
   let flow = chooseJoinColor(defaultJoinFlow(), "#EC407A");
   flow = advanceJoinFlow(flow);
   assert.deepEqual(flow, { screen: "name", color: "#EC407A" });
@@ -42,7 +42,7 @@ test("join preserves color through the name screen and submits Squircle automati
   assert.deepEqual(createJoinMessage("  Player One  ", flow), {
     type: "join",
     name: "Player One",
-    character_shape: "squircle",
+    character_shape: "cubio",
     character_color: "#EC407A",
   });
 });

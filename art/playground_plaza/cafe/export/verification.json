@@ -1,0 +1,184 @@
+{
+  "result": "PASS",
+  "blender_version": "5.2.2 LTS",
+  "source_sha256": "0543591367711820e136e6d281c5c77b604840fda2971bbe316d60dc83e90d86",
+  "export_sha256": "c0923e06b95df32cb8c7b9e7c77ddedb71d72fe6363d1c156534f98c71d2a981",
+  "export_bytes": 92316,
+  "source_geometry_blender_xyz": {
+    "minimum": [
+      -3.5,
+      -2.0,
+      0.0
+    ],
+    "maximum": [
+      3.5,
+      2.0,
+      6.5
+    ],
+    "triangles": 1132,
+    "mesh_count": 21,
+    "triangles_by_object": {
+      "Building Shell": 44,
+      "Roof": 44,
+      "Roof Underside Trim": 44,
+      "Facade Band": 44,
+      "Plinth Front Left": 44,
+      "Plinth Front Right": 44,
+      "Plinth Back": 44,
+      "Plinth Right": 44,
+      "Plinth Left": 44,
+      "Window Frame": 44,
+      "Window Panel": 44,
+      "Door Surround": 44,
+      "Door": 44,
+      "Door Window Frame": 44,
+      "Door Window": 44,
+      "Door Lower Recess": 44,
+      "Door Lower Panel": 44,
+      "Door Handle": 120,
+      "Cup Emblem": 92,
+      "Cup Saucer": 44,
+      "Cup Handle": 128
+    }
+  },
+  "round_trip_geometry_blender_xyz": {
+    "minimum": [
+      -3.5,
+      -2.0,
+      0.0
+    ],
+    "maximum": [
+      3.5,
+      2.0,
+      6.5
+    ],
+    "triangles": 1132,
+    "mesh_count": 21,
+    "triangles_by_object": {
+      "Building Shell": 44,
+      "Cup Emblem": 92,
+      "Cup Handle": 128,
+      "Cup Saucer": 44,
+      "Door": 44,
+      "Door Handle": 120,
+      "Door Lower Panel": 44,
+      "Door Lower Recess": 44,
+      "Door Surround": 44,
+      "Door Window": 44,
+      "Door Window Frame": 44,
+      "Facade Band": 44,
+      "Plinth Back": 44,
+      "Plinth Front Left": 44,
+      "Plinth Front Right": 44,
+      "Plinth Left": 44,
+      "Plinth Right": 44,
+      "Roof": 44,
+      "Roof Underside Trim": 44,
+      "Window Frame": 44,
+      "Window Panel": 44
+    }
+  },
+  "materials": {
+    "Wall Cream": {
+      "color": [
+        0.8796223998069763,
+        0.7011018991470337,
+        0.43415364623069763,
+        1.0
+      ],
+      "roughness": 0.7200000286102295,
+      "metallic": 0.0
+    },
+    "Trim Coral": {
+      "color": [
+        0.8148465752601624,
+        0.09305896610021591,
+        0.040915198624134064,
+        1.0
+      ],
+      "roughness": 0.7200000286102295,
+      "metallic": 0.0
+    },
+    "Door Teal": {
+      "color": [
+        0.009721217676997185,
+        0.21223075687885284,
+        0.19806931912899017,
+        1.0
+      ],
+      "roughness": 0.7200000286102295,
+      "metallic": 0.0
+    },
+    "Frame Charcoal": {
+      "color": [
+        0.03560131415724754,
+        0.061246052384376526,
+        0.07421357184648514,
+        1.0
+      ],
+      "roughness": 0.7200000286102295,
+      "metallic": 0.0
+    },
+    "Window Amber": {
+      "color": [
+        0.6938717365264893,
+        0.28314873576164246,
+        0.04666508734226227,
+        1.0
+      ],
+      "roughness": 0.4000000059604645,
+      "metallic": 0.0
+    },
+    "Handle Gold": {
+      "color": [
+        0.8962693810462952,
+        0.5149176716804504,
+        0.06480326503515244,
+        1.0
+      ],
+      "roughness": 0.4000000059604645,
+      "metallic": 0.0
+    },
+    "Emblem Coffee": {
+      "color": [
+        0.24228112399578094,
+        0.05951123684644699,
+        0.01850022003054619,
+        1.0
+      ],
+      "roughness": 0.7200000286102295,
+      "metallic": 0.0
+    }
+  },
+  "gltf_world_bounds_xyz": {
+    "minimum": [
+      -3.5,
+      0.0,
+      -2.0
+    ],
+    "maximum": [
+      3.5,
+      6.5,
+      2.0
+    ]
+  },
+  "flat_roof_size": [
+    6.929999828338623,
+    3.930000066757202
+  ],
+  "gltf_orientation": "Y up; facade -Z; ground-centered origin",
+  "evidence": "AUTO: Blender source and GLB round trip; no Godot import/runtime evidence",
+  "checks": [
+    "closed positive-volume parts",
+    "no degenerate faces",
+    "triangle budget",
+    "material budget",
+    "flat unobstructed roof",
+    "applied mesh scales",
+    "ground origin",
+    "no external dependencies",
+    "no studio objects in export",
+    "decoded GLB world bounds and facade orientation",
+    "round-trip part names, bounds, triangles and material values"
+  ]
+}

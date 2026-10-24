@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Full coverage adds larger Tilt Shift rosters and keeps the 90 s Bubbles round.
+// Full coverage adds larger Tilt Shift rosters and keeps the 90 s Bubbles 3D round.
 const fullRound = process.env.E2E_ROUND === "full";
 
 export default defineConfig({

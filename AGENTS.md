@@ -61,20 +61,20 @@ A pull request is history, read later by someone who was not there. Write what i
 - Name things for what they are. Ticket and task numbers do not belong anywhere in the repository: not in file names, comments, documents, test names or output folders.
 - Run `node tools/lint.mjs` as well. It reports naming, unused code and other mistakes in GDScript, TypeScript and JavaScript, and every line over 100 characters that the formatters could not shorten. Shorten such a line by naming part of the expression on the line before, by wrapping the expression in parentheses, or by joining a long string from shorter ones; move a trailing comment above its statement. Do not reword a message or a test title to make it fit.
 - Preserve the bundled runtime assets and `web/public/` output. Rebuild the browser bundle after changing `web/src/`.
-- Minigame numbers are stable identifiers. 001 was retired; 002 is the first approved game. Never reuse or renumber IDs.
+- Minigame numbers are stable identifiers. 001, 002 and 003 were retired; 004 is Bubbles and jellyfishes 3D, and 005 is Tilt Shift 3D. Never reuse or renumber IDs.
 - A Shape Character is a player-owned geometric character with floating hands and feet. Keep poses and expressions readable, including natural blinking and context-appropriate gestures.
 
 ## Visual direction
 
-Read [game-design-documents/Art direction.md](game-design-documents/Art%20direction.md) and apply it to UI, environments, characters, effects, shaders, and animation.
+Read [game-design-documents/Art direction.md](docs/game-design-documents/Art%20direction.md) and apply it to UI, environments, characters, effects, shaders, and animation.
 
-The canonical editable Squircle source and current export tools live in `art/squircle/`. Keep only current source and useful pipeline/review resources there. Prior versions, backups, variant experiments and version comparisons are temporary artifacts: use ignored `scratch/` or `comparisons/` directories and do not commit them or obsolete one-time construction scripts.
+The canonical editable Cubio source and current export tools live in `art/cubio/`. Keep only current source and useful pipeline/review resources there. Prior versions, backups, variant experiments and version comparisons are temporary artifacts: use ignored `scratch/` or `comparisons/` directories and do not commit them or obsolete one-time construction scripts.
 
 ## Setup and verification
 
 - Use Godot 4.7.2 or newer with the GL Compatibility renderer, and Node 22 or newer. Run `node tools/setup.mjs` after cloning and whenever a tool may be missing: it checks the required tools, reports the ones some tasks need, and installs `web/` dependencies, Playwright's Chromium and the GDScript formatter. [README.md](README.md#requirements) lists every tool. Set `GODOT_BIN` to a Godot executable when it is not on PATH as `godot`.
-- Run `node tools/check.mjs` before reporting a change as verified. It runs every Godot test script, the format, lint and document checks, the tests of `tools/`, the browser type check and tests, confirms `web/public/` matches a fresh build, and plays a shortened Bubbles round with two emulated phones against the real host. It prints one line per failure and writes full output under `test-results/check/`.
-- Pass name filters for a focused run (`node tools/check.mjs bubbles`), `--full` to play that round with every default, and `--release` to add the Windows export test, which needs export templates.
+- Run `node tools/check.mjs` before reporting a change as verified. It runs every Godot test script, the format, lint and document checks, the tests of `tools/`, the browser type check and tests, confirms `web/public/` matches a fresh build, and plays a shortened Bubbles and jellyfishes 3D round with two emulated phones against the real host. It prints one line per failure and writes full output under `test-results/check/`.
+- Pass name filters for a focused run (`node tools/check.mjs bubbles_3d`), `--full` to play that round with every default, and `--release` to add the Windows export test, which needs export templates.
 - Run a single Godot script with `godot --headless --path . --script tests/<name>.gd`. For browser work, run `npm run check`, `npm run build`, and `npm test` in `web/`.
 - Keep changes scoped. When setup, architecture, protocols or verification steps change, update the document for that area in the same change. `node tools/docs.mjs` checks the rules documents follow.
 - The vendored `addons/godot_mcp/` editor integration is optional. Enable it in Godot's Plugin settings only when needed; configure your own local MCP client separately. Do not change the third-party addon unless the task calls for it.

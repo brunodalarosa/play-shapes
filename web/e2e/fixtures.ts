@@ -32,7 +32,7 @@ export class Host {
   private process?: ChildProcess;
   private exit?: string;
 
-  async start(players: number, testInfo: TestInfo, game = "bubbles"): Promise<void> {
+  async start(players: number, testInfo: TestInfo, game = "bubbles_3d"): Promise<void> {
     // A host left running by a person would answer instead of this one.
     const busy = await fetch(`${this.url}session.json`, { signal: AbortSignal.timeout(500) }).then(
       () => true,
@@ -44,7 +44,10 @@ export class Host {
 
     const windowed = process.env.E2E_WINDOWED === "1";
     const exported = process.env.E2E_EXPORTED_PACK;
-    const script = game === "tilt_shift" ? "tilt_shift_host.gd" : "host.gd";
+    const scripts: Record<string, string> = {
+      tilt_shift_3d: "tilt_shift_3d_host.gd",
+    };
+    const script = scripts[game] ?? "host.gd";
     const args = [
       ...(windowed ? [] : ["--headless"]),
       ...(exported ? ["--main-pack", exported] : ["--path", ROOT]),
@@ -58,9 +61,10 @@ export class Host {
         ...process.env,
         E2E_PLAYERS: String(players),
         E2E_ROUND: process.env.E2E_ROUND === "full" ? "full" : "quick",
+        E2E_MINIGAME: game,
         E2E_HTTP_PORT: String(HTTP_PORT),
         E2E_HOST_CAPTURES: windowed ? testInfo.outputPath("host") : "",
-        E2E_REPORT_FOLDER: join(ROOT, "test-results", "tilt-shift"),
+        E2E_REPORT_FOLDER: join(ROOT, "test-results", "tilt-shift-3d"),
         PLAY_SHAPES_NETWORK_CONFIG: "off",
       },
     });
@@ -209,8 +213,8 @@ export class Phone {
     await this.page.click("#ready-button");
   }
 
-  async swipe(dx: number, dy: number): Promise<void> {
-    const center = await centerOf(this.page.locator("#bubbles-pad"));
+  async swipe(dx: number, dy: number, surface = "#bubbles-3d-card"): Promise<void> {
+    const center = await centerOf(this.page.locator(surface));
     await this.page.mouse.move(center.x, center.y);
     await this.page.mouse.down();
     await this.page.mouse.move(center.x + dx, center.y + dy, { steps: 6 });
@@ -255,7 +259,7 @@ type Fixtures = {
 };
 
 export const test = base.extend<Fixtures>({
-  game: ["bubbles", { option: true }],
+  game: ["bubbles_3d", { option: true }],
   players: [2, { option: true }],
 
   host: async ({ players, game }, use, testInfo) => {

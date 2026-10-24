@@ -5,7 +5,7 @@ func _run() -> void:
 	var registry := PlayerRegistry.new(10, 60.0)
 	var first: Dictionary = registry.join_player(1, "First", true)
 	var second: Dictionary = registry.join_player(2, "Second", true)
-	var phase := PreMinigameReadiness.new(&"bubbles", registry.public_players())
+	var phase := PreMinigameReadiness.new(&"bubbles_3d", registry.public_players())
 	var launches := [0]
 	var cancels := [0]
 	phase.launch_requested.connect(
@@ -72,7 +72,7 @@ func _run() -> void:
 	)
 	phase.cancel()
 	check(cancels[0] == 0, "Cancellation cannot undo launch")
-	var another := PreMinigameReadiness.new(&"bubbles", registry.public_players())
+	var another := PreMinigameReadiness.new(&"bubbles_3d", registry.public_players())
 	another.canceled.connect(
 		func() -> void:
 			cancels[0] += 1,
@@ -80,13 +80,13 @@ func _run() -> void:
 	another.cancel()
 	another.cancel()
 	check(cancels[0] == 1, "Host cancellation emits once")
-	var empty := PreMinigameReadiness.new(&"bubbles", [])
+	var empty := PreMinigameReadiness.new(&"bubbles_3d", [])
 	check(
 		empty.status_players().is_empty() and not empty.set_ready({ }, true).accepted,
 		"Empty roster cannot launch",
 	)
 	var expiring := PreMinigameReadiness.new(
-		&"bubbles",
+		&"bubbles_3d",
 		registry.public_players(),
 		func() -> bool:
 			return registry.player_count() >= 2,
