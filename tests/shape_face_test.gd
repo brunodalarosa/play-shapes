@@ -112,6 +112,18 @@ func _check_nodes() -> void:
 	check(face.face_name == "face_a", "It returns to the base face")
 	check(face.find_children("*", "CollisionObject3D").is_empty(), "A face has no physics")
 
+	face.front_push = 2.0
+	var pushed := face.quads()[0].material_override as ShaderMaterial
+	check(pushed != null, "A pushed face draws its parts with the front shader")
+	check(
+		is_equal_approx(float(pushed.get_shader_parameter("front_push")), 2.0),
+		"Its parts are pushed as far as the body",
+	)
+	check(
+		pushed.render_priority == 0 and face.quads()[2].material_override.render_priority == 2,
+		"Pushed parts keep their drawing order",
+	)
+
 	var chip := ShapeFace2D.new()
 	chip.size = Vector2(100.0, 40.0)
 	root.add_child(chip)
