@@ -81,7 +81,7 @@ test("natural blinks last 0.12 s, 2.4 to 5.6 s apart", () => {
 
 test("emoji presets compose on the phone and keep shut eyes during blinks", () => {
   const emojiFaces = Object.entries(manifest.faces).filter(([, face]) => face.emoji_reference);
-  assert.equal(emojiFaces.length, 42);
+  assert.equal(emojiFaces.length, 58);
   for (const [name, preset] of emojiFaces) {
     assert.ok(validSnapshot(snapshot({ face: name })), name);
     assert.ok(validPreparation(preparation({ face: name })), name);
@@ -104,6 +104,17 @@ test("emoji presets compose on the phone and keep shut eyes during blinks", () =
     "face_weary",
     "face_squinting_tongue",
     "face_savoring_food",
+    "face_joy_tears",
+    "face_grinning_sweat",
+    "face_sunglasses",
+    "face_heart_eyes",
+    "face_star_struck",
+    "face_sleepy",
+    "face_sleeping",
+    "face_downcast_sweat",
+    "face_money_mouth",
+    "face_loudly_crying",
+    "face_halo",
   ]) {
     assert.deepEqual(faceLayers(manifest, name, true), faceLayers(manifest, name, false));
   }
@@ -139,6 +150,29 @@ test("emoji presets compose on the phone and keep shut eyes during blinks", () =
   assert.equal(tongueWink[1].part, "facial_part_eye_closed_up");
   const zany = faceLayers(manifest, "face_zany", false);
   assert.notDeepEqual(zany[0].size, zany[1].size);
+  assert.equal(faceLayers(manifest, "face_money_mouth", false)[1].mirror, false);
+  const decorations = {
+    face_joy_tears: ["facial_part_tear_drop", 2],
+    face_grinning_sweat: ["facial_part_tear_drop", 1],
+    face_sunglasses: ["facial_part_sunglasses", 1],
+    face_smiling_tear: ["facial_part_tear_drop", 1],
+    face_sad_relieved: ["facial_part_tear_drop", 1],
+    face_sleepy: ["facial_part_sleep_bubble", 1],
+    face_sleeping: ["facial_part_sleep_z", 1],
+    face_drooling: ["facial_part_drool", 1],
+    face_downcast_sweat: ["facial_part_tear_drop", 1],
+    face_money_mouth: ["facial_part_money_tongue", 1],
+    face_crying: ["facial_part_tear_drop", 1],
+    face_loudly_crying: ["facial_part_tear_stream", 2],
+    face_holding_back_tears: ["facial_part_tear_pool", 2],
+    face_halo: ["facial_part_halo", 1],
+  };
+  for (const [name, [part, count]] of Object.entries(decorations)) {
+    const before = faceLayers(manifest, name, false).filter((layer) => layer.part === part);
+    const after = faceLayers(manifest, name, true).filter((layer) => layer.part === part);
+    assert.equal(before.length, count, name);
+    assert.deepEqual(after, before, name);
+  }
   for (const name of ["face_smirking", "face_unamused"]) {
     assert.equal(faceLayers(manifest, name, false)[1].mirror, false);
   }

@@ -27,6 +27,15 @@
       "sha256": "58fc10325f845041fece4dd054ba0cf056dab63f251ed312e1d3e995e1367744",
       "master_sha256": "4de7f355c2edd8b30385f9eaff7fbefb72cded2b0fddd41de6f23eaafd91049b"
     },
+    "facial_part_drool": {
+      "size": [
+        24,
+        40
+      ],
+      "soft_pixels": 0,
+      "sha256": "8ecb34d61389ff415c609c08296c43d9f254b9c2224eb80ae013eef94f7c219d",
+      "master_sha256": "b9c8d09917381d7b529fac1cc9c43884931d861de4ac83786f18cbc7f8c57b05"
+    },
     "facial_part_eye_closed_down": {
       "size": [
         48,
@@ -77,6 +86,15 @@
       "master_sha256": "51e23f038c5af5481155bc7fa90c350a71d9b17934494da8810dd619859d1a1f",
       "source_far_pixels": 0
     },
+    "facial_part_eye_heart": {
+      "size": [
+        44,
+        40
+      ],
+      "soft_pixels": 0,
+      "sha256": "11cae02eeb0f0423ac0f42f68e5eb3a7b31f0f1c832f9cd7b09096fbb23c0e04",
+      "master_sha256": "67205b8c17c3dd4abecd5c68579e20a687e4e06b606613bcde3d2c92da69eabf"
+    },
     "facial_part_eye_looking_up": {
       "size": [
         42,
@@ -85,6 +103,15 @@
       "soft_pixels": 0,
       "sha256": "ec4f84d0ec808339d0f05bd37910fb0c19c14564972ef7d85d3664dd7a7f9c48",
       "master_sha256": "204f6a1ea1e19fd38d309adac179771ce29a25f26efdb802edd051d3685bee5d"
+    },
+    "facial_part_eye_money": {
+      "size": [
+        32,
+        42
+      ],
+      "soft_pixels": 0,
+      "sha256": "755d984e940cf77b299d897197447d2e55b77d837c52e5a619c4d493f0aef8bf",
+      "master_sha256": "d013b9a0719af9739bf811971530baa741035e0194eb38a8977b8707b55c5114"
     },
     "facial_part_eye_open": {
       "size": [
@@ -149,6 +176,15 @@
       "soft_pixels": 0,
       "sha256": "9bf09f41f11423e16ddc74b157c9dfe1d0e96a7ad63effe49e2be68f86f3a831",
       "master_sha256": "4392a22283d012d9fcd48c8bec69ce41c36f447fd3dc5db040a9f35fb58bde93"
+    },
+    "facial_part_eye_star": {
+      "size": [
+        46,
+        46
+      ],
+      "soft_pixels": 0,
+      "sha256": "5bc510123ac12f0e60ef5512e7b829bcb726756ea730724020cbf1d6b1e9587c",
+      "master_sha256": "4dcc90eaebbac2cf6af4a9c12eef4fb47971a5e56ae9a20102c49a97e95f25e8"
     },
     "facial_part_eye_tired": {
       "size": [
@@ -225,6 +261,24 @@
       "soft_pixels": 0,
       "sha256": "b5f8b91bdf0ac8893ad9ec17a6d6b0cdd0745d8aa6bbab70e5adbf4a63035b1b",
       "master_sha256": "e69bf20f8f46db35272d97acdbd783db09b01f86d3fbf6a918b977aa913503fd"
+    },
+    "facial_part_halo": {
+      "size": [
+        102,
+        28
+      ],
+      "soft_pixels": 0,
+      "sha256": "6368de53a05c4dc5149118509d704ebd387b0b883243f789e7b57c2926e741cf",
+      "master_sha256": "1dc7f0ee24a7db2626eb9cf6ef5e3c314d27f6fff6cf717f66160b8b47b48224"
+    },
+    "facial_part_money_tongue": {
+      "size": [
+        34,
+        40
+      ],
+      "soft_pixels": 0,
+      "sha256": "fdb490e3b63585e4931e560d8d3c8942fd23fdc7c543f0837a69847f3a39db5a",
+      "master_sha256": "91896e580ae33f9784b4b6d0b14f258f918f7d4a52e04c79888530204c0f436a"
     },
     "facial_part_mouth_angry": {
       "size": [
@@ -391,6 +445,60 @@
       "soft_pixels": 0,
       "sha256": "7080bd03eb9baf897db06edc9506e5aacd97fd9e14f33adaf940541af0984b81",
       "master_sha256": "066be9e8c67980142525d2cf6a3d8505cb328be82207471b1d00d85c2c2df8ca"
+    },
+    "facial_part_sleep_bubble": {
+      "size": [
+        36,
+        42
+      ],
+      "soft_pixels": 0,
+      "sha256": "499f4a3667673a87ef22bcc345a0a8e331cc2c2dd6a5bec525ca7b164464e669",
+      "master_sha256": "dab66b518cca0d903d76314f16b369f6ee8ad484a642842b5e37cb6d559dfc40"
+    },
+    "facial_part_sleep_z": {
+      "size": [
+        46,
+        50
+      ],
+      "soft_pixels": 0,
+      "sha256": "464bdcf3c28cf5e054bf09e855caf66a6f33c80d79ef4cc94a1f2fa8e4951b3e",
+      "master_sha256": "75f7c862c19ca1b16a36c330253d98f7311f2354c83b106aeed141eefeaafb8e"
+    },
+    "facial_part_sunglasses": {
+      "size": [
+        102,
+        38
+      ],
+      "soft_pixels": 0,
+      "sha256": "3ae7c0b7ba9b172b671b0887e43f952352b5f807eb4d297e73a9d12488e969ed",
+      "master_sha256": "930541a30c929f93c9c55ac6b258b8d22770f1a827bfb65f84143f3cb0ad7302"
+    },
+    "facial_part_tear_drop": {
+      "size": [
+        24,
+        36
+      ],
+      "soft_pixels": 0,
+      "sha256": "7222ac0ee365f83b6d19f2593093ba3072e25f3a9571c252e72ee82e88d0cbad",
+      "master_sha256": "c359d9583cd9864dbcd88bf75e5b9917bd30c1ff21d45db9049feb0ca938edbb"
+    },
+    "facial_part_tear_pool": {
+      "size": [
+        40,
+        16
+      ],
+      "soft_pixels": 0,
+      "sha256": "4699d4f8495dab6d73c168417a5654b8a96f3e5fce6f07d1f5655368a5b86b48",
+      "master_sha256": "1b17fce646ea0092e38ebc4dfcf783ae0f1749ca186621894348a59eed0b4533"
+    },
+    "facial_part_tear_stream": {
+      "size": [
+        24,
+        72
+      ],
+      "soft_pixels": 0,
+      "sha256": "db0ad145e03bb95d9efc7ae775b6b254e67cce3ca55dfd8c0b9cb4256c1a9fd7",
+      "master_sha256": "35b4cb7cb0c756ae739824196c13c33e2efea36f6a7ca1c0a6a3dc3eae2c6e3f"
     },
     "facial_part_tongue": {
       "size": [
@@ -618,6 +726,70 @@
     "face_zany": {
       "emoji_reference": "🤪",
       "reference_comparison": false
+    },
+    "face_joy_tears": {
+      "emoji_reference": "😂",
+      "reference_comparison": false
+    },
+    "face_grinning_sweat": {
+      "emoji_reference": "😅",
+      "reference_comparison": false
+    },
+    "face_sunglasses": {
+      "emoji_reference": "😎",
+      "reference_comparison": false
+    },
+    "face_heart_eyes": {
+      "emoji_reference": "😍",
+      "reference_comparison": false
+    },
+    "face_smiling_tear": {
+      "emoji_reference": "🥲",
+      "reference_comparison": false
+    },
+    "face_star_struck": {
+      "emoji_reference": "🤩",
+      "reference_comparison": false
+    },
+    "face_sad_relieved": {
+      "emoji_reference": "😥",
+      "reference_comparison": false
+    },
+    "face_sleepy": {
+      "emoji_reference": "😪",
+      "reference_comparison": false
+    },
+    "face_sleeping": {
+      "emoji_reference": "😴",
+      "reference_comparison": false
+    },
+    "face_drooling": {
+      "emoji_reference": "🤤",
+      "reference_comparison": false
+    },
+    "face_downcast_sweat": {
+      "emoji_reference": "😓",
+      "reference_comparison": false
+    },
+    "face_money_mouth": {
+      "emoji_reference": "🤑",
+      "reference_comparison": false
+    },
+    "face_crying": {
+      "emoji_reference": "😢",
+      "reference_comparison": false
+    },
+    "face_loudly_crying": {
+      "emoji_reference": "😭",
+      "reference_comparison": false
+    },
+    "face_holding_back_tears": {
+      "emoji_reference": "🥹",
+      "reference_comparison": false
+    },
+    "face_halo": {
+      "emoji_reference": "😇",
+      "reference_comparison": false
     }
   },
   "eye_x": {
@@ -630,7 +802,7 @@
     "far_pixels_left": 0,
     "far_pixels_right": 0
   },
-  "manifest_sha256": "6b50fc6038261ac01e8898c007d49f9da63f32850475b08f0f261874d5dc8cf9",
+  "manifest_sha256": "6299578b63cc01e6d49639959246ca0c29aa6225e3cb6b5661b4e222c91ac8f3",
   "result": "PASS",
   "failures": []
 }

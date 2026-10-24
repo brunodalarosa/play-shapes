@@ -364,7 +364,10 @@ var UNBLINKING_EYES = [
   "facial_part_eye_squeezed",
   "facial_part_eye_soft_closed_up",
   "facial_part_eye_soft_closed_down",
-  "facial_part_eye_spiral"
+  "facial_part_eye_spiral",
+  "facial_part_eye_heart",
+  "facial_part_eye_star",
+  "facial_part_eye_money"
 ];
 var EYE_PREFIX = "facial_part_eye_";
 function validManifest(value) {

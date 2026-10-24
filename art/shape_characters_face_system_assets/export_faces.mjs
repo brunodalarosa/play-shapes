@@ -27,6 +27,21 @@ const SCALE = 8;
 const NAVY = [0x3d, 0x46, 0x5d];
 const WHITE = [255, 255, 255];
 const TONGUE_PINK = [0xf4, 0x7d, 0xa8];
+const WATER_BLUE = [0x75, 0xcb, 0xee];
+const GOLD = [0xff, 0xd1, 0x66];
+const MONEY_GREEN = [0x7f, 0xd7, 0x8b];
+const PART_PALETTES = {
+  facial_part_tongue: [NAVY, TONGUE_PINK],
+  facial_part_eye_heart: [NAVY, TONGUE_PINK],
+  facial_part_eye_star: [NAVY, GOLD],
+  facial_part_tear_drop: [NAVY, WATER_BLUE, WHITE],
+  facial_part_sleep_bubble: [NAVY, WATER_BLUE, WHITE],
+  facial_part_drool: [NAVY, WATER_BLUE, WHITE],
+  facial_part_money_tongue: [NAVY, MONEY_GREEN],
+  facial_part_tear_stream: [NAVY, WATER_BLUE, WHITE],
+  facial_part_tear_pool: [NAVY, WATER_BLUE, WHITE],
+  facial_part_halo: [NAVY, GOLD, WHITE],
+};
 // The X-eye is cut from face_j's left eye: a 40 x 40 box like the open eye's.
 const EYE_X_CUT = { face: "face_j", x: 0, y: 19, size: 40 };
 
@@ -93,7 +108,7 @@ function largestDifference(a, b) {
 }
 
 // At 8x, every partially covered or blended pixel touches clear space or a solid palette
-// colour. A blurred edge would be a wider band. The tongue's pink is a separate solid colour.
+// colour. A blurred edge would be a wider band. Coloured accents have their own palettes.
 function soft(png, palette) {
   const { width, height, data } = png;
   const at = (x, y) => {
@@ -161,7 +176,7 @@ try {
     }
     const png = readPng(target);
     if (png.width !== w * SCALE || png.height !== h * SCALE) fail(`${name}.png is not 8x`);
-    const palette = name === "facial_part_tongue" ? [NAVY, TONGUE_PINK] : [NAVY, WHITE];
+    const palette = PART_PALETTES[name] ?? [NAVY, WHITE];
     const softPixels = soft(png, palette);
     if (softPixels > 0) fail(`${name}.png has ${softPixels} pixels off a sharp edge`);
     report.parts[name] = {

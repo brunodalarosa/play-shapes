@@ -64,15 +64,15 @@ func _page(names: Array[String], first: int) -> void:
 	var index := 0
 	for name: String in names:
 		var x := (index % 4 - 1.5) * 5.2
-		var y := 5.9 - floorf(index / 4.0) * 4.1
+		var y := 5.65 - floorf(index / 4.0) * 4.1
 		var origin := Node3D.new()
 		origin.position = Vector3(x, y, 0.0)
 		world.add_child(origin)
-		var reference := _label(origin, EMOJIS[name], Vector3(-1.65, 1.2, 0.5), 76)
+		var reference := _label(origin, EMOJIS[name], Vector3(-1.65, 1.45, 0.5), 76)
 		reference.font = emoji_font
 		reference.modulate = Color.WHITE
 		var title := name.trim_prefix("face_").replace("_", " ").capitalize()
-		var caption := _label(origin, title, Vector3(0.45, 1.2, 0.5), 29)
+		var caption := _label(origin, title, Vector3(0.45, 1.45, 0.5), 29)
 		caption.width = 330.0
 		caption.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_paddle(origin, name, 1.65, 0.05, Color(COLORS[index % COLORS.size()]))

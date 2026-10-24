@@ -277,6 +277,66 @@ const ASSETS: Dictionary = {
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
+	"/shape_faces/facial_part_tear_drop.png": {
+		"path": SHAPE_FACES + "/facial_part_tear_drop.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_sunglasses.png": {
+		"path": SHAPE_FACES + "/facial_part_sunglasses.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_heart.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_heart.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_star.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_star.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_sleep_bubble.png": {
+		"path": SHAPE_FACES + "/facial_part_sleep_bubble.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_sleep_z.png": {
+		"path": SHAPE_FACES + "/facial_part_sleep_z.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_drool.png": {
+		"path": SHAPE_FACES + "/facial_part_drool.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_money.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_money.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_money_tongue.png": {
+		"path": SHAPE_FACES + "/facial_part_money_tongue.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_tear_stream.png": {
+		"path": SHAPE_FACES + "/facial_part_tear_stream.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_tear_pool.png": {
+		"path": SHAPE_FACES + "/facial_part_tear_pool.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_halo.png": {
+		"path": SHAPE_FACES + "/facial_part_halo.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
 	"/style.css": {
 		"path": "res://web/public/style.css",
 		"content_type": "text/css; charset=utf-8",

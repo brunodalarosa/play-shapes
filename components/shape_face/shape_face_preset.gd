@@ -2,7 +2,7 @@ class_name ShapeFacePreset
 extends RefCounted
 ## A named face: its box and the parts placed in it, in drawing order.
 
-## Eyes fixed by a pose: shut, crossed out or spiralled.
+## Eyes fixed by a pose, including closed eyes and symbolic eyes.
 const UNBLINKING_EYES: Array[String] = [
 	"facial_part_eye_closed_down",
 	"facial_part_eye_closed_up",
@@ -11,6 +11,9 @@ const UNBLINKING_EYES: Array[String] = [
 	"facial_part_eye_soft_closed_up",
 	"facial_part_eye_soft_closed_down",
 	"facial_part_eye_spiral",
+	"facial_part_eye_heart",
+	"facial_part_eye_star",
+	"facial_part_eye_money",
 ]
 const EYE_PREFIX := "facial_part_eye_"
 

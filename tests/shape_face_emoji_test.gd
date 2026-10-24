@@ -44,6 +44,22 @@ const EMOJIS := {
 	"face_squinting_tongue": "😝",
 	"face_savoring_food": "😋",
 	"face_zany": "🤪",
+	"face_joy_tears": "😂",
+	"face_grinning_sweat": "😅",
+	"face_sunglasses": "😎",
+	"face_heart_eyes": "😍",
+	"face_smiling_tear": "🥲",
+	"face_star_struck": "🤩",
+	"face_sad_relieved": "😥",
+	"face_sleepy": "😪",
+	"face_sleeping": "😴",
+	"face_drooling": "🤤",
+	"face_downcast_sweat": "😓",
+	"face_money_mouth": "🤑",
+	"face_crying": "😢",
+	"face_loudly_crying": "😭",
+	"face_holding_back_tears": "🥹",
+	"face_halo": "😇",
 }
 
 
@@ -90,6 +106,17 @@ func _run() -> void:
 		"face_weary",
 		"face_squinting_tongue",
 		"face_savoring_food",
+		"face_joy_tears",
+		"face_grinning_sweat",
+		"face_sunglasses",
+		"face_heart_eyes",
+		"face_star_struck",
+		"face_sleepy",
+		"face_sleeping",
+		"face_downcast_sweat",
+		"face_money_mouth",
+		"face_loudly_crying",
+		"face_halo",
 	]:
 		check(not manifest.face(name).can_blink(), "%s has a fixed eye pose" % name)
 		check(
@@ -146,6 +173,10 @@ func _run() -> void:
 	)
 	var zany := manifest.face("face_zany")
 	check(zany.layers[0].size != zany.layers[1].size, "The zany eyes have different sizes")
+	check(
+		not manifest.face("face_money_mouth").layers[1].mirror,
+		"Money symbols keep their reading direction",
+	)
 	for name: String in ["face_smirking", "face_unamused"]:
 		check(
 			not manifest.face(name).layers[1].mirror,
@@ -155,3 +186,43 @@ func _run() -> void:
 	for name: String in EMOJIS:
 		selected.play_face = name
 		check(selected.validation_errors().is_empty(), "%s can be selected in tuning" % name)
+	_check_decorations(manifest)
+
+
+func _check_decorations(manifest: ShapeFaceManifest) -> void:
+	var expected := {
+		"face_joy_tears": ["facial_part_tear_drop", 2],
+		"face_grinning_sweat": ["facial_part_tear_drop", 1],
+		"face_sunglasses": ["facial_part_sunglasses", 1],
+		"face_smiling_tear": ["facial_part_tear_drop", 1],
+		"face_sad_relieved": ["facial_part_tear_drop", 1],
+		"face_sleepy": ["facial_part_sleep_bubble", 1],
+		"face_sleeping": ["facial_part_sleep_z", 1],
+		"face_drooling": ["facial_part_drool", 1],
+		"face_downcast_sweat": ["facial_part_tear_drop", 1],
+		"face_money_mouth": ["facial_part_money_tongue", 1],
+		"face_crying": ["facial_part_tear_drop", 1],
+		"face_loudly_crying": ["facial_part_tear_stream", 2],
+		"face_holding_back_tears": ["facial_part_tear_pool", 2],
+		"face_halo": ["facial_part_halo", 1],
+	}
+	for name: String in expected:
+		var open := manifest.face(name)
+		var blinked := manifest.blinked(name)
+		var count := 0
+		for index: int in open.layers.size():
+			var layer := open.layers[index]
+			if layer.part != expected[name][0]:
+				continue
+			count += 1
+			var blink := blinked.layers[index]
+			check(
+				(
+					blink.part == layer.part and blink.center == layer.center
+					and blink.size == layer.size
+					and blink.rotation_degrees == layer.rotation_degrees
+					and blink.mirror == layer.mirror
+				),
+				"%s keeps its decoration during blinks" % name,
+			)
+		check(count == expected[name][1], "%s has the expected decorations" % name)

@@ -211,7 +211,8 @@ start only what they need, so they stay fast.
   blinking. The 005 browser tests check descriptive IDs and new parts in the 3D phone view.
   Run `shape_face_3d_visual_check.gd` without `--headless` for front, three-quarter and blink
   review captures; its examples use enlarged and default paddle proportions. Pages hold up
-  to sixteen expressions and trim unused rows; `-- --start=37` captures the five tongue presets.
+  to sixteen expressions and trim unused rows; `-- --start=42` captures the decorated presets.
+  Symbolic eyes stay fixed; the tests also check that decorations retain their blink placement.
 
 - Tilt Shift 3D: the `tests/` folder of `minigames/005_3d_tilt_shift/` covers the rules,
   allocation, delivery, presets, journeys, flow, preparation, motion, negative balls, Jolt
