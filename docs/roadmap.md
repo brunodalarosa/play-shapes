@@ -86,7 +86,9 @@ each player shown as their own coloured paddle built in code
 expressive face ([0037](decisions/0037-shape-face-system.md)), in a full-width toy factory.
 
 Cubio wears the same shape face, drawn on an anchor in its model on host and phone
-([0043](decisions/0043-cubio-shape-face.md)). The F12 Shape Characters lab reviews colours,
+([0043](decisions/0043-cubio-shape-face.md)). Every face is named for its emoji and drawn to the
+owner's originals' measurements, and Cubio shows `face_slightly_smiling`
+([0044](decisions/0044-one-face-style.md)). The F12 Shape Characters lab reviews colours,
 clips and faces and saves the face's default placement.
 
 Each phone shows the player's own paddle in 3D. 005 has its own workshop tab and F12 review, and

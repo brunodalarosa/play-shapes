@@ -80,3 +80,4 @@ What was decided.
 | [0041](0041-rooftop-logo-sign.md) | The logo is a 3D sign on the café roof, and the billboard shows only the QR |
 | [0042](0042-plaza-lobby-jolt-plane.md) | The Playground lobby simulates its characters on Jolt with plane-locked bodies |
 | [0043](0043-cubio-shape-face.md) | Cubio's face is the shape face system, drawn on an anchor in the model |
+| [0044](0044-one-face-style.md) | Every shape face is named for its emoji and drawn to the originals' measurements |

@@ -87,15 +87,6 @@ removes it. The evidence labels are defined in
 
 ## Tilt Shift 3D face parts and bin
 
-- Owner review of the fifty-eight emoji expressions in the Godot 3D front, three-quarter and
-  blink captures from `tests/shape_face_3d_visual_check.gd`, under
-  `test-results/shape-face-emoji/`: whether each reads as its emoji, especially the similar
-  unhappy faces, kissing-eye variations, subtle smiles, exhaustion, toothy mouths and dazed
-  eyes, and stays readable at default paddle proportions. The pink tongues also need to read
-  clearly, including the upward lip lick.
-- The sixteen decorated expressions need owner review of tears versus sweat, sleepy versus
-  sleeping, drool, symbolic eyes and money tongue, and the floating halo. Use
-  `-- --start=42` for their Godot 3D captures, including fixed decorations during blinks.
 - New gameplay assignments and adoption by the lobby's Squircle are separate decisions.
 - Physical-phone readability of the emoji presets when selected in a test profile remains
   unverified; desktop browser checks only establish composition and loading.
@@ -230,6 +221,13 @@ device.
   the painted face.
 - `[PHYSICAL-PHONE]` The shape face on the phone's setup preview and Bubbles view, its blinks,
   and its first download on a slow network.
+
+## Shape face redraw
+
+- `[HUMAN-PLAY]` The fifty-two redrawn faces against their emoji, on Cubio and on Tilt Shift
+  paddles, and the six originals that replaced their AI counterparts.
+- `[HUMAN-PLAY]` Whether faces with brows, drawn smaller than faces without them at the same
+  face height, should share one scale instead.
 
 ## Tooling on other platforms
 
