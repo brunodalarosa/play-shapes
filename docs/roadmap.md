@@ -72,9 +72,6 @@ The rendered animation sheets and Animation Lab are retired.
 The café roof carries the logo as a 3D sign traced from the approved artwork, and the
 billboard shows only the join QR ([0041](decisions/0041-rooftop-logo-sign.md)).
 
-The 2D painted-room art in `assets/runtime/lobby_playground/` is unused and is removed once
-the plaza is approved.
-
 Minigame 004, Bubbles and jellyfishes 3D, replaced the retired 2D version, 002: a from-scratch
 3D rebuild without the spin move, on Jolt physics with plane-locked bodies
 ([0034](decisions/0034-bubbles-3d-jolt-plane.md)), with a three.js view of each player's bubble
