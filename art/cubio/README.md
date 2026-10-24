@@ -69,6 +69,5 @@ npm run build
 cd ../art/cubio
 ```
 
-The live Ready-screen and phone setup previews share the gameplay character. There is no
-Animation Lab or sprite-sheet pipeline. Temporary variants and comparisons belong in
-ignored `scratch/` or `comparisons/` folders.
+The live Ready-screen and phone setup previews share the gameplay character. Temporary
+variants and comparisons belong in ignored `scratch/` or `comparisons/` folders.

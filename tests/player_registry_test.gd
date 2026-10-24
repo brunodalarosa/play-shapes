@@ -16,7 +16,7 @@ func _run() -> void:
 		):
 			return
 
-	var first := registry.join_player(11, "  Zoë 🎮  ", true, 1000, "square", "#EC407A")
+	var first := registry.join_player(11, "  Zoë 🎮  ", true, 1000, "cubio", "#EC407A")
 	if not check(
 		first.accepted and first.player.name == "Zoë 🎮",
 		"Printable Unicode name is trimmed and accepted",
@@ -24,7 +24,7 @@ func _run() -> void:
 		return
 	if not check(
 		first.player.character_shape == "cubio" and first.player.character_color == "#EC407A",
-		"Legacy body input resolves to Cubio while preserving the selected color",
+		"The Cubio body keeps the selected color",
 	):
 		return
 	if not check(
@@ -64,7 +64,7 @@ func _run() -> void:
 	if not check(blocked.code == &"game_in_progress", "New players cannot join during gameplay"):
 		return
 
-	var second := registry.join_player(12, "Other", true, 1000, "rhombus", "#00ACC1")
+	var second := registry.join_player(12, "Other", true, 1000, "cubio", "#00ACC1")
 	var both_counted: bool = second.accepted and registry.player_count() == 2
 	if not check(both_counted, "Capacity counts player records"):
 		return

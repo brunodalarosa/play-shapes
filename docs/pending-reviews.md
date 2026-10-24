@@ -203,8 +203,8 @@ device.
 - `[GODOT-RUNTIME]` Owner visual review of Tilt Shift 3D simulated controls: automatic countdown,
   paddle motion, later rounds, restart and lobby return. Automated progression uses shortened
   in-memory timing and does not establish presentation or game feel.
-- `[GODOT-RUNTIME]` A look at the text of the animation lab note, the motion lab readings and
-  pose hint, and the phone's motion lab panel and error panel. Tests cover their content; no
+- `[GODOT-RUNTIME]` A look at the motion lab readings and pose hint, and the phone's motion
+  lab panel and error panel. Tests cover their content; no
   one has looked at them on a screen since their strings were last rebuilt.
 
 ## Tooling on other platforms

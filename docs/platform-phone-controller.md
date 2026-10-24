@@ -1,6 +1,6 @@
 # Platform phone controller
 
-The phone's joystick and action button for 2D platform movement, and the host parts that
+The phone's joystick and action button for platform movement on one plane, and the host parts that
 turn their input into movement. It covers the input tuning, the intent the phone sends, the
 host components, and how another minigame reuses them. The Playground lobby is the first
 user.
@@ -15,7 +15,7 @@ On the phone:
   snapshots.
 - `LobbyControls` is a mounting wrapper over `createLobbyContext`, which maps intent to the
   Playground messages.
-- Another 2D platform context supplies `{ activeClass, send(intent) }` to the same component,
+- Another platform context supplies `{ activeClass, send(intent) }` to the same component,
   plus its own screen, stick and button elements.
 
 The transport adds the sequence and the ownership of the current connection. The controls

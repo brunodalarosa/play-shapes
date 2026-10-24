@@ -1,8 +1,8 @@
 # Bubbles and jellyfishes 3D tuning
 
 Every game-feel value of minigame 004 is in one `Bubbles3DTuning` resource. `Default.tres`
-holds provisional values, not approved feel: the 2D game's tuned values divided by 100, since
-one world unit is 100 pixels of the 2D arena.
+holds provisional values, not approved feel: the retired 002's tuned values divided by 100,
+since one world unit is 100 pixels of its arena.
 
 ## Changing a value
 

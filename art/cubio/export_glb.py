@@ -42,7 +42,7 @@ def bone_for(mesh):
 
 def parent_meshes_to_bones(rig):
     # In rest pose the empties sit exactly on their bones, so reparenting keeps
-    # every mesh where the sprite renders show it.
+    # every mesh where the animated source scene shows it.
     rig.data.pose_position = 'REST'
     bpy.context.view_layer.update()
     for source_name in MESH_NAMES:

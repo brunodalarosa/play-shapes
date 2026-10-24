@@ -187,10 +187,6 @@ test("setup shows live Cubio, preserves color through navigation and releases hi
     assert.equal(join.character_shape, "cubio");
     assert.equal(join.character_color, "#EC407A");
     assert.equal(requests.filter((path) => path === "/models/cubio.glb").length, 1);
-    assert.equal(
-      requests.some((path) => /squircle|cubio-v1|colorable/.test(path)),
-      false,
-    );
     await page.evaluate(() =>
       window.receiveHost({
         type: "join_accepted",

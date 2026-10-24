@@ -1,8 +1,8 @@
 class_name CharacterSelection
 extends RefCounted
-## Canonical player body and lobby colors. Legacy shape inputs normalize to Cubio.
+## Canonical player body and lobby colors. Cubio is the only body.
 
-const SHAPES: Array[StringName] = [&"cubio", &"squircle", &"square", &"circle", &"rhombus"]
+const SHAPES: Array[StringName] = [&"cubio"]
 const COLORS: Array[Dictionary] = [
 	{ "id": "red", "name": "Red", "hex": "#E53935" },
 	{ "id": "orange", "name": "Orange", "hex": "#F57C00" },

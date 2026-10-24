@@ -59,10 +59,10 @@ The reusable parts behind the lobby characters. Setup and reuse are in
 
 - `PlatformMotor` exposes speed, acceleration, gravity, jump impulse, player bounce, run
   threshold, input lease, fall-reset height and drop timing in its Inspector.
-- `PlatformSurface` exposes an independent **Drop Rule: Open/Closed** on all eleven surfaces.
-  Only `BottomShelf` is Closed.
-- Select `PlatformSurfaces/<name>` in the world scene to change one rule without touching art,
-  shape alignment or one-way collision.
+- `PlatformSurface` carries an independent **Drop Rule: Open/Closed** for each landing. Only
+  the ground is Closed.
+- Select a prop's `Landing` marker in the world scene to change its rule without touching the
+  model or its placement.
 
 ## Ready screen
 

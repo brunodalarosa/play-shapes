@@ -16,8 +16,9 @@ func _run() -> void:
 		"Cubio's undeformed body has equal two metre sides",
 	)
 	check(
-		CharacterSelection.validate_selection("squircle", "#E53935").character_shape == "cubio",
-		"Legacy Squircle selection resolves to Cubio",
+		CharacterSelection.validate_selection("cubio", "#E53935").accepted
+		and not CharacterSelection.validate_selection("triangle", "#E53935").accepted,
+		"Cubio is the only accepted body",
 	)
 
 	var player := cubio.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer

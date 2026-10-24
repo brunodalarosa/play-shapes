@@ -129,8 +129,7 @@ increasing gameplay sequence it needs to resume safely.
 ## Character appearance
 
 - The lobby, Bubbles and jellyfishes 3D, setup and the Ready screen use the same exported
-  3D Cubio. Current selections send `character_shape: "cubio"`; legacy `squircle` selections
-  are accepted and normalized to Cubio.
+  3D Cubio. Joins send `character_shape: "cubio"`, the only accepted body.
 - The player tint colors the body, hands and feet. The neutral and blink faces stay
   untinted.
 - The host and phone render the same rig and preserve the original face artwork.

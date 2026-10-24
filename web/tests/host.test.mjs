@@ -395,7 +395,7 @@ test("host accepts sequenced lobby intent only from its registered connection", 
     const joined = await request(player.peer, {
       type: "join",
       name: "Lobby Input Test",
-      character_shape: "square",
+      character_shape: "cubio",
       character_color: "#EC407A",
     });
     assert.equal(joined.type, "join_accepted");
