@@ -9,15 +9,6 @@
       "sha256": "593ee349e47ea4479690f2169eff9f7487878706ef85111c4c2c5ae9b44d50f4",
       "master_sha256": "862148a3a729631f1ef7a146bc2c7adb118f46bb591fd178ddaf17d3c2177b3e"
     },
-    "facial_part_cheek": {
-      "size": [
-        20,
-        10
-      ],
-      "soft_pixels": 0,
-      "sha256": "2b093150293277c451cefafce74e021af1d9cb5e4785ec701a1eb5e2b729ee44",
-      "master_sha256": "18d276ab15f3798304d6404e9a76a172a4eba0416643ff08272e9bfe2529ba18"
-    },
     "facial_part_cheek_blush": {
       "size": [
         26,
@@ -511,51 +502,51 @@
     }
   },
   "faces": {
-    "face_a": {
+    "face_slightly_smiling": {
       "far_pixels": 0,
       "largest_coverage_difference": 0.812
     },
-    "face_b": {
+    "face_unamused": {
       "far_pixels": 0,
       "largest_coverage_difference": 0.431
     },
-    "face_c": {
+    "face_content": {
       "far_pixels": 0,
       "largest_coverage_difference": 0.843
     },
-    "face_d": {
+    "face_suspicious": {
       "far_pixels": 0,
       "largest_coverage_difference": 0.637
     },
-    "face_e": {
+    "face_scheming": {
       "far_pixels": 0,
       "largest_coverage_difference": 0.536
     },
-    "face_f": {
+    "face_mischievous": {
       "far_pixels": 0,
       "largest_coverage_difference": 0.753
     },
-    "face_g": {
+    "face_furious": {
       "far_pixels": 0,
       "largest_coverage_difference": 0.701
     },
-    "face_h": {
+    "face_smirking": {
       "far_pixels": 0,
       "largest_coverage_difference": 0.565
     },
-    "face_i": {
+    "face_worried": {
       "far_pixels": 0,
       "largest_coverage_difference": 0.495
     },
-    "face_j": {
+    "face_dizzy": {
       "far_pixels": 0,
       "largest_coverage_difference": 0.529
     },
-    "face_k": {
+    "face_disappointed": {
       "far_pixels": 0,
       "largest_coverage_difference": 0.353
     },
-    "face_l": {
+    "face_smiling_eyes": {
       "far_pixels": 0,
       "largest_coverage_difference": 0.761
     },
@@ -565,10 +556,6 @@
     },
     "face_winking": {
       "emoji_reference": "😉",
-      "reference_comparison": false
-    },
-    "face_smiling_eyes": {
-      "emoji_reference": "😊",
       "reference_comparison": false
     },
     "face_neutral": {
@@ -581,10 +568,6 @@
     },
     "face_confused": {
       "emoji_reference": "😕",
-      "reference_comparison": false
-    },
-    "face_disappointed": {
-      "emoji_reference": "😞",
       "reference_comparison": false
     },
     "face_frowning_open_mouth": {
@@ -607,10 +590,6 @@
       "emoji_reference": "😖",
       "reference_comparison": false
     },
-    "face_dizzy": {
-      "emoji_reference": "😵",
-      "reference_comparison": false
-    },
     "face_kissing": {
       "emoji_reference": "😗",
       "reference_comparison": false
@@ -631,10 +610,6 @@
       "emoji_reference": "🤨",
       "reference_comparison": false
     },
-    "face_smirking": {
-      "emoji_reference": "😏",
-      "reference_comparison": false
-    },
     "face_persevering": {
       "emoji_reference": "😣",
       "reference_comparison": false
@@ -651,16 +626,8 @@
       "emoji_reference": "😌",
       "reference_comparison": false
     },
-    "face_unamused": {
-      "emoji_reference": "😒",
-      "reference_comparison": false
-    },
     "face_pensive": {
       "emoji_reference": "😔",
-      "reference_comparison": false
-    },
-    "face_worried": {
-      "emoji_reference": "😟",
       "reference_comparison": false
     },
     "face_flushed": {
@@ -794,7 +761,7 @@
   },
   "eye_x": {
     "cut": {
-      "face": "face_j",
+      "face": "face_dizzy",
       "x": 0,
       "y": 19,
       "size": 40
@@ -802,7 +769,7 @@
     "far_pixels_left": 0,
     "far_pixels_right": 0
   },
-  "manifest_sha256": "6299578b63cc01e6d49639959246ca0c29aa6225e3cb6b5661b4e222c91ac8f3",
+  "manifest_sha256": "15761baa4ed4eaf9df9439441ba8fed92c4106f4aa58221a4f9a130214383add",
   "result": "PASS",
   "failures": []
 }

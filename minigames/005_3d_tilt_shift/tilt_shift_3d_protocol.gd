@@ -21,7 +21,7 @@ var _faces: Dictionary[String, String] = { }
 var _angles: Dictionary[String, float] = { }
 var _sizes: Array[Vector2] = [Vector2(0.2, 0.04), Vector2(0.2, 0.04)]
 var _look: Dictionary = { }
-var _play_face := "face_a"
+var _play_face := "face_slightly_smiling"
 
 
 func _init(token: String = "") -> void:

@@ -9,10 +9,10 @@ lists what still needs the owner.
 ## Sources
 
 The 26 PNGs in this folder are the owner's own work, kept unchanged: twelve reference faces,
-`face_a` to `face_l`, and fourteen parts named `facial_part_*`. They are small (an open eye is
+named for their emoji counterparts, and fourteen parts named `facial_part_*`. They are small (an open eye is
 40 pixels), flat navy `#3D465D` and white, built from circles, arcs and rounded bars.
 
-The one exception to the two colours is `face_h`'s smirk, drawn in a darker `#37393F`; its
+The one exception to the two colours is `face_smirking`'s smirk, drawn in a darker `#37393F`; its
 preset uses the navy smirk part like every other face.
 
 ## Vector masters
@@ -35,11 +35,11 @@ within one source pixel. The half eyes and the winged eye are whole circles that
 cuts, as in the sources. Every other master has a transparent margin of one source pixel, so
 the round ends of strokes that touch a source's edge stay whole.
 
-`facial_part_eye_x` is cut from `face_j`: a 40 × 40 box at (0, 19) around its left eye, the
+`facial_part_eye_x` is cut from `face_dizzy`: a 40 × 40 box at (0, 19) around its left eye, the
 same box as the open eye's, holding two crossed round-capped strokes. It matches both of
-`face_j`'s eyes.
+`face_dizzy`'s eyes.
 
-`face_c` shows the eye wing longer than `facial_part_eye_half_top_wing.png`, whose canvas cuts
+`face_content` shows the eye wing longer than `facial_part_eye_half_top_wing.png`, whose canvas cuts
 it. Its master is 55 pixels wide instead of 50, holding the whole wing, with the eye where it
 was.
 
@@ -61,69 +61,76 @@ small in 3D stays smooth.
 - `rotation_degrees`: clockwise, about the part's centre;
 - `mirror`: flips the part horizontally about its centre before it turns.
 
-The original `face_a` to `face_l` presets keep their supplied reference images. Fifty-eight
-additional presets have descriptive IDs and `emoji_reference` metadata:
+The twelve original presets keep their supplied reference images, each named for the emoji it
+reads as. Fifty-two more presets are drawn from the same parts. Every preset has a descriptive ID
+and `emoji_reference` metadata:
 
-| Reference | Preset |
-| --- | --- |
-| 😀 | `face_grinning` |
-| 😉 | `face_winking` |
-| 😊 | `face_smiling_eyes` |
-| 😐 | `face_neutral` |
-| 😮 | `face_surprised` |
-| 😕 | `face_confused` |
-| 😞 | `face_disappointed` |
-| 😦 | `face_frowning_open_mouth` |
-| 🙄 | `face_rolling_eyes` |
-| 🫤 | `face_diagonal_mouth` |
-| ☹️ | `face_frowning` |
-| 😖 | `face_confounded` |
-| 😵 | `face_dizzy` |
-| 😗 | `face_kissing` |
-| 😙 | `face_kissing_smiling_eyes` |
-| 😚 | `face_kissing_closed_eyes` |
-| ☺️ | `face_warm_smile` |
-| 🤨 | `face_raised_eyebrow` |
-| 😏 | `face_smirking` |
-| 😣 | `face_persevering` |
-| 😯 | `face_hushed` |
-| 🫩 | `face_exhausted` |
-| 😌 | `face_relieved` |
-| 😒 | `face_unamused` |
-| 😔 | `face_pensive` |
-| 😟 | `face_worried` |
-| 😳 | `face_flushed` |
-| 😵‍💫 | `face_spiral_eyes` |
-| 🥴 | `face_woozy` |
-| 😠 | `face_angry` |
-| 🥺 | `face_pleading` |
-| 😧 | `face_anguished` |
-| 😁 | `face_beaming` |
-| 😫 | `face_tired` |
-| 😲 | `face_astonished` |
-| 😩 | `face_weary` |
-| 😬 | `face_grimacing` |
-| 😛 | `face_tongue` |
-| 😜 | `face_winking_tongue` |
-| 😝 | `face_squinting_tongue` |
-| 😋 | `face_savoring_food` |
-| 🤪 | `face_zany` |
-| 😂 | `face_joy_tears` |
-| 😅 | `face_grinning_sweat` |
-| 😎 | `face_sunglasses` |
-| 😍 | `face_heart_eyes` |
-| 🥲 | `face_smiling_tear` |
-| 🤩 | `face_star_struck` |
-| 😥 | `face_sad_relieved` |
-| 😪 | `face_sleepy` |
-| 😴 | `face_sleeping` |
-| 🤤 | `face_drooling` |
-| 😓 | `face_downcast_sweat` |
-| 🤑 | `face_money_mouth` |
-| 😢 | `face_crying` |
-| 😭 | `face_loudly_crying` |
-| 🥹 | `face_holding_back_tears` |
-| 😇 | `face_halo` |
+| Reference | Preset | Source |
+| --- | --- | --- |
+| 🙂 | `face_slightly_smiling` | Original |
+| 😒 | `face_unamused` | Original |
+| 😌 | `face_content` | Original |
+| 🤨 | `face_suspicious` | Original |
+| 😼 | `face_scheming` | Original |
+| 😈 | `face_mischievous` | Original |
+| 😤 | `face_furious` | Original |
+| 😏 | `face_smirking` | Original |
+| 😟 | `face_worried` | Original |
+| 😵 | `face_dizzy` | Original |
+| 😞 | `face_disappointed` | Original |
+| 😊 | `face_smiling_eyes` | Original |
+| 😀 | `face_grinning` | Drawn |
+| 😉 | `face_winking` | Drawn |
+| 😐 | `face_neutral` | Drawn |
+| 😮 | `face_surprised` | Drawn |
+| 😕 | `face_confused` | Drawn |
+| 😦 | `face_frowning_open_mouth` | Drawn |
+| 🙄 | `face_rolling_eyes` | Drawn |
+| 🫤 | `face_diagonal_mouth` | Drawn |
+| ☹️ | `face_frowning` | Drawn |
+| 😖 | `face_confounded` | Drawn |
+| 😗 | `face_kissing` | Drawn |
+| 😙 | `face_kissing_smiling_eyes` | Drawn |
+| 😚 | `face_kissing_closed_eyes` | Drawn |
+| ☺️ | `face_warm_smile` | Drawn |
+| 🤨 | `face_raised_eyebrow` | Drawn |
+| 😣 | `face_persevering` | Drawn |
+| 😯 | `face_hushed` | Drawn |
+| 🫩 | `face_exhausted` | Drawn |
+| 😌 | `face_relieved` | Drawn |
+| 😔 | `face_pensive` | Drawn |
+| 😳 | `face_flushed` | Drawn |
+| 😵‍💫 | `face_spiral_eyes` | Drawn |
+| 🥴 | `face_woozy` | Drawn |
+| 😠 | `face_angry` | Drawn |
+| 🥺 | `face_pleading` | Drawn |
+| 😧 | `face_anguished` | Drawn |
+| 😁 | `face_beaming` | Drawn |
+| 😫 | `face_tired` | Drawn |
+| 😲 | `face_astonished` | Drawn |
+| 😩 | `face_weary` | Drawn |
+| 😬 | `face_grimacing` | Drawn |
+| 😛 | `face_tongue` | Drawn |
+| 😜 | `face_winking_tongue` | Drawn |
+| 😝 | `face_squinting_tongue` | Drawn |
+| 😋 | `face_savoring_food` | Drawn |
+| 🤪 | `face_zany` | Drawn |
+| 😂 | `face_joy_tears` | Drawn |
+| 😅 | `face_grinning_sweat` | Drawn |
+| 😎 | `face_sunglasses` | Drawn |
+| 😍 | `face_heart_eyes` | Drawn |
+| 🥲 | `face_smiling_tear` | Drawn |
+| 🤩 | `face_star_struck` | Drawn |
+| 😥 | `face_sad_relieved` | Drawn |
+| 😪 | `face_sleepy` | Drawn |
+| 😴 | `face_sleeping` | Drawn |
+| 🤤 | `face_drooling` | Drawn |
+| 😓 | `face_downcast_sweat` | Drawn |
+| 🤑 | `face_money_mouth` | Drawn |
+| 😢 | `face_crying` | Drawn |
+| 😭 | `face_loudly_crying` | Drawn |
+| 🥹 | `face_holding_back_tears` | Drawn |
+| 😇 | `face_halo` | Drawn |
 
 The emoji presets use round strokes and layered construction, with the accent colours above.
 Their new parts have editable SVG masters; there are no supplied raster references for them.
@@ -163,7 +170,7 @@ needs owner review. The script writes
 - any preset or part differs from its reference by more than one source pixel: some pixel at
   least half navy, or half white, has no pixel at least a quarter of that colour within one
   pixel in the other image, so that colour's edge is more than a pixel away;
-- the X-eye differs from either of `face_j`'s eyes;
+- the X-eye differs from either of `face_dizzy`'s eyes;
 - any 8× PNG has a partly covered or blended pixel that touches no clear pixel or fully solid
   colour from its declared part palette, which a blurred edge would have;
 - the manifest and the masters disagree.

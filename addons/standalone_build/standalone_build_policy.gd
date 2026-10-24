@@ -123,7 +123,6 @@ const REQUIRED_RUNTIME_PATHS := [
 	"assets/runtime/shape_faces/facial_part_mouth_open_frown.png",
 	"assets/runtime/shape_faces/facial_part_mouth_deep_frown.png",
 	"assets/runtime/shape_faces/facial_part_mouth_scrunched.png",
-	"assets/runtime/shape_faces/facial_part_cheek.png",
 	"assets/runtime/shape_faces/facial_part_mouth_kiss.png",
 	"assets/runtime/shape_faces/facial_part_eye_soft_closed_up.png",
 	"assets/runtime/shape_faces/facial_part_eye_soft_closed_down.png",

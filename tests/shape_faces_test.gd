@@ -9,18 +9,18 @@ const ART := "res://art/shape_characters_face_system_assets/"
 const VERIFICATION := ART + "vector/verification.json"
 const EXPORT_SCALE := 8
 const FACES: Array[String] = [
-	"face_a",
-	"face_b",
-	"face_c",
-	"face_d",
-	"face_e",
-	"face_f",
-	"face_g",
-	"face_h",
-	"face_i",
-	"face_j",
-	"face_k",
-	"face_l",
+	"face_slightly_smiling",
+	"face_unamused",
+	"face_content",
+	"face_suspicious",
+	"face_scheming",
+	"face_mischievous",
+	"face_furious",
+	"face_smirking",
+	"face_worried",
+	"face_dizzy",
+	"face_disappointed",
+	"face_smiling_eyes",
 ]
 
 

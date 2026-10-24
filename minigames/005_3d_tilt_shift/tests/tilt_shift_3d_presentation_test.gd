@@ -139,7 +139,10 @@ func _check_panel(presentation: TiltShift3DPresentation, state: TiltShift3DState
 		selected += 1 if player.selected else 0
 	check(chips.size() == selected, "Each selected player appears as a paddle chip")
 	for chip: TiltShift3DPaddleChip in chips:
-		check(chip.face != null and chip.face.face_name == "face_a", "A chip shows the face")
+		check(
+			chip.face != null and chip.face.face_name == "face_slightly_smiling",
+			"A chip shows the face",
+		)
 
 
 func _check_camera(presentation: TiltShift3DPresentation) -> void:
@@ -175,7 +178,7 @@ func _check_play(presentation: TiltShift3DPresentation, state: TiltShift3DState.
 	await process_frame
 	check(presentation.cue_text() == "3", "The countdown shows on screen")
 	var face := presentation.paddle_visual(player_paddle.paddle_id).face
-	check(face.face_name == "face_e", "Paddles look determined during the countdown")
+	check(face.face_name == "face_scheming", "Paddles look determined during the countdown")
 
 	var started := arena.controller.snapshot()
 	for tick: int in 100:
@@ -187,14 +190,14 @@ func _check_play(presentation: TiltShift3DPresentation, state: TiltShift3DState.
 	await process_frame
 	await process_frame
 	check(labels[0].modulate.a == 1.0, "Names show when play starts")
-	check(face.face_name == "face_a", "Paddles show the default face in play")
+	check(face.face_name == "face_slightly_smiling", "Paddles show the default face in play")
 	check(presentation.clock_text().ends_with(" s"), "The clock shows the remaining seconds")
 
 	var collider := player_paddle.get_node("CollisionShape3D") as CollisionShape3D
 	var before := (collider.shape as ConvexPolygonShape3D).points.duplicate()
 	arena.paddle_hit.emit(player_paddle, 0.5)
 	await process_frame
-	check(face.face_name == "face_i", "A hit paddle looks startled")
+	check(face.face_name == "face_worried", "A hit paddle looks startled")
 	var visual := presentation.paddle_visual(player_paddle.paddle_id)
 	check(visual.scale.y < 1.0 and visual.scale.x == 1.0, "It squashes along its thickness")
 	check(
@@ -202,7 +205,7 @@ func _check_play(presentation: TiltShift3DPresentation, state: TiltShift3DState.
 		and player_paddle.scale == Vector3.ONE,
 		"The squash never changes the collider",
 	)
-	check(faces.has("face_i"), "The owner's strongest face changes with it")
+	check(faces.has("face_worried"), "The owner's strongest face changes with it")
 
 	_now = started.started_at_msec + 5300
 	await process_frame

@@ -29,7 +29,7 @@ export function snapshot(overrides = {}) {
     paddle_ids: ["a_0"],
     paddle_size: [0.2, 0.04],
     color: "e53935",
-    face: "face_a",
+    face: "face_slightly_smiling",
     look,
     ...overrides,
   };
@@ -45,7 +45,7 @@ export function preparation(overrides = {}) {
     capture_state: "waiting",
     angle_radians: 0,
     color: "43a047",
-    face: "face_a",
+    face: "face_slightly_smiling",
     look,
     ...overrides,
   };

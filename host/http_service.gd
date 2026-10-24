@@ -176,11 +176,6 @@ const ASSETS: Dictionary = {
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},
-	"/shape_faces/facial_part_cheek.png": {
-		"path": SHAPE_FACES + "/facial_part_cheek.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
 	"/shape_faces/facial_part_mouth_kiss.png": {
 		"path": SHAPE_FACES + "/facial_part_mouth_kiss.png",
 		"content_type": "image/png",

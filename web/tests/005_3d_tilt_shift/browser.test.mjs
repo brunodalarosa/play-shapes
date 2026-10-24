@@ -179,7 +179,7 @@ test("play turns the paddle with the host, shows the host's face and READY uses 
     );
     await page.evaluate(
       (message) => window.receiveHost(message),
-      snapshot({ sequence: 5, face: "face_j" }),
+      snapshot({ sequence: 5, face: "face_dizzy" }),
     );
     await page.waitForFunction(() =>
       performance

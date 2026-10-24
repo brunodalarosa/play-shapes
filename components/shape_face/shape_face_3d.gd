@@ -13,7 +13,7 @@ const PUSHED_PART: Shader = preload("res://components/shape_face/shape_face_part
 	set(value):
 		height = maxf(value, 0.001)
 		_rebuild()
-@export var face_name := "face_a":
+@export var face_name := "face_slightly_smiling":
 	set(value):
 		if value != face_name:
 			face_name = value

@@ -7,27 +7,42 @@ extends TestScript
 func _run() -> void:
 	var manifest := ShapeFaceManifest.load_default()
 	check(manifest.faces.size() >= 12, "The manifest keeps the twelve original presets")
-	var face_a := manifest.face("face_a")
-	check(face_a.layers.size() == 3, "face_a has two eyes and a mouth")
-	check(is_equal_approx(face_a.box_aspect, 1.72414), "face_a keeps its box aspect")
-	check(face_a.layers[0].center.is_equal_approx(Vector2(-0.51724, -0.15517)), "Eyes keep place")
-	check(face_a.can_blink(), "Open eyes can blink")
-	check(not manifest.face("face_j").can_blink(), "Crossed-out eyes do not blink")
-	check(not manifest.face("face_k").can_blink(), "Shut eyes do not blink")
+	var face_slightly_smiling := manifest.face("face_slightly_smiling")
+	check(
+		face_slightly_smiling.layers.size() == 3,
+		"face_slightly_smiling has two eyes and a mouth",
+	)
+	check(
+		is_equal_approx(face_slightly_smiling.box_aspect, 1.72414),
+		"face_slightly_smiling keeps its box aspect",
+	)
+	check(
+		face_slightly_smiling.layers[0].center.is_equal_approx(Vector2(-0.51724, -0.15517)),
+		"Eyes keep place",
+	)
+	check(face_slightly_smiling.can_blink(), "Open eyes can blink")
+	check(not manifest.face("face_dizzy").can_blink(), "Crossed-out eyes do not blink")
+	check(not manifest.face("face_disappointed").can_blink(), "Shut eyes do not blink")
 	for part: String in manifest.part_sizes:
 		check(manifest.texture(part) != null, "%s has a texture" % part)
 
-	var blink := manifest.blinked("face_a")
+	var blink := manifest.blinked("face_slightly_smiling")
 	check(blink.layers[0].part == ShapeFaceManifest.BLINK_EYE, "A blink closes the left eye")
 	check(blink.layers[1].part == ShapeFaceManifest.BLINK_EYE, "A blink closes the right eye")
-	check(blink.layers[0].center == face_a.layers[0].center, "A closed eye sits where it was")
+	check(
+		blink.layers[0].center == face_slightly_smiling.layers[0].center,
+		"A closed eye sits where it was",
+	)
 	check(
 		blink.layers[0].size.is_equal_approx(Vector2(48.0, 24.0) / 58.0),
 		"A closed eye keeps its own source size",
 	)
-	check(blink.layers[2].part == face_a.layers[2].part, "A blink leaves the mouth")
-	check(face_a.layers[0].part == "facial_part_eye_open", "A blink leaves the preset unchanged")
-	check(manifest.blinked("face_j").layers[0].part == "facial_part_eye_x", "X eyes stay X")
+	check(blink.layers[2].part == face_slightly_smiling.layers[2].part, "A blink leaves the mouth")
+	check(
+		face_slightly_smiling.layers[0].part == "facial_part_eye_open",
+		"A blink leaves the preset unchanged",
+	)
+	check(manifest.blinked("face_dizzy").layers[0].part == "facial_part_eye_x", "X eyes stay X")
 
 	_check_expressions()
 	_check_blinks()
@@ -36,21 +51,24 @@ func _run() -> void:
 
 func _check_expressions() -> void:
 	var stack := ShapeFaceExpressions.new(1)
-	check(stack.face_at(0.0) == "face_a", "With nothing active the base face shows")
-	stack.show("face_i", 0.35, 1, 0.0)
-	check(stack.face_at(0.2) == "face_i", "A timed expression shows")
-	stack.show("face_j", 0.8, 2, 0.1)
-	check(stack.face_at(0.2) == "face_j", "A higher priority covers a lower one")
+	check(stack.face_at(0.0) == "face_slightly_smiling", "With nothing active the base face shows")
+	stack.show("face_worried", 0.35, 1, 0.0)
+	check(stack.face_at(0.2) == "face_worried", "A timed expression shows")
+	stack.show("face_dizzy", 0.8, 2, 0.1)
+	check(stack.face_at(0.2) == "face_dizzy", "A higher priority covers a lower one")
 	check(stack.active_priority(0.2) == 2, "The active priority is the highest")
-	stack.show("face_i", 0.6, 1, 0.5)
-	check(stack.face_at(0.95) == "face_i", "A covered expression shows once the cover ends")
-	check(stack.face_at(1.11) == "face_a", "Every expression ends after its duration")
-	stack.show("face_j", 0.8, 2, 1.0)
-	stack.show("face_j", 0.8, 2, 1.5)
-	check(stack.face_at(2.2) == "face_j", "Showing again extends an expression")
-	stack.base_face = "face_e"
+	stack.show("face_worried", 0.6, 1, 0.5)
+	check(stack.face_at(0.95) == "face_worried", "A covered expression shows once the cover ends")
+	check(
+		stack.face_at(1.11) == "face_slightly_smiling",
+		"Every expression ends after its duration",
+	)
+	stack.show("face_dizzy", 0.8, 2, 1.0)
+	stack.show("face_dizzy", 0.8, 2, 1.5)
+	check(stack.face_at(2.2) == "face_dizzy", "Showing again extends an expression")
+	stack.base_face = "face_scheming"
 	stack.clear_all()
-	check(stack.face_at(2.2) == "face_e", "The base face can change")
+	check(stack.face_at(2.2) == "face_scheming", "The base face can change")
 
 
 func _check_blinks() -> void:
@@ -86,9 +104,9 @@ func _check_nodes() -> void:
 		"Parts sit at their centre, Y up, scaled by the face height",
 	)
 	check(mouth.position.z > face.quads()[0].position.z, "Later layers sit in front")
-	face.face_name = "face_j"
+	face.face_name = "face_dizzy"
 	check(face.quads().size() == 5, "Changing the face redraws it")
-	face.face_name = "face_a"
+	face.face_name = "face_slightly_smiling"
 	face.blinking = true
 	var eye := face.quads()[0].material_override as StandardMaterial3D
 	check(
@@ -102,14 +120,14 @@ func _check_nodes() -> void:
 	face.expressions = ShapeFaceExpressions.new(3)
 	face.clock = func() -> float:
 		return time[0]
-	face.expressions.show("face_i", 0.35, 1, 0.0)
+	face.expressions.show("face_worried", 0.35, 1, 0.0)
 	await process_frame
 	await process_frame
-	check(face.face_name == "face_i", "A face driven by an expression stack follows it")
+	check(face.face_name == "face_worried", "A face driven by an expression stack follows it")
 	time[0] = 1.0
 	await process_frame
 	await process_frame
-	check(face.face_name == "face_a", "It returns to the base face")
+	check(face.face_name == "face_slightly_smiling", "It returns to the base face")
 	check(face.find_children("*", "CollisionObject3D").is_empty(), "A face has no physics")
 
 	face.front_push = 2.0

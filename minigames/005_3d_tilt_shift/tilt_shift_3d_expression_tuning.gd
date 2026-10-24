@@ -33,18 +33,18 @@ const FACE_MANIFEST := "res://assets/runtime/shape_faces/face_presets.json"
 @export_range(0.05, 2.0, 0.05, "suffix:s") var squash_recovery_seconds: float = 0.25
 
 @export_group("Faces")
-@export var play_face: String = "face_a"
-@export var dizzy_face: String = "face_j"
-@export var startled_face: String = "face_i"
-@export var countdown_face: String = "face_e"
+@export var play_face: String = "face_slightly_smiling"
+@export var dizzy_face: String = "face_dizzy"
+@export var startled_face: String = "face_worried"
+@export var countdown_face: String = "face_scheming"
 ## Round end: the leading team, the other team, and both teams when tied.
-@export var leading_face: String = "face_f"
-@export var trailing_face: String = "face_k"
-@export var tied_face: String = "face_a"
+@export var leading_face: String = "face_mischievous"
+@export var trailing_face: String = "face_disappointed"
+@export var tied_face: String = "face_slightly_smiling"
 ## Shift results: the winning team, the losing team, and both teams on a draw.
-@export var winning_face: String = "face_f"
-@export var losing_face: String = "face_k"
-@export var draw_face: String = "face_a"
+@export var winning_face: String = "face_mischievous"
+@export var losing_face: String = "face_disappointed"
+@export var draw_face: String = "face_slightly_smiling"
 
 
 func validation_errors() -> PackedStringArray:

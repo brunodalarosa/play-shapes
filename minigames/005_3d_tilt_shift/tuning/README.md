@@ -41,8 +41,8 @@ phones' message rate.
 
 ## Expressions
 
-`Expressions.tres` decides when paddle faces change. Faces are presets `face_a` to `face_l` of
-the shared face manifest; the workshop offers them by name.
+`Expressions.tres` decides when paddle faces change. Faces are any presets of the shared face
+manifest; the workshop offers them by name.
 
 | Field | Default | Effect |
 | --- | --- | --- |
@@ -52,11 +52,11 @@ the shared face manifest; the workshop offers them by name.
 | Startled minimum speed | 0.05 widths/s | Closing speed of a new ball contact that startles the hit paddle. |
 | Startled seconds | 0.35 | How long the startled face shows. |
 | Squash / recovery | 12% / 0.25 s | Drawing-only squash along the thickness, springing back. |
-| Play face | `face_a` | Default face during play. |
-| Dizzy / startled face | `face_j` / `face_i` | During play, dizzy wins over startled, startled over the play face. |
-| Countdown face | `face_e` | During 3, 2, 1 and START. |
-| Leading / trailing / tied | `face_f` / `face_k` / `face_a` | At each round's end, by the teams' totals. |
-| Winning / losing / draw | `face_f` / `face_k` / `face_a` | At the shift's results, until Return to lobby. |
+| Play face | `face_slightly_smiling` | Default face during play. |
+| Dizzy / startled face | `face_dizzy` / `face_worried` | During play, dizzy wins over startled, startled over the play face. |
+| Countdown face | `face_scheming` | During 3, 2, 1 and START. |
+| Leading / trailing / tied | `face_mischievous` / `face_disappointed` / `face_slightly_smiling` | At each round's end, by the teams' totals. |
+| Winning / losing / draw | `face_mischievous` / `face_disappointed` / `face_slightly_smiling` | At the shift's results, until Return to lobby. |
 
 ## Arena coordinates and neighbors
 

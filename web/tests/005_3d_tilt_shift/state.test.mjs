@@ -43,13 +43,13 @@ test("the rings grow from the body by the gap and outline shares of its thicknes
 });
 
 test("faces compose from the manifest and blink only open eyes", () => {
-  const open = faceLayers(manifest, "face_a", false);
+  const open = faceLayers(manifest, "face_slightly_smiling", false);
   assert.equal(open.length, 3);
-  const blink = faceLayers(manifest, "face_a", true);
+  const blink = faceLayers(manifest, "face_slightly_smiling", true);
   assert.equal(blink[0].part, "facial_part_eye_closed_down");
   assert.deepEqual(blink[0].center, open[0].center);
   assert.equal(blink[2].part, open[2].part);
-  assert.equal(faceLayers(manifest, "face_j", true)[0].part, "facial_part_eye_x");
+  assert.equal(faceLayers(manifest, "face_dizzy", true)[0].part, "facial_part_eye_x");
   assert.equal(canClose("facial_part_eye_closed_up"), false);
   assert.deepEqual(faceLayers(manifest, "face_z", false), []);
 });
@@ -81,7 +81,7 @@ test("natural blinks last 0.12 s, 2.4 to 5.6 s apart", () => {
 
 test("emoji presets compose on the phone and keep shut eyes during blinks", () => {
   const emojiFaces = Object.entries(manifest.faces).filter(([, face]) => face.emoji_reference);
-  assert.equal(emojiFaces.length, 58);
+  assert.equal(emojiFaces.length, 64);
   for (const [name, preset] of emojiFaces) {
     assert.ok(validSnapshot(snapshot({ face: name })), name);
     assert.ok(validPreparation(preparation({ face: name })), name);
@@ -176,7 +176,12 @@ test("emoji presets compose on the phone and keep shut eyes during blinks", () =
   for (const name of ["face_smirking", "face_unamused"]) {
     assert.equal(faceLayers(manifest, name, false)[1].mirror, false);
   }
-  for (const invalid of ["face_bad/name", "face_../neutral", "face_", "face_a".repeat(20)]) {
+  for (const invalid of [
+    "face_bad/name",
+    "face_../neutral",
+    "face_",
+    "face_slightly_smiling".repeat(20),
+  ]) {
     assert.equal(validSnapshot(snapshot({ face: invalid })), false, invalid);
   }
 });

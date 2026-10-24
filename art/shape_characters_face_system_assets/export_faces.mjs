@@ -42,8 +42,23 @@ const PART_PALETTES = {
   facial_part_tear_pool: [NAVY, WATER_BLUE, WHITE],
   facial_part_halo: [NAVY, GOLD, WHITE],
 };
-// The X-eye is cut from face_j's left eye: a 40 x 40 box like the open eye's.
-const EYE_X_CUT = { face: "face_j", x: 0, y: 19, size: 40 };
+// The owner's twelve faces, named for their emoji counterparts; each has a reference image.
+const ORIGINALS = [
+  "face_slightly_smiling",
+  "face_unamused",
+  "face_content",
+  "face_suspicious",
+  "face_scheming",
+  "face_mischievous",
+  "face_furious",
+  "face_smirking",
+  "face_worried",
+  "face_dizzy",
+  "face_disappointed",
+  "face_smiling_eyes",
+];
+// The X-eye is cut from face_dizzy's left eye: a 40 x 40 box like the open eye's.
+const EYE_X_CUT = { face: "face_dizzy", x: 0, y: 19, size: 40 };
 
 const checkOnly = process.argv.includes("--check");
 const review = process.argv.includes("--review");
@@ -255,9 +270,9 @@ try {
     if (far.length > 0) fail(`${name} differs from its source at ${JSON.stringify(far)}`);
   }
 
-  const expected = Array.from({ length: 12 }, (_, i) => `face_${"abcdefghijkl"[i]}`);
+  const expected = ORIGINALS;
   if (expected.some((name) => !manifest.faces[name])) {
-    fail("the manifest must keep face_a to face_l");
+    fail("the manifest must keep the twelve original faces");
   }
   for (const [name, face] of Object.entries(manifest.faces)) {
     const [w, h] = face.source_size;
@@ -270,8 +285,8 @@ try {
     )) fail(`${name} has invalid layers`);
     const drawn = await draw(face.layers, w, h);
     const reference = join(here, `${name}.png`);
+    if (!face.emoji_reference) fail(`${name} has no emoji reference`);
     if (!expected.includes(name)) {
-      if (!face.emoji_reference) fail(`${name} has no emoji reference`);
       if (!drawn.some((value, index) => index % 4 === 3 && value > 0)) fail(`${name} is empty`);
       report.faces[name] = { emoji_reference: face.emoji_reference, reference_comparison: false };
       continue;
@@ -288,7 +303,7 @@ try {
     if (far.length > 0) fail(`${name} differs by more than one pixel at ${JSON.stringify(far)}`);
   }
 
-  // The X-eye at 1x against both of face_j's eyes; the right eye is the same part mirrored.
+  // The X-eye at 1x against both of face_dizzy's eyes; the right eye is the same part mirrored.
   const faceJ = readPng(join(here, `${EYE_X_CUT.face}.png`));
   const { x, y, size } = EYE_X_CUT;
   const eyeX = onSource("facial_part_eye_x", size, size);
@@ -298,7 +313,7 @@ try {
     return farPixels(drawnX, cut).length;
   });
   report.eye_x = { cut: EYE_X_CUT, far_pixels_left: cuts[0], far_pixels_right: cuts[1] };
-  if (cuts.some((n) => n > 0)) fail(`the X-eye differs from face_j: ${cuts}`);
+  if (cuts.some((n) => n > 0)) fail(`the X-eye differs from face_dizzy: ${cuts}`);
 
   if (review) {
     // This legacy comparison sheet is only for the supplied raster references.
