@@ -156,6 +156,9 @@ removes it. The evidence labels are defined in
   ground rejects FALL.
 - Set another platform to Closed in the Inspector and check it alone changes.
 - Feet stay grounded, and characters still interact as before.
+- The lobby on Jolt ([0042](decisions/0042-plaza-lobby-jolt-plane.md)): running, jumping
+  up through landings, landing on edges, bouncing off other players and FALL still feel as
+  they did on the 2D plane.
 
 ## Cubio look-up and crouch
 

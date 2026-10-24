@@ -64,8 +64,8 @@ After the input pipeline: bots that fill a game with players
 ## The 3D rework
 
 The game is being rebuilt with 3D assets, starting with the Playground lobby. The lobby is a
-3D café plaza where real-time Cubios move on one plane with the unchanged phone controls
-([0033](decisions/0033-plaza-lobby-plane-simulation.md)). Cubio is a cube with a small bevel;
+3D café plaza where real-time Cubios move as plane-locked Jolt bodies with the unchanged phone
+controls ([0042](decisions/0042-plaza-lobby-jolt-plane.md)). Cubio is a cube with a small bevel;
 the lobby, Bubbles, the Ready screen and phone setup share its live model and original rig.
 The rendered animation sheets and Animation Lab are retired.
 

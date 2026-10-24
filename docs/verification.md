@@ -189,6 +189,10 @@ start only what they need, so they stay fast.
   Run `cubio_preview_performance_check.gd` without `--headless` to measure ten live previews;
   it writes `test-results/cubio/ready-performance.json`. These are desktop composition and
   timing evidence, not phone performance or owner visual approval.
+- Playground lobby: `node tools/check.mjs lobby platform` covers the plane-locked Jolt
+  characters, one-way landings, FALL, bounce, side walls and the climb to the café roof. Run
+  `tests/lobby_physics_cost_check.gd` with `--headless` to print the physics cost of ten
+  characters.
 
 - Bubbles and jellyfishes 3D: the `tests/` folder of `minigames/004_3d_bubbles/` covers the
   round rules, Jolt arenas on real physics frames (plane locks, swipes, speed cap, wall and bump

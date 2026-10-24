@@ -2,6 +2,8 @@
 
 Chosen on 2026-10-17 for the 3D Playground lobby; the owner reviews it with that change.
 
+Replaced by [0042](0042-plaza-lobby-jolt-plane.md).
+
 ## Situation
 
 The lobby moves to a 3D plaza in which characters move only left, right and up, on one

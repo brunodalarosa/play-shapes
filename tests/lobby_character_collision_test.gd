@@ -2,7 +2,7 @@ extends TestScript
 ## Two real lobby bodies must block each other and rebound after a top landing.
 
 const WORLD: PackedScene = preload("res://scenes/lobby_playground_world.tscn")
-const CLEAR_GROUND_X := -384.0
+const CLEAR_GROUND_X := -4.0
 
 
 func _run() -> void:
@@ -26,13 +26,13 @@ func _run() -> void:
 	target.set_connected(false)
 	target.position.x = CLEAR_GROUND_X
 	target.spawn_point = target.position
-	mover.position = target.position + Vector2(-100.0, 0.0)
-	mover.velocity = Vector2.ZERO
+	mover.position = target.position + Vector3(-1.04, 0.0, 0.0)
+	mover.velocity = Vector3.ZERO
 	for unused: int in 35:
 		mover.motor.set_input(Vector2.RIGHT, "move", Time.get_ticks_msec())
 		await physics_frame
-	var reached := mover.position.x > target.position.x - 95.0
-	var blocked := mover.position.x <= target.position.x - 44.0
+	var reached := mover.position.x > target.position.x - 0.99
+	var blocked := mover.position.x <= target.position.x - 0.46
 	check(reached and blocked, "A moving player reaches but cannot pass through another player")
 	check(
 		target.position.x == target.spawn_point.x,
@@ -40,13 +40,13 @@ func _run() -> void:
 	)
 
 	mover.clear_input()
-	mover.position = target.position + Vector2(0.0, -220.0)
-	mover.velocity = Vector2.ZERO
+	mover.position = target.position + Vector3(0.0, 2.29, 0.0)
+	mover.velocity = Vector3.ZERO
 	var bounced := false
 	var impact_y := 0.0
 	for unused: int in 90:
 		await physics_frame
-		if mover.velocity.y < -100.0:
+		if mover.velocity.y > 1.04:
 			bounced = true
 			impact_y = mover.position.y
 			break
@@ -55,15 +55,15 @@ func _run() -> void:
 	var highest_y := impact_y
 	for unused: int in 25:
 		await physics_frame
-		highest_y = minf(highest_y, mover.position.y)
+		highest_y = maxf(highest_y, mover.position.y)
 	check(
-		impact_y - highest_y >= 10.0 and impact_y - highest_y <= 70.0,
+		highest_y - impact_y >= 0.1 and highest_y - impact_y <= 0.73,
 		"The player bounce is visible but modest",
 	)
 	for unused: int in 70:
 		await physics_frame
 	check(
-		mover.is_on_floor() and absf(mover.velocity.y) < 1.0,
+		mover.is_on_floor() and absf(mover.velocity.y) < 0.01,
 		"The rebound settles rather than repeating forever",
 	)
 	world.queue_free()

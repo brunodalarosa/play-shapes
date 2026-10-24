@@ -1,10 +1,9 @@
 extends TestScript
-## Checks the plaza's landing tiers, the 2D surfaces built from them, camera framing and the
-## billboard display.
+## Checks the plaza's landing tiers, the collision surfaces built from them, camera framing and
+## the billboard display.
 
 const WORLD := preload("res://scenes/lobby_playground_world.tscn")
 const PLATFORM_LAYER := 128
-const PPU := LobbyPlaygroundWorld.PIXELS_PER_UNIT
 ## Approved tiers in character heights: the ground, three chair seats, two tabletops, the roof.
 const EXPECTED := {
 	"GroundLanding": 0.0,
@@ -31,15 +30,18 @@ func _run() -> void:
 			continue
 		var bounds := surface.world_bounds()
 		check(
-			absf(bounds.position.y + float(EXPECTED[surface_name]) * PPU) < 0.5,
+			absf(surface.top() - float(EXPECTED[surface_name])) < 0.005,
 			"%s lands at %.2f character heights" % [surface_name, EXPECTED[surface_name]],
+		)
+		check(
+			bounds.position.z < 0.0 and bounds.end.z > 0.0,
+			"%s crosses the action plane" % surface_name,
 		)
 		check(
 			surface.collision_layer == PLATFORM_LAYER and surface.collision_mask == 0,
 			"%s uses the reserved platform layer" % surface_name,
 		)
-		var shape := surface.get_node("LandingTop") as CollisionShape2D
-		check(shape.one_way_collision, "%s is a one-way landing" % surface_name)
+		check(surface.one_way, "%s is a one-way landing" % surface_name)
 		var closed := surface_name == "GroundLanding"
 		check(
 			surface.drop_rule
@@ -51,7 +53,7 @@ func _run() -> void:
 	var table := world.surface_named("TableLeft").world_bounds()
 	var seat := world.surface_named("ChairLeft").world_bounds()
 	check(
-		roof.size.x >= 6.0 * PPU and table.size.x >= 3.0 * PPU and seat.size.x >= 1.2 * PPU,
+		roof.size.x >= 6.0 and table.size.x >= 3.0 and seat.size.x >= 1.2,
 		"Every landing is wider than a character",
 	)
 	check(
@@ -64,7 +66,8 @@ func _run() -> void:
 	for seat_index: int in range(1, 11):
 		var spawn := world.spawn_point(seat_index)
 		check(
-			spawn.y == 0.0 and spawn.x > ground.position.x and spawn.x < ground.end.x,
+			spawn.y == 0.0 and spawn.z == 0.0
+			and spawn.x > ground.position.x and spawn.x < ground.end.x,
 			"Spawn point %d stands on the plaza ground" % seat_index,
 		)
 
@@ -118,10 +121,10 @@ func _check_framing(size: Vector2i) -> void:
 		if landing.name == &"GroundLanding":
 			# The ground runs past the side walls, which keep characters in view instead.
 			var ground := world.surface_named("GroundLanding").world_bounds()
-			var walls := world.get_node("Simulation/PlatformSurfaces")
+			var walls := world.get_node("PlatformSurfaces")
 			check(
-				ground.position.x < (walls.get_node("LeftWall") as Node2D).position.x
-				and ground.end.x > (walls.get_node("RightWall") as Node2D).position.x,
+				ground.position.x < (walls.get_node("LeftWall") as Node3D).position.x
+				and ground.end.x > (walls.get_node("RightWall") as Node3D).position.x,
 				"The ground reaches both side walls at %s" % size,
 			)
 			continue

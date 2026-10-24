@@ -175,18 +175,32 @@ and client-supplied identity, support or grounding fields have no authority.
 
 - `components/platform_input.gd` is the shared classifier, with bounded snapshot and action
   validation. It loads `web/public/platform_input_settings.json` once.
-- `components/platform_surface.gd` attaches to each `StaticBody2D` support.
-  - Keep the authored `CollisionShape2D` geometry and the one-way settings.
+- `components/platform_surface.gd` attaches to each `StaticBody3D` landing and joins the
+  `platform_surfaces` group.
+  - Keep the authored `CollisionShape3D` geometry; its top is where bodies stand.
+  - **One Way** lets bodies rise through the landing from below. Every Playground landing,
+    the ground included, is one-way.
   - Choose **Drop Rule: Open/Closed** in the Inspector. Closed affects deliberate FALL only;
     it does not make the surface solid from below.
   - In the Playground, the ground is Closed and the chair seats, tabletops and café roof are
     Open. Select a prop's `Landing` marker to change just that rule.
-- `components/platform_motor.gd` is a child of any `CharacterBody2D` with ordinary collision
-  shapes.
+- `components/platform_motor.gd` is a child of any `CharacterBody3D` with ordinary collision
+  shapes. It locks the body to depth zero with `PlaneLock3D` and moves it in world units with
+  Y up.
   - The parent owns the geometry and layers. The motor owns physics, axes, input expiry, jump
-    eligibility, bounce, grounded stances, per-body drop exclusions and cleanup.
+    eligibility, bounce, grounded stances, per-body one-way and drop exclusions and cleanup.
   - Set its physics priority before a separate physics presentation adapter.
   - Read `presentation_action()` for idle, walk, run, look_up or crouch.
+
+## One-way landings
+
+Godot's 3D physics has no one-way shapes, so the motor provides them
+([decision 0042](decisions/0042-plaza-lobby-jolt-plane.md)).
+
+- Before each move it excludes, through collision exceptions on its own body, every one-way
+  surface in the step's path whose top is above the body's feet.
+- An exclusion ends once the feet are above that top, so the body lands from above.
+- A body standing still excludes nothing. Shared colliders and collision masks never change.
 
 ## Using the motor from a context
 
@@ -205,8 +219,8 @@ It also:
 Tree exit cleans the component too. The motor has no registry, nameplate, art, networking or
 singleton dependency.
 
-`tests/fixtures/platform_reuse.tscn` shows two generic capsule bodies and Open, Open and
-Closed supports using these exact components, with no lobby controller or registry. Open it to
+`tests/fixtures/platform_reuse.tscn` shows two generic plane-locked capsule bodies and Open,
+Open and Closed supports using these exact components, with no lobby controller or registry. Open it to
 inspect; the tests drive its physics without copying a controller.
 
 A custom platform context uses the same intent shape with its own explicit transport adapter.
@@ -220,7 +234,8 @@ Its host configuration and its browser constructor must share settings, not tune
   character. It never changes a shared collider or a collision mask.
 - Floor snap is suspended while the exception exists.
 - Full-body vertical clearance, horizontal edge clearance, another lower contact or the
-  timeout restores the previous snap and removes the exception.
+  timeout restores the previous snap and ends the drop. A body still inside the landing then
+  passes through it as an ordinary one-way body.
 - Closely stacked surfaces catch the body even before full-body clearance.
 - A FALL latch requires leaving crouch before another accepted drop, so repeated releases
   cannot silently descend several floors.
@@ -230,8 +245,8 @@ Its host configuration and its browser constructor must share settings, not tune
 | --- | --- | --- |
 | `input_timeout_msec` | 350 | Expire axes, stance, queued jump and transient drop after lost refresh. |
 | `drop_timeout_seconds` | 0.65 | Maximum support exclusion, even without clearance. |
-| `drop_clearance` | 4 px | Extra full-body clearance below support bounds. |
-| `drop_speed` | 80 px/s | Initial downward speed; lower platforms remain collidable. |
+| `drop_clearance` | 0.04 H | Extra full-body clearance below support bounds. |
+| `drop_speed` | 0.83 H/s | Initial downward speed; lower platforms remain collidable. |
 
 - The Playground's speed, acceleration, gravity and jump height live in
   `Tuning/Shared/Lobby/Default.tres`, in character heights. Bounce stays on

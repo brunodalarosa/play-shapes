@@ -14,7 +14,7 @@ extends SceneTree
 const LOBBY_SCENE := "res://scenes/lobby.tscn"
 const QUICK_ROUND_SECONDS := 10.0
 # A character counts as moved by its phone once it travels this far sideways.
-const MOVED_DISTANCE := 40.0
+const MOVED_DISTANCE := 0.42
 # Like a person, Start waits until everyone has stopped, and results stay up before Return.
 const AT_REST_SECONDS := 1.0
 const RESULTS_SECONDS := 3.0
@@ -122,7 +122,7 @@ func _watch_lobby(lobby: Node, delta: float) -> void:
 		if character == null:
 			continue
 
-		if character.velocity.length() > 1.0:
+		if character.velocity.length() > 0.01:
 			all_at_rest = false
 		if _moved.has(player_id):
 			continue

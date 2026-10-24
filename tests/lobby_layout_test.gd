@@ -60,7 +60,7 @@ func _check_size(size: Vector2i) -> bool:
 	# The board's top edge in the model, above its own origin.
 	var billboard_top := camera.unproject_position(world.billboard.to_global(Vector3.UP * 11.0))
 	var roof := world.surface_named("Cafe").world_bounds()
-	var roof_end := camera.unproject_position(LobbyPlaygroundWorld.to_world(roof.end))
+	var roof_end := camera.unproject_position(Vector3(roof.end.x, roof.end.y, 0.0))
 	# The logo sign's top corner nearest the panel.
 	var sign_corner := camera.unproject_position(world.logo_sign.to_global(SIGN_TOP_RIGHT))
 	var covers_landmark := (

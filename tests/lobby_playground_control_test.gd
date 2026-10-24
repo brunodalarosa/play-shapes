@@ -141,7 +141,7 @@ func _run() -> void:
 	)
 	await physics_frame
 	check(
-		first_character.velocity.y < 0.0 and not world.handle_input(first_player, {
+		first_character.velocity.y > 0.0 and not world.handle_input(first_player, {
 			"type": "lobby_jump_release",
 			"input_seq": 4,
 			"horizontal": 0.0,
@@ -176,8 +176,7 @@ func _run() -> void:
 	for index: int in range(2, 10):
 		registry.join_player(100 + index + 1, "Player %d" % index, true, now)
 	check(
-		world.get_node("Characters").get_child_count() == 10
-		and world.get_node("Simulation/Bodies").get_child_count() == 10,
+		world.get_node("Characters").get_child_count() == 10,
 		"All ten registered seats spawn a character",
 	)
 	registry.leave_connection(101)
@@ -189,11 +188,11 @@ func _run() -> void:
 		and replacement_character.spawn_point == world.spawn_point(2),
 		"A released seat reuses its anchor without overlapping an occupied seat",
 	)
-	first_character.position.y = first_character.motor.fall_reset_y + 10.0
+	first_character.position.y = first_character.motor.fall_reset_y - 0.1
 	await physics_frame
 	await physics_frame
 	check(
-		first_character.position.distance_to(first_character.spawn_point) < 3.0,
+		first_character.position.distance_to(first_character.spawn_point) < 0.03,
 		"A fallen character returns to its assigned anchor",
 	)
 	registry.disconnect_connection(102, now)

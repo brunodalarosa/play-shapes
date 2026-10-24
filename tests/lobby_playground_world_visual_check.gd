@@ -54,9 +54,10 @@ func _run() -> void:
 		var surface := world.surface_named(String(PLACES[index][0]))
 		var bounds := surface.world_bounds()
 		var character := world.character_for("player-%d" % index)
-		character.position = Vector2(
+		character.position = Vector3(
 			lerpf(bounds.position.x, bounds.end.x, float(PLACES[index][1])),
-			bounds.position.y - 1.0,
+			surface.top() + 0.01,
+			0.0,
 		)
 	world.character_for("player-6").motor.set_input(Vector2(1, 0), "move", Time.get_ticks_msec())
 	world.character_for("player-2").motor.set_input(Vector2(0, -1), "crouch", Time.get_ticks_msec())

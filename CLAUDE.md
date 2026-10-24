@@ -29,9 +29,9 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
 
 - Commits for this work go to `feature/3d-low-poly-project-rework`, as the owner asked.
 - Ready-made assets first; author new ones only when strictly necessary.
-- The owner wants the lobby on Jolt 3D physics with the plane locked, so the controls still
-  feel 2D. Today it simulates on a hidden 2D plane
-  ([0033](docs/decisions/0033-plaza-lobby-plane-simulation.md)), the last 2D gameplay code.
+- Every gameplay scene runs on Jolt with bodies locked to one plane, so the controls feel 2D.
+  The lobby's motor makes its own one-way landings
+  ([0042](docs/decisions/0042-plaza-lobby-jolt-plane.md)).
 
 ### Cubio
 
@@ -86,12 +86,15 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
   `lobby_fall_release` into motor calls after `PlatformInput.validate`.
 - Each `PlazaLanding` marker inside a prop defines a landing: the ground (Closed), chair seats,
   tabletops and the café roof (Open).
-- `characters/lobby_cubio.tscn` is the host body (`CharacterBody2D` today) with
-  `PlatformMotor`; it places its `Cubio3D` in the plaza every frame.
-- `components/platform_motor.gd` is generic platform physics: player bounce, run threshold, a
-  350 ms input lease, FALL as a per-body collision exception on exactly one Open support, and
-  a fall reset. `platform_surface.gd` carries the Open/Closed drop rule. `platform_input.gd`
-  rebuilds the phone's stance classification from `web/public/platform_input_settings.json`.
+- `characters/lobby_cubio.tscn` is the host body, a `CharacterBody3D` with `PlatformMotor`
+  and its `Cubio3D` as a child.
+- `components/platform_motor.gd` is generic plane-locked platform physics in world units:
+  one-way landings and FALL as per-body collision exceptions, player bounce, run threshold, a
+  350 ms input lease and a fall reset. `platform_surface.gd` is a `StaticBody3D` landing with
+  the one-way flag and the Open/Closed drop rule. `platform_input.gd` rebuilds the phone's
+  stance classification from `web/public/platform_input_settings.json`.
+- Physics layers: 3D layer 8 holds lobby landings and walls (bit 128), layer 9 lobby
+  characters (bit 256).
 
 ### Coupling the lobby has to respect
 
@@ -130,7 +133,7 @@ Condensed from AGENTS.md and the documents it links.
   needs a person goes into `docs/pending-reviews.md`.
 - Documents state what is true now, one topic each, with links that resolve and paragraphs
   under 600 characters; `node tools/docs.mjs` checks them. Reasons go in `docs/decisions/` as
-  numbered records, never edited to change a decision; the next free number is 0042. The
+  numbered records, never edited to change a decision; the next free number is 0043. The
   roadmap changes when work finishes or is added.
 - No ticket numbers anywhere: files, comments, tests or output folders.
 - Typed GDScript, composition, signals, Control/Container UI and no fixed viewport sizes.

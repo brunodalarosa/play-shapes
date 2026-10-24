@@ -1,14 +1,14 @@
 class_name LobbyCubio
-extends CharacterBody2D
-## Host-owned Playground body on the plaza's action plane. It simulates in plane pixels and
-## drives a 3D Cubio that the lobby world places in the plaza.
+extends CharacterBody3D
+## Host-owned Playground body on the plaza's action plane, locked to depth zero by its
+## PlatformMotor. Its 3D Cubio rides along as a child.
 
 var player_id: String = ""
-var spawn_point: Vector2 = Vector2.ZERO
+var spawn_point: Vector3 = Vector3.ZERO
 var connected: bool = true
-var visual: Cubio3D
 
 @onready var motor: PlatformMotor = $PlatformMotor
+@onready var visual: Cubio3D = $Cubio3D
 
 
 func _ready() -> void:
@@ -16,18 +16,17 @@ func _ready() -> void:
 	set_connected(connected)
 
 
-func configure(player: Dictionary, anchor: Vector2, presentation: Cubio3D) -> void:
+## Places a body that is already in the tree at its seat and applies the player's look.
+func configure(player: Dictionary, anchor: Vector3) -> void:
 	player_id = String(player.player_id)
 	spawn_point = anchor
 	position = anchor
-	visual = presentation
 	refresh_player(player)
 
 
 func refresh_player(player: Dictionary) -> void:
-	if visual != null and visual.is_node_ready():
-		visual.set_player_name(String(player.name))
-		visual.player_color = Color(String(player.character_color))
+	visual.set_player_name(String(player.name))
+	visual.player_color = Color(String(player.character_color))
 	set_connected(String(player.state) == "connected")
 
 
@@ -37,27 +36,20 @@ func set_connected(value: bool) -> void:
 		return
 	motor.set_enabled(value)
 	set_physics_process(connected)
-	if not connected and visual != null:
+	if not connected:
 		visual.play("idle")
 
 
 func clear_input() -> void:
 	motor.clear_input()
-	if visual != null:
-		visual.play("idle")
+	visual.play("idle")
 
 
 func _respawn() -> void:
 	position = spawn_point
-	if visual != null:
-		visual.play("idle")
+	visual.play("idle")
 
 
 func _physics_process(_delta: float) -> void:
-	if visual != null:
-		visual.play(motor.presentation_action())
-
-
-func _exit_tree() -> void:
-	if is_instance_valid(visual):
-		visual.queue_free()
+	visual.play(motor.presentation_action())
+	visual.set_travel(velocity.x)

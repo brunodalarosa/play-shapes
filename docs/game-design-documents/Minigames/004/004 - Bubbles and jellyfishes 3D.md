@@ -42,7 +42,7 @@ Fixed time duration.
 
 ## Simulation and world scale
 
-The host simulates 004 with Godot's 3D physics (Jolt), not with 2D physics mirrored into 3D. Bubbles, NPCs and walls live on one vertical gameplay plane at depth zero; every body's depth axis and rotation are locked so nothing leaves the plane. This differs from the 3D lobby, which mirrors a 2D simulation ([decision 0033](../../../decisions/0033-plaza-lobby-plane-simulation.md)), and is recorded as its own decision record when built.
+The host simulates 004 with Godot's 3D physics (Jolt), not with 2D physics mirrored into 3D. Bubbles, NPCs and walls live on one vertical gameplay plane at depth zero; every body's depth axis and rotation are locked so nothing leaves the plane. The lobby later moved to the same approach ([decision 0042](../../../decisions/0042-plaza-lobby-jolt-plane.md)).
 
 One world unit equals 100 pixels of a 1920 × 1080 reference frame. The playable plane is 19.2 × 10.8 units, centred on the origin.
 

@@ -37,7 +37,7 @@ func _check_size(size: Vector2i) -> void:
 		for _frame: int in RUN_FRAMES:
 			runner.motor.set_input(Vector2(direction, 0.0), "move", Time.get_ticks_msec())
 			await physics_frame
-		var centre := LobbyPlaygroundWorld.to_world(runner.position + Vector2(0.0, -48.0))
+		var centre := runner.position + Vector3(0.0, 0.5, 0.0)
 		var screen_x := world.camera.unproject_position(centre).x
 		var edge := 0.0 if direction < 0.0 else float(size.x)
 		check(
@@ -50,13 +50,10 @@ func _check_size(size: Vector2i) -> void:
 	var narrow := Vector2i(size.x / 2, size.y)
 	viewport.size = narrow
 	await process_frame
-	var left_wall := world.get_node("Simulation/PlatformSurfaces/LeftWall") as Node2D
+	var left_wall := world.get_node("PlatformSurfaces/LeftWall") as Node3D
 	var stop := LobbyPlaygroundWorld.BODY_HALF_WIDTH + LobbyPlaygroundWorld.WALL_THICKNESS * 0.5
-	var height := Vector2(
-		0.0,
-		-LobbyPlaygroundWorld.WALL_FIT_HEIGHT * LobbyPlaygroundWorld.PIXELS_PER_UNIT,
-	)
-	var stopped := LobbyPlaygroundWorld.to_world(left_wall.position + Vector2(stop, 0.0) + height)
+	var height := LobbyPlaygroundWorld.WALL_FIT_HEIGHT
+	var stopped := Vector3(left_wall.position.x + stop, height, 0.0)
 	check(
 		absf(world.camera.unproject_position(stopped).x) <= narrow.x * EDGE_TOLERANCE,
 		"Narrowing the view at %s brings the walls in with it" % size,

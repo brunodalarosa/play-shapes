@@ -35,8 +35,8 @@ enabled=PackedStringArray("res://addons/standalone_build/plugin.cfg", "res://add
 
 [layer_names]
 
-2d_physics/layer_8="Lobby platforms"
-2d_physics/layer_9="Lobby characters"
+3d_physics/layer_8="Lobby platforms"
+3d_physics/layer_9="Lobby characters"
 3d_physics/layer_10="Bubbles 3D bubbles"
 3d_physics/layer_11="Bubbles 3D walls"
 3d_physics/layer_12="Bubbles 3D creatures"

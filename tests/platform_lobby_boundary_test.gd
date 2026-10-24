@@ -26,8 +26,8 @@ func _run() -> void:
 	var first := world.character_for("first")
 	var second := world.character_for("second")
 	# The ground is Closed, so FALL starts from an Open tabletop above clear ground.
-	var table_top := world.surface_named("TableLeft").world_bounds().position.y
-	first.position = Vector2(0.0, table_top)
+	var table_top := world.surface_named("TableLeft").top()
+	first.position = Vector3(0.0, table_top, 0.0)
 	for index: int in 5:
 		await physics_frame
 		await process_frame
@@ -61,7 +61,7 @@ func _run() -> void:
 		await physics_frame
 		await process_frame
 	check(
-		absf(first.position.y) < 1.0 and absf(second.position.y) < 1.0,
+		absf(first.position.y) < 0.01 and absf(second.position.y) < 0.01,
 		"Playground FALL descends one actual support without disturbing another player",
 	)
 	release.input_seq = 3
@@ -98,8 +98,8 @@ func _run() -> void:
 		and first.get_collision_exceptions().is_empty(),
 		"Resume clears stance, queued actions and collision exceptions",
 	)
-	first.position = Vector2(0.0, table_top)
-	first.velocity = Vector2.ZERO
+	first.position = Vector3(0.0, table_top, 0.0)
+	first.velocity = Vector3.ZERO
 	for index: int in 3:
 		await physics_frame
 		await process_frame
@@ -111,7 +111,8 @@ func _run() -> void:
 	players[0].state = "reconnecting"
 	world.reconcile(players)
 	check(
-		first.get_collision_exceptions().is_empty() and first.floor_snap_length == 8.0
+		first.get_collision_exceptions().is_empty()
+		and is_equal_approx(first.floor_snap_length, 0.08)
 		and first.motor.stance == "neutral" and not first.motor.enabled,
 		"Registry disconnect clears the active drop",
 	)

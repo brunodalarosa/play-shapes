@@ -787,10 +787,5 @@ position = Vector3(8.4, 0, 0)
 
 [node name="Characters" type="Node3D" parent="."]
 
-[node name="Simulation" type="Node2D" parent="."]
-visible = false
-editor_description = "Host physics on the action plane, in plane pixels. Landings are built from PlazaLanding markers at runtime."
-
-[node name="PlatformSurfaces" type="Node2D" parent="Simulation"]
-
-[node name="Bodies" type="Node2D" parent="Simulation"]
+[node name="PlatformSurfaces" type="Node3D" parent="."]
+editor_description = "Invisible landings and side walls on the action plane. Landings are built from PlazaLanding markers at runtime."

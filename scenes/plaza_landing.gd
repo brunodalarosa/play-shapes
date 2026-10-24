@@ -2,7 +2,8 @@
 class_name PlazaLanding
 extends Node3D
 ## Marks the top centre of a landing where it crosses the plaza's action plane. The lobby
-## world builds the matching 2D platform from it, so scenery and collision share one placement.
+## world builds the matching landing collision from it, so scenery and collision share one
+## placement.
 
 ## Landing width along the action plane, in world units.
 @export_range(0.1, 40.0, 0.05, "suffix:H") var width: float = 2.0:

@@ -1,23 +1,24 @@
 class_name LobbyPlaygroundWorld
 extends Node3D
 ## The Playground plaza. Reconciles host registry records into one character per player
-## identity. Bodies simulate on a hidden 2D action plane, where one-way landings, FALL and
-## player bounce already exist; each body's 3D Cubio mirrors it in the plaza at depth zero.
+## identity. Characters are plane-locked Jolt bodies at depth zero; their PlatformMotor makes
+## the landings one-way, permits FALL and bounces players off each other. One world unit is
+## one character height.
 
 const CHARACTER: PackedScene = preload("res://characters/lobby_cubio.tscn")
-const VISUAL: PackedScene = preload("res://characters/cubio_3d.tscn")
 const ACTIVE_PRESETS: ActivePresets = preload("res://Tuning/Active Presets.tres")
 const MAX_SEQUENCE := 9007199254740991.0
-## Plane pixels per world unit. One unit is one character height, the motor's 96-pixel body.
-const PIXELS_PER_UNIT := 96.0
-## Landing collision depth below its top, plane pixels.
-const LANDING_THICKNESS := 10.0
+## Landing collision depth below its top, world units.
+const LANDING_THICKNESS := 0.1
+## Extent of landings and walls across the plane, world units. Bodies stay at depth zero, so
+## any depth that covers the capsule works.
+const COLLISION_DEPTH := 2.0
 const PLATFORM_LAYER := 128
-## Half the width of a lobby body: the capsule radius in lobby_cubio.tscn, plane pixels.
-const BODY_HALF_WIDTH := 23.0
-const WALL_THICKNESS := 40.0
-## Walls run from below the ground to far above the highest jump, plane pixels.
-const WALL_SPAN := Vector2(-40.0, 5.0) * PIXELS_PER_UNIT
+## Half the width of a lobby body: the capsule radius in lobby_cubio.tscn, world units.
+const BODY_HALF_WIDTH := 0.24
+const WALL_THICKNESS := 0.42
+## Walls run from below the ground to far above the highest jump, world units.
+const WALL_SPAN := Vector2(-5.0, 40.0)
 ## Height at which the walls meet the screen edges, world units: mid-way up the play area.
 const WALL_FIT_HEIGHT := 3.0
 
@@ -33,9 +34,8 @@ var _last_sequence: Dictionary = { }
 @onready var logo_sign: Node3D = $Plaza/Cafe/LogoSign
 @onready var camera: Camera3D = $Camera3D
 @onready var _spawn_points: Node3D = $SpawnPoints
-@onready var _visuals: Node3D = $Characters
-@onready var _surfaces: Node2D = $Simulation/PlatformSurfaces
-@onready var _bodies: Node2D = $Simulation/Bodies
+@onready var _bodies: Node3D = $Characters
+@onready var _surfaces: Node3D = $PlatformSurfaces
 
 
 func _ready() -> void:
@@ -50,14 +50,6 @@ func _ready() -> void:
 		_surfaces.add_child(_wall(wall_name))
 	get_viewport().size_changed.connect(fit_walls)
 	fit_walls()
-
-
-static func to_plane(point: Vector3) -> Vector2:
-	return Vector2(point.x, -point.y) * PIXELS_PER_UNIT
-
-
-static func to_world(point: Vector2) -> Vector3:
-	return Vector3(point.x, -point.y, 0.0) / PIXELS_PER_UNIT
 
 
 func landings() -> Array[PlazaLanding]:
@@ -77,14 +69,15 @@ func fit_walls() -> void:
 	var view := get_viewport().get_visible_rect().size
 	var fit_y := camera.unproject_position(Vector3(0.0, WALL_FIT_HEIGHT, 0.0)).y
 	var stop := BODY_HALF_WIDTH + WALL_THICKNESS * 0.5
-	var left := to_plane(_on_action_plane(Vector2(0.0, fit_y))).x
-	var right := to_plane(_on_action_plane(Vector2(view.x, fit_y))).x
-	(_surfaces.get_node("LeftWall") as Node2D).position.x = left - stop
-	(_surfaces.get_node("RightWall") as Node2D).position.x = right + stop
+	var left := _on_action_plane(Vector2(0.0, fit_y)).x
+	var right := _on_action_plane(Vector2(view.x, fit_y)).x
+	(_surfaces.get_node("LeftWall") as Node3D).position.x = left - stop
+	(_surfaces.get_node("RightWall") as Node3D).position.x = right + stop
 
 
-func spawn_point(seat: int) -> Vector2:
-	return to_plane((_spawn_points.get_child(seat - 1) as Node3D).global_position)
+func spawn_point(seat: int) -> Vector3:
+	var marker := (_spawn_points.get_child(seat - 1) as Node3D).global_position
+	return Vector3(marker.x, marker.y, 0.0)
 
 
 func reconcile(players: Array[Dictionary]) -> void:
@@ -166,30 +159,20 @@ func handle_input(player: Dictionary, message: Dictionary, now_msec: int) -> Dic
 	return { "accepted": true }
 
 
-func _process(_delta: float) -> void:
-	for character: LobbyCubio in _characters.values():
-		var visual := character.visual
-		visual.position = to_world(character.position)
-		visual.set_travel(character.velocity.x / PIXELS_PER_UNIT)
-
-
 func _spawn(player: Dictionary, seat: int) -> LobbyCubio:
-	var visual := VISUAL.instantiate() as Cubio3D
-	_visuals.add_child(visual)
 	var character := CHARACTER.instantiate() as LobbyCubio
 	_apply_movement(character.get_node("PlatformMotor") as PlatformMotor)
-	character.configure(player, spawn_point(seat), visual)
 	_bodies.add_child(character)
-	visual.position = to_world(character.position)
+	character.configure(player, spawn_point(seat))
 	return character
 
 
 func _apply_movement(motor: PlatformMotor) -> void:
-	motor.move_speed = movement.move_speed * PIXELS_PER_UNIT
-	motor.acceleration = movement.acceleration * PIXELS_PER_UNIT
-	motor.gravity = movement.gravity * PIXELS_PER_UNIT
-	motor.jump_impulse = movement.jump_impulse() * PIXELS_PER_UNIT
-	motor.fall_reset_y = fall_reset_depth * PIXELS_PER_UNIT
+	motor.move_speed = movement.move_speed
+	motor.acceleration = movement.acceleration
+	motor.gravity = movement.gravity
+	motor.jump_impulse = movement.jump_impulse()
+	motor.fall_reset_y = -fall_reset_depth
 
 
 func _surface_for(landing: PlazaLanding) -> PlatformSurface:
@@ -197,15 +180,17 @@ func _surface_for(landing: PlazaLanding) -> PlatformSurface:
 	# Landings share a node name inside their props, so the surface takes the prop's name.
 	surface.name = landing.get_parent().name if landing.name == &"Landing" else landing.name
 	surface.drop_rule = landing.drop_rule
+	surface.one_way = landing.one_way
 	surface.collision_layer = PLATFORM_LAYER
 	surface.collision_mask = 0
-	var shape := CollisionShape2D.new()
+	var top := landing.global_position
+	surface.position = Vector3(top.x, top.y, 0.0)
+	var shape := CollisionShape3D.new()
 	shape.name = "LandingTop"
-	var rectangle := RectangleShape2D.new()
-	rectangle.size = Vector2(landing.width * PIXELS_PER_UNIT, LANDING_THICKNESS)
-	shape.shape = rectangle
-	shape.one_way_collision = landing.one_way
-	shape.position = to_plane(landing.global_position) + Vector2(0.0, LANDING_THICKNESS * 0.5)
+	var box := BoxShape3D.new()
+	box.size = Vector3(landing.width, LANDING_THICKNESS, COLLISION_DEPTH)
+	shape.shape = box
+	shape.position.y = -LANDING_THICKNESS * 0.5
 	surface.add_child(shape)
 	return surface
 
@@ -216,15 +201,15 @@ func _on_action_plane(screen_point: Vector2) -> Vector3:
 	return origin + direction * (-origin.z / direction.z)
 
 
-func _wall(wall_name: String) -> StaticBody2D:
-	var wall := StaticBody2D.new()
+func _wall(wall_name: String) -> StaticBody3D:
+	var wall := StaticBody3D.new()
 	wall.name = wall_name
 	wall.collision_layer = PLATFORM_LAYER
 	wall.collision_mask = 0
-	var shape := CollisionShape2D.new()
-	var rectangle := RectangleShape2D.new()
-	rectangle.size = Vector2(WALL_THICKNESS, WALL_SPAN.y - WALL_SPAN.x)
-	shape.shape = rectangle
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(WALL_THICKNESS, WALL_SPAN.y - WALL_SPAN.x, COLLISION_DEPTH)
+	shape.shape = box
 	shape.position.y = (WALL_SPAN.x + WALL_SPAN.y) * 0.5
 	wall.add_child(shape)
 	return wall

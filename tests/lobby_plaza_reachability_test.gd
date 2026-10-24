@@ -4,8 +4,8 @@ extends TestScript
 
 const WORLD := preload("res://scenes/lobby_playground_world.tscn")
 const MAX_JUMP_FRAMES := 150
-## How far inside a support's edge the climber takes off, in plane pixels.
-const EDGE_MARGIN := 12.0
+## How far inside a support's edge the climber takes off, in world units.
+const EDGE_MARGIN := 0.12
 
 
 func _run() -> void:
@@ -28,7 +28,7 @@ func _run() -> void:
 		["ChairLeft", "TableLeft", 1.0, true],
 		["TableLeft", "Cafe", -1.0, true],
 	]
-	climber.position = Vector2(-3.9 * LobbyPlaygroundWorld.PIXELS_PER_UNIT, 0.0)
+	climber.position = Vector3(-3.9, 0.0, 0.0)
 	for step: Array in climb:
 		var from := world.surface_named(String(step[0]))
 		var to := world.surface_named(String(step[1]))
@@ -74,9 +74,9 @@ func _jump_onto(
 		return false
 	for _frame: int in MAX_JUMP_FRAMES:
 		var centre := bounds.get_center().x
-		var steer := clampf((centre - climber.position.x) / 40.0, -1.0, 1.0)
+		var steer := clampf((centre - climber.position.x) / 0.42, -1.0, 1.0)
 		# Keep driving away until above the target, then steer to its middle.
-		var above := climber.position.y < bounds.position.y
+		var above := climber.position.y > bounds.end.y
 		var axis := steer if above else direction
 		climber.motor.set_input(Vector2(axis, 0.0), "move", Time.get_ticks_msec())
 		await physics_frame

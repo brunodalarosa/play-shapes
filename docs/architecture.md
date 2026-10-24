@@ -35,9 +35,10 @@ Messages and limits are in [protocol.md](protocol.md).
   - Characters move on the action plane at depth zero. One world unit is one character height.
   - Each landing is a `PlazaLanding` marker inside its prop: the ground (Closed), three chair
     seats, two tabletops and the café roof (Open). Moving a prop moves its landing.
-  - `Simulation` is a hidden 2D plane, 96 pixels per unit, where the world builds one one-way
-    `PlatformSurface` per landing on physics layer 8 (bit 128). Characters use layer 9
-    (bit 256). See [decision 0033](decisions/0033-plaza-lobby-plane-simulation.md).
+  - `PlatformSurfaces` holds the invisible collision: the world builds one one-way
+    `PlatformSurface` box per landing on 3D physics layer 8 (bit 128). Characters are
+    plane-locked Jolt bodies on layer 9 (bit 256). See
+    [decision 0042](decisions/0042-plaza-lobby-jolt-plane.md).
   - Two invisible side walls on the same layer keep characters in view. `fit_walls()` places
     them from the camera whenever the view resizes, so a character stops with its centre on
     the screen edge, half out of view. The ground runs past both walls.
@@ -46,9 +47,9 @@ Messages and limits are in [protocol.md](protocol.md).
   - `Plaza/Cafe/LogoSign` is the logo as 3D letters on posts on the café roof, scenery with no
     collision ([decision 0041](decisions/0041-rooftop-logo-sign.md)).
 - `scenes/lobby_playground_world.gd` reconciles registered players to ten seat-indexed
-  `SpawnPoints` and places each body's 3D Cubio every frame.
-- `characters/lobby_cubio.tscn` is the host body: the shared `PlatformMotor`, a capsule and
-  the player lifecycle. It drives its `Cubio3D` and frees it on exit.
+  `SpawnPoints` and spawns their bodies under `Characters`.
+- `characters/lobby_cubio.tscn` is the host body: a `CharacterBody3D` with the shared
+  `PlatformMotor`, a capsule, the player lifecycle and its `Cubio3D` as a child.
 - `Tuning/Shared/Lobby/Default.tres` holds the movement preset, in character heights, selected
   in `Active Presets.tres`.
 
