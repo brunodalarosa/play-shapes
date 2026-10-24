@@ -83,13 +83,20 @@ export class ShapeFace3D {
   private material(part: string): MeshBasicMaterial {
     let material = this.materials.get(part);
     if (!material) {
-      material = new MeshBasicMaterial({ transparent: true, depthWrite: false, side: DoubleSide });
+      // Hidden until its image arrives; without one it would draw as a white block.
+      material = new MeshBasicMaterial({
+        transparent: true,
+        depthWrite: false,
+        side: DoubleSide,
+        visible: false,
+      });
       const created = material;
       this.pending++;
       partTexture(this.manifest, part, this.base)
         .then(
           (texture) => {
             created.map = texture;
+            created.visible = true;
             created.needsUpdate = true;
           },
           () => textures.delete(part),

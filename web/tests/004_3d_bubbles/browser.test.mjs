@@ -258,6 +258,8 @@ test("reusable Cubio tints every limb, draws its shape face, scales and blinks",
         colors.push(object.material.color.getHexString());
         tinted.push(object);
       });
+      // A part stays hidden until its image arrives, rather than drawing as a white block.
+      const hiddenWhileLoading = parts().every((material) => material.visible === !!material.map);
       const anchor = character.face.root.parent;
       const z = character.face.root.matrixWorld.elements[14];
       const open = parts().length;
@@ -271,8 +273,21 @@ test("reusable Cubio tints every limb, draws its shape face, scales and blinks",
         blinked = character.face.root.children[0].scale.y < eye * 0.9;
       }
       const white = tinted.map((object) => object.material.color.getHexString());
+      // The closed eye of the blink loads on first use; every part shows once it arrives.
+      while (character.face.loading()) await new Promise((done) => setTimeout(done, 20));
+      const shown = parts().every((material) => material.visible && material.map);
       character.dispose();
-      return { colors, anchor: anchor?.name, z, open, scale, white, blinked };
+      return {
+        colors,
+        anchor: anchor?.name,
+        z,
+        open,
+        scale,
+        white,
+        blinked,
+        hiddenWhileLoading,
+        shown,
+      };
     });
     assert.deepEqual(result.colors, Array(5).fill("e53935"));
     assert.equal(result.anchor, "FaceAnchor");
@@ -281,6 +296,8 @@ test("reusable Cubio tints every limb, draws its shape face, scales and blinks",
     assert.equal(result.scale, 0.5);
     assert.deepEqual(result.white, Array(5).fill("ffffff"));
     assert.equal(result.blinked, true);
+    assert.equal(result.hiddenWhileLoading, true);
+    assert.equal(result.shown, true);
   });
 });
 
