@@ -6,7 +6,6 @@ rig is restructured only in this process's memory before export.
 from pathlib import Path
 import hashlib
 import json
-import shutil
 import sys
 
 import bpy
@@ -19,25 +18,27 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 OUT = ROOT / 'assets/runtime/animated_characters/cubio/model'
 RIG = 'Animation.Controls'
-FACE = 'Face.Plane - neutral artwork'
-# Godot node names cannot contain dots, so the exported meshes use plain names.
+# Godot node names cannot contain dots, so the exported objects use plain names.
 MESH_NAMES = {
     'Body.Cubio': 'Body',
-    FACE: 'Face',
     'Hand.L': 'HandL',
     'Hand.R': 'HandR',
     'Foot.L': 'FootL',
     'Foot.R': 'FootR',
 }
+# The empty a shape face is drawn on. Unrotated, its -Y faces out of the front, which is +Z
+# once exported Y up.
+ANCHOR_NAMES = {'Face.Anchor': 'FaceAnchor'}
+EXPORTED_NAMES = {**MESH_NAMES, **ANCHOR_NAMES}
 
 
-def bone_for(mesh):
-    """The control bone whose COPY_TRANSFORMS empty carries this mesh."""
-    holder = mesh.parent
+def bone_for(item):
+    """The control bone whose COPY_TRANSFORMS empty carries this object."""
+    holder = item.parent
     for bone, empty in CONTROLS.items():
         if holder.name == empty:
             return bone
-    raise AssertionError(f'{mesh.name} is not carried by a control empty')
+    raise AssertionError(f'{item.name} is not carried by a control empty')
 
 
 def parent_meshes_to_bones(rig):
@@ -45,21 +46,21 @@ def parent_meshes_to_bones(rig):
     # every mesh where the animated source scene shows it.
     rig.data.pose_position = 'REST'
     bpy.context.view_layer.update()
-    for source_name in MESH_NAMES:
-        mesh = bpy.data.objects[source_name]
-        bone = bone_for(mesh)
-        world = mesh.matrix_world.copy()
-        mesh.parent = rig
-        mesh.parent_type = 'BONE'
-        mesh.parent_bone = bone
-        mesh.matrix_parent_inverse.identity()
-        mesh.matrix_world = world
+    for source_name in EXPORTED_NAMES:
+        item = bpy.data.objects[source_name]
+        bone = bone_for(item)
+        world = item.matrix_world.copy()
+        item.parent = rig
+        item.parent_type = 'BONE'
+        item.parent_bone = bone
+        item.matrix_parent_inverse.identity()
+        item.matrix_world = world
     bpy.context.view_layer.update()
     rig.data.pose_position = 'POSE'
 
 
 def rename_for_export(rig):
-    for source_name, export_name in MESH_NAMES.items():
+    for source_name, export_name in EXPORTED_NAMES.items():
         bpy.data.objects[source_name].name = export_name
     for clip in CLIPS:
         bpy.data.actions[action_name(clip)].name = clip
@@ -69,7 +70,7 @@ def rename_for_export(rig):
 def select_export_objects(rig):
     bpy.ops.object.select_all(action='DESELECT')
     rig.select_set(True)
-    for export_name in MESH_NAMES.values():
+    for export_name in EXPORTED_NAMES.values():
         bpy.data.objects[export_name].select_set(True)
     bpy.context.view_layer.objects.active = rig
 
@@ -95,12 +96,9 @@ def main():
             export_frame_step=1,
             export_def_bones=False,
             export_rest_position_armature=True,
-            # Godot assigns the tint and face materials, so none are embedded.
+            # Godot and the phone assign the tint, so no materials are embedded.
             export_materials='NONE',
         )
-    for face in ('neutral', 'blink'):
-        with atomic_output(OUT / f'face-{face}.png') as temporary:
-            shutil.copyfile(HERE / 'textures' / f'{face}.png', temporary)
     source = HERE / 'cubio-animated.blend'
     report = {
         'source_sha256': hashlib.sha256(source.read_bytes()).hexdigest(),
@@ -115,6 +113,7 @@ def main():
             for name, spec in CLIPS.items()
         },
         'meshes': sorted(MESH_NAMES.values()),
+        'anchors': sorted(ANCHOR_NAMES.values()),
         'body_dimensions_m': list(bpy.data.objects['Body'].dimensions),
         'body_bevel_m': bpy.context.scene['Body bevel m'],
         'standing_height_m': round(bpy.data.objects['Body'].matrix_world.translation.z + 1.0, 3),

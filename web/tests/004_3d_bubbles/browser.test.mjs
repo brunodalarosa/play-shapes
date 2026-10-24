@@ -31,11 +31,12 @@ async function phone(options, verify) {
         });
         return;
       }
-      // The host serves the face images from the runtime Cubio folder, as here.
-      const face = path.match(/^\/models\/cubio-face-(neutral|blink)\.png$/);
-      const source = face
-        ? `../../../assets/runtime/animated_characters/cubio/model/face-${face[1]}.png`
-        : `../../public${path === "/" ? "/index.html" : path}`;
+      // The host serves the face parts and Cubio's face placement from the runtime folders.
+      const source = path.startsWith("/shape_faces/")
+        ? `../../../assets/runtime${path}`
+        : path === "/models/cubio-face-anchor.json"
+          ? "../../../assets/runtime/animated_characters/cubio/face_anchor.json"
+          : `../../public${path === "/" ? "/index.html" : path}`;
       const file = new URL(source, import.meta.url);
       const types = {
         js: "text/javascript",
@@ -242,7 +243,7 @@ test("setup navigation while the model loads retires pending views without dupli
   });
 });
 
-test("reusable Cubio tints every limb, faces the camera, scales and blinks", async () => {
+test("reusable Cubio tints every limb, draws its shape face, scales and blinks", async () => {
   await phone({ noWebGL: false }, async (page) => {
     const result = await page.evaluate(async () => {
       const { createCubio } = await import("/three_view.js");
@@ -251,31 +252,52 @@ test("reusable Cubio tints every limb, faces the camera, scales and blinks", asy
       character.root.updateMatrixWorld(true);
       const colors = [];
       const tinted = [];
-      let face;
+      const parts = () => character.face.root.children.map((part) => part.material);
       character.root.traverse((object) => {
-        if (!object.isMesh) return;
-        if (object.name === "Face") face = object;
-        else {
-          colors.push(object.material.color.getHexString());
-          tinted.push(object);
-        }
+        if (!object.isMesh || !object.visible || parts().includes(object.material)) return;
+        colors.push(object.material.color.getHexString());
+        tinted.push(object);
       });
-      const z = face.matrixWorld.elements[14];
+      // A part stays hidden until its image arrives, rather than drawing as a white block.
+      const hiddenWhileLoading = parts().every((material) => material.visible === !!material.map);
+      const anchor = character.face.root.parent;
+      const z = character.face.root.matrixWorld.elements[14];
+      const open = parts().length;
       const scale = character.root.scale.x;
-      character.update(6, 1.31, "#e53935", true);
+      // Blinks come 2.4 to 5.6 s apart and last 0.12 s; step through one in small frames.
+      // A closed eye is shorter than the open eye it replaces.
+      const eye = character.face.root.children[0].scale.y;
+      let blinked = false;
+      for (let frame = 0; frame < 400 && !blinked; frame++) {
+        character.update(0.02, 1.31, "#e53935", true);
+        blinked = character.face.root.children[0].scale.y < eye * 0.9;
+      }
       const white = tinted.map((object) => object.material.color.getHexString());
-      const blink = face.material.map.image.src.endsWith("cubio-face-blink.png");
-      character.update(0.13, 1.31, "#e53935", false);
-      const neutral = face.material.map.image.src.endsWith("cubio-face-neutral.png");
+      // The closed eye of the blink loads on first use; every part shows once it arrives.
+      while (character.face.loading()) await new Promise((done) => setTimeout(done, 20));
+      const shown = parts().every((material) => material.visible && material.map);
       character.dispose();
-      return { colors, z, scale, white, blink, neutral };
+      return {
+        colors,
+        anchor: anchor?.name,
+        z,
+        open,
+        scale,
+        white,
+        blinked,
+        hiddenWhileLoading,
+        shown,
+      };
     });
     assert.deepEqual(result.colors, Array(5).fill("e53935"));
+    assert.equal(result.anchor, "FaceAnchor");
     assert.ok(result.z > 0);
+    assert.equal(result.open, 3);
     assert.equal(result.scale, 0.5);
     assert.deepEqual(result.white, Array(5).fill("ffffff"));
-    assert.equal(result.blink, true);
-    assert.equal(result.neutral, true);
+    assert.equal(result.blinked, true);
+    assert.equal(result.hiddenWhileLoading, true);
+    assert.equal(result.shown, true);
   });
 });
 

@@ -24,12 +24,12 @@ All library sources are CC0-1.0 KayKit packs (Kay Lousberg) held in the owner's 
 Reference: [the supplied assets](references/face-system-assets.jpg). The 26 source PNGs are small (an open eye is 40 px), flat navy and white, built from circles, arcs and rounded bars.
 
 - Trace every part into a clean SVG master with the same shapes and the same two colours. Keep the source PNGs unchanged.
-- Add an X-eye part, `facial_part_eye_x`, cut from `face_j` and traced the same way.
+- Add an X-eye part, `facial_part_eye_x`, cut from `face_dizzy` and traced the same way.
 - Export every part as a PNG at 8× the source pixel size with transparent edges.
-- Write `face_presets.json`: for each of `face_a` to `face_l`, the parts used and each part's centre, rotation, scale and mirroring inside a face box measured in face heights, plus the box aspect.
+- Write `face_presets.json`: for each of the twelve reference faces, named for its emoji counterpart such as `face_slightly_smiling`, the parts used and each part's centre, rotation, scale and mirroring inside a face box measured in face heights, plus the box aspect.
 - Output: masters in `art/shape_characters_face_system_assets/vector/`; runtime PNGs and the manifest in `assets/runtime/shape_faces/`, a folder shared by all minigames.
 
-Acceptance: each preset, rendered at 1× from the exported parts and the manifest, matches its reference face within one source pixel; the X-eye matches `face_j`; every part stays crisp at 8×; the owner approves a review sheet of all twelve presets at 1× and 8×.
+Acceptance: each preset, rendered at 1× from the exported parts and the manifest, matches its reference face within one source pixel; the X-eye matches `face_dizzy`; every part stays crisp at 8×; the owner approves a review sheet of all twelve presets at 1× and 8×.
 
 ### Bin
 

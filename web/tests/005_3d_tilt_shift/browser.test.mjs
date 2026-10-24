@@ -179,7 +179,7 @@ test("play turns the paddle with the host, shows the host's face and READY uses 
     );
     await page.evaluate(
       (message) => window.receiveHost(message),
-      snapshot({ sequence: 5, face: "face_j" }),
+      snapshot({ sequence: 5, face: "face_dizzy" }),
     );
     await page.waitForFunction(() =>
       performance
@@ -187,17 +187,27 @@ test("play turns the paddle with the host, shows the host's face and READY uses 
         .some((entry) => entry.name.endsWith("/shape_faces/facial_part_eye_x.png")),
     );
     assert.ok(requests.includes("/shape_faces/facial_part_eye_x.png"), "the dizzy eyes load");
+    await page.evaluate(
+      (message) => window.receiveHost(message),
+      snapshot({ sequence: 6, face: "face_rolling_eyes" }),
+    );
+    await page.waitForFunction(() =>
+      performance
+        .getEntriesByType("resource")
+        .some((entry) => entry.name.endsWith("/shape_faces/facial_part_eye_looking_up.png")),
+    );
+    assert.ok(requests.includes("/shape_faces/facial_part_eye_looking_up.png"));
     const capture = new URL("../../build/tilt-shift-3d-phone.png", import.meta.url);
     await page.screenshot({ path: fileURLToPath(capture) });
     await page.evaluate(
       (message) => window.receiveHost(message),
-      snapshot({ sequence: 6, selected: false, paddle_ids: [] }),
+      snapshot({ sequence: 7, selected: false, paddle_ids: [] }),
     );
     assert.equal(await page.locator("#tilt-shift-3d").getAttribute("data-waiting"), "true");
     assert.equal(await page.locator("#tilt3d-paddle").isVisible(), true, "Spectators see it");
     await page.evaluate(
       (message) => window.receiveHost(message),
-      snapshot({ sequence: 7, phase: "finished" }),
+      snapshot({ sequence: 8, phase: "finished" }),
     );
     assert.equal(await page.locator("#tilt-shift-3d").isVisible(), false);
     await page.evaluate(() => window.receiveHost({ type: "lobby" }));

@@ -43,13 +43,13 @@ test("the rings grow from the body by the gap and outline shares of its thicknes
 });
 
 test("faces compose from the manifest and blink only open eyes", () => {
-  const open = faceLayers(manifest, "face_a", false);
+  const open = faceLayers(manifest, "face_slightly_smiling", false);
   assert.equal(open.length, 3);
-  const blink = faceLayers(manifest, "face_a", true);
+  const blink = faceLayers(manifest, "face_slightly_smiling", true);
   assert.equal(blink[0].part, "facial_part_eye_closed_down");
   assert.deepEqual(blink[0].center, open[0].center);
   assert.equal(blink[2].part, open[2].part);
-  assert.equal(faceLayers(manifest, "face_j", true)[0].part, "facial_part_eye_x");
+  assert.equal(faceLayers(manifest, "face_dizzy", true)[0].part, "facial_part_eye_x");
   assert.equal(canClose("facial_part_eye_closed_up"), false);
   assert.deepEqual(faceLayers(manifest, "face_z", false), []);
 });
@@ -77,6 +77,120 @@ test("natural blinks last 0.12 s, 2.4 to 5.6 s apart", () => {
   assert.ok(closed.length > 15);
   for (const run of closed) assert.ok(Math.abs(run - 0.12) <= 0.0051, `blink ${run}`);
   for (const run of open.slice(1)) assert.ok(run >= 2.4 - 0.13 && run <= 5.6 + 0.006, `gap ${run}`);
+});
+
+test("emoji presets compose on the phone and keep shut eyes during blinks", () => {
+  const emojiFaces = Object.entries(manifest.faces).filter(([, face]) => face.emoji_reference);
+  assert.equal(emojiFaces.length, 64);
+  for (const [name, preset] of emojiFaces) {
+    assert.ok(validSnapshot(snapshot({ face: name })), name);
+    assert.ok(validPreparation(preparation({ face: name })), name);
+    assert.equal(faceLayers(manifest, name, false).length, preset.layers.length);
+  }
+  for (const name of [
+    "face_smiling_eyes",
+    "face_disappointed",
+    "face_confounded",
+    "face_dizzy",
+    "face_kissing_smiling_eyes",
+    "face_kissing_closed_eyes",
+    "face_warm_smile",
+    "face_persevering",
+    "face_relieved",
+    "face_pensive",
+    "face_spiral_eyes",
+    "face_beaming",
+    "face_tired",
+    "face_weary",
+    "face_squinting_tongue",
+    "face_savoring_food",
+    "face_joy_tears",
+    "face_grinning_sweat",
+    "face_sunglasses",
+    "face_heart_eyes",
+    "face_star_struck",
+    "face_sleepy",
+    "face_sleeping",
+    "face_downcast_sweat",
+    "face_money_mouth",
+    "face_loudly_crying",
+    "face_halo",
+  ]) {
+    assert.deepEqual(faceLayers(manifest, name, true), faceLayers(manifest, name, false));
+  }
+  const wink = faceLayers(manifest, "face_winking", true);
+  assert.equal(wink[0].part, "facial_part_eye_closed_down");
+  assert.equal(wink[1].part, "facial_part_eye_closed_up");
+  const tired = faceLayers(manifest, "face_exhausted", true);
+  assert.equal(tired[0].part, "facial_part_eye_closed_down");
+  assert.equal(tired[2].part, "facial_part_eyebrow_a");
+  assert.equal(tired[3].part, "facial_part_eyebrow_a");
+  assert.equal(faceLayers(manifest, "face_spiral_eyes", true)[0].part, "facial_part_eye_spiral");
+  assert.equal(faceLayers(manifest, "face_dizzy", true)[0].part, "facial_part_eye_x");
+  const pleading = faceLayers(manifest, "face_pleading", true);
+  assert.equal(pleading[0].part, "facial_part_eye_closed_down");
+  assert.equal(pleading[4].part, "facial_part_mouth_sad");
+  assert.equal(
+    faceLayers(manifest, "face_holding_back_tears", false)[0].part,
+    "facial_part_eye_teary",
+  );
+  assert.equal(
+    faceLayers(manifest, "face_holding_back_tears", true)[0].part,
+    "facial_part_eye_closed_down",
+  );
+  const woozy = faceLayers(manifest, "face_woozy", false);
+  assert.notEqual(woozy[0].part, woozy[1].part);
+  assert.notEqual(woozy[0].center[1], woozy[1].center[1]);
+  for (const name of [
+    "face_tongue",
+    "face_winking_tongue",
+    "face_squinting_tongue",
+    "face_savoring_food",
+    "face_zany",
+  ]) {
+    const open = faceLayers(manifest, name, false);
+    const blinked = faceLayers(manifest, name, true);
+    assert.equal(open[3].part, "facial_part_tongue");
+    assert.deepEqual(blinked[3], open[3]);
+  }
+  const tongueWink = faceLayers(manifest, "face_winking_tongue", true);
+  assert.equal(tongueWink[0].part, "facial_part_eye_closed_down");
+  assert.equal(tongueWink[1].part, "facial_part_eye_closed_up");
+  const zany = faceLayers(manifest, "face_zany", false);
+  assert.notDeepEqual(zany[0].size, zany[1].size);
+  assert.equal(faceLayers(manifest, "face_money_mouth", false)[1].mirror, false);
+  const decorations = {
+    face_joy_tears: ["facial_part_tear_drop", 2],
+    face_grinning_sweat: ["facial_part_tear_drop", 1],
+    face_sunglasses: ["facial_part_sunglasses", 1],
+    face_smiling_tear: ["facial_part_tear_drop", 1],
+    face_sad_relieved: ["facial_part_tear_drop", 1],
+    face_sleepy: ["facial_part_sleep_bubble", 1],
+    face_sleeping: ["facial_part_sleep_z", 1],
+    face_drooling: ["facial_part_tear_drop", 1],
+    face_downcast_sweat: ["facial_part_tear_drop", 1],
+    face_money_mouth: ["facial_part_tongue", 1],
+    face_crying: ["facial_part_tear_drop", 1],
+    face_loudly_crying: ["facial_part_tear_stream", 2],
+    face_halo: ["facial_part_halo", 1],
+  };
+  for (const [name, [part, count]] of Object.entries(decorations)) {
+    const before = faceLayers(manifest, name, false).filter((layer) => layer.part === part);
+    const after = faceLayers(manifest, name, true).filter((layer) => layer.part === part);
+    assert.equal(before.length, count, name);
+    assert.deepEqual(after, before, name);
+  }
+  for (const name of ["face_smirking", "face_unamused"]) {
+    assert.equal(faceLayers(manifest, name, false)[1].mirror, false);
+  }
+  for (const invalid of [
+    "face_bad/name",
+    "face_../neutral",
+    "face_",
+    "face_slightly_smiling".repeat(20),
+  ]) {
+    assert.equal(validSnapshot(snapshot({ face: invalid })), false, invalid);
+  }
 });
 
 test("snapshots and preparations are validated before use", () => {

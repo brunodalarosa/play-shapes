@@ -1,7 +1,7 @@
 class_name Cubio3D
 extends Node3D
-## Real-time 3D Cubio: the exported rig and clips with a player tint, natural blinking,
-## held stances and turning toward travel. Presentation only; no input or game state.
+## Real-time 3D Cubio: the exported rig and clips with a player tint, a shape face that blinks
+## on its own, held stances and turning toward travel. Presentation only; no input or game state.
 
 const LOOPING_CLIPS: Array[String] = ["idle", "walk", "run", "lever_pull"]
 const HELD_CLIPS: Array[String] = ["look_up", "crouch"]
@@ -19,18 +19,15 @@ const CLIP_TRAVEL := { "walk": 1.65, "run": 3.6 }
 ## Source standing height in metres, from the sole to the top of the body.
 const SOURCE_HEIGHT := 2.62
 const TINTED_MESHES: Array[String] = ["Body", "HandL", "HandR", "FootL", "FootR"]
-const FACE_NEUTRAL: Texture2D = preload(
-	"res://assets/runtime/animated_characters/cubio/model/face-neutral.png"
-)
-const FACE_BLINK: Texture2D = preload(
-	"res://assets/runtime/animated_characters/cubio/model/face-blink.png"
-)
 const TINT_SHADER: Shader = preload("res://characters/cubio_tint.gdshader")
-const FACE_SHADER: Shader = preload("res://characters/cubio_face.gdshader")
+const FACE_ANCHOR_PATH := "res://assets/runtime/animated_characters/cubio/face_anchor.json"
+## The face a Cubio shows when nothing else is asked of it.
+const DEFAULT_FACE := "face_slightly_smiling"
 
 static var _tints: Dictionary = { }
-static var _faces: Dictionary = { }
 static var _prepared_libraries: Dictionary = { }
+static var _face_anchor: ShapeFaceAnchor
+static var _face_manifest: ShapeFaceManifest
 
 ## Standing height in world units; the model is scaled to fit.
 @export var standing_height: float = 1.0
@@ -50,16 +47,20 @@ static var _prepared_libraries: Dictionary = { }
 var player_color := Color("#1e88e5"):
 	set = set_player_color
 var action: String = ""
+## The drawn face, on the model's face anchor.
+var face: ShapeFace3D
+## Which face [member face] shows, and its natural blinks.
+var expressions := ShapeFaceExpressions.new()
+## When true, clips and their speed are left to whoever drives [method animation_player], as a
+## lab does; [method play] and [method set_travel] still record what they are asked.
+var manual_playback := false
 var _player: AnimationPlayer
 var _model: Node3D
-var _face: MeshInstance3D
 var _tinted: Array[MeshInstance3D] = []
 var _held: String = ""
 var _held_time: float = 0.0
 var _held_direction: float = 1.0
 var _after_release: String = ""
-var _blink_wait: float = 0.0
-var _blink_left: float = 0.0
 var _yaw_target: float = 0.0
 var _rate: float = 1.0
 
@@ -72,14 +73,12 @@ func _ready() -> void:
 	_player = _model.find_children("*", "AnimationPlayer", true, false)[0] as AnimationPlayer
 	_prepare_library(_player)
 	for mesh: MeshInstance3D in _model.find_children("*", "MeshInstance3D", true, false):
-		if mesh.name == "Face":
-			_face = mesh
-		elif String(mesh.name) in TINTED_MESHES:
+		if String(mesh.name) in TINTED_MESHES:
 			_tinted.append(mesh)
-	assert(_face != null and _tinted.size() == TINTED_MESHES.size(), "Cubio model is incomplete")
+	var anchor := _model.find_child("FaceAnchor", true, false) as Node3D
+	assert(anchor != null and _tinted.size() == TINTED_MESHES.size(), "Cubio model is incomplete")
 	set_player_color(player_color)
-	_face.material_override = _face_material(false)
-	_blink_wait = randf_range(blink_interval.x, blink_interval.y)
+	_add_face(anchor)
 	play("idle")
 
 
@@ -98,6 +97,16 @@ func set_player_name(value: String) -> void:
 	nameplate.font_size = maxi(36, 48 - 2 * maxi(0, value.length() - 11))
 
 
+## Places the face on its anchor; see [ShapeFaceAnchor].
+func set_face_placement(placement: ShapeFaceAnchor) -> void:
+	face.position = Vector3(placement.offset.x, placement.offset.y, 0.0)
+	face.height = placement.height
+
+
+func animation_player() -> AnimationPlayer:
+	return _player
+
+
 ## Plays a looping clip, or enters a held stance and keeps its last frame. Requesting
 ## anything else while a stance is held first releases it by reversing from its progress.
 func play(next: String) -> void:
@@ -113,6 +122,8 @@ func play(next: String) -> void:
 	if next == action:
 		return
 	action = next
+	if manual_playback:
+		return
 	if next in HELD_CLIPS:
 		_held = next
 		_held_time = 0.0
@@ -141,18 +152,54 @@ func facing_yaw() -> float:
 
 
 func is_blinking() -> bool:
-	return _blink_left > 0.0
+	return face.blinking
+
+
+## The face placement every Cubio starts with, read once from its anchor file.
+static func face_anchor() -> ShapeFaceAnchor:
+	if _face_anchor == null:
+		_face_anchor = ShapeFaceAnchor.load_file(FACE_ANCHOR_PATH)
+		assert(_face_anchor != null, "Cubio's face anchor file is missing or malformed")
+	return _face_anchor
+
+
+## Makes [param placement] the face placement every Cubio starts with, and writes it to
+## [param path]. Returns false when the file cannot be written.
+static func store_face_anchor(placement: ShapeFaceAnchor, path := FACE_ANCHOR_PATH) -> bool:
+	if not placement.save_file(path):
+		return false
+	_face_anchor = ShapeFaceAnchor.load_file(path)
+	return _face_anchor != null
 
 
 func _process(delta: float) -> void:
-	_advance_held(delta)
-	_player.speed_scale = _rate if _held == "" else 1.0
 	_model.rotation.y = rotate_toward(
 		_model.rotation.y,
 		_yaw_target,
 		deg_to_rad(turn_speed_degrees) * delta,
 	)
-	_advance_blink(delta)
+	if manual_playback:
+		return
+	_advance_held(delta)
+	_player.speed_scale = _rate if _held == "" else 1.0
+
+
+func _add_face(anchor: Node3D) -> void:
+	if _face_manifest == null:
+		_face_manifest = ShapeFaceManifest.load_default()
+	expressions.base_face = DEFAULT_FACE
+	expressions.blink_interval = blink_interval
+	expressions.blink_seconds = blink_duration
+	face = ShapeFace3D.new()
+	face.name = "ShapeFace"
+	face.manifest = _face_manifest
+	face.face_name = DEFAULT_FACE
+	face.expressions = expressions
+	# The body's push of 2.0 plus a margin: the body's front is two large triangles, and close to
+	# the camera their interpolated depth can reach past a face lying just on top of them.
+	face.front_push = 2.1
+	set_face_placement(face_anchor())
+	anchor.add_child(face)
 
 
 func _advance_held(delta: float) -> void:
@@ -167,19 +214,6 @@ func _advance_held(delta: float) -> void:
 		action = ""
 		_after_release = ""
 		play(next if next != "" else "idle")
-
-
-func _advance_blink(delta: float) -> void:
-	if _blink_left > 0.0:
-		_blink_left -= delta
-		if _blink_left <= 0.0:
-			_face.material_override = _face_material(false)
-			_blink_wait = randf_range(blink_interval.x, blink_interval.y)
-		return
-	_blink_wait -= delta
-	if _blink_wait <= 0.0:
-		_blink_left = blink_duration
-		_face.material_override = _face_material(true)
 
 
 ## Imported clips end on their last exported key. Loops need one more frame of length so
@@ -211,12 +245,3 @@ static func _tint_material(color: Color) -> ShaderMaterial:
 		material.set_shader_parameter("player_color", color)
 		_tints[key] = material
 	return _tints[key]
-
-
-static func _face_material(blink: bool) -> ShaderMaterial:
-	if not _faces.has(blink):
-		var material := ShaderMaterial.new()
-		material.shader = FACE_SHADER
-		material.set_shader_parameter("face", FACE_BLINK if blink else FACE_NEUTRAL)
-		_faces[blink] = material
-	return _faces[blink]

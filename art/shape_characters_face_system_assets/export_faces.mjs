@@ -3,13 +3,13 @@
 // Usage: node art/shape_characters_face_system_assets/export_faces.mjs [--check] [--review]
 //
 // Renders every SVG master in vector/ with Playwright's Chromium into assets/runtime/shape_faces/,
-// then, in the same browser, draws each preset of face_presets.json at 1x from those PNGs, as a
-// game would, and compares it with its reference face. --check verifies without rewriting the
-// PNGs. --review also writes the owner's review sheets into ignored scratch/review/: every
-// preset at 1x beside its reference, enlarged four times, and every preset at 8x. Writes
+// then draws the presets and compares the originals with their supplied references. Emoji
+// presets have structural checks; recognizability needs the Godot 3D captures. --check leaves
+// PNGs unchanged. --review writes legacy sheets into ignored scratch/review/: original presets
+// beside their references at 1x enlarged four times, and at 8x. Writes
 // vector/verification.json and exits non-zero when any check fails.
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,8 +25,31 @@ const RUNTIME = join(root, "assets", "runtime", "shape_faces");
 const MANIFEST = join(RUNTIME, "face_presets.json");
 const SCALE = 8;
 const NAVY = [0x3d, 0x46, 0x5d];
-// The X-eye is cut from face_j's left eye: a 40 x 40 box like the open eye's.
-const EYE_X_CUT = { face: "face_j", x: 0, y: 19, size: 40 };
+const WHITE = [255, 255, 255];
+const TONGUE_PINK = [0xf4, 0x7d, 0xa8];
+// Every part is navy and white except the tongue.
+const PART_PALETTES = {
+  facial_part_tongue: [TONGUE_PINK],
+};
+// The owner's twelve faces, named for their emoji counterparts; each has a reference image.
+// Every face shares one frame at the originals' pixel scale, so each reference image sits at
+// its own place in it: these are its centre's offsets below the frame's centre, in pixels.
+const ORIGINALS = {
+  face_slightly_smiling: 0,
+  face_unamused: -5,
+  face_content: -3.06,
+  face_suspicious: -6.735,
+  face_scheming: -9.4,
+  face_mischievous: -2.5,
+  face_furious: -0.5,
+  face_smirking: -17.795,
+  face_worried: -12.55,
+  face_dizzy: -9,
+  face_disappointed: -17.5,
+  face_smiling_eyes: -10.105,
+};
+// The X-eye is cut from face_dizzy's left eye: a 40 x 40 box like the open eye's.
+const EYE_X_CUT = { face: "face_dizzy", x: 0, y: 19, size: 40 };
 
 const checkOnly = process.argv.includes("--check");
 const review = process.argv.includes("--review");
@@ -90,17 +113,20 @@ function largestDifference(a, b) {
   return Math.round(largest * 1000) / 1000;
 }
 
-// Every partly covered pixel and every navy-white blend at 8x lies on a sharp edge: it touches a
-// pixel that is clear, or fully navy, or fully white. A blurred edge would be a wider band.
-function soft(png) {
+// At 8x, every partially covered or blended pixel touches clear space or a solid palette
+// colour. A blurred edge would be a wider band. Coloured accents have their own palettes.
+function soft(png, palette) {
   const { width, height, data } = png;
   const at = (x, y) => {
     const i = (y * width + x) * 4;
     const alpha = data[i + 3] / 255;
-    const t = Math.min(1, Math.max(0, (data[i] - NAVY[0]) / (255 - NAVY[0])));
-    return { alpha, t };
+    return { alpha, rgb: [data[i], data[i + 1], data[i + 2]] };
   };
-  const solid = ({ alpha, t }) => alpha <= 0.05 || (alpha >= 0.95 && (t <= 0.05 || t >= 0.95));
+  const solid = ({ alpha, rgb }) => alpha <= 0.05 || (
+    alpha >= 0.95 && palette.some((colour) =>
+      colour.every((channel, index) => Math.abs(channel - rgb[index]) <= 255 * 0.05),
+    )
+  );
   let count = 0;
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -156,20 +182,26 @@ try {
     }
     const png = readPng(target);
     if (png.width !== w * SCALE || png.height !== h * SCALE) fail(`${name}.png is not 8x`);
-    const softPixels = soft(png);
+    const palette = PART_PALETTES[name] ?? [NAVY, WHITE];
+    const softPixels = soft(png, palette);
     if (softPixels > 0) fail(`${name}.png has ${softPixels} pixels off a sharp edge`);
-    report.parts[name] = { size: [w, h], soft_pixels: softPixels, sha256: sha256(target) };
+    report.parts[name] = {
+      size: [w, h], soft_pixels: softPixels, sha256: sha256(target),
+      master_sha256: sha256(join(VECTOR, file)),
+    };
   }
 
-  // Draws a list of layers, in face-height units, from the 8x PNGs at the given 1x size.
-  const draw = async (layers, width, height) => {
+  // Draws a list of layers, in face-height units, from the 8x PNGs onto a canvas of the given
+  // size, one face height being `scale` pixels, with the frame's centre `offset` pixels below
+  // the canvas's centre.
+  const draw = async (layers, width, height, scale = height, offset = 0) => {
     const images = {};
     for (const layer of layers) {
       const png = readFileSync(join(RUNTIME, `${layer.part}.png`));
       images[layer.part] = `data:image/png;base64,${png.toString("base64")}`;
     }
     return page.evaluate(
-      async ({ layers, images, width, height }) => {
+      async ({ layers, images, width, height, scale, offset }) => {
         const loaded = {};
         for (const [name, src] of Object.entries(images)) {
           const image = new Image();
@@ -185,17 +217,20 @@ try {
         context.imageSmoothingQuality = "high";
         for (const layer of layers) {
           context.save();
-          context.translate(width / 2 + layer.center[0] * height, height / 2 + layer.center[1] * height);
+          context.translate(
+            width / 2 + layer.center[0] * scale,
+            height / 2 + layer.center[1] * scale - offset,
+          );
           context.rotate((layer.rotation_degrees * Math.PI) / 180);
           context.scale(layer.mirror ? -1 : 1, 1);
-          const w = layer.size[0] * height;
-          const h = layer.size[1] * height;
+          const w = layer.size[0] * scale;
+          const h = layer.size[1] * scale;
           context.drawImage(loaded[layer.part], -w / 2, -h / 2, w, h);
           context.restore();
         }
         return Array.from(context.getImageData(0, 0, width, height).data);
       },
-      { layers, images, width, height },
+      { layers, images, width, height, scale, offset },
     );
   };
 
@@ -221,6 +256,8 @@ try {
   // Each part alone at 1x against its source PNG.
   for (const name of Object.keys(sizes)) {
     if (name === "facial_part_eye_x") continue;
+    // New SVG parts have no supplied raster reference. Sharpness and hashes still apply.
+    if (!existsSync(join(here, `${name}.png`))) continue;
     const source = readPng(join(here, `${name}.png`));
     const { width, height } = source;
     const drawn = await draw([onSource(name, width, height)], width, height);
@@ -229,18 +266,32 @@ try {
     if (far.length > 0) fail(`${name} differs from its source at ${JSON.stringify(far)}`);
   }
 
-  const expected = Array.from({ length: 12 }, (_, i) => `face_${"abcdefghijkl"[i]}`);
-  if (Object.keys(manifest.faces).sort().join() !== expected.join()) {
-    fail("the manifest must hold face_a to face_l");
+  const expected = Object.keys(ORIGINALS);
+  if (expected.some((name) => !manifest.faces[name])) {
+    fail("the manifest must keep the twelve original faces");
   }
   for (const [name, face] of Object.entries(manifest.faces)) {
-    const source = readPng(join(here, `${name}.png`));
     const [w, h] = face.source_size;
-    if (source.width !== w || source.height !== h) fail(`${name} source size differs`);
     if (Math.abs(face.box_aspect - w / h) > 1e-4) fail(`${name} aspect is not ${w}/${h}`);
+    if (!/^face_[a-z]+(?:_[a-z]+)*$/.test(name) || name.length > 64) fail(`${name} is not a face ID`);
+    if (!face.layers.length || face.layers.some((layer) =>
+      !manifest.parts[layer.part] ||
+      [...layer.center, ...layer.size, layer.rotation_degrees].some((value) => !Number.isFinite(value)) ||
+      layer.size.some((value) => value <= 0)
+    )) fail(`${name} has invalid layers`);
     const drawn = await draw(face.layers, w, h);
-    const a = planes(drawn, w, h);
-    const b = planes(source.data, w, h);
+    const reference = join(here, `${name}.png`);
+    if (!face.emoji_reference) fail(`${name} has no emoji reference`);
+    if (!expected.includes(name)) {
+      if (!drawn.some((value, index) => index % 4 === 3 && value > 0)) fail(`${name} is empty`);
+      report.faces[name] = { emoji_reference: face.emoji_reference, reference_comparison: false };
+      continue;
+    }
+    const source = readPng(reference);
+    const { width: rw, height: rh } = source;
+    const placed = await draw(face.layers, rw, rh, h, ORIGINALS[name]);
+    const a = planes(placed, rw, rh);
+    const b = planes(source.data, rw, rh);
     const far = farPixels(a, b);
     report.faces[name] = {
       far_pixels: far.length,
@@ -249,7 +300,7 @@ try {
     if (far.length > 0) fail(`${name} differs by more than one pixel at ${JSON.stringify(far)}`);
   }
 
-  // The X-eye at 1x against both of face_j's eyes; the right eye is the same part mirrored.
+  // The X-eye at 1x against both of face_dizzy's eyes; the right eye is the same part mirrored.
   const faceJ = readPng(join(here, `${EYE_X_CUT.face}.png`));
   const { x, y, size } = EYE_X_CUT;
   const eyeX = onSource("facial_part_eye_x", size, size);
@@ -259,10 +310,11 @@ try {
     return farPixels(drawnX, cut).length;
   });
   report.eye_x = { cut: EYE_X_CUT, far_pixels_left: cuts[0], far_pixels_right: cuts[1] };
-  if (cuts.some((n) => n > 0)) fail(`the X-eye differs from face_j: ${cuts}`);
+  if (cuts.some((n) => n > 0)) fail(`the X-eye differs from face_dizzy: ${cuts}`);
 
   if (review) {
-    const faces = Object.entries(manifest.faces);
+    // This legacy comparison sheet is only for the supplied raster references.
+    const faces = Object.entries(manifest.faces).filter(([name]) => expected.includes(name));
     const ZOOM = 4;
     const GAP = 24;
     const cellW = 2 * 118 * ZOOM + 3 * GAP;
@@ -272,14 +324,15 @@ try {
     fill(pairs);
     fill(large);
     for (const [index, [name, face]] of faces.entries()) {
-      const [w, h] = face.source_size;
+      const frame = face.source_size[1];
       const source = readPng(join(here, `${name}.png`));
-      const drawn = await draw(face.layers, w, h);
+      const { width: w, height: h } = source;
+      const drawn = await draw(face.layers, w, h, frame, ORIGINALS[name]);
       const x = (index % 2) * cellW + GAP;
       const y = Math.floor(index / 2) * cellH + GAP;
       paste(pairs, source.data, w, h, x, y, ZOOM);
       paste(pairs, drawn, w, h, x + w * ZOOM + GAP, y, ZOOM);
-      const eight = await draw(face.layers, w * SCALE, h * SCALE);
+      const eight = await draw(face.layers, w * SCALE, h * SCALE, frame * SCALE, ORIGINALS[name] * SCALE);
       const lx = (index % 4) * (118 * SCALE + GAP) + GAP;
       const ly = Math.floor(index / 4) * (84 * SCALE + GAP) + GAP;
       paste(large, eight, w * SCALE, h * SCALE, lx, ly, 1);

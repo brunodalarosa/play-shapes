@@ -6,7 +6,7 @@ extends RefCounted
 ## so callers and tests choose the clock. It never touches physics.
 
 ## The face shown when no expression is active.
-var base_face := "face_a"
+var base_face := "face_slightly_smiling"
 ## Seconds between blinks, drawn at random within this range.
 var blink_interval := Vector2(2.4, 5.6)
 ## How long a blink keeps the eyes closed.

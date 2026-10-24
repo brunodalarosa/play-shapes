@@ -41,7 +41,9 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
   `Animation.Controls` with five controls, actions Idle, Walk, Run, Look Up, Crouch and
   Lever Pull at 24 fps. See [the Cubio README](art/cubio/README.md).
 - Runtime: `assets/runtime/animated_characters/cubio/model/cubio.glb`, played by
-  `characters/cubio_3d.tscn` (`Cubio3D`), tinted body, hands and feet, untinted face.
+  `characters/cubio_3d.tscn` (`Cubio3D`), tinted body, hands and feet. Its face is a
+  `ShapeFace3D` on the model's `FaceAnchor`, placed by `cubio/face_anchor.json`, on host and
+  phone alike ([0043](docs/decisions/0043-cubio-shape-face.md)).
 - No jump or fall clip exists. In the air the lobby keeps whichever clip the motor reports.
 
 ### The plaza
@@ -73,8 +75,8 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
   TypeScript change; the check fails if `web/public/` is stale.
 - `Tuning/Active Presets.tres` selects named tuning Resources. No runtime tuning UI exists, and
   only the owner promotes subjective feel into `Default`.
-- `debug/`: F12 launcher with the motion lab, a Tilt Shift factory review and one-player
-  Bubbles.
+- `debug/`: F12 launcher with the Shape Characters lab, the motion lab, a Tilt Shift factory
+  review and one-player Bubbles.
 
 ### The lobby
 
@@ -133,7 +135,7 @@ Condensed from AGENTS.md and the documents it links.
   needs a person goes into `docs/pending-reviews.md`.
 - Documents state what is true now, one topic each, with links that resolve and paragraphs
   under 600 characters; `node tools/docs.mjs` checks them. Reasons go in `docs/decisions/` as
-  numbered records, never edited to change a decision; the next free number is 0043. The
+  numbered records, never edited to change a decision; the next free number is 0047. The
   roadmap changes when work finishes or is added.
 - No ticket numbers anywhere: files, comments, tests or output folders.
 - Typed GDScript, composition, signals, Control/Container UI and no fixed viewport sizes.

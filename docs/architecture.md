@@ -173,9 +173,12 @@ These live outside any minigame folder so later 3D scenes can use them.
   preserving selected colors. `web/src/character_selection.ts` offers colors and sends
   `cubio`.
 - `characters/cubio_3d.tscn` is the real-time Cubio used by the Playground lobby: the
-  exported rig and clips, the player tint, natural blinking, held stances, turning toward
+  exported rig and clips, the player tint, a shape face, held stances, turning toward
   travel and a nameplate.
-  - Its shaders, `cubio_tint` and `cubio_face`, draw the character in front of any
+  - The face is a `ShapeFace3D` on the model's `FaceAnchor`, placed by
+    `assets/runtime/animated_characters/cubio/face_anchor.json` and driven by a
+    `ShapeFaceExpressions` that shows `face_slightly_smiling` and blinks.
+  - Its tint shader and the face's parts draw the character in front of any
     scenery within `front_push` (2 units) of it. Each vertex moves toward the camera along
     its view ray, so its place on screen and the character's own layering are unchanged.
     Shadow passes are left alone. Nothing in the plaza may stand in front of a character
@@ -208,6 +211,11 @@ These live outside any minigame folder so later 3D scenes can use them.
   remains present in development exports.
 - **Tilt Shift 3D factory · simulated controls** opens `debug/tilt_shift_3d_review.tscn`: ten
   synthetic players tilt through a whole shift, with no phones and no launch eligibility.
+- **Shape Characters lab** opens `debug/shape_characters_lab/shape_characters_lab.tscn`. Three
+  quarters of the width show a Cubio turned by mouse drag; a tabbed panel picks the model and
+  join colour, plays each clip once with pause, restart, stop and speed, and picks any face.
+- The lab's Face tab toggles blinking and moves and scales the face. Save writes the placement
+  to Cubio's `face_anchor.json`, the game's default, which an export cannot write.
 - The motion lab is described in [motion-input.md](motion-input.md).
 
 ## Phone client
@@ -239,7 +247,8 @@ These live outside any minigame folder so later 3D scenes can use them.
   `assets/runtime/minigames/bubbles_3d/`. Their sources and provenance are in
   [art/bubbles_3d](../art/bubbles_3d/README.md).
 - The face parts shared by every minigame, 8× PNGs and the preset manifest that composes them
-  into the owner's twelve faces, live in `assets/runtime/shape_faces/`. Their vector masters
+  into the twelve original faces and fifty-two faces drawn in their style, live in
+  `assets/runtime/shape_faces/`. Their vector masters
   and provenance are in
   [art/shape_characters_face_system_assets](../art/shape_characters_face_system_assets/README.md).
 - The bin, factory props, trash emblem and booklet preview of minigame 005, Tilt Shift 3D,

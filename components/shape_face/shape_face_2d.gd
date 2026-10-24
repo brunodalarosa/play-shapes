@@ -3,7 +3,7 @@ extends Control
 ## The same composed face as [ShapeFace3D], drawn in a Control for UI such as a player chip.
 ## The face fits the Control's rectangle, centred, keeping the preset's aspect.
 
-@export var face_name := "face_a":
+@export var face_name := "face_slightly_smiling":
 	set(value):
 		face_name = value
 		queue_redraw()

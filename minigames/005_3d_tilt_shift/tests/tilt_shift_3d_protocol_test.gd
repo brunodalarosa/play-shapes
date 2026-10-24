@@ -46,7 +46,7 @@ func _run() -> void:
 		"It carries the shared screen's proportions",
 	)
 	check((look.outline_colors as Array).size() == 3, "It carries both teams' outlines")
-	check(wire.face == "face_a", "A player with no expression shows the play face")
+	check(wire.face == "face_slightly_smiling", "A player with no expression shows the play face")
 	check(JSON.stringify(wire).length() < 900, "A snapshot stays small")
 
 	var sent: Array[Dictionary] = []
@@ -54,10 +54,10 @@ func _run() -> void:
 		func(_id: String, message: Dictionary, _coalesce: bool) -> void:
 			sent.append(message),
 	)
-	check(protocol.apply_face(selected.player_id, "face_j"), "A new face is recorded")
-	check(not protocol.apply_face(selected.player_id, "face_j"), "The same face is not news")
+	check(protocol.apply_face(selected.player_id, "face_dizzy"), "A new face is recorded")
+	check(not protocol.apply_face(selected.player_id, "face_dizzy"), "The same face is not news")
 	protocol.publish(selected.player_id)
-	check(sent.size() == 1 and sent[0].face == "face_j", "The face goes to the phone")
+	check(sent.size() == 1 and sent[0].face == "face_dizzy", "The face goes to the phone")
 	check(protocol.apply_angle(selected.player_id, 0.4), "A physical angle is recorded")
 	check(
 		is_equal_approx(protocol.snapshot_for(selected.player_id).angle_radians, 0.4),
@@ -66,7 +66,10 @@ func _run() -> void:
 
 	var waiting := protocol.snapshot_for(spectator.player_id)
 	check(waiting.selected == false and waiting.angle_radians == 0.0, "Spectators rest level")
-	check(waiting.face == "face_a", "Spectators show the play face, blinking on the phone")
+	check(
+		waiting.face == "face_slightly_smiling",
+		"Spectators show the play face, blinking on the phone",
+	)
 
 	var calls: Array[String] = []
 	protocol.ready_action = _record.bind(calls)

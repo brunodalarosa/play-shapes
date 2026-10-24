@@ -64,8 +64,11 @@ for name in LIMBS:
     check(name + ' original dimensions', max(abs(a-b) for a, b in
           zip(obj.dimensions, expected)) < 2e-6, list(obj.dimensions))
     check(name + ' applied scale', max(abs(v-1) for v in obj.scale) < 1e-6)
-check('face follows the body at its front surface',
-      abs(bpy.data.objects['Face.Plane - neutral artwork'].location.y + 1.015) < 1e-6)
+anchor = bpy.data.objects['Face.Anchor']
+check('face anchor follows the body just in front of its centre',
+      anchor.parent.name == 'Body.Pivot'
+      and (anchor.location - Vector((0.0, -1.015, 0.0))).length < 1e-6
+      and Vector(anchor.rotation_euler).length < 1e-6)
 
 names = ['Body.Cubio'] + LIMBS
 polygons = {name: [list(p.vertices) for p in bpy.data.objects[name].data.polygons]
@@ -131,9 +134,6 @@ for clip, spec in CLIPS.items():
 
 check('all six editable actions exist', all(action_name(clip) in bpy.data.actions for clip in CLIPS))
 check('five independent controls', len(rig.pose.bones) == 5)
-check('neutral and blink artwork is packed and matches editable textures', all(
-    bpy.data.images['Cubio Face - ' + name].packed_file.data ==
-    (HERE / 'textures' / f'{name}.png').read_bytes() for name in ('neutral', 'blink')))
 check('ground anchor is fixed at the origin',
       bpy.data.objects['Character.Root - ground anchor'].location.length < 1e-8)
 report['source_sha256'] = hashlib.sha256((HERE / report['source']).read_bytes()).hexdigest()

@@ -3,7 +3,7 @@ extends Node
 ## A bounded, nonblocking HTTP service for a fixed set of bundled assets.
 ## Each connection serves one request, then closes; no filesystem paths come from clients.
 
-const CUBIO_MODEL := "res://assets/runtime/animated_characters/cubio/model"
+const CUBIO := "res://assets/runtime/animated_characters/cubio"
 const SHAPE_FACES := "res://assets/runtime/shape_faces"
 const ASSETS: Dictionary = {
 	"/manifest.webmanifest": {
@@ -48,15 +48,9 @@ const ASSETS: Dictionary = {
 		"path": "res://web/public/models/jellyfish.glb",
 		"content_type": "model/gltf-binary",
 	},
-	"/models/cubio-face-neutral.png": {
-		"path": CUBIO_MODEL + "/face-neutral.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
-	},
-	"/models/cubio-face-blink.png": {
-		"path": CUBIO_MODEL + "/face-blink.png",
-		"content_type": "image/png",
-		"resource_type": "Texture2D",
+	"/models/cubio-face-anchor.json": {
+		"path": CUBIO + "/face_anchor.json",
+		"content_type": "application/json",
 	},
 	"/shape_faces/face_presets.json": {
 		"path": SHAPE_FACES + "/face_presets.json",
@@ -134,6 +128,151 @@ const ASSETS: Dictionary = {
 	},
 	"/shape_faces/facial_part_mouth_smirk.png": {
 		"path": SHAPE_FACES + "/facial_part_mouth_smirk.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_looking_up.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_looking_up.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_squeezed.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_squeezed.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_grin.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_grin.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_neutral.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_neutral.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_open.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_open.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_open_frown.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_open_frown.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_deep_frown.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_deep_frown.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_scrunched.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_scrunched.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_kiss.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_kiss.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_wide.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_wide.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_spiral.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_spiral.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_pleading.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_pleading.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_woozy.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_woozy.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_beaming.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_beaming.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_wail.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_wail.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_astonished.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_astonished.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_grimace.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_grimace.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_mouth_tongue_open.png": {
+		"path": SHAPE_FACES + "/facial_part_mouth_tongue_open.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_tongue.png": {
+		"path": SHAPE_FACES + "/facial_part_tongue.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_tear_drop.png": {
+		"path": SHAPE_FACES + "/facial_part_tear_drop.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_sunglasses.png": {
+		"path": SHAPE_FACES + "/facial_part_sunglasses.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_heart.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_heart.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_star.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_star.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_sleep_bubble.png": {
+		"path": SHAPE_FACES + "/facial_part_sleep_bubble.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_sleep_z.png": {
+		"path": SHAPE_FACES + "/facial_part_sleep_z.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_money.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_money.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_tear_stream.png": {
+		"path": SHAPE_FACES + "/facial_part_tear_stream.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_eye_teary.png": {
+		"path": SHAPE_FACES + "/facial_part_eye_teary.png",
+		"content_type": "image/png",
+		"resource_type": "Texture2D",
+	},
+	"/shape_faces/facial_part_halo.png": {
+		"path": SHAPE_FACES + "/facial_part_halo.png",
 		"content_type": "image/png",
 		"resource_type": "Texture2D",
 	},

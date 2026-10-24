@@ -12,6 +12,11 @@ static func scenarios(minigames: MinigameCatalog) -> Array[DebugScenario]:
 			"res://debug/tilt_shift_3d_review.tscn",
 		),
 		DebugScenario.new(
+			&"shape_characters_lab",
+			"Shape Characters lab",
+			"res://debug/shape_characters_lab/shape_characters_lab.tscn",
+		),
+		DebugScenario.new(
 			&"motion_lab",
 			"Gyroscope and Accelerometer Lab",
 			"res://debug/motion_lab/motion_lab.tscn",

@@ -78,8 +78,8 @@ The host serves a fixed list and nothing else:
 - Generated settings: `/platform_input_settings.json`.
 - App manifest and icons: `/manifest.webmanifest`, `/app-icon-180.png`, `/app-icon-192.png`,
   `/app-icon-512.png`.
-- 3D models for the phone: `/models/cubio.glb`, `/models/jellyfish.glb`,
-  `/models/cubio-face-neutral.png` and `/models/cubio-face-blink.png`.
+- 3D models for the phone: `/models/cubio.glb` and `/models/jellyfish.glb`, and where
+  Cubio's shape face sits on its model, `/models/cubio-face-anchor.json`.
 - Shape character faces: `/shape_faces/face_presets.json` and one
   `/shape_faces/facial_part_<name>.png` per part the manifest lists, from the shared runtime
   folder.
@@ -160,6 +160,8 @@ for spectators, whose phones show their paddle resting under the waiting backgro
 
 - `color`: the player's Cubio colour as six hex digits.
 - `face`: the face preset the phone shows, the strongest across the player's paddles.
+  IDs start with `face_` followed by lowercase words separated by underscores, at most 64
+  characters in total. Original single-letter IDs remain valid.
 - `look`: the corner, depth, gap, outline and face ratios, the gap colour, the orange, blue
   and neutral outline colours and the wall's two colours.
 - `angle_radians`: the physical angle of the player's first paddle, which trails the accepted

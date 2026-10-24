@@ -20,7 +20,6 @@ scene.render.image_settings.file_format = 'PNG'
 scene.render.image_settings.color_mode = 'RGBA'
 scene.render.film_transparent = True
 bpy.data.objects['Ground.ShadowCatcher - optional'].hide_render = True
-bpy.data.objects['Face.Plane - neutral artwork'].hide_render = False
 output = HERE / 'previews'
 output.mkdir(exist_ok=True)
 

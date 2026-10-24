@@ -74,7 +74,8 @@ test("serves bundled HTML, JS, CSS and session configuration", async () => {
     ["/manifest.webmanifest", "application/manifest+json", "standalone"],
     ...[180, 192, 512].map((size) => [`/app-icon-${size}.png`, "image/png", null]),
     ["/platform_input_settings.json", "application/json", "x-right-y-up"],
-    ["/shape_faces/face_presets.json", "application/json", "face_a"],
+    ["/models/cubio-face-anchor.json", "application/json", "height"],
+    ["/shape_faces/face_presets.json", "application/json", "face_slightly_smiling"],
     ["/shape_faces/facial_part_eye_open.png", "image/png", null],
     ["/shape_faces/facial_part_eye_x.png", "image/png", null],
     ["/style.css", "text/css", "focus-visible"],
@@ -90,6 +91,18 @@ test("serves bundled HTML, JS, CSS and session configuration", async () => {
     } catch (error) {
       throw new Error(`Failed to serve ${path}`, { cause: error });
     }
+  }
+});
+
+test("every manifest face part is served by the real host at its export size", async () => {
+  const manifest = await (await fetch(base + "/shape_faces/face_presets.json")).json();
+  for (const [name, part] of Object.entries(manifest.parts)) {
+    const response = await fetch(base + "/shape_faces/" + part.file);
+    assert.equal(response.status, 200, name);
+    assert.ok(response.headers.get("content-type").startsWith("image/png"), name);
+    const png = PNG.sync.read(Buffer.from(await response.arrayBuffer()));
+    assert.equal(png.width, part.size[0] * manifest.export_scale, name);
+    assert.equal(png.height, part.size[1] * manifest.export_scale, name);
   }
 });
 

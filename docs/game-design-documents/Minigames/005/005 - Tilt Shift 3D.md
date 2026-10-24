@@ -59,7 +59,7 @@ Balls enter wholly above the visible top. Invisible walls stay at the arena's le
 
 A new reusable face component composes faces from separate parts: two eyes, two eyebrows and a mouth, with mirroring for left and right. Its sources are the owner's 2D assets in `art/shape_characters_face_system_assets/`, prepared as high-resolution parts plus a preset manifest ([[005 - Asset sources]]).
 
-The twelve reference faces `face_a` to `face_l` are named presets that reproduce those images exactly. A missing X-eye part is cut from `face_j`. Blinking swaps the eyes to `eye_closed_down` for 0.12 s every 2.4–5.6 s, as the 3D Cubio does; there is no blink while the eyes show X or are already closed.
+The twelve reference faces, named for their emoji counterparts such as `face_slightly_smiling`, are presets that reproduce those images exactly. A missing X-eye part is cut from `face_dizzy`. Blinking swaps the eyes to `eye_closed_down` for 0.12 s every 2.4–5.6 s, as the 3D Cubio does; there is no blink while the eyes show X or are already closed.
 
 ![The supplied face assets](references/face-system-assets.jpg)
 
@@ -67,12 +67,12 @@ The twelve reference faces `face_a` to `face_l` are named presets that reproduce
 
 | Moment | Face | Rule |
 | --- | --- | --- |
-| Default during play | `face_a` | With natural blinks |
-| Turning too fast | `face_j` (dizzy) | While the paddle's applied angular speed stays at or above 150°/s for at least 0.15 s, and for 0.8 s after it drops below |
-| Ball hit | `face_i` (startled) | On each new ball contact whose closing speed is at least 0.05 widths/s: 0.35 s, plus a 12% squash of the paddle along its thickness that springs back over 0.25 s. Only the paddle that was hit reacts |
-| Countdown | `face_e` (determined) | During 3, 2, 1 and START |
-| Round end | `face_f` / `face_k` / `face_a` | Leading team confident, the other team sad, `face_a` for both when tied, until the next round is prepared |
-| Shift results | `face_f` / `face_k` / `face_a` | Winning team confident, losing team sad, draw `face_a`, until Return to lobby |
+| Default during play | `face_slightly_smiling` | With natural blinks |
+| Turning too fast | `face_dizzy` | While the paddle's applied angular speed stays at or above 150°/s for at least 0.15 s, and for 0.8 s after it drops below |
+| Ball hit | `face_worried` (startled) | On each new ball contact whose closing speed is at least 0.05 widths/s: 0.35 s, plus a 12% squash of the paddle along its thickness that springs back over 0.25 s. Only the paddle that was hit reacts |
+| Countdown | `face_scheming` (determined) | During 3, 2, 1 and START |
+| Round end | `face_mischievous` / `face_disappointed` / `face_slightly_smiling` | Leading team confident, the other team sad, `face_slightly_smiling` for both when tied, until the next round is prepared |
+| Shift results | `face_mischievous` / `face_disappointed` / `face_slightly_smiling` | Winning team confident, losing team sad, draw `face_slightly_smiling`, until Return to lobby |
 
 During play, dizzy wins over startled, and startled wins over the default. The face never changes physics. All thresholds and durations are tunable.
 
@@ -107,7 +107,7 @@ During play the phone renders the player's own paddle in real-time 3D with three
 
 ## Participant panel
 
-When the participant panel opens, each selected player appears as a small 2D chip shaped like their paddle: their colour, the gap ring, their team outline and their `face_a`, grouped by team with readiness.
+When the participant panel opens, each selected player appears as a small 2D chip shaped like their paddle: their colour, the gap ring, their team outline and their `face_slightly_smiling`, grouped by team with readiness.
 
 ## Pre-minigame booklet
 
@@ -171,7 +171,7 @@ Confirmed by the project owner on 2026-10-18:
 * The automatic paddle is plain grey with no face.
 * Names show for 5 s at the start of every round and fade out.
 * A new part-composed face system is built from the supplied assets, used by 005's paddles and phone only for now.
-* Expressions: dizzy `face_j` for fast turns, startled `face_i` for hits, `face_e` for the countdown, `face_f` and `face_k` for results.
+* Expressions: dizzy `face_dizzy` for fast turns, startled `face_worried` for hits, `face_scheming` for the countdown, `face_mischievous` and `face_disappointed` for results.
 * Host physics is Jolt on a locked plane.
 * The phone shows the player's own 3D paddle.
 * The setting is a quiet toy factory with a cream wall and no hopper.

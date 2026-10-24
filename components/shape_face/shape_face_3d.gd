@@ -6,13 +6,14 @@ extends Node3D
 
 ## Gap in depth between stacked parts, so later layers draw over earlier ones.
 const LAYER_GAP := 0.0015
+const PUSHED_PART: Shader = preload("res://components/shape_face/shape_face_part.gdshader")
 
 ## The face box's height in world units; the width follows the preset's aspect.
 @export var height := 0.5:
 	set(value):
 		height = maxf(value, 0.001)
 		_rebuild()
-@export var face_name := "face_a":
+@export var face_name := "face_slightly_smiling":
 	set(value):
 		if value != face_name:
 			face_name = value
@@ -22,6 +23,13 @@ const LAYER_GAP := 0.0015
 		if value != blinking:
 			blinking = value
 			_rebuild()
+## World units of scenery the face draws in front of, matching the body it sits on, as in
+## [code]cubio_front.gdshaderinc[/code]. Zero draws it in place.
+@export var front_push := 0.0:
+	set(value):
+		front_push = maxf(value, 0.0)
+		_materials.clear()
+		_rebuild()
 
 ## When set, the node shows this stack's face and blinks each frame.
 var expressions: ShapeFaceExpressions
@@ -30,7 +38,7 @@ var clock := func() -> float:
 	return Time.get_ticks_msec() / 1000.0
 var manifest := ShapeFaceManifest.load_default()
 var _quads: Array[MeshInstance3D] = []
-var _materials: Dictionary[String, StandardMaterial3D] = { }
+var _materials: Dictionary[String, Material] = { }
 
 
 func _ready() -> void:
@@ -87,8 +95,16 @@ func _rebuild() -> void:
 		quad.material_override = _material(layer.part, layer.mirror, index)
 
 
-func _material(part: String, mirror: bool, order: int) -> StandardMaterial3D:
+func _material(part: String, mirror: bool, order: int) -> Material:
 	var key := "%s:%s:%d" % [part, mirror, order]
+	if not _materials.has(key) and front_push > 0.0:
+		var pushed := ShaderMaterial.new()
+		pushed.shader = PUSHED_PART
+		pushed.render_priority = order
+		pushed.set_shader_parameter("part", manifest.texture(part))
+		pushed.set_shader_parameter("mirror", mirror)
+		pushed.set_shader_parameter("front_push", front_push)
+		_materials[key] = pushed
 	if not _materials.has(key):
 		var material := StandardMaterial3D.new()
 		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED

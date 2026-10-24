@@ -8,10 +8,12 @@ phone use the same rigged GLB. Authoring art is excluded from Godot import and r
 - The body is **2 × 2 × 2 m**, with a **0.08 m** bevel and flat main faces.
 - Hands are the original **0.60 m** spheres. Feet retain their **0.78 × 0.92 × 0.39 m**
   dimensions. Their meshes, local transforms and animated positions are unchanged.
-- The five independent controls remain on `Animation.Controls`. The body and face follow
-  `Body.Pivot`; each hand and foot has its own control. Standing height is **2.62 m**.
-- The face plane sits 0.015 m in front of the cube. Its neutral and blink artwork is unchanged,
-  packed in the blend and editable in `textures/`.
+- The five independent controls remain on `Animation.Controls`. The body and face anchor
+  follow `Body.Pivot`; each hand and foot has its own control. Standing height is **2.62 m**.
+- The model has no face of its own. `Face.Anchor`, an unrotated empty 0.015 m in front of the
+  cube's centre, marks where Godot and the phone draw the shared shape face. Its −Y points out
+  of the front, which is +Z once exported Y up. The face's offset from it and its height are in
+  `assets/runtime/animated_characters/cubio/face_anchor.json`.
 
 ## Edit the motion
 
@@ -32,8 +34,8 @@ Actions have fake users. Looping curves repeat; held poses have constant extrapo
 The source keeps the original rig and motion. `animation_common.py` defines clip timing
 and the names used by the export and verification scripts.
 
-Geometry QA checks the floating parts separately. Ground-height notices for the body,
-hands and face are expected; the feet remain on the ground plane.
+Geometry QA checks the floating parts separately. Ground-height notices for the body and
+hands are expected; the feet remain on the ground plane.
 
 ## Verify and export
 
@@ -45,17 +47,19 @@ Run from this directory with a Blender executable in `$blender`:
 & $blender --background cubio-animated.blend --python-exit-code 1 --python render_review.py
 ```
 
-`verify_source.py` writes `validation.json`: cube and limb dimensions, packed artwork,
+`verify_source.py` writes `validation.json`: cube and limb dimensions, the face anchor,
 loop seams, held poses, sole contact and surface intersections sampled at quarter frames.
-`export_glb.py` temporarily parents rigid meshes to the existing control bones and exports
-the six clips. Neither script saves the blend.
+`export_glb.py` temporarily parents rigid meshes and the face anchor to the existing control
+bones and exports the six clips. Neither script saves the blend.
 
-The export writes `cubio.glb`, the two face images and source/hash metadata to
+The export writes `cubio.glb` and source/hash metadata to
 `assets/runtime/animated_characters/cubio/model/`. It embeds no materials: `Cubio3D` and
-the phone renderer apply the player tint and independent face. The character has
-**8,494 triangles**: 108 body, 2 face, 2,976 per hand and 1,216 per foot.
+the phone renderer apply the player tint and draw the shape face. The character has
+**8,492 triangles**: 108 body, 2,976 per hand and 1,216 per foot.
 
 `render_review.py` refreshes the front, three-quarter and motion-pose images in `previews/`.
+Blender has no shape face, so a fresh render shows a blank front; the committed previews were
+rendered with the former painted face.
 The motion sheet reads left to right: idle, walk, run, then look up, crouch and lever pull.
 These are authoring review images; runtime animation uses the GLB directly.
 

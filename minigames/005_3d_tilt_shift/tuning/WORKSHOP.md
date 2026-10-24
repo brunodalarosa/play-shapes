@@ -90,7 +90,7 @@ assign it and save the profile again. This keeps previews and runtime launches r
 
 The **Tunables** tab exposes rules, motion, preparation timings, physics/delivery,
 presentation and expression settings from the runtime Resources. Fields that name a face
-offer the twelve face presets by name. Field tooltips explain effects, units
+offer all shared face presets by name, including the emoji expressions. Field tooltips explain effects, units
 and defaults; input ranges come from the same Resource metadata as the Inspector.
 Round layout/basket maps and independent player/neutral sizes are editable there too.
 **Geometry** retains snapped anchors, baskets and clearance diagnostics.
