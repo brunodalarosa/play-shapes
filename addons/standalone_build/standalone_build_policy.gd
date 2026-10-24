@@ -36,6 +36,8 @@ const REQUIRED_BROWSER_PATHS := [
 const REQUIRED_RUNTIME_PATHS := [
 	"debug/tilt_shift_3d_review.tscn",
 	"web/public/platform_input_settings.json",
+	"debug/shape_characters_lab/shape_characters_lab.tscn",
+	"debug/shape_characters_lab/shape_characters_lab.gd",
 	"debug/motion_lab/motion_lab.tscn",
 	"debug/motion_lab/motion_lab.gd",
 	"debug/motion_lab/motion_plot.gd",

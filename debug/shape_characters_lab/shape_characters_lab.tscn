@@ -1,0 +1,294 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://debug/shape_characters_lab/shape_characters_lab.gd" id="1"]
+[ext_resource type="PackedScene" path="res://characters/cubio_3d.tscn" id="2"]
+
+[sub_resource type="Environment" id="Environment_lab"]
+background_mode = 1
+background_color = Color(0.952941, 0.917647, 0.839216, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.65
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 0.972549, 0.909804, 1)
+border_width_left = 4
+border_color = Color(0.768627, 0.545098, 0.313726, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+albedo_color = Color(0.909804, 0.835294, 0.690196, 1)
+roughness = 0.9
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_floor"]
+material = SubResource("StandardMaterial3D_floor")
+size = Vector2(12, 12)
+
+[node name="ShapeCharactersLab" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Zones" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="ZoneA" type="SubViewportContainer" parent="Zones"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Drag to turn the character"
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+stretch = true
+
+[node name="Viewport" type="SubViewport" parent="Zones/ZoneA"]
+own_world_3d = true
+handle_input_locally = false
+msaa_3d = 2
+size = Vector2i(1440, 1080)
+render_target_update_mode = 4
+
+[node name="Environment" type="WorldEnvironment" parent="Zones/ZoneA/Viewport"]
+environment = SubResource("Environment_lab")
+
+[node name="Light" type="DirectionalLight3D" parent="Zones/ZoneA/Viewport"]
+transform = Transform3D(0.866025, 0.000000, 0.500000, 0.286788, 0.819152, -0.496732, -0.409576, 0.573576, 0.709406, 0, 3, 0)
+light_energy = 0.9
+shadow_enabled = true
+
+[node name="Camera" type="Camera3D" parent="Zones/ZoneA/Viewport"]
+transform = Transform3D(1, 0, 0, 0, 0.995659, -0.093073, 0, 0.093073, 0.995659, 0, 0.75, 4.6)
+fov = 32.0
+
+[node name="Floor" type="MeshInstance3D" parent="Zones/ZoneA/Viewport"]
+mesh = SubResource("PlaneMesh_floor")
+
+[node name="Turntable" type="Node3D" parent="Zones/ZoneA/Viewport"]
+unique_name_in_owner = true
+
+[node name="Cubio" parent="Zones/ZoneA/Viewport/Turntable" instance=ExtResource("2")]
+unique_name_in_owner = true
+
+[node name="ZoneB" type="PanelContainer" parent="Zones"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Tabs" type="TabContainer" parent="Zones/ZoneB"]
+unique_name_in_owner = true
+layout_mode = 2
+current_tab = 0
+
+[node name="Character" type="VBoxContainer" parent="Zones/ZoneB/Tabs"]
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="ModelTitle" type="Label" parent="Zones/ZoneB/Tabs/Character"]
+layout_mode = 2
+text = "Model"
+
+[node name="ModelScroll" type="ScrollContainer" parent="Zones/ZoneB/Tabs/Character"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 0.4
+horizontal_scroll_mode = 0
+
+[node name="Models" type="VBoxContainer" parent="Zones/ZoneB/Tabs/Character/ModelScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ColorTitle" type="Label" parent="Zones/ZoneB/Tabs/Character"]
+layout_mode = 2
+text = "Colors"
+
+[node name="ColorScroll" type="ScrollContainer" parent="Zones/ZoneB/Tabs/Character"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Colors" type="GridContainer" parent="Zones/ZoneB/Tabs/Character/ColorScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+
+[node name="Animations" type="VBoxContainer" parent="Zones/ZoneB/Tabs"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="ControlsTitle" type="Label" parent="Zones/ZoneB/Tabs/Animations"]
+layout_mode = 2
+text = "Animation controls"
+
+[node name="Transport" type="HBoxContainer" parent="Zones/ZoneB/Tabs/Animations"]
+layout_mode = 2
+
+[node name="PlayPause" type="Button" parent="Zones/ZoneB/Tabs/Animations/Transport"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Play"
+
+[node name="Restart" type="Button" parent="Zones/ZoneB/Tabs/Animations/Transport"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Restart"
+
+[node name="Stop" type="Button" parent="Zones/ZoneB/Tabs/Animations/Transport"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Stop"
+
+[node name="SpeedRow" type="HBoxContainer" parent="Zones/ZoneB/Tabs/Animations"]
+layout_mode = 2
+
+[node name="SpeedTitle" type="Label" parent="Zones/ZoneB/Tabs/Animations/SpeedRow"]
+layout_mode = 2
+text = "Speed"
+
+[node name="Speed" type="HSlider" parent="Zones/ZoneB/Tabs/Animations/SpeedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="SpeedValue" type="Label" parent="Zones/ZoneB/Tabs/Animations/SpeedRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+horizontal_alignment = 2
+
+[node name="ClipStatus" type="Label" parent="Zones/ZoneB/Tabs/Animations"]
+unique_name_in_owner = true
+layout_mode = 2
+clip_text = true
+
+[node name="ClipsTitle" type="Label" parent="Zones/ZoneB/Tabs/Animations"]
+layout_mode = 2
+text = "Clips"
+
+[node name="ClipScroll" type="ScrollContainer" parent="Zones/ZoneB/Tabs/Animations"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Clips" type="VBoxContainer" parent="Zones/ZoneB/Tabs/Animations/ClipScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Face" type="VBoxContainer" parent="Zones/ZoneB/Tabs"]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="ControlsTitle" type="Label" parent="Zones/ZoneB/Tabs/Face"]
+layout_mode = 2
+text = "Face controls"
+
+[node name="FaceRow" type="HBoxContainer" parent="Zones/ZoneB/Tabs/Face"]
+layout_mode = 2
+
+[node name="Blink" type="CheckButton" parent="Zones/ZoneB/Tabs/Face/FaceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+button_pressed = true
+text = "Blinking"
+
+[node name="ResetFace" type="Button" parent="Zones/ZoneB/Tabs/Face/FaceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Reset face"
+
+[node name="Placement" type="GridContainer" parent="Zones/ZoneB/Tabs/Face"]
+layout_mode = 2
+columns = 2
+
+[node name="OffsetXTitle" type="Label" parent="Zones/ZoneB/Tabs/Face/Placement"]
+layout_mode = 2
+text = "Left / right"
+
+[node name="OffsetX" type="HSlider" parent="Zones/ZoneB/Tabs/Face/Placement"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="OffsetYTitle" type="Label" parent="Zones/ZoneB/Tabs/Face/Placement"]
+layout_mode = 2
+text = "Down / up"
+
+[node name="OffsetY" type="HSlider" parent="Zones/ZoneB/Tabs/Face/Placement"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="HeightTitle" type="Label" parent="Zones/ZoneB/Tabs/Face/Placement"]
+layout_mode = 2
+text = "Scale"
+
+[node name="FaceHeight" type="HSlider" parent="Zones/ZoneB/Tabs/Face/Placement"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="PlacementValue" type="Label" parent="Zones/ZoneB/Tabs/Face"]
+unique_name_in_owner = true
+layout_mode = 2
+clip_text = true
+
+[node name="PlacementRow" type="HBoxContainer" parent="Zones/ZoneB/Tabs/Face"]
+layout_mode = 2
+
+[node name="RevertPlacement" type="Button" parent="Zones/ZoneB/Tabs/Face/PlacementRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Revert to saved"
+
+[node name="SavePlacement" type="Button" parent="Zones/ZoneB/Tabs/Face/PlacementRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Save as game default"
+
+[node name="FaceStatus" type="Label" parent="Zones/ZoneB/Tabs/Face"]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="ExpressionsTitle" type="Label" parent="Zones/ZoneB/Tabs/Face"]
+layout_mode = 2
+text = "Expressions"
+
+[node name="ExpressionScroll" type="ScrollContainer" parent="Zones/ZoneB/Tabs/Face"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Expressions" type="GridContainer" parent="Zones/ZoneB/Tabs/Face/ExpressionScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
