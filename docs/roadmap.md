@@ -98,6 +98,9 @@ It awaits physical-phone checks and the owner's play review; tuning values are p
 
 ## Backlog
 
+- Minigame 006, Flappy Race: a phone-first race through a forest with hearts and speed
+  pickups, for 1 to 10 players. Designed in
+  `docs/game-design-documents/Minigames/006/`; not built.
 - The first release, `0.1.0`: decide where the project and the Windows package record the
   version, then follow [branching.md](branching.md#a-release).
 - Cloud CI, if hosted runners turn out to be free for this repository

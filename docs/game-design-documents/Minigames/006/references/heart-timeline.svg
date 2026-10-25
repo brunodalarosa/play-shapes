@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="250" viewBox="0 0 680 250" font-family="sans-serif">
+  <title>Flappy Race heart rules</title>
+  <rect width="680" height="250" fill="#FFFFFF"/>
+  <g font-size="14" fill="#2C2C2A" text-anchor="middle">
+    <rect x="50" y="30" width="130" height="150" rx="8" fill="#F1EFE8" stroke="#B4B2A9"/>
+    <text x="115" y="56" font-weight="bold">Race start</text>
+    <rect x="200" y="30" width="130" height="150" rx="8" fill="#F1EFE8" stroke="#B4B2A9"/>
+    <text x="265" y="56" font-weight="bold">First hit</text>
+    <rect x="350" y="30" width="130" height="150" rx="8" fill="#F1EFE8" stroke="#B4B2A9"/>
+    <text x="415" y="56" font-weight="bold">Second hit</text>
+    <rect x="500" y="30" width="130" height="150" rx="8" fill="#F1EFE8" stroke="#B4B2A9"/>
+    <text x="565" y="56" font-weight="bold">Hit with none</text>
+  </g>
+  <g stroke-width="1.5">
+    <circle cx="85" cy="95" r="11" fill="#E24B4A" stroke="#A32D2D"/>
+    <circle cx="115" cy="95" r="11" fill="#E24B4A" stroke="#A32D2D"/>
+    <circle cx="145" cy="95" r="11" fill="#E24B4A" stroke="#A32D2D"/>
+    <circle cx="235" cy="95" r="11" fill="#E24B4A" stroke="#A32D2D"/>
+    <circle cx="265" cy="95" r="11" fill="#E24B4A" stroke="#A32D2D"/>
+    <circle cx="295" cy="95" r="11" fill="#FAC775" stroke="#BA7517" stroke-dasharray="3 2"/>
+    <circle cx="385" cy="95" r="11" fill="#E24B4A" stroke="#A32D2D"/>
+    <circle cx="415" cy="95" r="11" fill="#FAC775" stroke="#BA7517" stroke-dasharray="3 2"/>
+    <circle cx="445" cy="95" r="11" fill="#D3D1C7" stroke="#888780"/>
+    <circle cx="535" cy="95" r="11" fill="#FAC775" stroke="#BA7517" stroke-dasharray="3 2"/>
+    <circle cx="565" cy="95" r="11" fill="#D3D1C7" stroke="#888780"/>
+    <circle cx="595" cy="95" r="11" fill="#D3D1C7" stroke="#888780"/>
+  </g>
+  <g font-size="12" fill="#5F5E5A" text-anchor="middle">
+    <text x="115" y="144">3 full hearts</text>
+    <text x="265" y="136">Heart 3 flies to</text>
+    <text x="265" y="154">respawn, refills</text>
+    <text x="415" y="136">Heart 2 refills,</text>
+    <text x="415" y="154">progress kept</text>
+    <text x="565" y="136">Wait for heart 1,</text>
+    <text x="565" y="154">then it flies out</text>
+  </g>
+  <g font-size="12" fill="#5F5E5A">
+    <circle cx="170" cy="215" r="7" fill="#E24B4A" stroke="#A32D2D"/>
+    <text x="184" y="219">Full</text>
+    <circle cx="270" cy="215" r="7" fill="#FAC775" stroke="#BA7517" stroke-dasharray="3 2"/>
+    <text x="284" y="219">Refilling</text>
+    <circle cx="400" cy="215" r="7" fill="#D3D1C7" stroke="#888780"/>
+    <text x="414" y="219">Empty, waiting</text>
+  </g>
+</svg>
