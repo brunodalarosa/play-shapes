@@ -249,6 +249,7 @@ Confirmed by the project owner on 2026-10-25:
 * Cooldown and refill both count from the hit; no automatic respawn; the respawn tap is a flap; 1 s invulnerability.
 * The ground costs a heart; the ceiling is a soft cap.
 * A constant base speed with small speed pickups in risky spots inside gaps.
+* Pickups are per player; boosts restart rather than stack, and a hit ends a boost.
 * The phone predicts its own Cubio; the host stays the authority.
 * Forward motion and gravity start at GO.
 * A podium past the finish line: three raised steps and one low step for the rest.
