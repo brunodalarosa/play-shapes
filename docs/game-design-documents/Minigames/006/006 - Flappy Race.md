@@ -42,14 +42,14 @@ The defaults aim at Flappy Bird's feel, measured from the widely used reference 
 | Flap velocity | 22.5 m/s upward | 11.25 bird heights per second |
 | Gravity | 75 m/s² | 37.5 bird heights per second² |
 | Maximum fall speed | 25 m/s | 12.5 bird heights per second |
-| Corridor height, ground to ceiling | 34 m | About 17 bird heights |
+| View height, ground to the top of the view | 34 m | About 17 bird heights |
 | Gap height at the start of the course | 8.4 m | About 4.2 bird heights |
 
-### Hit box, ground and ceiling
+### Hit box, ground and open sky
 
 - Only Cubio's body cube collides, inset slightly from the visible cube. Hands, feet and the face never cost a heart.
 - Touching the ground costs a heart, as in Flappy Bird.
-- The ceiling is a soft invisible cap: the Cubio stops rising there and loses nothing.
+- There is no ceiling. The sky is open, as in Flappy Bird: a Cubio can fly above the top of the view, and every hanging obstacle reaches far above the view, so flying high never skips an obstacle.
 
 ### Hearts
 
@@ -85,10 +85,10 @@ Small speed pickups sit inside some gaps, placed close to an obstacle edge so th
 
 ### Shape of the course
 
-The course runs from the start line, point A, to the finish line, point B, inside one corridor of fixed height. Its length gives a perfect run, with no hits and no pickups, a duration of about 3 minutes: 1800 m at the default speed. The course length is set as that target duration and derived from the base speed.
+The course runs from the start line, point A, to the finish line, point B, above one ground line, under an open sky. Its length gives a perfect run, with no hits and no pickups, a duration of about 3 minutes: 1800 m at the default speed. The course length is set as that target duration and derived from the base speed.
 
 - A clear stretch after the start line, about 3 s of travel, before the first obstacle.
-- Obstacles in pairs, one rising from the ground and one hanging from above, leaving one gap between them, as Flappy Bird's pipes do.
+- Obstacles in pairs at the same position along the course, one rising from the ground and one reaching down from far above the view, leaving one gap between them, as Flappy Bird's pipes do.
 - A clear stretch before the finish line, then the finish arch and the podium.
 
 ### Generation
@@ -114,7 +114,7 @@ Version 1 has one biome, the forest. The library holds far more forest pieces th
 ![Forest and town candidates from the asset library](references/biome-candidates.jpg)
 
 - Ground obstacles: tall pines and tree trunks, stacked rock pillars and log stacks, stretched or stacked to the needed height.
-- Hanging obstacles: inverted rock formations and bare branches hanging from a rocky overhang along the top of the corridor.
+- Hanging obstacles: tall columns that come down from far above the view, such as upside-down stacked rock pillars and giant tree trunks, ending at the gap. There is no overhang or ceiling: open sky shows between obstacles.
 - Ground: grass, weeds, flowers and mushrooms. Background: tree clusters in depth layers.
 - The scene-design workflow chooses and verifies the exact models, as it did for 004 and 005. Every model sits in the shared low-poly style of the [art direction](../../Art%20direction.md).
 
@@ -151,13 +151,13 @@ More biomes along a journey from A to B are a later version.
 The camera follows the leader: the player furthest along the course, counting a waiting player at their respawn spot. Once the leader finishes, it follows the leading player still racing.
 
 - The leader sits at about 65% of the screen width, so a little of the course ahead shows and more of the pack behind.
-- At its closest the camera fits the corridor height to the screen. It zooms out as far as needed to include the other players, up to the maximum zoom-out, and the extra space shows sky above and ground below.
+- At its closest the camera fits the view height to the screen. It zooms out as far as needed to include the other players, up to the maximum zoom-out; the extra space shows more sky above, with the hanging obstacles still reaching past the top edge, and more ground below.
 - Default maximum zoom-out: a visible height of 54 m, which keeps Cubio's body about 40 px tall on a 1080p screen. Human play confirms this value.
 - Zoom and pan are smoothed so the view never jumps.
 
 ### Players behind the view
 
-A player too far behind to fit appears as a bubble on the left edge of the screen: a speech-bubble shape with its arrow tip pointing left, in the player's colour, with their face and name. It slides up and down with that player's height in the corridor.
+A player too far behind to fit appears as a bubble on the left edge of the screen: a speech-bubble shape with its arrow tip pointing left, in the player's colour, with their face and name. It slides up and down with that player's height.
 
 ### Overlapping Cubios
 
@@ -182,7 +182,7 @@ Past the finish line stands a podium with three raised steps of different height
 ## Phone presentation
 
 - Three.js view of the player's own Cubio, the obstacles, the ground and the player's remaining pickups, reusing 004's phone viewport module. Other players never appear.
-- The view follows the player's Cubio horizontally and always shows the full corridor height. In portrait this shows less of the course ahead than the shared screen does.
+- The view follows the player's Cubio horizontally and always shows the full view height, from the ground to the top of the view. In portrait this shows less of the course ahead than the shared screen does.
 - The hearts in a row at the top left, the player's own progress bar to the finish at the top, and the race timer at the top right. No ranking.
 - The heart flight animation from the heart row to the respawn spot, the waiting heart and its refill ring.
 - The phone predicts its own Cubio locally from its own taps, so flaps answer immediately. The host stays the authority on hits, hearts, pickups, finishing and ranking, and the phone corrects itself when the host disagrees. A tap reaches the host with the phone's sequence and time so the host replays it at the moment the player pressed.
@@ -229,7 +229,7 @@ Built outside `minigames/006_flappy_race/`:
 
 * Race timer, default 6 minutes. Perfect-run target duration, default 3 minutes.
 * Base forward speed, flap velocity, gravity and maximum fall speed (defaults above).
-* Corridor height, and the hit box inset.
+* View height, and the hit box inset.
 * Difficulty curves over progress: obstacle spacing, gap height, largest gap change; pickup frequency.
 * Clear stretches after the start and before the finish.
 * Number of hearts, default 3. Heart recovery duration, default 10 s.
@@ -247,7 +247,7 @@ Confirmed by the project owner on 2026-10-25:
 * The race ends when everyone finishes or the timer runs out.
 * Hearts as spare respawns, emptied right to left, refilled one at a time from the leftmost, with refill progress carried over. The spent heart flies to the respawn spot and waits for a tap.
 * Cooldown and refill both count from the hit; no automatic respawn; the respawn tap is a flap; 1 s invulnerability.
-* The ground costs a heart; the ceiling is a soft cap.
+* The ground costs a heart. There is no ceiling: the sky is open and hanging obstacles reach far above the view (owner correction of the mockup, 2026-10-25, replacing the earlier soft cap).
 * A constant base speed with small speed pickups in risky spots inside gaps.
 * Pickups are per player; boosts restart rather than stack, and a hit ends a boost.
 * The phone predicts its own Cubio; the host stays the authority.
@@ -259,7 +259,7 @@ Confirmed by the project owner on 2026-10-25:
 * Players pass through one another, with a dithered overlap on the shared screen.
 * 1 to 10 players; 006 is the only minigame that can start with one player. Singleplayer shows the session's best time.
 * Portrait phone, whole-screen tap, own progress bar and timer, no ranking on the phone, phone sound.
-* Leader at about 65% of the width; the corridor fills the screen at the closest zoom; off-screen bubbles show face and name; place badges over every Cubio.
+* Leader at about 65% of the width; the view height fills the screen at the closest zoom; off-screen bubbles show face and name; place badges over every Cubio.
 * Difficulty follows course progress; curves for spacing, gap height and gap change.
 * No moving obstacles in version 1.
 * The seed only in the F12 debug review.
