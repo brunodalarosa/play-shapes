@@ -4,7 +4,7 @@ Flappy Race
 
 ## Overview
 
-Minigame 006 is a race from a start line to a finish line through a procedurally generated forest. Each player taps their phone to make their winged Cubio flap, as in the original Flappy Bird, and dodges obstacles to reach the finish first.
+Minigame 006 is a race from a start line to a finish line through a procedurally generated crystal cave. Each player taps their phone to make their winged Cubio flap, as in the original Flappy Bird, and dodges obstacles to reach the finish first.
 
 It is the first minigame played mainly on the phone. Each phone shows only that player's Cubio; the shared screen shows everyone racing in one world. To know whether you are winning you must look up at the shared screen, and looking up is how you hit the next obstacle. That tension is the party.
 
@@ -77,7 +77,7 @@ The shared screen shows the same floating heart in the player's colour at the re
 
 Small speed pickups sit inside some gaps, placed close to an obstacle edge so that taking one is a risk.
 
-- Touching one gives a boost: forward speed rises by a tunable amount (default 25%) for a tunable time (default 3 s), with a short `face_beaming`.
+- A pickup is a small glowing gold crystal. Touching one gives a boost: forward speed rises by a tunable amount (default 25%) for a tunable time (default 3 s), with a short `face_beaming`.
 - Taking another while boosted restarts the boost time; boosts do not stack.
 - Pickups are per player: every player can take every pickup on their own run. The phone hides a pickup its player has taken. The shared screen always shows every pickup and plays a burst in the taker's colour when anyone takes one.
 
@@ -107,16 +107,24 @@ Difficulty follows course progress, from 0 at the start line to 1 at the finish 
 
 Pickup frequency is a fourth tunable value over progress. All obstacles are static in this version.
 
-## Forest biome
+## Cave biome
 
-Version 1 has one biome, the forest. The library holds far more forest pieces than town pieces in one consistent style: KayKit's Forest Nature and Medieval Hexagon packs (CC0) give trees, bare trunks, stacked rocks and logs of many heights, whose tall silhouettes read naturally as obstacles. The town candidates are wide, mixed-pack buildings and posts.
+Version 1 has one biome: a bright, toy-like crystal cave. Stalactites coming from above feel natural in a cave, so the hanging obstacles need no explanation. The cave roof is far above the view: there is no visible ceiling, and open cave air shows between obstacles. The cave is never dark or gloomy.
 
-![Forest and town candidates from the asset library](references/biome-candidates.jpg)
+![The approved shared-screen composition](references/mockup-cave-shared.jpg)
 
-- Ground obstacles: tall pines and tree trunks, stacked rock pillars and log stacks, stretched or stacked to the needed height.
-- Hanging obstacles: tall columns that come down from far above the view, such as upside-down stacked rock pillars and giant tree trunks, ending at the gap. There is no overhang or ceiling: open sky shows between obstacles.
-- Ground: grass, weeds, flowers and mushrooms. Background: tree clusters in depth layers.
-- The scene-design workflow chooses and verifies the exact models, as it did for 004 and 005. Every model sits in the shared low-poly style of the [art direction](../../Art%20direction.md).
+![The approved phone composition](references/mockup-cave-phone.jpg)
+
+The mockups show composition; their incidental colours, crystal placement and background detail are not requirements.
+
+- Hanging obstacles: chunky faceted stalactites in warm sandy stone, coming down from far above the view and ending in a tip at the gap, with a few crystals growing on them.
+- Ground obstacles: matching stalagmites, tiered rock stacks and crystal clusters rising from the cave floor.
+- Ground: a sandy stone floor with small crystals and pebbles over darker rock.
+- Background, faded and well behind play: layered cave walls and arches in soft purple and teal, crystal clusters, glowing mushrooms and an underground pool, with soft light shafts from above. It stays quieter than in the mockup so every Cubio colour, purple included, reads against it.
+- Speed pickup: a small glowing gold crystal.
+- Stalagmites and stalactites start from KayKit's tiered rock towers (Forest Nature pack, CC0), flipped for stalactites. The library has no crystals with a known licence, so crystals are generated in code, as 005's paddle is. The scene-design workflow chooses and verifies the exact models.
+
+![Cave candidates from the asset library](references/cave-candidates.jpg)
 
 More biomes along a journey from A to B are a later version.
 
@@ -265,7 +273,7 @@ Confirmed by the project owner on 2026-10-25:
 * The seed only in the F12 debug review.
 * Cubio's hands become its wings; it tilts with its velocity; only the body cube collides.
 * Faces as in [Cubio with wings](#cubio-with-wings), with `face_beaming` for a pickup.
-* One biome, the forest, chosen for the assets the library already has.
+* One biome, a bright crystal cave with no visible ceiling, chosen over the forest after comparing mockups, because stalactites feel natural as obstacles from above. Crystals are generated in code.
 * The name is Flappy Race, number 006.
 
 ## Deferred decisions
@@ -275,7 +283,7 @@ Confirmed by the project owner on 2026-10-25:
 * More biomes along a journey from A to B.
 * A ghost of the best run for a single player.
 * A practice flap on the Pre-minigame screen.
-* The exact forest models and the speed pickup's look, through the scene-design workflow.
+* The exact cave models, through the scene-design workflow.
 * Audio on the shared screen.
 
 ## Validation needs
