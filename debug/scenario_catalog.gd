@@ -3,7 +3,8 @@ extends RefCounted
 ## Central extension point for debug destinations. Lifecycle and UI stay in DebugLauncher.
 
 
-## The labs, then a one-player round of each minigame that offers one.
+## The labs, then a one-player round of each minigame that offers one and needs more players
+## to launch normally.
 static func scenarios(minigames: MinigameCatalog) -> Array[DebugScenario]:
 	var result: Array[DebugScenario] = [
 		DebugScenario.new(
@@ -24,7 +25,8 @@ static func scenarios(minigames: MinigameCatalog) -> Array[DebugScenario]:
 	]
 
 	for minigame: MinigameDefinition in minigames.minigames:
-		if not minigame.one_player_debug:
+		# A minigame that starts with one player normally needs no debug round for it.
+		if not minigame.one_player_debug or minigame.min_players <= 1:
 			continue
 
 		result.append(

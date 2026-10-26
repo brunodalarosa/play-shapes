@@ -43,6 +43,11 @@ func _run() -> void:
 		"Bubbles 3D debug requires exactly one registered player",
 	):
 		return
+	if not check(
+		_solo_scenarios().is_empty(),
+		"A minigame that starts with one player gets no one-player debug scenario",
+	):
+		return
 	if not check(not launcher.restart_scenario(), "Restart is disabled outside a debug scenario"):
 		return
 	if not check(launcher.active_scenario == null, "Normal startup has no debug scenario"):
@@ -115,3 +120,19 @@ func _run() -> void:
 	):
 		return
 	host.stop()
+
+
+func _solo_scenarios() -> Array:
+	var solo := MinigameDefinition.new()
+	solo.id = &"solo_fixture"
+	solo.display_name = "Solo fixture"
+	solo.scene_path = "res://tests/fixtures/debug_scenario.tscn"
+	solo.min_players = 1
+	solo.one_player_debug = true
+	var catalog := MinigameCatalog.new()
+	catalog.minigames.append(solo)
+
+	return DebugScenarioCatalog.scenarios(catalog).filter(
+		func(scenario: DebugScenario) -> bool:
+			return scenario.minigame_id == solo.id,
+	)

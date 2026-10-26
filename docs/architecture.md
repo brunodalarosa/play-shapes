@@ -93,10 +93,11 @@ The shared code learns about a minigame from the catalog, `minigames/catalog.tre
 ([decision 0024](decisions/0024-minigame-catalog.md)):
 
 - The catalog lists one `MinigameDefinition` per minigame: its id, its name, the path of its
-  scene, its largest number of players, the path of its ready-screen content, and whether the
-  debug menu offers a one-player round.
+  scene, its fewest and largest numbers of players
+  ([decision 0049](decisions/0049-minimum-players-per-minigame.md)), the path of its
+  ready-screen content, and whether the debug menu offers a one-player round.
 - `SessionHost` owns the catalog. The lobby fills its picker from it in the catalog's order,
-  the host takes the scene, the name and the player limit from it, the ready screen loads its
+  the host takes the scene, the name and the player limits from it, the ready screen loads its
   content through it, and the debug menu derives its one-player scenarios from it.
 - `tests/minigame_catalog_test.gd` checks that every definition names things that exist.
 

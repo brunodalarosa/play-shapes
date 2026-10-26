@@ -26,7 +26,14 @@ func _run() -> void:
 			minigame.load_pre_minigame_content() != null,
 			"A minigame's ready-screen content loads: %s" % label,
 		)
-		check(minigame.max_players >= 2, "A minigame supports at least two players: %s" % label)
+		check(
+			1 <= minigame.min_players and minigame.min_players <= minigame.max_players,
+			"A minigame's fewest players fit under its most: %s" % label,
+		)
+		check(
+			not (minigame.one_player_debug and minigame.min_players == 1),
+			"A minigame that starts with one player offers no one-player debug: %s" % label,
+		)
 		check(CATALOG.find(minigame.id) == minigame, "The catalog finds it by id: %s" % label)
 
 	check(CATALOG.find(&"no_such_minigame") == null, "An unknown id finds nothing")
@@ -47,6 +54,42 @@ func _check_session_host() -> void:
 		"An unknown id is not available",
 	)
 
+	_check_fewest_players(host)
+
+
+## A minigame's own minimum gates a normal launch; the others keep theirs.
+func _check_fewest_players(host: Node) -> void:
+	var solo := MinigameDefinition.new()
+	solo.id = &"solo_fixture"
+	solo.display_name = "Solo fixture"
+	solo.min_players = 1
+	host.minigame_catalog.minigames.append(solo)
+
+	var empty: Dictionary = host.minigame_availability(solo.id)
+	check(
+		not empty.available and empty.reason == "At least 1 registered player is needed",
+		"A one-player minigame still needs a registered player",
+	)
+
+	var joined: Dictionary = host.player_registry.join_player(950, "Solo", true, 1000)
+	check(
+		joined.accepted and host.minigame_availability(solo.id).available,
+		"One registered player can launch a minigame whose minimum is one",
+	)
+	for minigame: MinigameDefinition in CATALOG.minigames:
+		if minigame.min_players < 2:
+			continue
+
+		var availability: Dictionary = host.minigame_availability(minigame.id)
+		check(
+			not availability.available
+			and availability.reason == "At least 2 registered players are needed",
+			"One registered player still cannot launch %s" % minigame.display_name,
+		)
+
+	host.player_registry.leave_connection(950)
+	host.minigame_catalog.minigames.erase(solo)
+
 
 func _check_debug_scenarios() -> void:
 	var scenarios := DebugScenarioCatalog.scenarios(CATALOG)
@@ -58,7 +101,7 @@ func _check_debug_scenarios() -> void:
 		)
 
 		check(
-			matching.size() == (1 if minigame.one_player_debug else 0),
+			matching.size() == (1 if minigame.one_player_debug and minigame.min_players > 1 else 0),
 			"A minigame has a one-player debug scenario only when it offers one: %s" % minigame.id,
 		)
 

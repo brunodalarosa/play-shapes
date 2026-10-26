@@ -150,8 +150,8 @@ func minigame_availability(minigame_id: StringName, allow_one_player_debug := fa
 			return { "available": false, "reason": "This minigame has no one-player mode" }
 		if player_count != 1:
 			return { "available": false, "reason": "Requires exactly one registered player" }
-	elif player_count < 2:
-		return { "available": false, "reason": "At least 2 registered players are needed" }
+	elif player_count < minigame.min_players:
+		return { "available": false, "reason": _fewest_players_reason(minigame.min_players) }
 	if player_count > minigame.max_players:
 		var limit := [minigame.display_name, minigame.max_players]
 		return { "available": false, "reason": "%s supports up to %d players" % limit }
@@ -165,6 +165,13 @@ func minigame_availability(minigame_id: StringName, allow_one_player_debug := fa
 		var reason := "%s requires %s players" % [minigame.display_name, ", ".join(counts)]
 		return { "available": false, "reason": reason }
 	return { "available": true, "reason": "" }
+
+
+func _fewest_players_reason(fewest: int) -> String:
+	if fewest == 1:
+		return "At least 1 registered player is needed"
+
+	return "At least %d registered players are needed" % fewest
 
 
 func minigame_display_name(minigame_id: StringName) -> String:

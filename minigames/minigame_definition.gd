@@ -14,8 +14,11 @@ extends Resource
 ## The shared-screen scene of a round.
 @export_file("*.tscn") var scene_path: String
 
+## Fewest registered players a normal launch needs.
+@export_range(1, 10) var min_players := 2
+
 ## Largest number of players a round supports.
-@export_range(2, 10) var max_players := 10
+@export_range(1, 10) var max_players := 10
 
 ## Empty accepts every count within the normal limits; otherwise only these counts launch.
 @export var allowed_player_counts := PackedInt32Array()
@@ -23,7 +26,8 @@ extends Resource
 ## The PreMinigameContent the ready screen shows.
 @export_file("*.tres") var pre_minigame_content_path: String
 
-## Whether the debug menu offers a round with exactly one registered player.
+## Whether the debug menu offers a round with exactly one registered player. A minigame whose
+## [member min_players] is 1 already launches normally with one player and offers none.
 @export var one_player_debug := false
 
 ## A Node script that coordinates the minigame from the Pre-minigame screen into play, for a
