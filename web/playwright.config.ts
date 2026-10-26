@@ -2,6 +2,12 @@ import { defineConfig, devices } from "@playwright/test";
 
 // Full coverage adds larger Tilt Shift rosters and keeps the 90 s Bubbles 3D round.
 const fullRound = process.env.E2E_ROUND === "full";
+// A test tagged @flaky fails intermittently for a known, unresolved reason, so no check run
+// includes it; E2E_FLAKY=1 runs it on purpose.
+const excludedTags = [
+  ...(fullRound ? [] : ["@full"]),
+  ...(process.env.E2E_FLAKY === "1" ? [] : ["@flaky"]),
+];
 
 export default defineConfig({
   testDir: "e2e",
@@ -10,7 +16,7 @@ export default defineConfig({
   workers: 1,
   fullyParallel: false,
   retries: 0,
-  grepInvert: fullRound ? undefined : /@full/,
+  grepInvert: excludedTags.length > 0 ? new RegExp(excludedTags.join("|")) : undefined,
   forbidOnly: true,
   timeout: fullRound ? 6 * 60_000 : 3 * 60_000,
   expect: { timeout: 30_000 },

@@ -41,13 +41,12 @@ This is the default `[AUTO]` check. In order, it runs:
    end-to-end test files.
 5. `npm test` in `web/`.
 6. A rebuild of the browser bundle, which fails if `web/public/` changed.
-7. The two-phone Bubbles and jellyfishes 3D and Tilt Shift 3D end-to-end
-   journeys described below.
+7. The two-phone Tilt Shift 3D end-to-end journey described below. The Bubbles and jellyfishes
+   3D journey is tagged `@flaky` and left out.
 
 `--full` adds the 4/6/8/10-phone Tilt Shift 3D journeys and
 `tilt_shift_3d_rotation_contact_test.gd`. The default retains the shorter Tilt Shift 3D
-physics checks. Full coverage also keeps the full-length Bubbles and jellyfishes 3D round;
-Windows export remains a separate `--release` option. Name filters do not override these
+physics checks. Windows export remains a separate `--release` option. Name filters do not override these
 coverage options.
 
 How it reports:
@@ -63,7 +62,7 @@ Options and single runs:
 
 ```powershell
 node tools/check.mjs bubbles_3d web-tests # only checks whose name contains a filter
-node tools/check.mjs --full               # extended coverage and full-length Bubbles 3D
+node tools/check.mjs --full               # extended coverage
 node tools/check.mjs --release            # also run the Windows export test
 godot --headless --path . --script res://tests/player_registry_test.gd   # one script, full output
 godot --headless --editor --path . --quit-after 30                        # editor import scan
@@ -104,6 +103,9 @@ The host side is `tests/e2e/host.gd`:
 The test fails on a missing step, a phone without an accepted swipe, a page error, a visible
 phone error panel, or a host `ERROR` line.
 
+It is tagged `@flaky` because it sometimes times out in the lobby
+([known bug](roadmap.md#known-bugs)), so no check run includes it. `E2E_FLAKY=1` runs it.
+
 `web/e2e/tilt_shift_3d_phones.spec.ts` runs the real boot/catalog/gameplay journey through
 Tilt Shift 3D with `tests/e2e/tilt_shift_3d_host.gd` and synthetic sensors. Every phone loads
 `/three_view.js` and the face parts and shows its own paddle, spectators included, and the test
@@ -119,7 +121,8 @@ with full coverage.
 ```powershell
 cd web
 npm run e2e                                    # the test alone
-$env:E2E_ROUND = "full"; npm run e2e; Remove-Item env:E2E_ROUND   # all journeys, full Bubbles
+$env:E2E_ROUND = "full"; npm run e2e; Remove-Item env:E2E_ROUND   # every journey not @flaky
+$env:E2E_FLAKY = "1"; npm run e2e; Remove-Item env:E2E_FLAKY   # add the @flaky Bubbles journey
 $env:E2E_WINDOWED = "1"; npm run e2e; Remove-Item env:E2E_WINDOWED   # show the host and save its screenshots
 npx playwright show-trace ../test-results/e2e/<test>/trace.zip    # inspect a failure
 cd ..
@@ -237,7 +240,7 @@ start only what they need, so they stay fast.
   and [PHYSICS.md](../minigames/005_3d_tilt_shift/tuning/PHYSICS.md#measurement).
 - `E2E_WINDOWED=1` enables real-host captures for those scenarios. It does not supply
   physical-phone evidence. The quick Tilt Shift 3D fixture maps two eight-second rounds;
-  Bubbles and jellyfishes 3D retains its existing quick/full behavior.
+  Bubbles and jellyfishes 3D, when run with `E2E_FLAKY=1`, keeps its quick/full behavior.
 - Set `E2E_EXPORTED_PACK` to the absolute Windows package PCK to run the same browser
   journey against exported resources in Godot. The driver remains an external test script;
   it rejects a package run that can see the workspace's test resources. This loads the

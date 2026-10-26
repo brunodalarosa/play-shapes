@@ -141,6 +141,12 @@ with code `3221225477` during native shutdown after printing zero assertion fail
 usually passes. Treat that exit as a failed check, retain its log and report it separately from
 assertion results; its cause remains unresolved.
 
+The two-phone Bubbles and jellyfishes 3D end-to-end test sometimes times out in the lobby: the
+host sees only the first phone's character move, never the second's, so the run never starts.
+It failed in 1 of 4 runs before Flappy Race existed and in 3 of 5 on later commits. Its cause
+remains unresolved. The test is tagged `@flaky`, so neither the default nor the `--full` check
+runs it; see [verification.md](verification.md#the-end-to-end-test) to run it on purpose.
+
 On Windows, the browser bundle rewrite after the browser suite can fail with
 `The requested operation cannot be performed on a file with a user-mapped section open.`
 Preserving the generated file in an ignored folder and regenerating it permits the focused
