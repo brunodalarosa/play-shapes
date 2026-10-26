@@ -122,9 +122,9 @@ The mockups show composition; their incidental colours, crystal placement and ba
 - Ground: a sandy stone floor with small crystals and pebbles over darker rock.
 - Background, faded and well behind play: layered cave walls and arches in soft purple and teal, crystal clusters, glowing mushrooms and an underground pool, with soft light shafts from above. It stays quieter than in the mockup so every Cubio colour, purple included, reads against it.
 - Speed pickup: a golden coin, KayKit's Prototype Bits coin (CC0).
-- Stalagmites and stalactites start from KayKit's tiered rock towers (Forest Nature pack, CC0), flipped for stalactites. The library has no crystals with a known licence, so crystals are generated in code, as 005's paddle is. The scene-design workflow chooses and verifies the exact models.
+- Stalagmites and stalactites start from KayKit's tiered rock towers (Forest Nature pack, CC0), flipped for stalactites. The library has no crystals with a known licence, so crystals are generated in code, as 005's paddle is. The models, their sources and changes are in [[006 - Asset sources]], and their placement in [[006 - Scene composition]].
 
-![Cave candidates from the asset library](references/cave-candidates.jpg)
+![The selected library sources](references/library-sources.jpg)
 
 More biomes along a journey from A to B are a later version.
 
@@ -283,7 +283,6 @@ Confirmed by the project owner on 2026-10-25:
 * More biomes along a journey from A to B.
 * A ghost of the best run for a single player.
 * A practice flap on the Pre-minigame screen.
-* The exact cave models, through the scene-design workflow.
 * Audio on the shared screen.
 
 ## Validation needs
