@@ -151,6 +151,17 @@ selected Resources are in the [field guide](../minigames/005_3d_tilt_shift/tunin
   `debug/tilt_shift_3d_review.tscn` is its simulated F12 review. See
   [player journeys](player-journeys.md).
 
+## Flappy Race
+
+Minigame 006 is in `minigames/006_flappy_race/`, the first minigame whose `min_players` is 1.
+Only its launch exists; [its README](../minigames/006_flappy_race/README.md) lists the files.
+
+- `flappy_race.tscn` and `flappy_race.gd` (`FlappyRace`) take the launch, register the
+  protocol, show the title and player count, and offer Return to lobby.
+- `flappy_race_protocol.gd` is a `MinigameProtocol` with only a waiting snapshot. See
+  [protocol.md](protocol.md#flappy-race).
+- Its design is in `docs/game-design-documents/Minigames/006/`.
+
 ## Shared 3D components
 
 These live outside any minigame folder so later 3D scenes can use them.
@@ -233,6 +244,7 @@ These live outside any minigame folder so later 3D scenes can use them.
   own paddle in 3D through `web/src/005_3d_tilt_shift/`, with a flat drawing without WebGL.
   `web/src/shape_paddle/` holds the rounded outline and the face composition;
   `web/src/three_view/shape_paddle.ts` draws them with three.js.
+- Flappy Race shows a portrait waiting screen through `web/src/006_flappy_race/`.
 - `web/src/character_preview.ts` mounts a live 3D Cubio only in the visible setup canvas.
   Its renderer is in `web/src/three_view/character_preview.ts`; model and face downloads are
   cached with gameplay's assets. Hidden setup screens release their renderer.

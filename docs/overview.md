@@ -16,6 +16,9 @@ repository.
   launch. Players guide balls in a 3D toy factory on Jolt physics, where each player is a
   paddle in their own colour with a face that reacts. Each phone shows the player's own paddle
   in real-time 3D.
+- **Flappy Race** (minigame 006) starts with 1–10 players, the only minigame that can start
+  with one. Only its launch exists: an empty race scene with Return to lobby, and a portrait
+  waiting screen on the phone.
 - Registered players appear as 3D Cubios in the Playground lobby, a café plaza viewed from
   the side. Each steers their character from a portrait phone stick and a release-action
   button. The billboard shows the join QR; the lobby controls are in the top-right panel. Near-vertical input
@@ -70,8 +73,8 @@ type the displayed URL, on a phone on the same LAN.
 
 ## Starting a round
 
-- Normal play starts with 2–10 registered players. Choose a minigame from the lobby dropdown
-  before starting. Tilt Shift 3D requires an even roster and calibrated motion from
+- Normal play starts with 2–10 registered players, or 1–10 for Flappy Race. Choose a minigame
+  from the lobby dropdown before starting. Tilt Shift 3D requires an even roster and calibrated motion from
   everyone.
 - For debug, register exactly one phone, press F12, and choose a one-player Bubbles
   scenario. The separately labeled Tilt Shift 3D factory review needs no phones.

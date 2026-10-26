@@ -99,8 +99,10 @@ It awaits physical-phone checks and the owner's play review; tuning values are p
 ## Backlog
 
 - Minigame 006, Flappy Race: a phone-first race through a crystal cave with hearts and speed
-  pickups, for 1 to 10 players. Designed in
-  `docs/game-design-documents/Minigames/006/`; not built.
+  pickups, for 1 to 10 players. Designed in `docs/game-design-documents/Minigames/006/`. Its
+  launch exists: 1 to 10 players go through the Pre-minigame screen into an empty race scene
+  and back to the lobby ([0049](decisions/0049-minimum-players-per-minigame.md)). The race
+  itself is not built.
 - The first release, `0.1.0`: decide where the project and the Windows package record the
   version, then follow [branching.md](branching.md#a-release).
 - Cloud CI, if hosted runners turn out to be free for this repository

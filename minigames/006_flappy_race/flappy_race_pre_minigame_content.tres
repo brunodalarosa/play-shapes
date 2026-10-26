@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PreMinigameContent" format=3]
+
+[ext_resource type="Script" path="res://scenes/pre_minigame_content.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+title = "Flappy Race"
+controls = "Hold your phone in portrait. Tap anywhere to flap."
+win_condition = "Fly from the start line to the finish. First across wins; the rest rank by finish time, then by distance."
+hints = "A hit costs a heart. Tap the floating heart to fly again. Golden coins give a short speed boost."

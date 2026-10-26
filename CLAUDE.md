@@ -17,6 +17,9 @@ results and return to the lobby.
   physics on one locked plane, a three.js view of each bubble on the phone.
 - Minigame 005, Tilt Shift 3D: 2/4/6/8/10 players, landscape phone tilt over HTTPS motion
   sensors, plane-locked Jolt physics, an editor workshop addon.
+- Minigame 006, Flappy Race: 1–10 players, the only minigame with `min_players = 1`
+  ([0049](docs/decisions/0049-minimum-players-per-minigame.md)). Only its launch exists so far:
+  an empty scene with Return to lobby and a portrait waiting screen on the phone.
 - 001, 002 and 003 are retired. Minigame numbers are stable identifiers and are never reused.
 
 ## The 3D rework
@@ -135,7 +138,8 @@ Condensed from AGENTS.md and the documents it links.
   needs a person goes into `docs/pending-reviews.md`.
 - Documents state what is true now, one topic each, with links that resolve and paragraphs
   under 600 characters; `node tools/docs.mjs` checks them. Reasons go in `docs/decisions/` as
-  numbered records, never edited to change a decision; the next free number is 0047. The
+  numbered records, never edited to change a decision; 0047 and 0048 are reserved for Flappy
+  Race's shared simulation and tick rule, and 0049 is taken, so the next free number is 0050. The
   roadmap changes when work finishes or is added.
 - No ticket numbers anywhere: files, comments, tests or output folders.
 - Typed GDScript, composition, signals, Control/Container UI and no fixed viewport sizes.

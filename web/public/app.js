@@ -854,6 +854,25 @@ var TiltShift3DPhone = class {
   }
 };
 
+// build/006_flappy_race/phone.js
+function isSnapshot2(value) {
+  if (!value || typeof value !== "object")
+    return false;
+  return value.type === "flappy_race_snapshot";
+}
+var FlappyRacePhone = class {
+  surface;
+  constructor(surface) {
+    this.surface = surface;
+  }
+  show() {
+    this.surface.hidden = false;
+  }
+  hide() {
+    this.surface.hidden = true;
+  }
+};
+
 // build/pwa.js
 function isStandalone(target, browser) {
   return target.matchMedia("(display-mode: standalone)").matches || target.matchMedia("(display-mode: fullscreen)").matches || browser.standalone === true;
@@ -2453,6 +2472,8 @@ var pwa = new PwaOnboarding(document.querySelector("#app-screen"), document.quer
   void requestImmersiveMode();
 });
 var bubble3DCard = document.querySelector("#bubbles-3d-card");
+var flappyRaceSurface = document.querySelector("#flappy-race");
+var flappyRacePhone = new FlappyRacePhone(flappyRaceSurface);
 var threeView;
 function loadThreeView() {
   const url = "/three_view.js";
@@ -2488,7 +2509,7 @@ function showBubble3D(message) {
   status.hidden = true;
   bubble3DPhone.receive(message);
 }
-for (const surface of [lobbyController, readyCard, tilt3DSurface])
+for (const surface of [lobbyController, readyCard, tilt3DSurface, flappyRaceSurface])
   protectControllerSurface(surface);
 bindControllerLifecycle(() => {
 });
@@ -2549,6 +2570,8 @@ function setGameplaySurface(active, game) {
     tilt3DPhone.hide();
   if (next !== "bubbles_3d")
     bubble3DPhone.hide();
+  if (next !== "flappy_race")
+    flappyRacePhone.hide();
   if (activeGame !== next) {
     if (next === null) {
       try {
@@ -2569,6 +2592,7 @@ function setGameplaySurface(active, game) {
   document.documentElement.classList.toggle("gameplay-active", next !== null);
   document.documentElement.classList.toggle("bubbles-3d-active", next === "bubbles_3d");
   document.documentElement.classList.toggle("tilt-3d-active", next === "tilt_shift_3d");
+  document.documentElement.classList.toggle("flappy-race-active", next === "flappy_race");
 }
 function showJoin(message, focus = false) {
   gameplayMotion.stop();
@@ -2647,6 +2671,19 @@ function showTiltSurface() {
   readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
   status.hidden = true;
+}
+function showFlappyRace(message) {
+  if (!isSnapshot2(message))
+    return;
+  gameplayMotion.stop();
+  motionLab.stop();
+  lobbyControls.deactivate();
+  setGameplaySurface(true, "flappy_race");
+  selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = true;
+  readyCard.hidden = true;
+  document.documentElement.classList.remove("ready-active");
+  status.hidden = true;
+  flappyRacePhone.show();
 }
 function showTilt3D(message) {
   if (tilt3DPhone.snapshot(message))
@@ -2783,6 +2820,8 @@ async function connect() {
             showBubble3D(message.gameplay);
           else if (message.gameplay?.type === "tilt_shift_3d_snapshot")
             showTilt3D(message.gameplay);
+          else if (isSnapshot2(message.gameplay))
+            showFlappyRace(message.gameplay);
           else if (message.gameplay?.type === "pre_minigame_snapshot")
             showReady(message.gameplay);
           else if (message.gameplay?.type === "lobby" && message.player && "player_id" in message.player && "name" in message.player)
@@ -2820,6 +2859,8 @@ async function connect() {
         showReady(message);
       else if (message.type === "tilt_shift_3d_snapshot")
         showTilt3D(message);
+      else if (isSnapshot2(message))
+        showFlappyRace(message);
       else if (message.type === "motion_lab" && joined && typeof message.subscription_id === "string" && typeof message.send_hz === "number") {
         lobbyControls.deactivate();
         setGameplaySurface(false);

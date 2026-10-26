@@ -3,6 +3,7 @@ import { isSnapshot as isBubble3DSnapshot } from "./004_3d_bubbles/state.js";
 import type { Message as Bubble3DMessage, ViewModule } from "./004_3d_bubbles/types.js";
 import { TiltShift3DPhone } from "./005_3d_tilt_shift/phone.js";
 import type { Preparation, ViewModule as TiltViewModule } from "./005_3d_tilt_shift/types.js";
+import { FlappyRacePhone, isSnapshot as isFlappyRaceSnapshot } from "./006_flappy_race/phone.js";
 import {
   attemptImmersive,
   protectControllerSurface,
@@ -141,7 +142,7 @@ let joined = false;
 let isReady = false;
 let joinFlow: JoinFlowState = defaultJoinFlow();
 let inputSeq = Number.parseInt(stored(STORAGE.inputSeq), 10) || 0;
-type Game = "bubbles_3d" | "tilt_shift_3d";
+type Game = "bubbles_3d" | "tilt_shift_3d" | "flappy_race";
 let activeGame: Game | null = null;
 const lobbyControls = new LobbyControls(
   lobbyController,
@@ -192,6 +193,8 @@ const pwa = new PwaOnboarding(
   },
 );
 const bubble3DCard = document.querySelector<HTMLElement>("#bubbles-3d-card")!;
+const flappyRaceSurface = document.querySelector<HTMLElement>("#flappy-race")!;
+const flappyRacePhone = new FlappyRacePhone(flappyRaceSurface);
 let threeView: Promise<ViewModule & TiltViewModule & CharacterPreviewModule> | undefined;
 /** The 3D view module, imported once on first use so other screens never download it. */
 function loadThreeView(): Promise<ViewModule & TiltViewModule & CharacterPreviewModule> {
@@ -240,7 +243,7 @@ function showBubble3D(message: Bubble3DMessage): void {
   bubble3DPhone.receive(message);
 }
 
-for (const surface of [lobbyController, readyCard, tilt3DSurface])
+for (const surface of [lobbyController, readyCard, tilt3DSurface, flappyRaceSurface])
   protectControllerSurface(surface);
 bindControllerLifecycle(() => {});
 
@@ -305,6 +308,7 @@ function setGameplaySurface(active: boolean, game?: Game): void {
   const next = active ? (game ?? null) : null;
   if (next !== "tilt_shift_3d") tilt3DPhone.hide();
   if (next !== "bubbles_3d") bubble3DPhone.hide();
+  if (next !== "flappy_race") flappyRacePhone.hide();
   if (activeGame !== next) {
     if (next === null) {
       try {
@@ -328,6 +332,7 @@ function setGameplaySurface(active: boolean, game?: Game): void {
   document.documentElement.classList.toggle("gameplay-active", next !== null);
   document.documentElement.classList.toggle("bubbles-3d-active", next === "bubbles_3d");
   document.documentElement.classList.toggle("tilt-3d-active", next === "tilt_shift_3d");
+  document.documentElement.classList.toggle("flappy-race-active", next === "flappy_race");
 }
 
 function showJoin(message: string, focus = false): void {
@@ -408,6 +413,20 @@ function showTiltSurface(): void {
   readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
   status.hidden = true;
+}
+
+function showFlappyRace(message: unknown): void {
+  if (!isFlappyRaceSnapshot(message)) return;
+
+  gameplayMotion.stop();
+  motionLab.stop();
+  lobbyControls.deactivate();
+  setGameplaySurface(true, "flappy_race");
+  selectionScreen.hidden = nameScreen.hidden = joinForm.hidden = playerCard.hidden = true;
+  readyCard.hidden = true;
+  document.documentElement.classList.remove("ready-active");
+  status.hidden = true;
+  flappyRacePhone.show();
 }
 
 function showTilt3D(message: unknown): void {
@@ -563,6 +582,7 @@ async function connect(): Promise<void> {
           if (isBubble3DSnapshot(message.gameplay)) showBubble3D(message.gameplay);
           else if (message.gameplay?.type === "tilt_shift_3d_snapshot")
             showTilt3D(message.gameplay);
+          else if (isFlappyRaceSnapshot(message.gameplay)) showFlappyRace(message.gameplay);
           else if (message.gameplay?.type === "pre_minigame_snapshot") showReady(message.gameplay);
           else if (
             message.gameplay?.type === "lobby" &&
@@ -622,6 +642,7 @@ async function connect(): Promise<void> {
         showBubble3D(message as unknown as Bubble3DMessage);
       else if (message.type === "pre_minigame_snapshot") showReady(message);
       else if (message.type === "tilt_shift_3d_snapshot") showTilt3D(message);
+      else if (isFlappyRaceSnapshot(message)) showFlappyRace(message);
       else if (
         message.type === "motion_lab" &&
         joined &&

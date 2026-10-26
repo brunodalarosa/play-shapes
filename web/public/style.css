@@ -613,6 +613,55 @@ html.tilt-3d-active main > :not(#tilt-shift-3d) {
 #tilt-shift-3d[data-waiting="true"][data-team="1"] {
   background: radial-gradient(circle, #b5d5ff 0 14%, #4c88df 15% 18%, #243345 19%);
 }
+html.flappy-race-active,
+html.flappy-race-active body {
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  background: #68c3c8;
+  overscroll-behavior: none;
+}
+html.flappy-race-active main {
+  padding: 0;
+  margin: 0;
+  max-inline-size: none;
+  inline-size: 100%;
+  block-size: var(--controller-height, 100dvh);
+}
+html.flappy-race-active main > :not(#flappy-race) {
+  display: none !important;
+}
+#flappy-race {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  background: linear-gradient(#9fe0de, #68c3c8 55%, #8a7bc4);
+  color: #284050;
+  text-align: center;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+#flappy-race h2 {
+  margin: 0;
+  padding: 18px 32px;
+  border: 4px solid #b98c5b;
+  border-radius: 24px;
+  background: #fff3cb;
+  font-size: 2.4rem;
+}
+#flappy-race p {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
 html.bubbles-3d-active,
 html.bubbles-3d-active body {
   inline-size: 100%;

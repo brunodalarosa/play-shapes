@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="MinigameDefinition" format=3]
+
+[ext_resource type="Script" path="res://minigames/minigame_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"flappy_race"
+display_name = "Flappy Race"
+scene_path = "res://minigames/006_flappy_race/flappy_race.tscn"
+min_players = 1
+max_players = 10
+pre_minigame_content_path = "res://minigames/006_flappy_race/flappy_race_pre_minigame_content.tres"

@@ -191,6 +191,13 @@ preserves neutral and does not recover unseen complete turns.
 quarter-turn display orientation qualifies. It is included in Tilt Shift 3D preparation,
 control feedback and gameplay snapshots. It does not change capture `usable` or paddle angles.
 
+## Flappy Race
+
+Flappy Race launches through the shared Pre-minigame gate with 1 to 10 players. Its race is not
+built: `flappy_race_protocol.gd` accepts no gameplay messages, and `flappy_race_snapshot`
+carries only `state`, always `waiting`, and `player_count`. The phone shows it as a portrait
+waiting screen, on launch and on reconnect.
+
 ## Bubbles and jellyfishes 3D
 
 Minigame 004 uses messages with a `bubbles_3d` prefix and has no spin or charge. Every client

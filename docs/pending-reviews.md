@@ -99,6 +99,12 @@ removes it. The evidence labels are defined in
   arena widths in orange, blue and grey, and heights of 0.75 and 2 times.
 - The faces and bins in the running scene are reviewed with minigame 005.
 
+## Flappy Race
+
+- `[PHYSICAL-PHONE]` On the iPhone Safari and Android Chrome pair: one phone starts Flappy Race
+  from the lobby, READY on the Pre-minigame screen, the portrait waiting screen with the
+  orientation lock where the browser allows it, and Return to lobby.
+
 ## Tilt Shift 3D
 
 - `[HUMAN-PLAY]` Feel: tilting responsiveness on Jolt, including balls rolling off the rounded

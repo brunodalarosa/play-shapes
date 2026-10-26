@@ -65,6 +65,12 @@ A phone without WebGL, or one whose 3D view fails to load twice, draws the same 
 flat on a 2D canvas. Phones wait a random moment of up to 1.5 seconds before their first
 download, and load face parts one at a time, so a room of phones does not overwhelm the host.
 
+## The Flappy Race screen
+
+The race is not built. After READY the phone shows a portrait waiting screen with the title,
+asking the player to watch the shared screen, and shows it again on reconnect. Returning to the
+lobby hides it.
+
 ## Keeping the screen awake
 
 The visible phone page requests Screen Wake Lock throughout onboarding, lobby, preparation,
