@@ -77,7 +77,7 @@ The shared screen shows the same floating heart in the player's colour at the re
 
 Small speed pickups sit inside some gaps, placed close to an obstacle edge so that taking one is a risk.
 
-- A pickup is a small glowing gold crystal. Touching one gives a boost: forward speed rises by a tunable amount (default 25%) for a tunable time (default 3 s), with a short `face_beaming`.
+- A pickup is a spinning golden coin, which reads at once as a power-up. Touching one gives a boost: forward speed rises by a tunable amount (default 25%) for a tunable time (default 3 s), with a short `face_beaming`.
 - Taking another while boosted restarts the boost time; boosts do not stack.
 - Pickups are per player: every player can take every pickup on their own run. The phone hides a pickup its player has taken. The shared screen always shows every pickup and plays a burst in the taker's colour when anyone takes one.
 
@@ -117,11 +117,11 @@ Version 1 has one biome: a bright, toy-like crystal cave. Stalactites coming fro
 
 The mockups show composition; their incidental colours, crystal placement and background detail are not requirements.
 
-- Hanging obstacles: chunky faceted stalactites in warm sandy stone, coming down from far above the view and ending in a tip at the gap, with a few crystals growing on them.
+- Hanging obstacles: chunky faceted stalactites in warm sandy stone, coming down from far above the view and tapering to a tip at the gap, each one formation. A few large crystal clusters grow out of the stone, as natural crystals do.
 - Ground obstacles: matching stalagmites, tiered rock stacks and crystal clusters rising from the cave floor.
 - Ground: a sandy stone floor with small crystals and pebbles over darker rock.
 - Background, faded and well behind play: layered cave walls and arches in soft purple and teal, crystal clusters, glowing mushrooms and an underground pool, with soft light shafts from above. It stays quieter than in the mockup so every Cubio colour, purple included, reads against it.
-- Speed pickup: a small glowing gold crystal.
+- Speed pickup: a golden coin, KayKit's Prototype Bits coin (CC0).
 - Stalagmites and stalactites start from KayKit's tiered rock towers (Forest Nature pack, CC0), flipped for stalactites. The library has no crystals with a known licence, so crystals are generated in code, as 005's paddle is. The scene-design workflow chooses and verifies the exact models.
 
 ![Cave candidates from the asset library](references/cave-candidates.jpg)
@@ -273,7 +273,7 @@ Confirmed by the project owner on 2026-10-25:
 * The seed only in the F12 debug review.
 * Cubio's hands become its wings; it tilts with its velocity; only the body cube collides.
 * Faces as in [Cubio with wings](#cubio-with-wings), with `face_beaming` for a pickup.
-* One biome, a bright crystal cave with no visible ceiling, chosen over the forest after comparing mockups, because stalactites feel natural as obstacles from above. Crystals are generated in code.
+* One biome, a bright crystal cave with no visible ceiling, chosen over the forest after comparing mockups, because stalactites feel natural as obstacles from above. Crystals are generated in code. The speed pickup is a golden coin rather than a crystal, so it reads as a power-up.
 * The name is Flappy Race, number 006.
 
 ## Deferred decisions
