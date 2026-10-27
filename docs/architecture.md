@@ -154,12 +154,17 @@ selected Resources are in the [field guide](../minigames/005_3d_tilt_shift/tunin
 ## Flappy Race
 
 Minigame 006 is in `minigames/006_flappy_race/`, the first minigame whose `min_players` is 1.
-Only its launch exists; [its README](../minigames/006_flappy_race/README.md) lists the files.
+Its launch, its course generator and its tuning exist; the race is not built.
+[Its README](../minigames/006_flappy_race/README.md) lists the files.
 
 - `flappy_race.tscn` and `flappy_race.gd` (`FlappyRace`) take the launch, register the
   protocol, show the title and player count, and offer Return to lobby.
 - `flappy_race_protocol.gd` is a `MinigameProtocol` with only a waiting snapshot. See
   [protocol.md](protocol.md#flappy-race).
+- `flappy_race_course.gd` (`FlappyRaceCourse`) generates the seeded course on the host: obstacle
+  pairs, respawn spots, pickups and each ground half's look, following difficulty `Curve`s over
+  course progress. Its `to_dictionary` is what phones will receive.
+- `FlappyRaceTuning` selects the flight and course values in `Tuning/Active Presets.tres`.
 - Its design is in `docs/game-design-documents/Minigames/006/`.
 
 ## Shared 3D components
@@ -175,6 +180,12 @@ These live outside any minigame folder so later 3D scenes can use them.
 - `components/screen_follow_label.gd`: screen text that follows a 3D node.
 - `components/rounded_bar/`: `RoundedBar` builds a bar's rounded outline, mesh and convex
   collider from its length, thickness, depth and corner radius.
+- `components/flappy_flight/`: the flappy shape gameplay, plain typed GDScript with no
+  nodes. `FlappyFlight` steps one player's flight at 60 Hz over a `FlappyFlightCourse`;
+  `HeartRow` holds the hearts; `FlappyFlightTuning` holds the values the phone also receives.
+  `web/src/flappy_flight/` is the same step in TypeScript, line for line
+  ([0047](decisions/0047-shared-deterministic-simulation.md)). `FlappyFlightAutopilot` flies a
+  course with no hit, for tests and simulated players.
 - `components/shape_face/`: the shape character face. `ShapeFaceManifest` reads the shared
   face parts and presets, `ShapeFaceExpressions` keeps timed expressions with priorities and
   natural blinks, and `ShapeFace3D` and `ShapeFace2D` draw a face in 3D or in a Control.
@@ -245,6 +256,7 @@ These live outside any minigame folder so later 3D scenes can use them.
   `web/src/shape_paddle/` holds the rounded outline and the face composition;
   `web/src/three_view/shape_paddle.ts` draws them with three.js.
 - Flappy Race shows a portrait waiting screen through `web/src/006_flappy_race/`.
+  `web/src/flappy_flight/` holds its flight rules for the phone's prediction, not yet used.
 - `web/src/character_preview.ts` mounts a live 3D Cubio only in the visible setup canvas.
   Its renderer is in `web/src/three_view/character_preview.ts`; model and face downloads are
   cached with gameplay's assets. Hidden setup screens release their renderer.
@@ -282,10 +294,11 @@ tuning UI.
 
 - Open `Tuning/Active Presets.tres` to select named resources. The current front doors are
   `minigames/004_3d_bubbles/tuning/Default.tres`,
-  `minigames/005_3d_tilt_shift/tuning/Default.tres` and `Tuning/Shared/Networking/Default.tres`.
+  `minigames/005_3d_tilt_shift/tuning/Default.tres`,
+  `minigames/006_flappy_race/tuning/Default.tres` and `Tuning/Shared/Networking/Default.tres`.
 - Restart to apply a changed selection.
-- Field descriptions for Bubbles and jellyfishes 3D and Tilt Shift 3D are in the `README.md`
-  beside each `Default.tres`.
+- Field descriptions for Bubbles and jellyfishes 3D, Tilt Shift 3D and Flappy Race are in the
+  `README.md` beside each `Default.tres`.
 - Only the human owner promotes subjective feel into `Default`. Tests establish configuration
   safety, not fun or comfort.
 

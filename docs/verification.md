@@ -44,8 +44,8 @@ This is the default `[AUTO]` check. In order, it runs:
 7. The two-phone Tilt Shift 3D end-to-end journey described below. The Bubbles and jellyfishes
    3D journey is tagged `@flaky` and left out.
 
-`--full` adds the 4/6/8/10-phone Tilt Shift 3D journeys and
-`tilt_shift_3d_rotation_contact_test.gd`. The default retains the shorter Tilt Shift 3D
+`--full` adds the 4/6/8/10-phone Tilt Shift 3D journeys,
+`tilt_shift_3d_rotation_contact_test.gd` and `flappy_race_flyable_sweep_test.gd`. The default retains the shorter Tilt Shift 3D
 physics checks. Windows export remains a separate `--release` option. Name filters do not override these
 coverage options.
 
@@ -223,6 +223,19 @@ start only what they need, so they stay fast.
   contact speeds), the expression rules, the presentation, the protocol and the workshop.
   `tilt_shift_3d_rotation_contact_test.gd` adds extended full turns and reversal with
   `node tools/check.mjs --full tilt_shift_3d_rotation_contact`.
+- Flappy Race: `tests/flappy_flight_test.gd` covers the flight, hearts, respawns,
+  invulnerability and pickups. The `tests/` folder of `minigames/006_flappy_race/` covers the
+  course generator and flyability: the autopilot flies a few seeds with no hit and a perfect
+  run in 2 minutes, and `flappy_race_flyable_sweep_test.gd` flies 45 more under `--full`. Run
+  `node tools/check.mjs flappy`.
+- The flight's parity: `tests/flappy_flight_parity_test.gd` and
+  `web/tests/flappy_flight/parity.test.mjs` must both reproduce every run in
+  `tests/fixtures/flappy_flight_runs.json`, its events and a digest of every tick's exact state
+  ([0047](decisions/0047-shared-deterministic-simulation.md)). On a mismatch each writes its
+  trace under `test-results/flappy_flight/` for a diff.
+- After a deliberate change to the flight rules, change both languages, rewrite the fixture
+  with `godot --headless --path . --script res://tests/flappy_flight_parity_test.gd --
+  --write-fixture`, and commit it with the change.
 - In `tests/`, `rounded_bar_test.gd`, `shape_face_test.gd`, `plane_3d_test.gd`,
   `tilt_shift_3d_props_test.gd` and `tilt_shift_3d_review_test.gd` cover the shared pieces,
   the copied assets and the F12 review. Run `node tools/check.mjs tilt_shift_3d rounded_bar
