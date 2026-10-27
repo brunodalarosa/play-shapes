@@ -12,6 +12,8 @@ extends Resource
 @export var course: FlappyRaceCourseTuning = preload(
 	"res://minigames/006_flappy_race/tuning/Course.tres"
 )
+## How the race looks and feels on the phone and the shared screen.
+@export var view: FlappyRaceViewTuning = preload("res://minigames/006_flappy_race/tuning/View.tres")
 
 @export_group("Race")
 ## 3, 2, 1, GO before forward motion and gravity start, s. Default: 3.
@@ -34,8 +36,8 @@ static func ticks(seconds: float) -> int:
 
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
-	if flight == null or course == null:
-		errors.append("Flappy Race: the flight and course tuning must be set.")
+	if flight == null or course == null or view == null:
+		errors.append("Flappy Race: the flight, course and view tuning must be set.")
 		return errors
 
 	errors.append_array(flight.validation_errors())

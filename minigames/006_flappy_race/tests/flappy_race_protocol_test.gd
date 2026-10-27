@@ -48,9 +48,12 @@ func _check_snapshot() -> void:
 		and snapshot.player_count == 2 and snapshot.countdown_remaining_msec == 3000
 		and snapshot.window_ticks == 15 and snapshot.race_ticks == 21600
 		and snapshot.flight == TUNING.flight.to_dictionary()
+		and snapshot.view == TUNING.view.to_dictionary()
+		and snapshot.character_color == _controller.racer_for("p0").character_color
 		and snapshot.course.flight.obstacles.size() == _controller.course.flight.obstacles.size()
 		and snapshot.own.flight.y == _controller.course.flight.start_y,
-		"The snapshot carries the timings, the flight tuning, the course and the own flight",
+		"The snapshot carries the timings, the flight and view tuning, "
+		+ "the course and the own flight",
 	)
 	check(size < 24000, "The snapshot with the whole course stays small")
 	check(

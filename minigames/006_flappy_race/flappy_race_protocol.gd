@@ -68,6 +68,7 @@ func snapshot_for(player_id: String) -> Dictionary:
 
 	var snapshot := {
 		"type": SNAPSHOT_TYPE,
+		"character_color": racer.character_color,
 		"phase": str(controller.phase_name()),
 		"player_count": controller.racers().size(),
 		"tick_rate": FlappyFlightTuning.TICK_RATE,
@@ -78,6 +79,7 @@ func snapshot_for(player_id: String) -> Dictionary:
 		"race_ticks": controller.race_ticks(),
 		"last_seconds_tick": controller.last_seconds_tick(),
 		"flight": controller.tuning.flight.to_dictionary(),
+		"view": controller.tuning.view.to_dictionary(),
 		"course": controller.course.to_dictionary(),
 		"own": _own(racer),
 	}

@@ -212,7 +212,8 @@ default) behind its clock, and applies each tap at its own tick when that lies i
 `flappy_race_snapshot` is sent on launch and on every resume. It carries `phase` (`countdown`,
 `racing` or `results`), `player_count`, `tick_rate`, the settled `tick`, the host's
 `clock_tick`, `countdown_remaining_msec`, `window_ticks`, `race_ticks`, `last_seconds_tick`,
-the flight tuning as `flight`, the generated `course` and the player's own state as `own`. In
+the flight tuning as `flight`, the presentation values as `view`, the player's
+`character_color`, the generated `course` and the player's own state as `own`. In
 results it adds `results`, every player's `place`, `name`, colour, finish time or distance and
 `dnf`.
 

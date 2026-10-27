@@ -1,7 +1,7 @@
 # Flappy Race tuning
 
 Select a rules Resource in `Tuning/Active Presets.tres`, under Flappy Race. `Default.tres`
-selects `Flight.tres` and `Course.tres` and holds the race values below. Changes apply when
+selects `Flight.tres`, `Course.tres` and `View.tres`, and holds the race values below. Changes apply when
 the host next starts.
 
 The values are starting points taken from the Flappy Bird reference in
@@ -65,3 +65,18 @@ The generator also keeps each gap within what a Cubio can still fall or climb to
 clear space at boosted speed, so every course can be flown; the flyability tests prove it at
 the defaults. Validation refuses values that leave no room for a respawn spot, gaps smaller
 than the hit box, and pickups that do not fit their gap.
+
+## View
+
+`View.tres` is a `FlappyRaceViewTuning`: how the race looks and feels on the phone and the
+shared screen. No value changes a flight; the phone receives them in its snapshot.
+
+| Field | Default | Effect |
+| --- | --- | --- |
+| Tilt up and down | 25° and 70° | Nose-up tilt at the flap velocity, nose-down at the fastest fall. |
+| Tilt response | 0.08 s | How quickly the tilt follows the vertical speed. |
+| Hit tumble | 0.6 s | The dizzy tumble at the hit spot before the Cubio leaves play. |
+| Pickup face | 0.6 s | How long the beaming face lasts after a pickup. |
+| Phone Cubio position | 0.3 | Share of the phone's width from the left edge to its Cubio. |
+| Correction | 0.12 s | Time a host correction takes to blend out of the phone's drawing. |
+| Heart flight | 0.6 s | Time the spent heart takes to fly from the row to the respawn spot. |
