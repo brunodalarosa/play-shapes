@@ -42,6 +42,7 @@ func validation_errors() -> PackedStringArray:
 
 	errors.append_array(flight.validation_errors())
 	errors.append_array(course.validation_errors())
+	errors.append_array(view.validation_errors())
 	if not errors.is_empty():
 		return errors
 

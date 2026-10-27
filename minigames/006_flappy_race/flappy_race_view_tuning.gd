@@ -36,3 +36,29 @@ func to_dictionary() -> Dictionary:
 		"correction_seconds": correction_seconds,
 		"heart_flight_seconds": heart_flight_seconds,
 	}
+
+
+func validation_errors() -> PackedStringArray:
+	var errors := PackedStringArray()
+	var tilts := [tilt_up_degrees, tilt_down_degrees]
+	if tilts.any(
+		func(value: float) -> bool:
+			return value < 0.0 or value > 90.0,
+	):
+		errors.append("Flappy Race view: tilts must lie between 0 and 90 degrees.")
+	var durations := [
+		tilt_response_seconds,
+		hit_tumble_seconds,
+		pickup_face_seconds,
+		correction_seconds,
+	]
+	if durations.any(
+		func(value: float) -> bool:
+			return value < 0.0,
+	):
+		errors.append("Flappy Race view: durations cannot be negative.")
+	if heart_flight_seconds <= 0.0:
+		errors.append("Flappy Race view: the heart flight must take some time.")
+	if phone_cubio_screen_share <= 0.0 or phone_cubio_screen_share >= 1.0:
+		errors.append("Flappy Race view: the phone's Cubio must sit inside the screen.")
+	return errors

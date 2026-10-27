@@ -230,7 +230,7 @@ test("a hit flies a heart to the respawn spot, where it waits and pulses when re
       x: obstacle.respawn_x,
       y: obstacle.respawn_y,
       flying: false,
-      cooldown_ticks: 30,
+      cooldown_ticks: 120,
       hearts: { full: 2, refill_ticks: 0, owed: false },
     };
     await host(page, {
