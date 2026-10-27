@@ -55,8 +55,8 @@ func _check_one_player_rules(host: Node) -> bool:
 	)
 
 
-## Starts Flappy Race from the lobby, readies every player, checks the race scene and the
-## phones' protocol, then returns to the lobby.
+## Starts Flappy Race from the lobby, readies every player, checks the race scene, its
+## countdown and the phones' protocol, then returns to the lobby.
 func _race_and_return(host: Node, players: Array[Dictionary]) -> bool:
 	var count := players.size()
 	_select(FlappyRace.ID)
@@ -85,9 +85,15 @@ func _race_and_return(host: Node, players: Array[Dictionary]) -> bool:
 	var snapshot := protocol.snapshot_for(String(players[0].player.player_id))
 	if not check(
 		protocol is FlappyRaceProtocol and protocol == host.websocket._minigame_protocol
-		and snapshot.type == "flappy_race_snapshot" and snapshot.state == "waiting"
+		and snapshot.type == "flappy_race_snapshot" and snapshot.phase == "countdown"
 		and snapshot.player_count == count and not host.accepting_new_players,
 		"Flappy Race with %d owns the phones' protocol and closes joins" % count,
+	):
+		return false
+	if not check(
+		race.controller.racers().size() == count and not snapshot.course.flight.obstacles.is_empty()
+		and race.status_text().begins_with("Get ready"),
+		"Flappy Race with %d counts down to a race on a generated course" % count,
 	):
 		return false
 

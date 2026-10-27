@@ -4,7 +4,21 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { chromium } from "@playwright/test";
 
-const WAITING = { type: "flappy_race_snapshot", state: "waiting", player_count: 1 };
+const WAITING = {
+  type: "flappy_race_snapshot",
+  phase: "countdown",
+  player_count: 1,
+  tick_rate: 60,
+  tick: 0,
+  clock_tick: -180,
+  countdown_remaining_msec: 3000,
+  window_ticks: 15,
+  race_ticks: 21600,
+  last_seconds_tick: 21000,
+  flight: {},
+  course: { flight: { obstacles: [], pickups: [] } },
+  own: {},
+};
 const PLAYER = { player_id: "one", name: "Tester", seat: 1, state: "connected" };
 
 async function phone(verify) {
@@ -90,6 +104,17 @@ test("the race start replaces READY with the Flappy Race waiting screen", async 
       await page.evaluate(() => document.documentElement.classList.contains("flappy-race-active")),
       true,
     );
+  });
+});
+
+test("race state and events leave the waiting screen as it is", async () => {
+  await phone(async (page) => {
+    await resume(page, WAITING);
+    await page.evaluate(() => {
+      window.receiveHost({ type: "flappy_race_event", event: "go", tick: 0 });
+      window.receiveHost({ type: "flappy_race_state", tick: 3, clock_tick: 18, own: {} });
+    });
+    assert.equal(await page.locator("#flappy-race").isVisible(), true);
   });
 });
 

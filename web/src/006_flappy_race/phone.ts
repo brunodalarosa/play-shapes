@@ -1,8 +1,24 @@
-/** The host's Flappy Race state for one phone. The race is not built yet, so it only waits. */
+/**
+ * The host's Flappy Race snapshot for one phone, sent on launch and on every resume. The phone
+ * does not fly the race yet, so it only waits; flappy_race_state and flappy_race_event messages
+ * are not read.
+ */
 export type Snapshot = {
   type: "flappy_race_snapshot";
-  state: "waiting";
+  phase: "countdown" | "racing" | "results";
   player_count: number;
+  tick_rate: number;
+  /** The settled tick, one tap window behind the host's clock. */
+  tick: number;
+  clock_tick: number;
+  countdown_remaining_msec: number;
+  window_ticks: number;
+  race_ticks: number;
+  last_seconds_tick: number;
+  flight: Record<string, number>;
+  course: unknown;
+  own: unknown;
+  results?: unknown[];
 };
 
 export function isSnapshot(value: unknown): value is Snapshot {
