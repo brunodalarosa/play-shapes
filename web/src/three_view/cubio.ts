@@ -4,7 +4,7 @@ import { modelInstance } from "./assets.js";
 import { ShapeFace3D } from "./shape_face.js";
 
 const TINTED = ["Body", "HandL", "HandR", "FootL", "FootR"];
-/** The face a Cubio shows, as on the host. */
+/** The face a Cubio shows unless asked for another, as on the host. */
 const FACE = "face_slightly_smiling";
 
 /** Where the face sits on the model's FaceAnchor, in source units, X right and Y up. */
@@ -71,13 +71,19 @@ export async function createCubio() {
   return {
     root,
     face,
-    update(delta: number, height: number, playerColor: string, white: boolean): void {
+    update(
+      delta: number,
+      height: number,
+      playerColor: string,
+      white: boolean,
+      faceName = FACE,
+    ): void {
       mixer.update(delta);
       seconds += delta;
       root.scale.setScalar(height / 2.62);
       color.set(playerColor);
       tint.color.copy(white ? color.set(0xffffff) : color);
-      face.set(faceLayers(manifest, FACE, blinker.closed(seconds)), anchor.height);
+      face.set(faceLayers(manifest, faceName, blinker.closed(seconds)), anchor.height);
     },
     dispose(): void {
       mixer.stopAllAction();

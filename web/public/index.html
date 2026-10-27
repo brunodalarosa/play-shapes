@@ -144,8 +144,23 @@
         </div>
       </section>
       <section id="flappy-race" aria-labelledby="flappy-race-title" hidden>
-        <h2 id="flappy-race-title">Flappy Race</h2>
-        <p>Watch the shared screen.</p>
+        <h2 id="flappy-race-title" class="visually-hidden">Flappy Race</h2>
+        <canvas class="flappy-view" aria-label="Your Cubio in the race" hidden></canvas>
+        <canvas class="flappy-fallback" aria-label="Your Cubio in the race" hidden></canvas>
+        <div class="flappy-hud">
+          <div class="flappy-hearts" aria-label="Hearts"></div>
+          <div class="flappy-progress" aria-label="Progress to the finish">
+            <div class="flappy-progress-fill"></div>
+          </div>
+          <p class="flappy-timer" aria-label="Time left">6:00</p>
+          <div class="flappy-floating-heart" aria-hidden="true" hidden>&#9829;</div>
+          <p class="flappy-cue" role="status" hidden></p>
+        </div>
+        <div class="flappy-results" role="status" hidden>
+          <p class="flappy-result-place"></p>
+          <p class="flappy-result-detail"></p>
+          <p>Look at the shared screen for everyone's results.</p>
+        </div>
       </section>
       <noscript>Enable JavaScript to connect to the game.</noscript>
       <p class="footnote">Keep this page open while you play.</p>

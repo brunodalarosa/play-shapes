@@ -3,7 +3,13 @@ import { isSnapshot as isBubble3DSnapshot } from "./004_3d_bubbles/state.js";
 import type { Message as Bubble3DMessage, ViewModule } from "./004_3d_bubbles/types.js";
 import { TiltShift3DPhone } from "./005_3d_tilt_shift/phone.js";
 import type { Preparation, ViewModule as TiltViewModule } from "./005_3d_tilt_shift/types.js";
-import { FlappyRacePhone, isSnapshot as isFlappyRaceSnapshot } from "./006_flappy_race/phone.js";
+import {
+  FlappyRacePhone,
+  isEvent as isFlappyRaceEvent,
+  isSnapshot as isFlappyRaceSnapshot,
+  isState as isFlappyRaceState,
+} from "./006_flappy_race/phone.js";
+import type { FlappyViewModule } from "./006_flappy_race/types.js";
 import {
   attemptImmersive,
   protectControllerSurface,
@@ -194,14 +200,19 @@ const pwa = new PwaOnboarding(
 );
 const bubble3DCard = document.querySelector<HTMLElement>("#bubbles-3d-card")!;
 const flappyRaceSurface = document.querySelector<HTMLElement>("#flappy-race")!;
-const flappyRacePhone = new FlappyRacePhone(flappyRaceSurface);
-let threeView: Promise<ViewModule & TiltViewModule & CharacterPreviewModule> | undefined;
+type ThreeViewModule = ViewModule & TiltViewModule & CharacterPreviewModule & FlappyViewModule;
+const flappyRacePhone = new FlappyRacePhone(
+  flappyRaceSurface,
+  (message) => {
+    if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify(message));
+  },
+  () => loadThreeView(),
+);
+let threeView: Promise<ThreeViewModule> | undefined;
 /** The 3D view module, imported once on first use so other screens never download it. */
-function loadThreeView(): Promise<ViewModule & TiltViewModule & CharacterPreviewModule> {
+function loadThreeView(): Promise<ThreeViewModule> {
   const url = "/three_view.js";
-  threeView ??= (
-    import(url) as Promise<ViewModule & TiltViewModule & CharacterPreviewModule>
-  ).catch((error: unknown) => {
+  threeView ??= (import(url) as Promise<ThreeViewModule>).catch((error: unknown) => {
     threeView = undefined;
     throw error;
   });
@@ -426,7 +437,7 @@ function showFlappyRace(message: unknown): void {
   readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
   status.hidden = true;
-  flappyRacePhone.show();
+  flappyRacePhone.receive(message);
 }
 
 function showTilt3D(message: unknown): void {
@@ -643,6 +654,8 @@ async function connect(): Promise<void> {
       else if (message.type === "pre_minigame_snapshot") showReady(message);
       else if (message.type === "tilt_shift_3d_snapshot") showTilt3D(message);
       else if (isFlappyRaceSnapshot(message)) showFlappyRace(message);
+      else if (isFlappyRaceState(message) || isFlappyRaceEvent(message))
+        flappyRacePhone.receive(message);
       else if (
         message.type === "motion_lab" &&
         joined &&

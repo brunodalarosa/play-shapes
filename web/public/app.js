@@ -854,23 +854,871 @@ var TiltShift3DPhone = class {
   }
 };
 
-// build/006_flappy_race/phone.js
+// build/flappy_flight/heart_row.js
+var HeartRow = class {
+  count;
+  full;
+  /** Ticks of progress on the leftmost empty heart. */
+  refillTicks = 0;
+  owed = false;
+  recoveryTicks;
+  constructor(heartCount, heartRecoveryTicks) {
+    this.count = heartCount;
+    this.full = heartCount;
+    this.recoveryTicks = heartRecoveryTicks;
+  }
+  /** Advances the refill by one tick. Returns true when a heart finished refilling. */
+  tick() {
+    if (this.full >= this.count)
+      return false;
+    this.refillTicks += 1;
+    if (this.refillTicks < this.recoveryTicks)
+      return false;
+    this.refillTicks = 0;
+    if (this.owed)
+      this.owed = false;
+    else
+      this.full += 1;
+    return true;
+  }
+  hit() {
+    if (this.full > 0)
+      this.full -= 1;
+    else
+      this.owed = true;
+  }
+  /** How far the leftmost empty heart has refilled, 0 to 1. */
+  refillShare() {
+    return this.refillTicks / this.recoveryTicks;
+  }
+  copyFrom(other) {
+    this.count = other.count;
+    this.full = other.full;
+    this.refillTicks = other.refillTicks;
+    this.owed = other.owed;
+    this.recoveryTicks = other.recoveryTicks;
+  }
+};
+
+// build/flappy_flight/tuning.js
+var TICK_RATE = 60;
+var TICK = 1 / TICK_RATE;
+var BODY_SIZE = 2;
+function hitHalf(tuning) {
+  return BODY_SIZE * 0.5 - tuning.hit_box_inset;
+}
+function boostedSpeed(tuning) {
+  return tuning.forward_speed * (1 + tuning.boost_share);
+}
+
+// build/flappy_flight/flight.js
+var EVENT_FLAP = 1;
+var EVENT_HIT = 2;
+var EVENT_PICKUP = 4;
+var EVENT_HEART_REFILLED = 8;
+var EVENT_READY = 16;
+var EVENT_RESPAWN = 32;
+var FlappyFlightState = class _FlappyFlightState {
+  /** Body centre, metres along the course and above the ground. While waiting, the respawn spot. */
+  x = 0;
+  y = 0;
+  verticalSpeed = 0;
+  /** False from a hit until the respawn tap. */
+  flying = true;
+  /** Waiting and allowed to respawn: the cooldown is over and no heart is owed. */
+  ready = false;
+  cooldownTicks = 0;
+  invulnerableTicks = 0;
+  boostTicks = 0;
+  /** The first obstacle the hit box has not yet passed. */
+  obstacleIndex = 0;
+  hearts;
+  /** One entry per course pickup, 1 once this player has taken it. */
+  taken;
+  constructor(hearts, pickupCount) {
+    this.hearts = hearts;
+    this.taken = new Uint8Array(pickupCount);
+  }
+  copyFrom(other) {
+    this.x = other.x;
+    this.y = other.y;
+    this.verticalSpeed = other.verticalSpeed;
+    this.flying = other.flying;
+    this.ready = other.ready;
+    this.cooldownTicks = other.cooldownTicks;
+    this.invulnerableTicks = other.invulnerableTicks;
+    this.boostTicks = other.boostTicks;
+    this.obstacleIndex = other.obstacleIndex;
+    this.hearts.copyFrom(other.hearts);
+    this.taken = other.taken.slice();
+  }
+  copy() {
+    const state = new _FlappyFlightState(new HeartRow(0, 1), 0);
+    state.copyFrom(this);
+    return state;
+  }
+};
+var FlappyFlight = class {
+  course;
+  forwardSpeed;
+  boostedSpeed;
+  flapVelocity;
+  gravity;
+  maxFallSpeed;
+  hitHalf;
+  heartCount;
+  heartRecoveryTicks;
+  cooldownTicks;
+  invulnerableTicks;
+  boostTicks;
+  constructor(tuning, course) {
+    this.course = course;
+    this.forwardSpeed = tuning.forward_speed;
+    this.boostedSpeed = boostedSpeed(tuning);
+    this.flapVelocity = tuning.flap_velocity;
+    this.gravity = tuning.gravity;
+    this.maxFallSpeed = tuning.max_fall_speed;
+    this.hitHalf = hitHalf(tuning);
+    this.heartCount = tuning.heart_count;
+    this.heartRecoveryTicks = tuning.heart_recovery_ticks;
+    this.cooldownTicks = tuning.respawn_cooldown_ticks;
+    this.invulnerableTicks = tuning.invulnerable_ticks;
+    this.boostTicks = tuning.boost_ticks;
+  }
+  /** A player at the start line at GO, flying with every heart full. */
+  newState() {
+    const hearts = new HeartRow(this.heartCount, this.heartRecoveryTicks);
+    const state = new FlappyFlightState(hearts, this.course.pickups.length);
+    state.x = this.course.start_x;
+    state.y = this.course.start_y;
+    return state;
+  }
+  /**
+   * Advances `state` by one tick. `tap` is a touch-down during this tick: a flap while flying,
+   * the respawn while waiting and ready, and nothing otherwise. Returns the EVENT_ bits.
+   */
+  step(state, tap) {
+    let events = 0;
+    if (state.hearts.tick())
+      events |= EVENT_HEART_REFILLED;
+    if (!state.flying) {
+      if (state.cooldownTicks > 0)
+        state.cooldownTicks -= 1;
+      if (!state.ready && state.cooldownTicks === 0 && !state.hearts.owed) {
+        state.ready = true;
+        events |= EVENT_READY;
+      }
+      if (!state.ready || !tap)
+        return events;
+      state.flying = true;
+      state.ready = false;
+      state.invulnerableTicks = this.invulnerableTicks;
+      state.obstacleIndex = 0;
+      events |= EVENT_RESPAWN;
+    }
+    if (tap) {
+      state.verticalSpeed = this.flapVelocity;
+      events |= EVENT_FLAP;
+    } else {
+      state.verticalSpeed = Math.max(state.verticalSpeed - this.gravity * TICK, -this.maxFallSpeed);
+    }
+    const speed = state.boostTicks > 0 ? this.boostedSpeed : this.forwardSpeed;
+    state.x += speed * TICK;
+    state.y += state.verticalSpeed * TICK;
+    if (state.boostTicks > 0)
+      state.boostTicks -= 1;
+    events |= this.takePickups(state);
+    events |= this.collide(state);
+    if (state.invulnerableTicks > 0)
+      state.invulnerableTicks -= 1;
+    return events;
+  }
+  takePickups(state) {
+    let events = 0;
+    const pickups = this.course.pickups;
+    for (let index = 0; index < pickups.length; index += 1) {
+      if (state.taken[index] !== 0)
+        continue;
+      const pickup = pickups[index];
+      const reach = this.hitHalf + pickup.half_size;
+      if (Math.abs(state.x - pickup.x) < reach && Math.abs(state.y - pickup.y) < reach) {
+        state.taken[index] = 1;
+        state.boostTicks = this.boostTicks;
+        events |= EVENT_PICKUP;
+      }
+    }
+    return events;
+  }
+  collide(state) {
+    const obstacles = this.course.obstacles;
+    const back = state.x - this.hitHalf;
+    const front = state.x + this.hitHalf;
+    while (state.obstacleIndex < obstacles.length && obstacles[state.obstacleIndex].x_end <= back)
+      state.obstacleIndex += 1;
+    if (state.invulnerableTicks > 0) {
+      if (state.y - this.hitHalf < 0) {
+        state.y = this.hitHalf;
+        if (state.verticalSpeed < 0)
+          state.verticalSpeed = 0;
+      }
+      return 0;
+    }
+    if (state.obstacleIndex < obstacles.length) {
+      const obstacle = obstacles[state.obstacleIndex];
+      const inside = front > obstacle.x_start && back < obstacle.x_end;
+      const outsideGap = state.y - this.hitHalf < obstacle.gap_bottom || state.y + this.hitHalf > obstacle.gap_top;
+      if (inside && outsideGap)
+        return this.hit(state, obstacle.respawn_x, obstacle.respawn_y);
+    }
+    if (state.y - this.hitHalf <= 0) {
+      if (obstacles.length === 0)
+        return this.hit(state, state.x, this.course.start_y);
+      const index = Math.min(state.obstacleIndex, obstacles.length - 1);
+      return this.hit(state, obstacles[index].respawn_x, obstacles[index].respawn_y);
+    }
+    return 0;
+  }
+  hit(state, respawnX, respawnY) {
+    state.flying = false;
+    state.ready = false;
+    state.x = respawnX;
+    state.y = respawnY;
+    state.verticalSpeed = 0;
+    state.boostTicks = 0;
+    state.invulnerableTicks = 0;
+    state.cooldownTicks = this.cooldownTicks;
+    state.hearts.hit();
+    return EVENT_HIT;
+  }
+};
+
+// build/006_flappy_race/framing.js
+function courseWindow(viewHeight, aspect, focusX, share) {
+  const width = viewHeight * aspect;
+  return { left: focusX - share * width, width, height: viewHeight };
+}
+function toCanvas(window2, size2, x2, y2) {
+  return [(x2 - window2.left) / window2.width * size2[0], (1 - y2 / window2.height) * size2[1]];
+}
+
+// build/006_flappy_race/fallback.js
+function createFallbackView(canvas, setup) {
+  const { course } = setup;
+  const context = canvas.getContext("2d");
+  let focus = course.flight.start_x;
+  let shown = courseWindow(course.view_height, 1, focus, setup.focusShare);
+  let size2 = [1, 1];
+  return {
+    draw(frame) {
+      if (!context)
+        return;
+      const rect = canvas.getBoundingClientRect();
+      const ratio = Math.min(2, window.devicePixelRatio || 1);
+      const width = Math.max(1, Math.round(rect.width * ratio));
+      const height = Math.max(1, Math.round(rect.height * ratio));
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+      }
+      size2 = [Math.max(1, rect.width), Math.max(1, rect.height)];
+      focus = frame.focusX;
+      shown = courseWindow(course.view_height, size2[0] / size2[1], focus, setup.focusShare);
+      const at = (x3, y3) => toCanvas(shown, size2, x3, y3);
+      const metre = size2[1] / course.view_height;
+      const box = (color, x0, x1, y0, y1) => {
+        const [left, top] = at(x0, y1);
+        const [right2, bottom] = at(x1, y0);
+        context.fillStyle = color;
+        context.fillRect(left, top, right2 - left, bottom - top);
+      };
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      context.clearRect(0, 0, size2[0], size2[1]);
+      const flight = course.flight;
+      const right = shown.left + shown.width;
+      box("#fff3cb", flight.finish_x - 0.25, flight.finish_x + 0.25, 0, course.view_height);
+      for (const obstacle of flight.obstacles) {
+        if (obstacle.x_end < shown.left || obstacle.x_start > right)
+          continue;
+        box("#d6a86c", obstacle.x_start, obstacle.x_end, 0, obstacle.gap_bottom);
+        box("#d6a86c", obstacle.x_start, obstacle.x_end, obstacle.gap_top, course.view_height * 2);
+      }
+      box("#b98a55", shown.left, right, -course.view_height, 0);
+      context.fillStyle = "#f2c230";
+      flight.pickups.forEach((pickup, index) => {
+        if (frame.taken[index] !== 0 || pickup.x < shown.left - 2 || pickup.x > right + 2)
+          return;
+        const [x3, y3] = at(pickup.x, pickup.y);
+        context.beginPath();
+        context.arc(x3, y3, pickup.half_size * metre, 0, Math.PI * 2);
+        context.fill();
+      });
+      if (!frame.cubioVisible)
+        return;
+      const [x2, y2] = at(frame.cubioX, frame.cubioY);
+      context.translate(x2, y2);
+      context.rotate(-frame.tilt);
+      context.fillStyle = setup.color;
+      context.fillRect(-metre, -metre, metre * 2, metre * 2);
+      context.fillStyle = "#1f2a33";
+      for (const eye of [-0.4, 0.4]) {
+        context.beginPath();
+        context.arc(eye * metre, -0.2 * metre, 0.16 * metre, 0, Math.PI * 2);
+        context.fill();
+      }
+    },
+    project(x2, y2) {
+      return toCanvas(shown, size2, x2, y2);
+    },
+    dispose() {
+      context?.setTransform(1, 0, 0, 1, 0, 0);
+      context?.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  };
+}
+
+// build/006_flappy_race/hud.js
+function ordinal(place) {
+  const tens = place % 100;
+  const ones = place % 10;
+  const suffix = tens >= 11 && tens <= 13 ? "th" : ones === 1 ? "st" : ones === 2 ? "nd" : ones === 3 ? "rd" : "th";
+  return `${place}${suffix}`;
+}
+function clockText(seconds) {
+  const whole = Math.max(0, Math.ceil(seconds));
+  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, "0")}`;
+}
+var FlappyRaceHud = class {
+  root;
+  hearts;
+  progress;
+  timer;
+  cue;
+  floating;
+  layer;
+  shownCount = -1;
+  constructor(root) {
+    this.root = root;
+    const find = (selector) => root.querySelector(selector);
+    this.hearts = find(".flappy-hearts");
+    this.progress = find(".flappy-progress-fill");
+    this.timer = find(".flappy-timer");
+    this.cue = find(".flappy-cue");
+    this.floating = find(".flappy-floating-heart");
+    this.layer = find(".flappy-hud");
+  }
+  update(frame) {
+    const { count, full, refillShare } = frame.hearts;
+    if (this.shownCount !== count) {
+      this.shownCount = count;
+      this.hearts.replaceChildren(...Array.from({ length: count }, () => {
+        const heart = document.createElement("span");
+        heart.className = "flappy-heart";
+        heart.textContent = "♥";
+        return heart;
+      }));
+    }
+    Array.from(this.hearts.children).forEach((child, index) => {
+      const heart = child;
+      heart.dataset.fill = index < full ? "full" : index === full ? "refill" : "empty";
+      heart.style.setProperty("--refill", index === full ? String(refillShare) : "0");
+    });
+    const progress = Math.min(1, Math.max(0, frame.progress));
+    this.progress.style.inlineSize = `${Math.round(progress * 1e3) / 10}%`;
+    this.timer.textContent = clockText(frame.secondsLeft);
+    this.timer.dataset.last = String(frame.lastSeconds);
+    if (this.cue.textContent !== frame.cue)
+      this.cue.textContent = frame.cue;
+    this.cue.hidden = frame.cue === "";
+    const floating = frame.floating;
+    this.floating.hidden = !floating;
+    if (floating) {
+      this.floating.dataset.state = floating.state;
+      this.floating.style.setProperty("--refill", String(floating.refillShare));
+      this.floating.style.transform = `translate(${floating.at[0]}px, ${floating.at[1]}px)`;
+    }
+  }
+  /** Flies a copy of heart `index` from the row to `to`, in canvas CSS pixels. */
+  flyHeart(index, to, seconds) {
+    const source = this.hearts.children[index];
+    if (!source)
+      return;
+    const layer = this.layer.getBoundingClientRect();
+    const start = source.getBoundingClientRect();
+    const flying = document.createElement("span");
+    flying.className = "flappy-heart flappy-heart-flight";
+    flying.textContent = "♥";
+    flying.dataset.fill = "full";
+    this.root.append(flying);
+    const from = [
+      start.left + start.width / 2 - layer.left,
+      start.top + start.height / 2 - layer.top
+    ];
+    const keyframes = [
+      { transform: `translate(${from[0]}px, ${from[1]}px) scale(1)` },
+      { transform: `translate(${to[0]}px, ${to[1]}px) scale(1.6)` }
+    ];
+    const animation = flying.animate?.(keyframes, {
+      duration: seconds * 1e3,
+      easing: "ease-in-out"
+    });
+    if (!animation) {
+      flying.remove();
+      return;
+    }
+    animation.onfinish = animation.oncancel = () => flying.remove();
+  }
+  /** Removes any heart still in flight. */
+  clear() {
+    for (const flying of Array.from(this.root.querySelectorAll(".flappy-heart-flight")))
+      flying.remove();
+  }
+};
+
+// build/006_flappy_race/messages.js
+function typed(value, type) {
+  return !!value && typeof value === "object" && value.type === type;
+}
 function isSnapshot2(value) {
-  if (!value || typeof value !== "object")
+  return typed(value, "flappy_race_snapshot");
+}
+function isState(value) {
+  return typed(value, "flappy_race_state") && Number.isInteger(value.tick);
+}
+function isEvent(value) {
+  return typed(value, "flappy_race_event") && typeof value.event === "string";
+}
+function flightState(flight, tuning, pickupCount) {
+  const hearts = new HeartRow(tuning.heart_count, tuning.heart_recovery_ticks);
+  hearts.full = flight.hearts.full;
+  hearts.refillTicks = flight.hearts.refill_ticks;
+  hearts.owed = flight.hearts.owed;
+  const state = new FlappyFlightState(hearts, pickupCount);
+  state.x = flight.x;
+  state.y = flight.y;
+  state.verticalSpeed = flight.vertical_speed;
+  state.flying = flight.flying;
+  state.ready = flight.ready;
+  state.cooldownTicks = flight.cooldown_ticks;
+  state.invulnerableTicks = flight.invulnerable_ticks;
+  state.boostTicks = flight.boost_ticks;
+  state.obstacleIndex = flight.obstacle_index;
+  for (const index of flight.taken)
+    if (index >= 0 && index < pickupCount)
+      state.taken[index] = 1;
+  return state;
+}
+
+// build/006_flappy_race/prediction.js
+var MOST_TICKS = 600;
+function sameFlight(a2, b2) {
+  if (a2.x !== b2.x || a2.y !== b2.y || a2.verticalSpeed !== b2.verticalSpeed || a2.flying !== b2.flying || a2.ready !== b2.ready || a2.cooldownTicks !== b2.cooldownTicks || a2.invulnerableTicks !== b2.invulnerableTicks || a2.boostTicks !== b2.boostTicks || a2.obstacleIndex !== b2.obstacleIndex || a2.hearts.full !== b2.hearts.full || a2.hearts.refillTicks !== b2.hearts.refillTicks || a2.hearts.owed !== b2.hearts.owed || a2.taken.length !== b2.taken.length)
     return false;
-  return value.type === "flappy_race_snapshot";
+  return a2.taken.every((taken, index) => taken === b2.taken[index]);
+}
+var FlappyPrediction = class {
+  flight;
+  /** The tick `state` has been stepped to. */
+  tick;
+  state;
+  /** Host corrections so far, for tests and diagnostics. */
+  corrections = 0;
+  /** Drawn minus predicted position, metres; it decays to zero. */
+  offsetX = 0;
+  offsetY = 0;
+  history = /* @__PURE__ */ new Map();
+  taps = /* @__PURE__ */ new Set();
+  constructor(flight, state, tick) {
+    this.flight = flight;
+    this.state = state;
+    this.tick = tick;
+  }
+  get finished() {
+    return this.state.x >= this.flight.course.finish_x;
+  }
+  /** Applies a touch-down at the next tick and returns that tick, for flappy_tap. */
+  tap() {
+    const tick = this.tick + 1;
+    this.taps.add(tick);
+    return tick;
+  }
+  /**
+   * Steps toward `target`, at most MOST_TICKS at a time so a page back from the background
+   * catches up over a few frames, and stopping at the finish line. Returns the event bits.
+   */
+  advanceTo(target) {
+    let events = 0;
+    const last = Math.min(target, this.tick + MOST_TICKS);
+    while (this.tick < last && !this.finished) {
+      this.tick += 1;
+      events |= this.flight.step(this.state, this.taps.has(this.tick));
+      this.history.set(this.tick, this.state.copy());
+    }
+    return events;
+  }
+  /**
+   * The host's settled `host` flight at `tick`. Returns true when it differed and the prediction
+   * was corrected.
+   */
+  confirm(tick, host) {
+    if (tick > this.tick)
+      this.advanceTo(tick);
+    const ours = tick === this.tick ? this.state : this.history.get(tick);
+    if (ours && sameFlight(ours, host)) {
+      this.forget(tick);
+      return false;
+    }
+    const before = this.state;
+    const replayed = host.copy();
+    this.history.clear();
+    this.history.set(tick, replayed.copy());
+    const last = Math.min(this.tick, tick + MOST_TICKS);
+    for (let next = tick + 1; next <= last; next += 1) {
+      if (replayed.x >= this.flight.course.finish_x)
+        break;
+      this.flight.step(replayed, this.taps.has(next));
+      this.history.set(next, replayed.copy());
+    }
+    this.state = replayed;
+    this.tick = Math.max(this.tick, tick);
+    this.corrections += 1;
+    if (before.flying === replayed.flying) {
+      this.offsetX += before.x - replayed.x;
+      this.offsetY += before.y - replayed.y;
+    } else {
+      this.offsetX = this.offsetY = 0;
+    }
+    this.forget(tick);
+    return true;
+  }
+  /** Blends the drawn position toward the prediction over about `seconds`. */
+  blend(delta, seconds) {
+    const keep = seconds > 0 ? Math.exp(-delta / seconds) : 0;
+    this.offsetX *= keep;
+    this.offsetY *= keep;
+    if (Math.abs(this.offsetX) < 1e-4)
+      this.offsetX = 0;
+    if (Math.abs(this.offsetY) < 1e-4)
+      this.offsetY = 0;
+  }
+  get drawnX() {
+    return this.state.x + this.offsetX;
+  }
+  get drawnY() {
+    return this.state.y + this.offsetY;
+  }
+  /** The host has settled everything up to `tick`, so nothing before it is replayed again. */
+  forget(tick) {
+    for (const key of this.history.keys())
+      if (key < tick)
+        this.history.delete(key);
+    for (const key of this.taps)
+      if (key <= tick)
+        this.taps.delete(key);
+  }
+};
+
+// build/006_flappy_race/race_clock.js
+var RaceClock = class {
+  go;
+  /** A host message reading `clockTick` arrived at local time `now`, in milliseconds. */
+  observe(clockTick, now) {
+    const go = now - clockTick * 1e3 / TICK_RATE;
+    if (this.go === void 0 || go < this.go)
+      this.go = go;
+  }
+  get started() {
+    return this.go !== void 0;
+  }
+  /** Whole ticks since GO at local time `now`. */
+  tick(now) {
+    if (this.go === void 0)
+      return Number.NEGATIVE_INFINITY;
+    return Math.floor((now - this.go) * TICK_RATE / 1e3);
+  }
+  /** Milliseconds from `now` to GO; zero once the race runs. */
+  untilGo(now) {
+    return this.go === void 0 ? 0 : Math.max(0, this.go - now);
+  }
+};
+
+// build/006_flappy_race/phone.js
+var GO_SECONDS = 0.6;
+var FOCUS_SECONDS = 0.25;
+var TUMBLE_TURNS = 1.5;
+function faceFor(moment, place = 0, players = 1) {
+  switch (moment) {
+    case "countdown":
+      return "face_scheming";
+    case "pickup":
+      return "face_beaming";
+    case "hit":
+      return "face_dizzy";
+    case "waiting":
+      return "face_worried";
+    case "results":
+      if (players === 1)
+        return place === 1 ? "face_slightly_smiling" : "face_disappointed";
+      return place >= 1 && place <= 3 ? "face_mischievous" : "face_disappointed";
+    default:
+      return "face_slightly_smiling";
+  }
+}
+function resultText(result) {
+  if (!result)
+    return ["Race over", ""];
+  if (result.dnf)
+    return ["Did not finish", ""];
+  const place = `${ordinal(result.place)} place`;
+  if (!result.finished)
+    return [place, `Reached ${Math.floor(result.distance)} m`];
+  const seconds = result.finish_msec / 1e3;
+  const hundredths = String(Math.floor(result.finish_msec % 1e3 / 10)).padStart(2, "0");
+  return [place, `Time ${clockText(Math.floor(seconds))}.${hundredths}`];
 }
 var FlappyRacePhone = class {
   surface;
-  constructor(surface) {
+  send;
+  loadView;
+  race;
+  presentation;
+  courseKey = "";
+  generation = 0;
+  request = 0;
+  previous = 0;
+  hud;
+  viewCanvas;
+  fallbackCanvas;
+  results;
+  constructor(surface, send, loadView) {
     this.surface = surface;
+    this.send = send;
+    this.loadView = loadView;
+    this.hud = new FlappyRaceHud(surface);
+    this.viewCanvas = surface.querySelector(".flappy-view");
+    this.fallbackCanvas = surface.querySelector(".flappy-fallback");
+    this.results = surface.querySelector(".flappy-results");
+    surface.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse" && event.button !== 0)
+        return;
+      if (this.tap(performance.now()))
+        event.preventDefault();
+    });
   }
   show() {
     this.surface.hidden = false;
+    if (!this.request)
+      this.request = requestAnimationFrame(this.frame);
   }
   hide() {
+    this.generation++;
+    if (this.request)
+      cancelAnimationFrame(this.request);
+    this.request = 0;
+    this.previous = 0;
+    this.presentation?.dispose();
+    this.presentation = void 0;
+    this.courseKey = "";
+    this.race = void 0;
+    this.hud.clear();
     this.surface.hidden = true;
   }
+  receive(message) {
+    const now = performance.now();
+    if (isSnapshot2(message)) {
+      this.start(message, now);
+      return;
+    }
+    const race = this.race;
+    if (!race)
+      return;
+    if (isState(message))
+      race.clock.observe(message.clock_tick, now);
+    const own = message.own;
+    if (own) {
+      race.prediction.confirm(message.tick, this.settledFrom(race.snapshot, own.flight));
+      race.place = own.place;
+    }
+    if (isEvent(message) && message.event === "finish" && message.place)
+      race.place = message.place;
+  }
+  /** A touch-down: one flap at the next tick, sent to the host with that tick. */
+  tap(now) {
+    const race = this.race;
+    if (!race || this.surface.hidden || race.snapshot.phase === "results")
+      return false;
+    if (race.clock.tick(now) < 0 || race.prediction.finished || !race.snapshot.own.connected)
+      return false;
+    const tick = race.prediction.tap();
+    race.seq += 1;
+    this.send({ type: "flappy_tap", seq: race.seq, tick });
+    return true;
+  }
+  start(snapshot, now) {
+    const flight = new FlappyFlight(snapshot.flight, snapshot.course.flight);
+    const clock = new RaceClock();
+    clock.observe(snapshot.clock_tick, now);
+    const state = this.settledFrom(snapshot, snapshot.own.flight);
+    const previous = this.race;
+    this.race = {
+      snapshot,
+      clock,
+      prediction: new FlappyPrediction(flight, state, snapshot.tick),
+      seq: Math.max(snapshot.own.last_seq, previous?.seq ?? -1),
+      place: snapshot.own.place,
+      ownResult: snapshot.own_result,
+      wasFlying: state.flying,
+      hitAt: Number.NEGATIVE_INFINITY,
+      hitX: state.x,
+      hitY: state.y,
+      heartSpent: false,
+      takenCount: state.taken.reduce((sum, taken) => sum + taken, 0),
+      pickupAt: Number.NEGATIVE_INFINITY,
+      tilt: 0,
+      focusX: state.x
+    };
+    const results = snapshot.phase === "results";
+    this.results.hidden = !results;
+    if (results) {
+      const [title, detail] = resultText(snapshot.own_result);
+      this.results.querySelector(".flappy-result-place").textContent = title;
+      this.results.querySelector(".flappy-result-detail").textContent = detail;
+    }
+    const flightCourse = snapshot.course.flight;
+    const key = JSON.stringify([
+      flightCourse.finish_x,
+      flightCourse.obstacles,
+      snapshot.character_color
+    ]);
+    if (key !== this.courseKey)
+      this.mount(key, snapshot);
+    this.show();
+  }
+  mount(key, snapshot) {
+    const generation = ++this.generation;
+    this.courseKey = key;
+    this.presentation?.dispose();
+    const setup = {
+      course: snapshot.course,
+      color: `#${snapshot.character_color.replace(/^#/, "")}`,
+      focusShare: snapshot.view.phone_cubio_screen_share
+    };
+    this.viewCanvas.hidden = true;
+    this.fallbackCanvas.hidden = false;
+    this.presentation = createFallbackView(this.fallbackCanvas, setup);
+    void this.loadView().then((module) => module.createFlappyRaceView(this.viewCanvas, setup)).then((presentation) => {
+      if (generation !== this.generation) {
+        presentation.dispose();
+        return;
+      }
+      this.presentation?.dispose();
+      this.presentation = presentation;
+      this.fallbackCanvas.hidden = true;
+      this.viewCanvas.hidden = false;
+    }, () => {
+    });
+  }
+  settledFrom(snapshot, flight) {
+    return flightState(flight, snapshot.flight, snapshot.course.flight.pickups.length);
+  }
+  frame = (now) => {
+    this.request = requestAnimationFrame(this.frame);
+    const race = this.race;
+    const presentation = this.presentation;
+    const delta = this.previous ? Math.min(0.1, (now - this.previous) / 1e3) : 0;
+    this.previous = now;
+    if (!race || !presentation || document.hidden)
+      return;
+    const { snapshot, prediction } = race;
+    const view = snapshot.view;
+    const clockTick = race.clock.tick(now);
+    if (snapshot.phase !== "results")
+      prediction.advanceTo(clockTick);
+    prediction.blend(delta, view.correction_seconds);
+    const state = prediction.state;
+    if (race.wasFlying && !state.flying) {
+      race.hitAt = now;
+      race.heartSpent = !state.hearts.owed;
+      if (race.heartSpent) {
+        const to = presentation.project(state.x, state.y);
+        this.hud.flyHeart(state.hearts.full, to, view.heart_flight_seconds);
+      }
+    }
+    if (state.flying) {
+      race.hitX = prediction.drawnX;
+      race.hitY = prediction.drawnY;
+    }
+    race.wasFlying = state.flying;
+    const taken = state.taken.reduce((sum, value) => sum + value, 0);
+    if (taken > race.takenCount)
+      race.pickupAt = now;
+    race.takenCount = taken;
+    const sinceHit = (now - race.hitAt) / 1e3;
+    const tumbling = !state.flying && sinceHit < view.hit_tumble_seconds;
+    const results = snapshot.phase === "results";
+    let face2 = faceFor("flying");
+    if (results)
+      face2 = faceFor("results", snapshot.own_result?.place ?? 0, snapshot.player_count);
+    else if (clockTick < 0)
+      face2 = faceFor("countdown");
+    else if (tumbling)
+      face2 = faceFor("hit");
+    else if (!state.flying)
+      face2 = faceFor("waiting");
+    else if ((now - race.pickupAt) / 1e3 < view.pickup_face_seconds)
+      face2 = faceFor("pickup");
+    const tuning = snapshot.flight;
+    const speed = state.verticalSpeed;
+    const target = speed >= 0 ? Math.min(1, speed / tuning.flap_velocity) * view.tilt_up_degrees * Math.PI / 180 : -Math.min(1, -speed / tuning.max_fall_speed) * view.tilt_down_degrees * Math.PI / 180;
+    const follow = view.tilt_response_seconds > 0 ? 1 - Math.exp(-delta / view.tilt_response_seconds) : 1;
+    race.tilt += (target - race.tilt) * follow;
+    const focusTarget = state.flying ? prediction.drawnX : tumbling ? race.hitX : state.x;
+    race.focusX = state.flying ? focusTarget : race.focusX + (focusTarget - race.focusX) * (1 - Math.exp(-delta / FOCUS_SECONDS));
+    presentation.draw({
+      delta,
+      focusX: race.focusX,
+      cubioX: tumbling ? race.hitX : prediction.drawnX,
+      cubioY: tumbling ? race.hitY : prediction.drawnY,
+      tilt: tumbling ? -sinceHit * TUMBLE_TURNS * Math.PI * 2 : race.tilt,
+      cubioVisible: state.flying || tumbling || state.ready,
+      face: face2,
+      taken: state.taken
+    });
+    const heartLanded = !race.heartSpent || sinceHit >= view.heart_flight_seconds;
+    let floating;
+    if (!state.flying && heartLanded && !results)
+      floating = {
+        at: presentation.project(state.x, state.y),
+        state: state.hearts.owed ? "owed" : state.ready ? "ready" : "cooling",
+        refillShare: state.hearts.refillShare()
+      };
+    let cue = "";
+    if (clockTick < 0)
+      cue = String(Math.max(1, Math.ceil(race.clock.untilGo(now) / 1e3)));
+    else if (clockTick < GO_SECONDS * snapshot.tick_rate)
+      cue = "GO!";
+    if (prediction.finished && !results)
+      cue = race.place > 0 ? `You finished ${ordinal(race.place)}!` : "Finished!";
+    const ticksLeft = snapshot.race_ticks - Math.max(0, clockTick);
+    this.hud.update({
+      hearts: {
+        count: tuning.heart_count,
+        full: state.hearts.full,
+        refillShare: state.hearts.refillShare()
+      },
+      progress: prediction.drawnX / snapshot.course.flight.finish_x,
+      secondsLeft: ticksLeft / snapshot.tick_rate,
+      lastSeconds: clockTick >= snapshot.last_seconds_tick,
+      cue: results ? "" : cue,
+      floating
+    });
+    const data = this.surface.dataset;
+    data.phase = results ? "results" : clockTick < 0 ? "countdown" : "racing";
+    data.tick = String(prediction.tick);
+    data.flying = String(state.flying);
+    data.ready = String(state.ready);
+    data.rising = String(state.verticalSpeed > 0);
+    data.corrections = String(prediction.corrections);
+  };
 };
 
 // build/pwa.js
@@ -2473,7 +3321,10 @@ var pwa = new PwaOnboarding(document.querySelector("#app-screen"), document.quer
 });
 var bubble3DCard = document.querySelector("#bubbles-3d-card");
 var flappyRaceSurface = document.querySelector("#flappy-race");
-var flappyRacePhone = new FlappyRacePhone(flappyRaceSurface);
+var flappyRacePhone = new FlappyRacePhone(flappyRaceSurface, (message) => {
+  if (socket?.readyState === WebSocket.OPEN)
+    socket.send(JSON.stringify(message));
+}, () => loadThreeView());
 var threeView;
 function loadThreeView() {
   const url = "/three_view.js";
@@ -2683,7 +3534,7 @@ function showFlappyRace(message) {
   readyCard.hidden = true;
   document.documentElement.classList.remove("ready-active");
   status.hidden = true;
-  flappyRacePhone.show();
+  flappyRacePhone.receive(message);
 }
 function showTilt3D(message) {
   if (tilt3DPhone.snapshot(message))
@@ -2861,6 +3712,8 @@ async function connect() {
         showTilt3D(message);
       else if (isSnapshot2(message))
         showFlappyRace(message);
+      else if (isState(message) || isEvent(message))
+        flappyRacePhone.receive(message);
       else if (message.type === "motion_lab" && joined && typeof message.subscription_id === "string" && typeof message.send_hz === "number") {
         lobbyControls.deactivate();
         setGameplaySurface(false);

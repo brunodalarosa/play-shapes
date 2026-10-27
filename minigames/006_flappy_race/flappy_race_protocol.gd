@@ -85,6 +85,9 @@ func snapshot_for(player_id: String) -> Dictionary:
 	}
 	if controller.phase == FlappyRaceController.Phase.RESULTS:
 		snapshot.results = _results()
+		for entry: Dictionary in snapshot.results:
+			if entry.player_id == player_id:
+				snapshot.own_result = entry
 	return snapshot
 
 

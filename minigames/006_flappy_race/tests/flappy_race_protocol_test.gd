@@ -177,11 +177,12 @@ func _check_resume_and_results() -> void:
 	)
 
 	_controller.observe_registry([{ "player_id": "p0", "state": "connected" }], now)
-	var results: Array = _protocol.snapshot_for("p0").get("results", [])
+	var final := _protocol.snapshot_for("p1")
+	var results: Array = final.get("results", [])
 	check(
 		_broadcasts == 1 and results.size() == 2 and results[0].player_id == "p0"
-		and results[0].finish_msec == roundi(201 * 1000.0 / 60.0)
-		and results[1].dnf and results[1].place == 2,
+		and results[0].finish_msec == roundi(201 * 1000.0 / 60.0) and results[1].dnf
+		and results[1].place == 2 and final.own_result == results[1],
 		"The results reach every phone in a fresh snapshot",
 	)
 

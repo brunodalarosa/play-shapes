@@ -215,7 +215,7 @@ default) behind its clock, and applies each tap at its own tick when that lies i
 the flight tuning as `flight`, the presentation values as `view`, the player's
 `character_color`, the generated `course` and the player's own state as `own`. In
 results it adds `results`, every player's `place`, `name`, colour, finish time or distance and
-`dnf`.
+`dnf`, and the player's own entry as `own_result`.
 
 `own` holds the exact settled `flight` (position, vertical speed, flying, ready, cooldown,
 invulnerability and boost ticks, obstacle index, `hearts` and the indices of the pickups
