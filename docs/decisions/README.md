@@ -84,5 +84,6 @@ What was decided.
 | [0045](0045-shared-face-frame.md) | Every shape face shares one frame and scale |
 | [0046](0046-shape-face-for-every-character.md) | Every Shape Character wears the shared shape face |
 | [0047](0047-shared-deterministic-simulation.md) | Phone-predicted characters run a shared deterministic simulation, not Jolt |
+| [0048](0048-predicted-input-carries-a-tick.md) | Predicted input carries a simulation tick, settled one window behind the host |
 | [0049](0049-minimum-players-per-minigame.md) | Each minigame sets its own minimum number of players |
 | [0050](0050-random-order-for-exact-ties.md) | Exact ties in gameplay results may be settled at random |
