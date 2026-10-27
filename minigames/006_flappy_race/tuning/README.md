@@ -1,11 +1,24 @@
 # Flappy Race tuning
 
 Select a rules Resource in `Tuning/Active Presets.tres`, under Flappy Race. `Default.tres`
-selects `Flight.tres` and `Course.tres`. Changes apply when the host next starts.
+selects `Flight.tres` and `Course.tres` and holds the race values below. Changes apply when
+the host next starts.
 
 The values are starting points taken from the Flappy Bird reference in
 [the design](../../../docs/game-design-documents/Minigames/006/006%20-%20Flappy%20Race.md).
 The owner chooses them in play.
+
+## Race
+
+`Default.tres` itself, a `FlappyRaceTuning`, holds the race around the flights.
+
+| Field | Default | Effect |
+| --- | --- | --- |
+| Countdown | 3 s | 3, 2, 1, GO before forward motion and gravity start. |
+| Race time | 360 s | The race ends when it runs out, if not everyone has finished. |
+| Last seconds | 10 s | The large countdown at the end of the race timer. |
+| Tap window | 0.25 s | How far behind its clock the host settles every flight, so a late tap still counts at its tick. |
+| State rate | 20 Hz | How often each phone receives its own settled flight. |
 
 ## Flight
 

@@ -209,7 +209,7 @@ Past the finish line stands a podium with three raised steps of different height
 - The view follows the player's Cubio horizontally and always shows the full view height, from the ground to the top of the view. In portrait this shows less of the course ahead than the shared screen does.
 - The hearts in a row at the top left, the player's own progress bar to the finish at the top, and the race timer at the top right. No ranking.
 - The heart flight animation from the heart row to the respawn spot, the waiting heart and its refill ring.
-- The phone predicts its own Cubio locally from its own taps, so flaps answer immediately. The host stays the authority on hits, hearts, pickups, finishing and ranking, and the phone corrects itself when the host disagrees. A tap reaches the host with the phone's sequence and time so the host replays it at the moment the player pressed.
+- The phone predicts its own Cubio locally from its own taps, so flaps answer immediately. The host stays the authority on hits, hearts, pickups, finishing and ranking, and the phone corrects itself when the host disagrees. A tap reaches the host with the phone's sequence and simulation tick, and the host applies it at that tick, within a bounded window behind its own clock (decision 0048).
 - On finishing: the place and the podium. Results: the final place and finish time.
 - Sound on the phone for flap, hit, pickup and respawn. Flappy Race is the first minigame with phone audio.
 - Without WebGL, a readable 2D drawing of the same view replaces the 3D one.
@@ -218,7 +218,7 @@ Past the finish line stands a podium with three raised steps of different height
 
 - Finishers rank by finish time.
 - Unfinished players rank after every finisher, by distance travelled; a waiting player counts at their respawn spot.
-- Equal finish times or equal distances share a place.
+- Players who finish in the same tick, or stop at the same distance, are ordered at random, so every place is distinct (decision 0050). Players whose grace expired are DNF in random order among themselves.
 - A player whose reconnect grace expired ranks last as DNF.
 
 ## Results
@@ -229,6 +229,7 @@ Results stay on the shared screen until Return to lobby, over the podium scene. 
 
 - A disconnected player's Cubio freezes in place, greyed out, and still counts for the camera.
 - A reconnect within the 60 s grace returns the player to a tap-to-respawn state at the same spot, with no heart spent.
+- While disconnected the cooldown and the heart refill stop too. A player who was already waiting when they dropped returns to that wait with the time that was left.
 - When grace expires the player is DNF and no longer holds up the end of the race.
 
 ## Lobby and debug flow
@@ -300,6 +301,9 @@ Confirmed by the project owner on 2026-10-26:
 * Invulnerability passes through obstacles and the ground, so a respawn clears the obstacle that caused it.
 * A ground hit with no obstacle ahead respawns before the last obstacle.
 * Every course at the defaults must be flyable with no hit.
+* Taps carry their simulation tick; the host settles every flight one tap window (250 ms) behind its clock, so its events are final and the shared screen runs that far behind (decision 0048).
+* Players who finish in the same tick or stop at the same distance are ordered at random: a party game does not need tie rules (decision 0050).
+* A disconnect freezes the whole flight, cooldown and refill included.
 
 ## Deferred decisions
 

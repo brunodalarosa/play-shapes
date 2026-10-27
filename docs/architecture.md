@@ -154,17 +154,23 @@ selected Resources are in the [field guide](../minigames/005_3d_tilt_shift/tunin
 ## Flappy Race
 
 Minigame 006 is in `minigames/006_flappy_race/`, the first minigame whose `min_players` is 1.
-Its launch, its course generator and its tuning exist; the race is not built.
+The host runs the whole race; it has no picture yet, and the phone only waits.
 [Its README](../minigames/006_flappy_race/README.md) lists the files.
 
-- `flappy_race.tscn` and `flappy_race.gd` (`FlappyRace`) take the launch, register the
-  protocol, show the title and player count, and offer Return to lobby.
-- `flappy_race_protocol.gd` is a `MinigameProtocol` with only a waiting snapshot. See
-  [protocol.md](protocol.md#flappy-race).
+- `flappy_race.tscn` and `flappy_race.gd` (`FlappyRace`) take the launch, start the race on
+  a random seed, register the protocol, show the player count and a status line, and offer
+  Return to lobby.
+- `flappy_race_controller.gd` (`FlappyRaceController`) owns the race: the countdown, every
+  player's `FlappyRaceRacer`, stepped together one tap window behind the clock
+  ([0048](decisions/0048-predicted-input-carries-a-tick.md)), finishing, the timer, freezing on
+  disconnect, DNF and the ranking ([0050](decisions/0050-random-order-for-exact-ties.md)).
+- `flappy_race_protocol.gd` turns taps into controller calls and sends each phone its course,
+  its settled flight and its events. See [protocol.md](protocol.md#flappy-race).
 - `flappy_race_course.gd` (`FlappyRaceCourse`) generates the seeded course on the host: obstacle
   pairs, respawn spots, pickups and each ground half's look, following difficulty `Curve`s over
-  course progress. Its `to_dictionary` is what phones will receive.
-- `FlappyRaceTuning` selects the flight and course values in `Tuning/Active Presets.tres`.
+  course progress. Its `to_dictionary` is what phones receive.
+- `FlappyRaceTuning` selects the flight and course values in `Tuning/Active Presets.tres`, and
+  holds the race's countdown, timer, last seconds, tap window and state rate.
 - Its design is in `docs/game-design-documents/Minigames/006/`.
 
 ## Shared 3D components
