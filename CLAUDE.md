@@ -34,7 +34,9 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
 - Ready-made assets first; author new ones only when strictly necessary.
 - Every gameplay scene runs on Jolt with bodies locked to one plane, so the controls feel 2D.
   The lobby's motor makes its own one-way landings
-  ([0042](docs/decisions/0042-plaza-lobby-jolt-plane.md)).
+  ([0042](docs/decisions/0042-plaza-lobby-jolt-plane.md)). The exception is a character the
+  phone predicts: it runs a shared deterministic step written in GDScript and TypeScript,
+  proven identical by a fixture ([0047](docs/decisions/0047-shared-deterministic-simulation.md)).
 
 ### Cubio
 
@@ -138,8 +140,8 @@ Condensed from AGENTS.md and the documents it links.
   needs a person goes into `docs/pending-reviews.md`.
 - Documents state what is true now, one topic each, with links that resolve and paragraphs
   under 600 characters; `node tools/docs.mjs` checks them. Reasons go in `docs/decisions/` as
-  numbered records, never edited to change a decision; 0047 and 0048 are reserved for Flappy
-  Race's shared simulation and tick rule, and 0049 is taken, so the next free number is 0050. The
+  numbered records, never edited to change a decision; 0047 and 0049 are taken and 0048
+  is reserved for Flappy Race's tick rule, so the next free number is 0050. The
   roadmap changes when work finishes or is added.
 - No ticket numbers anywhere: files, comments, tests or output folders.
 - Typed GDScript, composition, signals, Control/Container UI and no fixed viewport sizes.

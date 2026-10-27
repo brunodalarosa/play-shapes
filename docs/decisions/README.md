@@ -83,4 +83,5 @@ What was decided.
 | [0044](0044-one-face-style.md) | Every shape face is named for its emoji and drawn to the originals' measurements |
 | [0045](0045-shared-face-frame.md) | Every shape face shares one frame and scale |
 | [0046](0046-shape-face-for-every-character.md) | Every Shape Character wears the shared shape face |
+| [0047](0047-shared-deterministic-simulation.md) | Phone-predicted characters run a shared deterministic simulation, not Jolt |
 | [0049](0049-minimum-players-per-minigame.md) | Each minigame sets its own minimum number of players |
