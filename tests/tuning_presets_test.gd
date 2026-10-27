@@ -137,7 +137,53 @@ func _run() -> void:
 		return
 	if not _check_tooltip_contract(
 		"res://Tuning/active_presets.gd",
-		["bubbles_3d", "tilt_shift_3d", "networking", "lobby_movement"],
+		["bubbles_3d", "tilt_shift_3d", "flappy_race", "networking", "lobby_movement"],
+	):
+		return
+	if not _check_tooltip_contract(
+		"res://components/flappy_flight/flappy_flight_tuning.gd",
+		[
+			"forward_speed",
+			"flap_velocity",
+			"gravity",
+			"max_fall_speed",
+			"hit_box_inset",
+			"heart_count",
+			"heart_recovery_seconds",
+			"respawn_cooldown_seconds",
+			"invulnerable_seconds",
+			"boost_share",
+			"boost_seconds",
+		],
+	):
+		return
+	if not _check_tooltip_contract(
+		"res://minigames/006_flappy_race/flappy_race_course_tuning.gd",
+		[
+			"perfect_run_seconds",
+			"start_clear_seconds",
+			"finish_clear_seconds",
+			"view_height",
+			"start_height",
+			"obstacle_width",
+			"gap_lowest_share",
+			"gap_highest_share",
+			"respawn_distance",
+			"obstacle_spacing",
+			"gap_height",
+			"largest_gap_change",
+			"pickup_chance",
+			"pickup_size",
+			"pickup_edge_distance",
+			"stalagmite_weight",
+			"rock_stack_weight",
+			"crystal_cluster_weight",
+		],
+	):
+		return
+	if not _check_tooltip_contract(
+		"res://minigames/006_flappy_race/flappy_race_tuning.gd",
+		["flight", "course"],
 	):
 		return
 	if not _check_tooltip_contract(
@@ -154,6 +200,7 @@ func _run() -> void:
 		preset_paths.has("res://Tuning/Active Presets.tres")
 		and preset_paths.has("res://minigames/004_3d_bubbles/tuning/Default.tres")
 		and preset_paths.has("res://minigames/005_3d_tilt_shift/tuning/Default.tres")
+		and preset_paths.has("res://minigames/006_flappy_race/tuning/Default.tres")
 		and preset_paths.has("res://Tuning/Shared/Networking/Default.tres")
 		and preset_paths.has("res://Tuning/Shared/Lobby/Default.tres"),
 		"Default presets and Active Presets are discovered",
@@ -252,7 +299,7 @@ func _run() -> void:
 
 	var active: Resource = ActivePresetsScript.new()
 	if not check(
-		active.validation_errors().size() == 4,
+		active.validation_errors().size() == 5,
 		"Active selector rejects missing preset references",
 	):
 		return

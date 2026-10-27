@@ -5,10 +5,12 @@
 [ext_resource type="Resource" path="res://Tuning/Shared/Lobby/Default.tres" id="6"]
 [ext_resource type="Resource" path="res://minigames/004_3d_bubbles/tuning/Default.tres" id="7"]
 [ext_resource type="Resource" uid="uid://b6hqgmifkqwh8" path="res://minigames/005_3d_tilt_shift/tuning/Default.tres" id="8"]
+[ext_resource type="Resource" path="res://minigames/006_flappy_race/tuning/Default.tres" id="9"]
 
 [resource]
 script = ExtResource("1")
 bubbles_3d = ExtResource("7")
 tilt_shift_3d = ExtResource("8")
+flappy_race = ExtResource("9")
 networking = ExtResource("3")
 lobby_movement = ExtResource("6")

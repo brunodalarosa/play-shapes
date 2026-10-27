@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="FlappyRaceTuning" format=3]
+
+[ext_resource type="Resource" path="res://minigames/006_flappy_race/tuning/Course.tres" id="1_e0ws1"]
+[ext_resource type="Resource" path="res://minigames/006_flappy_race/tuning/Flight.tres" id="2_bjqfp"]
+[ext_resource type="Script" path="res://minigames/006_flappy_race/flappy_race_tuning.gd" id="3_kje31"]
+
+[resource]
+script = ExtResource("3_kje31")

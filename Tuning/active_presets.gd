@@ -10,6 +10,10 @@ extends Resource
 ## Active Tilt Shift 3D rules/content preset. Default values are provisional, pending owner play.
 @export var tilt_shift_3d: TiltShift3DTuning
 
+## Active Flappy Race flight and course preset. Default values are starting points, pending
+## owner play.
+@export var flappy_race: FlappyRaceTuning
+
 @export_group("Shared categories")
 ## Active host networking/session preset. Browser-only values intentionally remain in
 ## web/src/app.ts.
@@ -30,6 +34,10 @@ func validation_errors() -> PackedStringArray:
 		errors.append("Active Presets: Tilt Shift 3D preset is missing.")
 	else:
 		errors.append_array(tilt_shift_3d.validation_errors())
+	if flappy_race == null:
+		errors.append("Active Presets: Flappy Race preset is missing.")
+	else:
+		errors.append_array(flappy_race.validation_errors())
 	if networking == null:
 		errors.append("Active Presets: Networking preset is missing.")
 	else:
