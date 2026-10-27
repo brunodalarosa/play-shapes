@@ -66,10 +66,10 @@ Each player has a row of hearts, 3 by default, shown side by side on the phone. 
 
 1. The Cubio plays its hit animation with `face_dizzy` and leaves play. A speed boost ends.
 2. On the phone the spent heart flies out of the heart row into the world and floats at the respawn spot. With no full heart, a heart outline floats there with a filling ring instead.
-3. The respawn spot is before the obstacle that caused the hit, at the height of that obstacle's gap centre, a tunable distance back. A ground hit uses the next obstacle ahead.
+3. The respawn spot is before the obstacle that caused the hit, at the height of that obstacle's gap centre, a tunable distance back. A ground hit uses the next obstacle ahead, or the last obstacle when none lies ahead.
 4. The respawn cooldown (default 2 s) and any heart refill both count from the moment of the hit. Until both are done, the floating heart cannot be tapped.
 5. When it can be tapped, the heart pulses and the Cubio waits with `face_worried`. There is no automatic respawn; a player who never taps simply stays there.
-6. The tap that respawns is also the first flap. The Cubio pops out of the heart in its respawn animation and is invulnerable for 1 s, blinking.
+6. The tap that respawns is also the first flap. The Cubio pops out of the heart in its respawn animation and is invulnerable for 1 s, blinking. It passes through obstacles and rests on the ground without losing a heart. At the defaults this carries it through the obstacle that hit it, so a respawn never costs a second heart at once.
 
 The shared screen shows the same floating heart in the player's colour at the respawn spot.
 
@@ -85,11 +85,12 @@ Small speed pickups sit inside some gaps, placed close to an obstacle edge so th
 
 ### Shape of the course
 
-The course runs from the start line, point A, to the finish line, point B, above one ground line, under an open sky. Its length gives a perfect run, with no hits and no pickups, a duration of about 3 minutes: 1800 m at the default speed. The course length is set as that target duration and derived from the base speed.
+The course runs from the start line, point A, to the finish line, point B, above one ground line, under an open sky. Its length gives a perfect run, with no hits and no pickups, a duration of about 2 minutes: 1200 m at the default speed, about 90 obstacles. The course length is set as that target duration and derived from the base speed. The 6-minute race timer leaves room for hits and waiting.
 
 - A clear stretch after the start line, about 3 s of travel, before the first obstacle.
 - Obstacles in pairs at the same position along the course, one rising from the ground and one reaching down from far above the view, leaving one gap between them, as Flappy Bird's pipes do.
-- A clear stretch before the finish line, then the finish arch and the podium.
+- A clear stretch before the finish line, about 3 s of travel, then the finish arch and the podium.
+- Every Cubio starts at half the view height, 17 m above the ground.
 
 ### Generation
 
@@ -106,6 +107,21 @@ Difficulty follows course progress, from 0 at the start line to 1 at the finish 
 - The largest change in gap height between one obstacle and the next.
 
 Pickup frequency is a fourth tunable value over progress. All obstacles are static in this version.
+
+Starting values, taken from the same Flappy Bird reference as the flight values. Each curve runs straight from its start value to its end value until human play reshapes it.
+
+| Value | Start of course | End of course |
+| --- | --- | --- |
+| Obstacle spacing, centre to centre | 14 m | 11 m |
+| Gap height | 8.4 m | 7.0 m |
+| Largest gap change from the previous obstacle | 4 m | 9 m |
+| Chance that a gap holds a pickup | 10% | 25% |
+
+- Every obstacle is 6 m wide. A gap always lies between 20% and 80% of the view height.
+- A pickup is 1.6 m across, 0.4 m inside the top or bottom edge of its gap; the seed picks the edge.
+- The hit box is Cubio's body cube inset by 0.2 m on every side, a 1.6 m box.
+- The respawn spot is 2 m before the front face of its obstacle, always inside the clear space before it. The 1 s of invulnerability then lasts until the hit box has left that obstacle.
+- Every course generated at the defaults can be flown with no hit; a test proves it over many seeds.
 
 ## Cave biome
 
@@ -235,11 +251,12 @@ Built outside `minigames/006_flappy_race/`:
 
 ## Designer-tunable values
 
-* Race timer, default 6 minutes. Perfect-run target duration, default 3 minutes.
+* Race timer, default 6 minutes. Perfect-run target duration, default 2 minutes.
 * Base forward speed, flap velocity, gravity and maximum fall speed (defaults above).
 * View height, and the hit box inset.
 * Difficulty curves over progress: obstacle spacing, gap height, largest gap change; pickup frequency.
-* Clear stretches after the start and before the finish.
+* Clear stretches after the start and before the finish. The height at GO.
+* Obstacle width, the range of gap positions, the pickup size and its distance from the gap edge.
 * Number of hearts, default 3. Heart recovery duration, default 10 s.
 * Respawn cooldown, default 2 s. Respawn distance before the obstacle. Invulnerability, default 1 s.
 * Pickup boost, default 25% for 3 s.
@@ -275,6 +292,14 @@ Confirmed by the project owner on 2026-10-25:
 * Faces as in [Cubio with wings](#cubio-with-wings), with `face_beaming` for a pickup.
 * One biome, a bright crystal cave with no visible ceiling, chosen over the forest after comparing mockups, because stalactites feel natural as obstacles from above. Crystals are generated in code. The speed pickup is a golden coin rather than a crystal, so it reads as a power-up.
 * The name is Flappy Race, number 006.
+
+Confirmed by the project owner on 2026-10-26:
+
+* A perfect run lasts about 2 minutes instead of 3, so a race has about 90 obstacles; the race timer stays 6 minutes.
+* The starting course values in [Difficulty curve](#difficulty-curve).
+* Invulnerability passes through obstacles and the ground, so a respawn clears the obstacle that caused it.
+* A ground hit with no obstacle ahead respawns before the last obstacle.
+* Every course at the defaults must be flyable with no hit.
 
 ## Deferred decisions
 
