@@ -5,7 +5,8 @@ winged Cubio from the start line to the finish. It is the only minigame that sta
 player. The design is in `docs/game-design-documents/Minigames/006/`.
 
 The host runs the whole race: countdown, flights, finishing, ranking, the timer and
-disconnects. Its scenes and the phone's view are not built; the race shows as a status line. The flight and heart rules are shared code in `components/flappy_flight/`,
+disconnects. Each phone flies its own Cubio on a placeholder course; the shared screen shows
+only a status line. The flight and heart rules are shared code in `components/flappy_flight/`,
 mirrored for the phone in `web/src/flappy_flight/`.
 
 ## Files

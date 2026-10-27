@@ -261,8 +261,10 @@ These live outside any minigame folder so later 3D scenes can use them.
   own paddle in 3D through `web/src/005_3d_tilt_shift/`, with a flat drawing without WebGL.
   `web/src/shape_paddle/` holds the rounded outline and the face composition;
   `web/src/three_view/shape_paddle.ts` draws them with three.js.
-- Flappy Race shows a portrait waiting screen through `web/src/006_flappy_race/`.
-  `web/src/flappy_flight/` holds its flight rules for the phone's prediction, not yet used.
+- Flappy Race flies the player's own Cubio through `web/src/006_flappy_race/`. `race_clock.ts`
+  reads the host's clock, `prediction.ts` predicts the flight on `web/src/flappy_flight/` and
+  corrects it from host state, `view.ts` draws it with three.js and `fallback.ts` flat,
+  `hud.ts` shows the hearts and text, and `phone.ts` ties them to the surface.
 - `web/src/character_preview.ts` mounts a live 3D Cubio only in the visible setup canvas.
   Its renderer is in `web/src/three_view/character_preview.ts`; model and face downloads are
   cached with gameplay's assets. Hidden setup screens release their renderer.

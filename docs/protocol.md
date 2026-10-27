@@ -230,8 +230,8 @@ invulnerability and boost ticks, obstacle index, `hearts` and the indices of the
 Everything the host sends is settled and final. A disconnected player's flight freezes; a resume
 within grace waits ready at the same spot with no heart spent. When grace expires the player is
 DNF. Exact ties in the ranking are ordered at random
-([0050](decisions/0050-random-order-for-exact-ties.md)). The phone still shows a portrait
-waiting screen for every snapshot and ignores the other messages.
+([0050](decisions/0050-random-order-for-exact-ties.md)). The phone compares each settled
+state with its own prediction for that tick and replays its taps only when they differ.
 
 ## Bubbles and jellyfishes 3D
 

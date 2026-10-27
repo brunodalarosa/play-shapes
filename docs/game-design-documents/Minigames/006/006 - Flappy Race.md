@@ -64,11 +64,11 @@ Each player has a row of hearts, 3 by default, shown side by side on the phone. 
 
 ### Getting hit and respawning
 
-1. The Cubio plays its hit animation with `face_dizzy` and leaves play. A speed boost ends.
+1. The Cubio plays its hit animation with `face_dizzy` at the hit spot and leaves play. A speed boost ends.
 2. On the phone the spent heart flies out of the heart row into the world and floats at the respawn spot. With no full heart, a heart outline floats there with a filling ring instead.
 3. The respawn spot is before the obstacle that caused the hit, at the height of that obstacle's gap centre, a tunable distance back. A ground hit uses the next obstacle ahead, or the last obstacle when none lies ahead.
 4. The respawn cooldown (default 2 s) and any heart refill both count from the moment of the hit. Until both are done, the floating heart cannot be tapped.
-5. When it can be tapped, the heart pulses and the Cubio waits with `face_worried`. There is no automatic respawn; a player who never taps simply stays there.
+5. When it can be tapped, the heart pulses and the Cubio reappears behind it at the respawn spot, waiting with `face_worried`. There is no automatic respawn; a player who never taps simply stays there.
 6. The tap that respawns is also the first flap. The Cubio pops out of the heart in its respawn animation and is invulnerable for 1 s, blinking. It passes through obstacles and rests on the ground without losing a heart. At the defaults this carries it through the obstacle that hit it, so a respawn never costs a second heart at once.
 
 The shared screen shows the same floating heart in the player's colour at the respawn spot.
@@ -304,6 +304,10 @@ Confirmed by the project owner on 2026-10-26:
 * Taps carry their simulation tick; the host settles every flight one tap window (250 ms) behind its clock, so its events are final and the shared screen runs that far behind (decision 0048).
 * Players who finish in the same tick or stop at the same distance are ordered at random: a party game does not need tie rules (decision 0050).
 * A disconnect freezes the whole flight, cooldown and refill included.
+
+Confirmed by the project owner on 2026-10-27:
+
+* After a hit the Cubio tumbles dizzy at the hit spot, then leaves play; once the heart can be tapped it waits, worried, behind the pulsing heart at the respawn spot.
 
 ## Deferred decisions
 

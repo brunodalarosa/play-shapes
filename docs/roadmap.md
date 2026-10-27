@@ -100,13 +100,15 @@ It awaits physical-phone checks and the owner's play review; tuning values are p
 
 - Minigame 006, Flappy Race: a phone-first race through a crystal cave with hearts and speed
   pickups, for 1 to 10 players. Designed in `docs/game-design-documents/Minigames/006/`. Its
-  phone view and its shared-screen view are not built.
+  shared-screen view is not built.
   - Its launch exists: 1 to 10 players go through the Pre-minigame screen into the race scene
     and back to the lobby ([0049](decisions/0049-minimum-players-per-minigame.md)).
   - Its flight, hearts and seeded course exist as shared code, the flight proven identical on
     host and phone ([0047](decisions/0047-shared-deterministic-simulation.md)).
   - The host runs the whole race from taps that carry their tick
     ([0048](decisions/0048-predicted-input-carries-a-tick.md)).
+  - Each phone flies its own predicted Cubio with its hearts, timer and result, on a
+    placeholder course.
 - The first release, `0.1.0`: decide where the project and the Windows package record the
   version, then follow [branching.md](branching.md#a-release).
 - Cloud CI, if hosted runners turn out to be free for this repository

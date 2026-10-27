@@ -102,8 +102,13 @@ removes it. The evidence labels are defined in
 ## Flappy Race
 
 - `[PHYSICAL-PHONE]` On the iPhone Safari and Android Chrome pair: one phone starts Flappy Race
-  from the lobby, READY on the Pre-minigame screen, the portrait waiting screen with the
+  from the lobby, READY on the Pre-minigame screen, the portrait race screen with the
   orientation lock where the browser allows it, and Return to lobby.
+- `[PHYSICAL-PHONE]` Flaps feel immediate on real Wi-Fi, host corrections are rare and not
+  noticed, and the 250 ms tap window is enough. The phone's 3D view holds its frame rate over a
+  whole course, and the hearts, timer and progress bar read at arm's length.
+- `[HUMAN-PLAY]` The phone's framing with the Cubio 30% from the left, the tilt, the dizzy
+  tumble and the heart flight, on the placeholder course.
 
 ## Tilt Shift 3D
 

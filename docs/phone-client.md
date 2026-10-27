@@ -67,9 +67,17 @@ download, and load face parts one at a time, so a room of phones does not overwh
 
 ## The Flappy Race screen
 
-The race is not built. After READY the phone shows a portrait waiting screen with the title,
-asking the player to watch the shared screen, and shows it again on reconnect. Returning to the
-lobby hides it.
+After READY the phone shows the race in portrait: its own Cubio over the course, in 3D or
+drawn flat without WebGL, with the hearts and refill ring at the top left, the progress bar,
+and the timer at the top right. Every touch-down anywhere on it is one flap.
+
+- The phone predicts its own flight from its own taps, so a flap shows in the next frame, and
+  corrects itself from the host's settled state
+  ([0048](decisions/0048-predicted-input-carries-a-tick.md)).
+- A hit flies the spent heart to the respawn spot, where it waits, or shows an outline that
+  fills while a heart is owed, and pulses once a tap respawns.
+- The phone shows the countdown, "Finished!" and then the place, and the player's own result.
+  A reconnect returns to the race; returning to the lobby hides it.
 
 ## Keeping the screen awake
 

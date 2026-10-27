@@ -17,8 +17,8 @@ repository.
   paddle in their own colour with a face that reacts. Each phone shows the player's own paddle
   in real-time 3D.
 - **Flappy Race** (minigame 006) starts with 1–10 players, the only minigame that can start
-  with one. Only its launch exists: an empty race scene with Return to lobby, and a portrait
-  waiting screen on the phone.
+  with one. The host runs the race, and each phone flies its own Cubio with hearts and a
+  timer; the shared screen shows only a status line.
 - Registered players appear as 3D Cubios in the Playground lobby, a café plaza viewed from
   the side. Each steers their character from a portrait phone stick and a release-action
   button. The billboard shows the join QR; the lobby controls are in the top-right panel. Near-vertical input
