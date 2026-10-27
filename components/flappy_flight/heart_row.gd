@@ -52,6 +52,11 @@ func refill_share() -> float:
 	return float(refill_ticks) / recovery_ticks
 
 
+## What changes during a run; the phone already has the count and the recovery time.
+func to_dictionary() -> Dictionary:
+	return { "full": full, "refill_ticks": refill_ticks, "owed": owed }
+
+
 func copy_from(other: HeartRow) -> void:
 	count = other.count
 	full = other.full

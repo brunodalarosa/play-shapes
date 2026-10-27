@@ -13,6 +13,24 @@ extends Resource
 	"res://minigames/006_flappy_race/tuning/Course.tres"
 )
 
+@export_group("Race")
+## 3, 2, 1, GO before forward motion and gravity start, s. Default: 3.
+@export_range(0.0, 10.0, 0.5, "suffix:s") var countdown_seconds: float = 3.0
+## The race ends when this runs out, if not everyone has finished, s. Default: 360.
+@export_range(10.0, 1800.0, 1.0, "suffix:s") var race_seconds: float = 360.0
+## The large countdown at the end of the race timer, s. Default: 10.
+@export_range(0.0, 60.0, 1.0, "suffix:s") var last_seconds: float = 10.0
+## How far behind its clock the host settles every flight, so a tap reaching it this late
+## still counts at the tick the phone applied it (decision 0048), s. Default: 0.25.
+@export_range(0.0, 1.0, 0.05, "suffix:s") var tap_window_seconds: float = 0.25
+## How often each phone receives its own settled flight. Default: 20.
+@export_range(1, 60, 1, "suffix:Hz") var state_hz: int = 20
+
+
+## Whole simulation ticks in [param seconds].
+static func ticks(seconds: float) -> int:
+	return FlappyFlightTuning.ticks(seconds)
+
 
 func validation_errors() -> PackedStringArray:
 	var errors := PackedStringArray()
@@ -38,4 +56,10 @@ func validation_errors() -> PackedStringArray:
 		errors.append("Flappy Race: a pickup must fit inside its gap.")
 	if course.start_height - half <= 0.0:
 		errors.append("Flappy Race: the start height must be above the ground.")
+	if ticks(race_seconds) < 1 or last_seconds > race_seconds:
+		errors.append("Flappy Race: the race must last, and longer than its last seconds.")
+	if countdown_seconds < 0.0 or tap_window_seconds < 0.0:
+		errors.append("Flappy Race: the countdown and the tap window cannot be negative.")
+	if state_hz < 1 or state_hz > FlappyFlightTuning.TICK_RATE:
+		errors.append("Flappy Race: phones get their state between once and 60 times a second.")
 	return errors

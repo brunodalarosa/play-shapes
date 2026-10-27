@@ -37,6 +37,28 @@ func copy_from(other: FlappyFlightState) -> void:
 	taken = other.taken.duplicate()
 
 
+## The exact state for the phone, which JSON carries without loss. [member taken] becomes the
+## indices of the pickups taken.
+func to_dictionary() -> Dictionary:
+	var taken_indices: Array[int] = []
+	for index: int in taken.size():
+		if taken[index] != 0:
+			taken_indices.append(index)
+	return {
+		"x": x,
+		"y": y,
+		"vertical_speed": vertical_speed,
+		"flying": flying,
+		"ready": ready,
+		"cooldown_ticks": cooldown_ticks,
+		"invulnerable_ticks": invulnerable_ticks,
+		"boost_ticks": boost_ticks,
+		"obstacle_index": obstacle_index,
+		"hearts": hearts.to_dictionary(),
+		"taken": taken_indices,
+	}
+
+
 func copy() -> FlappyFlightState:
 	var state := FlappyFlightState.new()
 	state.copy_from(self)
