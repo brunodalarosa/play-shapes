@@ -191,6 +191,14 @@ func countdown_remaining_msec() -> int:
 	return maxi(0, _go_msec - _last_msec)
 
 
+## How far the race clock is past the settled tick, 0 to 1, for drawing between ticks.
+func settled_fraction() -> float:
+	if phase != Phase.RACING:
+		return 0.0
+	var ticks := float(_last_msec - _go_msec) * FlappyFlightTuning.TICK_RATE / 1000.0
+	return clampf(ticks - _window_ticks - settled_tick, 0.0, 1.0)
+
+
 func race_ticks() -> int:
 	return _race_ticks
 

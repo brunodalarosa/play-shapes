@@ -52,6 +52,8 @@ func validation_errors() -> PackedStringArray:
 	var closest := FlappyRaceCourseTuning.curve_range(course.obstacle_spacing).x
 	if closest - course.obstacle_width < course.respawn_distance + half:
 		errors.append("Flappy Race: obstacles must leave room for the respawn spot between them.")
+	if view.farthest_visible_height < course.view_height:
+		errors.append("Flappy Race: the shared screen cannot zoom in past the view height.")
 	if FlappyRaceCourseTuning.curve_range(course.gap_height).x <= half * 2.0:
 		errors.append("Flappy Race: every gap must be taller than the hit box.")
 	var largest_pickup_gap := course.pickup_size + course.pickup_edge_distance

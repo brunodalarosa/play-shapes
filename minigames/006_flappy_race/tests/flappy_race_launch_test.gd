@@ -92,7 +92,8 @@ func _race_and_return(host: Node, players: Array[Dictionary]) -> bool:
 		return false
 	if not check(
 		race.controller.racers().size() == count and not snapshot.course.flight.obstacles.is_empty()
-		and race.status_text().begins_with("Get ready"),
+		and race.presentation.cue_text() == "3"
+		and race.presentation.visual_for(String(players[0].player.player_id)) != null,
 		"Flappy Race with %d counts down to a race on a generated course" % count,
 	):
 		return false

@@ -1,0 +1,108 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://minigames/006_flappy_race/flappy_race_presentation.gd" id="1_present"]
+[ext_resource type="Script" path="res://components/race_camera/race_camera_3d.gd" id="2_camera"]
+[ext_resource type="Script" path="res://minigames/006_flappy_race/flappy_race_course_view.gd" id="3_course"]
+[ext_resource type="Script" path="res://components/race_camera/offscreen_bubbles.gd" id="4_bubbles"]
+
+[sub_resource type="Environment" id="Environment_cave"]
+background_mode = 1
+background_color = Color(0.56, 0.82, 0.83, 1)
+ambient_light_source = 2
+ambient_light_color = Color(1, 0.96, 0.88, 1)
+ambient_light_energy = 0.7
+
+[node name="FlappyRacePresentation" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_present")
+
+[node name="World" type="Node3D" parent="."]
+
+[node name="Environment" type="WorldEnvironment" parent="World"]
+environment = SubResource("Environment_cave")
+
+[node name="Sun" type="DirectionalLight3D" parent="World"]
+unique_name_in_owner = true
+light_energy = 1.4
+
+[node name="Camera" type="Camera3D" parent="World"]
+unique_name_in_owner = true
+fov = 30.0
+far = 600.0
+script = ExtResource("2_camera")
+
+[node name="CourseView" type="Node3D" parent="World"]
+unique_name_in_owner = true
+script = ExtResource("3_course")
+
+[node name="Racers" type="Node3D" parent="World"]
+unique_name_in_owner = true
+
+[node name="Bursts" type="Node3D" parent="World"]
+unique_name_in_owner = true
+
+[node name="Hud" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Labels" type="Control" parent="Hud"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Bubbles" type="Control" parent="Hud"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_bubbles")
+
+[node name="Timer" type="Label" parent="Hud"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 16.0
+offset_bottom = 96.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.953, 0.796, 1)
+theme_override_colors/font_outline_color = Color(0.42, 0.3, 0.17, 1)
+theme_override_constants/outline_size = 14
+theme_override_font_sizes/font_size = 60
+text = "6:00"
+horizontal_alignment = 1
+
+[node name="Cue" type="Label" parent="Hud"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.953, 0.796, 1)
+theme_override_colors/font_outline_color = Color(0.42, 0.3, 0.17, 1)
+theme_override_constants/outline_size = 28
+theme_override_font_sizes/font_size = 220
+horizontal_alignment = 1
+vertical_alignment = 1
