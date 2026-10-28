@@ -14,8 +14,8 @@ Why: [decision 0052](../decisions/0052-a-workshop-for-every-minigame.md).
   What the designer feels in the workshop is what players feel in a real game; only the
   placeholder visuals may differ while final art is missing.
 - Additions sit around the game and never change how it settles input: autopilot players fed
-  through the same input path as phones ([0008](../decisions/0008-bots.md)), time controls,
-  quick setups, readouts.
+  through the same input path as phones ([0008](../decisions/0008-bots.md)), quick setups,
+  readouts.
 - Joining by QR, the Playground lobby, minigame choice and the Pre-minigame screen are skipped.
 
 ## Starting a workshop
@@ -49,9 +49,9 @@ Why: [decision 0052](../decisions/0052-a-workshop-for-every-minigame.md).
 - **Phone view:** the real phone page, served by the workshop and shown in a phone frame sized
   by a device picker, connected as the designer's own player. It can stay on top of other
   windows when popped out.
-- **Minigame flow:** pause, step, speed, restart, the seed where the minigame has one, the
-  players taking part, autopilots and their skill, and quick setups that restart into a named
-  situation.
+- **Minigame flow:** restart, the seed where the minigame has one, the players taking part,
+  autopilots and their skill, and quick setups that restart into a named situation. The game
+  always runs at real time: a phone predicts on its own clock, so there is no pause or speed.
 - **Tunables:** one tab per tuning Resource, generated from it and grouped by its export
   groups. Each value is one row: an edited dot, its label, a slider with the default marked,
   and the number with its unit. The selected row shows its help, default and range.

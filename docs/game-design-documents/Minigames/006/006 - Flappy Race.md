@@ -258,15 +258,14 @@ parts:
 
 * Boot: it asks only for the HTTP and WebSocket servers, bound to this PC, for its phone view.
 * Racers: the designer flies through the phone view (a click, or Space while it has focus) and
-  can be left out; 0 to 9 autopilots, at most 10 racers. Autopilot skill: Sloppy, Mixed, Good
-  or Perfect, setting how often one misjudges a gap.
-* Time: pause, step one 60 Hz tick, and ¼×, ½×, 1×, 2× and 4× speed.
+  can be left out; 0 to 9 autopilots, at most 10 racers. Autopilots have one skill, Good, until
+  the game has its own bots to share with the workshop.
 * Course: restart with the same seed, new course with a new one, a seed field with a lock that
-  keeps the seed across Course edits, and a course strip of everyone's progress that moves the
-  pack to the clicked spot.
+  keeps the seed across Course edits, and a course strip of everyone's progress that restarts the
+  race with the pack at the clicked spot.
 * Quick setups: Start crowd, Spread pack, One far behind, Leader near finish, Out of hearts.
 * Camera: Leader (the real game), the designer's Cubio, or Free.
-* Shared-screen readouts: seed, speed, tick, leader progress, difficulty at the leader's spot,
+* Shared-screen readouts: seed, tick, leader progress, difficulty at the leader's spot,
   each racer's place, progress, hearts and state, and host time per frame.
 * Phone view: portrait, with a device picker, a readout of how much course the phone and the
   shared screen each show, and an optional outline of the phone's view on the shared screen.
