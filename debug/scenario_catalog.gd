@@ -8,6 +8,11 @@ extends RefCounted
 static func scenarios(minigames: MinigameCatalog) -> Array[DebugScenario]:
 	var result: Array[DebugScenario] = [
 		DebugScenario.new(
+			&"flappy_race_workshop",
+			"Flappy Race workshop",
+			"res://minigames/006_flappy_race/workshop/flappy_race_workshop.tscn",
+		),
+		DebugScenario.new(
 			&"tilt_shift_3d_review",
 			"Tilt Shift 3D factory · simulated controls",
 			"res://debug/tilt_shift_3d_review.tscn",

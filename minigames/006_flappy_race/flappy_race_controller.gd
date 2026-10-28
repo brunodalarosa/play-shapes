@@ -115,6 +115,24 @@ func start_race(participants: Array, seed_value: int, host_msec: int) -> Diction
 	return { "accepted": true }
 
 
+## Before GO, puts [param player_id] at the respawn spot of obstacle [param obstacle_index] with
+## [param hearts] full hearts, for a workshop setting up a situation. Phones receive it in
+## their snapshot. Returns false once the race runs.
+func place_racer(player_id: String, obstacle_index: int, hearts: int) -> bool:
+	var racer: FlappyRaceRacer = _racers.get(player_id)
+	if phase != Phase.COUNTDOWN or racer == null:
+		return false
+
+	var obstacles := course.flight.obstacles
+	if obstacle_index >= 0 and obstacle_index < obstacles.size():
+		var obstacle := obstacles[obstacle_index]
+		racer.state.x = obstacle.respawn_x
+		racer.state.y = obstacle.respawn_y
+		racer.state.obstacle_index = obstacle_index
+	racer.state.hearts.full = clampi(hearts, 0, racer.state.hearts.count)
+	return true
+
+
 ## Moves the race to [param host_msec]: GO when the countdown ends, then every flight up to
 ## the settled tick.
 func advance(host_msec: int) -> void:

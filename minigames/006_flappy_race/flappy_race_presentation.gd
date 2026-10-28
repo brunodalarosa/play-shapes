@@ -46,6 +46,10 @@ class RacerVisual:
 
 
 var controller: FlappyRaceController
+## Whom the camera follows: empty for the leader, as in a real race, or one player.
+var followed_id := ""
+## False leaves the camera where someone else puts it.
+var frames_camera := true
 var _visuals: Array[RacerVisual] = []
 var _by_id: Dictionary[String, RacerVisual] = { }
 var _leader := Vector2.ZERO
@@ -69,12 +73,7 @@ func _ready() -> void:
 ## Draws [param race] from now on. Call once, after its countdown has started.
 func bind(race: FlappyRaceController) -> void:
 	controller = race
-	var view := race.tuning.view
-	camera.leader_share = view.leader_screen_share
-	camera.closest_height = race.course.view_height
-	camera.farthest_height = view.farthest_visible_height
-	camera.centre_height = race.course.view_height * 0.5
-	camera.smoothing_seconds = view.camera_smoothing_seconds
+	apply_view_tuning()
 	camera.current = true
 	course_view.build(race.course)
 
@@ -89,6 +88,16 @@ func bind(race: FlappyRaceController) -> void:
 	race.race_event.connect(_on_race_event)
 	set_process(true)
 	draw_frame(0.0)
+
+
+## Takes the camera values of the race's view tuning again, after they changed.
+func apply_view_tuning() -> void:
+	var view := controller.tuning.view
+	camera.leader_share = view.leader_screen_share
+	camera.closest_height = controller.course.view_height
+	camera.farthest_height = view.farthest_visible_height
+	camera.centre_height = controller.course.view_height * 0.5
+	camera.smoothing_seconds = view.camera_smoothing_seconds
 
 
 func visual_for(player_id: String) -> RacerVisual:
@@ -307,6 +316,15 @@ func _face(visual: RacerVisual, now: float, tumbling: bool, place: int) -> Strin
 ## Follows the leader still racing, counting waiting and frozen players where they are, and
 ## fits the others still racing.
 func _frame_camera(delta: float) -> void:
+	if not frames_camera:
+		return
+	var followed := visual_for(followed_id)
+	if followed != null:
+		_leader = followed.drawn
+		camera.frame_race(_leader, PackedVector2Array(), delta if _framed else 0.0)
+		_framed = true
+		return
+
 	var racing := _visuals.filter(
 		func(visual: RacerVisual) -> bool:
 			return not visual.racer.dnf and not visual.racer.finished(),

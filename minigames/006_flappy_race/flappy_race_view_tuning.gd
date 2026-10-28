@@ -5,6 +5,10 @@ extends Resource
 ## value here changes a flight. The phone receives [method to_dictionary] in its snapshot; the
 ## shared-screen values stay on the host.
 
+## Groups a workshop applies while the race runs. The phone draws with the Cubio and Phone
+## values it received at the start, so those wait for a restart.
+const LIVE_GROUPS: Array[StringName] = [&"Shared screen"]
+
 @export_group("Cubio")
 ## Nose-up tilt at the flap velocity, degrees. Default: 25.
 @export_range(0.0, 90.0, 1.0, "suffix:°") var tilt_up_degrees: float = 25.0
