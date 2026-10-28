@@ -154,12 +154,18 @@ selected Resources are in the [field guide](../minigames/005_3d_tilt_shift/tunin
 ## Flappy Race
 
 Minigame 006 is in `minigames/006_flappy_race/`, the first minigame whose `min_players` is 1.
-The host runs the whole race; it has no picture yet, and the phone only waits.
+The host runs and draws the whole race on a placeholder course; each phone flies its own Cubio.
 [Its README](../minigames/006_flappy_race/README.md) lists the files.
 
 - `flappy_race.tscn` and `flappy_race.gd` (`FlappyRace`) take the launch, start the race on
-  a random seed, register the protocol, show the player count and a status line, and offer
-  Return to lobby.
+  a random seed, register the protocol, bind the presentation and offer Return to lobby.
+- `flappy_race_presentation.tscn` and `.gd` (`FlappyRacePresentation`) draw the shared
+  screen from the controller's settled flights, smoothed between ticks: a `Cubio3D` per racer
+  in its own depth slot, dithered while it covers another
+  ([0051](decisions/0051-dithered-overlap-on-a-shared-plane.md)), the floating respawn
+  hearts, pickup bursts, a `RaceCamera3D` on the leader, `OffscreenBubbles`, place badges,
+  fading names, the timer and the countdowns. `flappy_race_course_view.gd` is the placeholder
+  course.
 - `flappy_race_controller.gd` (`FlappyRaceController`) owns the race: the countdown, every
   player's `FlappyRaceRacer`, stepped together one tap window behind the clock
   ([0048](decisions/0048-predicted-input-carries-a-tick.md)), finishing, the timer, freezing on
@@ -171,6 +177,8 @@ The host runs the whole race; it has no picture yet, and the phone only waits.
   course progress. Its `to_dictionary` is what phones receive.
 - `FlappyRaceTuning` selects the flight and course values in `Tuning/Active Presets.tres`, and
   holds the race's countdown, timer, last seconds, tap window and state rate.
+  `FlappyRaceViewTuning` holds what both screens show: tilt, faces, the phone's framing and
+  the shared screen's camera, names, depth slots and dither.
 - Its design is in `docs/game-design-documents/Minigames/006/`.
 
 ## Shared 3D components
@@ -184,6 +192,9 @@ These live outside any minigame folder so later 3D scenes can use them.
 - `components/underwater_environment/`: the water backdrop, god rays, seabed with caustics,
   depth haze and air bubbles, plus a recolouring prop material with optional sway.
 - `components/screen_follow_label.gd`: screen text that follows a 3D node.
+- `components/race_camera/`: `RaceCamera3D` keeps a race's leader at a share of the width and
+  zooms between two visible heights to fit the pack; `OffscreenBubbles` shows racers behind
+  its left edge as bubbles with face and name.
 - `components/rounded_bar/`: `RoundedBar` builds a bar's rounded outline, mesh and convex
   collider from its length, thickness, depth and corner radius.
 - `components/flappy_flight/`: the flappy shape gameplay, plain typed GDScript with no

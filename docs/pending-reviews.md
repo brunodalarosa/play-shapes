@@ -109,6 +109,12 @@ removes it. The evidence labels are defined in
   whole course, and the hearts, timer and progress bar read at arm's length.
 - `[HUMAN-PLAY]` The phone's framing with the Cubio 30% from the left, the tilt, the dizzy
   tumble and the heart flight, on the placeholder course.
+- Owner confirmation of the shared screen's furthest zoom, 54 m visible, from the captures
+  that `flappy_race_presentation_visual_check.gd` writes to `test-results/flappy-race/`.
+- `[HUMAN-PLAY]` The shared-screen camera: following the leader, zooming and switching
+  leaders, the bubbles, the overlap dither, and the stacked names and badges in a crowd.
+- `[GODOT-RUNTIME]` Host frame time with ten players on the target PC. The presentation test
+  measures its own work at about 0.15 ms a frame; drawing is not yet measured.
 
 ## Tilt Shift 3D
 

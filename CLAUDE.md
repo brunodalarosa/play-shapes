@@ -18,11 +18,14 @@ results and return to the lobby.
 - Minigame 005, Tilt Shift 3D: 2/4/6/8/10 players, landscape phone tilt over HTTPS motion
   sensors, plane-locked Jolt physics, an editor workshop addon.
 - Minigame 006, Flappy Race: 1–10 players, the only minigame with `min_players = 1`
-  ([0049](docs/decisions/0049-minimum-players-per-minigame.md)). Its launch is an empty scene
-  with Return to lobby and a portrait waiting screen on the phone. The flight and hearts are
-  shared code in `components/flappy_flight/` with a TypeScript twin in `web/src/flappy_flight/`,
-  proven bit-identical by `tests/fixtures/flappy_flight_runs.json`; `FlappyRaceCourse` generates
-  the seeded course and `FlappyFlightAutopilot` flies it. The race itself is not built.
+  ([0049](docs/decisions/0049-minimum-players-per-minigame.md)).
+  - The host runs the race in `FlappyRaceController`, settling taps one window behind its
+    clock ([0048](docs/decisions/0048-predicted-input-carries-a-tick.md)).
+  - Each phone predicts its own flight on the shared step in `components/flappy_flight/` and
+    its TypeScript twin, proven bit-identical by `tests/fixtures/flappy_flight_runs.json`.
+  - The shared screen follows the leader with `RaceCamera3D` and dithers overlaps
+    ([0051](docs/decisions/0051-dithered-overlap-on-a-shared-plane.md)).
+  - The course is placeholder boxes; cave art, flight clips, podium and results are to come.
 - 001, 002 and 003 are retired. Minigame numbers are stable identifiers and are never reused.
 
 ## The 3D rework

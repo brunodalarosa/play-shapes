@@ -388,7 +388,8 @@ func _draw_hud(now: float) -> void:
 		alpha = clampf(1.0 - faded, 0.0, 1.0)
 	for visual: RacerVisual in _visuals:
 		visual.name_label.modulate.a = alpha
-		var racing := controller.phase == FlappyRaceController.Phase.RACING
+		# A place among one says nothing.
+		var racing := controller.phase == FlappyRaceController.Phase.RACING and _visuals.size() > 1
 		visual.badge.modulate.a = 1.0 if racing else 0.0
 
 
