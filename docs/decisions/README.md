@@ -89,3 +89,4 @@ What was decided.
 | [0050](0050-random-order-for-exact-ties.md) | Exact ties in gameplay results may be settled at random |
 | [0051](0051-dithered-overlap-on-a-shared-plane.md) | Characters sharing a plane take depth slots, and the one in front dithers |
 | [0052](0052-a-workshop-for-every-minigame.md) | Every minigame has a workshop built on one shared design |
+| [0053](0053-boot-steps-and-entry-points.md) | Every launch runs one boot made of Essential and Optional steps |

@@ -33,6 +33,8 @@ existing ones. The game keeps playing the same while the code is reshaped; see
   ([0024](decisions/0024-minigame-catalog.md)).
 - The phone client bundled into one script, so a new module needs no route and no export
   rule ([0016](decisions/0016-bundle-the-phone-client.md)).
+- One boot of Essential and Optional steps, so a scene started on its own loads only what it
+  asks for ([0053](decisions/0053-boot-steps-and-entry-points.md)).
 
 ## The refactor, in order
 
@@ -112,9 +114,8 @@ It awaits physical-phone checks and the owner's play review; tuning values are p
     placeholder course.
   - The shared screen follows the leader with a zooming camera, bubbles for players behind,
     dithered overlaps, place badges and the timer, on the same placeholder course.
-- Minigame workshops ([0052](decisions/0052-a-workshop-for-every-minigame.md)): a boot whose
-  steps are essential or optional, so a workshop starts on its own with only what it needs;
-  then the shared workshop and Flappy Race's, designed in
+- Minigame workshops ([0052](decisions/0052-a-workshop-for-every-minigame.md)): the shared
+  workshop and Flappy Race's, designed in
   [Minigame workshops](game-design-documents/Minigame%20workshops.md). Tilt Shift 3D and
   Bubbles and jellyfishes 3D move onto it afterwards.
 - The first release, `0.1.0`: decide where the project and the Windows package record the

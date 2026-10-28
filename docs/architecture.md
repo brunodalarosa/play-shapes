@@ -5,9 +5,20 @@ Messages and limits are in [protocol.md](protocol.md).
 
 ## Boot and host services
 
-- `scenes/boot.*` starts the services and presents Retry after a startup failure.
+- Every launch runs one boot ([0053](decisions/0053-boot-steps-and-entry-points.md)).
+  `host/boot_steps.gd` names the steps, their order and what each needs. Presets is the one
+  Essential step; the others run only when an entry lists them.
+- An entry lists its steps in a `BootRequest` (`host/boot_request.gd`), exported as
+  `boot_request` on its scene root. `SessionHost` boots the launched scene once it is in the
+  tree and logs a failed step. A scene that lists nothing runs the Essential steps only.
+- `scenes/boot.*` is the full game. It asks for every step through
+  `host/full_game_boot_request.tres`, boots itself and presents Retry after a failure.
+- `servers_this_pc` starts HTTP and WebSocket on 127.0.0.1 without TLS or the network file.
 - `host/session_host.gd` persists the services and the registry across scene changes. It
-  discovers addresses, constructs URLs, and rolls HTTP back if WebSocket binding fails.
+  discovers addresses, constructs URLs, and rolls HTTP back if WebSocket binding fails. The
+  registry and catalog load on first use, and `steps_run` lists the steps that have run.
+- `host/lobby_controller.gd` is what the services call on the lobby world, so naming the
+  lobby loads none of its scenes or models.
 - A catalog definition may name a `session_script`. SessionHost creates that session on first
   use and lets it prepare players, gate READY and the launch, and follow the roster, from the
   Pre-minigame screen into play ([decision 0039](decisions/0039-minigame-session-scripts.md)).

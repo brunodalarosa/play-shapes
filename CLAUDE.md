@@ -72,9 +72,12 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
 
 `docs/architecture.md` is the file-by-file map; this is the part I hold in my head.
 
-- `scenes/boot.*` starts `SessionHost`, an autoload in `host/session_host.gd` that outlives
-  scene changes and owns the HTTP and WebSocket services, the `PlayerRegistry` (at most ten
-  players, reconnect tokens, 60 s grace), the minigame catalog and pre-minigame readiness.
+- Every launch runs one boot of Essential and Optional steps (`host/boot_steps.gd`,
+  [0053](docs/decisions/0053-boot-steps-and-entry-points.md)); a scene asks for steps with an
+  exported `boot_request`. `scenes/boot.*` asks for all of them and starts `SessionHost`,
+  an autoload in `host/session_host.gd` that outlives scene changes and owns the HTTP and
+  WebSocket services, the `PlayerRegistry` (at most ten players, reconnect tokens, 60 s
+  grace), the minigame catalog and pre-minigame readiness.
 - `host/websocket_service.gd` resolves every message to a host-owned player through its
   connection and routes it to whichever controller is registered: lobby, readiness, or a
   minigame's `MinigameProtocol`.
@@ -112,7 +115,8 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
 ### Coupling the lobby has to respect
 
 - `WebsocketService._lobby_controller` and `SessionHost.register_lobby_controller` are typed
-  `LobbyPlaygroundWorld`, with `reconcile`, `handle_input`, `reset_sequence`,
+  `LobbyController`, the small base of `LobbyPlaygroundWorld`, so naming the lobby loads no
+  model. The lobby world provides `reconcile`, `handle_input`, `reset_sequence`,
   `clear_all_input` and `character_for`.
 - `tests/e2e/host.gd` reads `lobby.world`, `lobby.start_button` and each character's motion,
   and clicks Start through real mouse events, so the button must be reachable on screen.
@@ -146,7 +150,7 @@ Condensed from AGENTS.md and the documents it links.
   needs a person goes into `docs/pending-reviews.md`.
 - Documents state what is true now, one topic each, with links that resolve and paragraphs
   under 600 characters; `node tools/docs.mjs` checks them. Reasons go in `docs/decisions/` as
-  numbered records, never edited to change a decision; the next free number is 0053. The
+  numbered records, never edited to change a decision; the next free number is 0054. The
   roadmap changes when work finishes or is added.
 - No ticket numbers anywhere: files, comments, tests or output folders.
 - Typed GDScript, composition, signals, Control/Container UI and no fixed viewport sizes.
