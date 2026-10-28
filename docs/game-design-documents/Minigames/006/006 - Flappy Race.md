@@ -85,7 +85,7 @@ Small speed pickups sit inside some gaps, placed close to an obstacle edge so th
 
 ### Shape of the course
 
-The course runs from the start line, point A, to the finish line, point B, above one ground line, under an open sky. Its length gives a perfect run, with no hits and no pickups, a duration of about 2 minutes: 1200 m at the default speed, about 90 obstacles. The course length is set as that target duration and derived from the base speed. The 6-minute race timer leaves room for hits and waiting.
+The course runs from the start line, point A, to the finish line, point B, above one ground line, under an open sky. Its length gives a perfect run, with no hits and no pickups, a duration of about 2 minutes: 1200 m at the default speed, about 80 obstacles. The course length is set as that target duration and derived from the base speed. The 6-minute race timer leaves room for hits and waiting.
 
 - A clear stretch after the start line, about 3 s of travel, before the first obstacle.
 - Obstacles in pairs at the same position along the course, one rising from the ground and one reaching down from far above the view, leaving one gap between them, as Flappy Bird's pipes do.
@@ -102,7 +102,7 @@ The course runs from the start line, point A, to the finish line, point B, above
 
 Difficulty follows course progress, from 0 at the start line to 1 at the finish line, never time, so respawns do not change what lies ahead. Three tunable curves over progress set:
 
-- Obstacle spacing, which sets the number of obstacles.
+- Obstacle spacing, which sets the number of obstacles. Each spacing strays at random from its curve, within a tunable spread and between a shortest and a longest spacing, so the rhythm is never even.
 - Gap height.
 - The largest change in gap height between one obstacle and the next.
 
@@ -112,11 +112,12 @@ Starting values, taken from the same Flappy Bird reference as the flight values.
 
 | Value | Start of course | End of course |
 | --- | --- | --- |
-| Obstacle spacing, centre to centre | 14 m | 11 m |
+| Obstacle spacing, centre to centre | 16.1 m | 12.65 m |
 | Gap height | 8.4 m | 7.0 m |
 | Largest gap change from the previous obstacle | 4 m | 9 m |
 | Chance that a gap holds a pickup | 10% | 25% |
 
+- Each spacing strays up to 25% either way from its curve, and always lies between 11 m and 20 m.
 - Every obstacle is 6 m wide. A gap always lies between 20% and 80% of the view height.
 - A pickup is 1.6 m across, 0.4 m inside the top or bottom edge of its gap; the seed picks the edge.
 - The hit box is Cubio's body cube inset by 0.2 m on every side, a 1.6 m box.
@@ -308,6 +309,8 @@ Confirmed by the project owner on 2026-10-26:
 Confirmed by the project owner on 2026-10-27:
 
 * After a hit the Cubio tumbles dizzy at the hit spot, then leaves play; once the heart can be tapped it waits, worried, behind the pulsing heart at the respawn spot.
+* The shared screen's furthest zoom stays at 54 m visible, confirmed from captures.
+* Obstacles are 15% further apart than the first values, 16.1 m to 12.65 m, so a race has about 80 of them; each spacing varies at random by up to 25%, between 11 m and 20 m, so the rhythm is never even.
 
 ## Deferred decisions
 

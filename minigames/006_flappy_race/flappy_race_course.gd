@@ -74,7 +74,8 @@ static func generate(seed_value: int, tuning: FlappyRaceTuning) -> FlappyRaceCou
 
 		centre = gap_centre
 		previous = obstacle
-		x += settings.obstacle_spacing.sample(progress)
+		# Drawn for every obstacle too, after the pickup rolls.
+		x += settings.spacing_at(progress, rng.randf_range(-1.0, 1.0))
 	return course
 
 

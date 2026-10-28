@@ -49,7 +49,7 @@ func validation_errors() -> PackedStringArray:
 	var half := flight.hit_half()
 	if course.respawn_distance < half:
 		errors.append("Flappy Race: a respawn spot must keep the hit box out of its obstacle.")
-	var closest := FlappyRaceCourseTuning.curve_range(course.obstacle_spacing).x
+	var closest := course.shortest_possible_spacing()
 	if closest - course.obstacle_width < course.respawn_distance + half:
 		errors.append("Flappy Race: obstacles must leave room for the respawn spot between them.")
 	if view.farthest_visible_height < course.view_height:

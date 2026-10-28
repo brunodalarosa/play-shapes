@@ -25,8 +25,16 @@ extends Resource
 @export_range(0.0, 10.0, 0.25, "suffix:m") var respawn_distance: float = 2.0
 
 @export_group("Difficulty over progress")
-## Distance from one obstacle's front face to the next, metres. Default: 14 to 11.
+## Distance from one obstacle's front face to the next, metres, before its random spread.
+## Default: 16.1 to 12.65.
 @export var obstacle_spacing: Curve
+## How far each spacing may stray from its curve, either way, as a share, drawn from the seed.
+## Default: 0.25.
+@export_range(0.0, 0.9, 0.05) var spacing_variation: float = 0.25
+## No spacing is shorter than this, whatever the curve and spread say. Default: 11.
+@export_range(1.0, 60.0, 0.25, "suffix:m") var shortest_spacing: float = 11.0
+## No spacing is longer than this. Default: 20.
+@export_range(1.0, 60.0, 0.25, "suffix:m") var longest_spacing: float = 20.0
 ## Gap height, metres. Default: 8.4 to 7.
 @export var gap_height: Curve
 ## Largest change of gap centre from the previous obstacle, metres. Default: 4 to 9.
@@ -49,6 +57,19 @@ extends Resource
 @export_range(0.0, 1.0, 0.05) var crystal_cluster_weight: float = 0.15
 
 
+## The spacing after an obstacle at [param progress], with [param roll] from -1 to 1 setting its
+## share of the spread.
+func spacing_at(progress: float, roll: float) -> float:
+	var spread := obstacle_spacing.sample(progress) * (1.0 + roll * spacing_variation)
+	return clampf(spread, shortest_spacing, longest_spacing)
+
+
+## The shortest spacing the curve, its spread and the limits allow.
+func shortest_possible_spacing() -> float:
+	var lowest := curve_range(obstacle_spacing).x * (1.0 - spacing_variation)
+	return clampf(lowest, shortest_spacing, longest_spacing)
+
+
 ## The lowest and highest value of [param curve] over progress, sampled in hundredths.
 static func curve_range(curve: Curve) -> Vector2:
 	var low := INF
@@ -67,7 +88,9 @@ func validation_errors() -> PackedStringArray:
 		errors.append("Flappy Race course: every difficulty curve must be set.")
 		return errors
 
-	if curve_range(obstacle_spacing).x <= obstacle_width:
+	if shortest_spacing > longest_spacing:
+		errors.append("Flappy Race course: the shortest spacing cannot exceed the longest.")
+	if shortest_possible_spacing() <= obstacle_width:
 		errors.append("Flappy Race course: obstacles must be spaced wider than they are.")
 	if curve_range(gap_height).x <= 0.0 or curve_range(largest_gap_change).x < 0.0:
 		errors.append("Flappy Race course: gaps and gap changes cannot be negative.")

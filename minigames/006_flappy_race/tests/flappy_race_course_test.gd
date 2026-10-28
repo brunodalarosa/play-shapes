@@ -31,7 +31,7 @@ func _check_shape() -> void:
 	check(course.length == 1200.0, "A 2-minute perfect run at 10 m/s is 1200 m")
 	check(course.flight.finish_x == course.length, "The finish line ends the course")
 	check(course.flight.start_x == 0.0 and course.flight.start_y == 17.0, "GO is at 17 m")
-	check(obstacles.size() > 85 and obstacles.size() < 95, "About 90 obstacles")
+	check(obstacles.size() > 75 and obstacles.size() < 85, "About 80 obstacles")
 	check(obstacles[0].x_start == 30.0, "3 s of clear travel before the first obstacle")
 	check(obstacles.back().x_end <= course.length - 30.0, "3 s of clear travel before the finish")
 	check(course.view_height == 34.0, "The course is made for a 34 m view")
@@ -75,17 +75,33 @@ func _check_curves() -> void:
 				continue
 
 			var spacing := obstacle.x_start - obstacles[index - 1].x_start
-			var expected := settings.obstacle_spacing.sample(
-				obstacles[index - 1].x_start / course.length
-			)
-			if not check(absf(spacing - expected) <= SNAP * 2.0, "The spacing follows its curve"):
+			var previous_progress := obstacles[index - 1].x_start / course.length
+			var shortest := settings.spacing_at(previous_progress, -1.0) - SNAP * 2.0
+			var longest := settings.spacing_at(previous_progress, 1.0) + SNAP * 2.0
+			if not check(
+				spacing >= shortest and spacing <= longest,
+				"The spacing stays within its curve's spread and the limits",
+			):
 				return
 
 	var course := FlappyRaceCourse.generate(1, TUNING)
-	var first := course.flight.obstacles[1].x_start - course.flight.obstacles[0].x_start
-	var last := course.flight.obstacles.size() - 1
-	var final := course.flight.obstacles[last].x_start - course.flight.obstacles[last - 1].x_start
-	check(first > 13.5 and final < 11.5, "Obstacles close in from 14 m to 11 m apart")
+	var spacings := PackedFloat64Array()
+	var obstacles := course.flight.obstacles
+	for index: int in range(1, obstacles.size()):
+		spacings.append(obstacles[index].x_start - obstacles[index - 1].x_start)
+	var quarter := spacings.size() / 4
+	var first := _mean(spacings.slice(0, quarter))
+	var final := _mean(spacings.slice(spacings.size() - quarter))
+	check(
+		first > 15.0 and final < 14.0,
+		"Obstacles close in from about 16 m to about 13 m apart: %.1f, %.1f" % [first, final],
+	)
+	var sorted := spacings.duplicate()
+	sorted.sort()
+	check(
+		sorted[0] >= 11.0 - SNAP and sorted[-1] <= 20.0 + SNAP and sorted[-1] - sorted[0] > 5.0,
+		"Spacings vary between 11 m and 20 m: %.2f to %.2f" % [sorted[0], sorted[-1]],
+	)
 
 
 func _check_respawn_spots() -> void:
@@ -162,10 +178,29 @@ func _check_message() -> void:
 	)
 
 
+static func _mean(values: PackedFloat64Array) -> float:
+	var total := 0.0
+	for value: float in values:
+		total += value
+	return total / values.size()
+
+
 func _check_validation() -> void:
 	var tuning: FlappyRaceTuning = TUNING.duplicate(true)
 	tuning.course.obstacle_width = 12.0
 	check(not tuning.validation_errors().is_empty(), "Obstacles wider than their spacing fail")
+
+	tuning = TUNING.duplicate(true)
+	tuning.course.shortest_spacing = 25.0
+	check(not tuning.validation_errors().is_empty(), "A shortest spacing over the longest fails")
+
+	tuning = TUNING.duplicate(true)
+	tuning.course.shortest_spacing = 6.0
+	tuning.course.spacing_variation = 0.6
+	check(
+		not tuning.validation_errors().is_empty(),
+		"A spread that leaves no room for a respawn spot fails",
+	)
 
 	tuning = TUNING.duplicate(true)
 	tuning.course.respawn_distance = 0.5

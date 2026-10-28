@@ -53,7 +53,9 @@ start line to 1 at the finish line.
 | Obstacle width | 6 m | Width of every obstacle pair. |
 | Gap lowest and highest share | 0.2 and 0.8 | Gaps stay inside this part of the view height. |
 | Respawn distance | 2 m | From a respawn spot to its obstacle's front face. |
-| Obstacle spacing | 14 m to 11 m | Curve: front face to front face, which gives about 90 obstacles. |
+| Obstacle spacing | 16.1 m to 12.65 m | Curve: front face to front face, before the spread; about 80 obstacles. |
+| Spacing variation | 0.25 | Each spacing strays at random up to this share either way from its curve. |
+| Shortest and longest spacing | 11 m and 20 m | No spacing leaves this range, whatever the curve and spread. |
 | Gap height | 8.4 m to 7 m | Curve. |
 | Largest gap change | 4 m to 9 m | Curve: most the gap centre moves from one obstacle to the next. |
 | Pickup chance | 0.1 to 0.25 | Curve: chance that an obstacle's gap holds a pickup. |
