@@ -25,11 +25,15 @@ repository.
   reaches or crouches, and FALL descends Open supports.
 - The live 3D Cubio is the character in phone setup and the Ready screen. Minigame 004
   uses the same model on the shared screen and on the phone.
-- F12 opens the debug menu: the one-real-player scenario for Bubbles and jellyfishes 3D, the
-  Shape Characters lab, the Gyroscope and Accelerometer Lab, and the Tilt Shift 3D factory with
+- F12 opens the debug menu: the Flappy Race workshop, the one-real-player scenario for Bubbles
+  and jellyfishes 3D, the Shape Characters lab, the Gyroscope and Accelerometer Lab, and the Tilt Shift 3D factory with
   explicitly simulated controls. The factory review creates ten synthetic players without
   registering phones.
   Bubbles and jellyfishes 3D labels its debug round on the host and the phone.
+- The Flappy Race workshop, `minigames/006_flappy_race/workshop/flappy_race_workshop.tscn`,
+  runs on its own with F6. Fly through its phone view beside autopilots, edit the Tunables,
+  press R to restart with them, then save the preset and use it in the game. See
+  [Minigame workshops](game-design-documents/Minigame%20workshops.md).
 - The host defaults to a responsive 1920×1080 GL Compatibility presentation.
 - **Project > Tools > Build Standalone Host** creates a portable Windows x86_64 release ZIP.
   There is no Linux build.

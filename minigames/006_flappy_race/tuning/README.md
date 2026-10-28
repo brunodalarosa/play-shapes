@@ -1,8 +1,9 @@
 # Flappy Race tuning
 
 Select a preset in `Tuning/Active Presets.tres`, under Flappy Race. A preset is one file, such as
-`Default.tres`, holding the race values and its Flight, Course and View parts below. Changes apply
-when the host next starts.
+`Default.tres`, holding the race values and its Flight, Course and View parts below. The
+workshop edits, saves and selects presets; changes reach a normal game when the host next
+starts.
 
 The values are starting points taken from the Flappy Bird reference in
 [the design](../../../docs/game-design-documents/Minigames/006/006%20-%20Flappy%20Race.md).

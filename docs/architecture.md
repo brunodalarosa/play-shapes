@@ -186,11 +186,39 @@ The host runs and draws the whole race on a placeholder course; each phone flies
 - `flappy_race_course.gd` (`FlappyRaceCourse`) generates the seeded course on the host: obstacle
   pairs, respawn spots, pickups and each ground half's look, following difficulty `Curve`s over
   course progress. Its `to_dictionary` is what phones receive.
-- `FlappyRaceTuning` selects the flight and course values in `Tuning/Active Presets.tres`, and
-  holds the race's countdown, timer, last seconds, tap window and state rate.
+- `FlappyRaceTuning` is a preset, selected in `Tuning/Active Presets.tres`: one file holding
+  the race's countdown, timer, last seconds, tap window and state rate, and its flight, course
+  and view parts.
   `FlappyRaceViewTuning` holds what both screens show: tilt, faces, the phone's framing and
   the shared screen's camera, names, depth slots and dither.
+- `flappy_race_autopilot.gd` (`FlappyRaceAutopilot`) is a simulated player that taps through
+  the protocol as a phone does, with one skill, Good.
+- `workshop/` is its workshop on the shared window: `flappy_race_workshop.tscn` runs the real
+  race with the designer and autopilots, and `flappy_race_course_strip.gd` draws the course
+  strip. The controller's `place_racer` and the presentation's `followed_id` and
+  `frames_camera` serve it; a real race uses neither.
 - Its design is in `docs/game-design-documents/Minigames/006/`.
+
+## Minigame workshops
+
+The shared parts of every workshop live in `workshop/`, outside any minigame folder, as
+[Minigame workshops](game-design-documents/Minigame%20workshops.md) designs them. Workshops and
+`workshop/` are left out of the exported game.
+
+- `workshop_window.gd` (`WorkshopWindow`) is the window: the top bar and the four panels. A
+  minigame's workshop scene calls `setup` with its presets and its Active Presets field, fills
+  the first three panels and restarts its game on `restart_requested`.
+- `workshop_dockable_panel.gd` pops a panel out into its own window and docks it back;
+  `workshop_layout.gd` remembers the layout in `user://workshops/`.
+- `workshop_tuning.gd` (`WorkshopTuning`) holds the preset as saved, as edited and as running,
+  with undo. A tuning Resource lists its live export groups in `LIVE_GROUPS`; other edits wait
+  for a restart. `workshop_tunable.gd` is one value, found from the Resource's exports.
+- `workshop_tunables_panel.gd` and `workshop_tunable_row.gd` draw the Tunables panel.
+- `workshop_presets.gd` reads and writes a minigame's preset files, and
+  `workshop_game_preset.gd` changes its one line of `Tuning/Active Presets.tres`.
+- `workshop_phone_view.gd` shows the phone page in godot-wry, signed in as the designer
+  ([0054](decisions/0054-workshop-phone-view-in-godot-wry.md)).
+- `workshop_boot_request.tres` asks the boot for the servers bound to this PC only.
 
 ## Shared 3D components
 
@@ -260,6 +288,7 @@ These live outside any minigame folder so later 3D scenes can use them.
 
 - `debug/` contains the non-pausing F12 scenario catalog and the debug scenes. The launcher
   remains present in development exports.
+- **Flappy Race workshop** opens its workshop; see [Minigame workshops](#minigame-workshops).
 - **Tilt Shift 3D factory · simulated controls** opens `debug/tilt_shift_3d_review.tscn`: ten
   synthetic players tilt through a whole shift, with no phones and no launch eligibility.
 - **Shape Characters lab** opens `debug/shape_characters_lab/shape_characters_lab.tscn`. Three
@@ -312,6 +341,7 @@ These live outside any minigame folder so later 3D scenes can use them.
   phone from `assets/runtime/shape_faces/`.
 - `addons/standalone_build/` is the editor-only Windows builder.
   `addons/kenyoni/qr_code/` is the required vendored runtime QR dependency.
+  `addons/godot_wry/` is the vendored Windows web view the workshops use; it is not exported.
 - `tests/` holds focused headless, integration, policy and render checks of the shared code. A
   minigame's own are in its `tests/` folder. Generated evidence belongs under ignored
   `test-results/`.
@@ -319,8 +349,8 @@ These live outside any minigame folder so later 3D scenes can use them.
 ## Tuning
 
 `Tuning/` contains the active selector, the shared named resources, a guide and an experiment
-template. A minigame's named resources are in its own `tuning/` folder. There is no runtime
-tuning UI.
+template. A minigame's named resources are in its own `tuning/` folder. The game has no
+runtime tuning UI; a minigame's workshop edits its presets.
 
 - Open `Tuning/Active Presets.tres` to select named resources. The current front doors are
   `minigames/004_3d_bubbles/tuning/Default.tres`,

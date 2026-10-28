@@ -40,7 +40,7 @@ The `Play Shapes Windows Release` preset includes the committed browser runtime.
 - tools;
 - source art and extraction manifests; runtime Cubio and factory geometry remain included;
 - build output;
-- editor addons;
+- editor addons, godot-wry and every minigame workshop;
 - package configuration.
 
 Rules when changing it:

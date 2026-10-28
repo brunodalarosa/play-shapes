@@ -26,6 +26,8 @@ results and return to the lobby.
   - The shared screen follows the leader with `RaceCamera3D` and dithers overlaps
     ([0051](docs/decisions/0051-dithered-overlap-on-a-shared-plane.md)).
   - The course is placeholder boxes; cave art, flight clips, podium and results are to come.
+  - Its workshop, `minigames/006_flappy_race/workshop/`, is the first on the shared window in
+    `workshop/`. Presets are one file each; `FlappyRaceAutopilot` taps through the protocol.
 - 001, 002 and 003 are retired. Minigame numbers are stable identifiers and are never reused.
 
 ## The 3D rework
@@ -89,7 +91,12 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
   TypeScript change; the check fails if `web/public/` is stale.
 - `Tuning/Active Presets.tres` selects named tuning Resources. No runtime tuning UI exists, and
   only the owner promotes subjective feel into `Default`.
-- `debug/`: F12 launcher with the Shape Characters lab, the motion lab, a Tilt Shift factory
+- `workshop/`: the shared minigame workshop window (presets, generated Tunables, live versus
+  restart by each Resource's `LIVE_GROUPS`, pop-out panels). No pause or speed: the owner
+  removed time controls because phones predict on their own clock. The phone view uses
+  vendored `addons/godot_wry/` v1.0.2, which only draws in the main window, so that panel stays
+  docked ([0054](docs/decisions/0054-workshop-phone-view-in-godot-wry.md)).
+- `debug/`: F12 launcher with the Flappy Race workshop, the Shape Characters lab, the motion lab, a Tilt Shift factory
   review and one-player Bubbles.
 
 ### The lobby
@@ -150,7 +157,7 @@ Condensed from AGENTS.md and the documents it links.
   needs a person goes into `docs/pending-reviews.md`.
 - Documents state what is true now, one topic each, with links that resolve and paragraphs
   under 600 characters; `node tools/docs.mjs` checks them. Reasons go in `docs/decisions/` as
-  numbered records, never edited to change a decision; the next free number is 0054. The
+  numbered records, never edited to change a decision; the next free number is 0055. The
   roadmap changes when work finishes or is added.
 - No ticket numbers anywhere: files, comments, tests or output folders.
 - Typed GDScript, composition, signals, Control/Container UI and no fixed viewport sizes.

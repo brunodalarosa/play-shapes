@@ -23,6 +23,14 @@ removes it. The evidence labels are defined in
 - Owner visual review of the café [logo sign](../art/playground_plaza/logo_sign/README.md) at
   the real camera: letter depth, cream backing, posts, and characters on the roof in front.
 - `[PHYSICAL-PHONE]` The installed app icon with the stacked logo at Home Screen size.
+- `[HUMAN-PLAY]` The workshop: change a value, see it, save a preset, use it in the game and
+  start a normal race that uses it; fly through the phone view with autopilots.
+- `[HUMAN-PLAY]` The workshop's panels popped out across two monitors, maximized and
+  fullscreen, and the layout coming back on the next start.
+- `[DESKTOP-BROWSER]` The phone view lines up with its frame when the window is not
+  1920 × 1080 and on a scaled display, and dialogs and menus show above it.
+- `[GODOT-RUNTIME]` The workshop opened from F12 while the full game runs, whose servers may
+  use HTTPS that the phone view does not trust.
 - `[GODOT-RUNTIME]` Host frame time with ten players on the target PC. Not yet measured.
 - `[EXPORTED-BUILD]` The Windows package opens the plaza with every model and license.
 

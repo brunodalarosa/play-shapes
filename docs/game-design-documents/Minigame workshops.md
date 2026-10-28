@@ -47,14 +47,16 @@ Why: [decision 0052](../decisions/0052-a-workshop-for-every-minigame.md).
   its title bar and readouts drawn over it; Tab hides them. Popped out and fullscreen, it shows
   exactly what players see.
 - **Phone view:** the real phone page, served by the workshop and shown in a phone frame sized
-  by a device picker, connected as the designer's own player. It can stay on top of other
-  windows when popped out.
+  by a device picker, connected as the designer's own player. It stays docked until the web
+  view add-on can draw in a popped-out window
+  ([0054](../decisions/0054-workshop-phone-view-in-godot-wry.md)).
 - **Minigame flow:** restart, the seed where the minigame has one, the players taking part,
   autopilots and their skill, and quick setups that restart into a named situation. The game
   always runs at real time: a phone predicts on its own clock, so there is no pause or speed.
 - **Tunables:** one tab per tuning Resource, generated from it and grouped by its export
-  groups. Each value is one row: an edited dot, its label, a slider with the default marked,
-  and the number with its unit. The selected row shows its help, default and range.
+  groups. Each value is one row: an edited dot, its label, a slider with the Default preset's
+  value marked, and the number with its unit. A curve over the course is two rows, its start
+  and its finish. The selected row shows its help, default and range.
 - A filter finds a value by name. Edits waiting for a restart and validation errors sit at the
   bottom of the panel.
 

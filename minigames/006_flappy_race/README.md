@@ -27,8 +27,12 @@ mirrored for the phone in `web/src/flappy_flight/`.
 - `flappy_race_protocol.gd` takes `flappy_tap` and sends each phone its snapshot, its settled
   flight and its events, as [protocol.md](../../docs/protocol.md#flappy-race) describes.
 - `flappy_race_course.gd` generates a course from a seed and the tuning.
-- `flappy_race_tuning.gd` and `flappy_race_course_tuning.gd` are the tuning scripts; the values
-  are in `tuning/`, described in [its README](tuning/README.md).
+- `flappy_race_tuning.gd` and `flappy_race_course_tuning.gd` are the tuning scripts; each
+  preset is one file in `tuning/`, described in [its README](tuning/README.md).
+- `flappy_race_autopilot.gd` is a simulated player that taps through the protocol.
+- `workshop/flappy_race_workshop.tscn` is the workshop: the real race on the shared workshop
+  window, with the designer in the phone view, autopilots, quick setups and the course strip
+  of `workshop/flappy_race_course_strip.gd`. Run it with F6 or from F12.
 - `tests/flappy_race_launch_test.gd` starts the race with one and with ten players.
 - `tests/flappy_race_controller_test.gd` checks the tap window, freezing, resuming, leaving
   and the ranking; `flappy_race_ten_player_race_test.gd` flies ten autopilots to both ends of
@@ -37,4 +41,6 @@ mirrored for the phone in `web/src/flappy_flight/`.
   same name captures it with 1, 4 and 10 players, run without `--headless`.
 - `tests/flappy_race_course_test.gd` checks the generator, and `flappy_race_flyable_test.gd`
   flies its courses with the autopilot; the sweep version runs under `--full`.
+- `tests/flappy_race_preset_test.gd` checks the Default preset holds every part, and
+  `flappy_race_workshop_test.gd` runs the workshop with its autopilots and quick setups.
 - The phone side is `web/src/006_flappy_race/`, tested in `web/tests/006_flappy_race/`.
