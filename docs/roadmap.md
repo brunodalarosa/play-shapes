@@ -100,7 +100,7 @@ It awaits physical-phone checks and the owner's play review; tuning values are p
 
 - Minigame 006, Flappy Race: a phone-first race through a crystal cave with hearts and speed
   pickups, for 1 to 10 players. Designed in `docs/game-design-documents/Minigames/006/`. Its
-  cave art, Cubio's flight clips, the podium, results, F12 review, phone audio and booklet
+  cave art, Cubio's flight clips, the podium, results, workshop, phone audio and booklet
   preview are not built.
   - Its launch exists: 1 to 10 players go through the Pre-minigame screen into the race scene
     and back to the lobby ([0049](decisions/0049-minimum-players-per-minigame.md)).
@@ -112,6 +112,11 @@ It awaits physical-phone checks and the owner's play review; tuning values are p
     placeholder course.
   - The shared screen follows the leader with a zooming camera, bubbles for players behind,
     dithered overlaps, place badges and the timer, on the same placeholder course.
+- Minigame workshops ([0052](decisions/0052-a-workshop-for-every-minigame.md)): a boot whose
+  steps are essential or optional, so a workshop starts on its own with only what it needs;
+  then the shared workshop and Flappy Race's, designed in
+  [Minigame workshops](game-design-documents/Minigame%20workshops.md). Tilt Shift 3D and
+  Bubbles and jellyfishes 3D move onto it afterwards.
 - The first release, `0.1.0`: decide where the project and the Windows package record the
   version, then follow [branching.md](branching.md#a-release).
 - Cloud CI, if hosted runners turn out to be free for this repository

@@ -146,13 +146,15 @@ Condensed from AGENTS.md and the documents it links.
   needs a person goes into `docs/pending-reviews.md`.
 - Documents state what is true now, one topic each, with links that resolve and paragraphs
   under 600 characters; `node tools/docs.mjs` checks them. Reasons go in `docs/decisions/` as
-  numbered records, never edited to change a decision; the next free number is 0052. The
+  numbered records, never edited to change a decision; the next free number is 0053. The
   roadmap changes when work finishes or is added.
 - No ticket numbers anywhere: files, comments, tests or output folders.
 - Typed GDScript, composition, signals, Control/Container UI and no fixed viewport sizes.
   Dictionaries are being pushed to the edges ([0019](docs/decisions/0019-typed-classes.md)).
 - Test scripts extend `TestScript` and put their body in `_run()`. Any logged error fails the
   script, and so does anything still held at exit.
+- Every minigame has a workshop on the shared design, planned with the minigame
+  ([0052](docs/decisions/0052-a-workshop-for-every-minigame.md)).
 - Every normal minigame launch goes through the Pre-minigame screen. A plan that skips it must
   carry the bold uppercase warning from [player-journeys.md](docs/player-journeys.md).
 - Temporary art variants go in ignored `scratch/` or `comparisons/`, never in commits.

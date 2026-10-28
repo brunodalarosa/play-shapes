@@ -96,7 +96,7 @@ The course runs from the start line, point A, to the finish line, point B, above
 
 - The course is generated from a seed for every race. The same seed and the same tuning give the same course.
 - The host generates the course and sends it to every phone when the race starts. Phones never generate it themselves.
-- The seed is shown and can be set only in the F12 debug review. Players never see it.
+- The seed is shown and can be set only in the workshop. Players never see it.
 
 ### Difficulty curve
 
@@ -235,7 +235,7 @@ Results stay on the shared screen until Return to lobby, over the podium scene. 
 
 ## Lobby and debug flow
 
-006 appears in the lobby's minigame dropdown after 005 and starts through the Pre-minigame screen like every normal launch. The F12 debug launcher offers a simulated 006 review with the seed field, which skips the Pre-minigame screen without granting real launch eligibility.
+006 appears in the lobby's minigame dropdown after 005 and starts through the Pre-minigame screen like every normal launch. The F12 debug launcher opens the [workshop](#workshop), which skips the Pre-minigame screen without granting real launch eligibility.
 
 ## Pre-minigame booklet
 
@@ -250,6 +250,29 @@ Built outside `minigames/006_flappy_race/`:
 - The follow-the-leader camera with off-screen bubbles.
 - The phone's local prediction of its own character, with host correction.
 - The dithered overlap for characters that share a plane.
+
+## Workshop
+
+The Flappy Race workshop follows [Minigame workshops](../../Minigame%20workshops.md). Its own
+parts:
+
+* Boot: it asks only for the HTTP and WebSocket servers, bound to this PC, for its phone view.
+* Racers: the designer flies through the phone view (a click, or Space while it has focus) and
+  can be left out; 0 to 9 autopilots, at most 10 racers. Autopilot skill: Sloppy, Mixed, Good
+  or Perfect, setting how often one misjudges a gap.
+* Time: pause, step one 60 Hz tick, and ¼×, ½×, 1×, 2× and 4× speed.
+* Course: restart with the same seed, new course with a new one, a seed field with a lock that
+  keeps the seed across Course edits, and a course strip of everyone's progress that moves the
+  pack to the clicked spot.
+* Quick setups: Start crowd, Spread pack, One far behind, Leader near finish, Out of hearts.
+* Camera: Leader (the real game), the designer's Cubio, or Free.
+* Shared-screen readouts: seed, speed, tick, leader progress, difficulty at the leader's spot,
+  each racer's place, progress, hearts and state, and host time per frame.
+* Phone view: portrait, with a device picker, a readout of how much course the phone and the
+  shared screen each show, and an optional outline of the phone's view on the shared screen.
+* Live values: the shared-screen part of View. Flight, Course, Race and the phone part of View
+  wait for a restart, because the phone predicts with the values it starts with.
+* One preset file holds Race, Flight, Course and View.
 
 ## Designer-tunable values
 
@@ -289,7 +312,7 @@ Confirmed by the project owner on 2026-10-25:
 * Leader at about 65% of the width; the view height fills the screen at the closest zoom; off-screen bubbles show face and name; place badges over every Cubio.
 * Difficulty follows course progress; curves for spacing, gap height and gap change.
 * No moving obstacles in version 1.
-* The seed only in the F12 debug review.
+* The seed only in the workshop.
 * Cubio's hands become its wings; it tilts with its velocity; only the body cube collides.
 * Faces as in [Cubio with wings](#cubio-with-wings), with `face_beaming` for a pickup.
 * One biome, a bright crystal cave with no visible ceiling, chosen over the forest after comparing mockups, because stalactites feel natural as obstacles from above. Crystals are generated in code. The speed pickup is a golden coin rather than a crystal, so it reads as a power-up.

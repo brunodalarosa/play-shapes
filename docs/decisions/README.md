@@ -88,3 +88,4 @@ What was decided.
 | [0049](0049-minimum-players-per-minigame.md) | Each minigame sets its own minimum number of players |
 | [0050](0050-random-order-for-exact-ties.md) | Exact ties in gameplay results may be settled at random |
 | [0051](0051-dithered-overlap-on-a-shared-plane.md) | Characters sharing a plane take depth slots, and the one in front dithers |
+| [0052](0052-a-workshop-for-every-minigame.md) | Every minigame has a workshop built on one shared design |
