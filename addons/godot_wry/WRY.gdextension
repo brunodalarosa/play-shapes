@@ -1,0 +1,15 @@
+[configuration]
+entry_symbol = "gdext_rust_init"
+compatibility_minimum = 4.1
+reloadable = true
+
+[libraries]
+windows.debug.x86_64   = "bin/x86_64-pc-windows-msvc/godot_wry.dll"
+windows.release.x86_64 = "bin/x86_64-pc-windows-msvc/godot_wry.dll"
+
+[icons]
+WebView = "icons/webview.svg"
+
+[dependencies]
+windows.debug.x86_64 = { "bin/x86_64-pc-windows-msvc/godot_wry.dll" : "" }
+windows.release.x86_64 = { "bin/x86_64-pc-windows-msvc/godot_wry.dll" : "" }
