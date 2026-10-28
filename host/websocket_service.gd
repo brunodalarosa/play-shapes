@@ -210,7 +210,8 @@ func _process(_delta: float) -> void:
 			continue
 		var peer := WebSocketPeer.new()
 		peer.inbound_buffer_size = 16384
-		peer.outbound_buffer_size = 4096
+		# A Flappy Race snapshot carries the whole course, about 13 KB.
+		peer.outbound_buffer_size = 65536
 		peer.max_queued_packets = 8
 		peer.heartbeat_interval = 5.0
 		_clients.append(

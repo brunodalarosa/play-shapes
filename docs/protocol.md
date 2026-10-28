@@ -52,6 +52,9 @@ From `Tuning/Shared/Networking/Default.tres`:
 - Five-second request and handshake timeout.
 - 60-second reconnect grace.
 
+Each WebSocket connection takes host messages of up to 64 KiB, such as a Flappy Race snapshot
+with its whole course, and phone messages of up to 16 KiB.
+
 ## Endpoints and session discovery
 
 `ControllerNetworkConfig` is the endpoint source for both services, the lobby QR and
