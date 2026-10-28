@@ -27,8 +27,9 @@ removes it. The evidence labels are defined in
   start a normal race that uses it; fly through the phone view with autopilots.
 - `[HUMAN-PLAY]` The workshop's panels popped out across two monitors, maximized and
   fullscreen, and the layout coming back on the next start.
-- `[DESKTOP-BROWSER]` The phone view lines up with its frame when the window is not
-  1920 × 1080 and on a scaled display, and dialogs and menus show above it.
+- `[HUMAN-PLAY]` The phone view over its frame in the editor's embedded Game view at FHD and
+  4K, and dialogs and menus above it. In a separate window it was measured exact at three
+  positions and stretches on a 150% display.
 - `[GODOT-RUNTIME]` The workshop opened from F12 while the full game runs, whose servers may
   use HTTPS that the phone view does not trust.
 - `[GODOT-RUNTIME]` Host frame time with ten players on the target PC. Not yet measured.

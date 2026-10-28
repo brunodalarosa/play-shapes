@@ -2,9 +2,8 @@ class_name WorkshopPhoneView
 extends VBoxContainer
 ## The real phone page in a phone-shaped frame, signed in as the designer's player.
 ##
-## The page runs in a godot-wry WebView, a native window drawn over the game window. That
-## add-on places it by the control's screen position but takes the control's size as physical
-## pixels, so the frame scales it by the window's stretch itself.
+## The page runs in a godot-wry WebView, a native window drawn over the game window and placed
+## in its physical pixels; [method _place_page] keeps it over the frame.
 
 signal page_message(message: Dictionary)
 
@@ -140,14 +139,37 @@ func _on_device(index: int) -> void:
 	probe()
 
 
-## Sizes the native page to the frame in physical pixels.
 func _fit() -> void:
-	if web_view == null:
-		return
-	var stretch := get_viewport().get_final_transform().get_scale()
-	web_view.position = Vector2.ZERO
-	web_view.size = _screen.size * stretch
+	_place_page()
 	probe()
+
+
+func _process(_delta: float) -> void:
+	# Runs before the WebView's own process, which moves the page when its position changes.
+	_place_page()
+
+
+## Puts the native page over the frame, in the window's physical pixels.
+##
+## The add-on places the page at the control's screen position, which adds the window's place
+## on the screen when subwindows are not embedded and leaves out the stretch when they are, and
+## it reads the control's size as physical pixels. So the control goes wherever makes that
+## screen position the frame's pixel position in the window, at the frame's pixel size.
+func _place_page() -> void:
+	if web_view == null or not web_view.is_inside_tree():
+		return
+	var to_pixels := get_viewport().get_final_transform()
+	var wanted := to_pixels * _screen.get_global_transform_with_canvas().origin
+	var to_screen := (
+		web_view.get_screen_transform()
+		* web_view.get_global_transform_with_canvas().affine_inverse()
+	)
+	var position_for_wanted := to_screen.affine_inverse() * wanted
+	if not web_view.global_position.is_equal_approx(position_for_wanted):
+		web_view.global_position = position_for_wanted
+	var pixel_size := _screen.size * to_pixels.get_scale()
+	if not web_view.size.is_equal_approx(pixel_size):
+		web_view.size = pixel_size
 
 
 ## Zooms the page so it lays out at the device's CSS width.
