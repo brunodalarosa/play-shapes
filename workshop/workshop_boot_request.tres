@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="BootRequest" format=3]
+
+[ext_resource type="Script" path="res://host/boot_request.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+steps = Array[StringName]([&"servers_this_pc"])
