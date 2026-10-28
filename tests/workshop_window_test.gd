@@ -40,7 +40,7 @@ func _check_editing(window: WorkshopWindow) -> void:
 	check(row != null, "Every value has a row")
 	row.edited.emit(row.tunable, 80.0)
 	check(window.tuning.edited.flight.gravity == 80.0, "A row edits the preset")
-	check(window._edits.text == "1 edit", "The top bar counts the edit")
+	check(window._edits.text == "Edited · 1", "The top bar counts the edit")
 	check(window.use_button.disabled, "An unsaved preset cannot be used in the game")
 
 
@@ -52,7 +52,7 @@ func _check_saving(window: WorkshopWindow, presets: WorkshopPresets) -> void:
 	check(window.save_preset_as("Heavy").is_empty(), "Save as makes a new preset")
 	check(window.preset_name == "Heavy", "And edits it")
 	check(presets.load_preset("Heavy").flight.gravity == 80.0, "With the edit")
-	check(window._edits.text == "Saved", "It has no unsaved edits")
+	check(not window._edits.visible, "It has no unsaved edits")
 
 	window.use_in_game()
 	check(window.dialog.visible, "Using a preset in the game asks first")
@@ -61,7 +61,7 @@ func _check_saving(window: WorkshopWindow, presets: WorkshopPresets) -> void:
 	window._write_game_preset()
 	var game := WorkshopGamePreset.new("flappy_race", ACTIVE_COPY)
 	check(game.current_path() == presets.path("Heavy"), "The game now uses it")
-	check(window.game_label.text == "Game uses Heavy", "And the top bar says so")
+	check(window.game_label.text == "Heavy", "And the top bar says so")
 
 
 func _check_layout(window: WorkshopWindow, presets: WorkshopPresets) -> void:

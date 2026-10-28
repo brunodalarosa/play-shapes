@@ -5,9 +5,9 @@ extends Control
 
 signal picked(obstacle_index: int)
 
-const BAR := Color(0.25, 0.3, 0.36)
-const OBSTACLE := Color(0.55, 0.62, 0.7)
-const FINISH := Color(1.0, 0.85, 0.3)
+const BAR := WorkshopTheme.SECONDARY_CONTAINER
+const OBSTACLE := WorkshopTheme.OUTLINE
+const FINISH := WorkshopTheme.PRIMARY
 
 var race: FlappyRaceController
 

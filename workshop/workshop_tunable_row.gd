@@ -7,7 +7,8 @@ signal edited(tunable: WorkshopTunable, value: Variant)
 signal selected(row: WorkshopTunableRow)
 
 const DOT := "●"
-const TICK_COLOR := Color(1.0, 0.8, 0.3)
+## The default's mark on the slider.
+const TICK_COLOR := WorkshopTheme.CAUTION
 
 var tunable: WorkshopTunable
 var _dot := Label.new()
@@ -23,13 +24,17 @@ func _init(row_tunable: WorkshopTunable) -> void:
 	tunable = row_tunable
 	name = row_tunable.key().validate_node_name()
 	mouse_filter = Control.MOUSE_FILTER_PASS
+	theme_type_variation = &"TunableRow"
 	_dot.text = DOT
 	_dot.custom_minimum_size = Vector2(14, 0)
-	_dot.add_theme_color_override(&"font_color", TICK_COLOR)
+	_dot.add_theme_color_override(&"font_color", WorkshopTheme.PRIMARY)
+	_dot.add_theme_font_size_override(&"font_size", WorkshopTheme.LABEL_SMALL)
+	_dot.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	add_child(_dot)
 	_label.text = tunable.label
 	_label.custom_minimum_size = Vector2(210, 0)
 	_label.clip_text = true
+	_label.theme_type_variation = &"BodyLabel"
 	_label.tooltip_text = tunable.help
 	_label.mouse_filter = Control.MOUSE_FILTER_STOP
 	_label.gui_input.connect(_on_label_input)
@@ -57,6 +62,7 @@ func _init(row_tunable: WorkshopTunable) -> void:
 	_number.custom_minimum_size = Vector2(130, 0)
 	_number.suffix = tunable.unit
 	_number.select_all_on_focus = true
+	_number.get_line_edit().theme_type_variation = &"NumberEdit"
 	_number.get_line_edit().focus_entered.connect(selected.emit.bind(self))
 	add_child(_number)
 	for range_control: Range in [_slider, _number]:

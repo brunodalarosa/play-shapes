@@ -1,5 +1,5 @@
 class_name WorkshopPhoneView
-extends VBoxContainer
+extends HBoxContainer
 ## The real phone page in a phone-shaped frame, signed in as the designer's player.
 ##
 ## The page runs in a godot-wry WebView, a native window drawn over the game window and placed
@@ -20,11 +20,13 @@ const STORAGE_TOKEN := "play-shapes.reconnect-token"
 
 var url := ""
 var device_picker := OptionButton.new()
-## The title bar readout a minigame fills, such as how much course the phone shows.
+## A readout the minigame fills, such as how much course the phone shows.
 var readout := Label.new()
 var web_view: Control
 var _frame := AspectRatioContainer.new()
-var _screen := Panel.new()
+## The phone's body, and its screen inside the bezel, where the page goes.
+var _body := Panel.new()
+var _screen := Control.new()
 var _message := Label.new()
 var _session_id := ""
 var _token := ""
@@ -35,24 +37,52 @@ var _zoom := 1.0
 
 func _init() -> void:
 	name = "PhoneView"
-	var bar := HBoxContainer.new()
-	add_child(bar)
+	add_theme_constant_override(&"separation", 16)
+	_frame.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_frame.size_flags_stretch_ratio = 1.2
+	add_child(_frame)
+	_body.theme_type_variation = &"PhoneFrame"
+	_frame.add_child(_body)
+	WorkshopTheme.fill(_screen, 10)
+	_body.add_child(_screen)
+
+	var column := VBoxContainer.new()
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override(&"separation", 12)
+	add_child(column)
 	for device: Dictionary in DEVICES:
 		device_picker.add_item(device.name)
 	device_picker.selected = 1
 	device_picker.item_selected.connect(_on_device)
-	bar.add_child(device_picker)
-	readout.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	readout.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	readout.modulate = Color(1, 1, 1, 0.75)
-	bar.add_child(readout)
-	_frame.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	add_child(_frame)
-	_frame.add_child(_screen)
+	column.add_child(device_picker)
+	var help := Label.new()
+	help.text = (
+		"The real phone page, served by the workshop and connected as you. "
+		+ "Click it or press Space on it to flap."
+	)
+	help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	help.theme_type_variation = &"BodyLabel"
+	column.add_child(help)
+	var card := PanelContainer.new()
+	card.theme_type_variation = &"InfoCard"
+	column.add_child(card)
+	readout.theme_type_variation = &"ReadoutLabel"
+	readout.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	card.add_child(readout)
+	var reload := Button.new()
+	reload.text = "Reload page"
+	reload.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	reload.pressed.connect(
+		func() -> void:
+			open(url, _session_id, _token),
+	)
+	column.add_child(reload)
 	_message.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_message.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_message.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_message.theme_type_variation = &"HelpLabel"
 	_screen.add_child(_message)
 	_screen.resized.connect(_fit)
 	_on_device(device_picker.selected)

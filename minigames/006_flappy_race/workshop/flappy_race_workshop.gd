@@ -49,16 +49,17 @@ var camera_mode := Camera.LEADER
 var _host: Node
 var _viewport := SubViewport.new()
 var _readouts := Label.new()
+var _readouts_card := PanelContainer.new()
 var _outline := Control.new()
 var _strip := FlappyRaceCourseStrip.new()
 var _status := Label.new()
 var _seed_field := SpinBox.new()
-var _seed_lock := CheckBox.new()
-var _you_racing := CheckBox.new()
+var _seed_lock := Button.new()
+var _you_racing := Button.new()
 var _autopilot_count := SpinBox.new()
 var _skill := OptionButton.new()
-var _camera_picker := OptionButton.new()
-var _outline_toggle := CheckBox.new()
+var _camera_chips := ButtonGroup.new()
+var _outline_toggle := Button.new()
 var _free_point := Vector2.ZERO
 var _dragging := false
 
@@ -67,6 +68,7 @@ func _ready() -> void:
 	# Dialogs and menus open as their own windows, above the phone view's native page.
 	get_tree().root.gui_embed_subwindows = false
 	add_child(window)
+	window.title = "Flappy Race workshop"
 	window.setup(ID, WorkshopPresets.new(TUNING_FOLDER), ID)
 	window.restart_requested.connect(restart)
 	window.key_pressed.connect(_on_key)
@@ -217,22 +219,31 @@ func _build_shared_screen() -> void:
 	_outline.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_outline.draw.connect(_draw_phone_outline)
 	stage.add_child(_outline)
-	_readouts.position = Vector2(12, 8)
-	_readouts.add_theme_color_override(&"font_outline_color", Color.BLACK)
-	_readouts.add_theme_constant_override(&"outline_size", 6)
-	_readouts.add_theme_font_size_override(&"font_size", 14)
-	stage.add_child(_readouts)
-	window.shared_screen.set_body(stage)
+	_readouts_card.theme_type_variation = &"Readouts"
+	_readouts_card.position = Vector2(12, 12)
+	_readouts_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	stage.add_child(_readouts_card)
+	_readouts.theme_type_variation = &"ReadoutLabel"
+	_readouts_card.add_child(_readouts)
+	window.shared_screen.set_body(stage, false)
 
-	for label: String in ["Leader", "You", "Free"]:
-		_camera_picker.add_item(label)
-	_camera_picker.tooltip_text = "Camera: the leader as in a real race, your Cubio, or dragged"
-	_camera_picker.item_selected.connect(
-		func(index: int) -> void:
-			camera_mode = index as Camera
-			_apply_camera(),
-	)
-	window.shared_screen.title_bar.add_child(_camera_picker)
+	var camera_label := Label.new()
+	camera_label.text = "Camera"
+	camera_label.theme_type_variation = &"HelpLabel"
+	window.shared_screen.title_bar.add_child(camera_label)
+	var tips := ["As in a real race", "Your Cubio", "Drag the shared screen"]
+	for index: int in 3:
+		var chip := _chip(window.shared_screen.title_bar, ["Leader", "You", "Free"][index])
+		chip.button_group = _camera_chips
+		chip.button_pressed = index == Camera.LEADER
+		chip.tooltip_text = tips[index]
+		chip.pressed.connect(
+			func() -> void:
+				camera_mode = index as Camera
+				_apply_camera(),
+		)
+	_outline_toggle.theme_type_variation = &"ChipButton"
+	_outline_toggle.toggle_mode = true
 	_outline_toggle.text = "Phone outline"
 	_outline_toggle.toggled.connect(
 		func(_on: bool) -> void:
@@ -250,34 +261,48 @@ func _build_phone_view() -> void:
 
 func _build_flow() -> void:
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override(&"separation", 8)
+	column.add_theme_constant_override(&"separation", 10)
+	column.add_child(_label("Course"))
 
 	var course_row := HBoxContainer.new()
 	column.add_child(course_row)
-	_add_button(course_row, "Restart (R)", restart.bind("", -1), "Same seed, running preset")
+	var restart_button := _add_button(
+		course_row,
+		"Restart · R",
+		restart.bind("", -1),
+		"Same seed, running preset",
+	)
+	restart_button.theme_type_variation = &"FilledButton"
 	_add_button(course_row, "New course", _on_new_course, "A new seed")
-	course_row.add_child(_label("Seed"))
+	course_row.add_child(_body_label("Seed"))
 	_seed_field.max_value = 4294967295
-	_seed_field.custom_minimum_size = Vector2(140, 0)
+	_seed_field.custom_minimum_size = Vector2(150, 0)
+	_seed_field.get_line_edit().theme_type_variation = &"NumberEdit"
 	_seed_field.value_changed.connect(
 		func(value: float) -> void:
 			seed_value = int(value),
 	)
 	course_row.add_child(_seed_field)
-	_seed_lock.text = "Lock"
+	_seed_lock.text = "Lock seed"
+	_seed_lock.theme_type_variation = &"ChipButton"
+	_seed_lock.toggle_mode = true
 	_seed_lock.tooltip_text = "Keep the seed when Course values change"
 	course_row.add_child(_seed_lock)
 
+	column.add_child(_label("Racers"))
 	var racers_row := HBoxContainer.new()
 	column.add_child(racers_row)
 	_you_racing.text = "You race"
+	_you_racing.theme_type_variation = &"ChipButton"
+	_you_racing.toggle_mode = true
 	_you_racing.button_pressed = true
 	_you_racing.tooltip_text = "Fly in the phone view: click or Space"
 	racers_row.add_child(_you_racing)
-	racers_row.add_child(_label("Autopilots"))
+	racers_row.add_child(_body_label("Autopilots"))
 	_autopilot_count.max_value = MAX_AUTOPILOTS
+	_autopilot_count.get_line_edit().theme_type_variation = &"NumberEdit"
 	racers_row.add_child(_autopilot_count)
-	racers_row.add_child(_label("Skill"))
+	racers_row.add_child(_body_label("Skill"))
 	_skill.add_item("Good")
 	racers_row.add_child(_skill)
 	_add_button(racers_row, "Apply", restart.bind("", -1), "Restart with these racers")
@@ -288,14 +313,14 @@ func _build_flow() -> void:
 	for setup: String in SETUPS:
 		_add_button(setups, setup, restart.bind(setup, -1), "Restart into %s" % setup.to_lower())
 
-	column.add_child(_label("Course: click to restart with the pack there"))
+	column.add_child(_label("Course strip · click to put the pack there"))
 	_strip.custom_minimum_size = Vector2(0, 46)
 	_strip.picked.connect(
 		func(obstacle: int) -> void:
 			restart("", obstacle),
 	)
 	column.add_child(_strip)
-	_status.modulate = Color(1, 1, 1, 0.75)
+	_status.theme_type_variation = &"HelpLabel"
 	column.add_child(_status)
 	window.flow.set_body(column)
 
@@ -313,7 +338,7 @@ func _process(_delta: float) -> void:
 
 
 func _readout_text() -> String:
-	if not _readouts.visible:
+	if not _readouts_card.visible:
 		return ""
 	var ranking := FlappyRaceController.rank(controller.racers())
 	var length := controller.course.length
@@ -374,7 +399,14 @@ func _update_coverage() -> void:
 	var device := phone.device_size()
 	var phone_width := controller.course.view_height * device.x / device.y
 	var shared := presentation.camera.visible_rect().size.x
-	phone.readout.text = "Phone shows %d m · shared screen %d m" % [phone_width, shared]
+	var lines := PackedStringArray(
+		[
+			"HOW MUCH COURSE IS VISIBLE",
+			"Phone   %3d m wide" % phone_width,
+			"Shared  %3d m wide" % shared,
+		]
+	)
+	phone.readout.text = "\n".join(lines)
 
 
 ## The part of the course the designer's phone shows, outlined on the shared screen.
@@ -426,7 +458,7 @@ func _on_players_changed(players: Array[Dictionary]) -> void:
 
 func _on_key(event: InputEventKey) -> void:
 	if event.keycode == KEY_TAB:
-		_readouts.visible = not _readouts.visible
+		_readouts_card.visible = not _readouts_card.visible
 		get_viewport().set_input_as_handled()
 
 
@@ -439,10 +471,30 @@ func _add_button(parent: Control, text: String, action: Callable, tip: String) -
 	return button
 
 
+## A section's name in the flow panel.
 func _label(text: String) -> Label:
 	var label := Label.new()
 	label.text = text
+	label.uppercase = true
+	label.theme_type_variation = &"SectionLabel"
 	return label
+
+
+func _body_label(text: String) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.theme_type_variation = &"BodyLabel"
+	return label
+
+
+## A filter chip that stays selected.
+func _chip(parent: Control, text: String) -> Button:
+	var chip := Button.new()
+	chip.text = text
+	chip.theme_type_variation = &"ChipButton"
+	chip.toggle_mode = true
+	parent.add_child(chip)
+	return chip
 
 
 func _exit_tree() -> void:

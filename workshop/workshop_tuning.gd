@@ -204,7 +204,7 @@ static func _discover_in(holder: Resource, part: String, tab: String) -> Array[W
 		base.part = part
 		base.property = property.name
 		base.group = group if not group.is_empty() else "General"
-		base.label = String(property.name).capitalize()
+		base.label = _sentence_case(property.name)
 		base.help = help.get(property.name, "")
 		base.live = StringName(group) in live_groups
 		match property.type:
@@ -229,6 +229,12 @@ static func _discover_in(holder: Resource, part: String, tab: String) -> Array[W
 	for each: WorkshopTunable in result:
 		each.tab = tab
 	return result
+
+
+## "forward_speed" as "Forward speed", as Material writes labels.
+static func _sentence_case(property_name: String) -> String:
+	var words := property_name.capitalize()
+	return words.left(1) + words.substr(1).to_lower()
 
 
 static func _read_range(tunable: WorkshopTunable, property: Dictionary) -> void:

@@ -27,34 +27,47 @@ func _init(panel_number: int, panel_title: String) -> void:
 	size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	size_flags_vertical = Control.SIZE_EXPAND_FILL
 	custom_minimum_size = Vector2(160, 120)
+	theme_type_variation = &"WorkshopPanel"
 
 	var column := VBoxContainer.new()
 	column.add_theme_constant_override(&"separation", 0)
 	add_child(column)
+	var header := PanelContainer.new()
+	header.theme_type_variation = &"PanelHeader"
+	column.add_child(header)
 	var bar := HBoxContainer.new()
-	column.add_child(bar)
+	bar.add_theme_constant_override(&"separation", 10)
+	header.add_child(bar)
+	var badge := Label.new()
+	badge.text = str(number)
+	badge.theme_type_variation = &"PanelNumber"
+	badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	bar.add_child(badge)
 	var label := Label.new()
-	label.text = "%d  %s" % [number, title]
-	label.add_theme_font_size_override(&"font_size", 15)
+	label.text = title
+	label.uppercase = true
+	label.theme_type_variation = &"PanelTitle"
 	bar.add_child(label)
 	title_bar = HBoxContainer.new()
 	title_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	title_bar.alignment = BoxContainer.ALIGNMENT_END
 	bar.add_child(title_bar)
 	_pop_button = Button.new()
-	_pop_button.flat = true
+	_pop_button.theme_type_variation = &"TextButton"
 	_pop_button.pressed.connect(toggle_pop_out)
 	bar.add_child(_pop_button)
 	content = MarginContainer.new()
+	content.theme_type_variation = &"PanelBody"
 	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	column.add_child(content)
 	_refresh_button()
 
 
-## Puts [param control] in the panel body.
-func set_body(control: Control) -> void:
+## Puts [param control] in the panel body, inside its margin unless [param padded] is false.
+func set_body(control: Control, padded := true) -> void:
 	for child: Node in content.get_children():
 		content.remove_child(child)
+	content.theme_type_variation = &"PanelBody" if padded else &""
 	control.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	control.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	content.add_child(control)
@@ -80,13 +93,19 @@ func pop_out(rect := Rect2i(), screen := -1, mode := Window.MODE_WINDOWED) -> vo
 	var from := Rect2i(Vector2i(get_screen_position()), Vector2i(size))
 	window = Window.new()
 	window.title = "%d %s" % [number, title]
+	# Windows hosted under a plain node inherit no theme.
+	window.theme = WorkshopTheme.theme()
 	window.wrap_controls = false
 	window.min_size = Vector2i(320, 240)
 	window.close_requested.connect(dock)
 	window.size = rect.size if rect.has_area() else from.size
+	var background := ColorRect.new()
+	background.color = WorkshopTheme.SURFACE
+	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	window.add_child(background)
 	_dock_parent.remove_child(self)
 	window.add_child(self)
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	WorkshopTheme.fill(self, 8)
 	window_host.add_child(window)
 	if screen >= 0 and screen < DisplayServer.get_screen_count():
 		window.current_screen = screen

@@ -10,10 +10,12 @@ var _filter := LineEdit.new()
 var _tabs := TabContainer.new()
 var _help := Label.new()
 var _pending := Label.new()
+var _pending_bar := PanelContainer.new()
 var _restart := Button.new()
 var _errors := Label.new()
+var _errors_bar := PanelContainer.new()
 var _rows: Array[WorkshopTunableRow] = []
-var _headers: Dictionary[Label, Array] = { }
+var _headers: Dictionary[Control, Array] = { }
 var _selected: WorkshopTunableRow
 
 
@@ -29,20 +31,26 @@ func _init(workshop_tuning: WorkshopTuning) -> void:
 	_build_tabs()
 
 	_help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_help.custom_minimum_size = Vector2(0, 54)
-	_help.modulate = Color(1, 1, 1, 0.8)
+	_help.custom_minimum_size = Vector2(0, 40)
+	_help.theme_type_variation = &"HelpLabel"
+	_help.text = "Select a value to see what it does."
 	add_child(_help)
+	_pending_bar.theme_type_variation = &"CautionBar"
+	add_child(_pending_bar)
 	var waiting := HBoxContainer.new()
-	add_child(waiting)
+	_pending_bar.add_child(waiting)
 	_pending.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_pending.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_pending.theme_type_variation = &"CautionLabel"
 	waiting.add_child(_pending)
-	_restart.text = "Restart (R)"
+	_restart.text = "Restart now · R"
 	_restart.pressed.connect(restart_requested.emit)
 	waiting.add_child(_restart)
+	_errors_bar.theme_type_variation = &"ErrorBar"
+	add_child(_errors_bar)
 	_errors.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_errors.add_theme_color_override(&"font_color", Color(1.0, 0.45, 0.4))
-	add_child(_errors)
+	_errors.theme_type_variation = &"ErrorLabel"
+	_errors_bar.add_child(_errors)
 	tuning.changed.connect(refresh)
 	refresh()
 
@@ -68,13 +76,15 @@ func refresh() -> void:
 			tuning.default_value(tunable),
 		)
 	var waiting := tuning.pending()
-	_pending.text = (
-		""
-		if waiting.is_empty()
-		else "Waiting for a restart: %s" % ", ".join(waiting.map(_short_name))
-	)
-	_restart.disabled = waiting.is_empty()
+	var count := waiting.size()
+	_pending.text = "%d %s for a restart: %s" % [
+		count,
+		"change waits" if count == 1 else "changes wait",
+		", ".join(waiting.map(_short_name)),
+	]
+	_pending_bar.visible = count > 0
 	_errors.text = "\n".join(tuning.errors())
+	_errors_bar.visible = not _errors.text.is_empty()
 
 
 func _build_tabs() -> void:
@@ -86,17 +96,19 @@ func _build_tabs() -> void:
 			scroll.name = tunable.tab
 			scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 			_tabs.add_child(scroll)
+			var margin := MarginContainer.new()
+			margin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			margin.add_theme_constant_override(&"margin_top", 6)
+			margin.add_theme_constant_override(&"margin_right", 12)
+			scroll.add_child(margin)
 			var list := VBoxContainer.new()
-			list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			scroll.add_child(list)
+			list.add_theme_constant_override(&"separation", 4)
+			margin.add_child(list)
 			lists[tunable.tab] = list
 		var list := lists[tunable.tab]
 		if groups.get(tunable.tab, "") != tunable.group:
 			groups[tunable.tab] = tunable.group
-			var header := Label.new()
-			header.text = tunable.group + ("  · live" if tunable.live else "")
-			header.add_theme_font_size_override(&"font_size", 13)
-			header.modulate = Color(0.75, 0.85, 1.0)
+			var header := _group_header(tunable)
 			list.add_child(header)
 			_headers[header] = []
 		var row_control := WorkshopTunableRow.new(tunable)
@@ -105,6 +117,23 @@ func _build_tabs() -> void:
 		list.add_child(row_control)
 		_rows.append(row_control)
 		_headers[_headers.keys().back()].append(row_control)
+
+
+## A group's name, with a chip saying whether its values apply live or on a restart.
+func _group_header(tunable: WorkshopTunable) -> Control:
+	var header := HBoxContainer.new()
+	var label := Label.new()
+	label.text = tunable.group
+	label.uppercase = true
+	label.theme_type_variation = &"SectionLabel"
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(label)
+	var chip := Label.new()
+	chip.text = "Live" if tunable.live else "Restart"
+	chip.uppercase = true
+	chip.theme_type_variation = &"QuietChip" if tunable.live else &"CautionChip"
+	header.add_child(chip)
+	return header
 
 
 func _on_edited(tunable: WorkshopTunable, value: Variant) -> void:
@@ -132,7 +161,7 @@ func _select(row_control: WorkshopTunableRow) -> void:
 
 func _apply_filter(text: String) -> void:
 	var needle := text.strip_edges().to_lower()
-	for header: Label in _headers:
+	for header: Control in _headers:
 		var any := false
 		for row_control: WorkshopTunableRow in _headers[header]:
 			var shown := needle.is_empty() or row_control.tunable.label.to_lower().contains(needle)

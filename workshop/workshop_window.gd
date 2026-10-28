@@ -6,6 +6,7 @@ extends VBoxContainer
 ##
 ## A minigame's workshop scene builds one with [method setup], fills the first three panels and
 ## restarts its game on [signal restart_requested]. The Tunables panel comes from the preset.
+## It wears [WorkshopTheme], Material Design 3's dark scheme.
 
 ## Restart the game with [member WorkshopTuning.running].
 signal restart_requested
@@ -17,6 +18,8 @@ var presets: WorkshopPresets
 var game_preset: WorkshopGamePreset
 var layout: WorkshopLayout
 var preset_name := WorkshopPresets.DEFAULT_NAME
+## Shown at the left of the top bar, such as "Flappy Race workshop".
+var title := "Workshop"
 var shared_screen := WorkshopDockablePanel.new(1, "Shared screen")
 var phone_view := WorkshopDockablePanel.new(2, "Phone view")
 var flow := WorkshopDockablePanel.new(3, "Minigame flow")
@@ -26,6 +29,7 @@ var top_split := HSplitContainer.new()
 var bottom_split := HSplitContainer.new()
 var rows_split := VSplitContainer.new()
 var preset_picker := OptionButton.new()
+## The preset the game uses, as a chip.
 var game_label := Label.new()
 var use_button := Button.new()
 var status := Label.new()
@@ -45,8 +49,21 @@ var _dialog_action := Callable()
 
 func _init() -> void:
 	name = "WorkshopWindow"
-	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	add_theme_constant_override(&"separation", 4)
+	theme = WorkshopTheme.theme()
+	WorkshopTheme.fill(self, 10)
+	add_theme_constant_override(&"separation", 10)
+	# A control grows past its parent while its minimum is large, as wrapping labels are before
+	# their first layout, and does not shrink back by itself.
+	minimum_size_changed.connect(_refit, CONNECT_DEFERRED)
+
+
+func _refit() -> void:
+	WorkshopTheme.fill(self, 10)
+
+
+func _draw() -> void:
+	# The background reaches past the window's margin to the edges.
+	draw_rect(Rect2(-position, get_parent_area_size()), WorkshopTheme.SURFACE)
 
 
 ## Opens [param preset_to_edit] from [param workshop_presets], the minigame's presets, whose
@@ -160,13 +177,21 @@ func save_layout() -> void:
 
 
 func _build_top_bar() -> void:
+	var surface := PanelContainer.new()
+	surface.name = "TopBar"
+	surface.theme_type_variation = &"TopBar"
+	add_child(surface)
 	var bar := HBoxContainer.new()
-	bar.name = "TopBar"
-	add_child(bar)
-	var label := Label.new()
-	label.text = "Preset"
-	bar.add_child(label)
-	preset_picker.custom_minimum_size = Vector2(180, 0)
+	surface.add_child(bar)
+	var heading := Label.new()
+	heading.text = title
+	heading.theme_type_variation = &"TitleLabel"
+	bar.add_child(heading)
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(12, 0)
+	bar.add_child(gap)
+	preset_picker.custom_minimum_size = Vector2(200, 0)
+	preset_picker.tooltip_text = "The preset being edited"
 	preset_picker.item_selected.connect(
 		func(index: int) -> void:
 			open_preset(preset_picker.get_item_text(index)),
@@ -184,7 +209,9 @@ func _build_top_bar() -> void:
 	menu.id_pressed.connect(_on_preset_menu)
 	_copy_menu.index_pressed.connect(_on_copy_tab)
 	bar.add_child(_preset_menu)
-	_edits.custom_minimum_size = Vector2(80, 0)
+	_edits.theme_type_variation = &"CautionChip"
+	_edits.uppercase = true
+	_edits.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	bar.add_child(_edits)
 	for button: Button in [_save, _undo, _redo, _revert]:
 		bar.add_child(button)
@@ -201,19 +228,29 @@ func _build_top_bar() -> void:
 			_ask("Drop %d unsaved edits?" % tuning.edit_count(), tuning.revert),
 	)
 	_undo.text = "Undo"
+	_undo.theme_type_variation = &"TextButton"
 	_undo.pressed.connect(tuning.undo_edit)
 	_redo.text = "Redo"
+	_redo.theme_type_variation = &"TextButton"
 	_redo.pressed.connect(tuning.redo_edit)
 
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.add_child(spacer)
 	bar.add_child(status)
-	status.modulate = Color(1, 1, 1, 0.7)
+	status.theme_type_variation = &"HelpLabel"
+	var uses := Label.new()
+	uses.text = "Game uses"
+	uses.theme_type_variation = &"BodyLabel"
+	bar.add_child(uses)
+	game_label.theme_type_variation = &"QuietChip"
+	game_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	bar.add_child(game_label)
+	use_button.theme_type_variation = &"FilledButton"
 	use_button.pressed.connect(use_in_game)
 	bar.add_child(use_button)
 	var reset := Button.new()
+	reset.theme_type_variation = &"TextButton"
 	reset.text = "Reset layout"
 	reset.pressed.connect(reset_layout)
 	bar.add_child(reset)
@@ -278,14 +315,15 @@ func _refresh() -> void:
 		if name != preset_name:
 			_copy_menu.add_item(name)
 	var count := tuning.edit_count()
-	_edits.text = "%d edit%s" % [count, "" if count == 1 else "s"] if count > 0 else "Saved"
+	_edits.text = "Edited · %d" % count
+	_edits.visible = count > 0
 	var valid := tuning.errors().is_empty()
 	_save.disabled = count == 0 or not valid
 	_revert.disabled = count == 0
 	_undo.disabled = not tuning.can_undo()
 	_redo.disabled = not tuning.can_redo()
 	var used := _name_of(game_preset.current_path())
-	game_label.text = "Game uses %s" % used
+	game_label.text = used
 	use_button.text = "Use %s in the game" % preset_name
 	use_button.disabled = used == preset_name or count > 0 or not valid
 
