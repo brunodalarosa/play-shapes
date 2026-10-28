@@ -29,6 +29,10 @@ Why: [decision 0052](../decisions/0052-a-workshop-for-every-minigame.md).
 
 ## The window
 
+- The window follows Material Design 3's dark scheme
+  ([0055](../decisions/0055-material-design-3-for-workshops.md)). A new kind of control is
+  designed from Material's component for the same job and added to the shared theme.
+
 - A top bar holds the preset being edited, its count of unsaved edits, Save, Save as, Revert,
   Undo and Redo, then the preset the game uses with a button to use the current one instead.
   There is no file menu.

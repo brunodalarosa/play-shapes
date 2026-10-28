@@ -93,9 +93,13 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
   only the owner promotes subjective feel into `Default`.
 - `workshop/`: the shared minigame workshop window (presets, generated Tunables, live versus
   restart by each Resource's `LIVE_GROUPS`, pop-out panels). No pause or speed: the owner
-  removed time controls because phones predict on their own clock. The phone view uses
-  vendored `addons/godot_wry/` v1.0.2, which only draws in the main window, so that panel stays
-  docked ([0054](docs/decisions/0054-workshop-phone-view-in-godot-wry.md)).
+  removed time controls because phones predict on their own clock.
+  - The phone view uses vendored `addons/godot_wry/` v1.0.2, which only draws in the main
+    window, so that panel stays docked
+    ([0054](docs/decisions/0054-workshop-phone-view-in-godot-wry.md)).
+  - It wears Material Design 3 dark through `WorkshopTheme`; new workshop controls are
+    designed from Material 3 and added there as variations
+    ([0055](docs/decisions/0055-material-design-3-for-workshops.md)).
 - `debug/`: F12 launcher with the Flappy Race workshop, the Shape Characters lab, the motion lab, a Tilt Shift factory
   review and one-player Bubbles.
 
@@ -157,7 +161,7 @@ Condensed from AGENTS.md and the documents it links.
   needs a person goes into `docs/pending-reviews.md`.
 - Documents state what is true now, one topic each, with links that resolve and paragraphs
   under 600 characters; `node tools/docs.mjs` checks them. Reasons go in `docs/decisions/` as
-  numbered records, never edited to change a decision; the next free number is 0055. The
+  numbered records, never edited to change a decision; the next free number is 0056. The
   roadmap changes when work finishes or is added.
 - No ticket numbers anywhere: files, comments, tests or output folders.
 - Typed GDScript, composition, signals, Control/Container UI and no fixed viewport sizes.

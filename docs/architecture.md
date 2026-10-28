@@ -219,6 +219,8 @@ The shared parts of every workshop live in `workshop/`, outside any minigame fol
 - `workshop_phone_view.gd` shows the phone page in godot-wry, signed in as the designer
   ([0054](decisions/0054-workshop-phone-view-in-godot-wry.md)).
 - `workshop_boot_request.tres` asks the boot for the servers bound to this PC only.
+- `workshop_theme.gd` (`WorkshopTheme`) builds the Material Design 3 theme the window wears
+  ([0055](decisions/0055-material-design-3-for-workshops.md)), with the fonts in `fonts/`.
 
 ## Shared 3D components
 

@@ -91,3 +91,4 @@ What was decided.
 | [0052](0052-a-workshop-for-every-minigame.md) | Every minigame has a workshop built on one shared design |
 | [0053](0053-boot-steps-and-entry-points.md) | Every launch runs one boot made of Essential and Optional steps |
 | [0054](0054-workshop-phone-view-in-godot-wry.md) | The workshop phone view is the real phone page in a godot-wry web view |
+| [0055](0055-material-design-3-for-workshops.md) | Workshops follow Material Design 3 |
