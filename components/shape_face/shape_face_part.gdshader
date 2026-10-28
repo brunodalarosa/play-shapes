@@ -3,6 +3,7 @@ render_mode unshaded, cull_disabled;
 // One face part drawn in front of scenery, on a body that is pushed the same way.
 
 #include "res://characters/cubio_front.gdshaderinc"
+#include "res://characters/cubio_dither.gdshaderinc"
 
 uniform sampler2D part : source_color, filter_linear_mipmap_anisotropic, repeat_disable;
 // Flips the part horizontally about its centre.
@@ -24,6 +25,9 @@ void vertex() {
 
 
 void fragment() {
+	if (dithered_out(FRAGCOORD.xy)) {
+		discard;
+	}
 	vec2 uv = corrected_uv.xy / corrected_uv.z;
 	uv = mirror ? vec2(1.0 - uv.x, uv.y) : uv;
 	vec4 artwork = texture(part, uv);

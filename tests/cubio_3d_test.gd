@@ -47,6 +47,7 @@ func _run() -> void:
 			tinted += 1
 	check(tinted == 5, "Body, both hands and both feet take the player tint")
 	_check_face(cubio)
+	await _check_dither(cubio)
 
 	cubio.play("look_up")
 	await _wait(0.5)
@@ -111,6 +112,47 @@ func _check_face(cubio: Cubio3D) -> void:
 			material.get_shader_parameter("player_color") == null,
 			"Face parts keep their untinted artwork",
 		)
+
+
+## A dithered Cubio leaves out part of its body and face; others of its colour stay whole.
+func _check_dither(cubio: Cubio3D) -> void:
+	var other := VISUAL.instantiate() as Cubio3D
+	root.add_child(other)
+	await process_frame
+	other.player_color = cubio.player_color
+	var body := cubio.find_child("Body", true, false) as MeshInstance3D
+	var other_body := other.find_child("Body", true, false) as MeshInstance3D
+	check(
+		body.material_override == other_body.material_override
+		and _dither_of(body.material_override) == 0.0,
+		"Cubios of one colour share a whole tint",
+	)
+
+	cubio.set_dither(0.5)
+	var own := body.material_override as ShaderMaterial
+	var faces := cubio.face.quads().all(
+		func(quad: MeshInstance3D) -> bool:
+			return _dither_of(quad.material_override) == 0.5,
+	)
+	check(
+		own != other_body.material_override and _dither_of(own) == 0.5
+		and faces and _dither_of(other_body.material_override) == 0.0,
+		"A dithered Cubio leaves out half its body and face, and only its own",
+	)
+	cubio.player_color = Color("#E53935")
+	check(
+		own.get_shader_parameter("player_color") == Color("#E53935"),
+		"A dithered Cubio keeps its own tint through a colour change",
+	)
+	cubio.set_dither(0.0)
+	check(_dither_of(own) == 0.0, "Zero draws it whole again")
+	other.queue_free()
+
+
+## A material's dither; an unset parameter keeps the shader's default of zero.
+static func _dither_of(material: Material) -> float:
+	var value: Variant = (material as ShaderMaterial).get_shader_parameter("dither")
+	return 0.0 if value == null else float(value)
 
 
 func _wait(seconds: float) -> void:

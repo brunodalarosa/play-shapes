@@ -63,6 +63,9 @@ var _held_direction: float = 1.0
 var _after_release: String = ""
 var _yaw_target: float = 0.0
 var _rate: float = 1.0
+## This Cubio's own tint once it has been dithered, so other Cubios of its colour stay whole.
+var _own_tint: ShaderMaterial
+var _dither := 0.0
 
 @onready var nameplate: Label3D = $Nameplate
 
@@ -86,6 +89,9 @@ func set_player_color(value: Color) -> void:
 	player_color = value
 	if _tinted.is_empty():
 		return
+	if _own_tint != null:
+		_own_tint.set_shader_parameter("player_color", value)
+		return
 	var material := _tint_material(value)
 	for mesh: MeshInstance3D in _tinted:
 		mesh.material_override = material
@@ -95,6 +101,24 @@ func set_player_name(value: String) -> void:
 	nameplate.text = value
 	# Long names shrink a little so neighbours' nameplates overlap less.
 	nameplate.font_size = maxi(36, 48 - 2 * maxi(0, value.length() - 11))
+
+
+## Leaves out [param amount] of this Cubio's pixels in an ordered pattern, so a Cubio behind it
+## shows through (decision 0051). Zero draws it whole.
+func set_dither(amount: float) -> void:
+	if is_equal_approx(amount, _dither) or _tinted.is_empty():
+		return
+	_dither = amount
+	if _own_tint == null:
+		_own_tint = _tint_material(player_color).duplicate() as ShaderMaterial
+		for mesh: MeshInstance3D in _tinted:
+			mesh.material_override = _own_tint
+	_own_tint.set_shader_parameter("dither", amount)
+	face.dither = amount
+
+
+func dither() -> float:
+	return _dither
 
 
 ## Places the face on its anchor; see [ShapeFaceAnchor].

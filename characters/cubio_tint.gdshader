@@ -2,6 +2,7 @@ shader_type spatial;
 // The player-tinted body, hands and feet.
 
 #include "res://characters/cubio_front.gdshaderinc"
+#include "res://characters/cubio_dither.gdshaderinc"
 
 uniform vec4 player_color : source_color = vec4(0.12, 0.53, 0.9, 1.0);
 
@@ -12,6 +13,9 @@ void vertex() {
 
 
 void fragment() {
+	if (dithered_out(FRAGCOORD.xy)) {
+		discard;
+	}
 	ALBEDO = player_color.rgb;
 	ROUGHNESS = 0.32;
 	SPECULAR = 0.5;

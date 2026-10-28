@@ -37,6 +37,14 @@ var expressions: ShapeFaceExpressions
 var clock := func() -> float:
 	return Time.get_ticks_msec() / 1000.0
 var manifest := ShapeFaceManifest.load_default()
+## Share of a pushed face left out in its body's ordered pattern; see
+## [method Cubio3D.set_dither]. Zero draws it whole.
+var dither := 0.0:
+	set(value):
+		dither = value
+		for material: Material in _materials.values():
+			if material is ShaderMaterial:
+				(material as ShaderMaterial).set_shader_parameter("dither", value)
 var _quads: Array[MeshInstance3D] = []
 var _materials: Dictionary[String, Material] = { }
 
@@ -104,6 +112,7 @@ func _material(part: String, mirror: bool, order: int) -> Material:
 		pushed.set_shader_parameter("part", manifest.texture(part))
 		pushed.set_shader_parameter("mirror", mirror)
 		pushed.set_shader_parameter("front_push", front_push)
+		pushed.set_shader_parameter("dither", dither)
 		_materials[key] = pushed
 	if not _materials.has(key):
 		var material := StandardMaterial3D.new()
