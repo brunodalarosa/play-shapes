@@ -148,6 +148,7 @@ func draw_frame(delta: float) -> void:
 	for visual: RacerVisual in _visuals:
 		visual.name_label.follow()
 		visual.badge.follow()
+	_stack_labels()
 
 
 func _add_visual(racer: FlappyRaceRacer, slot: int) -> void:
@@ -185,6 +186,8 @@ func _add_visual(racer: FlappyRaceRacer, slot: int) -> void:
 		label.add_theme_color_override("font_outline_color", Color(0.1, 0.12, 0.16))
 		label.add_theme_constant_override("outline_size", 8)
 		_labels.add_child(label)
+		# Placed by draw_frame, after the Cubios move and before the crowd is stacked.
+		label.set_process(false)
 	visual.name_label.text = racer.display_name
 	visual.name_label.add_theme_font_size_override("font_size", 30)
 	visual.name_label.world_offset = Vector3(0.0, CUBIO_HEIGHT - BODY_CENTRE + 0.4, 0.0)
@@ -387,6 +390,43 @@ func _draw_hud(now: float) -> void:
 		visual.name_label.modulate.a = alpha
 		var racing := controller.phase == FlappyRaceController.Phase.RACING
 		visual.badge.modulate.a = 1.0 if racing else 0.0
+
+
+## Lifts each racer's name and badge, together, above any that would cover them, lowest first,
+## so a crowd stays readable and every name keeps its place.
+func _stack_labels() -> void:
+	var units: Array[Array] = []
+	for visual: RacerVisual in _visuals:
+		var labels: Array[Label] = []
+		for label: Label in [visual.name_label, visual.badge]:
+			if label.visible and label.modulate.a > 0.0 and label.text != "":
+				labels.append(label)
+		if not labels.is_empty():
+			units.append(labels)
+	var bounds := func(labels: Array) -> Rect2:
+		var rect := Rect2(labels[0].position, labels[0].size)
+		for label: Label in labels:
+			rect = rect.merge(Rect2(label.position, label.size))
+		return rect
+	units.sort_custom(
+		func(a: Array, b: Array) -> bool:
+			return bounds.call(a).end.y > bounds.call(b).end.y,
+	)
+
+	var placed: Array[Rect2] = []
+	for labels: Array in units:
+		var rect: Rect2 = bounds.call(labels)
+		var start := rect.position.y
+		var moved := true
+		while moved:
+			moved = false
+			for other: Rect2 in placed:
+				if rect.intersects(other):
+					rect.position.y = other.position.y - rect.size.y - 2.0
+					moved = true
+		for label: Label in labels:
+			label.position.y += rect.position.y - start
+		placed.append(rect)
 
 
 func _burst(at: Vector3, color: Color) -> void:
