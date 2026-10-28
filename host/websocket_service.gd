@@ -17,7 +17,7 @@ var _accepting_new_players: Callable
 var _next_id: int = 1
 var _minigame_protocol: MinigameProtocol
 var _active_protocol: RefCounted
-var _lobby_controller: LobbyPlaygroundWorld
+var _lobby_controller: LobbyController
 var _readiness: PreMinigameReadiness
 var motion_channel := MotionInputChannel.new()
 var motion_channels: Dictionary[String, MotionInputChannel] = { }
@@ -154,11 +154,11 @@ func stop() -> void:
 	connection_count_changed.emit(0)
 
 
-func set_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
+func set_lobby_controller(controller: LobbyController) -> void:
 	_lobby_controller = controller
 
 
-func clear_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
+func clear_lobby_controller(controller: LobbyController) -> void:
 	if _lobby_controller == controller:
 		_lobby_controller.clear_all_input()
 		_lobby_controller = null

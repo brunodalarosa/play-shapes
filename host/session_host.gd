@@ -1,5 +1,6 @@
 extends Node
-## Persistent services survive scene changes. Boot owns starting them.
+## Persistent services survive scene changes. The boot steps in [BootSteps] start them: the
+## Essential ones when the game launches, the Optional ones when an entry asks.
 
 signal connection_count_changed(count: int)
 signal players_changed(players: Array[Dictionary])
@@ -7,91 +8,91 @@ signal readiness_changed(snapshot: Dictionary)
 signal readiness_launch_requested(minigame_id: StringName)
 signal readiness_canceled
 
+const MINIGAME_CATALOG_PATH := "res://minigames/catalog.tres"
+const LOBBY_PATH := "res://scenes/lobby.tscn"
+
 @export var active_presets: ActivePresets = preload("res://Tuning/Active Presets.tres")
-@export var minigame_catalog: MinigameCatalog = preload("res://minigames/catalog.tres")
+
+## Loaded by the catalog step on first use.
+var minigame_catalog: MinigameCatalog:
+	get:
+		_run_step(BootSteps.CATALOG)
+		return _minigame_catalog
 var settings: NetworkingTuning
 var network: ControllerNetworkConfig
+## False to start the servers without reading the local network file.
+var use_local_network_config := true
 var running: bool = false
 var startup_error: String = ""
 var http: HttpService
 var websocket: WebsocketService
-var player_registry: PlayerRegistry
+## Created by the registry step on first use.
+var player_registry: PlayerRegistry:
+	get:
+		_run_step(BootSteps.REGISTRY)
+		return _player_registry
 var accepting_new_players: bool = false
+## The boot steps that have run, in order.
+var steps_run: Array[StringName] = []
 var _pending_minigame_launch: Dictionary = { }
 var readiness: PreMinigameReadiness
 ## Sessions of catalog minigames that prepare during the Pre-minigame screen, by minigame ID.
 ## Each is created on first use from its definition's session script.
 var minigame_sessions: Dictionary[StringName, Node] = { }
+var _minigame_catalog: MinigameCatalog
+var _player_registry: PlayerRegistry
+var _tls_options: TLSOptions
 
 
 func _ready() -> void:
-	settings = active_presets.networking
-	player_registry = PlayerRegistry.new(settings.max_players, settings.reconnect_grace_seconds)
+	for step: StringName in BootSteps.ESSENTIAL:
+		_run_step(step)
 	http = HttpService.new()
 	websocket = WebsocketService.new()
 	add_child(http)
 	add_child(websocket)
 	websocket.connection_count_changed.connect(connection_count_changed.emit)
-	player_registry.players_changed.connect(_on_players_changed)
-	_on_players_changed()
+	_boot_launched_scene.call_deferred()
 
 
 func _process(_delta: float) -> void:
-	player_registry.expire_players()
+	if _player_registry != null:
+		_player_registry.expire_players()
+
+
+## Runs the Essential steps, the steps [param request] lists and the steps those need. On a
+## failure it stops, keeps the reason in [member startup_error] and returns false.
+func boot(request: BootRequest) -> bool:
+	startup_error = BootSteps.request_error(request.steps)
+	if not startup_error.is_empty():
+		return false
+	for step: StringName in BootSteps.with_needs(request.steps):
+		startup_error = _run_step(step)
+		if not startup_error.is_empty():
+			# A retry reads the network file again, as a first start does.
+			_forget_steps(BootSteps.NETWORK)
+			return false
+	return true
+
+
+## Boots what [param scene] asks for in its [code]boot_request[/code] property. A scene that asks
+## for nothing gets the Essential steps only. A failure is logged and the scene carries on.
+func boot_scene(scene: Node) -> bool:
+	var request := scene.get(&"boot_request") as BootRequest
+	if request == null or request.started_by_entry:
+		return true
+	if boot(request):
+		return true
+	push_warning("%s runs without a boot step: %s" % [scene.scene_file_path, startup_error])
+	return false
 
 
 func start(use_local_config := true) -> bool:
 	if running:
 		return true
-	network = ControllerNetworkConfig.new(settings)
-	var path := ControllerNetworkConfig.local_path()
-	if (
-		use_local_config and not path.is_empty()
-		and (OS.has_environment("PLAY_SHAPES_NETWORK_CONFIG") or FileAccess.file_exists(path))
-	):
-		network.load_local(path)
-	startup_error = network.error if not network.error.is_empty() else network.validation_error()
-	if not startup_error.is_empty():
-		return false
-	var tls := ControllerTLS.new()
-	var error := tls.prepare(network)
-	if error != OK:
-		startup_error = tls.error
-		return false
-	error = http.start(settings, player_registry.session_id, network, tls.options)
-	if error != OK:
-		startup_error = http.startup_error
-		if startup_error.is_empty():
-			startup_error = "Could not start HTTP service: %s" % error_string(error)
-		http.stop()
-		return false
-	error = websocket.start(
-		settings,
-		player_registry,
-		func() -> bool:
-			return accepting_new_players,
-		network,
-		tls.options,
-	)
-	if error != OK:
-		http.stop()
-		startup_error = "Could not listen for WebSocket on port %d: %s" % [
-			network.websocket_port,
-			error_string(error),
-		]
-		return false
-	running = true
-	startup_error = ""
-	print(
-		"Play Shapes ready: %s %d / %s %d"
-		% [
-			network.http_scheme(),
-			network.http_port,
-			network.websocket_scheme(),
-			network.websocket_port,
-		]
-	)
-	return true
+	use_local_network_config = use_local_config
+	var steps: Array[StringName] = [BootSteps.SERVERS]
+	return boot(BootRequest.new(steps))
 
 
 func addresses() -> PackedStringArray:
@@ -119,6 +120,7 @@ func stop() -> void:
 	http.stop()
 	websocket.stop()
 	running = false
+	_forget_steps(BootSteps.NETWORK)
 
 
 func join_url(address: String) -> String:
@@ -293,7 +295,7 @@ func send_players_to_lobby() -> void:
 		websocket.send_lobby_state()
 
 
-func register_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
+func register_lobby_controller(controller: LobbyController) -> void:
 	if websocket != null:
 		websocket.set_lobby_controller(controller)
 
@@ -320,7 +322,7 @@ func _stop_minigame_sessions() -> void:
 		session.stop()
 
 
-func unregister_lobby_controller(controller: LobbyPlaygroundWorld) -> void:
+func unregister_lobby_controller(controller: LobbyController) -> void:
 	if websocket != null:
 		websocket.clear_lobby_controller(controller)
 
@@ -337,7 +339,7 @@ func unregister_minigame_protocol(protocol: MinigameProtocol) -> void:
 
 
 func _on_players_changed() -> void:
-	var public_players := player_registry.public_players()
+	var public_players := _player_registry.public_players()
 	for session: Node in minigame_sessions.values():
 		session.sync_players(public_players)
 	if readiness != null:
@@ -346,3 +348,99 @@ func _on_players_changed() -> void:
 	var launcher := get_node_or_null("/root/DebugLauncher")
 	if launcher != null:
 		launcher.set_feature_available(&"one_registered_player", public_players.size() == 1)
+
+
+func _boot_launched_scene() -> void:
+	var scene := get_tree().current_scene
+	if scene != null:
+		boot_scene(scene)
+
+
+func _run_step(step: StringName) -> String:
+	if step in steps_run:
+		return ""
+	var error := ""
+	match step:
+		BootSteps.PRESETS:
+			settings = active_presets.networking
+		BootSteps.REGISTRY:
+			_player_registry = PlayerRegistry.new(
+				settings.max_players,
+				settings.reconnect_grace_seconds,
+			)
+			_player_registry.players_changed.connect(_on_players_changed)
+		BootSteps.CATALOG:
+			_minigame_catalog = load(MINIGAME_CATALOG_PATH)
+		BootSteps.NETWORK_CONFIG:
+			error = _load_network_config()
+		BootSteps.CERTIFICATE:
+			var tls := ControllerTLS.new()
+			if tls.prepare(network) != OK:
+				error = tls.error
+			_tls_options = tls.options
+		BootSteps.SERVERS:
+			error = _start_servers()
+		BootSteps.SERVERS_THIS_PC:
+			network = ControllerNetworkConfig.new(settings)
+			network.bind_address = "127.0.0.1"
+			_tls_options = null
+			error = _start_servers()
+		BootSteps.LOBBY:
+			get_tree().change_scene_to_file(LOBBY_PATH)
+	if error.is_empty():
+		steps_run.append(step)
+	if step == BootSteps.REGISTRY:
+		_on_players_changed()
+	return error
+
+
+func _forget_steps(steps: Array[StringName]) -> void:
+	steps_run = steps_run.filter(
+		func(step: StringName) -> bool:
+			return step not in steps,
+	)
+
+
+func _load_network_config() -> String:
+	network = ControllerNetworkConfig.new(settings)
+	var path := ControllerNetworkConfig.local_path()
+	if (
+		use_local_network_config and not path.is_empty()
+		and (OS.has_environment("PLAY_SHAPES_NETWORK_CONFIG") or FileAccess.file_exists(path))
+	):
+		network.load_local(path)
+	return network.error if not network.error.is_empty() else network.validation_error()
+
+
+func _start_servers() -> String:
+	var error := http.start(settings, player_registry.session_id, network, _tls_options)
+	if error != OK:
+		http.stop()
+		if not http.startup_error.is_empty():
+			return http.startup_error
+		return "Could not start HTTP service: %s" % error_string(error)
+	error = websocket.start(
+		settings,
+		player_registry,
+		func() -> bool:
+			return accepting_new_players,
+		network,
+		_tls_options,
+	)
+	if error != OK:
+		http.stop()
+		return "Could not listen for WebSocket on port %d: %s" % [
+			network.websocket_port,
+			error_string(error),
+		]
+	running = true
+	print(
+		"Play Shapes ready: %s %d / %s %d"
+		% [
+			network.http_scheme(),
+			network.http_port,
+			network.websocket_scheme(),
+			network.websocket_port,
+		]
+	)
+	return ""

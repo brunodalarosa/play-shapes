@@ -1,5 +1,5 @@
 class_name LobbyPlaygroundWorld
-extends Node3D
+extends LobbyController
 ## The Playground plaza. Reconciles host registry records into one character per player
 ## identity. Characters are plane-locked Jolt bodies at depth zero; their PlatformMotor makes
 ## the landings one-way, permits FALL and bounces players off each other. One world unit is

@@ -10,11 +10,11 @@ var _scenario_list: VBoxContainer
 var _marker: Label
 var _restart_button: Button
 var _scenarios: Array[DebugScenario] = []
+var _scenarios_listed := false
 
 
 func _ready() -> void:
 	layer = 100
-	_scenarios = DebugScenarioCatalog.scenarios(SessionHost.minigame_catalog)
 	_build_ui()
 	_refresh_actions()
 
@@ -65,7 +65,7 @@ func return_to_lobby(notify_players := true) -> void:
 
 
 func scenario_for_id(scenario_id: StringName) -> DebugScenario:
-	for scenario: DebugScenario in _scenarios:
+	for scenario: DebugScenario in _all_scenarios():
 		if scenario.id == scenario_id:
 			return scenario
 	return null
@@ -167,11 +167,12 @@ func _build_ui() -> void:
 
 
 func _refresh_actions() -> void:
-	if _scenario_list == null:
+	# Built when the panel opens, so the catalog stays unloaded until then.
+	if _scenario_list == null or not _panel.visible:
 		return
 	for child: Node in _scenario_list.get_children():
 		child.queue_free()
-	for scenario: DebugScenario in _scenarios:
+	for scenario: DebugScenario in _all_scenarios():
 		var state := scenario.availability(_features)
 		var button := Button.new()
 		button.text = (
@@ -185,6 +186,14 @@ func _refresh_actions() -> void:
 		button.pressed.connect(launch.bind(scenario.id))
 		_scenario_list.add_child(button)
 	_restart_button.disabled = active_scenario == null
+
+
+## Listed on first use, so a launch that never opens F12 loads no minigame catalog.
+func _all_scenarios() -> Array[DebugScenario]:
+	if not _scenarios_listed:
+		_scenarios_listed = true
+		_scenarios.append_array(DebugScenarioCatalog.scenarios(SessionHost.minigame_catalog))
+	return _scenarios
 
 
 func _style_action(button: Button, fill: Color) -> void:
