@@ -70,6 +70,13 @@ func _check_game_preset() -> void:
 		if before[index] != after[index]:
 			changed += 1
 	check(before.size() == after.size() and changed == 1, "Only that entry's line changes")
+	var active: ActivePresets = ResourceLoader.load(
+		ACTIVE_COPY,
+		"",
+		ResourceLoader.CACHE_MODE_IGNORE,
+	)
+	check(active.flappy_race.flight.gravity == 80.0, "A normal launch loads the used preset")
+	check(active.validation_errors().is_empty(), "And Active Presets stays valid")
 	var tilt := WorkshopGamePreset.new("tilt_shift_3d", ACTIVE_COPY)
 	check(tilt.current_path().ends_with("005_3d_tilt_shift/tuning/Default.tres"), "Others stay")
 	check(not WorkshopGamePreset.new("missing", ACTIVE_COPY).use(floaty).is_empty(), "No entry")
