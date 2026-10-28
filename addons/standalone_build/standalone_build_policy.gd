@@ -165,7 +165,6 @@ const REQUIRED_RUNTIME_PATHS := [
 	"minigames/006_flappy_race/flappy_race_presentation.tscn",
 	"minigames/006_flappy_race/flappy_race_tuning.gd",
 	"minigames/006_flappy_race/tuning/Default.tres",
-	"minigames/006_flappy_race/tuning/View.tres",
 	"characters/cubio_dither.gdshaderinc",
 	"components/flappy_flight/flappy_flight_tuning.gd",
 	"components/rounded_bar/rounded_bar.gd",

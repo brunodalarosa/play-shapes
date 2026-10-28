@@ -1,8 +1,44 @@
 [gd_resource type="Resource" script_class="FlappyRaceTuning" format=3]
 
-[ext_resource type="Resource" path="res://minigames/006_flappy_race/tuning/Course.tres" id="1_e0ws1"]
-[ext_resource type="Resource" path="res://minigames/006_flappy_race/tuning/Flight.tres" id="2_bjqfp"]
-[ext_resource type="Script" path="res://minigames/006_flappy_race/flappy_race_tuning.gd" id="3_kje31"]
+[ext_resource type="Script" path="res://minigames/006_flappy_race/flappy_race_course_tuning.gd" id="1_7xgwa"]
+[ext_resource type="Script" path="res://components/flappy_flight/flappy_flight_tuning.gd" id="2_tg76g"]
+[ext_resource type="Script" path="res://minigames/006_flappy_race/flappy_race_tuning.gd" id="3_b2gpq"]
+[ext_resource type="Script" path="res://minigames/006_flappy_race/flappy_race_view_tuning.gd" id="4_8ls8m"]
+
+[sub_resource type="Curve" id="Curve_xj2sw"]
+_limits = [0.0, 20.0, 0.0, 1.0]
+_data = [Vector2(0, 8.4), 0.0, -1.3999996, 1, 1, Vector2(1, 7), -1.3999996, 0.0, 1, 1]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_w7j2t"]
+_limits = [0.0, 30.0, 0.0, 1.0]
+_data = [Vector2(0, 4), 0.0, 5.0, 1, 1, Vector2(1, 9), 5.0, 0.0, 1, 1]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_vs1xt"]
+_limits = [0.0, 30.0, 0.0, 1.0]
+_data = [Vector2(0, 16.1), 0.0, -3.45, 1, 1, Vector2(1, 12.65), -3.45, 0.0, 1, 1]
+point_count = 2
+
+[sub_resource type="Curve" id="Curve_xg61o"]
+_data = [Vector2(0, 0.1), 0.0, 0.15, 1, 1, Vector2(1, 0.25), 0.15, 0.0, 1, 1]
+point_count = 2
+
+[sub_resource type="Resource" id="Resource_nuclf"]
+script = ExtResource("1_7xgwa")
+obstacle_spacing = SubResource("Curve_vs1xt")
+gap_height = SubResource("Curve_xj2sw")
+largest_gap_change = SubResource("Curve_w7j2t")
+pickup_chance = SubResource("Curve_xg61o")
+
+[sub_resource type="Resource" id="Resource_2sqw6"]
+script = ExtResource("2_tg76g")
+
+[sub_resource type="Resource" id="Resource_4sm0g"]
+script = ExtResource("4_8ls8m")
 
 [resource]
-script = ExtResource("3_kje31")
+script = ExtResource("3_b2gpq")
+flight = SubResource("Resource_2sqw6")
+course = SubResource("Resource_nuclf")
+view = SubResource("Resource_4sm0g")

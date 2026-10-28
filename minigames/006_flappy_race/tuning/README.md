@@ -1,8 +1,8 @@
 # Flappy Race tuning
 
-Select a rules Resource in `Tuning/Active Presets.tres`, under Flappy Race. `Default.tres`
-selects `Flight.tres`, `Course.tres` and `View.tres`, and holds the race values below. Changes apply when
-the host next starts.
+Select a preset in `Tuning/Active Presets.tres`, under Flappy Race. A preset is one file, such as
+`Default.tres`, holding the race values and its Flight, Course and View parts below. Changes apply
+when the host next starts.
 
 The values are starting points taken from the Flappy Bird reference in
 [the design](../../../docs/game-design-documents/Minigames/006/006%20-%20Flappy%20Race.md).
@@ -10,7 +10,7 @@ The owner chooses them in play.
 
 ## Race
 
-`Default.tres` itself, a `FlappyRaceTuning`, holds the race around the flights.
+The preset itself, a `FlappyRaceTuning`, holds the race around the flights.
 
 | Field | Default | Effect |
 | --- | --- | --- |
@@ -22,7 +22,7 @@ The owner chooses them in play.
 
 ## Flight
 
-`Flight.tres` is a `FlappyFlightTuning`. The phone receives the same values, with durations
+The Flight part is a `FlappyFlightTuning`. The phone receives the same values, with durations
 turned into whole 60 Hz ticks.
 
 | Field | Default | Effect |
@@ -41,7 +41,7 @@ turned into whole 60 Hz ticks.
 
 ## Course
 
-`Course.tres` is a `FlappyRaceCourseTuning`. Difficulty follows course progress, from 0 at the
+The Course part is a `FlappyRaceCourseTuning`. Difficulty follows course progress, from 0 at the
 start line to 1 at the finish line.
 
 | Field | Default | Effect |
@@ -70,7 +70,7 @@ than the hit box, and pickups that do not fit their gap.
 
 ## View
 
-`View.tres` is a `FlappyRaceViewTuning`: how the race looks and feels on the phone and the
+The View part is a `FlappyRaceViewTuning`: how the race looks and feels on the phone and the
 shared screen. No value changes a flight; the phone receives them in its snapshot.
 
 | Field | Default | Effect |

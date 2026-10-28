@@ -1,19 +1,16 @@
 @tool
 class_name FlappyRaceTuning
 extends Resource
-## The Flappy Race rules profile, selected in Tuning/Active Presets.tres. Values are starting
-## points from the Flappy Bird reference; human play decides them.
+## The Flappy Race rules profile, selected in Tuning/Active Presets.tres. A preset is one file
+## holding its flight, course and view parts. Values are starting points from the Flappy Bird
+## reference; human play decides them.
 
 ## The flappy shape gameplay values, shared with the phone.
-@export var flight: FlappyFlightTuning = preload(
-	"res://minigames/006_flappy_race/tuning/Flight.tres"
-)
+@export var flight: FlappyFlightTuning
 ## How the course is generated.
-@export var course: FlappyRaceCourseTuning = preload(
-	"res://minigames/006_flappy_race/tuning/Course.tres"
-)
+@export var course: FlappyRaceCourseTuning
 ## How the race looks and feels on the phone and the shared screen.
-@export var view: FlappyRaceViewTuning = preload("res://minigames/006_flappy_race/tuning/View.tres")
+@export var view: FlappyRaceViewTuning
 
 @export_group("Race")
 ## 3, 2, 1, GO before forward motion and gravity start, s. Default: 3.
