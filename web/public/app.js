@@ -1631,11 +1631,16 @@ var FlappyRacePhone = class {
     const { snapshot, prediction } = race;
     const view = snapshot.view;
     const clockTick = race.clock.tick(now);
-    if (snapshot.phase !== "results")
-      prediction.advanceTo(clockTick);
+    const events = snapshot.phase !== "results" ? prediction.advanceTo(clockTick) : 0;
     prediction.blend(delta, view.correction_seconds);
     const state = prediction.state;
+    let gesture;
+    if (events & EVENT_FLAP)
+      gesture = "flap";
+    if (events & EVENT_RESPAWN || !race.wasFlying && state.flying)
+      gesture = "respawn";
     if (race.wasFlying && !state.flying) {
+      gesture = "hit";
       race.hitAt = now;
       race.heartSpent = !state.hearts.owed;
       if (race.heartSpent) {
@@ -1681,6 +1686,10 @@ var FlappyRacePhone = class {
       tilt: tumbling ? -sinceHit * TUMBLE_TURNS * Math.PI * 2 : race.tilt,
       cubioVisible: state.flying || tumbling || state.ready,
       face: face2,
+      gesture,
+      hitSeconds: view.hit_tumble_seconds,
+      tumbling,
+      idle: !state.flying && !tumbling || results || clockTick < 0,
       taken: state.taken
     });
     const heartLanded = !race.heartSpent || sinceHit >= view.heart_flight_seconds;

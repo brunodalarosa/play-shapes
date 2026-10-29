@@ -115,8 +115,12 @@ export async function createFlappyRaceView(
       });
       cubio.root.visible = frame.cubioVisible;
       cubio.root.position.set(frame.cubioX, frame.cubioY, 1);
-      cubio.root.rotation.z = frame.tilt;
+      // Hit owns its tumble in the rig; the fallback still uses the procedural tilt.
+      cubio.root.rotation.z = frame.tumbling ? 0 : frame.tilt;
       cubio.root.children[0]!.position.y = -BODY_CENTRE;
+      if (frame.idle) cubio.idle();
+      else if (frame.gesture)
+        cubio.playOnce(frame.gesture, frame.gesture === "hit" ? frame.hitSeconds : undefined);
       cubio.update(frame.delta, CUBIO_HEIGHT, setup.color, false, frame.face);
       viewport.renderer.render(viewport.scene, viewport.camera);
     },

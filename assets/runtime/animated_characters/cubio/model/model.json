@@ -1,6 +1,6 @@
 {
-  "source_sha256": "af88bc9f187216e493a2f55d841a579cb81ae2a3474cb19ede1a4b3fce204e60",
-  "glb_sha256": "f3405e8b5a519634de2ef2ffe1564edd18007cd00c68acc6274b91fe3f631776",
+  "source_sha256": "7e3e900307a29733f3ac19eff0216394a3cdca997b2477d08966cfc41e3f4bcf",
+  "glb_sha256": "a1d40d41b598145171b0fdd4446716fb2c8db978db9c10da7f4c5e6d5c85f2d1",
   "clips": {
     "idle": {
       "frames": 48,
@@ -36,6 +36,24 @@
       "frames": 24,
       "fps": 24,
       "playback": "loop",
+      "forward_speed_m_per_s": 0.0
+    },
+    "flap": {
+      "frames": 7,
+      "fps": 24,
+      "playback": "once",
+      "forward_speed_m_per_s": 0.0
+    },
+    "hit": {
+      "frames": 17,
+      "fps": 24,
+      "playback": "once",
+      "forward_speed_m_per_s": 0.0
+    },
+    "respawn": {
+      "frames": 13,
+      "fps": 24,
+      "playback": "once",
       "forward_speed_m_per_s": 0.0
     }
   },

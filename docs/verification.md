@@ -277,6 +277,8 @@ start only what they need, so they stay fast.
 - Shape Characters lab: `tests/shape_characters_lab_test.gd` checks the 3:1 layout, turning,
   colours, one-pass clips and their controls, and the face controls, saving to a test file.
   `tests/shape_face_anchor_test.gd` and `tests/cubio_3d_test.gd` cover the face placement.
+  Cubio tests also cover gesture retriggering and respawn priority; the Flappy Race browser
+  suite checks wing beats at ten taps per second, the tumble and the squash/pop.
 - Motion lab: `tests/motion_lab_test.gd`, `tests/motion_input_channel_test.gd`,
   `tests/debug_launcher_test.gd`, `web/tests/motion_lab_host.test.mjs` and
   `web/tests/motion_lab_controller.test.mjs`.
@@ -299,6 +301,7 @@ that folder in place of `tests/`. Those starting with `tilt_shift_3d_` are in
 
 | Helper | What it saves | Folder |
 | --- | --- | --- |
+| `cubio_clips_visual_check` | Four poses of every clip in the Shape Characters lab, including the runtime face. | `cubio/clips/` |
 | `bubbles_3d_scene_visual_check` | Bubbles and jellyfishes 3D mid-round with five and ten players, catches of several sizes, free jellyfishes and two pufferfishes. | `bubbles-3d/` |
 | `bubbles_3d_performance_check` | No capture: prints the frame time and draw calls of ten players with every jellyfish cap reached, vsync off. Run it on the target PC. | none |
 | `tilt_shift_3d_presentation_visual_check` | Tilt Shift 3D with layout A and four players and layout B and six, through preparation, countdown, play with and without names and the round's end, then every colour on both teams. | `tilt-shift-3d/presentation/` |

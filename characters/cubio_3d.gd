@@ -5,6 +5,7 @@ extends Node3D
 
 const LOOPING_CLIPS: Array[String] = ["idle", "walk", "run", "lever_pull"]
 const HELD_CLIPS: Array[String] = ["look_up", "crouch"]
+const ONE_SHOT_CLIPS: Array[String] = ["flap", "hit", "respawn"]
 const CLIP_FRAMES := {
 	"idle": 48,
 	"walk": 24,
@@ -12,6 +13,9 @@ const CLIP_FRAMES := {
 	"lever_pull": 24,
 	"look_up": 9,
 	"crouch": 9,
+	"flap": 7,
+	"hit": 17,
+	"respawn": 13,
 }
 const CLIP_FPS := 24.0
 ## Forward travel of each locomotion clip in source metres per second.
@@ -145,6 +149,9 @@ func play(next: String) -> void:
 		return
 	if next == action:
 		return
+	if action in ONE_SHOT_CLIPS:
+		_rate = 1.0
+		_player.speed_scale = 1.0
 	action = next
 	if manual_playback:
 		return
@@ -157,6 +164,24 @@ func play(next: String) -> void:
 		_player.seek(0.0, true)
 		return
 	_player.play(next, clip_blend)
+
+
+## Restarts a single gesture immediately, then holds its final pose. Flaps cannot hide the
+## respawn pop, but a hit can interrupt it. Gameplay movement remains with the caller.
+func play_once(next: String, speed: float = 1.0) -> void:
+	assert(next in ONE_SHOT_CLIPS, "Unknown Cubio gesture %s" % next)
+	if next == "flap" and action == "respawn" and _player.is_playing():
+		return
+	action = next
+	if manual_playback:
+		return
+	_held = ""
+	_after_release = ""
+	_rate = speed
+	_player.stop()
+	_player.speed_scale = speed
+	_player.play(next, 0.0)
+	_player.seek(0.0, true)
 
 
 ## Turns toward horizontal travel, in world units per second, and matches the stride.

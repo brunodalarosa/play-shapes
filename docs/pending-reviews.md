@@ -110,6 +110,9 @@ removes it. The evidence labels are defined in
 
 ## Flappy Race
 
+- `[HUMAN-PLAY]` The hands reading as wings during rapid tapping, the Hit tumble and the
+  Respawn squash/pop at race distance. `[PHYSICAL-PHONE]` Their readability and smoothness
+  on real phones. Lab captures are under `test-results/cubio/after/`.
 - `[PHYSICAL-PHONE]` On the iPhone Safari and Android Chrome pair: one phone starts Flappy Race
   from the lobby, READY on the Pre-minigame screen, the portrait race screen with the
   orientation lock where the browser allows it, and Return to lobby.

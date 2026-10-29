@@ -337,6 +337,73 @@ test("without WebGL the race is drawn flat and stays readable", async () => {
   });
 });
 
+test("Cubio flight gestures beat at ten taps per second, tumble and protect the respawn pop", async () => {
+  await phone({}, async (page) => {
+    const poses = await page.evaluate(async () => {
+      const { createCubio } = await import("/three_view.js");
+      const cubio = await createCubio();
+      const step = (seconds) => cubio.update(seconds, 2.62, "#598df2", false);
+      const matrix = (name) => {
+        cubio.root.updateMatrixWorld(true);
+        return [...cubio.root.getObjectByName(name).matrixWorld.elements];
+      };
+      const height = () => {
+        const body = matrix("Body");
+        return Math.hypot(body[1], body[5], body[9]);
+      };
+      const beats = [];
+      for (let tap = 0; tap < 10; tap++) {
+        cubio.playOnce("flap");
+        const up = matrix("HandL")[13];
+        step(1 / 12);
+        beats.push(up - matrix("HandL")[13]);
+        step(1 / 60);
+      }
+      cubio.playOnce("respawn");
+      const squash = height();
+      step(0.1);
+      const beforeTap = matrix("Body");
+      cubio.playOnce("flap");
+      const afterTap = matrix("Body");
+      step(1 / 15);
+      const stretch = height();
+      step(1);
+      const settled = height();
+      cubio.playOnce("hit", 0.6);
+      step(0.3);
+      const upsideDown = matrix("FaceAnchor")[5];
+      step(0.4);
+      const stopped = matrix("Body");
+      step(1);
+      const held = matrix("Body");
+      cubio.idle();
+      step(0);
+      const idle = height();
+      cubio.dispose();
+      return {
+        beats,
+        squash,
+        beforeTap,
+        afterTap,
+        stretch,
+        settled,
+        upsideDown,
+        stopped,
+        held,
+        idle,
+      };
+    });
+    assert.ok(poses.beats.every((distance) => distance > 1.5));
+    assert.ok(poses.squash < 0.3, `squash scale ${poses.squash}`);
+    assert.deepEqual(poses.beforeTap, poses.afterTap, "a rapid flap preserves the pop");
+    assert.ok(poses.stretch > 1.1);
+    assert.ok(Math.abs(poses.settled - 1) < 0.01);
+    assert.ok(poses.upsideDown < -0.99, "the hit tumbles about the body centre");
+    assert.deepEqual(poses.stopped, poses.held, "Hit never loops");
+    assert.ok(Math.abs(poses.idle - 1) < 0.01);
+  });
+});
+
 test("returning to the lobby hides the race screen", async () => {
   await phone({}, async (page) => {
     await resume(page, snapshot());

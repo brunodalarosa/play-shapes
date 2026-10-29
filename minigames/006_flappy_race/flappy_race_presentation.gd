@@ -14,7 +14,6 @@ const OUTLINE := Vector2(1.6, 1.4)
 ## A disconnected Cubio's colour is mixed this far toward grey.
 const GREY := Color(0.55, 0.57, 0.6)
 const GREY_SHARE := 0.7
-const TUMBLE_TURNS := 1.5
 const GO_SECONDS := 0.6
 const BURST_DROPS := 10
 const BURST_REACH := 1.8
@@ -222,7 +221,17 @@ func _on_tick_settled(_tick: int) -> void:
 
 func _on_race_event(kind: StringName, player_id: String, data: Dictionary) -> void:
 	var visual: RacerVisual = _by_id.get(player_id)
-	if kind != &"pickup" or visual == null:
+	if visual == null:
+		return
+	if kind in [&"flap", &"respawn"]:
+		visual.cubio.play_once(String(kind))
+		return
+	if kind == &"hit":
+		var seconds := maxf(controller.tuning.view.hit_tumble_seconds, 0.001)
+		var duration := visual.cubio.animation_player().get_animation("hit").length
+		visual.cubio.play_once("hit", duration / seconds)
+		return
+	if kind != &"pickup":
 		return
 	visual.pickup_at = race_seconds()
 	var index := int(data.get("pickup", -1))
@@ -270,8 +279,9 @@ func _draw_racer(
 	var response := view.tilt_response_seconds
 	var follow := 1.0 if response <= 0.0 else 1.0 - exp(-delta / response)
 	visual.tilt = lerpf(visual.tilt, target, follow)
-	var spin := -(now - visual.hit_at) * TAU * TUMBLE_TURNS
-	visual.pivot.rotation.z = spin if tumbling else visual.tilt
+	visual.pivot.rotation.z = 0.0 if tumbling else visual.tilt
+	if not state.flying and not tumbling:
+		visual.cubio.play("idle")
 
 	var color := visual.color if racer.connected else visual.color.lerp(GREY, GREY_SHARE)
 	if color != visual.shown_color:

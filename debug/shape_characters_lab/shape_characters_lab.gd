@@ -70,6 +70,8 @@ func select_color(hex: String) -> void:
 ## Plays [param clip] once from its first frame, from the start again if it is playing.
 func play_clip(clip: String) -> void:
 	var player := cubio.animation_player()
+	# Airborne gestures swing below the standing sole, so lift their preview above the floor.
+	_turntable.position.y = 0.25 if clip in Cubio3D.ONE_SHOT_CLIPS else 0.0
 	_clip = clip
 	player.play(clip)
 	player.seek(0.0, true)
@@ -97,6 +99,7 @@ func restart_clip() -> void:
 ## Stops the reviewed clip and lets Cubio idle as it does in the game.
 func stop_clip() -> void:
 	var player := cubio.animation_player()
+	_turntable.position.y = 0.0
 	_clip = ""
 	player.speed_scale = 1.0
 	player.play("idle")

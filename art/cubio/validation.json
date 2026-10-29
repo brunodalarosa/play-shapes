@@ -202,7 +202,52 @@
       "detail": 0.0
     },
     {
-      "name": "all six editable actions exist",
+      "name": "flap sustained hold",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "flap no body or limb surface intersections",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "hit sustained hold",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "hit no body or limb surface intersections",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "respawn sustained hold",
+      "passed": true,
+      "detail": 0.0
+    },
+    {
+      "name": "respawn no body or limb surface intersections",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "both wings beat down within one twelfth of a second",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "hit turns the body upside down around its centre",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "respawn pops from a squash into a stretch",
+      "passed": true,
+      "detail": null
+    },
+    {
+      "name": "all editable actions exist",
       "passed": true,
       "detail": null
     },
@@ -271,8 +316,35 @@
       "maximum_seam_error": 0.0,
       "minimum_sole_z": 0.0,
       "surface_intersections": []
+    },
+    "flap": {
+      "frames": 7,
+      "fps": 24,
+      "playback": "once",
+      "sampled_poses": 29,
+      "maximum_seam_error": 0.0,
+      "minimum_sole_z": 0.1499999761581421,
+      "surface_intersections": []
+    },
+    "hit": {
+      "frames": 17,
+      "fps": 24,
+      "playback": "once",
+      "sampled_poses": 69,
+      "maximum_seam_error": 0.0,
+      "minimum_sole_z": -0.01781357079744339,
+      "surface_intersections": []
+    },
+    "respawn": {
+      "frames": 13,
+      "fps": 24,
+      "playback": "once",
+      "sampled_poses": 53,
+      "maximum_seam_error": 0.0,
+      "minimum_sole_z": -0.11460006237030029,
+      "surface_intersections": []
     }
   },
-  "source_sha256": "af88bc9f187216e493a2f55d841a579cb81ae2a3474cb19ede1a4b3fce204e60",
+  "source_sha256": "7e3e900307a29733f3ac19eff0216394a3cdca997b2477d08966cfc41e3f4bcf",
   "passed": true
 }

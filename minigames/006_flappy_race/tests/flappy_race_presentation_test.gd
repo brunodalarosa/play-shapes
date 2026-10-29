@@ -129,6 +129,10 @@ func _check_hit_and_heart() -> void:
 		visual.pivot.visible and visual.face == "face_dizzy" and not visual.heart.visible,
 		"A hit Cubio tumbles dizzy before the heart shows",
 	)
+	check(
+		visual.cubio.action == "hit" and visual.pivot.rotation.z == 0.0,
+		"The rig plays Hit without a second tumble on the presentation pivot",
+	)
 	_settle(start + 40)
 	check(
 		not visual.pivot.visible and visual.heart.visible,
@@ -144,6 +148,14 @@ func _check_hit_and_heart() -> void:
 		and visual.face == "face_worried" and visual.heart.modulate.a == 1.0,
 		"Once ready the Cubio waits worried behind the full heart",
 	)
+	check(visual.cubio.action == "idle", "The waiting Cubio leaves its hit pose")
+	racer.taps[_controller.settled_tick + 1] = true
+	_settle(_controller.settled_tick + 1)
+	check(visual.cubio.action == "respawn", "The respawn tap plays the pop before its flap")
+	visual.cubio.animation_player().advance(0.6)
+	racer.taps[_controller.settled_tick + 1] = true
+	_settle(_controller.settled_tick + 1)
+	check(visual.cubio.action == "flap", "A settled tap plays the wing beat")
 
 
 func _check_frozen_and_burst() -> void:

@@ -84,7 +84,8 @@ func _check_clips(lab: ShapeCharactersLab) -> void:
 	for button: Button in clips.get_children():
 		names.append(button.text)
 	check(
-		names == ["Idle", "Walk", "Run", "Lever Pull", "Look Up", "Crouch"],
+		names
+		== ["Idle", "Walk", "Run", "Lever Pull", "Look Up", "Crouch", "Flap", "Hit", "Respawn"],
 		"Every clip has a button",
 	)
 
@@ -120,6 +121,22 @@ func _check_clips(lab: ShapeCharactersLab) -> void:
 	check(
 		player.current_animation == "idle" and is_equal_approx(player.speed_scale, 1.0),
 		"Stop returns to idling as in the game",
+	)
+	lab.set_speed(1.0)
+	for index: int in range(6, 9):
+		(clips.get_child(index) as Button).pressed.emit()
+		check(
+			(lab.get_node("%Turntable") as Node3D).position.y > 0.0,
+			"Airborne gestures have room below the feet in the lab",
+		)
+		await create_timer(0.8).timeout
+		check(not player.is_playing(), "A flight clip plays once in the lab")
+		lab.restart_clip()
+		check(player.is_playing(), "A finished flight clip restarts in the lab")
+	lab.stop_clip()
+	check(
+		(lab.get_node("%Turntable") as Node3D).position.y == 0.0,
+		"Standing clips return to the floor",
 	)
 
 

@@ -1,4 +1,5 @@
 import type { Course } from "./messages.js";
+import type { CubioGesture } from "../three_view/cubio.js";
 
 /** What one drawn frame of the phone's race shows, in course metres. */
 export interface Frame {
@@ -12,6 +13,11 @@ export interface Frame {
   tilt: number;
   cubioVisible: boolean;
   face: string;
+  /** Gesture started this frame; a hit replaces a flap, and respawn protects its pop. */
+  gesture?: CubioGesture;
+  hitSeconds: number;
+  tumbling: boolean;
+  idle: boolean;
   /** One entry per pickup, 1 once this player has taken it. */
   taken: Uint8Array;
 }

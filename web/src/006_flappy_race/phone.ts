@@ -1,4 +1,10 @@
-import { FlappyFlight, type FlappyFlightState } from "../flappy_flight/flight.js";
+import {
+  EVENT_FLAP,
+  EVENT_RESPAWN,
+  FlappyFlight,
+  type FlappyFlightState,
+} from "../flappy_flight/flight.js";
+import type { CubioGesture } from "../three_view/cubio.js";
 import { createFallbackView } from "./fallback.js";
 import { clockText, FlappyRaceHud, ordinal, type FloatingHeart } from "./hud.js";
 import {
@@ -244,11 +250,15 @@ export class FlappyRacePhone {
     const { snapshot, prediction } = race;
     const view = snapshot.view;
     const clockTick = race.clock.tick(now);
-    if (snapshot.phase !== "results") prediction.advanceTo(clockTick);
+    const events = snapshot.phase !== "results" ? prediction.advanceTo(clockTick) : 0;
     prediction.blend(delta, view.correction_seconds);
     const state = prediction.state;
 
+    let gesture: CubioGesture | undefined;
+    if (events & EVENT_FLAP) gesture = "flap";
+    if (events & EVENT_RESPAWN || (!race.wasFlying && state.flying)) gesture = "respawn";
     if (race.wasFlying && !state.flying) {
+      gesture = "hit";
       race.hitAt = now;
       race.heartSpent = !state.hearts.owed;
       if (race.heartSpent) {
@@ -297,6 +307,10 @@ export class FlappyRacePhone {
       tilt: tumbling ? -sinceHit * TUMBLE_TURNS * Math.PI * 2 : race.tilt,
       cubioVisible: state.flying || tumbling || state.ready,
       face,
+      gesture,
+      hitSeconds: view.hit_tumble_seconds,
+      tumbling,
+      idle: (!state.flying && !tumbling) || results || clockTick < 0,
       taken: state.taken,
     });
 

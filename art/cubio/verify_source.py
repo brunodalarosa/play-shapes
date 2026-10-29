@@ -79,14 +79,16 @@ for clip, spec in CLIPS.items():
     bpy.context.view_layer.update()
     first = controls()
     held = spec.get('playback') == 'held'
-    scene.frame_set(spec['frames'] if held else spec['frames'] + 1)
+    once = spec.get('playback') == 'once'
+    stops = held or once
+    scene.frame_set(spec['frames'] if stops else spec['frames'] + 1)
     bpy.context.view_layer.update()
     end = controls()
-    if held:
+    if stops:
         scene.frame_set(spec['frames'] + 240)
         bpy.context.view_layer.update()
-    seam = maximum_matrix_error(end if held else first, controls(), CONTROLS)
-    check(clip + (' sustained hold' if held else ' loop seam'), seam < 1e-6, seam)
+    seam = maximum_matrix_error(end if stops else first, controls(), CONTROLS)
+    check(clip + (' sustained hold' if stops else ' loop seam'), seam < 1e-6, seam)
     if held:
         check(clip + ' starts at idle neutral',
               maximum_matrix_error(neutral, first, CONTROLS) < 1e-6)
@@ -122,17 +124,41 @@ for clip, spec in CLIPS.items():
                 first, controls(), ['Body', 'Hand.L', 'Foot.L', 'Foot.R']))
     check(clip + ' no body or limb surface intersections', not intersections,
           intersections[:8])
-    check(clip + ' soles stay above ground', minimum_sole > -1e-6, minimum_sole)
+    if not once:
+        check(clip + ' soles stay above ground', minimum_sole > -1e-6, minimum_sole)
     if clip == 'lever_pull':
         check('lever pull only moves the right hand', fixed_error < 1e-6, fixed_error)
     report['clips'][clip] = {
-        'frames': spec['frames'], 'fps': spec['fps'], 'playback': 'held' if held else 'loop',
+        'frames': spec['frames'], 'fps': spec['fps'], 'playback': spec.get('playback', 'loop'),
         'sampled_poses': spec['frames'] * 4 + 1,
         'maximum_seam_error': seam, 'minimum_sole_z': minimum_sole,
         'surface_intersections': intersections,
     }
 
-check('all six editable actions exist', all(action_name(clip) in bpy.data.actions for clip in CLIPS))
+activate_clip(scene, 'flap')
+bpy.context.view_layer.update()
+raised = controls()
+scene.frame_set(3)
+bpy.context.view_layer.update()
+down = controls()
+check('both wings beat down within one twelfth of a second', all(
+    raised[name].translation.z - down[name].translation.z > 1.5
+    for name in ['Hand.L', 'Hand.R']))
+activate_clip(scene, 'hit')
+scene.frame_set(9)
+bpy.context.view_layer.update()
+check('hit turns the body upside down around its centre',
+      body.matrix_world.to_3x3()[2][2] < -0.99
+      and (body.matrix_world.translation - Vector((0, 0, 1.62))).length < 1e-5)
+activate_clip(scene, 'respawn')
+bpy.context.view_layer.update()
+small = body.dimensions.copy()
+scene.frame_set(5)
+bpy.context.view_layer.update()
+check('respawn pops from a squash into a stretch',
+      small.z < small.x * 0.6 and body.dimensions.z > 2.2)
+
+check('all editable actions exist', all(action_name(clip) in bpy.data.actions for clip in CLIPS))
 check('five independent controls', len(rig.pose.bones) == 5)
 check('ground anchor is fixed at the origin',
       bpy.data.objects['Character.Root - ground anchor'].location.length < 1e-8)

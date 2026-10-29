@@ -7,6 +7,9 @@ CLIPS = {
     'look_up': {'frames': 9, 'fps': 24, 'speed': 0.0, 'stance': 1.0, 'playback': 'held'},
     'crouch': {'frames': 9, 'fps': 24, 'speed': 0.0, 'stance': 1.0, 'playback': 'held'},
     'lever_pull': {'frames': 24, 'fps': 24, 'speed': 0.0, 'stance': 1.0},
+    'flap': {'frames': 7, 'fps': 24, 'speed': 0.0, 'playback': 'once'},
+    'hit': {'frames': 17, 'fps': 24, 'speed': 0.0, 'playback': 'once'},
+    'respawn': {'frames': 13, 'fps': 24, 'speed': 0.0, 'playback': 'once'},
 }
 VIEWS = {'front': 'Camera.Front', 'three-quarter': 'Camera.ThreeQuarter'}
 PARTS = ['Body.Cubio', 'Hand.L', 'Hand.R', 'Foot.L', 'Foot.R']

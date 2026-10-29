@@ -1,4 +1,4 @@
-import { AnimationMixer, Color, Group, Mesh, MeshStandardMaterial } from "three";
+import { AnimationMixer, Color, Group, LoopOnce, Mesh, MeshStandardMaterial } from "three";
 import { Blinker, faceLayers, loadManifest, type FaceManifest } from "../shape_paddle/face.js";
 import { modelInstance } from "./assets.js";
 import { ShapeFace3D } from "./shape_face.js";
@@ -6,6 +6,7 @@ import { ShapeFace3D } from "./shape_face.js";
 const TINTED = ["Body", "HandL", "HandR", "FootL", "FootR"];
 /** The face a Cubio shows unless asked for another, as on the host. */
 const FACE = "face_slightly_smiling";
+export type CubioGesture = "flap" | "hit" | "respawn";
 
 /** Where the face sits on the model's FaceAnchor, in source units, X right and Y up. */
 export interface FaceAnchor {
@@ -65,12 +66,40 @@ export async function createCubio() {
   const mixer = new AnimationMixer(model.scene);
   const idle = model.animations.find((clip) => clip.name === "idle");
   if (idle) mixer.clipAction(idle).play();
+  const gestures = new Map(
+    model.animations
+      .filter((clip) => ["flap", "hit", "respawn"].includes(clip.name))
+      .map((clip) => {
+        const action = mixer.clipAction(clip).setLoop(LoopOnce, 1);
+        action.clampWhenFinished = true;
+        return [clip.name, action] as const;
+      }),
+  );
+  let current = "idle";
   const blinker = new Blinker();
   let seconds = 0;
   const color = new Color();
   return {
     root,
     face,
+    /** Restart a gesture, holding its last pose; rapid flaps leave the respawn pop intact. */
+    playOnce(name: CubioGesture, seconds?: number): void {
+      if (name === "flap" && current === "respawn" && gestures.get("respawn")?.isRunning()) return;
+      const action = gestures.get(name);
+      if (!action) throw new Error(`Cubio gesture missing: ${name}`);
+      mixer.stopAllAction();
+      current = name;
+      const duration = action.getClip().duration;
+      const speed = seconds === undefined ? 1 : duration / Math.max(0.001, seconds);
+      action.reset().setEffectiveTimeScale(speed).play();
+      mixer.update(0);
+    },
+    idle(): void {
+      if (current === "idle") return;
+      mixer.stopAllAction();
+      current = "idle";
+      if (idle) mixer.clipAction(idle).reset().play();
+    },
     update(
       delta: number,
       height: number,

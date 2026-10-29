@@ -1,4 +1,4 @@
-"""Render current Cubio artwork and six motion poses, independently of game assets."""
+"""Render current Cubio artwork and motion poses, independently of game assets."""
 import json
 import sys
 from pathlib import Path
@@ -40,21 +40,23 @@ tiles = []
 for clip, spec in CLIPS.items():
     activate_clip(scene, clip)
     scene.frame_set(spec['frames'] if spec.get('playback') == 'held' else
-                    {'idle': 1, 'walk': 7, 'run': 5, 'lever_pull': 13}[clip])
+                    {'idle': 1, 'walk': 7, 'run': 5, 'lever_pull': 13,
+                     'flap': 3, 'hit': 7, 'respawn': 3}[clip])
     render(output / f'{clip}.png', 256)
     image = bpy.data.images.load(str(output / f'{clip}.png'), check_existing=False)
     pixels = np.empty(256 * 256 * 4, dtype=np.float32)
     image.pixels.foreach_get(pixels)
     tiles.append(pixels.reshape(256, 256, 4))
     bpy.data.images.remove(image)
-sheet = np.ones((512, 768, 4), dtype=np.float32)
+rows = (len(tiles) + 2) // 3
+sheet = np.ones((rows * 256, 768, 4), dtype=np.float32)
 sheet[:, :, :3] = (0.94, 0.96, 0.98)
 for index, tile in enumerate(tiles):
-    row, column = 1 - index // 3, index % 3
+    row, column = rows - 1 - index // 3, index % 3
     alpha = tile[:, :, 3:4]
     target = sheet[row * 256:(row + 1) * 256, column * 256:(column + 1) * 256]
     target[:, :, :3] = tile[:, :, :3] * alpha + target[:, :, :3] * (1 - alpha)
-image = bpy.data.images.new('Cubio Motion Review', 768, 512, alpha=True)
+image = bpy.data.images.new('Cubio Motion Review', 768, rows * 256, alpha=True)
 image.pixels.foreach_set(sheet.ravel())
 image.filepath_raw = str(output / 'motion-poses.png')
 image.file_format = 'PNG'

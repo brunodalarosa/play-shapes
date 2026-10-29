@@ -69,6 +69,7 @@ func _run() -> void:
 	cubio.play("idle")
 	await _wait(0.4)
 	check(absf(cubio.facing_yaw()) < 0.01, "Standing still faces the camera")
+	_check_gestures(cubio)
 
 	var blinked := false
 	for _frame: int in 30:
@@ -77,6 +78,28 @@ func _run() -> void:
 	check(blinked, "The Cubio blinks on its own")
 	cubio.queue_free()
 	await process_frame
+
+
+func _check_gestures(cubio: Cubio3D) -> void:
+	var player := cubio.animation_player()
+	cubio.play_once("flap")
+	player.advance(0.1)
+	check(player.current_animation_position > 0.09, "A wing beat advances")
+	cubio.play_once("flap")
+	check(player.current_animation_position == 0.0, "Rapid flaps restart the wing beat")
+	cubio.play_once("respawn")
+	player.advance(0.1)
+	cubio.play_once("flap")
+	check(cubio.action == "respawn", "Rapid taps preserve the respawn pop")
+	player.advance(0.6)
+	check(not player.is_playing(), "A gesture holds its final pose without looping")
+	cubio.play_once("flap")
+	check(cubio.action == "flap", "A flap can follow the completed pop")
+	cubio.play_once("respawn")
+	cubio.play_once("hit")
+	check(cubio.action == "hit", "A hit can interrupt a pop")
+	cubio.play("idle")
+	check(player.current_animation == "idle", "A gesture can return to idle")
 
 
 func _check_face(cubio: Cubio3D) -> void:
