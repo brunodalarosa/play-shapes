@@ -1,4 +1,14 @@
+---
+area: Minigames
+tags: [system, stub]
+code: [project.godot]
+verified:
+branch:
+---
+
 # Tilt Shift 3D editor workshop
+
+Hub: [[005 Tilt Shift]].
 
 The **Tilt Shift 3D** tab in Godot edits named layouts, baskets and profiles, and launches
 the actual 3D gameplay in a separate preview window. The workshop opens the active
@@ -29,7 +39,6 @@ Tilt Shift 3D profile from `Tuning/Active Presets.tres`; edits stay in an indepe
    spacing and reflection discrepancies are warnings, never automatic repositioning.
    Neighbor distance is the runtime proximity threshold, including vertical/diagonal pairs.
 
-
 The canvas uses a paper-colored board and Orange/Blue/grey markers. Paddles are drawn with
 their rounded outline at their true thickness, as the collider has them; the grey line is
 the floor, raised by the bin band, with the scoring openings below it. Labels such as A0
@@ -54,7 +63,6 @@ a basket adds it to that selector; choose it separately for each numbered round.
 Changing **Rounds per shift** exposes missing or stale mappings. Choose **Missing** to
 clear a round reference; remove surplus mappings explicitly with **Remove stale**.
 Changing the editing basket or layout does not change a round assignment by itself.
-
 
 The existing `baskets/FiveOpenings.tres` is the mirrored Orange, Blue, Trash, Orange,
 Blue example. Basket count remains configurable. Invalid geometry, missing references,
@@ -95,7 +103,6 @@ and defaults; input ranges come from the same Resource metadata as the Inspector
 Round layout/basket maps and independent player/neutral sizes are editable there too.
 **Geometry** retains snapped anchors, baskets and clearance diagnostics.
 
-
 The controls expose separate positive and negative ball counts, optional position seed, offscreen spawn height,
 delivery cutoff, ball geometry, gravity, entry speed, rotation speed, friction and bounce.
 Use the progress/
@@ -112,7 +119,7 @@ in undo/redo; preview or runtime restart applies the selected profile.
 
 The budget remains independent of curve shape. Zero-intensity spans stay empty; a
 positive budget with an all-zero curve is invalid. A seed repeats entry positions,
-not physics, input, scoring or strategic outcomes. See [the physics guide](PHYSICS.md).
+not physics, input, scoring or strategic outcomes. See [[005 Physics and Delivery|the physics guide]].
 
 **Start / restart physics** copies the current profile and launches another Godot process.
 Preview runs the numbered round map, rather than an unassigned basket being edited.
@@ -120,7 +127,6 @@ Select 2/4/6/8/10 designers to inspect ownership. Angle controls address synthet
 every selected paddle moves through the same host controller as gameplay. Designer
 READY/CANCEL, recalibration and force-start controls exercise actual preparation phases.
 Spectators control no paddle. Neutral rotation stays stopped until the active clock begins.
-
 
 The preview uses native ball contacts, rotating paddle bodies, delivery curves, basket
 catches and exclusive deadlines. Angles are unwrapped: type repeated turns or use the
@@ -150,4 +156,4 @@ editor launches, verifies save/reopen and preview cleanup, and writes captures b
 
 Its captures are real editor/runtime images with synthetic input. They establish
 composition and implementation behavior. Owner usability, snap/tolerance preferences,
-fairness and game feel remain in [pending reviews](../../../KnowledgeBase/Notebook/Pending%20Reviews.md).
+fairness and game feel remain in [[Pending Reviews|pending reviews]].

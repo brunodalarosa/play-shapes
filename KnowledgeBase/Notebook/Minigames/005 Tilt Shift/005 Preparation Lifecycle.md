@@ -26,4 +26,4 @@ the complete countdown starts. Later rounds reuse calibration and retain their p
 Older shared-gate preparation retains its original neutral-reset policy.
 Host cancel, scene startup failure, results, debug replacement and return to the lobby retire
 the prepared consumer. The F12 factory review is explicitly simulated and creates no motion
-subscriptions. See [flow tuning](../../../../minigames/005_3d_tilt_shift/tuning/FLOW.md).
+subscriptions. See [[005 Flow Tuning|flow tuning]].

@@ -172,7 +172,7 @@ These live outside any minigame folder so later 3D scenes can use them.
   a two-metre cube with a small bevel; the floating limbs and rig retain their transforms.
 - `art/cubio/export_glb.py` exports the model and two face textures to
   `assets/runtime/animated_characters/cubio/model/`. Both host and phone consume that model.
-  See the [source workflow](../../art/cubio/README.md).
+  See the [[Cubio Source and Export|source workflow]].
 
 ### Loops and held stances
 
@@ -233,15 +233,15 @@ These live outside any minigame folder so later 3D scenes can use them.
   outside it and is excluded from Godot import and export.
 - The models of minigame 004, Bubbles and jellyfishes 3D, live in
   `assets/runtime/minigames/bubbles_3d/`. Their sources and provenance are in
-  [art/bubbles_3d](../../art/bubbles_3d/README.md).
+  [[004 Art Assets|art/bubbles_3d]].
 - The face parts shared by every minigame, 8× PNGs and the preset manifest that composes them
   into the twelve original faces and fifty-two faces drawn in their style, live in
   `assets/runtime/shape_faces/`. Their vector masters
   and provenance are in
-  [art/shape_characters_face_system_assets](../../art/shape_characters_face_system_assets/README.md).
+  [[Shape Face Parts|art/shape_characters_face_system_assets]].
 - The bin, factory props, trash emblem and booklet preview of minigame 005, Tilt Shift 3D,
   live in `assets/runtime/minigames/tilt_shift_3d/`. Their sources and provenance are in
-  [art/tilt_shift_3d](../../art/tilt_shift_3d/README.md). The host serves the face parts to the
+  [[005 Art Assets|art/tilt_shift_3d]]. The host serves the face parts to the
   phone from `assets/runtime/shape_faces/`.
 - `addons/standalone_build/` is the editor-only Windows builder.
   `addons/kenyoni/qr_code/` is the required vendored runtime QR dependency.

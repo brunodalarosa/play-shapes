@@ -13,8 +13,8 @@ Hub: [[005 Tilt Shift]].
 Where minigame 005 lives in the code.
 
 Minigame 005 is Tilt Shift in 3D, in `minigames/005_3d_tilt_shift/`.
-[Its README](../../../../minigames/005_3d_tilt_shift/README.md) lists what each script owns, and its
-selected Resources are in the [field guide](../../../../minigames/005_3d_tilt_shift/tuning/README.md).
+[[005 Tilt Shift|Its README]] lists what each script owns, and its
+selected Resources are in the [[005 Tuning|field guide]].
 
 - `tilt_shift_3d_shift_controller.gd` owns equal teams, frozen shift content, layout exposure
   history, participant selection, readiness, countdown, round deadlines, cumulative scores,
@@ -31,6 +31,6 @@ selected Resources are in the [field guide](../../../../minigames/005_3d_tilt_sh
 - `tilt_shift_3d_session.gd` is the catalog's session script; `tilt_shift_3d_protocol.gd` is a
   `MinigameProtocol`. The messages are in [[005 Messages]].
 - `addons/tilt_shift_3d_workshop/` is its editor workshop
-  ([workshop guide](../../../../minigames/005_3d_tilt_shift/tuning/WORKSHOP.md)), and
+  ([[005 Workshop|workshop guide]]), and
   `debug/tilt_shift_3d_review.tscn` is its simulated F12 review. See
   [[Journey Change Rules|player journeys]].

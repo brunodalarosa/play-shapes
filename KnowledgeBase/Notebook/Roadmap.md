@@ -106,7 +106,7 @@ clips and faces and saves the face's default placement.
 Each phone shows the player's own paddle in 3D. 005 has its own workshop tab and F12 review, and
 launches through a catalog session script ([[0039-minigame-session-scripts|0039]]).
 It awaits physical-phone checks and the owner's play review; tuning values are provisional. See
-[the minigame guide](../../minigames/005_3d_tilt_shift/README.md).
+[[005 Tilt Shift|the minigame guide]].
 
 ## Backlog
 

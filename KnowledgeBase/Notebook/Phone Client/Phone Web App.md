@@ -150,7 +150,7 @@ temporary controller mounts.
 
 ## Icons
 
-- The icons reuse the Cubio three-quarter render and the [approved logo](../../../art/logo/README.md),
+- The icons reuse the Cubio three-quarter render and the [[Logo|approved logo]],
   cut out from its cream background.
 - Regenerate them with `node web/scripts/generate_pwa_icons.mjs`, then import in Godot.
 - The HTTP allowlist, the export presets and the pack policy include the manifest, the 180,

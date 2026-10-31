@@ -46,7 +46,7 @@ Some tasks need more. The setup script reports these without failing:
 | Godot export templates matching the installed Godot | The standalone Windows build and `node tools/check.mjs --release` |
 | mkcert | Local HTTPS for motion input; `node tools/local_https.mjs download` fetches it, see [docs/local-https.md](KnowledgeBase/Notebook/Phone%20Client/Local%20HTTPS.md) |
 | GitHub CLI (`gh`) | Pull requests from the terminal |
-| Python 3 with Pillow, Blender | Regenerating art; see [art/cubio/README.md](art/cubio/README.md) and [art/bubbles_3d/README.md](art/bubbles_3d/README.md) |
+| Python 3 with Pillow, Blender | Regenerating art; see [art/cubio/README.md](KnowledgeBase/Notebook/Art%20Pipeline/Cubio%20Source%20and%20Export.md) and [art/bubbles_3d/README.md](KnowledgeBase/Notebook/Minigames/004%20Bubbles%20and%20Jellyfishes/004%20Art%20Assets.md) |
 
 The vendored Godot MCP addon is disabled by default and is optional developer
 tooling; it is not required to launch or play the game.

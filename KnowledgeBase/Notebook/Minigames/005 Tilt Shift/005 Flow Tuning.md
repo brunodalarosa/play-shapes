@@ -1,4 +1,14 @@
+---
+area: Minigames
+tags: [system, stub]
+code: []
+verified:
+branch:
+---
+
 # Tilt Shift 3D flow tuning
+
+Hub: [[005 Tilt Shift]].
 
 The selected `TiltShift3DTuning.flow` profile is copied when preparation starts. Changes
 apply to a later shift. Existing motion, physics and rules profiles retain their owners.

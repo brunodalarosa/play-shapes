@@ -14,7 +14,7 @@ Where minigame 006 lives in the code.
 
 Minigame 006 is in `minigames/006_flappy_race/`, the first minigame whose `min_players` is 1.
 The host runs and draws the whole race on a placeholder course; each phone flies its own Cubio.
-[Its README](../../../../minigames/006_flappy_race/README.md) lists the files.
+[[006 Flappy Race|Its README]] lists the files.
 
 - `flappy_race.tscn` and `flappy_race.gd` (`FlappyRace`) take the launch, start the race on
   a random seed, register the protocol, bind the presentation and offer Return to lobby.

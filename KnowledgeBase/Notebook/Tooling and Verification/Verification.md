@@ -196,7 +196,7 @@ start only what they need, so they stay fast.
 
 - Cubio: `node tools/check.mjs cubio pre_minigame_screen lobby_playground` checks the
   model, tint, clips, blinking, live Ready-screen instances and lobby input. Source geometry,
-  quarter-frame intersections and export commands are in [the Cubio workflow](../../../art/cubio/README.md).
+  quarter-frame intersections and export commands are in [[Cubio Source and Export|the Cubio workflow]].
 - `pre_minigame_visual_check.gd` captures two- and ten-player Ready screens at 1080p and 720p.
   Run `cubio_preview_performance_check.gd` without `--headless` to measure ten live previews;
   it writes `test-results/cubio/ready-performance.json`. These are desktop composition and
@@ -217,8 +217,8 @@ start only what they need, so they stay fast.
   check the face parts and presets and the bin against their verified exports. Run
   `node tools/check.mjs shape_faces tilt_shift_3d_models`. The exports themselves are verified
   by `export_faces.mjs` in
-  [art/shape_characters_face_system_assets](../../../art/shape_characters_face_system_assets/README.md)
-  and `export_and_verify.py` in [art/tilt_shift_3d](../../../art/tilt_shift_3d/README.md).
+  [[Shape Face Parts|art/shape_characters_face_system_assets]]
+  and `export_and_verify.py` in [[005 Art Assets|art/tilt_shift_3d]].
 - Emoji face presets: `shape_face_emoji_test.gd` checks 3D layers, selectable presets and
   blinking. The 005 browser tests check descriptive IDs and new parts in the 3D phone view.
   Run `shape_face_3d_visual_check.gd` without `--headless` for front, three-quarter and blink
@@ -257,9 +257,9 @@ start only what they need, so they stay fast.
   The Tilt Shift 3D browser journey uses a synthetic wake lock across preparation, gameplay
   and lobby return. It does not prove the physical phone avoids automatic screen lock.
 - Traffic and coordination costs are described in
-  [flow tuning](../../../minigames/005_3d_tilt_shift/tuning/FLOW.md); motion and physics measurement
-  boundaries are in [MOTION.md](../../../minigames/005_3d_tilt_shift/tuning/MOTION.md#measurement-boundaries)
-  and [PHYSICS.md](../../../minigames/005_3d_tilt_shift/tuning/PHYSICS.md#measurement).
+  [[005 Flow Tuning|flow tuning]]; motion and physics measurement
+  boundaries are in [[005 Motion Tuning#Measurement boundaries|MOTION.md]]
+  and [[005 Physics and Delivery#Measurement|PHYSICS.md]].
 - `E2E_WINDOWED=1` enables real-host captures for those scenarios. It does not supply
   physical-phone evidence. The quick Tilt Shift 3D fixture maps two eight-second rounds;
   Bubbles and jellyfishes 3D, when run with `E2E_FLAKY=1`, keeps its quick/full behavior.

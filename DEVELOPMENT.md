@@ -22,11 +22,11 @@ none of them needs the others first.
 | LAN, firewall, the host's network settings | [docs/networking.md](KnowledgeBase/Notebook/Host%20and%20Session/Networking.md) |
 | HTTPS for test phones | [docs/local-https.md](KnowledgeBase/Notebook/Phone%20Client/Local%20HTTPS.md) |
 | The Windows package | [docs/standalone-build.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Standalone%20Build.md) |
-| Tuning values | [Tuning/README.md](Tuning/README.md) |
-| Tilt Shift 3D editor workshop | [the workshop guide](minigames/005_3d_tilt_shift/tuning/WORKSHOP.md) |
-| Cubio art source and export | [art/cubio/README.md](art/cubio/README.md) |
-| Bubbles and jellyfishes 3D art source and runtime assets | [art/bubbles_3d/README.md](art/bubbles_3d/README.md) |
-| Tilt Shift 3D art source and runtime assets | [art/tilt_shift_3d/README.md](art/tilt_shift_3d/README.md) |
+| Tuning values | [Tuning/README.md](KnowledgeBase/Notebook/Workshops%20and%20Tuning/Tuning%20Presets.md) |
+| Tilt Shift 3D editor workshop | [the workshop guide](KnowledgeBase/Notebook/Minigames/005%20Tilt%20Shift/005%20Workshop.md) |
+| Cubio art source and export | [art/cubio/README.md](KnowledgeBase/Notebook/Art%20Pipeline/Cubio%20Source%20and%20Export.md) |
+| Bubbles and jellyfishes 3D art source and runtime assets | [art/bubbles_3d/README.md](KnowledgeBase/Notebook/Minigames/004%20Bubbles%20and%20Jellyfishes/004%20Art%20Assets.md) |
+| Tilt Shift 3D art source and runtime assets | [art/tilt_shift_3d/README.md](KnowledgeBase/Notebook/Minigames/005%20Tilt%20Shift/005%20Art%20Assets.md) |
 
 [README.md](README.md) covers what to install and how to play.
 [AGENTS.md](AGENTS.md) covers how to work on the project.

@@ -1,4 +1,14 @@
+---
+area: Minigames
+tags: [system, stub]
+code: [RoundedBar]
+verified:
+branch:
+---
+
 # Tilt Shift 3D physics and delivery
+
+Hub: [[005 Tilt Shift]].
 
 The selected rules profile references `Physics.tres`. These values drive the same arena for
 runtime and the workshop preview. Duplicate the profile for experiments, select it through the
@@ -69,5 +79,5 @@ speed it closed in at, which the faces use; it never changes a score.
 `tests/tilt_shift_3d_rotation_contact_test.gd` turns a paddle through full turns against a
 resting ball and requires less than half a ball radius of transient penetration.
 `tests/tilt_shift_3d_physics_cost_check.gd` and `tests/tilt_shift_3d_performance_check.gd`
-measure the arena and the shared screen; [verification](../../../KnowledgeBase/Notebook/Tooling%20and%20Verification/Verification.md) names
+measure the arena and the shared screen; [[Verification|verification]] names
 the commands.

@@ -1,4 +1,14 @@
+---
+area: Minigames
+tags: [system, stub]
+code: []
+verified:
+branch:
+---
+
 # Tilt Shift 3D motion tuning
+
+Hub: [[005 Tilt Shift]].
 
 The selected `TiltShift3DTuning.motion` profile controls calibrated phone tilt. Its values
 are copied at preparation; changes apply to a later control session.
@@ -14,7 +24,7 @@ are copied at preparation; changes apply to a later control session.
 | Continuity gap | 250 | Milliseconds, 34–1000 | Longer intervals are marked resumed, not observed continuous paths. |
 
 No extra smoothing is applied. These are provisional trial values, not owner feel approval.
-The arena's [physical limits](PHYSICS.md) still constrain how fast colliders can follow
+The arena's [[005 Physics and Delivery|physical limits]] still constrain how fast colliders can follow
 targets. High gain does not bypass those limits or certify faster contacts.
 
 ## Gesture and calibration

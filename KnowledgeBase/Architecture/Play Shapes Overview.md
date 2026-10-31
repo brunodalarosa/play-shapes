@@ -58,4 +58,4 @@ the tests and the tooling.
 - [README.md](../../README.md): what to install and how to play.
 - [AGENTS.md](../../AGENTS.md): how to work on the project.
 - [DEVELOPMENT.md](../../DEVELOPMENT.md): the table of development documents.
-- [Tuning/README.md](../../Tuning/README.md): tuning values.
+- [[Tuning Presets|Tuning/README.md]]: tuning values.

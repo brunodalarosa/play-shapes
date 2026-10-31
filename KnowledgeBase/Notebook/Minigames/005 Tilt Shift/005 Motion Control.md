@@ -25,7 +25,7 @@ receive the same target. The existing physical limiter determines their confirme
 Control uses the direction of world up projected into the physical screen plane. Clockwise
 rotation as seen by the holder maps to clockwise rotation on screen. Yaw and display autorotation
 alone do not change the phase. Repeated sampled turns accumulate without a rotation stop.
-See [the tuning guide](../../../../minigames/005_3d_tilt_shift/tuning/MOTION.md).
+See [[005 Motion Tuning|the tuning guide]].
 
 Complete, fresh orientation is required. Unknown permission may be proven usable by samples;
 denied, unavailable, unsupported, insecure, missing and partial orientation remain distinct.

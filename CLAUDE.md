@@ -54,7 +54,7 @@ Sources:
   and two feet, standing 2.62 m tall. Joins send `character_shape: "cubio"`, the only body.
 - Source: `art/cubio/cubio-animated.blend`, scene `Cubio Animation Studio`, rig
   `Animation.Controls` with five controls, actions Idle, Walk, Run, Look Up, Crouch and
-  Lever Pull at 24 fps. See [the Cubio README](art/cubio/README.md).
+  Lever Pull at 24 fps. See [the Cubio README](KnowledgeBase/Notebook/Art%20Pipeline/Cubio%20Source%20and%20Export.md).
 - Runtime: `assets/runtime/animated_characters/cubio/model/cubio.glb`, played by
   `characters/cubio_3d.tscn` (`Cubio3D`), tinted body, hands and feet. Its face is a
   `ShapeFace3D` on the model's `FaceAnchor`, placed by `cubio/face_anchor.json`, on host and
@@ -65,7 +65,7 @@ Sources:
 
 - `art/playground_plaza/`: an authored café, billboard, table and rooftop logo sign (Blender
   sources, verified GLBs) plus KayKit glTF props (CC0). Runtime copies are in
-  `assets/runtime/playground_plaza/`. See [the plaza README](art/playground_plaza/README.md).
+  `assets/runtime/playground_plaza/`. See [the plaza README](KnowledgeBase/Notebook/Art%20Pipeline/Plaza%20Assets.md).
 - `art/` carries `.gdignore`, and the export filter excludes `art/**`.
 - One world unit is one character height. GLBs are Y up with facades facing −Z.
 - The table's pack-specific license is unresolved

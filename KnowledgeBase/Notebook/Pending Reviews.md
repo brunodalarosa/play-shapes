@@ -30,7 +30,7 @@ removes it. The evidence labels are defined in
   Owner decision whether this replaces true depth layering.
 - `[PHYSICAL-PHONE]` Scanning the billboard QR from the couch at real viewing distance, now
   that it fills the display.
-- Owner visual review of the café [logo sign](../../art/playground_plaza/logo_sign/README.md) at
+- Owner visual review of the café [[Plaza Logo Sign|logo sign]] at
   the real camera: letter depth, cream backing, posts, and characters on the roof in front.
 - `[PHYSICAL-PHONE]` The installed app icon with the stacked logo at Home Screen size.
 - `[HUMAN-PLAY]` The workshop: change a value, see it, save a preset, use it in the game and
@@ -56,7 +56,7 @@ removes it. The evidence labels are defined in
 ## Playground plaza billboard
 
 - Owner visual approval of the
-  [billboard source and previews](../../art/playground_plaza/billboard/README.md):
+  [[Plaza Billboard|billboard source and previews]]:
   square display, frame proportions, grounded support silhouette and low-poly finish.
   Automated source/export checks and Blender renders do not establish creative approval.
 - After separate scene integration, `[GODOT-RUNTIME]` materials, display mapping and high,
@@ -66,7 +66,7 @@ removes it. The evidence labels are defined in
 
 ## Playground plaza cafe
 
-- Owner visual approval of the [cafe source and preview renders](../../art/playground_plaza/cafe/README.md):
+- Owner visual approval of the [[Plaza Cafe|cafe source and preview renders]]:
   facade and cup readability, flat roof silhouette, shallow decorative trim and low-poly finish.
   Automated source/export checks and Blender renders do not establish creative approval.
 - After separate scene integration, `[GODOT-RUNTIME]` material and final-camera inspection,
@@ -99,7 +99,7 @@ removes it. The evidence labels are defined in
 ## Bubbles and jellyfishes 3D models
 
 - Owner approval of the jellyfish and pufferfish look from the review renders that
-  `render_review.py` in [art/bubbles_3d](../../art/bubbles_3d/README.md) writes: the reshaped
+  `render_review.py` in [[004 Art Assets|art/bubbles_3d]] writes: the reshaped
   bell, the curled tentacles, the pufferfish face, spikes and fins.
 - Owner review of both creatures and the recoloured props in the running scene. Captures from
   `bubbles_3d_scene_visual_check.gd` are in `test-results/bubbles-3d/`.
@@ -110,11 +110,11 @@ removes it. The evidence labels are defined in
 - Physical-phone readability of the emoji presets when selected in a test profile remains
   unverified; desktop browser checks only establish composition and loading.
 - Owner approval of the face presets from the review sheets that `export_faces.mjs --review` in
-  [art/shape_characters_face_system_assets](../../art/shape_characters_face_system_assets/README.md)
+  [[Shape Face Parts|art/shape_characters_face_system_assets]]
   writes: all twelve at 1× beside their reference faces, and at 8×, drawn from the exported
   parts and the manifest.
 - Owner approval of the bin from the renders that `render_review.py` in
-  [art/tilt_shift_3d](../../art/tilt_shift_3d/README.md) writes: openings of 0.10, 0.20 and 0.40
+  [[005 Art Assets|art/tilt_shift_3d]] writes: openings of 0.10, 0.20 and 0.40
   arena widths in orange, blue and grey, and heights of 0.75 and 2 times.
 - The faces and bins in the running scene are reviewed with minigame 005.
 
@@ -160,7 +160,7 @@ removes it. The evidence labels are defined in
   squash, the countdown and result faces, and whether 150°/s triggers dizziness too often.
 - `[HUMAN-PLAY]` Names: five seconds and the fade; overlap when two paddles sit close.
 - `[HUMAN-PLAY]` Layout spacing after the thicker paddles and raised floor, and every
-  starting value in [the tuning guide](../../minigames/005_3d_tilt_shift/tuning/README.md).
+  starting value in [[005 Tuning|the tuning guide]].
 - `[PHYSICAL-PHONE]` On the iPhone Safari and Android Chrome pair: normal lobby Start showing
   shared preparation, portrait blocking and revoking READY, both landscape holds permitting
   READY, rotation lock guidance, comfortable sideways neutral, mirrored tilts, repeated full
@@ -281,7 +281,7 @@ device.
 
 - Owner visual approval of the two-metre cube, small bevel and existing floating limbs, at
   lobby and Bubbles gameplay distances and in the live Ready-screen tray.
-  Source renders are in [the Cubio folder](../../art/cubio/README.md).
+  Source renders are in [[Cubio Source and Export|the Cubio folder]].
 - `[HUMAN-PLAY]` Existing idle, walk, run, look-up, crouch and lever-pull motion on the deeper
   body, plus lobby movement, jumps and readability with ten players.
 - `[PHYSICAL-PHONE]` Android Chrome and iPhone Safari: live setup preview, selected color,
