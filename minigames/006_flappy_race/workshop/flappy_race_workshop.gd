@@ -27,6 +27,7 @@ const SETUPS: Array[String] = [
 	"One far behind",
 	"Leader near finish",
 	"Out of hearts",
+	"Podium",
 ]
 ## Obstacles between racers in Spread pack.
 const SPREAD_OBSTACLES := 4
@@ -119,6 +120,11 @@ func restart(setup := "", pack_at := -1) -> void:
 	_status.text = "Seed %d%s" % [seed_value, "" if setup.is_empty() else " · " + setup]
 
 
+func _end_race() -> void:
+	if controller != null:
+		controller.end_now()
+
+
 func new_seed() -> void:
 	seed_value = randi()
 	_seed_field.set_value_no_signal(seed_value)
@@ -184,6 +190,8 @@ func _place(participants: Array[Dictionary], setup: String, pack_at: int) -> voi
 				obstacle = -1 if behind else FAR_BEHIND_OBSTACLES
 			"Leader near finish":
 				obstacle = count - NEAR_FINISH_OBSTACLES - index * SPREAD_OBSTACLES
+			"Podium":
+				obstacle = count - 1 - index
 			"Out of hearts":
 				full = 0
 		if obstacle >= 0 or full != hearts:
@@ -274,6 +282,7 @@ func _build_flow() -> void:
 	)
 	restart_button.theme_type_variation = &"FilledButton"
 	_add_button(course_row, "New course", _on_new_course, "A new seed")
+	_add_button(course_row, "End race", _end_race, "Rank everyone now and show the results")
 	course_row.add_child(_body_label("Seed"))
 	_seed_field.max_value = 4294967295
 	_seed_field.custom_minimum_size = Vector2(150, 0)

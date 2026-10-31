@@ -347,7 +347,17 @@ func _end_if_decided() -> void:
 			break
 	if open and settled_tick < _race_ticks:
 		return
+	_close_race()
 
+
+## Ends a running race at the settled tick, ranked as when the timer runs out. The workshop's
+## End race; a real race ends only by its own rules.
+func end_now() -> void:
+	if phase == Phase.RACING:
+		_close_race()
+
+
+func _close_race() -> void:
 	_ranking = rank(racers())
 	_transition(Phase.RESULTS)
 	set_process(false)

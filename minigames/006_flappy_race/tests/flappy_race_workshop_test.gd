@@ -1,8 +1,8 @@
 extends TestScript
 ## The Flappy Race workshop runs the real race: the designer and autopilots race, autopilots fly
 ## through the phone input path, a seed gives the same course as a normal race, quick setups
-## and the course strip place racers, live values reach the shared screen at once, and other
-## edits wait for a restart.
+## and the course strip place racers, End race shows the real results, live values reach the
+## shared screen at once, and other edits wait for a restart.
 
 const SCENE_PATH := "res://minigames/006_flappy_race/workshop/flappy_race_workshop.tscn"
 
@@ -73,10 +73,45 @@ func _check_setups(workshop: FlappyRaceWorkshop) -> void:
 	workshop.restart("Leader near finish")
 	var finish := workshop.controller.course.flight.finish_x
 	check(workshop.controller.racers()[0].distance() > finish * 0.9, "The leader nears the end")
+	workshop.restart("Podium")
+	var last := workshop.controller.course.flight.obstacles.size() - 1
+	var near := workshop.controller.course.flight.obstacles[last - 3].respawn_x
+	check(
+		workshop
+		.controller
+		.racers()
+		.all(
+			func(racer: FlappyRaceRacer) -> bool:
+				return racer.distance() >= near,
+		),
+		"Podium puts every racer among the last obstacles",
+	)
+	_check_end_race(workshop)
 	workshop.restart("", 30)
 	var spot := workshop.controller.course.flight.obstacles[30].respawn_x
 	for racer: FlappyRaceRacer in workshop.controller.racers():
 		check(is_equal_approx(racer.distance(), spot), "The course strip moves the pack")
+
+
+func _check_end_race(workshop: FlappyRaceWorkshop) -> void:
+	var race := workshop.controller
+	race.end_now()
+	check(race.phase == FlappyRaceController.Phase.COUNTDOWN, "End race waits for the race to run")
+	var go := Time.get_ticks_msec() + race.countdown_remaining_msec() + 50
+	race.advance(go)
+	race.end_now()
+	var ranking := race.ranking()
+	var furthest_first := true
+	for index: int in ranking.size() - 1:
+		furthest_first = (
+			furthest_first and ranking[index].distance() >= ranking[index + 1].distance()
+		)
+	check(
+		race.phase == FlappyRaceController.Phase.RESULTS and ranking.size() == 4 and furthest_first,
+		"End race ranks everyone by distance and shows the results",
+	)
+	workshop.presentation.draw_frame(0.0)
+	check(workshop.presentation.results_shown(), "The workshop shows the real results panel")
 
 
 func _check_live_and_restart(workshop: FlappyRaceWorkshop) -> void:
