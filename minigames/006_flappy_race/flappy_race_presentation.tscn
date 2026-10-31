@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://minigames/006_flappy_race/flappy_race_presentation.gd" id="1_present"]
 [ext_resource type="Script" path="res://components/race_camera/race_camera_3d.gd" id="2_camera"]
@@ -12,6 +12,17 @@ background_color = Color(0.56, 0.82, 0.83, 1)
 ambient_light_source = 2
 ambient_light_color = Color(1, 0.96, 0.88, 1)
 ambient_light_energy = 0.7
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_results"]
+content_margin_left = 28.0
+content_margin_top = 22.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+bg_color = Color(0.2, 0.14, 0.09, 0.82)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [node name="FlappyRacePresentation" type="Control"]
 layout_mode = 3
@@ -111,3 +122,46 @@ theme_override_constants/outline_size = 28
 theme_override_font_sizes/font_size = 220
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Results" type="PanelContainer" parent="Hud"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -600.0
+offset_top = 104.0
+offset_right = -24.0
+offset_bottom = 104.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_results")
+
+[node name="Column" type="VBoxContainer" parent="Hud/Results"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Hud/Results/Column"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.953, 0.796, 1)
+theme_override_colors/font_outline_color = Color(0.42, 0.3, 0.17, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/font_size = 44
+text = "Results"
+horizontal_alignment = 1
+
+[node name="ResultRows" type="VBoxContainer" parent="Hud/Results/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="Best" type="Label" parent="Hud/Results/Column"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.84, 0.4, 1)
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1

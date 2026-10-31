@@ -155,9 +155,6 @@ func _results() -> Array[Dictionary]:
 	var results: Array[Dictionary] = []
 	for index: int in controller.ranking().size():
 		var racer := controller.ranking()[index]
-		var finish_msec := -1
-		if racer.finished():
-			finish_msec = roundi(racer.finish_tick * 1000.0 / FlappyFlightTuning.TICK_RATE)
 		results.append(
 			{
 				"player_id": racer.player_id,
@@ -165,7 +162,7 @@ func _results() -> Array[Dictionary]:
 				"character_color": racer.character_color,
 				"place": index + 1,
 				"finished": racer.finished(),
-				"finish_msec": finish_msec,
+				"finish_msec": racer.finish_msec(),
 				"distance": racer.distance(),
 				"dnf": racer.dnf,
 			}

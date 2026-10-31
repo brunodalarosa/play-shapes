@@ -3,7 +3,8 @@ extends TestScript
 ## behind become bubbles and return when caught up, overlapping Cubios dither, names fade,
 ## places show, a hit tumbles and then waits behind a floating heart, a disconnected Cubio
 ## greys, pickups burst, the countdowns read right, finishers teleport to the podium and the
-## results stand everyone on it with the camera on the podium. Also measures a frame with ten
+## results stand everyone on it with the camera on the podium beside a panel of places, times
+## and distances, with the session's best for a single player. Also measures a frame with ten
 ## players.
 
 const SCENE: PackedScene = preload("res://minigames/006_flappy_race/flappy_race_presentation.tscn")
@@ -25,6 +26,8 @@ const GO_MSEC := 4000
 
 var _controller: FlappyRaceController
 var _presentation: FlappyRacePresentation
+var _solo_best := -1
+var _first_msec := -1
 
 
 func _run() -> void:
@@ -41,7 +44,13 @@ func _run() -> void:
 	_check_frozen_and_burst()
 	_check_last_seconds()
 	_check_podium()
+	_check_results_panel()
 	_close()
+
+	for race: int in 2:
+		await _open(1, tuning)
+		_check_solo_best(race)
+		_close()
 
 	await _open(10, tuning)
 	_measure_frame()
@@ -225,6 +234,63 @@ func _check_podium() -> void:
 		shown.encloses(area) and shown.end.x > area.end.x + shown.size.x * 0.3,
 		"The camera frames the podium and leaves the right of the screen for the results",
 	)
+
+
+func _check_results_panel() -> void:
+	var lines := _presentation.result_lines()
+	var order := _controller.ranking()
+	check(_presentation.results_shown() and lines.size() == 4, "The results list every player")
+	var winner := order[0]
+	check(
+		lines[0]
+		== "1st %s %s"
+		% [winner.display_name, FlappyRacePresentation.race_time(winner.finish_msec())],
+		"A finisher's row shows the place, name and finish time",
+	)
+	var last := order[3]
+	var reached := "%d m" % floori(last.distance())
+	check(
+		lines[3] == "4th %s %s" % [last.display_name, reached],
+		"A player still racing shows the distance reached",
+	)
+	check(_presentation.best_text() == "", "Several players see no session best")
+
+
+## A single player finishes [param race] twice in a row; the second sees the better of the two.
+func _check_solo_best(race: int) -> void:
+	var racer := _controller.racer_for("p0")
+	# The second race finishes half a second later, so its best is the first race's time.
+	_settle(1 + race * 30)
+	racer.state.invulnerable_ticks = 100000
+	racer.state.x = _controller.course.flight.finish_x - 0.1
+	racer.state.y = 12.0
+	# As FlappyRace does: the best is kept when the results come, before they are drawn.
+	_controller.race_event.connect(
+		func(kind: StringName, _player_id: String, _data: Dictionary) -> void:
+			if kind == &"results":
+				_solo_best = FlappyRace.record(_solo_best, racer.finish_msec())
+				_presentation.session_best_msec = _solo_best,
+	)
+	_settle(_controller.settled_tick + 2)
+	check(_controller.phase == FlappyRaceController.Phase.RESULTS, "A lone finisher ends the race")
+	var time := FlappyRacePresentation.race_time(racer.finish_msec())
+	check(
+		_presentation.result_lines()[0] == "1st Player 1 %s" % time,
+		"A single player sees their finish time",
+	)
+	var best := FlappyRacePresentation.race_time(
+		mini(_first_time(racer, race), racer.finish_msec())
+	)
+	check(
+		_presentation.best_text() == "Best this session %s" % best,
+		"Race %d shows the best time of the session" % (race + 1),
+	)
+
+
+func _first_time(racer: FlappyRaceRacer, race: int) -> int:
+	if race == 0:
+		_first_msec = racer.finish_msec()
+	return _first_msec
 
 
 func _on_spot(visual: FlappyRacePresentation.RacerVisual, place: int) -> bool:

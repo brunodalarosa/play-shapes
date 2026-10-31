@@ -18,6 +18,7 @@ const GO_SECONDS := 0.6
 const BURST_DROPS := 10
 const BURST_REACH := 1.8
 const PUFF_SPARKS := 28
+const RESULT_CHIP := Vector2(26.0, 26.0)
 ## Visible height the camera keeps at least while it frames the podium, m.
 const RESULTS_VIEW_HEIGHT := 18.0
 
@@ -54,6 +55,8 @@ var controller: FlappyRaceController
 var followed_id := ""
 ## False leaves the camera where someone else puts it.
 var frames_camera := true
+## The best finish time of this session, ms, shown under a single player's results; -1 for none.
+var session_best_msec := -1
 var _visuals: Array[RacerVisual] = []
 var _by_id: Dictionary[String, RacerVisual] = { }
 var _leader := Vector2.ZERO
@@ -68,6 +71,9 @@ var _framed := false
 @onready var _labels: Control = %Labels
 @onready var _timer: Label = %Timer
 @onready var _cue: Label = %Cue
+@onready var _results: PanelContainer = %Results
+@onready var _result_rows: VBoxContainer = %ResultRows
+@onready var _best: Label = %Best
 
 
 func _ready() -> void:
@@ -126,6 +132,33 @@ func cue_text() -> String:
 	return _cue.text
 
 
+## m:ss.hh, as the phone shows a finish time.
+static func race_time(msec: int) -> String:
+	var seconds := floori(msec / 1000.0)
+	var hundredths := floori((msec % 1000) / 10.0)
+	return "%d:%02d.%02d" % [floori(seconds / 60.0), seconds % 60, hundredths]
+
+
+## Each row's place, name and finish time, distance or DNF, as the results panel shows them.
+func result_lines() -> PackedStringArray:
+	var lines := PackedStringArray()
+	for row: Node in _result_rows.get_children():
+		var texts := PackedStringArray()
+		for cell: Node in row.get_children():
+			if cell is Label:
+				texts.append((cell as Label).text)
+		lines.append(" ".join(texts))
+	return lines
+
+
+func best_text() -> String:
+	return _best.text if _best.visible else ""
+
+
+func results_shown() -> bool:
+	return _results.visible
+
+
 ## 1st, 2nd, 3rd, 4th, ..., 11th, 12th, 13th, ..., 21st.
 static func ordinal(place: int) -> String:
 	var tens := place % 100
@@ -160,6 +193,8 @@ func draw_frame(delta: float) -> void:
 	_dither_overlaps()
 	_show_bubbles()
 	_draw_hud(now)
+	if results and not _results.visible:
+		_show_results()
 	for visual: RacerVisual in _visuals:
 		visual.name_label.follow()
 		visual.badge.follow()
@@ -531,6 +566,56 @@ func _burst(at: Vector3, color: Color) -> void:
 		tween.tween_property(mesh, "position", reach, seconds).set_ease(Tween.EASE_OUT)
 		tween.tween_property(mesh, "scale", Vector3.ONE * 0.05, seconds)
 		tween.chain().tween_callback(mesh.queue_free)
+
+
+## Fills the results panel from the final ranking, once, as the race ends.
+func _show_results() -> void:
+	for row: Node in _result_rows.get_children():
+		row.queue_free()
+	var order := controller.ranking()
+	for index: int in order.size():
+		_result_rows.add_child(_result_row(order[index], index + 1))
+	var solo := order.size() == 1
+	_best.visible = solo and session_best_msec >= 0
+	_best.text = "Best this session %s" % race_time(session_best_msec)
+	_results.visible = true
+
+
+func _result_row(racer: FlappyRaceRacer, place: int) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 14)
+	var place_label := _result_label(ordinal(place), 30)
+	place_label.custom_minimum_size.x = 64.0
+	row.add_child(place_label)
+	var chip := PanelContainer.new()
+	var swatch := StyleBoxFlat.new()
+	swatch.bg_color = Color.html(racer.character_color)
+	swatch.set_corner_radius_all(6)
+	chip.add_theme_stylebox_override("panel", swatch)
+	chip.custom_minimum_size = RESULT_CHIP
+	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(chip)
+	var name_label := _result_label(racer.display_name, 30)
+	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	row.add_child(name_label)
+	var detail := "DNF"
+	if racer.finished():
+		detail = race_time(racer.finish_msec())
+	elif not racer.dnf:
+		detail = "%d m" % floori(racer.distance())
+	var detail_label := _result_label(detail, 30)
+	detail_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	row.add_child(detail_label)
+	return row
+
+
+func _result_label(text: String, size: int) -> Label:
+	var label := Label.new()
+	label.text = text
+	label.add_theme_font_size_override("font_size", size)
+	label.add_theme_color_override("font_color", Color("#fff3cb"))
+	return label
 
 
 ## A one-shot spray of sparks in [param color] at [param at], where a Cubio teleports.

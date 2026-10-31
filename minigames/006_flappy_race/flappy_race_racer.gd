@@ -36,6 +36,13 @@ func racing() -> bool:
 
 
 ## How far along the course the player is; a waiting player counts at the respawn spot.
+## Race time from GO to crossing the finish line, ms; -1 before finishing.
+func finish_msec() -> int:
+	if not finished():
+		return -1
+	return roundi(finish_tick * 1000.0 / FlappyFlightTuning.TICK_RATE)
+
+
 func distance() -> float:
 	return state.x
 
