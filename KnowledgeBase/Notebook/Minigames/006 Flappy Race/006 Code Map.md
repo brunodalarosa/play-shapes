@@ -33,7 +33,7 @@ The host runs and draws the whole race on a placeholder course; each phone flies
   ([[0048-predicted-input-carries-a-tick|0048]]), finishing, the timer, freezing on
   disconnect, DNF and the ranking ([[0050-random-order-for-exact-ties|0050]]).
 - `flappy_race_protocol.gd` turns taps into controller calls and sends each phone its course,
-  its settled flight and its events. See [[006 Messages|protocol.md]].
+  its settled flight and its events. See [[006 Messages]].
 - `flappy_race_course.gd` (`FlappyRaceCourse`) generates the seeded course on the host: obstacle
   pairs, respawn spots, pickups and each ground half's look, following difficulty `Curve`s over
   course progress. Its `to_dictionary` is what phones receive.

@@ -31,4 +31,4 @@ calibration protection and participant-panel rules remain.
 - Losing landscape eligibility while waiting clears READY. This does not change physical
   tilt interpretation, scoring or an already-started countdown.
 - Plans that bypass the screen in normal play must flag the conflict conspicuously.
-  [Player journeys](../../../docs/player-journeys.md) defines the warning and design-reading guidance.
+  [[Journey Change Rules|Player journeys]] defines the warning and design-reading guidance.

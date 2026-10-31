@@ -13,7 +13,7 @@ Hub: [[Phone Client]].
 How to give the host a certificate that controlled test phones trust, so phone sensors work
 over the LAN. It is for the owners' and developers' own phones; it is not a way to bring
 guests in without certificates. How the host uses the certificate is in
-[[Networking#HTTPS and WSS|networking.md]].
+[[Networking#HTTPS and WSS]].
 
 Everything needed for play is served on the LAN. Internet is needed only once, to download
 the certificate tool. Testing uses **Chrome on iPhone and Android**.

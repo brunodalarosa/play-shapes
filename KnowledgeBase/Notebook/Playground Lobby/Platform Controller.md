@@ -300,4 +300,4 @@ Godot tests:
 - `platform_lobby_boundary_test.gd`: the real Playground adapter.
 
 A desktop viewport cannot show touch latency or ergonomics. What still needs a real phone is
-in [[Pending Reviews|pending-reviews.md]].
+in [[Pending Reviews]].

@@ -43,12 +43,12 @@ repository.
 - The Flappy Race workshop, `minigames/006_flappy_race/workshop/flappy_race_workshop.tscn`,
   runs on its own with F6. Fly through its phone view beside autopilots, edit the Tunables,
   press R to restart with them, then save the preset and use it in the game. See
-  [Minigame workshops](../../docs/game-design-documents/Minigame%20workshops.md).
+  [[Minigame Workshops|Minigame workshops]].
 - The host defaults to a responsive 1920×1080 GL Compatibility presentation.
 - **Project > Tools > Build Standalone Host** creates a portable Windows x86_64 release ZIP.
   There is no Linux build.
 
-What still needs a person's review is listed in [[Pending Reviews|pending-reviews.md]].
+What still needs a person's review is listed in [[Pending Reviews]].
 
 ## Where things are
 

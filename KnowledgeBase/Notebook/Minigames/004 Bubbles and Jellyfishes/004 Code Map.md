@@ -54,4 +54,4 @@ with plane-locked bodies ([[0034-bubbles-3d-jolt-plane|decision 0034]]).
   register `Bubbles3DProtocol` for the round and step both arenas each physics frame.
 - `bubbles_3d_protocol.gd` validates touches and releases, times holds on the host and pushes
   snapshots, feedback and visuals. The messages are in
-  [[004 Messages|protocol.md]].
+  [[004 Messages]].

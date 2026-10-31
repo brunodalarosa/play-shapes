@@ -29,8 +29,8 @@ selected Resources are in the [field guide](../../../../minigames/005_3d_tilt_sh
   lifecycle; each `TiltShift3DTiltInput` holds one player's neutral and continuous input. See
   [[005 Motion Control|motion input]].
 - `tilt_shift_3d_session.gd` is the catalog's session script; `tilt_shift_3d_protocol.gd` is a
-  `MinigameProtocol`. The messages are in [[005 Messages|protocol.md]].
+  `MinigameProtocol`. The messages are in [[005 Messages]].
 - `addons/tilt_shift_3d_workshop/` is its editor workshop
   ([workshop guide](../../../../minigames/005_3d_tilt_shift/tuning/WORKSHOP.md)), and
   `debug/tilt_shift_3d_review.tscn` is its simulated F12 review. See
-  [player journeys](../../../../docs/player-journeys.md).
+  [[Journey Change Rules|player journeys]].

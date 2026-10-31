@@ -10,7 +10,7 @@ Decided by the owner on 2026-10-28, for every minigame workshop.
 ## Situation
 
 The first workshop used Godot's default controls, which the owner found unpleasant and unlike
-the mockups of [Minigame workshops](../../../docs/game-design-documents/Minigame%20workshops.md). Godot
+the mockups of [[Minigame Workshops|Minigame workshops]]. Godot
 styles every control through a theme, so any design system can be applied without engine
 changes. The owner chose Google's Material Design 3.
 

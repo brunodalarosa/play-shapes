@@ -25,5 +25,5 @@ blur, rotation, fullscreen or viewport changes.
 The renderer loads on the first game snapshot, including resumed gameplay. Lobby return
 or another screen disposes it. Rendering pauses while hidden and caps device pixel ratio
 at two. If WebGL or model loading fails, the count remains readable above a flat circle in
-the player's color, sized by the host radius. See [[Browser Build|browser-build.md]] for the
+the player's color, sized by the host radius. See [[Browser Build]] for the
 separate bundle.

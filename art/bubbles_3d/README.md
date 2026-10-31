@@ -1,8 +1,8 @@
 # Bubbles and jellyfishes 3D assets
 
 Source models for minigame 004. The
-[asset sources guide](../../docs/game-design-documents/Minigames/004/004%20-%20Asset%20sources.md)
-decides each source and change; [scene composition](../../docs/game-design-documents/Minigames/004/004%20-%20Scene%20composition.md)
+[asset sources guide](../../KnowledgeBase/Notebook/Minigames/004%20Bubbles%20and%20Jellyfishes/004%20Asset%20Sources.md)
+decides each source and change; [scene composition](../../KnowledgeBase/Notebook/Minigames/004%20Bubbles%20and%20Jellyfishes/004%20Scene%20Composition.md)
 decides placement. Nothing here is used by a scene yet; [pending reviews](../../KnowledgeBase/Notebook/Pending%20Reviews.md)
 lists what still needs the owner.
 

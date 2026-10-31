@@ -66,7 +66,7 @@ Rules when changing it:
 
 Editor and runtime checks do not prove a package. Smoke the exported executable without Godot
 or Node: the lobby, the HTTP routes, the WebSocket, and a browser connection. The automated
-export tests are in [[Verification#Export tests|verification.md]].
+export tests are in [[Verification#Export tests]].
 
 ## How the builder runs
 

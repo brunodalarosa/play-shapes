@@ -11,7 +11,7 @@ branch:
 Hub: [[Notebook]].
 
 Which script or scene owns what. Use it to find where a behavior lives before changing it.
-Messages and limits are in [[Message Protocol|protocol.md]].
+Messages and limits are in [[Message Protocol]].
 
 ## Boot and host services
 
@@ -77,7 +77,7 @@ Messages and limits are in [[Message Protocol|protocol.md]].
 ## Platform movement
 
 The reusable parts behind the lobby characters. Setup and reuse are in
-[[Platform Controller#Host components and platform setup|platform-phone-controller.md]].
+[[Platform Controller#Host components and platform setup]].
 
 - `PlatformMotor` exposes speed, acceleration, gravity, jump impulse, player bounce, run
   threshold, input lease, fall-reset height and drop timing in its Inspector.
@@ -99,12 +99,12 @@ The reusable parts behind the lobby characters. Setup and reuse are in
   `bubbles_3d_pre_minigame_content.tres`, in the minigame's folder, and a four-player gameplay
   capture in `assets/runtime/minigames/bubbles_3d/bubbles_3d_preview.png`.
 - Every normal catalog launch uses this screen. Journey requirements and plan warnings are
-  in [player journeys](../../docs/player-journeys.md).
+  in [[Journey Change Rules|player journeys]].
 
 ## Minigame workshops
 
 The shared parts of every workshop live in `workshop/`, outside any minigame folder, as
-[Minigame workshops](../../docs/game-design-documents/Minigame%20workshops.md) designs them. Workshops and
+[[Minigame Workshops|Minigame workshops]] designs them. Workshops and
 `workshop/` are left out of the exported game.
 
 - `workshop_window.gd` (`WorkshopWindow`) is the window: the top bar and the four panels. A
@@ -200,14 +200,14 @@ These live outside any minigame folder so later 3D scenes can use them.
   join colour, plays each clip once with pause, restart, stop and speed, and picks any face.
 - The lab's Face tab toggles blinking and moves and scales the face. Save writes the placement
   to Cubio's `face_anchor.json`, the game's default, which an export cannot write.
-- The motion lab is described in [[Motion Input|motion-input.md]].
+- The motion lab is described in [[Motion Input]].
 
 ## Phone client
 
 - `web/src/` is the TypeScript source. The build bundles it into one script,
   `web/public/app.js`, which is committed and served by Godot with the page, the styles and
   the icons beside it. Normal play needs neither Node nor Internet. See
-  [[Browser Build|browser-build.md]].
+  [[Browser Build]].
 - The phone onboarding keeps the socket available while players choose a Cubio color and
   enter a name. The host creates the player record only on the final join submission.
 - Ordinary ready-up shows one host-confirmed READY/CANCEL toggle. Preview and instructions
@@ -225,7 +225,7 @@ These live outside any minigame folder so later 3D scenes can use them.
   cached with gameplay's assets. Hidden setup screens release their renderer.
 - `web/src/screen_wake_lock.ts` owns one visible-page wake lock across every phone screen,
   independent of the active minigame or socket. It adds no host state or messages.
-- What the phone screens do is in [[Phone Web App|phone-client.md]].
+- What the phone screens do is in [[Phone Web App]].
 
 ## Assets, addons and tests
 

@@ -1,7 +1,7 @@
 ---
 tags: [architecture]
 level: implementation
-parent: "[[Minigames Design]]"
+parent: "[[Minigame Contract]]"
 status: draft
 code: []
 verified:

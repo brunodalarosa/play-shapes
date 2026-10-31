@@ -13,7 +13,7 @@ Hub: [[Phone Client]].
 How the phone's gyroscope and accelerometer readings reach the host, the units they use,
 the F12 lab that displays them, and Tilt Shift 3D's calibrated control consumer.
 Capture runs only for a host-selected consumer. Phone browsers expose these sensors only
-over HTTPS; see [[Local HTTPS|local-https.md]].
+over HTTPS; see [[Local HTTPS]].
 
 ## On the phone
 
@@ -132,4 +132,4 @@ open the lab, and tap **Request Motion Permission** on that phone. Then check:
   both phones. Check the desktop no-sensor fallback separately.
 
 Record each result with the browser and device versions. The tests for this area are listed
-in [[Verification#Focused checks by area|verification.md]].
+in [[Verification#Focused checks by area]].

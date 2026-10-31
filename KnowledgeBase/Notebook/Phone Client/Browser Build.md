@@ -11,7 +11,7 @@ branch:
 Hub: [[Phone Client]].
 
 How the phone client's TypeScript becomes the scripts the host serves. What the phone
-screens do is in [[Phone Web App|phone-client.md]].
+screens do is in [[Phone Web App]].
 
 ## Building
 
@@ -67,4 +67,4 @@ reached only from that entry; the app shares its interfaces through type-only im
 The host serves `/three_view.js` and the model files separately. Phone code that 3D and flat
 drawings share, such as `web/src/shape_paddle/`, stays in `/app.js`.
 
-The other routes the host serves are in [[Message Protocol#HTTP routes|protocol.md]].
+The other routes the host serves are in [[Message Protocol#HTTP routes]].

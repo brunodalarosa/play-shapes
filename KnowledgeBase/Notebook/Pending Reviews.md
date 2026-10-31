@@ -14,7 +14,7 @@ What still needs a person, a real phone or an exported package before it can be 
 checked. Automated tests and render captures do not settle any of it. Remove an entry when
 the review is done, and record the device and browser versions in the pull request that
 removes it. The evidence labels are defined in
-[[Verification#Evidence labels|verification.md]].
+[[Verification#Evidence labels]].
 
 ## Playground plaza lobby
 
@@ -238,7 +238,7 @@ device.
 ## Motion lab
 
 - `[PHYSICAL-PHONE]` The checklist in
-  [[Motion Input#Checking it on a real phone|motion-input.md]], on Chrome for iPhone and
+  [[Motion Input#Checking it on a real phone]], on Chrome for iPhone and
   Android.
 
 ## Exported package

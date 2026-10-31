@@ -13,8 +13,8 @@ Hub: [[Phone Client]].
 What the phone's web page does around the game itself: the offer to run as an app, fullscreen
 and touch handling, what happens when the page is hidden or rotated, caching, and the
 development error panel. The joystick and action button are in
-[[Platform Controller|platform-phone-controller.md]]; the messages are in
-[[Message Protocol|protocol.md]].
+[[Platform Controller]]; the messages are in
+[[Message Protocol]].
 
 ## Character setup
 

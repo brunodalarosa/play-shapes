@@ -15,7 +15,7 @@ The alternative was to keep the single branch and tag releases on it. It has no 
 
 ## Decision
 
-The project follows Git Flow as it is commonly described: `main`, `develop`, and `feature/`, `release/` and `hotfix/` branches. It is adopted before the first release, so that it is practiced by the time a release depends on it. [[Branching|branching.md]] states the rules.
+The project follows Git Flow as it is commonly described: `main`, `develop`, and `feature/`, `release/` and `hotfix/` branches. It is adopted before the first release, so that it is practiced by the time a release depends on it. [[Branching]] states the rules.
 
 ## What follows
 

@@ -17,7 +17,7 @@ minigame could get its own tool, or all could share one design.
 ## Decision
 
 Every minigame has a workshop following
-[Minigame workshops](../../../docs/game-design-documents/Minigame%20workshops.md): a scene started on its
+[[Minigame Workshops|Minigame workshops]]: a scene started on its
 own through the boot, running the real game and phone page, with four named panels that can be
 resized and popped out into windows, presets saved as one file each, and a button that makes a
 preset the one the game uses. Only the parts that document lists as the minigame's own differ.

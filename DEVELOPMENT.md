@@ -6,7 +6,7 @@ none of them needs the others first.
 | Working on | Read |
 | --- | --- |
 | What exists today, running the project, joining from a phone | [docs/overview.md](KnowledgeBase/Architecture/Play%20Shapes%20Overview.md) |
-| Player-facing screen sequences, preparation and journey changes | [docs/player-journeys.md](docs/player-journeys.md) |
+| Player-facing screen sequences, preparation and journey changes | [docs/player-journeys.md](KnowledgeBase/Architecture/Player%20Journeys/Journey%20Change%20Rules.md) |
 | Which script or scene owns what | [docs/architecture.md](KnowledgeBase/Notebook/Codebase.md) |
 | Messages between phone and host, HTTP routes, limits | [docs/protocol.md](KnowledgeBase/Architecture/Host%20and%20Session/Message%20Protocol.md) |
 | Tests, the check command, evidence labels | [docs/verification.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Verification.md) |

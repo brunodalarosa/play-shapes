@@ -12,7 +12,7 @@ branch:
 
 What phones and the host say to each other: the HTTP routes, the WebSocket messages, and the
 limits the host enforces. Which script owns each part is in
-[[Codebase|architecture.md]].
+[[Codebase]].
 
 ## Host authority
 
@@ -50,7 +50,7 @@ player ID is rejected. The raw sample/status schema is shared with the lab.
 Samples are accepted no faster than every 34 ms; the raw transport stale threshold is
 1000 ms. Latest-only burst handling and browser backpressure avoid catch-up replay.
 Capture failure states and Tilt Shift 3D's shorter continuity gap are documented in
-[[005 Motion Control|motion-input.md]].
+[[005 Motion Control]].
 
 ## Defaults
 
@@ -80,7 +80,7 @@ with its whole course, and phone messages of up to 16 KiB.
 - Ports default from the active `NetworkingTuning` Resource.
 - Joining is always at `/`. There is no room system and no mDNS.
 
-Local overrides and HTTPS are in [[Networking#Local network configuration|networking.md]].
+Local overrides and HTTPS are in [[Networking#Local network configuration]].
 
 ## HTTP routes
 
@@ -89,7 +89,7 @@ The host serves a fixed list and nothing else:
 - Pages and styles: `/`, `/style.css`, `/session.json`.
 - The phone client: `/app.js`, one script that holds every module except the 3D view, and
   `/three_view.js`, which `/app.js` loads only when a 3D screen starts
-  ([[Browser Build|browser-build.md]]).
+  ([[Browser Build]]).
 - Generated settings: `/platform_input_settings.json`.
 - App manifest and icons: `/manifest.webmanifest`, `/app-icon-180.png`, `/app-icon-192.png`,
   `/app-icon-512.png`.
@@ -166,7 +166,7 @@ During ready-up, a registered phone sends `{"type":"pre_minigame_ready","ready":
 After join, the portrait Playground mounts the reusable `PlatformControls` and
 `PlatformInputState` through `createLobbyContext`. The shared intent, tuning, lifecycle,
 adapter harness and host handoff are in
-[[Platform Controller|platform-phone-controller.md]].
+[[Platform Controller]].
 
 - The NippleJS stick is unlocked: X is right-positive and Y is up-positive, with unit-disk
   analog axes, a radial dead zone with hysteresis, and narrow up and down sectors.

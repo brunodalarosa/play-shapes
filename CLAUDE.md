@@ -36,9 +36,9 @@ results and return to the lobby.
 
 The game has been rebuilt as a 3D low-poly world where characters move on one vertical plane.
 The lobby, both minigames, the Ready screen and phone setup all share the live 3D Cubio.
-Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
-[the art direction](docs/game-design-documents/Art%20direction.md) and
-[the lobby visual rules](docs/game-design-documents/Playground%20Lobby%20Visual%20Rules.md).
+Sources:
+[the art direction](KnowledgeBase/Architecture/Art%20Direction.md) and
+[the lobby visual rules](KnowledgeBase/Architecture/Playground%20Lobby/Lobby%20Visual%20Rules.md).
 
 - Commits for this work go to `feature/3d-low-poly-project-rework`, as the owner asked.
 - Ready-made assets first; author new ones only when strictly necessary.
@@ -173,7 +173,7 @@ Condensed from AGENTS.md and the documents it links.
 - Every minigame has a workshop on the shared design, planned with the minigame
   ([0052](KnowledgeBase/Architecture/Decisions/0052-a-workshop-for-every-minigame.md)).
 - Every normal minigame launch goes through the Pre-minigame screen. A plan that skips it must
-  carry the bold uppercase warning from [player-journeys.md](docs/player-journeys.md).
+  carry the bold uppercase warning from [player-journeys.md](KnowledgeBase/Architecture/Player%20Journeys/Journey%20Change%20Rules.md).
 - Temporary art variants go in ignored `scratch/` or `comparisons/`, never in commits.
 
 ## This machine

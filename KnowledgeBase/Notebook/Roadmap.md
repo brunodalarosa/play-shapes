@@ -29,7 +29,7 @@ existing ones. The game keeps playing the same while the code is reshaped; see
 - The development manual split into one document per area, held to one standard.
 - A decision log and this roadmap.
 - A branching model, Git Flow, with `develop` as the branch work merges into
-  ([[Branching|branching.md]]).
+  ([[Branching]]).
 - No ticket numbers anywhere, with no exemptions: the names inside the Cubio Blender
   source were the last.
 - One shared base for the test scripts
@@ -134,20 +134,20 @@ It awaits physical-phone checks and the owner's play review; tuning values are p
 - Bot players in the full game, sharing one implementation with the workshop autopilots; to be
   designed. Workshop autopilots have one skill, Good, until then.
 - The first release, `0.1.0`: decide where the project and the Windows package record the
-  version, then follow [[Branching#A release|branching.md]].
+  version, then follow [[Branching#A release]].
 - Cloud CI, if hosted runners turn out to be free for this repository
   ([[0021-no-cloud-ci|0021]]).
 - The end-to-end test on WebKit, in the `--full` run.
 - Mark `web/public/` as generated for GitHub's diffs.
 - Remove 21 `.uid` files whose scripts no longer exist.
-- Shrink the code map in [[Codebase|architecture.md]]; it describes the code file by
+- Shrink the code map in [[Codebase]]; it describes the code file by
   file and goes stale.
 - Use Godot's own script warnings as a stricter GDScript lint.
 - Format Markdown with a tool. Format and lint the Python art tools.
 - A connection helper in the lobby: firewall, same Wi-Fi and guest-network tips. An idea,
   not yet asked for.
 
-Reviews that need a person or a real phone are in [[Pending Reviews|pending-reviews.md]].
+Reviews that need a person or a real phone are in [[Pending Reviews]].
 
 ## Known bugs
 
@@ -175,7 +175,7 @@ The two-phone Bubbles and jellyfishes 3D end-to-end test sometimes times out in 
 host sees only the first phone's character move, never the second's, so the run never starts.
 It failed in 1 of 4 runs before Flappy Race existed and in 3 of 5 on later commits. Its cause
 remains unresolved. The test is tagged `@flaky`, so neither the default nor the `--full` check
-runs it; see [[Verification#The end-to-end test|verification.md]] to run it on purpose.
+runs it; see [[Verification#The end-to-end test]] to run it on purpose.
 
 On Windows, the browser bundle rewrite after the browser suite can fail with
 `The requested operation cannot be performed on a file with a user-mapped section open.`

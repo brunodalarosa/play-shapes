@@ -12,8 +12,8 @@ Hub: [[Host and Session]].
 
 How the host and phones reach each other on the LAN, what to check when a phone cannot
 connect, and how the host's network settings are overridden locally. Setting up HTTPS for
-test phones is in [[Local HTTPS|local-https.md]]. The messages themselves are in
-[[Message Protocol|protocol.md]].
+test phones is in [[Local HTTPS]]. The messages themselves are in
+[[Message Protocol]].
 
 ## How it works
 
@@ -101,4 +101,4 @@ To return to HTTP, set `tls_enabled` to false or remove the local override, then
 
 Certificates are provisioned with `node tools/local_https.mjs setup --ip LAN_IP`. Setup never
 changes system trust. The commands, the per-phone steps and how to undo them are in
-[[Local HTTPS|local-https.md]].
+[[Local HTTPS]].

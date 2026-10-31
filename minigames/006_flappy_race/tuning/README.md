@@ -6,7 +6,7 @@ workshop edits, saves and selects presets; changes reach a normal game when the 
 starts.
 
 The values are starting points taken from the Flappy Bird reference in
-[the design](../../../docs/game-design-documents/Minigames/006/006%20-%20Flappy%20Race.md).
+[the design](../../../KnowledgeBase/Architecture/Minigames/006%20Flappy%20Race%20Design.md).
 The owner chooses them in play.
 
 ## Race

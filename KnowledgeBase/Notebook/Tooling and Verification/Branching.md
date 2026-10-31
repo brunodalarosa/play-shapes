@@ -47,7 +47,7 @@ a release. The model is Git Flow; [[0022-git-flow|decision 0022]] says why.
 - The tag is the version with a `v` in front: `v0.1.0`. It is an annotated tag on the merge
   commit on `main`.
 - The tag is the only record of the version. Neither `project.godot` nor the Windows package
-  carries one yet; see the [[Roadmap#Backlog|roadmap]].
+  carries one yet; see the [[Roadmap#Backlog]].
 
 ## Merging
 
@@ -55,7 +55,7 @@ Every merge is a merge commit: **Create a merge commit** on GitHub, `git merge -
 locally. Squash merging and rebase merging are not used.
 
 A pull request needs no approval from a second person to merge. It does need the output of
-the check command, as [[Verification|verification.md]] describes.
+the check command, as [[Verification]] describes.
 
 GitHub holds `main` and `develop` to these rules with a ruleset: a change arrives by pull
 request, only a merge commit is offered, and force pushes and deletion are refused. `develop`
@@ -82,7 +82,7 @@ git push --force-with-lease
   commit that reaches `develop` stands on its own and is not known to be broken.
 - A rebase gives every commit a new hash. A commit listed in `.git-blame-ignore-revs` is
   listed with the hash it has after the last rebase; see
-  [[Formatting and Linting#Blame|formatting-and-linting.md]].
+  [[Formatting and Linting#Blame]].
 - The pull request targets `develop`. Delete the branch after the merge.
 - A feature that builds on another unmerged feature targets that feature's branch. When the
   base has merged, rebase onto `develop` and change the target to `develop`.

@@ -30,7 +30,7 @@ Every claim that something was verified carries one label. One label never impli
 
 Render captures establish technical composition. They do not establish couch-distance
 readability, accessibility, comfort, motion feel, fairness or creative approval. Those need a
-person; what is waiting for one is in [[Pending Reviews|pending-reviews.md]].
+person; what is waiting for one is in [[Pending Reviews]].
 
 ## The check command
 
@@ -45,7 +45,7 @@ This is the default `[AUTO]` check. In order, it runs:
    up by name. [[#Test scripts]] says how
    one is written.
 2. `node tools/format.mjs --check`, `node tools/lint.mjs` and `node tools/docs.mjs`. See
-   [[Formatting and Linting|formatting-and-linting.md]].
+   [[Formatting and Linting]].
 3. The `tools/tests/` suite.
 4. `npm run check` in `web/`, which type-checks the phone client and, with Node types, the
    end-to-end test files.
@@ -293,7 +293,7 @@ start only what they need, so they stay fast.
   `web/tests/motion_lab_controller.test.mjs`.
 - Ready-up over WebSocket: `web/tests/ready_flow.test.mjs`.
 - Platform controls: see
-  [[Platform Controller#Harness and tests|platform-phone-controller.md]].
+  [[Platform Controller#Harness and tests]].
 
 ## Render helpers
 
@@ -346,4 +346,4 @@ godot --headless --path . --script $preview
 
 Restart the host after rebuilding the browser output, so its startup-cached assets refresh.
 Then reload or relaunch the controller. The phone's development error panel is described in
-[[Phone Web App#Development error panel|phone-client.md]].
+[[Phone Web App#Development error panel]].

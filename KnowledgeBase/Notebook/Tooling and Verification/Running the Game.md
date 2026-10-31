@@ -32,7 +32,7 @@ type the displayed URL, on a phone on the same LAN.
 - It prefers common `192.168.*` addresses. It is not default-route detection.
 - Loopback, link-local and IPv6 addresses are excluded.
 - VPNs, multiple adapters, guest Wi-Fi and client isolation can require a manual choice or
-  prevent access. See [[Networking|networking.md]].
+  prevent access. See [[Networking]].
 ## Starting a round
 
 - Normal play starts with 2–10 registered players, or 1–10 for Flappy Race. Choose a minigame
