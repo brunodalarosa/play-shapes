@@ -1,12 +1,12 @@
 # Contributor guidance
 
-This directory is the Godot project root. Work on a new local `feature/<name>` branch started from `develop`, as [docs/branching.md](docs/branching.md) describes, and commit implementation changes locally. Do not push or open a pull request until the project owner approves publication.
+This directory is the Godot project root. Work on a new local `feature/<name>` branch started from `develop`, as [Branching](KnowledgeBase/Notebook/Tooling%20and%20Verification/Branching.md) describes, and commit implementation changes locally. Do not push or open a pull request until the project owner approves publication.
 
 ## Working method
 
 A change has two plans, and they answer different questions.
 
-- **The feature plan is the task.** It says what a player or contributor gets, what counts as done, and which approvals only a person can give. It is stated in a sentence, in [docs/roadmap.md](docs/roadmap.md) or by a project owner, and belongs to the project owner. It does not say how the code changes.
+- **The feature plan is the task.** It says what a player or contributor gets, what counts as done, and which approvals only a person can give. It is stated in a sentence, in the [Roadmap](KnowledgeBase/Notebook/Roadmap.md) or by a project owner, and belongs to the project owner. It does not say how the code changes.
 - **The implementation plan is the branch's.** It says how the code changes to deliver the task. It is written after the task is understood and before any code, and it is approved before implementation starts.
 
 Every non-trivial task runs through the five phases below. Phases 1 and 2 end at a checkpoint: stop and wait for an answer. Scale each phase to the task; a one line plan is a valid plan for a one line change.
@@ -42,9 +42,9 @@ If planning shows the task itself should change, stop and say so. Do not reshape
 
 ### 4. Verify
 
-- Run the checks under Setup and verification, and the focused checks in [docs/verification.md](docs/verification.md) for what was touched.
-- Report what changed, what was verified under which [evidence label](docs/verification.md#evidence-labels), what still needs a person, and what was documented.
-- Add what still needs a person to [docs/pending-reviews.md](docs/pending-reviews.md), and remove an entry there when its review is done.
+- Run the checks under Setup and verification, and the focused checks in [Verification](KnowledgeBase/Notebook/Tooling%20and%20Verification/Verification.md) for what was touched.
+- Report what changed, what was verified under which [evidence label](KnowledgeBase/Notebook/Tooling%20and%20Verification/Verification.md#evidence-labels), what still needs a person, and what was documented.
+- Add what still needs a person to [Pending Reviews](KnowledgeBase/Notebook/Pending%20Reviews.md), and remove an entry there when its review is done.
 - State failures plainly, with output. A task is not done because the code is written.
 
 ### 5. Pull request
@@ -57,46 +57,42 @@ A pull request is history, read later by someone who was not there. Write what i
 
 - Godot is the authoritative PC host. Phones are TypeScript/HTML/CSS browser clients over HTTP and WebSockets. Clients send input and choices; only the host changes game state.
 - Use typed GDScript where practical, small reusable scenes, composition, signals for loose coupling, and Control/Container nodes for UI. Avoid fixed viewport dimensions and duplicate behavior. Explain complex code in comments.
-- Layout is decided by the formatters, not by hand. Run `node tools/format.mjs` before committing. Separate the logical steps inside a function with a blank line; the formatters keep those lines but do not add them. If the GDScript formatter refuses a file, see [what to do](docs/formatting-and-linting.md#the-gdscript-formatter).
+- Layout is decided by the formatters, not by hand. Run `node tools/format.mjs` before committing. Separate the logical steps inside a function with a blank line; the formatters keep those lines but do not add them. If the GDScript formatter refuses a file, see [what to do](KnowledgeBase/Notebook/Tooling%20and%20Verification/Formatting%20and%20Linting.md#the-gdscript-formatter).
 - Name things for what they are. Ticket and task numbers do not belong anywhere in the repository: not in file names, comments, documents, test names or output folders.
 - Run `node tools/lint.mjs` as well. It reports naming, unused code and other mistakes in GDScript, TypeScript and JavaScript, and every line over 100 characters that the formatters could not shorten. Shorten such a line by naming part of the expression on the line before, by wrapping the expression in parentheses, or by joining a long string from shorter ones; move a trailing comment above its statement. Do not reword a message or a test title to make it fit.
 - Preserve the bundled runtime assets and `web/public/` output. Rebuild the browser bundle after changing `web/src/`.
-- Minigame numbers are stable identifiers. 001, 002 and 003 were retired; 004 is Bubbles and jellyfishes 3D, and 005 is Tilt Shift 3D. Never reuse or renumber IDs.
-- A Shape Character is a player-owned geometric character with floating hands and feet. Keep poses and expressions readable, including natural blinking and context-appropriate gestures.
+- Minigame numbers are stable identifiers. 001, 002 and 003 were retired; 004 is Bubbles and jellyfishes 3D, 005 is Tilt Shift 3D and 006 is Flappy Race. Never reuse or renumber IDs.
+- Cubio is the one player character: a bevelled cube with floating hands and feet. Keep poses and expressions readable, including natural blinking and context-appropriate gestures.
 
 ## Visual direction
 
-Read [game-design-documents/Art direction.md](docs/game-design-documents/Art%20direction.md) and apply it to UI, environments, characters, effects, shaders, and animation.
+Read [Art Direction](KnowledgeBase/Architecture/Art%20Direction.md) and apply it to UI, environments, characters, effects, shaders, and animation.
 
 The canonical editable Cubio source and current export tools live in `art/cubio/`. Keep only current source and useful pipeline/review resources there. Prior versions, backups, variant experiments and version comparisons are temporary artifacts: use ignored `scratch/` or `comparisons/` directories and do not commit them or obsolete one-time construction scripts.
 
 ## Setup and verification
 
 - Use Godot 4.7.2 or newer with the GL Compatibility renderer, and Node 22 or newer. Run `node tools/setup.mjs` after cloning and whenever a tool may be missing: it checks the required tools, reports the ones some tasks need, and installs `web/` dependencies, Playwright's Chromium and the GDScript formatter. [README.md](README.md#requirements) lists every tool. Set `GODOT_BIN` to a Godot executable when it is not on PATH as `godot`.
-- Run `node tools/check.mjs` before reporting a change as verified. It runs every Godot test script, the format, lint and document checks, the tests of `tools/`, the browser type check and tests, confirms `web/public/` matches a fresh build, and plays Tilt Shift 3D with two emulated phones against the real host. The Bubbles and jellyfishes 3D phone journey is a known flaky test and runs only on request ([verification](docs/verification.md#the-end-to-end-test)). It prints one line per failure and writes full output under `test-results/check/`.
+- Run `node tools/check.mjs` before reporting a change as verified. It runs every Godot test script, the format, lint and document checks, the tests of `tools/`, the browser type check and tests, confirms `web/public/` matches a fresh build, and plays Tilt Shift 3D with two emulated phones against the real host. The Bubbles and jellyfishes 3D phone journey is a known flaky test and runs only on request ([verification](KnowledgeBase/Notebook/Tooling%20and%20Verification/Verification.md#the-end-to-end-test)). It prints one line per failure and writes full output under `test-results/check/`.
 - Pass name filters for a focused run (`node tools/check.mjs bubbles_3d`), `--full` for extended coverage, and `--release` to add the Windows export test, which needs export templates.
 - Run a single Godot script with `godot --headless --path . --script tests/<name>.gd`. For browser work, run `npm run check`, `npm run build`, and `npm test` in `web/`.
-- Keep changes scoped. When setup, architecture, protocols or verification steps change, update the document for that area in the same change. `node tools/docs.mjs` checks the rules documents follow.
+- Keep changes scoped. When setup, architecture, protocols or verification steps change, update the knowledge base page for that area in the same change. `node tools/docs.mjs` checks the rules pages follow.
 - The vendored `addons/godot_mcp/` editor integration is optional. Enable it in Godot's Plugin settings only when needed; configure your own local MCP client separately. Do not change the third-party addon unless the task calls for it.
 
-## Documents
+## Knowledge base
 
-Read the one document for the area you are working on, not all of them. [DEVELOPMENT.md](DEVELOPMENT.md) describes each and states the rules they follow.
+`KnowledgeBase/` is an Obsidian vault that holds what the code doesn't say. Start at [Home](KnowledgeBase/Home.md), which states its conventions.
 
-- [README.md](README.md): what to install, how to play.
-- [docs/overview.md](docs/overview.md): what exists today, running the project.
-- [docs/architecture.md](docs/architecture.md): which script or scene owns what.
-- [docs/protocol.md](docs/protocol.md): messages, HTTP routes, limits.
-- [docs/verification.md](docs/verification.md): the check command, tests, evidence labels.
-- [docs/pending-reviews.md](docs/pending-reviews.md): what still needs a person or a real phone.
-- [docs/roadmap.md](docs/roadmap.md): what is done, what is next, known bugs.
-- [docs/decisions/](docs/decisions/README.md): why things are the way they are. Add a record when a change makes a choice whose reason will not show in the code.
-- [docs/branching.md](docs/branching.md): branches, merging, releases and version numbers.
-- [docs/formatting-and-linting.md](docs/formatting-and-linting.md): format, lint and document rules.
-- [docs/browser-build.md](docs/browser-build.md): building the phone client.
-- [docs/phone-client.md](docs/phone-client.md): app install, touch handling, the error panel.
-- [docs/platform-phone-controller.md](docs/platform-phone-controller.md): joystick, action button, platform movement.
-- [docs/motion-input.md](docs/motion-input.md): phone sensors and the motion lab.
-- [docs/networking.md](docs/networking.md): LAN, connection problems, network settings.
-- [docs/local-https.md](docs/local-https.md): HTTPS for test phones.
-- [docs/standalone-build.md](docs/standalone-build.md): the Windows package.
+- **Notebook**: working notes, agents first, one hub per area: Host and Session, Phone Client, Playground Lobby, Minigames, Workshops and Tuning, Art Pipeline, Tooling and Verification. Each minigame has a folder under Minigames whose hub follows one fixed shape and lists the rest of the folder.
+- **Architecture**: explanations, humans first, and every record in [Decisions](KnowledgeBase/Architecture/Decisions/Decisions.md).
+- **Reference**: the outside documentation the project relies on, and how far to trust it.
+
+How to use it:
+
+- For a task in an area, read its hub and the notes for the systems involved first. For a minigame, read its hub first: it describes that folder.
+- Notes can be stale: the code wins. Report a wrong note, and fix it in the same change as the code.
+- At the end of each task, propose 0 to 3 learnings (target note, exact text, `code` anchors) and 0 to 3 friction items for [Improvements](KnowledgeBase/Notebook/Improvements.md). Write them only after the owner approves. A learning is what cost real effort to find or what the owner explained that exists nowhere else, not a log of the work.
+- Architecture docs are owned by people: an agent's edit stays `status: draft`. A decision record is never edited to change its decision; the next free number is in Decisions.
+- `node tools/docs.mjs` checks links, wikilinks and frontmatter. `node tools/kb_staleness.mjs` lists pages whose code anchors changed since they were verified.
+
+[README.md](README.md) says what to install and how to play; [DEVELOPMENT.md](DEVELOPMENT.md) says where each kind of document lives.

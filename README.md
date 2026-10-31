@@ -44,9 +44,9 @@ Some tasks need more. The setup script reports these without failing:
 | Tool | Needed for |
 | --- | --- |
 | Godot export templates matching the installed Godot | The standalone Windows build and `node tools/check.mjs --release` |
-| mkcert | Local HTTPS for motion input; `node tools/local_https.mjs download` fetches it, see [docs/local-https.md](docs/local-https.md) |
+| mkcert | Local HTTPS for motion input; `node tools/local_https.mjs download` fetches it, see [Local HTTPS](KnowledgeBase/Notebook/Phone%20Client/Local%20HTTPS.md) |
 | GitHub CLI (`gh`) | Pull requests from the terminal |
-| Python 3 with Pillow, Blender | Regenerating art; see [art/cubio/README.md](art/cubio/README.md) and [art/bubbles_3d/README.md](art/bubbles_3d/README.md) |
+| Python 3 with Pillow, Blender | Regenerating art; see [Cubio Source and Export](KnowledgeBase/Notebook/Art%20Pipeline/Cubio%20Source%20and%20Export.md) and [004 Art Assets](KnowledgeBase/Notebook/Minigames/004%20Bubbles%20and%20Jellyfishes/004%20Art%20Assets.md) |
 
 The vendored Godot MCP addon is disabled by default and is optional developer
 tooling; it is not required to launch or play the game.
@@ -161,8 +161,8 @@ The generated files in `web/public/` are the files Godot serves to phones.
   layout, orientation, and touch behavior still need broader device coverage.
 - Minigames still need their owner-led phone and game-feel reviews. No validation here
   guarantees every phone, browser, Wi-Fi configuration, or accessibility
-  setup. See [docs/pending-reviews.md](docs/pending-reviews.md) for what still
-  needs a person, and [docs/networking.md](docs/networking.md) when a phone
+  setup. See [Pending Reviews](KnowledgeBase/Notebook/Pending%20Reviews.md) for what still
+  needs a person, and [Networking](KnowledgeBase/Notebook/Host%20and%20Session/Networking.md) when a phone
   cannot connect.
 
 ## Project notes

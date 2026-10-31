@@ -2,23 +2,80 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   anchors,
+  frontmatter,
+  frontmatterProblems,
   hasTicketName,
   headingAnchor,
   isProjectDocument,
+  isVaultPage,
   localLinks,
   paragraphs,
   ticketLines,
+  vaultName,
+  wikiLinks,
 } from "../doc_rules.mjs";
 
 // Built from two pieces so this file does not itself contain a ticket number.
 const ticket = (number) => `PS-${number}`;
 
-test("covers project Markdown and leaves vendored addons and the design vault alone", () => {
+test("covers project Markdown and leaves vendored addons alone", () => {
   assert.equal(isProjectDocument("README.md"), true);
-  assert.equal(isProjectDocument("docs/protocol.md"), true);
+  assert.equal(isProjectDocument("KnowledgeBase/Home.md"), true);
   assert.equal(isProjectDocument("addons/godot_mcp/README.md"), false);
-  assert.equal(isProjectDocument("game-design-documents/Glossary.md"), false);
   assert.equal(isProjectDocument("tools/check.mjs"), false);
+});
+
+test("tells vault pages from templates and names vault files as wikilinks do", () => {
+  assert.equal(isVaultPage("KnowledgeBase/Notebook/Codebase.md"), true);
+  assert.equal(isVaultPage("KnowledgeBase/_Templates/System Note.md"), false);
+  assert.equal(isVaultPage("README.md"), false);
+
+  assert.equal(vaultName("KnowledgeBase/Notebook/Codebase.md"), "Codebase");
+  assert.equal(vaultName("KnowledgeBase/_Attachments/lobby.png"), "lobby.png");
+});
+
+test("reads frontmatter fields and lists", () => {
+  const text = '---\narea: Lobby\ntags: [system]\ncode: [`a`, "B::c", d/e.gd]\n---\n# T';
+  assert.deepEqual(frontmatter(text), {
+    area: "Lobby",
+    tags: ["system"],
+    code: ["`a`", "B::c", "d/e.gd"],
+  });
+  assert.equal(frontmatter("# No frontmatter"), null);
+  assert.deepEqual(frontmatter('---\nparent: "[[Architecture]]"\ncode: []\n---'), {
+    parent: "[[Architecture]]",
+    code: [],
+  });
+});
+
+test("asks each page kind for the frontmatter it needs", () => {
+  assert.deepEqual(frontmatterProblems({ tags: ["hub"] }), []);
+  assert.deepEqual(frontmatterProblems({ tags: ["system"] }), ["A system page needs area"]);
+  assert.deepEqual(
+    frontmatterProblems({ tags: ["architecture"], level: "macro", parent: "x", status: "done" }),
+    ["status must be one of draft, reviewed"],
+  );
+  assert.deepEqual(frontmatterProblems({ tags: ["hub"], verified: "31/10/2026" }), [
+    "verified must be a date written YYYY-MM-DD",
+  ]);
+  assert.equal(frontmatterProblems({ tags: ["other"] }).length, 1);
+  assert.equal(frontmatterProblems(null).length, 1);
+});
+
+test("finds wikilinks and embeds outside code", () => {
+  const text = [
+    "See [[Codebase]] and [[Networking#Ports|the ports]].",
+    "![[lobby.png]] but not `[[Code]]`",
+    "```",
+    "[[Fenced]]",
+    "```",
+  ].join("\n");
+
+  assert.deepEqual(wikiLinks(text), [
+    { line: 1, name: "Codebase", heading: "" },
+    { line: 1, name: "Networking", heading: "Ports" },
+    { line: 2, name: "lobby.png", heading: "" },
+  ]);
 });
 
 test("finds ticket numbers in text and in file names", () => {

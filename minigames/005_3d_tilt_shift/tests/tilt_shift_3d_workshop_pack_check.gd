@@ -3,11 +3,7 @@ extends SceneTree
 
 
 func _initialize() -> void:
-	var excluded := [
-		"res://addons/tilt_shift_3d_workshop",
-		"res://scratch",
-		"res://docs/images/tilt-shift-workshop",
-	]
+	var excluded := ["res://addons/tilt_shift_3d_workshop", "res://scratch", "res://KnowledgeBase"]
 	var failures := 0
 	for path: String in excluded:
 		if DirAccess.dir_exists_absolute(path):
