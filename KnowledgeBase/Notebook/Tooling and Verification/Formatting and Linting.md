@@ -89,14 +89,23 @@ git tracks or would add.
 node tools/docs.mjs
 ```
 
-It checks every Markdown file outside `addons/` and `game-design-documents/`:
+It checks every Markdown file outside `addons/`:
 
 - A link inside the repository must point to an existing file, with the exact spelling and
   case, and to an existing heading when it names one.
 - No paragraph, list item or table row may be longer than 600 characters.
+- In `KnowledgeBase/`, every page outside `_Templates/` needs frontmatter whose `tags` name
+  its kind, with the fields that kind needs (see [[Home#Frontmatter]]). File names must be
+  unique, and a `[[wikilink]]` to an existing page must name an existing heading. A wikilink
+  to a page that does not exist yet is a gap: listed, not a failure.
 
 It also reports a ticket number in any text file or file name. Name the thing itself; nobody
 can look a ticket up from the repository.
+
+`node tools/kb_staleness.mjs [--days N]` reads each vault page's `code` and `verified` fields
+and writes `scratch/knowledge-base-staleness.md`: pages whose anchors went MISSING, whose files
+CHANGED since `verified`, or that are OLD (never verified, or older than 90 days). Decision
+records are skipped; it never fails.
 
 ## Blame
 

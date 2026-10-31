@@ -1,44 +1,37 @@
 # Play Shapes development
 
-The development documents, one per area. Read the one for what you are working on;
-none of them needs the others first.
+Where the project's documentation lives. Development knowledge is in the knowledge base, an
+Obsidian vault in [KnowledgeBase/](KnowledgeBase/Home.md); open it in Obsidian or read it as
+Markdown.
 
-| Working on | Read |
+| Working on | Start at |
 | --- | --- |
-| What exists today, running the project, joining from a phone | [docs/overview.md](KnowledgeBase/Architecture/Play%20Shapes%20Overview.md) |
-| Player-facing screen sequences, preparation and journey changes | [docs/player-journeys.md](KnowledgeBase/Architecture/Player%20Journeys/Journey%20Change%20Rules.md) |
-| Which script or scene owns what | [docs/architecture.md](KnowledgeBase/Notebook/Codebase.md) |
-| Messages between phone and host, HTTP routes, limits | [docs/protocol.md](KnowledgeBase/Architecture/Host%20and%20Session/Message%20Protocol.md) |
-| Tests, the check command, evidence labels | [docs/verification.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Verification.md) |
-| What still needs a person or a real phone | [docs/pending-reviews.md](KnowledgeBase/Notebook/Pending%20Reviews.md) |
-| What is done, what is next, known bugs | [docs/roadmap.md](KnowledgeBase/Notebook/Roadmap.md) |
-| Why things are the way they are | [docs/decisions/](KnowledgeBase/Architecture/Decisions/Decisions.md) |
-| Branches, merging, releases and version numbers | [docs/branching.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Branching.md) |
-| Formatting, linting and the document rules | [docs/formatting-and-linting.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Formatting%20and%20Linting.md) |
-| The phone client's TypeScript and its build | [docs/browser-build.md](KnowledgeBase/Notebook/Phone%20Client/Browser%20Build.md) |
-| The phone page: app install, touch, error panel | [docs/phone-client.md](KnowledgeBase/Notebook/Phone%20Client/Phone%20Web%20App.md) |
-| The phone's joystick and action button, platform movement | [docs/platform-phone-controller.md](KnowledgeBase/Notebook/Playground%20Lobby/Platform%20Controller.md) |
-| Motion sensors and the motion lab | [docs/motion-input.md](KnowledgeBase/Notebook/Phone%20Client/Motion%20Input.md) |
-| LAN, firewall, the host's network settings | [docs/networking.md](KnowledgeBase/Notebook/Host%20and%20Session/Networking.md) |
-| HTTPS for test phones | [docs/local-https.md](KnowledgeBase/Notebook/Phone%20Client/Local%20HTTPS.md) |
-| The Windows package | [docs/standalone-build.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Standalone%20Build.md) |
-| Tuning values | [Tuning/README.md](KnowledgeBase/Notebook/Workshops%20and%20Tuning/Tuning%20Presets.md) |
-| Tilt Shift 3D editor workshop | [the workshop guide](KnowledgeBase/Notebook/Minigames/005%20Tilt%20Shift/005%20Workshop.md) |
-| Cubio art source and export | [art/cubio/README.md](KnowledgeBase/Notebook/Art%20Pipeline/Cubio%20Source%20and%20Export.md) |
-| Bubbles and jellyfishes 3D art source and runtime assets | [art/bubbles_3d/README.md](KnowledgeBase/Notebook/Minigames/004%20Bubbles%20and%20Jellyfishes/004%20Art%20Assets.md) |
-| Tilt Shift 3D art source and runtime assets | [art/tilt_shift_3d/README.md](KnowledgeBase/Notebook/Minigames/005%20Tilt%20Shift/005%20Art%20Assets.md) |
+| Anything: the conventions and the map of the vault | [Home](KnowledgeBase/Home.md) |
+| Where each part of the code lives | [Codebase](KnowledgeBase/Notebook/Codebase.md) |
+| Boot, the host services, players and networking | [Host and Session](KnowledgeBase/Notebook/Host%20and%20Session/Host%20and%20Session.md) |
+| The phone client, its build, motion input and HTTPS | [Phone Client](KnowledgeBase/Notebook/Phone%20Client/Phone%20Client.md) |
+| The lobby plaza, platform movement and Cubio | [Playground Lobby](KnowledgeBase/Notebook/Playground%20Lobby/Playground%20Lobby.md) |
+| A minigame, the catalog or the Ready screen | [Minigames](KnowledgeBase/Notebook/Minigames/Minigames.md) |
+| Tuning presets and the workshop window | [Workshops and Tuning](KnowledgeBase/Notebook/Workshops%20and%20Tuning/Workshops%20and%20Tuning.md) |
+| Art sources and runtime assets | [Art Pipeline](KnowledgeBase/Notebook/Art%20Pipeline/Art%20Pipeline.md) |
+| Running, checking, formatting, branching and building | [Tooling and Verification](KnowledgeBase/Notebook/Tooling%20and%20Verification/Tooling%20and%20Verification.md) |
+| What is done, what is next, known bugs | [Roadmap](KnowledgeBase/Notebook/Roadmap.md) |
+| What still needs a person or a real phone | [Pending Reviews](KnowledgeBase/Notebook/Pending%20Reviews.md) |
+| How systems are meant to work, and why | [Architecture](KnowledgeBase/Architecture/Architecture.md) |
+| Why things are the way they are | [Decisions](KnowledgeBase/Architecture/Decisions/Decisions.md) |
 
 [README.md](README.md) covers what to install and how to play.
 [AGENTS.md](AGENTS.md) covers how to work on the project.
 
-## Writing these documents
+## Writing pages
 
-- One topic per document, named after the topic.
-- Say what is true now. The reason for a choice goes in a [decision record](KnowledgeBase/Architecture/Decisions/Decisions.md). How a change was verified goes in its pull request.
-- Open with one or two sentences that say what the document covers.
+- One topic per page, named after the topic. Page names are unique across the vault.
+- Say what is true now. The reason for a choice goes in a [decision
+  record](KnowledgeBase/Architecture/Decisions/Decisions.md). How a change was verified goes in
+  its pull request.
 - Keep paragraphs short and use lists for anything enumerated.
 - State each fact in one place and link to it from the others.
 - Name things for what they are, never for the ticket they came from.
 
-`node tools/docs.mjs` checks the links, the paragraph length and the ticket rule. See
-[docs/formatting-and-linting.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Formatting%20and%20Linting.md#document-rules).
+`node tools/docs.mjs` checks the links, wikilinks, frontmatter, paragraph length and the ticket
+rule. See [the document rules](KnowledgeBase/Notebook/Tooling%20and%20Verification/Formatting%20and%20Linting.md#document-rules).

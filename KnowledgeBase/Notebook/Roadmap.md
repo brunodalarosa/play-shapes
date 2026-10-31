@@ -12,7 +12,7 @@ Hub: [[Notebook]].
 
 What is done, what comes next, what is waiting, and which bugs are known. The project owners
 decide what goes here. A change that finishes or adds work updates this document. The reasons
-behind the choices are in [[Decisions|decisions/]].
+behind the choices are in [[Decisions]].
 
 ## The goal
 
@@ -45,6 +45,10 @@ existing ones. The game keeps playing the same while the code is reshaped; see
   rule ([[0016-bundle-the-phone-client|0016]]).
 - One boot of Essential and Optional steps, so a scene started on its own loads only what it
   asks for ([[0053-boot-steps-and-entry-points|0053]]).
+- The knowledge base: `docs/` reorganized into an Obsidian vault with area hubs, a folder per
+  minigame, frontmatter anchors and a staleness check
+  ([[0057-knowledge-base-replaces-docs|0057]]). Most migrated pages are still `stub` until a
+  task re-verifies them.
 
 ## The refactor, in order
 

@@ -14,12 +14,19 @@ Write a record when a change makes a choice between real alternatives and the re
 not be visible in the code or the documents. A fact that the documents already state, such
 as a port number or a frame count, needs no record.
 
-- One decision per file, named `NNNN-short-title.md` with the next free number.
+- One decision per file, named `NNNN-short-title.md` with the next free number. **The next
+  free number is 0058.**
+- Each record starts with frontmatter: `tags: [decision]` and `decided: YYYY-MM-DD`.
 - Say who decided and when, then give the three sections below.
 - A record is not edited to change its decision. A new record replaces it and says which
   one it replaces; the old one gets a line pointing to the new one.
 
 ```markdown
+---
+tags: [decision]
+decided: YYYY-MM-DD
+---
+
 # NNNN. The decision in a few words
 
 Decided by ... on YYYY-MM-DD.
@@ -97,3 +104,4 @@ What was decided.
 | [[0054-workshop-phone-view-in-godot-wry|0054]] | The workshop phone view is the real phone page in a godot-wry web view |
 | [[0055-material-design-3-for-workshops|0055]] | Workshops follow Material Design 3 |
 | [[0056-podium-arrivals-teleport|0056]] | Flappy Race finishers teleport to the podium instead of flying there |
+| [[0057-knowledge-base-replaces-docs|0057]] | The knowledge base replaces docs/ |

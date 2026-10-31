@@ -4,7 +4,7 @@ first person, no "as discussed", no reference to a chat, a review or who
 suggested what. A rejected alternative is worth recording; how it came to be
 rejected is not. Keep it short. Title the pull request with what changed, not
 with the branch name. Target develop unless this is a release or a hotfix;
-docs/branching.md has the rules. -->
+KnowledgeBase/Notebook/Tooling and Verification/Branching.md has the rules. -->
 
 ## Task
 
@@ -29,7 +29,7 @@ failed. Attach captures for anything a person can see. -->
 
 <!-- What no automated run could establish and who has to look: device and
 browser behavior, couch-distance readability, feel, accessibility, a tuning
-value waiting on the owner. Add the same items to docs/pending-reviews.md, and
+value waiting on the owner. Add the same items to Pending Reviews in KnowledgeBase/Notebook/, and
 remove from it any review this change completes. Omit the section if there is
 nothing. -->
 
@@ -37,7 +37,7 @@ nothing. -->
 
 <!-- Choices a reader could not infer from the diff, and why the alternative
 lost. A choice that will outlive this change also gets a record under
-docs/decisions/. Omit the section if there were none. -->
+KnowledgeBase/Architecture/Decisions/. Omit the section if there were none. -->
 
 ## Left out
 
@@ -46,5 +46,5 @@ surfaced rather than fixed. -->
 
 ## Documented
 
-<!-- Which documents under docs/, or README.md, changed, or why none needed
+<!-- Which KnowledgeBase/ pages, or README.md, changed, or why none needed
 to. DEVELOPMENT.md lists them. -->

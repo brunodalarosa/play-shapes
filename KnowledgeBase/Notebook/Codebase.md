@@ -90,4 +90,9 @@ These live outside any minigame folder so later 3D scenes can use them.
 - `tests/` holds focused headless, integration, policy and render checks of the shared code. A
   minigame's own are in its `tests/` folder. Generated evidence belongs under ignored
   `test-results/`.
-
+
+## Engine and rendering
+
+- **Renderer: GL Compatibility on desktop and mobile.** In 3D it lacks SDFGI, VoxelGI, SSAO,
+  SSR and volumetric fog; check any effect against it before relying on it.
+- 3D physics is Jolt. The window is 1920×1080 with `canvas_items` stretch and `expand` aspect.
