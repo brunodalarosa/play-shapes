@@ -484,6 +484,7 @@ func _draw_hud(now: float) -> void:
 	var left_ticks := controller.race_ticks() - controller.settled_tick
 	var seconds_left := ceili(float(left_ticks) / FlappyFlightTuning.TICK_RATE)
 	_timer.text = "%d:%02d" % [floori(seconds_left / 60.0), seconds_left % 60]
+	_timer.visible = controller.phase != FlappyRaceController.Phase.RESULTS
 
 	var cue := ""
 	match controller.phase:

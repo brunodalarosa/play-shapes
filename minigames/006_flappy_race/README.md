@@ -39,7 +39,8 @@ mirrored for the phone in `web/src/flappy_flight/`.
   and the ranking; `flappy_race_ten_player_race_test.gd` flies ten autopilots to both ends of
   a race; `flappy_race_protocol_test.gd` checks the messages.
 - `tests/flappy_race_presentation_test.gd` checks the shared screen; the visual check of the
-  same name captures it with 1, 4 and 10 players, run without `--headless`.
+  same name captures it with 1, 4 and 10 players, the podium mid-race and the results, run
+  without `--headless`.
 - `tests/flappy_race_course_test.gd` checks the generator, and `flappy_race_flyable_test.gd`
   flies its courses with the autopilot; the sweep version runs under `--full`.
 - `tests/flappy_race_preset_test.gd` checks the Default preset holds every part, and

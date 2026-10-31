@@ -6,8 +6,9 @@ extends Node3D
 
 ## Width of each raised block, m.
 const BLOCK_WIDTH := 4.0
-## Heights of the raised blocks for first, second and third, m.
-const BLOCK_HEIGHTS: Array[float] = [4.5, 3.2, 2.2]
+## Heights of the raised blocks for first, second and third, m: even third stands clear above
+## the heads of the Cubios on the low step in front.
+const BLOCK_HEIGHTS: Array[float] = [6.6, 5.4, 4.4]
 ## Where each raised block stands for first, second and third, m from the origin.
 const BLOCK_OFFSETS: Array[float] = [0.0, -BLOCK_WIDTH, BLOCK_WIDTH]
 const BLOCK_DEPTH := 3.0

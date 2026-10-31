@@ -1,7 +1,8 @@
 extends TestScript
 ## Renders the Flappy Race shared screen for review: autopilot races with 1, 4 and 10 players,
 ## the overlap at the start, the closest and the furthest zoom, and bubbles for players behind.
-## Players start tapping at different times, so the pack spreads. Run without --headless.
+## Players start tapping at different times, so the pack spreads. Then finishers on the podium
+## mid-race and the results beside it with 1, 4 and 10 players. Run without --headless.
 
 const OUTPUT_DIR := "res://test-results/flappy-race"
 const SCENE: PackedScene = preload("res://minigames/006_flappy_race/flappy_race_presentation.tscn")
@@ -64,9 +65,22 @@ func _run() -> void:
 	await _capture("furthest-10-players")
 	_close()
 
+	for count: int in [1, 4, 10]:
+		await _open(count, 0, true)
+		await _race_to(240)
+		if count == 10:
+			await _capture("podium-mid-race-10-players")
+		_controller.end_now()
+		# Lets the camera glide to the podium.
+		for frame: int in 90:
+			_presentation.draw_frame(1.0 / 60.0)
+		await _capture("results-%d-players" % count)
+		_close()
+
 
 ## Opens a race; player i starts tapping [param delay_step] × i ticks after GO.
-func _open(count: int, delay_step: int) -> void:
+## [param near_finish] starts player i i obstacles before the last, as the workshop's Podium.
+func _open(count: int, delay_step: int, near_finish := false) -> void:
 	_controller = FlappyRaceController.new()
 	_controller.tuning = TUNING
 	var players: Array[Dictionary] = []
@@ -81,6 +95,9 @@ func _open(count: int, delay_step: int) -> void:
 			}
 		)
 	_controller.start_race(players, 2026, START_MSEC)
+	var last := _controller.course.flight.obstacles.size() - 1
+	for index: int in count if near_finish else 0:
+		_controller.place_racer(players[index].player_id, last - index, TUNING.flight.heart_count)
 	_controller.set_meta(
 		"delays",
 		players.map(
