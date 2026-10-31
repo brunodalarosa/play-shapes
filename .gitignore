@@ -25,3 +25,6 @@ local/
 *.cer
 *.der
 *.pem.tmp
+
+# Temporary copies Windows leaves when godot-wry's loaded DLL is replaced
+addons/godot_wry/bin/**/~*
