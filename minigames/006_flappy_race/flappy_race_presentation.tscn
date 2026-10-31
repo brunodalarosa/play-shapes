@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://minigames/006_flappy_race/flappy_race_presentation.gd" id="1_present"]
 [ext_resource type="Script" path="res://components/race_camera/race_camera_3d.gd" id="2_camera"]
 [ext_resource type="Script" path="res://minigames/006_flappy_race/flappy_race_course_view.gd" id="3_course"]
 [ext_resource type="Script" path="res://components/race_camera/offscreen_bubbles.gd" id="4_bubbles"]
+[ext_resource type="Script" path="res://minigames/006_flappy_race/flappy_race_podium.gd" id="5_podium"]
 
 [sub_resource type="Environment" id="Environment_cave"]
 background_mode = 1
@@ -40,6 +41,10 @@ script = ExtResource("2_camera")
 [node name="CourseView" type="Node3D" parent="World"]
 unique_name_in_owner = true
 script = ExtResource("3_course")
+
+[node name="Podium" type="Node3D" parent="World"]
+unique_name_in_owner = true
+script = ExtResource("5_podium")
 
 [node name="Racers" type="Node3D" parent="World"]
 unique_name_in_owner = true

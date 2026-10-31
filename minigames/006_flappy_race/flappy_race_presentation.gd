@@ -17,6 +17,9 @@ const GREY_SHARE := 0.7
 const GO_SECONDS := 0.6
 const BURST_DROPS := 10
 const BURST_REACH := 1.8
+const PUFF_SPARKS := 28
+## Visible height the camera keeps at least while it frames the podium, m.
+const RESULTS_VIEW_HEIGHT := 18.0
 
 
 ## One racer as drawn.
@@ -42,6 +45,8 @@ class RacerVisual:
 	var tilt := 0.0
 	var shown_color := Color.WHITE
 	var face := ""
+	## Teleported to the podium, by finishing or at the results.
+	var on_podium := false
 
 
 var controller: FlappyRaceController
@@ -56,6 +61,7 @@ var _framed := false
 
 @onready var camera: RaceCamera3D = %Camera
 @onready var course_view: FlappyRaceCourseView = %CourseView
+@onready var podium: FlappyRacePodium = %Podium
 @onready var bubbles: OffscreenBubbles = %Bubbles
 @onready var _racers_root: Node3D = %Racers
 @onready var _bursts: Node3D = %Bursts
@@ -97,6 +103,7 @@ func apply_view_tuning() -> void:
 	camera.farthest_height = view.farthest_visible_height
 	camera.centre_height = controller.course.view_height * 0.5
 	camera.smoothing_seconds = view.camera_smoothing_seconds
+	podium.position.x = controller.course.flight.finish_x + view.podium_distance
 
 
 func visual_for(player_id: String) -> RacerVisual:
@@ -254,6 +261,10 @@ func _draw_racer(
 		visual.heart.visible = false
 		return
 
+	if racer.finished() or controller.phase == FlappyRaceController.Phase.RESULTS:
+		_draw_on_podium(visual, now, place)
+		return
+
 	var view := controller.tuning.view
 	var between := visual.previous.lerp(visual.current, fraction)
 	visual.drawn = between if state.flying else visual.current
@@ -282,19 +293,10 @@ func _draw_racer(
 	visual.pivot.rotation.z = 0.0 if tumbling else visual.tilt
 	if not state.flying and not tumbling:
 		visual.cubio.play("idle")
-
-	var color := visual.color if racer.connected else visual.color.lerp(GREY, GREY_SHARE)
-	if color != visual.shown_color:
-		visual.shown_color = color
-		visual.cubio.player_color = color
-	var face := _face(visual, now, tumbling, place)
-	if face != visual.face:
-		visual.face = face
-		visual.cubio.expressions.base_face = face
+	_dress(visual, now, tumbling, place)
 
 	var waiting := not state.flying and not tumbling
-	var results := controller.phase == FlappyRaceController.Phase.RESULTS
-	visual.heart.visible = waiting and not results
+	visual.heart.visible = waiting
 	if visual.heart.visible:
 		var depth := visual.slot * view.depth_slot + 0.4
 		visual.heart.position = Vector3(state.x, state.y, depth)
@@ -303,6 +305,39 @@ func _draw_racer(
 		var pulse := 1.0 + 0.15 * sin(now * 9.0) if state.ready else 1.0
 		visual.heart.scale = Vector3.ONE * pulse
 	visual.badge.text = ordinal(place) if place > 0 else ""
+
+
+## Stands [param visual] on its spot for [param place], with a puff where it leaves and one where
+## it lands the first time.
+func _draw_on_podium(visual: RacerVisual, now: float, place: int) -> void:
+	var spot := podium.position + FlappyRacePodium.spot_for(place)
+	spot.y += BODY_CENTRE
+	if not visual.on_podium:
+		visual.on_podium = true
+		if visual.pivot.visible:
+			_puff(visual.pivot.position, visual.color)
+		_puff(spot, visual.color)
+	visual.pivot.visible = true
+	visual.pivot.position = spot
+	visual.pivot.rotation.z = 0.0
+	visual.tilt = 0.0
+	visual.drawn = Vector2(spot.x, spot.y)
+	visual.heart.visible = false
+	visual.cubio.play("idle")
+	_dress(visual, now, false, place)
+
+
+## The colour, greyed while disconnected, and the face of the moment.
+func _dress(visual: RacerVisual, now: float, tumbling: bool, place: int) -> void:
+	var racer := visual.racer
+	var color := visual.color if racer.connected else visual.color.lerp(GREY, GREY_SHARE)
+	if color != visual.shown_color:
+		visual.shown_color = color
+		visual.cubio.player_color = color
+	var face := _face(visual, now, tumbling, place)
+	if face != visual.face:
+		visual.face = face
+		visual.cubio.expressions.base_face = face
 
 
 func _face(visual: RacerVisual, now: float, tumbling: bool, place: int) -> String:
@@ -327,6 +362,9 @@ func _face(visual: RacerVisual, now: float, tumbling: bool, place: int) -> Strin
 ## fits the others still racing.
 func _frame_camera(delta: float) -> void:
 	if not frames_camera:
+		return
+	if controller.phase == FlappyRaceController.Phase.RESULTS:
+		_frame_podium(delta)
 		return
 	var followed := visual_for(followed_id)
 	if followed != null:
@@ -355,6 +393,19 @@ func _frame_camera(delta: float) -> void:
 	_framed = true
 
 
+## Keeps the podium left of the leader's share, so the results have the right of the screen.
+func _frame_podium(delta: float) -> void:
+	var area := FlappyRacePodium.outline()
+	area.position += Vector2(podium.position.x, podium.position.y)
+	camera.closest_height = RESULTS_VIEW_HEIGHT
+	var keep := 0.0 if delta <= 0.0 or not _framed else exp(-delta / camera.smoothing_seconds)
+	camera.centre_height = lerpf(RESULTS_VIEW_HEIGHT * 0.5, camera.centre_height, keep)
+	_leader = Vector2(area.end.x, area.get_center().y)
+	var corner := PackedVector2Array([Vector2(area.position.x, area.end.y)])
+	camera.frame_race(_leader, corner, delta if _framed else 0.0)
+	_framed = true
+
+
 ## Dithers each visible Cubio whose outline covers one in a slot behind it.
 func _dither_overlaps() -> void:
 	var view := controller.tuning.view
@@ -379,7 +430,7 @@ func _show_bubbles() -> void:
 	var entries: Array[OffscreenBubbles.Entry] = []
 	for visual: RacerVisual in _visuals:
 		var racer := visual.racer
-		if racer.dnf or racer.finished() or visual.drawn.x + OUTLINE.x >= left:
+		if racer.dnf or visual.on_podium or visual.drawn.x + OUTLINE.x >= left:
 			continue
 		var height := camera.unproject_position(Vector3(left, visual.drawn.y, 0.0)).y
 		var entry := OffscreenBubbles.Entry.new(
@@ -414,6 +465,8 @@ func _draw_hud(now: float) -> void:
 	if now > view.name_seconds:
 		var faded := (now - view.name_seconds) / maxf(view.name_fade_seconds, 0.001)
 		alpha = clampf(1.0 - faded, 0.0, 1.0)
+	if controller.phase == FlappyRaceController.Phase.RESULTS:
+		alpha = 1.0
 	for visual: RacerVisual in _visuals:
 		visual.name_label.modulate.a = alpha
 		# A place among one says nothing.
@@ -478,6 +531,44 @@ func _burst(at: Vector3, color: Color) -> void:
 		tween.tween_property(mesh, "position", reach, seconds).set_ease(Tween.EASE_OUT)
 		tween.tween_property(mesh, "scale", Vector3.ONE * 0.05, seconds)
 		tween.chain().tween_callback(mesh.queue_free)
+
+
+## A one-shot spray of sparks in [param color] at [param at], where a Cubio teleports.
+func _puff(at: Vector3, color: Color) -> void:
+	var seconds := controller.tuning.view.teleport_puff_seconds
+	var spark := SphereMesh.new()
+	spark.radius = 0.14
+	spark.height = 0.28
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.vertex_color_use_as_albedo = true
+	spark.material = material
+	var puff := CPUParticles3D.new()
+	puff.mesh = spark
+	puff.amount = PUFF_SPARKS
+	puff.lifetime = seconds
+	puff.one_shot = true
+	puff.explosiveness = 1.0
+	puff.direction = Vector3.UP
+	puff.spread = 180.0
+	puff.initial_velocity_min = 3.0
+	puff.initial_velocity_max = 7.0
+	puff.damping_min = 6.0
+	puff.damping_max = 9.0
+	puff.gravity = Vector3(0.0, -4.0, 0.0)
+	puff.emission_shape = CPUParticles3D.EMISSION_SHAPE_SPHERE
+	puff.emission_sphere_radius = 1.0
+	puff.scale_amount_curve = Curve.new()
+	puff.scale_amount_curve.add_point(Vector2(0.0, 1.0))
+	puff.scale_amount_curve.add_point(Vector2(1.0, 0.0))
+	var ramp := Gradient.new()
+	ramp.set_color(0, color.lightened(0.5))
+	ramp.set_color(1, color)
+	puff.color_ramp = ramp
+	puff.position = at + Vector3(0.0, 0.0, 0.6)
+	puff.finished.connect(puff.queue_free)
+	_bursts.add_child(puff)
+	puff.emitting = true
 
 
 func bursts() -> int:

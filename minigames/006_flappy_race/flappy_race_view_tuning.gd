@@ -46,6 +46,10 @@ const LIVE_GROUPS: Array[StringName] = [&"Shared screen"]
 @export_range(0.0, 1.0, 0.05) var overlap_dither: float = 0.5
 ## How long a pickup burst lasts, s. Default: 0.5.
 @export_range(0.05, 3.0, 0.05, "suffix:s") var burst_seconds: float = 0.5
+## How far past the finish line the podium stands, m. Default: 16.
+@export_range(4.0, 60.0, 1.0, "suffix:m") var podium_distance: float = 16.0
+## How long the puff lasts where a Cubio teleports from and to, s. Default: 0.7.
+@export_range(0.05, 3.0, 0.05, "suffix:s") var teleport_puff_seconds: float = 0.7
 
 
 func to_dictionary() -> Dictionary:
@@ -96,4 +100,6 @@ func validation_errors() -> PackedStringArray:
 		)
 	if overlap_dither < 0.0 or overlap_dither > 1.0 or burst_seconds <= 0.0:
 		errors.append("Flappy Race view: the dither is a share, and a burst must take some time.")
+	if podium_distance <= 0.0 or teleport_puff_seconds <= 0.0:
+		errors.append("Flappy Race view: the podium stands past the finish; a puff takes time.")
 	return errors

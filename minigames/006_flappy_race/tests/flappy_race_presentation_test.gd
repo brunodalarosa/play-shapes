@@ -2,7 +2,9 @@ extends TestScript
 ## The shared screen of a Flappy Race: the camera keeps the leader in view, players too far
 ## behind become bubbles and return when caught up, overlapping Cubios dither, names fade,
 ## places show, a hit tumbles and then waits behind a floating heart, a disconnected Cubio
-## greys, pickups burst, and the countdowns read right. Also measures a frame with ten players.
+## greys, pickups burst, the countdowns read right, finishers teleport to the podium and the
+## results stand everyone on it with the camera on the podium. Also measures a frame with ten
+## players.
 
 const SCENE: PackedScene = preload("res://minigames/006_flappy_race/flappy_race_presentation.tscn")
 const TUNING := preload("res://minigames/006_flappy_race/tuning/Default.tres")
@@ -38,6 +40,7 @@ func _run() -> void:
 	_check_hit_and_heart()
 	_check_frozen_and_burst()
 	_check_last_seconds()
+	_check_podium()
 	_close()
 
 	await _open(10, tuning)
@@ -184,6 +187,50 @@ func _check_last_seconds() -> void:
 	_settle(_controller.last_seconds_tick() + 1)
 	check(_presentation.cue_text() == "10", "The last 10 seconds count down large")
 	check(_presentation.timer_text() == "0:10", "The timer agrees")
+
+
+func _check_podium() -> void:
+	var winner := _controller.racer_for("p0")
+	winner.state.invulnerable_ticks = 100000
+	winner.state.x = _controller.course.flight.finish_x - 0.1
+	winner.state.y = 12.0
+	var puffs := _presentation.bursts()
+	_settle(_controller.settled_tick + 2)
+	var visual := _presentation.visual_for("p0")
+	check(winner.finished() and visual.on_podium, "A finisher teleports to the podium")
+	check(
+		_on_spot(visual, 1) and visual.pivot.rotation.z == 0.0,
+		"The first to finish stands upright on the tallest block",
+	)
+	check(_presentation.bursts() == puffs + 2, "A puff where it leaves and one where it lands")
+	check(not _presentation.visual_for("p1").on_podium, "Players still racing keep flying")
+
+	_settle(_controller.race_ticks())
+	check(_controller.phase == FlappyRaceController.Phase.RESULTS, "The timer ends the race")
+	var order := _controller.ranking()
+	for index: int in order.size():
+		var standing := _presentation.visual_for(order[index].player_id)
+		check(_on_spot(standing, index + 1), "Place %d stands on its spot" % (index + 1))
+	var fourth := _presentation.visual_for(order[3].player_id)
+	check(fourth.face == "face_disappointed", "Off the raised blocks the face is disappointed")
+	check(visual.face == "face_mischievous", "The top three look mischievous")
+	check(visual.name_label.modulate.a == 1.0, "Names show again over the podium")
+	check(_presentation.bubbles.shown_ids().is_empty(), "Nobody on the podium has a bubble")
+	for frame: int in 120:
+		_presentation.draw_frame(1.0 / 60.0)
+	var area := FlappyRacePodium.outline()
+	area.position += Vector2(_presentation.podium.position.x, 0.0)
+	var shown := _presentation.camera.visible_rect()
+	check(
+		shown.encloses(area) and shown.end.x > area.end.x + shown.size.x * 0.3,
+		"The camera frames the podium and leaves the right of the screen for the results",
+	)
+
+
+func _on_spot(visual: FlappyRacePresentation.RacerVisual, place: int) -> bool:
+	var spot := _presentation.podium.position + FlappyRacePodium.spot_for(place)
+	spot.y += FlappyRacePresentation.BODY_CENTRE
+	return visual.pivot.visible and visual.pivot.position.is_equal_approx(spot)
 
 
 func _measure_frame() -> void:

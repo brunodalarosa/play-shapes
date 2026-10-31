@@ -24,9 +24,9 @@ func build(course: FlappyRaceCourse) -> void:
 	_coins.clear()
 
 	var flight := course.flight
-	_block(_material(FLOOR), flight.start_x - 80.0, flight.finish_x + 80.0, -40.0, 0.0)
-	_block(_material(FINISH), flight.finish_x - 0.25, flight.finish_x + 0.25, 0.0, 80.0)
-	var stone := _material(STONE)
+	_block(stone_material(FLOOR), flight.start_x - 80.0, flight.finish_x + 80.0, -40.0, 0.0)
+	_block(stone_material(FINISH), flight.finish_x - 0.25, flight.finish_x + 0.25, 0.0, 80.0)
+	var stone := stone_material(STONE)
 	for obstacle: FlappyFlightObstacle in flight.obstacles:
 		_block(stone, obstacle.x_start, obstacle.x_end, -1.0, obstacle.gap_bottom)
 		var top := obstacle.gap_top + HANGING_REACH
@@ -37,7 +37,7 @@ func build(course: FlappyRaceCourse) -> void:
 	coin.bottom_radius = 0.5
 	coin.height = 0.18
 	coin.radial_segments = 20
-	coin.material = _material(GOLD, 0.35)
+	coin.material = stone_material(GOLD, 0.35)
 	for pickup: FlappyFlightPickup in flight.pickups:
 		var mesh := MeshInstance3D.new()
 		mesh.mesh = coin
@@ -67,7 +67,7 @@ func _block(material: Material, x0: float, x1: float, y0: float, y1: float) -> v
 	add_child(mesh)
 
 
-static func _material(color: Color, metallic := 0.0) -> StandardMaterial3D:
+static func stone_material(color: Color, metallic := 0.0) -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
 	material.metallic = metallic
