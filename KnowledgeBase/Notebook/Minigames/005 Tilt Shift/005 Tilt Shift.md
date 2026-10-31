@@ -1,44 +1,73 @@
 ---
 area: Minigames
-tags: [system, stub]
-code: [RoundedBar, components/rounded_bar, ShapeFace3D, components/shape_face, ScreenFollowLabel]
-verified:
-branch:
+tags: [hub]
+code: [minigames/005_3d_tilt_shift, web/src/005_3d_tilt_shift, assets/runtime/minigames/tilt_shift_3d, addons/tilt_shift_3d_workshop, TiltShift3DMotionController, minigames/005_3d_tilt_shift/tilt_shift_3d_session.gd]
+verified: 2026-10-31
+branch: feature/knowledge-base
 ---
 
-# Tilt Shift 3D
+# 005 Tilt Shift
 
-Hub: [[005 Tilt Shift]].
+Hub of minigame 005, Tilt Shift 3D. Parent: [[Minigames]]. Two equal teams tilt their phones
+to steer paddles that guide falling balls into their bins.
 
-Minigame 005 is Tilt Shift in the 3D low-poly world. Two equal teams tilt their phones to
-guide falling balls into their bins; each player is a paddle in their own colour, with a face
-that reacts. The design is in `docs/game-design-documents/Minigames/005/`.
+## Identity
 
-## Ownership
+| Number | Players | Phone input | Status |
+| --- | --- | --- | --- |
+| 005 | 2, 4, 6, 8 or 10 | landscape tilt over HTTPS motion sensors | playable; replaced the retired 2D Tilt Shift, 003 |
 
-- `tilt_shift_3d_shift_controller.gd` owns the shift: roster, teams, rounds, selection,
-  allocation, readiness, countdown, scoring and results. Physics reports catches only.
-- `tilt_shift_3d_arena.gd` owns the Jolt bodies on the plane: paddles, balls, walls and the
-  raised floor, delivery and catches. It converts between the rules' arena widths, measured
-  from the top-left with Y down, and world units centred on the origin with Y up.
-- `tilt_shift_3d_presentation.gd` and `tilt_shift_3d_presentation.tscn` draw the factory,
-  bins, shape paddles, faces, names, balls, HUD, participant panel and results.
-- `tilt_shift_3d_expression_driver.gd` turns fast turns, hits and the round's moments into
-  faces; it reads the arena and never feeds back into it.
-- `tilt_shift_3d_session.gd` carries motion preparation from the Pre-minigame screen into
-  play, and `tilt_shift_3d_protocol.gd` is its phone protocol.
-- `3d_tilt_shift.tscn` is the catalog entry's scene, with Return to lobby.
+## Where in code
 
-## Shape paddles and faces
+- Host: `minigames/005_3d_tilt_shift/`, with a session script, `tilt_shift_3d_session.gd`.
+- Phone: `web/src/005_3d_tilt_shift/`, drawing the player's own paddle in three.js.
+- Runtime art: `assets/runtime/minigames/tilt_shift_3d/`; sources in `art/tilt_shift_3d/`.
+- Workshop: the editor addon `addons/tilt_shift_3d_workshop/`, not yet on the shared window.
 
-Each paddle's collider and drawing come from `RoundedBar` in `components/rounded_bar/`, built
-from the layout's length and thickness. The drawing adds a cream gap ring, the team outline and
-a `ShapeFace3D` from `components/shape_face/`; the automatic paddle is grey with no face.
+## This folder
 
-A hit squashes only the drawing. Names follow the paddles through `ScreenFollowLabel` for the
-first seconds of each round. The phone shows the strongest face across the player's paddles.
+| Note | Holds |
+| --- | --- |
+| [[005 Ownership]] | what each script owns; paddles and faces |
+| [[005 Code Map]] | the controller, arena, motion and session in the code |
+| [[005 Messages]] | the motion, calibration and round messages |
+| [[005 Phone Screen]] | what the phone shows in preparation and play |
+| [[005 Motion Control]] | how tilt becomes a paddle angle |
+| [[005 Preparation Lifecycle]] | permission, calibration and landscape from Ready to play |
+| [[005 Tuning]] | the tuning guide and its Resources |
+| [[005 Flow Tuning]], [[005 Motion Tuning]], [[005 Physics and Delivery]] | the three tuning groups |
+| [[005 Workshop]] | the editor workshop addon |
+| [[005 Scene Composition]] | the factory scene |
+| [[005 Asset Sources]], [[005 Art Assets]] | provenance and the art pipeline |
 
-## Tuning and tools
+## Messages and authority
 
-[[005 Tuning|The tuning guide]] lists every value. The **Tilt Shift 3D** workshop tab edits
-them and runs the 3D preview; F12 offers a simulated factory with ten synthetic players.
+The host owns teams, rounds, allocation, scoring and every body; the phone streams its
+orientation and the host turns it into held angles. See [[005 Messages]] and [[Motion Input]].
+
+## Prediction
+
+None. The phone shows its paddle from host state.
+
+## Workshop and tuning
+
+Selected Resources and their fields are in [[005 Tuning]]; the workshop is [[005 Workshop]].
+F12 offers a simulated factory with ten synthetic players ([[Debug Menu]]).
+
+## Verification
+
+The `tests/` folder of the minigame; see Tilt Shift 3D in
+[[Verification#Focused checks by area]]. Motion needs `[PHYSICAL-PHONE]` evidence over HTTPS
+([[Local HTTPS]]).
+
+## Gotchas
+
+- **Motion sensors need a secure context**: a phone on plain HTTP gets no orientation.
+- **READY is blocked in portrait** and cleared when landscape is lost while waiting
+  ([[Pre-minigame Screen]]).
+- Some Tilt Shift tests can exit `3221225477` at native shutdown on Windows with zero
+  failures. Report it as a failure, separately ([[Roadmap#Known bugs]]).
+
+## Architecture docs
+
+[[005 Tilt Shift Design]].

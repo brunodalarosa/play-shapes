@@ -13,7 +13,7 @@ Hub: [[005 Tilt Shift]].
 Where minigame 005 lives in the code.
 
 Minigame 005 is Tilt Shift in 3D, in `minigames/005_3d_tilt_shift/`.
-[[005 Tilt Shift|Its README]] lists what each script owns, and its
+[[005 Ownership]] lists what each script owns, and its
 selected Resources are in the [[005 Tuning|field guide]].
 
 - `tilt_shift_3d_shift_controller.gd` owns equal teams, frozen shift content, layout exposure

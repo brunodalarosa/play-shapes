@@ -71,7 +71,7 @@ function main() {
   }
 
   const files = repositoryFiles();
-  const sources = files.filter((file) => !file.startsWith(VAULT) && !file.startsWith("addons/"));
+  const sources = files.filter((file) => !file.startsWith(VAULT));
   const texts = new Map();
   for (const file of sources) {
     texts.set(file, existsSync(join(root, file)) ? readText(file) : null);

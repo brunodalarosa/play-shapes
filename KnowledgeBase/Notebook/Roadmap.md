@@ -1,7 +1,7 @@
 ---
 area: Notebook
 tags: [system, stub]
-code: [docs/game-design-documents/Minigames/004, docs/game-design-documents/Minigames/006, tests/e2e/host.gd]
+code: [tests/e2e/host.gd]
 verified:
 branch:
 ---
@@ -87,8 +87,8 @@ billboard shows only the join QR ([[0041-rooftop-logo-sign|0041]]).
 Minigame 004, Bubbles and jellyfishes 3D, replaced the retired 2D version, 002: a from-scratch
 3D rebuild without the spin move, on Jolt physics with plane-locked bodies
 ([[0034-bubbles-3d-jolt-plane|0034]]), with a three.js view of each player's bubble
-on the phone ([[0035-phone-three-js|0035]]). Its design is in
-`docs/game-design-documents/Minigames/004/`. It awaits physical-phone checks and the owner's
+on the phone ([[0035-phone-three-js|0035]]). Its design is
+[[004 Bubbles and Jellyfishes Design]]. It awaits physical-phone checks and the owner's
 play review; tuning values are provisional.
 
 Minigame 005, Tilt Shift 3D, replaced the retired 2D version, 003: the same game
@@ -111,7 +111,7 @@ It awaits physical-phone checks and the owner's play review; tuning values are p
 ## Backlog
 
 - Minigame 006, Flappy Race: a phone-first race through a crystal cave with hearts and speed
-  pickups, for 1 to 10 players. Designed in `docs/game-design-documents/Minigames/006/`. Its
+  pickups, for 1 to 10 players. Designed in [[006 Flappy Race Design]]. Its
   cave art, phone audio and booklet preview are not built.
   - Its launch exists: 1 to 10 players go through the Pre-minigame screen into the race scene
     and back to the lobby ([[0049-minimum-players-per-minigame|0049]]).

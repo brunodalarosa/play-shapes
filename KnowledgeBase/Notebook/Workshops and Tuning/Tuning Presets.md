@@ -1,7 +1,7 @@
 ---
 area: Workshops and Tuning
 tags: [system, stub]
-code: [minigames/004_3d_bubbles/tuning/Default.tres, tests/lobby_plaza_reachability_test.gd, Tuning, minigames/005_3d_tilt_shift/tuning/Default.tres, web/src/app.ts, tests/tuning_presets_test.gd]
+code: [minigames/004_3d_bubbles/tuning/Default.tres, tests/lobby_plaza_reachability_test.gd, minigames/005_3d_tilt_shift/tuning/Default.tres, web/src/app.ts, tests/tuning_presets_test.gd]
 verified:
 branch:
 ---
