@@ -177,6 +177,9 @@ The host runs and draws the whole race on a placeholder course; each phone flies
   hearts, pickup bursts, a `RaceCamera3D` on the leader, `OffscreenBubbles`, place badges,
   fading names, the timer and the countdowns. `flappy_race_course_view.gd` is the placeholder
   course.
+- Finishers teleport with a puff of sparks to their spot on `FlappyRacePodium`
+  (`flappy_race_podium.gd`), and at the results the presentation frames the podium beside a
+  panel of places ([0056](decisions/0056-podium-arrivals-teleport.md)).
 - `flappy_race_controller.gd` (`FlappyRaceController`) owns the race: the countdown, every
   player's `FlappyRaceRacer`, stepped together one tap window behind the clock
   ([0048](decisions/0048-predicted-input-carries-a-tick.md)), finishing, the timer, freezing on

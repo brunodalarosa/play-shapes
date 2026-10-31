@@ -92,3 +92,4 @@ What was decided.
 | [0053](0053-boot-steps-and-entry-points.md) | Every launch runs one boot made of Essential and Optional steps |
 | [0054](0054-workshop-phone-view-in-godot-wry.md) | The workshop phone view is the real phone page in a godot-wry web view |
 | [0055](0055-material-design-3-for-workshops.md) | Workshops follow Material Design 3 |
+| [0056](0056-podium-arrivals-teleport.md) | Flappy Race finishers teleport to the podium instead of flying there |

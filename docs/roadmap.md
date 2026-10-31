@@ -102,8 +102,7 @@ It awaits physical-phone checks and the owner's play review; tuning values are p
 
 - Minigame 006, Flappy Race: a phone-first race through a crystal cave with hearts and speed
   pickups, for 1 to 10 players. Designed in `docs/game-design-documents/Minigames/006/`. Its
-  cave art, Cubio's flight clips, the podium, results, phone audio and booklet preview are not
-  built.
+  cave art, phone audio and booklet preview are not built.
   - Its launch exists: 1 to 10 players go through the Pre-minigame screen into the race scene
     and back to the lobby ([0049](decisions/0049-minimum-players-per-minigame.md)).
   - Its flight, hearts and seeded course exist as shared code, the flight proven identical on
@@ -114,6 +113,8 @@ It awaits physical-phone checks and the owner's play review; tuning values are p
     placeholder course.
   - The shared screen follows the leader with a zooming camera, bubbles for players behind,
     dithered overlaps, place badges and the timer, on the same placeholder course.
+  - Finishers teleport to a placeholder stone podium past the finish line, and the results
+    panel lists every place beside it ([0056](decisions/0056-podium-arrivals-teleport.md)).
   - Its workshop exists on the shared workshop window, with autopilots, quick setups and the
     designer flying through the real phone page.
 - Minigame workshops ([0052](decisions/0052-a-workshop-for-every-minigame.md)): the shared

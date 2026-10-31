@@ -16,11 +16,12 @@ mirrored for the phone in `web/src/flappy_flight/`.
 - `flappy_race_pre_minigame_content.tres` is the Pre-minigame booklet text. It has no preview
   image yet.
 - `flappy_race.tscn` and `flappy_race.gd` take the launch from `SessionHost`, start the race,
-  register the protocol, show the player count and the race's status, and offer Return to
-  lobby.
+  register the protocol, show the player count and the race's status, keep the best finish
+  time since the host started, and offer Return to lobby.
 - `flappy_race_presentation.tscn` and `.gd` draw the shared screen: Cubios, hearts, bursts,
-  the race camera, bubbles, the dithered overlap, badges, names, timer and countdowns.
-  `flappy_race_course_view.gd` is the placeholder course.
+  the race camera, bubbles, the dithered overlap, badges, names, timer and countdowns, the
+  teleports to the podium and the results panel. `flappy_race_course_view.gd` is the
+  placeholder course and `flappy_race_podium.gd` the placeholder podium.
 - `flappy_race_controller.gd` runs the race, settling every flight one tap window behind its
   clock ([decision 0048](../../docs/decisions/0048-predicted-input-carries-a-tick.md)).
   `flappy_race_racer.gd` is one player's race state.

@@ -166,7 +166,7 @@ More biomes along a journey from A to B are a later version.
 2. The shared Pre-minigame screen: every phone holds portrait and presses READY.
 3. A 3, 2, 1, GO countdown. At GO forward motion and gravity start for everyone, so a player who taps late falls behind.
 4. The race. Each player flies on their phone; the shared screen follows the race.
-5. On crossing the finish line the phone shows the player's place, such as "You finished 3rd!", and the Cubio flies to its spot on the podium.
+5. On crossing the finish line the phone shows the player's place, such as "You finished 3rd!", and the Cubio teleports to its spot on the podium in a puff of sparks.
 6. The race ends; results show on the shared screen until Return to lobby.
 
 ## Shared-screen presentation
@@ -197,7 +197,7 @@ Players pass through one another, so Cubios often overlap on the shared screen, 
 
 ### Finish and podium
 
-Past the finish line stands a podium with three raised steps of different heights for first, second and third, and one long low step for everyone else. Finishers fly to their spot in finish order. When the timer runs out, unfinished players join the low step in ranking order.
+Past the finish line stands a podium with three raised steps of different heights for first, second and third, and one long low step for everyone else. A finisher teleports to their spot as they cross the line, with a puff of sparks in their colour where they leave and where they land (decision 0056). When the race ends, unfinished players teleport to the low step in ranking order, and the camera frames the podium on the left of the screen.
 
 ## Phone controls
 
@@ -224,7 +224,7 @@ Past the finish line stands a podium with three raised steps of different height
 
 ## Results
 
-Results stay on the shared screen until Return to lobby, over the podium scene. They list every player's place, name and finish time or distance. A single player sees their finish time and the best time of this session.
+Results stay on the shared screen until Return to lobby, in a panel on the right beside the podium. They list every player's place, colour, name and finish time, distance reached or DNF. A single player sees their finish time and the best finish time of any race since the host started; workshop races do not count.
 
 ## Disconnects and reconnects
 
@@ -263,7 +263,8 @@ parts:
 * Course: restart with the same seed, new course with a new one, a seed field with a lock that
   keeps the seed across Course edits, and a course strip of everyone's progress that restarts the
   race with the pack at the clicked spot.
-* Quick setups: Start crowd, Spread pack, One far behind, Leader near finish, Out of hearts.
+* Quick setups: Start crowd, Spread pack, One far behind, Leader near finish, Out of hearts, and Podium, which starts everyone among the last obstacles.
+* End race: ranks everyone now, as when the timer runs out, and shows the real results.
 * Camera: Leader (the real game), the designer's Cubio, or Free.
 * Shared-screen readouts: seed, tick, leader progress, difficulty at the leader's spot,
   each racer's place, progress, hearts and state, and host time per frame.

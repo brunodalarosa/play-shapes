@@ -54,7 +54,7 @@ References: [mushroom](references/cave-mushroom.jpg), [heart](references/respawn
 
 ### Podium
 
-Reference: [podium](references/podium.jpg). Three raised blocks side by side, the middle tallest for first, the left for second, the right lowest for third, and one long low step in front for everyone else. Each raised top holds one Cubio; the low step holds nine.
+Reference: [podium](references/podium.jpg). Three raised blocks side by side, the middle tallest for first, the left for second, the right lowest for third, and one long low step in front for everyone else. Each raised top holds one Cubio; the low step holds the other seven of ten players.
 
 ## Copy and import instructions
 

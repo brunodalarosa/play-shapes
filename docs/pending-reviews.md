@@ -125,6 +125,9 @@ removes it. The evidence labels are defined in
   spread between 11 m and 20 m, about 80 obstacles a race.
 - `[HUMAN-PLAY]` The shared-screen camera: following the leader, zooming and switching
   leaders, the bubbles, the overlap dither, and the stacked names and badges in a crowd.
+- `[HUMAN-PLAY]` The podium and results: the teleport puffs, the podium's size and framing
+  beside the results panel with 1, 4 and 10 players, and readability from the couch. The
+  workshop's Podium setup and End race reach it quickly.
 - `[GODOT-RUNTIME]` Host frame time with ten players on the target PC. The presentation test
   measures its own work at about 0.15 ms a frame; drawing is not yet measured.
 

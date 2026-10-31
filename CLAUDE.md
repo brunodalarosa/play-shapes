@@ -25,7 +25,9 @@ results and return to the lobby.
     its TypeScript twin, proven bit-identical by `tests/fixtures/flappy_flight_runs.json`.
   - The shared screen follows the leader with `RaceCamera3D` and dithers overlaps
     ([0051](docs/decisions/0051-dithered-overlap-on-a-shared-plane.md)).
-  - The course is placeholder boxes; cave art, flight clips, podium and results are to come.
+  - The course and podium are placeholder boxes; finishers teleport to the podium and the
+    results panel stands beside it ([0056](docs/decisions/0056-podium-arrivals-teleport.md)).
+    Cave art is to come.
   - Its workshop, `minigames/006_flappy_race/workshop/`, is the first on the shared window in
     `workshop/`. Presets are one file each; `FlappyRaceAutopilot` taps through the protocol.
 - 001, 002 and 003 are retired. Minigame numbers are stable identifiers and are never reused.
@@ -161,7 +163,7 @@ Condensed from AGENTS.md and the documents it links.
   needs a person goes into `docs/pending-reviews.md`.
 - Documents state what is true now, one topic each, with links that resolve and paragraphs
   under 600 characters; `node tools/docs.mjs` checks them. Reasons go in `docs/decisions/` as
-  numbered records, never edited to change a decision; the next free number is 0056. The
+  numbered records, never edited to change a decision; the next free number is 0057. The
   roadmap changes when work finishes or is added.
 - No ticket numbers anywhere: files, comments, tests or output folders.
 - Typed GDScript, composition, signals, Control/Container UI and no fixed viewport sizes.
