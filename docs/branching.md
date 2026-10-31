@@ -1,7 +1,7 @@
 # Branching
 
 Which branches exist, what each one holds, and how a change travels from a feature branch to
-a release. The model is Git Flow; [decision 0022](decisions/0022-git-flow.md) says why.
+a release. The model is Git Flow; [decision 0022](../KnowledgeBase/Architecture/Decisions/0022-git-flow.md) says why.
 
 ## The branches
 

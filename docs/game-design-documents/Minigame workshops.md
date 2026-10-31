@@ -4,7 +4,7 @@ Every minigame has a workshop: a slice of the game where the designer sees, play
 on the PC. The game itself runs from scripts with no scene a person can look at, so the
 workshop is where game feel is decided. This document is the design every workshop follows;
 each minigame adapts only the parts listed under [What each minigame supplies](#what-each-minigame-supplies).
-Why: [decision 0052](../decisions/0052-a-workshop-for-every-minigame.md).
+Why: [decision 0052](../../KnowledgeBase/Architecture/Decisions/0052-a-workshop-for-every-minigame.md).
 
 ![The workshop window with its four panels](../images/minigame-workshop/main-window.png)
 
@@ -14,7 +14,7 @@ Why: [decision 0052](../decisions/0052-a-workshop-for-every-minigame.md).
   What the designer feels in the workshop is what players feel in a real game; only the
   placeholder visuals may differ while final art is missing.
 - Additions sit around the game and never change how it settles input: autopilot players fed
-  through the same input path as phones ([0008](../decisions/0008-bots.md)), quick setups,
+  through the same input path as phones ([0008](../../KnowledgeBase/Architecture/Decisions/0008-bots.md)), quick setups,
   readouts.
 - Joining by QR, the Playground lobby, minigame choice and the Pre-minigame screen are skipped.
 
@@ -30,7 +30,7 @@ Why: [decision 0052](../decisions/0052-a-workshop-for-every-minigame.md).
 ## The window
 
 - The window follows Material Design 3's dark scheme
-  ([0055](../decisions/0055-material-design-3-for-workshops.md)). A new kind of control is
+  ([0055](../../KnowledgeBase/Architecture/Decisions/0055-material-design-3-for-workshops.md)). A new kind of control is
   designed from Material's component for the same job and added to the shared theme.
 
 - A top bar holds the preset being edited, its count of unsaved edits, Save, Save as, Revert,
@@ -53,7 +53,7 @@ Why: [decision 0052](../decisions/0052-a-workshop-for-every-minigame.md).
 - **Phone view:** the real phone page, served by the workshop and shown in a phone frame sized
   by a device picker, connected as the designer's own player. It stays docked until the web
   view add-on can draw in a popped-out window
-  ([0054](../decisions/0054-workshop-phone-view-in-godot-wry.md)).
+  ([0054](../../KnowledgeBase/Architecture/Decisions/0054-workshop-phone-view-in-godot-wry.md)).
 - **Minigame flow:** restart, the seed where the minigame has one, the players taking part,
   autopilots and their skill, and quick setups that restart into a named situation. The game
   always runs at real time: a phone predicts on its own clock, so there is no pause or speed.

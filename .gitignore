@@ -1,6 +1,12 @@
 # Godot 4+ specific ignores
 .godot/
 .obsidian/
+# The knowledge base vault keeps its shared settings; per-user Obsidian state stays out.
+!KnowledgeBase/.obsidian/
+KnowledgeBase/.obsidian/*
+!KnowledgeBase/.obsidian/app.json
+!KnowledgeBase/.obsidian/core-plugins.json
+!KnowledgeBase/.obsidian/templates.json
 /android/
 web/node_modules/
 web/build/

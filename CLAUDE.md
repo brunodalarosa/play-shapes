@@ -18,15 +18,15 @@ results and return to the lobby.
 - Minigame 005, Tilt Shift 3D: 2/4/6/8/10 players, landscape phone tilt over HTTPS motion
   sensors, plane-locked Jolt physics, an editor workshop addon.
 - Minigame 006, Flappy Race: 1–10 players, the only minigame with `min_players = 1`
-  ([0049](docs/decisions/0049-minimum-players-per-minigame.md)).
+  ([0049](KnowledgeBase/Architecture/Decisions/0049-minimum-players-per-minigame.md)).
   - The host runs the race in `FlappyRaceController`, settling taps one window behind its
-    clock ([0048](docs/decisions/0048-predicted-input-carries-a-tick.md)).
+    clock ([0048](KnowledgeBase/Architecture/Decisions/0048-predicted-input-carries-a-tick.md)).
   - Each phone predicts its own flight on the shared step in `components/flappy_flight/` and
     its TypeScript twin, proven bit-identical by `tests/fixtures/flappy_flight_runs.json`.
   - The shared screen follows the leader with `RaceCamera3D` and dithers overlaps
-    ([0051](docs/decisions/0051-dithered-overlap-on-a-shared-plane.md)).
+    ([0051](KnowledgeBase/Architecture/Decisions/0051-dithered-overlap-on-a-shared-plane.md)).
   - The course and podium are placeholder boxes; finishers teleport to the podium and the
-    results panel stands beside it ([0056](docs/decisions/0056-podium-arrivals-teleport.md)).
+    results panel stands beside it ([0056](KnowledgeBase/Architecture/Decisions/0056-podium-arrivals-teleport.md)).
     Cave art is to come.
   - Its workshop, `minigames/006_flappy_race/workshop/`, is the first on the shared window in
     `workshop/`. Presets are one file each; `FlappyRaceAutopilot` taps through the protocol.
@@ -44,9 +44,9 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
 - Ready-made assets first; author new ones only when strictly necessary.
 - Every gameplay scene runs on Jolt with bodies locked to one plane, so the controls feel 2D.
   The lobby's motor makes its own one-way landings
-  ([0042](docs/decisions/0042-plaza-lobby-jolt-plane.md)). The exception is a character the
+  ([0042](KnowledgeBase/Architecture/Decisions/0042-plaza-lobby-jolt-plane.md)). The exception is a character the
   phone predicts: it runs a shared deterministic step written in GDScript and TypeScript,
-  proven identical by a fixture ([0047](docs/decisions/0047-shared-deterministic-simulation.md)).
+  proven identical by a fixture ([0047](KnowledgeBase/Architecture/Decisions/0047-shared-deterministic-simulation.md)).
 
 ### Cubio
 
@@ -58,7 +58,7 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
 - Runtime: `assets/runtime/animated_characters/cubio/model/cubio.glb`, played by
   `characters/cubio_3d.tscn` (`Cubio3D`), tinted body, hands and feet. Its face is a
   `ShapeFace3D` on the model's `FaceAnchor`, placed by `cubio/face_anchor.json`, on host and
-  phone alike ([0043](docs/decisions/0043-cubio-shape-face.md)).
+  phone alike ([0043](KnowledgeBase/Architecture/Decisions/0043-cubio-shape-face.md)).
 - No jump or fall clip exists. In the air the lobby keeps whichever clip the motor reports.
 
 ### The plaza
@@ -77,7 +77,7 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
 `docs/architecture.md` is the file-by-file map; this is the part I hold in my head.
 
 - Every launch runs one boot of Essential and Optional steps (`host/boot_steps.gd`,
-  [0053](docs/decisions/0053-boot-steps-and-entry-points.md)); a scene asks for steps with an
+  [0053](KnowledgeBase/Architecture/Decisions/0053-boot-steps-and-entry-points.md)); a scene asks for steps with an
   exported `boot_request`. `scenes/boot.*` asks for all of them and starts `SessionHost`,
   an autoload in `host/session_host.gd` that outlives scene changes and owns the HTTP and
   WebSocket services, the `PlayerRegistry` (at most ten players, reconnect tokens, 60 s
@@ -98,10 +98,10 @@ Sources: [the rework note](docs/Temp%20doc%20-%203D%20game%20rework.md),
   removed time controls because phones predict on their own clock.
   - The phone view uses vendored `addons/godot_wry/` v1.0.2, which only draws in the main
     window, so that panel stays docked
-    ([0054](docs/decisions/0054-workshop-phone-view-in-godot-wry.md)).
+    ([0054](KnowledgeBase/Architecture/Decisions/0054-workshop-phone-view-in-godot-wry.md)).
   - It wears Material Design 3 dark through `WorkshopTheme`; new workshop controls are
     designed from Material 3 and added there as variations
-    ([0055](docs/decisions/0055-material-design-3-for-workshops.md)).
+    ([0055](KnowledgeBase/Architecture/Decisions/0055-material-design-3-for-workshops.md)).
 - `debug/`: F12 launcher with the Flappy Race workshop, the Shape Characters lab, the motion lab, a Tilt Shift factory
   review and one-player Bubbles.
 
@@ -167,11 +167,11 @@ Condensed from AGENTS.md and the documents it links.
   roadmap changes when work finishes or is added.
 - No ticket numbers anywhere: files, comments, tests or output folders.
 - Typed GDScript, composition, signals, Control/Container UI and no fixed viewport sizes.
-  Dictionaries are being pushed to the edges ([0019](docs/decisions/0019-typed-classes.md)).
+  Dictionaries are being pushed to the edges ([0019](KnowledgeBase/Architecture/Decisions/0019-typed-classes.md)).
 - Test scripts extend `TestScript` and put their body in `_run()`. Any logged error fails the
   script, and so does anything still held at exit.
 - Every minigame has a workshop on the shared design, planned with the minigame
-  ([0052](docs/decisions/0052-a-workshop-for-every-minigame.md)).
+  ([0052](KnowledgeBase/Architecture/Decisions/0052-a-workshop-for-every-minigame.md)).
 - Every normal minigame launch goes through the Pre-minigame screen. A plan that skips it must
   carry the bold uppercase warning from [player-journeys.md](docs/player-journeys.md).
 - Temporary art variants go in ignored `scratch/` or `comparisons/`, never in commits.

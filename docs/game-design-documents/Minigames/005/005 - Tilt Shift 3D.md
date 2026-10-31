@@ -36,7 +36,7 @@ The round deadline stops scoring immediately and clears unresolved balls before 
 
 ## Simulation and world scale
 
-The host simulates 005 with Godot's 3D physics (Jolt), as 004 does ([decision 0034](../../../decisions/0034-bubbles-3d-jolt-plane.md)). Balls, paddles, walls and floor segments live on one vertical plane at depth zero; every body's depth translation is locked, balls rotate only about the depth axis and paddles turn only about it.
+The host simulates 005 with Godot's 3D physics (Jolt), as 004 does ([decision 0034](../../../../KnowledgeBase/Architecture/Decisions/0034-bubbles-3d-jolt-plane.md)). Balls, paddles, walls and floor segments live on one vertical plane at depth zero; every body's depth translation is locked, balls rotate only about the depth axis and paddles turn only about it.
 
 One world unit equals 100 pixels of a 1920 × 1080 frame. One arena width is 19.2 units; the arena is 19.2 × 10.8 units, centred on the origin, and fills the frame edge to edge at 16:9. Distances in tuning are measured in arena widths and multiplied by 19.2 in the arena.
 

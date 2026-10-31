@@ -22,7 +22,7 @@ The initial screen shows the preview, instructions and all-player READY status. 
 checks inside gameplay, including Tilt Shift 3D's selected-player round panels, do not replace it.
 
 There is no player setting to skip the initial screen. Debug launch paths may bypass it.
-See [decision 0032](decisions/0032-mandatory-pre-minigame-screen.md).
+See [decision 0032](../KnowledgeBase/Architecture/Decisions/0032-mandatory-pre-minigame-screen.md).
 
 ## Implementation-plan warning
 

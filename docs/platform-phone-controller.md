@@ -195,7 +195,7 @@ and client-supplied identity, support or grounding fields have no authority.
 ## One-way landings
 
 Godot's 3D physics has no one-way shapes, so the motor provides them
-([decision 0042](decisions/0042-plaza-lobby-jolt-plane.md)).
+([decision 0042](../KnowledgeBase/Architecture/Decisions/0042-plaza-lobby-jolt-plane.md)).
 
 - Before each move it excludes, through collision exceptions on its own body, every one-way
   surface in the step's path whose top is above the body's feet.

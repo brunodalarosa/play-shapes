@@ -5,7 +5,7 @@ Messages and limits are in [protocol.md](protocol.md).
 
 ## Boot and host services
 
-- Every launch runs one boot ([0053](decisions/0053-boot-steps-and-entry-points.md)).
+- Every launch runs one boot ([0053](../KnowledgeBase/Architecture/Decisions/0053-boot-steps-and-entry-points.md)).
   `host/boot_steps.gd` names the steps, their order and what each needs. Presets is the one
   Essential step; the others run only when an entry lists them.
 - An entry lists its steps in a `BootRequest` (`host/boot_request.gd`), exported as
@@ -21,7 +21,7 @@ Messages and limits are in [protocol.md](protocol.md).
   lobby loads none of its scenes or models.
 - A catalog definition may name a `session_script`. SessionHost creates that session on first
   use and lets it prepare players, gate READY and the launch, and follow the roster, from the
-  Pre-minigame screen into play ([decision 0039](decisions/0039-minigame-session-scripts.md)).
+  Pre-minigame screen into play ([decision 0039](../KnowledgeBase/Architecture/Decisions/0039-minigame-session-scripts.md)).
   Tilt Shift 3D uses one.
 - `host/http_service.gd` serves a fixed asset allowlist with bounded requests. It never serves
   a client-selected filesystem path.
@@ -49,14 +49,14 @@ Messages and limits are in [protocol.md](protocol.md).
   - `PlatformSurfaces` holds the invisible collision: the world builds one one-way
     `PlatformSurface` box per landing on 3D physics layer 8 (bit 128). Characters are
     plane-locked Jolt bodies on layer 9 (bit 256). See
-    [decision 0042](decisions/0042-plaza-lobby-jolt-plane.md).
+    [decision 0042](../KnowledgeBase/Architecture/Decisions/0042-plaza-lobby-jolt-plane.md).
   - Two invisible side walls on the same layer keep characters in view. `fit_walls()` places
     them from the camera whenever the view resizes, so a character stops with its centre on
     the screen edge, half out of view. The ground runs past both walls.
   - `scenes/plaza_billboard.*` draws the live join QR across the whole display in a
     `SubViewport` that renders only when it changes, shown unshaded on the `Display` surface.
   - `Plaza/Cafe/LogoSign` is the logo as 3D letters on posts on the café roof, scenery with no
-    collision ([decision 0041](decisions/0041-rooftop-logo-sign.md)).
+    collision ([decision 0041](../KnowledgeBase/Architecture/Decisions/0041-rooftop-logo-sign.md)).
 - `scenes/lobby_playground_world.gd` reconciles registered players to ten seat-indexed
   `SpawnPoints` and spawns their bodies under `Characters`.
 - `characters/lobby_cubio.tscn` is the host body: a `CharacterBody3D` with the shared
@@ -94,18 +94,18 @@ The reusable parts behind the lobby characters. Setup and reuse are in
 ## Minigame catalog and Bubbles and jellyfishes 3D
 
 A minigame has one folder under `minigames/`, named with its number and name
-([decision 0015](decisions/0015-one-folder-per-minigame.md)). It holds the minigame's scenes,
+([decision 0015](../KnowledgeBase/Architecture/Decisions/0015-one-folder-per-minigame.md)). It holds the minigame's scenes,
 scripts, protocol script and tuning script, its presets in `tuning/` and its tests and render
 helpers in `tests/`. Its phone code is in the folder of the same name under `web/src/`, and
 its browser tests in the one under `web/tests/`. Art sources and runtime assets stay under
 `art/` and `assets/runtime/`.
 
 The shared code learns about a minigame from the catalog, `minigames/catalog.tres`
-([decision 0024](decisions/0024-minigame-catalog.md)):
+([decision 0024](../KnowledgeBase/Architecture/Decisions/0024-minigame-catalog.md)):
 
 - The catalog lists one `MinigameDefinition` per minigame: its id, its name, the path of its
   scene, its fewest and largest numbers of players
-  ([decision 0049](decisions/0049-minimum-players-per-minigame.md)), the path of its
+  ([decision 0049](../KnowledgeBase/Architecture/Decisions/0049-minimum-players-per-minigame.md)), the path of its
   ready-screen content, and whether the debug menu offers a one-player round.
 - `SessionHost` owns the catalog. The lobby fills its picker from it in the catalog's order,
   the host takes the scene, the name and the player limits from it, the ready screen loads its
@@ -120,7 +120,7 @@ needs no change to the WebSocket service.
 
 Minigame 004, Bubbles and jellyfishes 3D, lives in `minigames/004_3d_bubbles/`. It has no spin
 move; `tests/bubbles_3d_no_spin_test.gd` in its folder checks that. Its gameplay runs on Jolt
-with plane-locked bodies ([decision 0034](decisions/0034-bubbles-3d-jolt-plane.md)).
+with plane-locked bodies ([decision 0034](../KnowledgeBase/Architecture/Decisions/0034-bubbles-3d-jolt-plane.md)).
 
 - `bubbles_3d_round_controller.gd` owns the entrance, countdown, active and results phases,
   scores, pops and scatter counts, the zero-time freeze, ranking, disconnects and leaves.
@@ -148,10 +148,10 @@ selected Resources are in the [field guide](../minigames/005_3d_tilt_shift/tunin
   ball resolution, assignments and held angles. The allocator returns inspectable neighbor and
   conflict diagnostics.
 - The arena simulates on Jolt with plane-locked bodies, as 004 does, and fills the frame with
-  the floor raised for the bins ([decision 0038](decisions/0038-tilt-shift-3d-full-width-frame.md)).
+  the floor raised for the bins ([decision 0038](../KnowledgeBase/Architecture/Decisions/0038-tilt-shift-3d-full-width-frame.md)).
 - Paddles are rounded bars built in code with a matching convex collider
-  ([decision 0036](decisions/0036-tilt-shift-3d-generated-paddle.md)), each with a composed face
-  ([decision 0037](decisions/0037-shape-face-system.md)).
+  ([decision 0036](../KnowledgeBase/Architecture/Decisions/0036-tilt-shift-3d-generated-paddle.md)), each with a composed face
+  ([decision 0037](../KnowledgeBase/Architecture/Decisions/0037-shape-face-system.md)).
 - `TiltShift3DMotionController` owns capture preparation, calibration and active-consumer
   lifecycle; each `TiltShift3DTiltInput` holds one player's neutral and continuous input. See
   [motion input](motion-input.md#tilt-shift-3d-control).
@@ -173,17 +173,17 @@ The host runs and draws the whole race on a placeholder course; each phone flies
 - `flappy_race_presentation.tscn` and `.gd` (`FlappyRacePresentation`) draw the shared
   screen from the controller's settled flights, smoothed between ticks: a `Cubio3D` per racer
   in its own depth slot, dithered while it covers another
-  ([0051](decisions/0051-dithered-overlap-on-a-shared-plane.md)), the floating respawn
+  ([0051](../KnowledgeBase/Architecture/Decisions/0051-dithered-overlap-on-a-shared-plane.md)), the floating respawn
   hearts, pickup bursts, a `RaceCamera3D` on the leader, `OffscreenBubbles`, place badges,
   fading names, the timer and the countdowns. `flappy_race_course_view.gd` is the placeholder
   course.
 - Finishers teleport with a puff of sparks to their spot on `FlappyRacePodium`
   (`flappy_race_podium.gd`), and at the results the presentation frames the podium beside a
-  panel of places ([0056](decisions/0056-podium-arrivals-teleport.md)).
+  panel of places ([0056](../KnowledgeBase/Architecture/Decisions/0056-podium-arrivals-teleport.md)).
 - `flappy_race_controller.gd` (`FlappyRaceController`) owns the race: the countdown, every
   player's `FlappyRaceRacer`, stepped together one tap window behind the clock
-  ([0048](decisions/0048-predicted-input-carries-a-tick.md)), finishing, the timer, freezing on
-  disconnect, DNF and the ranking ([0050](decisions/0050-random-order-for-exact-ties.md)).
+  ([0048](../KnowledgeBase/Architecture/Decisions/0048-predicted-input-carries-a-tick.md)), finishing, the timer, freezing on
+  disconnect, DNF and the ranking ([0050](../KnowledgeBase/Architecture/Decisions/0050-random-order-for-exact-ties.md)).
 - `flappy_race_protocol.gd` turns taps into controller calls and sends each phone its course,
   its settled flight and its events. See [protocol.md](protocol.md#flappy-race).
 - `flappy_race_course.gd` (`FlappyRaceCourse`) generates the seeded course on the host: obstacle
@@ -220,10 +220,10 @@ The shared parts of every workshop live in `workshop/`, outside any minigame fol
 - `workshop_presets.gd` reads and writes a minigame's preset files, and
   `workshop_game_preset.gd` changes its one line of `Tuning/Active Presets.tres`.
 - `workshop_phone_view.gd` shows the phone page in godot-wry, signed in as the designer
-  ([0054](decisions/0054-workshop-phone-view-in-godot-wry.md)).
+  ([0054](../KnowledgeBase/Architecture/Decisions/0054-workshop-phone-view-in-godot-wry.md)).
 - `workshop_boot_request.tres` asks the boot for the servers bound to this PC only.
 - `workshop_theme.gd` (`WorkshopTheme`) builds the Material Design 3 theme the window wears
-  ([0055](decisions/0055-material-design-3-for-workshops.md)), with the fonts in `fonts/`.
+  ([0055](../KnowledgeBase/Architecture/Decisions/0055-material-design-3-for-workshops.md)), with the fonts in `fonts/`.
 
 ## Shared 3D components
 
@@ -245,7 +245,7 @@ These live outside any minigame folder so later 3D scenes can use them.
   nodes. `FlappyFlight` steps one player's flight at 60 Hz over a `FlappyFlightCourse`;
   `HeartRow` holds the hearts; `FlappyFlightTuning` holds the values the phone also receives.
   `web/src/flappy_flight/` is the same step in TypeScript, line for line
-  ([0047](decisions/0047-shared-deterministic-simulation.md)). `FlappyFlightAutopilot` flies a
+  ([0047](../KnowledgeBase/Architecture/Decisions/0047-shared-deterministic-simulation.md)). `FlappyFlightAutopilot` flies a
   course with no hit, for tests and simulated players.
 - `components/shape_face/`: the shape character face. `ShapeFaceManifest` reads the shared
   face parts and presets, `ShapeFaceExpressions` keeps timed expressions with priorities and

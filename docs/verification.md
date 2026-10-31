@@ -231,7 +231,7 @@ start only what they need, so they stay fast.
 - The flight's parity: `tests/flappy_flight_parity_test.gd` and
   `web/tests/flappy_flight/parity.test.mjs` must both reproduce every run in
   `tests/fixtures/flappy_flight_runs.json`, its events and a digest of every tick's exact state
-  ([0047](decisions/0047-shared-deterministic-simulation.md)). On a mismatch each writes its
+  ([0047](../KnowledgeBase/Architecture/Decisions/0047-shared-deterministic-simulation.md)). On a mismatch each writes its
   trace under `test-results/flappy_flight/` for a diff.
 - After a deliberate change to the flight rules, change both languages, rewrite the fixture
   with `godot --headless --path . --script res://tests/flappy_flight_parity_test.gd --

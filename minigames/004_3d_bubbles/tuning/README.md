@@ -42,6 +42,6 @@ preset, so a preset that breaks a rule below fails the check.
   20 units from the camera, so the play objects never fade.
 - Wall bounciness must be at least half the bump bounciness. Godot adds the bounce of the two
   bodies in a contact, so each bubble carries half the bump bounciness and the walls the rest
-  ([decision 0034](../../../docs/decisions/0034-bubbles-3d-jolt-plane.md)).
+  ([decision 0034](../../../KnowledgeBase/Architecture/Decisions/0034-bubbles-3d-jolt-plane.md)).
 
 Only the owner promotes a tried value into `Default.tres`.

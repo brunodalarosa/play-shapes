@@ -25,7 +25,7 @@ cd ..
 
 ## What the build does
 
-`npm run build` runs these steps ([decision 0016](decisions/0016-bundle-the-phone-client.md)):
+`npm run build` runs these steps ([decision 0016](../KnowledgeBase/Architecture/Decisions/0016-bundle-the-phone-client.md)):
 
 1. `npm run modules` compiles each TypeScript module to JavaScript in `web/build/`, which git
    ignores, and copies the pinned NippleJS beside them. TypeScript checks the types as it

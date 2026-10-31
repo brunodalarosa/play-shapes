@@ -17,6 +17,7 @@ const PAGE_KINDS = {
   architecture: ["level", "parent", "status"],
   reference: [],
   stub: [],
+  decision: [],
 };
 const LEVELS = ["macro", "system", "implementation"];
 const STATUSES = ["draft", "reviewed"];

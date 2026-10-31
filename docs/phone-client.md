@@ -73,7 +73,7 @@ and the timer at the top right. Every touch-down anywhere on it is one flap.
 
 - The phone predicts its own flight from its own taps, so a flap shows in the next frame, and
   corrects itself from the host's settled state
-  ([0048](decisions/0048-predicted-input-carries-a-tick.md)).
+  ([0048](../KnowledgeBase/Architecture/Decisions/0048-predicted-input-carries-a-tick.md)).
 - A hit flies the spent heart to the respawn spot, where it waits, or shows an outline that
   fills while a heart is owed, and pulses once a tap respawns.
 - The phone shows the countdown, "Finished!" and then the place, and the player's own result.

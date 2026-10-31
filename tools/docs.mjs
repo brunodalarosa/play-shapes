@@ -102,7 +102,7 @@ function main() {
       }
     }
 
-    if (file.startsWith(VAULT)) {
+    if (isVaultPage(file)) {
       for (const link of wikiLinks(text)) {
         const target = vaultFiles.get(link.name);
         if (!target) {

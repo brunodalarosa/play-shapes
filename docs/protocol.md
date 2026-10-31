@@ -13,7 +13,7 @@ Phones send UI actions and controller input only.
   connection.
 - The browser never sends host time, client timestamps or pointer positions. Input to a
   character the phone predicts carries a simulation tick instead
-  ([0048](decisions/0048-predicted-input-carries-a-tick.md)), never wall-clock time.
+  ([0048](../KnowledgeBase/Architecture/Decisions/0048-predicted-input-carries-a-tick.md)), never wall-clock time.
 - Registered socket identity and the lobby or active-protocol gates decide what a message may
   do.
 
@@ -200,7 +200,7 @@ control feedback and gameplay snapshots. It does not change capture `usable` or 
 
 Flappy Race launches through the shared Pre-minigame gate with 1 to 10 players. The host runs
 the race in `FlappyRaceController`; `flappy_race_protocol.gd` is its phone side. Ticks are the
-shared 60 Hz simulation ticks since GO ([0047](decisions/0047-shared-deterministic-simulation.md)).
+shared 60 Hz simulation ticks since GO ([0047](../KnowledgeBase/Architecture/Decisions/0047-shared-deterministic-simulation.md)).
 
 The phone sends `flappy_tap` with `type`, a whole `seq` increasing per player and a whole `tick`,
 the tick it applied the tap at. Other fields, a missing or fractional number and a negative one
@@ -233,7 +233,7 @@ invulnerability and boost ticks, obstacle index, `hearts` and the indices of the
 Everything the host sends is settled and final. A disconnected player's flight freezes; a resume
 within grace waits ready at the same spot with no heart spent. When grace expires the player is
 DNF. Exact ties in the ranking are ordered at random
-([0050](decisions/0050-random-order-for-exact-ties.md)). The phone compares each settled
+([0050](../KnowledgeBase/Architecture/Decisions/0050-random-order-for-exact-ties.md)). The phone compares each settled
 state with its own prediction for that tick and replays its taps only when they differ.
 
 ## Bubbles and jellyfishes 3D

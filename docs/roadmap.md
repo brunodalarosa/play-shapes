@@ -2,13 +2,13 @@
 
 What is done, what comes next, what is waiting, and which bugs are known. The project owners
 decide what goes here. A change that finishes or adds work updates this document. The reasons
-behind the choices are in [decisions/](decisions/README.md).
+behind the choices are in [decisions/](../KnowledgeBase/Architecture/Decisions/Decisions.md).
 
 ## The goal
 
 Many minigames built from shared parts, especially input, and quick iteration on new and
 existing ones. The game keeps playing the same while the code is reshaped; see
-[decision 0001](decisions/0001-evolve-the-code.md).
+[decision 0001](../KnowledgeBase/Architecture/Decisions/0001-evolve-the-code.md).
 
 ## Done: making the project safe to change
 
@@ -23,78 +23,78 @@ existing ones. The game keeps playing the same while the code is reshaped; see
 - No ticket numbers anywhere, with no exemptions: the names inside the Cubio Blender
   source were the last.
 - One shared base for the test scripts
-  ([0023](decisions/0023-shared-test-base.md)). A script error, or anything a test still
+  ([0023](../KnowledgeBase/Architecture/Decisions/0023-shared-test-base.md)). A script error, or anything a test still
   holds at exit, fails the check at once.
 
 ## Done: the refactor so far
 
-- One folder per minigame ([0015](decisions/0015-one-folder-per-minigame.md)), and a catalog
+- One folder per minigame ([0015](../KnowledgeBase/Architecture/Decisions/0015-one-folder-per-minigame.md)), and a catalog
   of minigames that the lobby, the launch rules, the ready screen and the debug menu read
-  ([0024](decisions/0024-minigame-catalog.md)).
+  ([0024](../KnowledgeBase/Architecture/Decisions/0024-minigame-catalog.md)).
 - The phone client bundled into one script, so a new module needs no route and no export
-  rule ([0016](decisions/0016-bundle-the-phone-client.md)).
+  rule ([0016](../KnowledgeBase/Architecture/Decisions/0016-bundle-the-phone-client.md)).
 - One boot of Essential and Optional steps, so a scene started on its own loads only what it
-  asks for ([0053](decisions/0053-boot-steps-and-entry-points.md)).
+  asks for ([0053](../KnowledgeBase/Architecture/Decisions/0053-boot-steps-and-entry-points.md)).
 
 ## The refactor, in order
 
 This is what comes next.
 
 1. Split the phone client's largest module, `app.ts`. The client is already bundled into
-   one file ([0016](decisions/0016-bundle-the-phone-client.md)).
+   one file ([0016](../KnowledgeBase/Architecture/Decisions/0016-bundle-the-phone-client.md)).
 2. The input pipeline: one message for gameplay input and reusable controls
-   ([0017](decisions/0017-one-input-message.md)). The late-input bugs below belong here,
+   ([0017](../KnowledgeBase/Architecture/Decisions/0017-one-input-message.md)). The late-input bugs below belong here,
    and so does one shared phone helper for the browser tests, which this step rewrites.
 3. A shared round lifecycle and a stage kit.
 4. A shared character component, and screens rebuilt with containers and a theme
-   ([0018](decisions/0018-ui-with-containers.md)).
+   ([0018](../KnowledgeBase/Architecture/Decisions/0018-ui-with-containers.md)).
 5. Typed classes throughout the host. It starts with the lint list of files still allowed to
    declare a dictionary, and ends when only the two edges remain
-   ([0019](decisions/0019-typed-classes.md)).
+   ([0019](../KnowledgeBase/Architecture/Decisions/0019-typed-classes.md)).
 6. Tools for faster iteration: a control route for quick tests
-   ([0004](decisions/0004-end-to-end-test.md)), a short-round tuning preset, screenshot
+   ([0004](../KnowledgeBase/Architecture/Decisions/0004-end-to-end-test.md)), a short-round tuning preset, screenshot
    comparison against references, bot phones that speak the protocol, and free ports in
    place of the hard-coded ones in the tests.
 
 Each step gives the tests of the code it reshapes proper ways into that code. When the last
 one has, the `private-access` lint rule is turned back on for `tests/`
-([0007](decisions/0007-lint-rules-and-exceptions.md)).
+([0007](../KnowledgeBase/Architecture/Decisions/0007-lint-rules-and-exceptions.md)).
 
 After the input pipeline: bots that fill a game with players
-([0008](decisions/0008-bots.md)).
+([0008](../KnowledgeBase/Architecture/Decisions/0008-bots.md)).
 
 ## The 3D rework
 
 The game is being rebuilt with 3D assets, starting with the Playground lobby. The lobby is a
 3D café plaza where real-time Cubios move as plane-locked Jolt bodies with the unchanged phone
-controls ([0042](decisions/0042-plaza-lobby-jolt-plane.md)). Cubio is a cube with a small bevel;
+controls ([0042](../KnowledgeBase/Architecture/Decisions/0042-plaza-lobby-jolt-plane.md)). Cubio is a cube with a small bevel;
 the lobby, Bubbles, the Ready screen and phone setup share its live model and original rig.
 The rendered animation sheets and Animation Lab are retired.
 
 The café roof carries the logo as a 3D sign traced from the approved artwork, and the
-billboard shows only the join QR ([0041](decisions/0041-rooftop-logo-sign.md)).
+billboard shows only the join QR ([0041](../KnowledgeBase/Architecture/Decisions/0041-rooftop-logo-sign.md)).
 
 Minigame 004, Bubbles and jellyfishes 3D, replaced the retired 2D version, 002: a from-scratch
 3D rebuild without the spin move, on Jolt physics with plane-locked bodies
-([0034](decisions/0034-bubbles-3d-jolt-plane.md)), with a three.js view of each player's bubble
-on the phone ([0035](decisions/0035-phone-three-js.md)). Its design is in
+([0034](../KnowledgeBase/Architecture/Decisions/0034-bubbles-3d-jolt-plane.md)), with a three.js view of each player's bubble
+on the phone ([0035](../KnowledgeBase/Architecture/Decisions/0035-phone-three-js.md)). Its design is in
 `docs/game-design-documents/Minigames/004/`. It awaits physical-phone checks and the owner's
 play review; tuning values are provisional.
 
 Minigame 005, Tilt Shift 3D, replaced the retired 2D version, 003: the same game
-on plane-locked Jolt physics ([0038](decisions/0038-tilt-shift-3d-full-width-frame.md)), with
+on plane-locked Jolt physics ([0038](../KnowledgeBase/Architecture/Decisions/0038-tilt-shift-3d-full-width-frame.md)), with
 each player shown as their own coloured paddle built in code
-([0036](decisions/0036-tilt-shift-3d-generated-paddle.md)) and carrying a part-composed,
-expressive face ([0037](decisions/0037-shape-face-system.md)), in a full-width toy factory.
+([0036](../KnowledgeBase/Architecture/Decisions/0036-tilt-shift-3d-generated-paddle.md)) and carrying a part-composed,
+expressive face ([0037](../KnowledgeBase/Architecture/Decisions/0037-shape-face-system.md)), in a full-width toy factory.
 
 Cubio wears the same shape face, drawn on an anchor in its model on host and phone
-([0043](decisions/0043-cubio-shape-face.md)). Every face is named for its emoji and drawn to the
+([0043](../KnowledgeBase/Architecture/Decisions/0043-cubio-shape-face.md)). Every face is named for its emoji and drawn to the
 owner's originals' measurements, and Cubio shows `face_slightly_smiling`
-([0044](decisions/0044-one-face-style.md)). The F12 Shape Characters lab reviews colours,
+([0044](../KnowledgeBase/Architecture/Decisions/0044-one-face-style.md)). The F12 Shape Characters lab reviews colours,
 clips and faces and saves the face's default placement.
 
 Each phone shows the player's own paddle in 3D. 005 has its own workshop tab and F12 review, and
-launches through a catalog session script ([0039](decisions/0039-minigame-session-scripts.md)).
+launches through a catalog session script ([0039](../KnowledgeBase/Architecture/Decisions/0039-minigame-session-scripts.md)).
 It awaits physical-phone checks and the owner's play review; tuning values are provisional. See
 [the minigame guide](../minigames/005_3d_tilt_shift/README.md).
 
@@ -104,29 +104,29 @@ It awaits physical-phone checks and the owner's play review; tuning values are p
   pickups, for 1 to 10 players. Designed in `docs/game-design-documents/Minigames/006/`. Its
   cave art, phone audio and booklet preview are not built.
   - Its launch exists: 1 to 10 players go through the Pre-minigame screen into the race scene
-    and back to the lobby ([0049](decisions/0049-minimum-players-per-minigame.md)).
+    and back to the lobby ([0049](../KnowledgeBase/Architecture/Decisions/0049-minimum-players-per-minigame.md)).
   - Its flight, hearts and seeded course exist as shared code, the flight proven identical on
-    host and phone ([0047](decisions/0047-shared-deterministic-simulation.md)).
+    host and phone ([0047](../KnowledgeBase/Architecture/Decisions/0047-shared-deterministic-simulation.md)).
   - The host runs the whole race from taps that carry their tick
-    ([0048](decisions/0048-predicted-input-carries-a-tick.md)).
+    ([0048](../KnowledgeBase/Architecture/Decisions/0048-predicted-input-carries-a-tick.md)).
   - Each phone flies its own predicted Cubio with its hearts, timer and result, on a
     placeholder course.
   - The shared screen follows the leader with a zooming camera, bubbles for players behind,
     dithered overlaps, place badges and the timer, on the same placeholder course.
   - Finishers teleport to a placeholder stone podium past the finish line, and the results
-    panel lists every place beside it ([0056](decisions/0056-podium-arrivals-teleport.md)).
+    panel lists every place beside it ([0056](../KnowledgeBase/Architecture/Decisions/0056-podium-arrivals-teleport.md)).
   - Its workshop exists on the shared workshop window, with autopilots, quick setups and the
     designer flying through the real phone page.
-- Minigame workshops ([0052](decisions/0052-a-workshop-for-every-minigame.md)): the shared
+- Minigame workshops ([0052](../KnowledgeBase/Architecture/Decisions/0052-a-workshop-for-every-minigame.md)): the shared
   window exists, with Flappy Race's workshop on it. Tilt Shift 3D and Bubbles and jellyfishes
   3D move onto it next. The Phone view pops out once godot-wry releases its fix for windows
-  ([0054](decisions/0054-workshop-phone-view-in-godot-wry.md)).
+  ([0054](../KnowledgeBase/Architecture/Decisions/0054-workshop-phone-view-in-godot-wry.md)).
 - Bot players in the full game, sharing one implementation with the workshop autopilots; to be
   designed. Workshop autopilots have one skill, Good, until then.
 - The first release, `0.1.0`: decide where the project and the Windows package record the
   version, then follow [branching.md](branching.md#a-release).
 - Cloud CI, if hosted runners turn out to be free for this repository
-  ([0021](decisions/0021-no-cloud-ci.md)).
+  ([0021](../KnowledgeBase/Architecture/Decisions/0021-no-cloud-ci.md)).
 - The end-to-end test on WebKit, in the `--full` run.
 - Mark `web/public/` as generated for GitHub's diffs.
 - Remove 21 `.uid` files whose scripts no longer exist.
