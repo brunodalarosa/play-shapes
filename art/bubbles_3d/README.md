@@ -3,7 +3,7 @@
 Source models for minigame 004. The
 [asset sources guide](../../docs/game-design-documents/Minigames/004/004%20-%20Asset%20sources.md)
 decides each source and change; [scene composition](../../docs/game-design-documents/Minigames/004/004%20-%20Scene%20composition.md)
-decides placement. Nothing here is used by a scene yet; [pending reviews](../../docs/pending-reviews.md)
+decides placement. Nothing here is used by a scene yet; [pending reviews](../../KnowledgeBase/Notebook/Pending%20Reviews.md)
 lists what still needs the owner.
 
 ## Unchanged library copies

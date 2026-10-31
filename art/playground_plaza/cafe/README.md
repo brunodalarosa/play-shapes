@@ -65,4 +65,4 @@ Previews use a near-frontal orthographic camera with a gentle downward tilt, plu
 angles. They establish technical composition, not final-camera readability or visual approval.
 Godot import, collision, integration performance, roof reachability and multiplayer play
 remain outside this delivery. Owner review is listed in
-[pending reviews](../../../docs/pending-reviews.md#playground-plaza-cafe).
+[pending reviews](../../../KnowledgeBase/Notebook/Pending%20Reviews.md#playground-plaza-cafe).

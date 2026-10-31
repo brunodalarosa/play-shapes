@@ -95,6 +95,8 @@ function main() {
     }
 
     const fields = frontmatter(text) ?? {};
+    // A decision record is history: it says why, as of its date, and is never re-verified.
+    if (Array.isArray(fields.tags) && fields.tags.includes("decision")) continue;
     const anchors = Array.isArray(fields.code) ? fields.code : [];
     const verified = typeof fields.verified === "string" ? fields.verified : "";
     const flags = [];

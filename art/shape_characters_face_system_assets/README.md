@@ -3,7 +3,7 @@
 The owner's face system for Shape Characters: parts that compose into expressive faces, first
 used by minigame 005. The
 [asset sources guide](../../docs/game-design-documents/Minigames/005/005%20-%20Asset%20sources.md)
-describes the original sources. Tilt Shift 3D uses this system; [pending reviews](../../docs/pending-reviews.md)
+describes the original sources. Tilt Shift 3D uses this system; [pending reviews](../../KnowledgeBase/Notebook/Pending%20Reviews.md)
 lists what still needs the owner.
 
 ## Sources

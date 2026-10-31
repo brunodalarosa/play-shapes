@@ -3,7 +3,7 @@
 Source models for minigame 005. The
 [asset sources guide](../../docs/game-design-documents/Minigames/005/005%20-%20Asset%20sources.md)
 decides each source and change; [scene composition](../../docs/game-design-documents/Minigames/005/005%20-%20Scene%20composition.md)
-decides placement. [Pending reviews](../../docs/pending-reviews.md) lists what still needs the
+decides placement. [Pending reviews](../../KnowledgeBase/Notebook/Pending%20Reviews.md) lists what still needs the
 owner.
 
 ## Crate, unchanged

@@ -41,4 +41,4 @@ model here, copy it there too.
 
 The lobby scene places, scales and orients every prop; the models themselves are unchanged.
 Collision comes from landing markers in that scene, not from the meshes. See
-[architecture.md](../../docs/architecture.md#lobby).
+[architecture.md](../../KnowledgeBase/Notebook/Codebase.md#lobby).

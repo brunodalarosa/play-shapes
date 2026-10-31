@@ -78,6 +78,6 @@ work or phone traffic, regardless of roster size.
 Review renders use a near-frontal orthographic camera with a gentle downward tilt,
 plus inspection angles. They establish technical composition. Owner visual acceptance,
 final-camera placement and readability remain pending in
-[pending reviews](../../../docs/pending-reviews.md#playground-plaza-billboard).
+[pending reviews](../../../KnowledgeBase/Notebook/Pending%20Reviews.md#playground-plaza-billboard).
 Godot import, collision, scene conversion, QR scanning and ten-player performance
 are outside this standalone asset delivery.

@@ -69,5 +69,5 @@ speed it closed in at, which the faces use; it never changes a score.
 `tests/tilt_shift_3d_rotation_contact_test.gd` turns a paddle through full turns against a
 resting ball and requires less than half a ball radius of transient penetration.
 `tests/tilt_shift_3d_physics_cost_check.gd` and `tests/tilt_shift_3d_performance_check.gd`
-measure the arena and the shared screen; [verification](../../../docs/verification.md) names
+measure the arena and the shared screen; [verification](../../../KnowledgeBase/Notebook/Tooling%20and%20Verification/Verification.md) names
 the commands.

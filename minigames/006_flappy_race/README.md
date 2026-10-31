@@ -26,7 +26,7 @@ mirrored for the phone in `web/src/flappy_flight/`.
   clock ([decision 0048](../../KnowledgeBase/Architecture/Decisions/0048-predicted-input-carries-a-tick.md)).
   `flappy_race_racer.gd` is one player's race state.
 - `flappy_race_protocol.gd` takes `flappy_tap` and sends each phone its snapshot, its settled
-  flight and its events, as [protocol.md](../../docs/protocol.md#flappy-race) describes.
+  flight and its events, as [protocol.md](../../KnowledgeBase/Notebook/Minigames/006%20Flappy%20Race/006%20Messages.md) describes.
 - `flappy_race_course.gd` generates a course from a seed and the tuning.
 - `flappy_race_tuning.gd` and `flappy_race_course_tuning.gd` are the tuning scripts; each
   preset is one file in `tuning/`, described in [its README](tuning/README.md).

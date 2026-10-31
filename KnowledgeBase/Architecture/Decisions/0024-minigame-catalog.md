@@ -24,5 +24,5 @@ A definition holds the paths of the minigame's scene and of its ready-screen con
 - Adding a minigame is a folder, a definition and one entry in the catalog.
 - A path in a definition is a string. Moving the file it names does not update it; `tests/minigame_catalog_test.gd` fails when a path leads nowhere.
 - `Tuning/Active Presets.tres` keeps one typed slot per minigame. It is the one place where every active preset is seen and switched, and a slot shared by all minigames would accept the wrong minigame's preset.
-- The phone asset routes and the export policy's required paths still name each minigame by hand. The steps that rewrite them are on the [roadmap](../../../docs/roadmap.md).
+- The phone asset routes and the export policy's required paths still name each minigame by hand. The steps that rewrite them are on the [[Roadmap|roadmap]].
 - The session host's four functions named after Bubbles are gone. A minigame calls the general ones with its own id.

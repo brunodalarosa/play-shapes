@@ -185,6 +185,6 @@ Condensed from AGENTS.md and the documents it links.
 - Run `node tools/setup.mjs` in a fresh worktree before formatting, linting or checking.
 - Known Windows flakes: some Tilt Shift tests can exit `3221225477` at native shutdown with zero
   failures, and the bundle rewrite can hit a user-mapped-section lock. Both count as failures
-  to report separately, never as passes ([roadmap](docs/roadmap.md#known-bugs)).
+  to report separately, never as passes ([roadmap](KnowledgeBase/Notebook/Roadmap.md#known-bugs)).
 - Close any running host before the browser suite; it uses ports 18080/18081 and the
   end-to-end test uses 18200/18201.

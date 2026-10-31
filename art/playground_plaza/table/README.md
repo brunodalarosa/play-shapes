@@ -77,6 +77,6 @@ saturation in inspection previews; final Godot lighting remains a later scene de
 The owner approved the revised table's visual result on 2026-10-13, including its
 50% narrower stem and retained height, tabletop and foot. Final-camera readability,
 middle-tier reachability, ten-player play and game feel remain pending in
-[pending reviews](../../../docs/pending-reviews.md#playground-plaza-cafe-table).
+[pending reviews](../../../KnowledgeBase/Notebook/Pending%20Reviews.md#playground-plaza-cafe-table).
 Godot import, collisions, scene conversion and gameplay changes are outside this delivery.
 Pack-specific license evidence must be resolved before publication.

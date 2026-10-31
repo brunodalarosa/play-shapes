@@ -26,6 +26,6 @@ The check command fails a script on any line Godot prints at exit about somethin
 - A script error returns to the base, which quits. Godot returns to the caller of a function that errors, also across `await`, and the base relies on that.
 - Before quitting, the base waits for two audio mixes. A sound still playing is let go by the audio thread, and frames pass faster than mixes when nothing is drawn; without the wait a test that played a sound held it at exit in some runs and not in others.
 - A test waiting on a signal that never comes still runs into the check command's timeout.
-- The hosts a browser test starts, and the export test that runs inside the editor, do not use the base. [verification.md](../../../docs/verification.md#test-scripts) lists them.
+- The hosts a browser test starts, and the export test that runs inside the editor, do not use the base. [[Verification#Test scripts|verification.md]] lists them.
 - The export test is excused the lines about things held at exit, because the editor holds a great deal when a script quits it.
-- The ports, the browser tests' phone helper and the tests' reach into private members were planned with this change. They moved into the refactor steps that rewrite the same tests; the [roadmap](../../../docs/roadmap.md) says where.
+- The ports, the browser tests' phone helper and the tests' reach into private members were planned with this change. They moved into the refactor steps that rewrite the same tests; the [[Roadmap|roadmap]] says where.

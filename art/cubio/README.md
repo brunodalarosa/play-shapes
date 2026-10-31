@@ -76,7 +76,7 @@ These are authoring review images; runtime animation uses the GLB directly.
 
 The Shape Characters lab lists every exported clip. Capture four poses per clip, with the
 runtime face, using `tests/cubio_clips_visual_check.gd` as described in
-[verification](../../docs/verification.md#render-helpers). Its output is under
+[verification](../../KnowledgeBase/Notebook/Tooling%20and%20Verification/Verification.md#render-helpers). Its output is under
 `test-results/cubio/clips/`; `-- --output=res://test-results/cubio/before` chooses another folder.
 
 After exporting, rebuild the phone client. Refresh app icons only when the character's

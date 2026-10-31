@@ -1,12 +1,12 @@
 # Contributor guidance
 
-This directory is the Godot project root. Work on a new local `feature/<name>` branch started from `develop`, as [docs/branching.md](docs/branching.md) describes, and commit implementation changes locally. Do not push or open a pull request until the project owner approves publication.
+This directory is the Godot project root. Work on a new local `feature/<name>` branch started from `develop`, as [docs/branching.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Branching.md) describes, and commit implementation changes locally. Do not push or open a pull request until the project owner approves publication.
 
 ## Working method
 
 A change has two plans, and they answer different questions.
 
-- **The feature plan is the task.** It says what a player or contributor gets, what counts as done, and which approvals only a person can give. It is stated in a sentence, in [docs/roadmap.md](docs/roadmap.md) or by a project owner, and belongs to the project owner. It does not say how the code changes.
+- **The feature plan is the task.** It says what a player or contributor gets, what counts as done, and which approvals only a person can give. It is stated in a sentence, in [docs/roadmap.md](KnowledgeBase/Notebook/Roadmap.md) or by a project owner, and belongs to the project owner. It does not say how the code changes.
 - **The implementation plan is the branch's.** It says how the code changes to deliver the task. It is written after the task is understood and before any code, and it is approved before implementation starts.
 
 Every non-trivial task runs through the five phases below. Phases 1 and 2 end at a checkpoint: stop and wait for an answer. Scale each phase to the task; a one line plan is a valid plan for a one line change.
@@ -42,9 +42,9 @@ If planning shows the task itself should change, stop and say so. Do not reshape
 
 ### 4. Verify
 
-- Run the checks under Setup and verification, and the focused checks in [docs/verification.md](docs/verification.md) for what was touched.
-- Report what changed, what was verified under which [evidence label](docs/verification.md#evidence-labels), what still needs a person, and what was documented.
-- Add what still needs a person to [docs/pending-reviews.md](docs/pending-reviews.md), and remove an entry there when its review is done.
+- Run the checks under Setup and verification, and the focused checks in [docs/verification.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Verification.md) for what was touched.
+- Report what changed, what was verified under which [evidence label](KnowledgeBase/Notebook/Tooling%20and%20Verification/Verification.md#evidence-labels), what still needs a person, and what was documented.
+- Add what still needs a person to [docs/pending-reviews.md](KnowledgeBase/Notebook/Pending%20Reviews.md), and remove an entry there when its review is done.
 - State failures plainly, with output. A task is not done because the code is written.
 
 ### 5. Pull request
@@ -57,7 +57,7 @@ A pull request is history, read later by someone who was not there. Write what i
 
 - Godot is the authoritative PC host. Phones are TypeScript/HTML/CSS browser clients over HTTP and WebSockets. Clients send input and choices; only the host changes game state.
 - Use typed GDScript where practical, small reusable scenes, composition, signals for loose coupling, and Control/Container nodes for UI. Avoid fixed viewport dimensions and duplicate behavior. Explain complex code in comments.
-- Layout is decided by the formatters, not by hand. Run `node tools/format.mjs` before committing. Separate the logical steps inside a function with a blank line; the formatters keep those lines but do not add them. If the GDScript formatter refuses a file, see [what to do](docs/formatting-and-linting.md#the-gdscript-formatter).
+- Layout is decided by the formatters, not by hand. Run `node tools/format.mjs` before committing. Separate the logical steps inside a function with a blank line; the formatters keep those lines but do not add them. If the GDScript formatter refuses a file, see [what to do](KnowledgeBase/Notebook/Tooling%20and%20Verification/Formatting%20and%20Linting.md#the-gdscript-formatter).
 - Name things for what they are. Ticket and task numbers do not belong anywhere in the repository: not in file names, comments, documents, test names or output folders.
 - Run `node tools/lint.mjs` as well. It reports naming, unused code and other mistakes in GDScript, TypeScript and JavaScript, and every line over 100 characters that the formatters could not shorten. Shorten such a line by naming part of the expression on the line before, by wrapping the expression in parentheses, or by joining a long string from shorter ones; move a trailing comment above its statement. Do not reword a message or a test title to make it fit.
 - Preserve the bundled runtime assets and `web/public/` output. Rebuild the browser bundle after changing `web/src/`.
@@ -73,7 +73,7 @@ The canonical editable Cubio source and current export tools live in `art/cubio/
 ## Setup and verification
 
 - Use Godot 4.7.2 or newer with the GL Compatibility renderer, and Node 22 or newer. Run `node tools/setup.mjs` after cloning and whenever a tool may be missing: it checks the required tools, reports the ones some tasks need, and installs `web/` dependencies, Playwright's Chromium and the GDScript formatter. [README.md](README.md#requirements) lists every tool. Set `GODOT_BIN` to a Godot executable when it is not on PATH as `godot`.
-- Run `node tools/check.mjs` before reporting a change as verified. It runs every Godot test script, the format, lint and document checks, the tests of `tools/`, the browser type check and tests, confirms `web/public/` matches a fresh build, and plays Tilt Shift 3D with two emulated phones against the real host. The Bubbles and jellyfishes 3D phone journey is a known flaky test and runs only on request ([verification](docs/verification.md#the-end-to-end-test)). It prints one line per failure and writes full output under `test-results/check/`.
+- Run `node tools/check.mjs` before reporting a change as verified. It runs every Godot test script, the format, lint and document checks, the tests of `tools/`, the browser type check and tests, confirms `web/public/` matches a fresh build, and plays Tilt Shift 3D with two emulated phones against the real host. The Bubbles and jellyfishes 3D phone journey is a known flaky test and runs only on request ([verification](KnowledgeBase/Notebook/Tooling%20and%20Verification/Verification.md#the-end-to-end-test)). It prints one line per failure and writes full output under `test-results/check/`.
 - Pass name filters for a focused run (`node tools/check.mjs bubbles_3d`), `--full` for extended coverage, and `--release` to add the Windows export test, which needs export templates.
 - Run a single Godot script with `godot --headless --path . --script tests/<name>.gd`. For browser work, run `npm run check`, `npm run build`, and `npm test` in `web/`.
 - Keep changes scoped. When setup, architecture, protocols or verification steps change, update the document for that area in the same change. `node tools/docs.mjs` checks the rules documents follow.
@@ -84,19 +84,19 @@ The canonical editable Cubio source and current export tools live in `art/cubio/
 Read the one document for the area you are working on, not all of them. [DEVELOPMENT.md](DEVELOPMENT.md) describes each and states the rules they follow.
 
 - [README.md](README.md): what to install, how to play.
-- [docs/overview.md](docs/overview.md): what exists today, running the project.
-- [docs/architecture.md](docs/architecture.md): which script or scene owns what.
-- [docs/protocol.md](docs/protocol.md): messages, HTTP routes, limits.
-- [docs/verification.md](docs/verification.md): the check command, tests, evidence labels.
-- [docs/pending-reviews.md](docs/pending-reviews.md): what still needs a person or a real phone.
-- [docs/roadmap.md](docs/roadmap.md): what is done, what is next, known bugs.
+- [docs/overview.md](KnowledgeBase/Architecture/Play%20Shapes%20Overview.md): what exists today, running the project.
+- [docs/architecture.md](KnowledgeBase/Notebook/Codebase.md): which script or scene owns what.
+- [docs/protocol.md](KnowledgeBase/Architecture/Host%20and%20Session/Message%20Protocol.md): messages, HTTP routes, limits.
+- [docs/verification.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Verification.md): the check command, tests, evidence labels.
+- [docs/pending-reviews.md](KnowledgeBase/Notebook/Pending%20Reviews.md): what still needs a person or a real phone.
+- [docs/roadmap.md](KnowledgeBase/Notebook/Roadmap.md): what is done, what is next, known bugs.
 - [docs/decisions/](KnowledgeBase/Architecture/Decisions/Decisions.md): why things are the way they are. Add a record when a change makes a choice whose reason will not show in the code.
-- [docs/branching.md](docs/branching.md): branches, merging, releases and version numbers.
-- [docs/formatting-and-linting.md](docs/formatting-and-linting.md): format, lint and document rules.
-- [docs/browser-build.md](docs/browser-build.md): building the phone client.
-- [docs/phone-client.md](docs/phone-client.md): app install, touch handling, the error panel.
-- [docs/platform-phone-controller.md](docs/platform-phone-controller.md): joystick, action button, platform movement.
-- [docs/motion-input.md](docs/motion-input.md): phone sensors and the motion lab.
-- [docs/networking.md](docs/networking.md): LAN, connection problems, network settings.
-- [docs/local-https.md](docs/local-https.md): HTTPS for test phones.
-- [docs/standalone-build.md](docs/standalone-build.md): the Windows package.
+- [docs/branching.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Branching.md): branches, merging, releases and version numbers.
+- [docs/formatting-and-linting.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Formatting%20and%20Linting.md): format, lint and document rules.
+- [docs/browser-build.md](KnowledgeBase/Notebook/Phone%20Client/Browser%20Build.md): building the phone client.
+- [docs/phone-client.md](KnowledgeBase/Notebook/Phone%20Client/Phone%20Web%20App.md): app install, touch handling, the error panel.
+- [docs/platform-phone-controller.md](KnowledgeBase/Notebook/Playground%20Lobby/Platform%20Controller.md): joystick, action button, platform movement.
+- [docs/motion-input.md](KnowledgeBase/Notebook/Phone%20Client/Motion%20Input.md): phone sensors and the motion lab.
+- [docs/networking.md](KnowledgeBase/Notebook/Host%20and%20Session/Networking.md): LAN, connection problems, network settings.
+- [docs/local-https.md](KnowledgeBase/Notebook/Phone%20Client/Local%20HTTPS.md): HTTPS for test phones.
+- [docs/standalone-build.md](KnowledgeBase/Notebook/Tooling%20and%20Verification/Standalone%20Build.md): the Windows package.

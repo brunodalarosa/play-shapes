@@ -44,7 +44,7 @@ Some tasks need more. The setup script reports these without failing:
 | Tool | Needed for |
 | --- | --- |
 | Godot export templates matching the installed Godot | The standalone Windows build and `node tools/check.mjs --release` |
-| mkcert | Local HTTPS for motion input; `node tools/local_https.mjs download` fetches it, see [docs/local-https.md](docs/local-https.md) |
+| mkcert | Local HTTPS for motion input; `node tools/local_https.mjs download` fetches it, see [docs/local-https.md](KnowledgeBase/Notebook/Phone%20Client/Local%20HTTPS.md) |
 | GitHub CLI (`gh`) | Pull requests from the terminal |
 | Python 3 with Pillow, Blender | Regenerating art; see [art/cubio/README.md](art/cubio/README.md) and [art/bubbles_3d/README.md](art/bubbles_3d/README.md) |
 
@@ -161,8 +161,8 @@ The generated files in `web/public/` are the files Godot serves to phones.
   layout, orientation, and touch behavior still need broader device coverage.
 - Minigames still need their owner-led phone and game-feel reviews. No validation here
   guarantees every phone, browser, Wi-Fi configuration, or accessibility
-  setup. See [docs/pending-reviews.md](docs/pending-reviews.md) for what still
-  needs a person, and [docs/networking.md](docs/networking.md) when a phone
+  setup. See [docs/pending-reviews.md](KnowledgeBase/Notebook/Pending%20Reviews.md) for what still
+  needs a person, and [docs/networking.md](KnowledgeBase/Notebook/Host%20and%20Session/Networking.md) when a phone
   cannot connect.
 
 ## Project notes

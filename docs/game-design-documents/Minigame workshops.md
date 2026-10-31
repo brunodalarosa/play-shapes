@@ -6,7 +6,7 @@ workshop is where game feel is decided. This document is the design every worksh
 each minigame adapts only the parts listed under [What each minigame supplies](#what-each-minigame-supplies).
 Why: [decision 0052](../../KnowledgeBase/Architecture/Decisions/0052-a-workshop-for-every-minigame.md).
 
-![The workshop window with its four panels](../images/minigame-workshop/main-window.png)
+![The workshop window with its four panels](../../KnowledgeBase/_Attachments/minigame-workshop/main-window.png)
 
 ## Same as the real game
 
@@ -43,7 +43,7 @@ Why: [decision 0052](../../KnowledgeBase/Architecture/Decisions/0052-a-workshop-
 - Which panels are out, their monitors, positions and sizes are remembered. Reset layout brings
   every panel back into one window.
 
-![Panels spread across two monitors](../images/minigame-workshop/two-monitors.png)
+![Panels spread across two monitors](../../KnowledgeBase/_Attachments/minigame-workshop/two-monitors.png)
 
 ## The panels
 

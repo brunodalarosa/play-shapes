@@ -150,4 +150,4 @@ editor launches, verifies save/reopen and preview cleanup, and writes captures b
 
 Its captures are real editor/runtime images with synthetic input. They establish
 composition and implementation behavior. Owner usability, snap/tolerance preferences,
-fairness and game feel remain in [pending reviews](../../../docs/pending-reviews.md).
+fairness and game feel remain in [pending reviews](../../../KnowledgeBase/Notebook/Pending%20Reviews.md).

@@ -38,4 +38,4 @@ and final when sent.
 - A late tap gives exactly the run an on-time tap gives, with no history and no re-simulation.
 - The window is a tuning value; physical-phone play decides it.
 - The first user is Flappy Race's `flappy_tap`, described in
-  [protocol.md](../../../docs/protocol.md#flappy-race).
+  [[006 Messages|protocol.md]].
