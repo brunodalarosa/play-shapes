@@ -5,23 +5,34 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   PARAGRAPH_LENGTH,
+  VAULT,
   anchors,
+  frontmatter,
+  frontmatterProblems,
   hasTicketName,
+  headingAnchor,
   isProjectDocument,
+  isVaultPage,
   localLinks,
   paragraphs,
   ticketLines,
+  vaultName,
+  wikiLinks,
 } from "./doc_rules.mjs";
 import { root } from "./environment.mjs";
 import { repositoryFiles } from "./sources.mjs";
 
 const USAGE = `Usage: node tools/docs.mjs
 
-Checks every Markdown file outside addons/ and game-design-documents/: each
-link inside the repository must point to an existing file, and to an existing
-heading when it names one, and no paragraph, list item or table row may be
-longer than ${PARAGRAPH_LENGTH} characters. Also reports a ticket number in any text
-file or file name. Prints one finding per line and fails when there is any.
+Checks every Markdown file outside addons/: each link inside the repository
+must point to an existing file, and to an existing heading when it names one,
+and no paragraph, list item or table row may be longer than ${PARAGRAPH_LENGTH} characters.
+Also reports a ticket number in any text file or file name.
+
+In ${VAULT} every page needs valid frontmatter, file names must be unique, and a
+[[wikilink]] that names an existing page must name an existing heading. A
+wikilink to a page that does not exist yet is a gap: listed, but not a failure.
+Prints one finding per line and fails when there is any.
 `;
 
 /** Reads a file as text, or returns null when it holds binary data. */
@@ -52,6 +63,17 @@ function main() {
     return headings.get(file);
   };
 
+  const vaultFiles = new Map();
+  for (const file of files.filter((candidate) => candidate.startsWith(VAULT))) {
+    const name = vaultName(file);
+    if (vaultFiles.has(name)) {
+      findings.push(`${file}:1: duplicate-name: ${vaultFiles.get(name)} has the same name`);
+    } else {
+      vaultFiles.set(name, file);
+    }
+  }
+  const gaps = new Set();
+
   for (const file of files) {
     if (hasTicketName(file)) {
       findings.push(`${file}:1: ticket-id: The file name carries a ticket number`);
@@ -74,6 +96,23 @@ function main() {
       );
     }
 
+    if (isVaultPage(file)) {
+      for (const problem of frontmatterProblems(frontmatter(text))) {
+        findings.push(`${file}:1: frontmatter: ${problem}`);
+      }
+    }
+
+    if (file.startsWith(VAULT)) {
+      for (const link of wikiLinks(text)) {
+        const target = vaultFiles.get(link.name);
+        if (!target) {
+          if (link.name) gaps.add(link.name);
+        } else if (link.heading && !anchorsOf(target).includes(headingAnchor(link.heading))) {
+          findings.push(`${file}:${link.line}: broken-link: [[${link.name}#${link.heading}]]`);
+        }
+      }
+    }
+
     for (const link of localLinks(file, text)) {
       if (!known.has(link.path)) {
         findings.push(`${file}:${link.line}: broken-link: ${link.target} does not exist`);
@@ -83,6 +122,10 @@ function main() {
         }
       }
     }
+  }
+
+  if (gaps.size > 0) {
+    process.stdout.write(`Gaps, pages linked but not written: ${[...gaps].sort().join(", ")}\n`);
   }
 
   if (findings.length === 0) {
